@@ -30,15 +30,22 @@
        org.mule.runtime.extensions.spring.support;
    exports org.mule.runtime.module.extension.soap.internal.loader.property to
        org.mule.runtime.extensions.spring.support;
+   exports org.mule.runtime.module.extension.soap.internal.metadata to
+       org.mule.runtime.extensions.support;
    exports org.mule.runtime.module.extension.soap.internal.runtime.connection to
        org.mule.runtime.extensions.spring.support;
 
    requires java.inject;
    requires com.google.common;
 
-   opens org.mule.runtime.module.extension.soap.internal.runtime.connection to spring.core;
-   opens org.mule.runtime.module.extension.soap.api.runtime.connection.transport to spring.core;
-   opens org.mule.runtime.module.extension.soap.internal.runtime.operation to spring.core;
+   opens org.mule.runtime.module.extension.soap.api.runtime.connection.transport to
+       spring.core;
+   opens org.mule.runtime.module.extension.soap.internal.metadata to
+       org.mule.runtime.extensions.support;
+   opens org.mule.runtime.module.extension.soap.internal.runtime.connection to
+       spring.core;
+   opens org.mule.runtime.module.extension.soap.internal.runtime.operation to
+       spring.core;
 
    provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider with
        org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoaderProvider;
