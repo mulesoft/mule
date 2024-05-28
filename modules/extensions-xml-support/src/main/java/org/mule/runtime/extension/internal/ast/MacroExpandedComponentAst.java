@@ -9,6 +9,7 @@ package org.mule.runtime.extension.internal.ast;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getName;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsContextFactoryParameter;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsEnabled;
 
@@ -28,7 +29,6 @@ import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.error.ErrorMapping;
-import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,7 +49,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
   private static final String TLS_CONTEXT_CONFIG_PARAMETER_KEY = getTlsContextConfigParameterKey();
 
   private static String getTlsContextConfigParameterKey() {
-    return "#[vars." + InfrastructureTypeMapping.getMap().get(TlsContextFactory.class).getName() + "]";
+    return "#[vars." + getName(TlsContextFactory.class.getName()) + "]";
   }
 
   private final ComponentLocation location;

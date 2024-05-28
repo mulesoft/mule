@@ -13,10 +13,10 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getDslConfiguration;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getQName;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInfrastructure;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getDslConfiguration;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.loadExtension;
 

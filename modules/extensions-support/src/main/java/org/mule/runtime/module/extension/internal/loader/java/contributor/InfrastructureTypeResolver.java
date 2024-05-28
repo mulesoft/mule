@@ -8,9 +8,11 @@ package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 
+import static java.util.function.Function.identity;
+
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
-import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.InfrastructureType;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.InfrastructureType;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 
@@ -18,18 +20,19 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Resolves whether a {@link Type} is one of the considered as an Infrastructure Type ({@link InfrastructureTypeMapping})
+ * Resolves whether a {@link Type} is one of the considered as an Infrastructure Type.
  *
  * @since 4.4
  */
 public class InfrastructureTypeResolver {
 
-  private static final Map<Type, InfrastructureType> TYPE_MAPPING = InfrastructureTypeMapping.getMap().entrySet()
+  private static final Map<Type, InfrastructureType> TYPE_MAPPING = InfrastructureTypeUtils.getInfrastructureTypes()
       .stream()
-      .collect(toImmutableMap(entry -> new TypeWrapper(entry.getKey(),
-                                                       new DefaultExtensionsTypeLoaderFactory()
-                                                           .createTypeLoader(InfrastructureTypeMapping.class.getClassLoader())),
-                              Map.Entry::getValue));
+      .collect(toImmutableMap(infrastructureType -> new TypeWrapper(infrastructureType.getClazz(),
+                                                                    new DefaultExtensionsTypeLoaderFactory()
+                                                                        .createTypeLoader(InfrastructureTypeUtils.class
+                                                                            .getClassLoader())),
+                              identity()));
 
 
   public static Optional<InfrastructureType> getInfrastructureType(Type type) {

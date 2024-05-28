@@ -36,7 +36,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isF
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isReferableType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getNameMap;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.acceptsReferences;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.getChildKey;
@@ -83,6 +82,7 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
@@ -144,7 +144,6 @@ public abstract class ExtensionDefinitionParser {
   protected final DslSyntaxResolver dslResolver;
   private final Map<String, AttributeDefinition.Builder> parameters = new HashMap<>();
   private final List<ComponentBuildingDefinition> parsedDefinitions = new ArrayList<>();
-  protected final Map<String, String> infrastructureParameterMap = getNameMap();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   protected final Builder definitionBuilder;
@@ -932,7 +931,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   protected Optional<String> getInfrastructureParameterName(MetadataType fieldType) {
-    return getId(fieldType).map(infrastructureParameterMap::get);
+    return getId(fieldType).map(InfrastructureTypeUtils::getName);
   }
 
   private TypeConverter getTypeConverter(String name, MetadataType type, Object defaultValue, ExpressionSupport expressionSupport,

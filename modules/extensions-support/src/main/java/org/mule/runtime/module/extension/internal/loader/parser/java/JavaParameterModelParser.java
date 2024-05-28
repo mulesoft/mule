@@ -15,10 +15,10 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getQName;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
 import static org.mule.runtime.extension.privileged.semantic.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION;
 import static org.mule.runtime.extension.privileged.semantic.ConnectivityVocabulary.NTLM_PROXY_CONFIGURATION_PARAMETER;
 import static org.mule.runtime.extension.privileged.semantic.ConnectivityVocabulary.PROXY_CONFIGURATION_PARAMETER;
@@ -68,11 +68,11 @@ import org.mule.runtime.extension.api.annotation.param.stereotype.ComponentId;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
 import org.mule.runtime.extension.api.model.parameter.ImmutableExclusiveParametersModel;
 import org.mule.runtime.extension.api.property.DefaultImplementingTypeModelProperty;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
-import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -374,7 +374,7 @@ public class JavaParameterModelParser implements ParameterModelParser, HasExtens
           additionalModelProperties.add(new InfrastructureParameterModelProperty(infrastructureType.getSequence()));
           expressionSupport = NOT_SUPPORTED;
           getQName(infrastructureType.getName()).ifPresent(additionalModelProperties::add);
-          InfrastructureTypeMapping.getDslConfiguration(infrastructureType.getName())
+          InfrastructureTypeUtils.getDslConfiguration(infrastructureType.getName())
               .ifPresent(dsl -> dslConfiguration = of(dsl));
         }
       });
