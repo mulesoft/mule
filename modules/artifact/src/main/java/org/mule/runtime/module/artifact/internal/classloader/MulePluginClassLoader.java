@@ -8,7 +8,7 @@ package org.mule.runtime.module.artifact.internal.classloader;
 
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.net.URL;
 import java.util.HashSet;
@@ -35,7 +35,7 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader implements Wi
    * @param parent             the parent class loader for delegation
    * @param lookupPolicy       policy used to guide the lookup process. Non null
    */
-  public MulePluginClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
+  public MulePluginClassLoader(String artifactId, ArtifactPluginDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
                                ClassLoaderLookupPolicy lookupPolicy) {
     super(artifactId, artifactDescriptor, urls, parent, lookupPolicy);
   }
