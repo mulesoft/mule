@@ -8,6 +8,7 @@ package org.mule.module.artifact.classloader;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
 import java.lang.reflect.InvocationTargetException;
@@ -64,7 +65,10 @@ public class GroovyResourceReleaser implements ResourceReleaser {
       Object clazz = null;
       try {
         clazz = getTheClassMethod.invoke(classInfo);
-        removeClassMethod.invoke(null, clazz);
+        if (clazz.getClass().getClassLoader() == this.classLoader) {
+          removeClassMethod.invoke(null, clazz);
+        }
+
       } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
         String className = clazz instanceof Class ? ((Class) clazz).getName() : "Unknown";
         LOGGER.warn("Could not remove the {} class from the Groovy's InvokerHelper", className, e);
