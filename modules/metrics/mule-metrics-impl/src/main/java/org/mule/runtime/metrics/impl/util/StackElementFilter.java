@@ -10,22 +10,22 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Component in charge of accepting or rejecting {@link StackTraceElement elements} when computing a stack trace hash
+ * Allows Stacktrace filtering.
  */
 public abstract class StackElementFilter {
 
   /**
-   * Tests whether the specified {@link StackTraceElement} should be accepted when computing a stack hash.
+   * Tests whether the specified {@link StackTraceElement} should be accepted (not filtered).
    *
-   * @param element The {@link StackTraceElement} to be tested
-   * @return {@code true} if and only if {@code element} should be accepted
+   * @param element The {@link StackTraceElement} to be tested.
+   * @return {@code true} if and only if {@code element} should be accepted.
    */
   public abstract boolean accept(StackTraceElement element);
 
   /**
-   * Creates a {@link StackElementFilter} that accepts any stack trace elements
+   * Creates a {@link StackElementFilter} that accepts any {@link StackTraceElement}.
    *
-   * @return the filter
+   * @return The {@link StackElementFilter filter}
    */
   public static StackElementFilter any() {
     return new StackElementFilter() {
@@ -39,9 +39,9 @@ public abstract class StackElementFilter {
 
   /**
    * Creates a {@link StackElementFilter} that accepts all stack trace elements with a non {@code null} {@code {@link
-   * StackTraceElement#getFileName()} filename} and positive {@link StackTraceElement#getLineNumber()} line number
+   * StackTraceElement#getFileName()} filename} and positive {@link StackTraceElement#getLineNumber()} line number.
    *
-   * @return the filter
+   * @return The {@link StackElementFilter filter}
    */
   public static StackElementFilter withSourceInfo() {
     return new StackElementFilter() {
@@ -54,10 +54,10 @@ public abstract class StackElementFilter {
   }
 
   /**
-   * Creates a {@link StackElementFilter} by exclusion {@link Pattern patterns}
+   * Creates a {@link StackElementFilter} by exclusion {@link Pattern patterns}.
    *
-   * @param excludes regular expressions matching {@link StackTraceElement} to filter out
-   * @return the filter
+   * @param excludes Regular expressions list. Matching {@link StackTraceElement elements} will be filtered.
+   * @return The {@link StackElementFilter filter}.
    */
   public static StackElementFilter byPattern(final List<Pattern> excludes) {
     return new StackElementFilter() {
