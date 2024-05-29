@@ -204,7 +204,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
     assertThat(deployableProjectModel.getDependencies(),
-               hasItems(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
+               hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
 
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(1));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),

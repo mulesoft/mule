@@ -160,7 +160,7 @@
         <muleBomVersion>4.8.0-SNAPSHOT</muleBomVersion>
         <muleMavenClientBomVersion>2.3.0-SNAPSHOT</muleMavenClientBomVersion>
 
-        <weaveVersion>2.7.0-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.8.0-SNAPSHOT</weaveVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
 
         <!-- Mule Snapshot Dependencies -->
@@ -294,7 +294,7 @@
         <!-- These are declared here so that version upgrading bots keep the version property up to date -->
         <springVersion>5.3.33</springVersion>
         <commonsCliVersion>1.6.0</commonsCliVersion>
-        <mule.maven.plugin.version>3.7.0-SNAPSHOT</mule.maven.plugin.version>
+        <mule.maven.plugin.version>4.1.1</mule.maven.plugin.version>
     </properties>
 
     <dependencyManagement>
