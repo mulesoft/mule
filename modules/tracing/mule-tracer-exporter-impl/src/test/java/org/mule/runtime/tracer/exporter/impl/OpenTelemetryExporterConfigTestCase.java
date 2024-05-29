@@ -38,6 +38,7 @@ import static org.testcontainers.utility.MountableFile.forHostPath;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.optel.resources.SpanExporterConfiguratorException;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -69,7 +70,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -78,13 +79,14 @@ import org.testcontainers.utility.DockerImageName;
 
 @Feature(PROFILING)
 @Story(OPEN_TELEMETRY_EXPORTER)
-@Ignore("W-15586397")
 public class OpenTelemetryExporterConfigTestCase {
 
   public static final String TEST_SERVICE_NAME = "test-service-name";
 
   private static final DockerImageName COLLECTOR_IMAGE =
       DockerImageName.parse("otel/opentelemetry-collector:0.99.0");
+
+  public static final String RECEIVER_PORT = "receiverPort";
 
   private static final Integer COLLECTOR_OTLP_GRPC_PORT = 4317;
   private static final Integer COLLECTOR_OTLP_HTTP_PORT = 4318;
@@ -105,8 +107,8 @@ public class OpenTelemetryExporterConfigTestCase {
   @ClassRule
   public static SelfSignedCertificateRule clientTls = new SelfSignedCertificateRule();
 
-  @ClassRule
-  public static final GrpcServerRule server = new GrpcServerRule();
+  @Rule
+  public final GrpcServerRule server = new GrpcServerRule(new DynamicPort(RECEIVER_PORT));
 
   @Before
   public void before() {
@@ -285,6 +287,11 @@ public class OpenTelemetryExporterConfigTestCase {
   private static class GrpcServerRule extends ServerRule {
 
     private final List<ExportTraceServiceRequest> traceRequests = new ArrayList<>();
+    private final DynamicPort port;
+
+    public GrpcServerRule(DynamicPort port) {
+      this.port = port;
+    }
 
     @Override
     protected void configure(ServerBuilder sb) throws Exception {
@@ -305,7 +312,7 @@ public class OpenTelemetryExporterConfigTestCase {
                    }
                  });
 
-      sb.http(0);
+      sb.http(port.getNumber());
     }
 
     public void reset() {
