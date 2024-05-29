@@ -29,6 +29,7 @@ module org.mule.runtime.metrics.exporter.impl {
   requires io.opentelemetry.sdk.metrics;
   requires io.opentelemetry.sdk.testing;
   requires org.apache.commons.lang3;
+  requires io.opentelemetry.exporter.logging;
 
   exports org.mule.runtime.metrics.exporter.impl to
       org.mule.runtime.spring.config,
