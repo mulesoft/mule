@@ -60,12 +60,13 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 
   public void removeContext(ComponentLocation location, String eventId) {
-    LOGGER.debug("Removing context at location - {} for event - {}", () -> {location != null ? location.getLocation() : "null"}, eventId);
+    LOGGER.debug("Removing context at location - {} for event - {}", location != null ? location.getLocation() : "null", eventId);
     locationSpecificContext.remove(new Pair<>(location, eventId));
   }
 
   public void putContext(ComponentLocation location, String eventId) {
-    LOGGER.debug("Adding new context at location - {} for event - {}", () -> {location != null ? location.getLocation() : "null"}, eventId);
+    LOGGER.debug("Adding new context at location - {} for event - {}", location != null ? location.getLocation() : "null",
+                 eventId);
     locationSpecificContext.put(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
   }
 
@@ -77,7 +78,8 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
    */
   public void setConfiguration(ComponentLocation location, String eventId,
                                Optional<ConfigurationInstance> configuration) {
-    LOGGER.debug("Adding configuration at location - {} for event - {}", () -> {location != null ? location.getLocation() : "null"}, eventId);
+    LOGGER.debug("Adding configuration at location - {} for event - {}", location != null ? location.getLocation() : "null",
+                 eventId);
     locationSpecificContext.get(new Pair<>(location, eventId)).setConfiguration(configuration);
   }
 
@@ -89,7 +91,8 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
                                           Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback,
                                           ExecutionContextAdapter executionContextAdapter) {
-    LOGGER.debug("Setting Operation Parameters at location - {} for event - {}", () -> {location != null ? location.getLocation() : "null"}, eventId);
+    LOGGER.debug("Setting Operation Parameters at location - {} for event - {}",
+                 location != null ? location.getLocation() : "null", eventId);
     locationSpecificContext.get(new Pair<>(location, eventId)).setOperationExecutionParams(configuration, parameters,
                                                                                            operationEvent,
                                                                                            callback, executionContextAdapter);
