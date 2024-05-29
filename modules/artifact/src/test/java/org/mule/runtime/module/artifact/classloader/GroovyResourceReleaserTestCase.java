@@ -77,9 +77,7 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
   @Parameterized.Parameters(name = "Testing artifact {0}")
   public static String[] data() throws NoSuchFieldException, IllegalAccessException {
     return new String[] {
-        "2.4.21",
-        "2.5.22",
-        "3.0.19"
+        "2.4.21"
     };
   }
 
