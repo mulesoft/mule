@@ -61,9 +61,8 @@ import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
@@ -599,7 +598,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private ErrorTypeRepository mockErrorModel() {
     final ErrorType parentErrorType = mock(ErrorType.class);
     ErrorTypeRepository errorTypeRepository = mock(ErrorTypeRepository.class);
-    when(errorTypeRepository.lookupErrorType(any())).thenReturn(of(ErrorTypeBuilder.builder()
+    when(errorTypeRepository.lookupErrorType(any())).thenReturn(of(DefaultErrorTypeBuilder.builder()
         .namespace("testNs")
         .identifier("test")
         .parentErrorType(parentErrorType)

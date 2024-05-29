@@ -27,6 +27,7 @@ import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamesp
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.addTlsContextParameter;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsConfigurationSupported;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoReconnectionStrategy;
 import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.XML_SDK;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
@@ -108,7 +109,6 @@ import org.mule.runtime.extension.internal.ast.property.TestConnectionGlobalElem
 import org.mule.runtime.extension.internal.factories.XmlSdkConfigurationFactory;
 import org.mule.runtime.extension.internal.factories.XmlSdkConnectionProviderFactory;
 import org.mule.runtime.extension.internal.loader.xml.validator.property.InvalidTestConnectionMarkerModelProperty;
-import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DevelopmentFrameworkModelProperty;
@@ -750,7 +750,7 @@ public final class XmlExtensionLoaderDelegate {
     Optional<ComponentAst> tlsEnabledComponent = getTlsEnabledComponent(moduleAst);
 
     if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || tlsEnabledComponent.isPresent()) {
-      declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
+      withNoReconnectionStrategy(declarer);
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
       tlsEnabledComponent.ifPresent(comp -> addTlsContextParameter(configurationDeclarer.onDefaultParameterGroup(), comp));
       configurationProperties.forEach(param -> extractProperty(configurationDeclarer, param));

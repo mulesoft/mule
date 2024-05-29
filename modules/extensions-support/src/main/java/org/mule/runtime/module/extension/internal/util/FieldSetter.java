@@ -7,6 +7,10 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class which allows setting the value of a {@link Field} on random compatible instances
@@ -20,10 +24,26 @@ public final class FieldSetter<Target, Value> {
    * The {@link Field} in which the value is to be assigned
    */
   private final Field field;
+  private final Method setterMethod;
 
   public FieldSetter(Field field) {
+    Method setterMethod = null;
+
     this.field = field;
-    field.setAccessible(true);
+    try {
+      field.setAccessible(true);
+    } catch (Exception e) {
+      // create a bean property setter fallback
+      try {
+        setterMethod =
+            field.getDeclaringClass().getDeclaredMethod("set" + StringUtils.capitalize(field.getName()), field.getType());
+      } catch (NoSuchMethodException e1) {
+        e.addSuppressed(e1);
+        throw e;
+      }
+    }
+
+    this.setterMethod = setterMethod;
   }
 
   /**
@@ -33,10 +53,18 @@ public final class FieldSetter<Target, Value> {
    * @param value  the value to set
    */
   public void set(Target target, Value value) {
-    try {
-      field.set(target, value);
-    } catch (IllegalAccessException ex) {
-      throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+    if (setterMethod != null) {
+      try {
+        setterMethod.invoke(target, value);
+      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+        throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+      }
+    } else {
+      try {
+        field.set(target, value);
+      } catch (IllegalAccessException ex) {
+        throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
+      }
     }
   }
 

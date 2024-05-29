@@ -19,7 +19,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 

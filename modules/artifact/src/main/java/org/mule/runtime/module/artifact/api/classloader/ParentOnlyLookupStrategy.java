@@ -30,4 +30,9 @@ public class ParentOnlyLookupStrategy implements LookupStrategy {
     }
     return classLoaders;
   }
+
+  @Override
+  public String toString() {
+    return "ParentOnlyLookupStrategy";
+  }
 }

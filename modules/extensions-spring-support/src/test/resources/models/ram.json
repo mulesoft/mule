@@ -1272,9 +1272,9 @@
                 "format": "java",
                 "type": "Object",
                 "annotations": {
-                  "typeId": "org.mule.runtime.extension.api.soap.WebServiceTypeKey",
+                  "typeId": "org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKey",
                   "classInformation": {
-                    "classname": "org.mule.runtime.extension.api.soap.WebServiceTypeKey",
+                    "classname": "org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKey",
                     "hasDefaultConstructor": true,
                     "isInterface": false,
                     "isInstantiable": true,

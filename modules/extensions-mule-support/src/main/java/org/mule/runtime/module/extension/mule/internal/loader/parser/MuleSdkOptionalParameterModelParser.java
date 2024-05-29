@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 
 /**

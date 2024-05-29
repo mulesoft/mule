@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader;
 
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.CLIENT_SECRET;
+import static org.mule.runtime.extension.privileged.semantic.ConnectivityVocabulary.CLIENT_SECRET;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLICATION_EXTENSION_MODEL;
 

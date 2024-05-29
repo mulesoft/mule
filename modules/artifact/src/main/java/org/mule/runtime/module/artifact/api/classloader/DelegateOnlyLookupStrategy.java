@@ -7,7 +7,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.api.annotation.NoInstantiate;
 
@@ -29,7 +29,7 @@ public final class DelegateOnlyLookupStrategy implements LookupStrategy {
    * @param classLoader class loader containing the container classes. Not null.
    */
   public DelegateOnlyLookupStrategy(ClassLoader classLoader) {
-    checkArgument(classLoader != null, "classLoader cannot be null");
+    requireNonNull(classLoader, "classLoader cannot be null");
 
     classLoaders = singletonList(classLoader);
   }
@@ -37,5 +37,10 @@ public final class DelegateOnlyLookupStrategy implements LookupStrategy {
   @Override
   public List<ClassLoader> getClassLoaders(ClassLoader classLoader) {
     return classLoaders;
+  }
+
+  @Override
+  public String toString() {
+    return "DelegateOnlyLookupStrategy[classloaders=" + classLoaders + "]";
   }
 }

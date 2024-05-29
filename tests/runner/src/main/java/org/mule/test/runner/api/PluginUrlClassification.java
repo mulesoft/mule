@@ -12,6 +12,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.net.URL;
 import java.util.List;
@@ -32,6 +33,7 @@ public class PluginUrlClassification {
   private final List<URL> urls;
   private final String name;
   private final List<Class> exportClasses;
+  private final BundleDescriptor pluginBundleDescriptor;
   private final List<String> pluginDependencies;
   private final Set<String> exportedPackages;
   private final Set<String> exportedResources;
@@ -52,11 +54,14 @@ public class PluginUrlClassification {
    *                                    artifacts only
    * @param privilegedArtifacts         name of the artifacts with privileged access to the API.
    */
-  public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses, List<String> pluginDependencies,
+  public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses,
+                                 BundleDescriptor pluginBundleDescriptor,
+                                 List<String> pluginDependencies,
                                  Set<String> exportedPackages, Set<String> exportedResources,
                                  Set<String> privilegedExportedPackages, Set<String> privilegedArtifacts) {
     requireNonNull(name, "name cannot be null");
     requireNonNull(urls, "urls cannot be null");
+    requireNonNull(pluginBundleDescriptor, "pluginBundleDescriptor cannot be null");
     requireNonNull(pluginDependencies, "pluginDependencies cannot be null");
     requireNonNull(exportedPackages, "exportedPackages cannot be null");
     requireNonNull(exportedResources, "exportedResources cannot be null");
@@ -68,6 +73,7 @@ public class PluginUrlClassification {
     this.name = name;
     this.urls = urls;
     this.exportClasses = exportClasses;
+    this.pluginBundleDescriptor = pluginBundleDescriptor;
     this.pluginDependencies = pluginDependencies;
     this.exportedPackages = exportedPackages;
     this.exportedResources = exportedResources;
@@ -75,8 +81,10 @@ public class PluginUrlClassification {
     this.privilegedArtifacts = privilegedArtifacts;
   }
 
-  public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses, List<String> pluginDependencies) {
-    this(name, urls, exportClasses, pluginDependencies, emptySet(), emptySet(), emptySet(), emptySet());
+  public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses,
+                                 BundleDescriptor pluginBundleDescriptor,
+                                 List<String> pluginDependencies) {
+    this(name, urls, exportClasses, pluginBundleDescriptor, pluginDependencies, emptySet(), emptySet(), emptySet(), emptySet());
   }
 
   public List<URL> getUrls() {
@@ -89,6 +97,10 @@ public class PluginUrlClassification {
 
   public List<Class> getExportClasses() {
     return exportClasses;
+  }
+
+  public BundleDescriptor getPluginBundleDescriptor() {
+    return pluginBundleDescriptor;
   }
 
   public List<String> getPluginDependencies() {

@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.asPagedOperation;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoConnectivityError;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoReconnectionStrategy;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoStreamingConfiguration;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoTransactionalAction;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
@@ -128,6 +133,22 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
     loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
     addSemanticTerms(operation.getDeclaration(), parser);
     parser.getExecutionType().ifPresent(operation::withExecutionType);
+
+    if (parser.isAutoPaging()) {
+      asPagedOperation(operation);
+    }
+    if (!parser.hasStreamingConfiguration()) {
+      withNoStreamingConfiguration(operation);
+    }
+    if (!parser.hasTransactionalAction()) {
+      withNoTransactionalAction(operation);
+    }
+    if (!parser.hasReconnectionStrategy()) {
+      withNoReconnectionStrategy(operation);
+    }
+    if (!parser.propagatesConnectivityError()) {
+      withNoConnectivityError(operation);
+    }
     parser.getAdditionalModelProperties().forEach(operation::withModelProperty);
     parser.getExceptionHandlerModelProperty().ifPresent(operation::withModelProperty);
 

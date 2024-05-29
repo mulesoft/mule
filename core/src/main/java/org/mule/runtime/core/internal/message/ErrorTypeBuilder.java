@@ -18,7 +18,7 @@ import java.util.Objects;
 
 /**
  * @deprecated Keeping this because the package it belongs to is exported. Use
- *             {@link org.mule.runtime.ast.internal.error.ErrorTypeBuilder} instead.
+ *             {@code org.mule.runtime.ast.api.error.ErrorTypeBuilder} instead.
  */
 @Deprecated
 public class ErrorTypeBuilder {

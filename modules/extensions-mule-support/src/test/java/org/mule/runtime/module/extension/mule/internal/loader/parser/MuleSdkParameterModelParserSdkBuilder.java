@@ -25,7 +25,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.ast.api.model.ExtensionModelHelper;
+import org.mule.runtime.ast.internal.model.DefaultExtensionModelHelper;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
@@ -114,7 +115,7 @@ class MuleSdkParameterModelParserSdkBuilder {
    */
   public MuleSdkParameterModelParser build() {
     final TypeLoader typeLoader = mockTypeLoader(typeLoaderTypes != null ? typeLoaderTypes : emptyMap());
-    final ExtensionModelHelper extensionModelHelper = new ExtensionModelHelper(loadExtensionModels());
+    final ExtensionModelHelper extensionModelHelper = new DefaultExtensionModelHelper(loadExtensionModels());
 
     final ComponentAst componentAst = mock(ComponentAst.class);
 
