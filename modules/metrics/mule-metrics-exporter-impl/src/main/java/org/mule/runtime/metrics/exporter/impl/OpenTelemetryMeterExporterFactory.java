@@ -19,6 +19,9 @@ import javax.inject.Inject;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.exporter.logging.LoggingMetricExporter;
+import io.opentelemetry.sdk.metrics.data.AggregationTemporality;
+import io.opentelemetry.sdk.metrics.export.MetricExporter;
 import io.opentelemetry.sdk.resources.Resource;
 
 /**
@@ -30,6 +33,7 @@ import io.opentelemetry.sdk.resources.Resource;
 public class OpenTelemetryMeterExporterFactory implements MeterExporterFactory {
 
   public static final CapturingMeterExporterWrapper METER_SNIFFER_EXPORTER = new CapturingMeterExporterWrapper();
+  public static final MetricExporter METER_LOGGING_EXPORTER = LoggingMetricExporter.create(AggregationTemporality.DELTA);
 
   public static final AttributeKey<String> SERVICE_NAME_KEY = stringKey("service.name");
 
