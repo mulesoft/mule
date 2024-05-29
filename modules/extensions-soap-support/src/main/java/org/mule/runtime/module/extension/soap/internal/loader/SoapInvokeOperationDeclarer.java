@@ -32,7 +32,6 @@ import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactor
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.soap.SoapAttributes;
 import org.mule.runtime.extension.api.soap.SoapOutputPayload;
-import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
@@ -46,6 +45,7 @@ import org.mule.runtime.module.extension.soap.internal.metadata.InvokeInputHeade
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeKeysResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeOutputTypeResolver;
 import org.mule.runtime.module.extension.soap.internal.metadata.InvokeRequestTypeResolver;
+import org.mule.runtime.module.extension.soap.internal.metadata.WebServiceTypeKey;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.ForwardingSoapClient;
 import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOperationExecutorFactory;
 
