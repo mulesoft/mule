@@ -33,7 +33,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NA
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getQName;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getInfrastructureType;
 
 import static java.lang.String.format;
 
@@ -233,7 +233,8 @@ class InfrastructureElementModelDelegate {
                             .build());
 
                 if (TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER.equals(name)) {
-                  getQName(objectValue.getTypeId())
+                  getInfrastructureType(objectValue.getTypeId())
+                      .getQNameModelProperty()
                       .map(QNameModelProperty::getValue)
                       .ifPresent(qname -> {
                         ComponentConfiguration.Builder nested = ComponentConfiguration.builder()

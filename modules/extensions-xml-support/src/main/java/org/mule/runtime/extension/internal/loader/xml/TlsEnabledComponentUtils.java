@@ -8,9 +8,7 @@ package org.mule.runtime.extension.internal.loader.xml;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getDslConfiguration;
 import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getInfrastructureType;
-import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getQName;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
 import static java.lang.Boolean.parseBoolean;
@@ -106,8 +104,8 @@ public class TlsEnabledComponentUtils {
         .withModelProperty(new SyntheticModelModelProperty())
         .withModelProperty(new InfrastructureParameterModelProperty(tlsContextInfrastructureType.getSequence()));
 
-    getQName(tlsContextInfrastructureType.getName()).ifPresent(parameterDeclarer::withModelProperty);
-    getDslConfiguration(tlsContextInfrastructureType.getName()).ifPresent(parameterDeclarer::withDsl);
+    tlsContextInfrastructureType.getQNameModelProperty().ifPresent(parameterDeclarer::withModelProperty);
+    tlsContextInfrastructureType.getDslConfiguration().ifPresent(parameterDeclarer::withDsl);
   }
 
   private static boolean isTlsContextFactoryParameter(ParameterModel parameterModel) {

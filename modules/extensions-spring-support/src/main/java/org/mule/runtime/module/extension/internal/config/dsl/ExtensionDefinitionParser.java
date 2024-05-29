@@ -31,7 +31,6 @@ import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newB
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getExpressionSupport;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isReferableType;
@@ -931,7 +930,7 @@ public abstract class ExtensionDefinitionParser {
   }
 
   protected Optional<String> getInfrastructureParameterName(MetadataType fieldType) {
-    return getId(fieldType).map(InfrastructureTypeUtils::getName);
+    return InfrastructureTypeUtils.getInfrastructureParameterName(fieldType);
   }
 
   private TypeConverter getTypeConverter(String name, MetadataType type, Object defaultValue, ExpressionSupport expressionSupport,

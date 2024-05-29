@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 
+import static java.lang.String.format;
 import static java.util.function.Function.identity;
 
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
@@ -28,7 +29,9 @@ public class InfrastructureTypeResolver {
 
   private static final Map<Type, InfrastructureType> TYPE_MAPPING = InfrastructureTypeUtils.getInfrastructureTypes()
       .stream()
-      .collect(toImmutableMap(infrastructureType -> new TypeWrapper(infrastructureType.getClazz(),
+      .collect(toImmutableMap(infrastructureType -> new TypeWrapper(infrastructureType.getClazz()
+          .orElseThrow(() -> new RuntimeException(format("Expected infrastructure type to have an associated class: '%s'",
+                                                         infrastructureType))),
                                                                     new DefaultExtensionsTypeLoaderFactory()
                                                                         .createTypeLoader(InfrastructureTypeUtils.class
                                                                             .getClassLoader())),
