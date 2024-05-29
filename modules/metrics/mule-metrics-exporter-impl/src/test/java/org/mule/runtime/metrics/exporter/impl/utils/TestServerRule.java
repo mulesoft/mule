@@ -10,6 +10,8 @@ import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import static io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.parseFrom;
 
+import org.mule.tck.junit4.rule.DynamicPort;
+
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,12 @@ import org.jetbrains.annotations.NotNull;
 import io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceResponse;
 
 public class TestServerRule extends ServerRule {
+
+  private final DynamicPort port;
+
+  public TestServerRule(DynamicPort port) {
+    this.port = port;
+  }
 
   private static final String GRPC_ENDPOINT_PATH = "/opentelemetry.proto.collector.metrics.v1.MetricsService/Export";
 
@@ -48,7 +56,7 @@ public class TestServerRule extends ServerRule {
                  }
                });
 
-    sb.http(0);
+    sb.http(port.getNumber());
   }
 
   public void reset() {
