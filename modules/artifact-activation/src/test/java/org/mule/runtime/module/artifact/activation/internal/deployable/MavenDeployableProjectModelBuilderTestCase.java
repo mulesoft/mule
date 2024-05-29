@@ -185,8 +185,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     // checks there are no packages in the project
     assertThat(deployableProjectModel.getPackages(), hasSize(0));
 
-    assertThat(deployableProjectModel.getSharedLibraries(), contains(hasProperty("artifactId", equalTo("derbyshared")),
-                                                                     hasProperty("artifactId", equalTo("derby"))));
+    assertThat(deployableProjectModel.getSharedLibraries(), contains(hasProperty("artifactId", equalTo("derby"))));
   }
 
   @Test
@@ -209,8 +208,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(1));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
                hasEntry(hasProperty("artifactId", equalTo("mule-db-connector")),
-                        contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
-                                 hasProperty("descriptor", hasProperty("artifactId", equalTo("derbyshared"))))));
+                        contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))))));
   }
 
   @Test
@@ -218,17 +216,15 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     DeployableProjectModel deployableProjectModel =
         getDeployableProjectModel(deploymentTypePrefix + "/additional-plugin-dependency-and-dep");
 
-    assertThat(deployableProjectModel.getDependencies(), hasSize(5));
+    assertThat(deployableProjectModel.getDependencies(), hasSize(4));
     assertThat(deployableProjectModel.getDependencies(),
-               hasItems(hasProperty("descriptor", hasProperty("artifactId", equalTo("derbyshared"))),
-                        hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
+               hasItems(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
                         hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
 
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(1));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
                hasEntry(hasProperty("artifactId", equalTo("mule-db-connector")),
-                        contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
-                                 hasProperty("descriptor", hasProperty("artifactId", equalTo("derbyshared"))))));
+                        contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))))));
   }
 
   @Test

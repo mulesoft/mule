@@ -116,17 +116,12 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
     assertThat(deployableProjectModel.getAdditionalPluginDependencies().size(), is(1));
     List<BundleDependency> additionalBundleDependencies =
         deployableProjectModel.getAdditionalPluginDependencies().values().stream().findFirst().get();
-    assertThat(additionalBundleDependencies.size(), is(2));
+    assertThat(additionalBundleDependencies.size(), is(1));
 
     org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor descriptor =
         additionalBundleDependencies.get(0).getDescriptor();
     assertThat(descriptor.getGroupId(), is("org.apache.derby"));
     assertThat(descriptor.getArtifactId(), is("derby"));
-
-    descriptor =
-        additionalBundleDependencies.get(1).getDescriptor();
-    assertThat(descriptor.getGroupId(), is("org.apache.derby"));
-    assertThat(descriptor.getArtifactId(), is("derbyshared"));
   }
 
 
