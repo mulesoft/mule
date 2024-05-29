@@ -10,6 +10,7 @@ import org.mule.runtime.metrics.exporter.impl.optel.resources.MeterExporterConfi
 import org.mule.runtime.metrics.exporter.impl.optel.resources.grpc.GrpcMeterExporterConfigurator;
 import org.mule.runtime.metrics.exporter.impl.optel.resources.http.HttpMeterExporterConfigurator;
 import org.mule.runtime.metrics.exporter.impl.optel.resources.inmemory.InMemoryMeterExporterConfigurator;
+import org.mule.runtime.metrics.exporter.impl.optel.resources.logging.LoggingMeterExporterConfigurator;
 
 /**
  * Specifies different ways in which metrics can be exported.
@@ -22,7 +23,9 @@ public enum OpenTelemetryMeterExporterTransport {
 
   HTTP(new HttpMeterExporterConfigurator()),
 
-  IN_MEMORY(new InMemoryMeterExporterConfigurator());
+  IN_MEMORY(new InMemoryMeterExporterConfigurator()),
+
+  LOGGING(new LoggingMeterExporterConfigurator());
 
   private final MeterExporterConfigurator meterExporterConfigurator;
 

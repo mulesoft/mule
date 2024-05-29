@@ -52,7 +52,7 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
   private final PeriodicMetricReader periodicMetricReader;
 
   public OpenTelemetryMeterExporter(MeterExporterConfiguration configuration, Resource resource) {
-    // TODO W-13218993: In this task all the configuration possibilities will be applied.
+    // TODO W-13218993: Finish ADR adoption and implementation.
     MetricExporter metricExporter;
     String meterExporterType = configuration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE);
 
