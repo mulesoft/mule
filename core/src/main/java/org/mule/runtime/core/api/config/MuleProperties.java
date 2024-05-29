@@ -11,6 +11,7 @@ import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
+import org.mule.runtime.core.util.internal.StandaloneServerUtils;
 
 /**
  * <code>MuleProperties</code> is a set of constants pertaining to Mule properties.
@@ -104,8 +105,8 @@ public class MuleProperties {
   // End Connector Service descriptor properties
 
   public static final String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
-  public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
-  public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
+  public static final String MULE_HOME_DIRECTORY_PROPERTY = StandaloneServerUtils.MULE_HOME_DIRECTORY_PROPERTY;
+  public static final String MULE_BASE_DIRECTORY_PROPERTY = StandaloneServerUtils.MULE_BASE_DIRECTORY_PROPERTY;
   public static final String APP_HOME_DIRECTORY_PROPERTY = "app.home";
   public static final String DOMAIN_HOME_DIRECTORY_PROPERTY = "domain.home";
   public static final String APP_NAME_PROPERTY = "app.name";

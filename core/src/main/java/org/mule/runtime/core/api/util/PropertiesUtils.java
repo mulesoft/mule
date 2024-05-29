@@ -6,68 +6,29 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-
-import static java.lang.String.format;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.util.OrderedProperties;
-
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>PropertiesHelper</code> is a utility class for manipulating and filtering property Maps.
+ * 
+ * @deprecated Use {@link org.mule.runtime.core.util.api.PropertiesUtils} instead.
  */
 // @ThreadSafe
+@Deprecated
 public final class PropertiesUtils {
-
-  private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
-
-  // @GuardedBy(itself)
-  private static final List<String> maskedProperties = new CopyOnWriteArrayList<>();
-
-  static {
-    // When printing property lists mask password fields
-    // Users can register their own fields to mask
-    registerMaskedPropertyName("password");
-  }
 
   /** Do not instanciate. */
   private PropertiesUtils() {
     // no-op
   }
 
-  /**
-   * Register a property name for masking. This will prevent certain values from leaking e.g. into debugging output or logfiles.
-   *
-   * @param name the key of the property to be masked.
-   * @throws IllegalArgumentException is name is null or empty.
-   */
   public static void registerMaskedPropertyName(String name) {
-    if (!isEmpty(name)) {
-      maskedProperties.add(name);
-    } else {
-      throw new IllegalArgumentException("Cannot mask empty property name.");
-    }
+    org.mule.runtime.core.util.api.PropertiesUtils.registerMaskedPropertyName(name);
   }
 
   /**
@@ -79,22 +40,7 @@ public final class PropertiesUtils {
    *         key or its value is <code>null</code>.
    */
   public static String maskedPropertyValue(Map.Entry<?, ?> property) {
-    if (property == null) {
-      return null;
-    }
-
-    Object key = property.getKey();
-    Object value = property.getValue();
-
-    if (key == null || value == null) {
-      return null;
-    }
-
-    if (maskedProperties.contains(key)) {
-      return ("*****");
-    } else {
-      return value.toString();
-    }
+    return org.mule.runtime.core.util.api.PropertiesUtils.maskedPropertyValue(property);
   }
 
   /**
@@ -105,96 +51,34 @@ public final class PropertiesUtils {
    * @return a java.util.Properties object containing the properties.
    */
   public static synchronized Properties loadProperties(String fileName, final Class<?> callingClass) throws IOException {
-    InputStream is = IOUtils.getResourceAsStream(fileName, callingClass, /* tryAsFile */true, /* tryAsUrl */false);
-    if (is == null) {
-      I18nMessage error = CoreMessages.cannotLoadFromClasspath(fileName);
-      throw new IOException(error.toString());
-    }
-
-    try {
-      return loadProperties(is);
-    } catch (IOException e) {
-      throw new MuleRuntimeException(createStaticMessage("Failed to load resource from fileName: " + fileName + "; callingClass: "
-          + callingClass), e);
-    }
+    return org.mule.runtime.core.util.api.PropertiesUtils.loadProperties(fileName, callingClass);
   }
 
   public static Properties loadProperties(URL url) throws IOException {
-    if (url == null) {
-      I18nMessage error = CoreMessages.objectIsNull("url");
-      throw new IOException(error.toString());
-    }
-
-    try {
-      return loadProperties(url.openStream());
-    } catch (IOException e) {
-      throw new MuleRuntimeException(createStaticMessage("Failed to load resource from url: " + url), e);
-    }
+    return org.mule.runtime.core.util.api.PropertiesUtils.loadProperties(url);
   }
 
   /**
    * Load all properties files in the classpath with the given properties file name.
    */
   public static Properties loadAllProperties(String fileName, ClassLoader classLoader) {
-    Properties p = new Properties();
-    List<URL> resourcesUrl = new ArrayList<>();
-    Enumeration<URL> resources;
-    try {
-      resources = classLoader.getResources(fileName);
-      while (resources.hasMoreElements()) {
-        resourcesUrl.add(resources.nextElement());
-      }
-      Collections.sort(resourcesUrl, (url, url1) -> {
-        if ("file".equals(url.getProtocol())) {
-          return 1;
-        }
-        return -1;
-      });
-      for (URL resourceUrl : resourcesUrl) {
-        InputStream in = resourceUrl.openStream();
-        p.load(in);
-        in.close();
-      }
-    } catch (IOException e) {
-      throw new MuleRuntimeException(createStaticMessage("Failed to load resource: " + fileName), e);
-    }
-    return p;
+    return org.mule.runtime.core.util.api.PropertiesUtils.loadAllProperties(fileName, classLoader);
   }
 
   public static Properties loadProperties(InputStream is) throws IOException {
-    if (is == null) {
-      I18nMessage error = CoreMessages.objectIsNull("input stream");
-      throw new IOException(error.toString());
-    }
-
-    try {
-      Properties props = new Properties();
-      props.load(is);
-      return props;
-    } finally {
-      is.close();
-    }
+    return org.mule.runtime.core.util.api.PropertiesUtils.loadProperties(is);
   }
 
   public static String removeXmlNamespacePrefix(String eleName) {
-    int i = eleName.indexOf(':');
-    return (i == -1 ? eleName : eleName.substring(i + 1, eleName.length()));
+    return org.mule.runtime.core.util.api.PropertiesUtils.removeXmlNamespacePrefix(eleName);
   }
 
   public static String removeNamespacePrefix(String eleName) {
-    int i = eleName.lastIndexOf('.');
-    return (i == -1 ? eleName : eleName.substring(i + 1, eleName.length()));
+    return org.mule.runtime.core.util.api.PropertiesUtils.removeNamespacePrefix(eleName);
   }
 
   public static Map removeNamespaces(Map properties) {
-    HashMap props = new HashMap(properties.size());
-    Map.Entry entry;
-    for (Object element : properties.entrySet()) {
-      entry = (Map.Entry) element;
-      props.put(removeNamespacePrefix((String) entry.getKey()), entry.getValue());
-
-    }
-    return props;
+    return org.mule.runtime.core.util.api.PropertiesUtils.removeNamespaces(properties);
   }
 
   /**
@@ -206,74 +90,15 @@ public final class PropertiesUtils {
    * @param newProps return map containing the filtered list of properties or an empty map if no properties matched the prefix
    */
   public static void getPropertiesWithPrefix(Map props, String prefix, Map newProps) {
-    if (props == null) {
-      return;
-    }
-
-    for (Object element : props.entrySet()) {
-      Map.Entry entry = (Map.Entry) element;
-      Object key = entry.getKey();
-      if (key.toString().startsWith(prefix)) {
-        newProps.put(key, entry.getValue());
-      }
-    }
+    org.mule.runtime.core.util.api.PropertiesUtils.getPropertiesWithPrefix(props, prefix, newProps);
   }
 
   public static Properties getPropertiesFromQueryString(String query) {
-    Properties props = new Properties();
-
-    if (isEmpty(query)) {
-      return props;
-    }
-
-    query = new StringBuilder(query.length() + 1).append('&').append(query).toString();
-
-    int x = 0;
-    while ((x = addProperty(query, x, '&', props)) != -1);
-
-    return props;
+    return org.mule.runtime.core.util.api.PropertiesUtils.getPropertiesFromQueryString(query);
   }
 
   public static Properties getPropertiesFromString(String query, char separator) {
-    Properties props = new Properties();
-
-    if (query == null) {
-      return props;
-    }
-
-    query = new StringBuilder(query.length() + 1).append(separator).append(query).toString();
-
-    int x = 0;
-    while ((x = addProperty(query, x, separator, props)) != -1) {
-      // run
-    }
-
-    return props;
-  }
-
-  private static int addProperty(String query, int start, char separator, Properties properties) {
-    int i = query.indexOf(separator, start);
-    int i2 = query.indexOf(separator, i + 1);
-    String pair;
-    if (i > -1 && i2 > -1) {
-      pair = query.substring(i + 1, i2);
-    } else if (i > -1) {
-      pair = query.substring(i + 1);
-    } else {
-      return -1;
-    }
-    int eq = pair.indexOf('=');
-
-    if (eq <= 0) {
-      String key = pair;
-      String value = StringUtils.EMPTY;
-      properties.setProperty(key, value);
-    } else {
-      String key = pair.substring(0, eq);
-      String value = (eq == pair.length() ? StringUtils.EMPTY : pair.substring(eq + 1));
-      properties.setProperty(key, value);
-    }
-    return i2;
+    return org.mule.runtime.core.util.api.PropertiesUtils.getPropertiesFromString(query, separator);
   }
 
   /**
@@ -284,7 +109,7 @@ public final class PropertiesUtils {
    * @throws IOException when a property file cannot be processed
    */
   public static List<Properties> discoverProperties(String resource) throws IOException {
-    return discoverProperties(PropertiesUtils.class.getClassLoader(), resource);
+    return org.mule.runtime.core.util.api.PropertiesUtils.discoverProperties(resource);
   }
 
   /**
@@ -296,34 +121,6 @@ public final class PropertiesUtils {
    * @throws IOException when a property file cannot be processed
    */
   public static List<Properties> discoverProperties(ClassLoader classLoader, String resource) throws IOException {
-    checkArgument(!isEmpty(resource), "Resource cannot be empty");
-    checkArgument(classLoader != null, "ClassLoader cannot be null");
-
-    List<Properties> result = new LinkedList<>();
-
-    Enumeration<URL> allPropertiesResources;
-    try {
-      allPropertiesResources = classLoader.getResources(resource);
-    } catch (IOException e) {
-      throw new IOException(format("Error getting resources '%s' from classLoader '%s'", resource, classLoader.toString()), e);
-    }
-
-    while (allPropertiesResources.hasMoreElements()) {
-      URL propertiesResource = allPropertiesResources.nextElement();
-      if (logger.isDebugEnabled()) {
-        logger.debug("Reading properties from: " + propertiesResource.toString());
-      }
-      Properties properties = new OrderedProperties();
-
-      try (InputStream resourceStream = new BufferedInputStream(propertiesResource.openStream())) {
-        properties.load(resourceStream);
-      } catch (IOException e) {
-        throw new IOException(format("Error loading properties from '%s'", propertiesResource.toString()), e);
-      }
-
-      result.add(properties);
-    }
-
-    return result;
+    return org.mule.runtime.core.util.api.PropertiesUtils.discoverProperties(classLoader, resource);
   }
 }

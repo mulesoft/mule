@@ -11,12 +11,13 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableSet;
 
-import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Defines a module on the Mule container as defined by a {@code mule-module.properties} descriptor.

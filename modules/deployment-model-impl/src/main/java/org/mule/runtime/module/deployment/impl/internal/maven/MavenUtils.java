@@ -7,12 +7,12 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.loadFileContentFrom;
 import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.getJarConnection;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM;
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM_PROPERTIES;
+import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.loadFileContentFrom;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
+import static org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor.MULE_POM;
+import static org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor.MULE_POM_PROPERTIES;
 import static org.mule.runtime.module.deployment.impl.internal.util.JarUtils.getUrlWithinJar;
 import static org.mule.runtime.module.deployment.impl.internal.util.JarUtils.getUrlsWithinJar;
 
@@ -22,7 +22,7 @@ import static java.lang.String.format;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.util.PropertiesUtils;
+import org.mule.runtime.core.util.api.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 
@@ -39,7 +39,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 /**
- * Provides utility methods to wrk with Maven
+ * Provides utility methods to work with Maven
  */
 public class MavenUtils {
 

@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.util.PropertiesUtils;
+import org.mule.runtime.core.util.api.PropertiesUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;

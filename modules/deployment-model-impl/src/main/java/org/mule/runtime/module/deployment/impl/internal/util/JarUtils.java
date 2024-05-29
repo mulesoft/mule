@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.util;
 
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
+import static org.mule.runtime.core.util.internal.StandaloneServerUtils.getMuleHome;
 
 import static java.nio.file.Files.createTempFile;
 import static java.util.Optional.empty;

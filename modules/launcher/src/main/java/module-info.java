@@ -19,6 +19,7 @@ module org.mule.runtime.launcher {
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.boot.log4j;
   requires org.mule.runtime.container;
+  requires org.mule.runtime.core.utils;
   requires org.mule.runtime.core;
   requires org.mule.runtime.deployment;
   requires org.mule.runtime.deployment.model.impl;

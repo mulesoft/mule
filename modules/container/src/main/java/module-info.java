@@ -13,7 +13,7 @@
 module org.mule.runtime.container {
 
   requires org.mule.runtime.api;
-  requires org.mule.runtime.core;
+  requires org.mule.runtime.core.utils;
   requires org.mule.runtime.jar.handling.utils;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.jpms.utils;

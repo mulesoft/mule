@@ -7,14 +7,16 @@
 package org.mule.functional.junit4;
 
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapService;
 import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.api.util.PropertiesUtils;
+import org.mule.runtime.core.util.api.PropertiesUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -49,9 +52,9 @@ public class TestBootstrapServiceDiscovererConfigurationBuilder extends Abstract
    */
   public TestBootstrapServiceDiscovererConfigurationBuilder(ClassLoader containerClassLoader, ClassLoader executionClassLoader,
                                                             List<ArtifactClassLoader> pluginClassLoaders) {
-    checkArgument(containerClassLoader != null, "ContainerClassLoader cannot be null");
-    checkArgument(executionClassLoader != null, "ExecutionClassLoader cannot be null");
-    checkArgument(pluginClassLoaders != null, "PluginClassLoaders cannot be null");
+    requireNonNull(containerClassLoader, "ContainerClassLoader cannot be null");
+    requireNonNull(executionClassLoader, "ExecutionClassLoader cannot be null");
+    requireNonNull(pluginClassLoaders, "PluginClassLoaders cannot be null");
     this.containerClassLoader = containerClassLoader;
     this.executionClassLoader = executionClassLoader;
     this.pluginClassLoaders = pluginClassLoaders;

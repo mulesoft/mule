@@ -13,8 +13,8 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
+import static org.mule.runtime.core.util.internal.StandaloneServerUtils.getMuleBase;
+import static org.mule.runtime.core.util.internal.StandaloneServerUtils.getMuleHome;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;

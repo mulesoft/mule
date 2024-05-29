@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.RegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
@@ -15,7 +16,7 @@ import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapService;
 import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.api.util.PropertiesUtils;
+import org.mule.runtime.core.util.api.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 
 import java.net.URL;
@@ -46,7 +47,7 @@ public class ArtifactBootstrapServiceDiscovererConfigurationBuilder extends Abst
    * @param artifactPlugins artifact plugins deployed inside an artifact. Non null.
    */
   public ArtifactBootstrapServiceDiscovererConfigurationBuilder(List<ArtifactPlugin> artifactPlugins) {
-    checkArgument(artifactPlugins != null, "ArtifactPlugins cannot be null");
+    requireNonNull(artifactPlugins, "ArtifactPlugins cannot be null");
     this.artifactPlugins = artifactPlugins;
   }
 

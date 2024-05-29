@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.config.bootstrap;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+import static org.mule.runtime.core.util.api.PropertiesUtils.discoverProperties;
 
 import org.mule.runtime.core.api.config.bootstrap.BootstrapException;
 import org.mule.runtime.core.api.config.bootstrap.RegistryBootstrapDiscoverer;

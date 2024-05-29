@@ -122,6 +122,7 @@
     <modules>
         <module>errors</module>
         <module>runtime-extension-model</module>
+        <module>core-utils</module>
         <module>core</module>
         <module>core-tests</module>
         <module>modules</module>
