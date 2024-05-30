@@ -8,7 +8,7 @@ package org.mule.runtime.extension.internal.loader.xml;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getInfrastructureType;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getActionableInfrastructureType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 
 import static java.lang.Boolean.parseBoolean;
@@ -23,7 +23,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.InfrastructureType;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.ActionableInfrastructureType;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 
@@ -84,7 +84,7 @@ public class TlsEnabledComponentUtils {
    *                               parameter.
    */
   public static void addTlsContextParameter(ParameterGroupDeclarer<?> parameterGroupDeclarer, ComponentAst targetComponent) {
-    InfrastructureType tlsContextInfrastructureType = getInfrastructureType(TlsContextFactory.class);
+    ActionableInfrastructureType tlsContextInfrastructureType = getActionableInfrastructureType(TlsContextFactory.class);
     MetadataType tlsContextType = new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(TlsEnabledComponentUtils.class.getClassLoader())
         .load(TlsContextFactory.class);

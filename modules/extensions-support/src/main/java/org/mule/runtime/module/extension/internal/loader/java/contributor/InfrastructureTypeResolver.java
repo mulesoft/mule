@@ -7,12 +7,14 @@
 package org.mule.runtime.module.extension.internal.loader.java.contributor;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getActionableInfrastructureTypes;
 
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
 
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.ActionableInfrastructureType;
 import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.InfrastructureType;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -27,19 +29,16 @@ import java.util.Optional;
  */
 public class InfrastructureTypeResolver {
 
-  private static final Map<Type, InfrastructureType> TYPE_MAPPING = InfrastructureTypeUtils.getInfrastructureTypes()
+  private static final Map<Type, ActionableInfrastructureType> TYPE_MAPPING = getActionableInfrastructureTypes()
       .stream()
-      .filter(infrastructureType -> infrastructureType.getClazz().isPresent())
-      .collect(toImmutableMap(infrastructureType -> new TypeWrapper(infrastructureType.getClazz()
-          .orElseThrow(() -> new RuntimeException(format("Expected infrastructure type to have an associated class: '%s'",
-                                                         infrastructureType))),
+      .collect(toImmutableMap(infrastructureType -> new TypeWrapper(infrastructureType.getClazz(),
                                                                     new DefaultExtensionsTypeLoaderFactory()
                                                                         .createTypeLoader(InfrastructureTypeUtils.class
                                                                             .getClassLoader())),
                               identity()));
 
 
-  public static Optional<InfrastructureType> getInfrastructureType(Type type) {
+  public static Optional<ActionableInfrastructureType> getInfrastructureType(Type type) {
     return TYPE_MAPPING.entrySet()
         .stream()
         .filter(entry -> entry.getKey().isSameType(type))
