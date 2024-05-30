@@ -456,18 +456,22 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     }
 
     List<String> pluginLocalPackages = new ArrayList<>();
-    for (String localPackage : descriptor.getClassLoaderConfiguration().getLocalPackages()) {
-      // packages exported from another artifact in the region will be ParentFirst,
-      // even if they are also exported by the container.
-      if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
-          || (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ParentFirstLookupStrategy
-              && muleModulesExportedPackages.contains(localPackage))) {
-        LOGGER.debug("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
-            + "', but it will be ignored since it is already available from the container.");
-      } else {
-        pluginLocalPackages.add(localPackage);
-      }
-    }
+
+    concat(concat(descriptor.getClassLoaderConfiguration().getLocalPackages().stream(),
+                  descriptor.getClassLoaderConfiguration().getExportedPackages().stream()),
+           descriptor.getClassLoaderConfiguration().getPrivilegedExportedPackages().stream())
+               .forEach(localPackage -> {
+                 // packages exported from another artifact in the region will be ParentFirst,
+                 // even if they are also exported by the container.
+                 if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
+                     || (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ParentFirstLookupStrategy
+                         && muleModulesExportedPackages.contains(localPackage))) {
+                   LOGGER.debug("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
+                       + "', but it will be ignored since it is already available from the container.");
+                 } else {
+                   pluginLocalPackages.add(localPackage);
+                 }
+               });
 
     return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPackages.stream(), CHILD_ONLY, true);
   }
