@@ -13,7 +13,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
-import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getActionableInfrastructureType;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getMetadataTypeBasedInfrastructureType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isInfrastructure;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
@@ -32,7 +32,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
-import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.ActionableInfrastructureType;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.MetadataTypeBasedInfrastructureType;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
@@ -143,7 +143,7 @@ public class TlsEnabledModelTestCase extends AbstractMuleTestCase {
     assertThat(tlsContextParameterModel.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(tlsContextParameterModel.getModelProperty(SyntheticModelModelProperty.class).isPresent(), is(true));
     assertThat(tlsContextParameterModel.getModelProperty(InfrastructureParameterModelProperty.class).isPresent(), is(true));
-    ActionableInfrastructureType tlsInfrastructureType = getActionableInfrastructureType(TlsContextFactory.class);
+    MetadataTypeBasedInfrastructureType tlsInfrastructureType = getMetadataTypeBasedInfrastructureType(TlsContextFactory.class);
     assertThat(tlsContextParameterModel.getModelProperty(QNameModelProperty.class),
                is(tlsInfrastructureType.getQNameModelProperty()));
 

@@ -9,7 +9,7 @@ package org.mule.runtime.extension.internal.ast;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getActionableInfrastructureType;
+import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getMetadataTypeBasedInfrastructureType;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsContextFactoryParameter;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsEnabled;
 
@@ -49,7 +49,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
   private static final String TLS_CONTEXT_CONFIG_PARAMETER_KEY = getTlsContextConfigParameterKey();
 
   private static String getTlsContextConfigParameterKey() {
-    return "#[vars." + getActionableInfrastructureType(TlsContextFactory.class).getName() + "]";
+    return "#[vars." + getMetadataTypeBasedInfrastructureType(TlsContextFactory.class).getName() + "]";
   }
 
   private final ComponentLocation location;

@@ -43,7 +43,7 @@ import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.IdempotentDeclarationEnricherWalkDelegate;
 import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
-import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.ActionableInfrastructureType;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.MetadataTypeBasedInfrastructureType;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
@@ -73,7 +73,7 @@ public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnric
           getInfrastructureType(new TypeWrapper(SchedulingStrategy.class,
                                                 new DefaultExtensionsTypeLoaderFactory()
                                                     .createTypeLoader(extensionLoadingContext.getExtensionClassLoader())))
-                                                        .map(ActionableInfrastructureType::getSequence).orElse(0);
+                                                        .map(MetadataTypeBasedInfrastructureType::getSequence).orElse(0);
       ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
       boolean thereArePollingSources = false;

@@ -13,7 +13,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.contributor
 import static org.springframework.core.ResolvableType.forMethodParameter;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.ActionableInfrastructureType;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.MetadataTypeBasedInfrastructureType;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -92,7 +92,7 @@ public final class ParameterWrapper implements ParameterElement {
   @Override
   public String getAlias() {
     return getInfrastructureType(getType())
-        .map(ActionableInfrastructureType::getName)
+        .map(MetadataTypeBasedInfrastructureType::getName)
         .orElse(ParameterElement.super.getAlias());
   }
 
