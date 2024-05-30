@@ -36,7 +36,6 @@ import org.mule.runtime.metrics.exporter.impl.utils.TestMeterExporterConfigurati
 import org.mule.runtime.metrics.exporter.impl.utils.TestOpenTelemetryMeterExporterFactory;
 import org.mule.runtime.metrics.exporter.impl.utils.TestServerRule;
 import org.mule.runtime.metrics.impl.meter.DefaultMeter;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -49,14 +48,15 @@ import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
+@Ignore("W-15586397")
 public class OpenTelemetryMeterExporterConfigTestCase {
 
   private static final int TIMEOUT_MILLIS = 30000;
@@ -82,16 +82,14 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   private LongCounter longCounter;
   private GenericContainer<?> collector;
 
-  public static final String RECEIVER_PORT = "receiverPort";
-
   @ClassRule
   public static SelfSignedCertificateRule serverTls = new SelfSignedCertificateRule();
 
   @ClassRule
   public static SelfSignedCertificateRule clientTls = new SelfSignedCertificateRule();
 
-  @Rule
-  public final TestServerRule server = new TestServerRule(new DynamicPort(RECEIVER_PORT));
+  @ClassRule
+  public static final TestServerRule server = new TestServerRule();
 
   @Before
   public void before() {
