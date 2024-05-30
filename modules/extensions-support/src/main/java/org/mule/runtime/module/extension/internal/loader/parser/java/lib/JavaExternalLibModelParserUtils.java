@@ -6,20 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.lib;
 
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExternalLibraryType.DEPENDENCY;
 import static org.mule.runtime.api.meta.ExternalLibraryType.JAR;
 import static org.mule.runtime.api.meta.ExternalLibraryType.NATIVE;
 import static org.mule.runtime.core.api.util.StringUtils.ifNotBlank;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.toMuleApi;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
 
 import org.mule.runtime.api.meta.ExternalLibraryType;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
+import org.mule.runtime.extension.api.annotation.ConfigReferences;
 import org.mule.runtime.extension.api.annotation.ExternalLib;
 import org.mule.runtime.extension.api.annotation.ExternalLibs;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 
+import java.lang.annotation.Annotation;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Utilities for parsing External Libraries definitions on a Java based extension

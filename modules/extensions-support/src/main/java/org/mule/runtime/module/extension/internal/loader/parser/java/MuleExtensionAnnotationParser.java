@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.loader.utils.JavaParserUtils.getAlias;
-import static org.mule.runtime.module.extension.internal.loader.utils.JavaParserUtils.toMuleApi;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.getAlias;
+import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.toMuleApi;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
