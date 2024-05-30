@@ -29,6 +29,7 @@ public class InfrastructureTypeResolver {
 
   private static final Map<Type, InfrastructureType> TYPE_MAPPING = InfrastructureTypeUtils.getInfrastructureTypes()
       .stream()
+      .filter(infrastructureType -> infrastructureType.getClazz().isPresent())
       .collect(toImmutableMap(infrastructureType -> new TypeWrapper(infrastructureType.getClazz()
           .orElseThrow(() -> new RuntimeException(format("Expected infrastructure type to have an associated class: '%s'",
                                                          infrastructureType))),

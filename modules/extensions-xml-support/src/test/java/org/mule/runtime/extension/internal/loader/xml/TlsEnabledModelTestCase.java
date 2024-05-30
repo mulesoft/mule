@@ -32,7 +32,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
-import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
 import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.InfrastructureType;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;

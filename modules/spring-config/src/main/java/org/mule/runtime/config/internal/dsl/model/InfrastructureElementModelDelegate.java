@@ -33,7 +33,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NA
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECT_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
-import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.getInfrastructureType;
 
 import static java.lang.String.format;
 
@@ -49,6 +48,7 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
@@ -233,7 +233,7 @@ class InfrastructureElementModelDelegate {
                             .build());
 
                 if (TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER.equals(name)) {
-                  getInfrastructureType(objectValue.getTypeId())
+                  InfrastructureTypeUtils.getInfrastructureTypes(objectValue.getTypeId()).iterator().next()
                       .getQNameModelProperty()
                       .map(QNameModelProperty::getValue)
                       .ifPresent(qname -> {
