@@ -1,0 +1,32 @@
+{
+  "4.8.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeValueChanged",
+            "old": "class org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor",
+            "new": "class org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor",
+            "annotationType": "javax.annotation.processing.SupportedOptions",
+            "attribute": "value",
+            "oldValue": "{\"extension.version\"}",
+            "newValue": "{\"extension.version\", \"extension.version\"}",
+            "justification": "W-15905984: Annotation processor classloader cannot access extension own resources"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeValueChanged",
+            "old": "class org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor",
+            "new": "class org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor",
+            "annotationType": "javax.annotation.processing.SupportedOptions",
+            "attribute": "value",
+            "oldValue": "{\"extension.version\"}",
+            "newValue": "{\"extension.version\", \"extension.version\"}",
+            "justification": "W-15905984: Annotation processor classloader cannot access extension own resources"
+          }
+        ]
+      }
+    }
+  }
+}
