@@ -1165,7 +1165,7 @@ public class MuleExtensionModelDeclarer {
         .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
   }
 
-  public static void addReconnectionStrategyParameter(ParameterizedDeclaration declaration) {
+  private static void addReconnectionStrategyParameter(ParameterizedDeclaration declaration) {
     ParameterDeclaration parameter = new ParameterDeclaration(RECONNECTION_STRATEGY_PARAMETER_NAME);
     parameter.setDescription(RECONNECTION_STRATEGY_PARAMETER_DESCRIPTION);
     parameter.setExpressionSupport(NOT_SUPPORTED);
