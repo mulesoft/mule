@@ -16,7 +16,7 @@ import static java.util.Optional.ofNullable;
 import static org.springframework.core.ResolvableType.forField;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.InfrastructureType;
+import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.MetadataTypeBasedInfrastructureType;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -97,7 +97,7 @@ public class FieldWrapper implements FieldElement {
   @Override
   public String getAlias() {
     return getInfrastructureType(getType())
-        .map(InfrastructureType::getName)
+        .map(MetadataTypeBasedInfrastructureType::getName)
         .orElse(FieldElement.super.getAlias());
   }
 
