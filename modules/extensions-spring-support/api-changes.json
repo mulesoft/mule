@@ -11,7 +11,7 @@
             "annotationType": "javax.annotation.processing.SupportedOptions",
             "attribute": "value",
             "oldValue": "{\"extension.version\"}",
-            "newValue": "{\"extension.version\", \"extension.version\"}",
+            "newValue": "{\"extension.version\", \"extension.resources\"}",
             "justification": "W-15905984: Annotation processor classloader cannot access extension own resources"
           },
           {
@@ -22,7 +22,7 @@
             "annotationType": "javax.annotation.processing.SupportedOptions",
             "attribute": "value",
             "oldValue": "{\"extension.version\"}",
-            "newValue": "{\"extension.version\", \"extension.version\"}",
+            "newValue": "{\"extension.version\", \"extension.resources\"}",
             "justification": "W-15905984: Annotation processor classloader cannot access extension own resources"
           }
         ]

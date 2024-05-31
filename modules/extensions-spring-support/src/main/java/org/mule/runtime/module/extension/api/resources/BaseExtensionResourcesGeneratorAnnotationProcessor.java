@@ -79,7 +79,7 @@ import com.google.common.base.Joiner;
 @SupportedSourceVersion(RELEASE_8)
 @SupportedOptions({
     BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION,
-    BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION
+    BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES
 })
 public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor {
 

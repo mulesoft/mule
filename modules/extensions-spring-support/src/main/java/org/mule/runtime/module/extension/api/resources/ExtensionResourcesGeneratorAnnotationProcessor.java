@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.resources;
 
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES;
 import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 
 import static javax.lang.model.SourceVersion.RELEASE_8;
@@ -29,7 +30,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 @SupportedSourceVersion(RELEASE_8)
 @SupportedOptions({
     EXTENSION_VERSION,
-    EXTENSION_VERSION
+    EXTENSION_RESOURCES
 })
 public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensionResourcesGeneratorAnnotationProcessor {
 
