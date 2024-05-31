@@ -28,7 +28,7 @@ public class TlsRevocationCheckTestCase extends MuleArtifactFunctionalTestCase {
   }
 
   @Test
-  public void testTlsContextKeyStoreProperties() {
+  public void testTlsContextWithStandardRevocation() {
     try {
       TlsContextKeyStoreConfiguration keyStoreConfig = tlsContextFactory.getKeyStoreConfiguration();
     } catch (Exception ex) {
