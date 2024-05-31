@@ -32,6 +32,7 @@ import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.chain.AllOfRoutesOutputTypeResolver;
 import org.mule.runtime.module.extension.internal.metadata.chain.OneOfRoutesOutputTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.chain.PassThroughChainInputTypeResolver;
 import org.mule.runtime.module.extension.internal.metadata.chain.PassThroughChainOutputTypeResolver;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
@@ -119,6 +120,12 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
   }
 
   @Override
+  public DefaultComponentMetadataConfigurer withPassThroughChainInputTypeResolver() {
+    this.chainInputTypeResolver = PassThroughChainInputTypeResolver.INSTANCE;
+    return this;
+  }
+
+  @Override
   public DefaultComponentMetadataConfigurer addInputResolver(String parameterName, InputTypeResolver resolver) {
     checkArgument(!isBlank(parameterName), "parameterName cannot be blank");
     checkArgument(resolver != null, "resolver cannot be null");
@@ -172,6 +179,9 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
 
   @Override
   public DefaultComponentMetadataConfigurer asPassthroughScope() {
+    if (chainInputTypeResolver == null) {
+      withPassThroughChainInputTypeResolver();
+    }
     setOutputTypeResolver(PassThroughChainOutputTypeResolver.INSTANCE);
     setAttributesTypeResolver(PassThroughChainOutputTypeResolver.INSTANCE);
 

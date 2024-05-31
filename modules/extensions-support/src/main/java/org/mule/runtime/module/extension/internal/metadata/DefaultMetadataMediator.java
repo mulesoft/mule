@@ -207,16 +207,7 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
     }
   }
 
-  /**
-   * Resolves the {@link ScopeInputMetadataDescriptor}. Only to be used for scope components
-   *
-   * @param context               current {@link MetadataContext} that will be used by the metadata resolvers.
-   * @param key                   {@link MetadataKey} of the type which structure has to be resolved, used both for input and
-   *                              output types
-   * @param scopeInputMessageType a {@link MessageMetadataType} for the message that originally entered the scope
-   * @return a {@link MetadataResult} of {@link ScopeInputMetadataDescriptor}
-   * @since 4.7.0
-   */
+  @Override
   public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataContext context,
                                                                             MetadataKey key,
                                                                             Supplier<MessageMetadataType> scopeInputMessageType) {
@@ -242,16 +233,7 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
     }
   }
 
-  /**
-   * Resolves the {@link RouterInputMetadataDescriptor}. Only to be used for router components
-   *
-   * @param context                current {@link MetadataContext} that will be used by the metadata resolvers.
-   * @param key                    {@link MetadataKey} of the type which structure has to be resolved, used both for input and
-   *                               output types
-   * @param routerInputMessageType a {@link MessageMetadataType} for the message that originally entered the router
-   * @return a {@link MetadataResult} of {@link RouterInputMetadataDescriptor}
-   * @since 4.7.0
-   */
+  @Override
   public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataContext context,
                                                                               MetadataKey key,
                                                                               Supplier<MessageMetadataType> routerInputMessageType) {
