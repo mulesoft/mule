@@ -140,6 +140,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes to
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.loader.utils to
+      org.mule.runtime.extensions.mule.support,
       org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.manager to
