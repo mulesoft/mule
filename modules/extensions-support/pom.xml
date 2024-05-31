@@ -10,6 +10,7 @@
     <artifactId>mule-module-extensions-support</artifactId>
     <name>Mule Extensions Support</name>
     <packaging>jar</packaging>
+    <version>4.3.0-20240408-W-15708770</version>
     <description>
         Default implementation of the Mule Extension API.
     </description>
@@ -40,12 +41,12 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-deployment-model</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -54,12 +55,12 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-oauth-api</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -89,7 +90,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -114,7 +115,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -125,54 +126,54 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <!-- Test Extensions dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-metadata-extension</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-vegan-extension</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-heisenberg-extension</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-marvel-extension</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-subtypes-extension</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-petstore-extension</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-values-extension</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
@@ -190,13 +191,13 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-model</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -214,7 +215,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-test-oauth-extension</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
