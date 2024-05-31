@@ -135,6 +135,7 @@ import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
+import org.mule.sdk.api.annotation.metadata.PassThroughInputChainResolver;
 
 import java.util.Map;
 
@@ -399,6 +400,10 @@ public class MuleExtensionModelDeclarer {
         .describedAs("Processes the nested list of message processors asynchronously.").blocking(false);
 
     async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
+    configurerFactory.create()
+        .withPassThroughChainInputTypeResolver()
+        .configure(async);
+
     async.onDefaultParameterGroup()
         .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
@@ -611,6 +616,10 @@ public class MuleExtensionModelDeclarer {
 
     forEach.withChain()
         .withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(MULTIPLE_OR_NONE);
+
+    configurerFactory.create()
+        .setChainInputTypeResolver(CollectionChainInputTypeResolver.INSTANCE)
+        .configure(forEach);
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
@@ -862,7 +871,10 @@ public class MuleExtensionModelDeclarer {
 
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asPassthroughScope().configure(parallelForeach);
+    configurerFactory.create()
+        .setChainInputTypeResolver(CollectionChainInputTypeResolver.INSTANCE)
+        .asPassthroughScope()
+        .configure(parallelForeach);
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer) {
