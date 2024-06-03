@@ -17,9 +17,11 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithNestedComponentsDeclaration;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
@@ -171,6 +173,9 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
 
   @Override
   public DefaultComponentMetadataConfigurer asOneOfRouter() {
+    if (chainInputTypeResolver == null) {
+      withPassThroughChainInputTypeResolver();
+    }
     setOutputTypeResolver(OneOfRoutesOutputTypeResolver.INSTANCE);
     setAttributesTypeResolver(OneOfRoutesOutputTypeResolver.INSTANCE);
 
@@ -190,6 +195,9 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
 
   @Override
   public DefaultComponentMetadataConfigurer asAllOfRouter() {
+    if (chainInputTypeResolver == null) {
+      withPassThroughChainInputTypeResolver();
+    }
     setOutputTypeResolver(AllOfRoutesOutputTypeResolver.INSTANCE);
     return this;
   }
@@ -201,6 +209,10 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
 
   @Override
   public <T extends ComponentDeclaration> void configure(ParameterizedDeclaration<T> declaration) {
+    if (routesChainInputTypesResolvers.isEmpty() && chainInputTypeResolver != null
+        && declaration instanceof WithNestedComponentsDeclaration) {
+      applyChainInputTypeResolverToAllRoutes((WithNestedComponentsDeclaration<?>) declaration);
+    }
     declaration.addModelProperty(buildFactoryModelProperty());
     buildResolverInformationModelProperty(declaration).ifPresent(declaration::addModelProperty);
 
@@ -209,6 +221,12 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
                                                                   getCategoryName(keysResolver, firstSeenInputResolverCategory,
                                                                                   outputTypeResolver)));
     }
+  }
+
+  private void applyChainInputTypeResolverToAllRoutes(WithNestedComponentsDeclaration<?> router) {
+    router.getNestedComponents().stream()
+        .map(NamedObject::getName)
+        .forEach(routeName -> routesChainInputTypesResolvers.put(routeName, chainInputTypeResolver));
   }
 
   private MetadataResolverFactoryModelProperty buildFactoryModelProperty() {
