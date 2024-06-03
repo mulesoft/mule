@@ -30,14 +30,10 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
 
   public static final String EXPORTED_PACKAGES_VALIDATOR_SKIP = "exportedPackagesValidator.skip";
   public static final String EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION = "exportedPackagesValidator.strictValidation";
-  private ProcessingEnvironment processingEnv;
+  private final ProcessingEnvironment processingEnv;
 
   public ExportedPackagesValidator(ProcessingEnvironment processingEnv) {
     this.processingEnv = processingEnv;
-  }
-
-  public ExportedPackagesValidator() {
-
   }
 
   @Override

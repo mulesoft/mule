@@ -7,12 +7,16 @@
 package org.mule.runtime.module.extension.internal.resources.validator;
 
 import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_SKIP;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 
+import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -21,6 +25,7 @@ import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mockito.quality.Strictness.STRICT_STUBS;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -35,6 +40,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.OperationWrapper;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.module.extension.api.ApiTestClass;
@@ -46,31 +52,45 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 
-import com.google.common.reflect.TypeToken;
-import org.hamcrest.collection.IsEmptyCollection;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import javax.annotation.processing.ProcessingEnvironment;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ExportedPackagesValidatorTestCase {
+import com.google.common.reflect.TypeToken;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.hamcrest.collection.IsEmptyCollection;
+
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+public class ExportedPackagesValidatorTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule().strictness(STRICT_STUBS);
 
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   private static boolean shouldValidate() {
-    String skip = System.getProperty("exportedPackagesValidator.skip");
+    String skip = getProperty(EXPORTED_PACKAGES_VALIDATOR_SKIP);
     return !(skip != null ? Boolean.valueOf(skip) : false);
   }
 
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
+  private ProcessingEnvironment processingEnvironment;
+
   @Before
   public void setup() {
     ClassLoaderModelProperty classLoaderModelProperty = new ClassLoaderModelProperty(getClass().getClassLoader());
     when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(of(classLoaderModelProperty));
+
+    processingEnvironment = mock(ProcessingEnvironment.class);
+    when(processingEnvironment.getOptions())
+        .thenReturn(singletonMap("EXPORTED_PACKAGES_VALIDATOR_SKIP", getProperty(EXPORTED_PACKAGES_VALIDATOR_SKIP)));
   }
 
   @Test
@@ -79,7 +99,7 @@ public class ExportedPackagesValidatorTestCase {
 
     setUpInvalidExtension();
 
-    ExportedPackagesValidator exportedPackagesValidator = new ExportedPackagesValidator();
+    ExportedPackagesValidator exportedPackagesValidator = new ExportedPackagesValidator(processingEnvironment);
     ProblemsReporter problemsReporter = new ProblemsReporter(extensionModel);
     exportedPackagesValidator.validate(extensionModel, problemsReporter);
 
@@ -99,7 +119,7 @@ public class ExportedPackagesValidatorTestCase {
   @Test
   public void validExportedPackages() {
     setUpValidExtension();
-    ExportedPackagesValidator exportedPackagesValidator = new ExportedPackagesValidator();
+    ExportedPackagesValidator exportedPackagesValidator = new ExportedPackagesValidator(processingEnvironment);
     ProblemsReporter problemsReporter = new ProblemsReporter(extensionModel);
     exportedPackagesValidator.validate(extensionModel, problemsReporter);
 

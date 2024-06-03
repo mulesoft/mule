@@ -43,7 +43,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensi
     super.configureLoadingRequest(requestBuilder);
 
     requestBuilder.addEnricher(new DescriptionDeclarationEnricher());
-    requestBuilder.addValidator(new ExportedPackagesValidator());
+    requestBuilder.addValidator(new ExportedPackagesValidator(processingEnv));
   }
 
   @Override
