@@ -8,7 +8,6 @@ package org.mule.module.artifact.classloader;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
 import java.lang.reflect.InvocationTargetException;
@@ -52,27 +51,46 @@ public class GroovyResourceReleaser implements ResourceReleaser {
       Method removeClassMethod = invokerHelperClass.getMethod("removeClass", Class.class);
       Object classInfos = getAllClassInfoMethod.invoke(null);
       if (classInfos instanceof Collection) {
-        unregisterClassesFromInvokerHelper(removeClassMethod, getTheClassMethod, (Collection) classInfos);
+        // If the ClassInfo class was loaded by this classloader, then it means it is the owner of the Groovy dependency itself.
+        // In that case we want to make sure there are no classes retained by the ClassInfos.
+        boolean unregisterAllClasses = isOwnedClassLoader(classInfoClass.getClassLoader(), classLoader);
+        unregisterClassesFromInvokerHelper(removeClassMethod, getTheClassMethod, (Collection<?>) classInfos,
+                                           unregisterAllClasses);
       }
     } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException e) {
       LOGGER.warn("Error trying to remove the Groovy's InvokerHelper classes", e);
     }
   }
 
-  private void unregisterClassesFromInvokerHelper(Method removeClassMethod, Method getTheClassMethod,
-                                                  Collection<?> classes) {
+  private void unregisterClassesFromInvokerHelper(Method removeClassMethod,
+                                                  Method getTheClassMethod,
+                                                  Collection<?> classes,
+                                                  boolean unregisterAllClasses) {
     for (Object classInfo : classes) {
-      Object clazz = null;
+      Class<?> clazz = null;
       try {
-        clazz = getTheClassMethod.invoke(classInfo);
-        if (clazz.getClass().getClassLoader() == this.classLoader) {
+        clazz = (Class<?>) getTheClassMethod.invoke(classInfo);
+
+        // Only unregister classes owned by this classloader, unless specified otherwise
+        // This is to avoid interference between sibling artifacts
+        if (unregisterAllClasses || isOwnedClassLoader(classLoader, clazz.getClassLoader())) {
           removeClassMethod.invoke(null, clazz);
         }
-
       } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
-        String className = clazz instanceof Class ? ((Class) clazz).getName() : "Unknown";
+        String className = clazz != null ? clazz.getName() : "Unknown";
         LOGGER.warn("Could not remove the {} class from the Groovy's InvokerHelper", className, e);
       }
     }
+  }
+
+  private boolean isOwnedClassLoader(ClassLoader ownerClassLoader, ClassLoader classLoader) {
+    // Traverse the hierarchy for this ClassLoader searching for the same instance of the ownerClassLoader.
+    while (classLoader != null) {
+      if (classLoader == ownerClassLoader) {
+        return true;
+      }
+      classLoader = classLoader.getParent();
+    }
+    return false;
   }
 }

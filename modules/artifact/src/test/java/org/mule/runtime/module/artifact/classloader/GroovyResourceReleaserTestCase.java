@@ -17,12 +17,10 @@ import static java.lang.Class.forName;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -30,9 +28,11 @@ import org.mule.tck.util.CollectableReference;
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.aspectj.weaver.loadtime.Aj;
 import org.junit.AfterClass;
@@ -59,40 +59,67 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     Aj.loadersToSkip = oldAjLoadersToSkip;
   }
 
-  private static final int PROBER_POLLING_INTERVAL = 150;
-  private static final int PROBER_POLLING_TIMEOUT = 6000;
   private static final String GROOVY_ARTIFACT_ID = "groovy";
   private static final String GROOVY_GROUP_ID = "org.codehaus.groovy";
   private static final String GROOVY_SCRIPT_ENGINE = "groovy.util.GroovyScriptEngine";
   private static final String GROOVY_LANG_BINDING = "groovy.lang.Binding";
 
   private final String groovyVersion;
-  private final ClassLoaderLookupPolicy testLookupPolicy;
 
   public GroovyResourceReleaserTestCase(String groovyVersion) {
     this.groovyVersion = groovyVersion;
-    this.testLookupPolicy = CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
   }
 
   @Parameterized.Parameters(name = "Testing artifact {0}")
   public static String[] data() throws NoSuchFieldException, IllegalAccessException {
     return new String[] {
-        "2.4.21"
+        "2.4.21",
+        "2.5.22",
+        "3.0.19"
     };
   }
 
   @Test
   public void runGroovyScriptAndDispose() throws ReflectiveOperationException {
-    CollectableReference<MuleArtifactClassLoader> collectableReference =
-        new CollectableReference<>(new MuleArtifactClassLoader("GroovyResourceReleaserTestCase",
-                                                               mock(ArtifactDescriptor.class),
-                                                               new URL[] {
-                                                                   getDependencyFromMaven(GROOVY_GROUP_ID, GROOVY_ARTIFACT_ID,
-                                                                                          groovyVersion)},
-                                                               currentThread().getContextClassLoader(),
-                                                               testLookupPolicy));
+    createAppClassLoaderRunAndAssert(currentThread().getContextClassLoader(),
+                                     new URL[] {getDependencyFromMaven(GROOVY_GROUP_ID,
+                                                                       GROOVY_ARTIFACT_ID,
+                                                                       groovyVersion)});
+  }
 
-    assertEquals("TEST", runScript(collectableReference.get()));
+  @Test
+  @Issue("W-15750766")
+  public void runGroovyScriptAndDisposeWhenGroovyIsInDomain() throws ReflectiveOperationException {
+    MuleArtifactClassLoader domainClassLoader = new MuleArtifactClassLoader("Domain",
+                                                                            mock(ArtifactDescriptor.class),
+                                                                            new URL[] {
+                                                                                getDependencyFromMaven(GROOVY_GROUP_ID,
+                                                                                                       GROOVY_ARTIFACT_ID,
+                                                                                                       groovyVersion)},
+                                                                            currentThread().getContextClassLoader(),
+                                                                            CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY);
+    // This is to make the hierarchy more similar to reality, in particular, this affects the way in which classloaders are
+    // reachable through the parents.
+    RegionClassLoader regionClassLoader = new RegionClassLoader(domainClassLoader);
+
+    createAppClassLoaderRunAndAssert(regionClassLoader);
+    createAppClassLoaderRunAndAssert(regionClassLoader);
+  }
+
+  private void createAppClassLoaderRunAndAssert(ClassLoader parentClassLoader) throws ReflectiveOperationException {
+    createAppClassLoaderRunAndAssert(parentClassLoader, new URL[] {});
+  }
+
+  private void createAppClassLoaderRunAndAssert(ClassLoader parentClassLoader, URL[] classPaths)
+      throws ReflectiveOperationException {
+    CollectableReference<MuleArtifactClassLoader> collectableReference =
+        new CollectableReference<>(new MuleArtifactClassLoader("Application",
+                                                               mock(ArtifactDescriptor.class),
+                                                               classPaths,
+                                                               parentClassLoader,
+                                                               CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY));
+
+    assertThat(runScript(collectableReference.get()), is("hello"));
     collectableReference.get().dispose();
 
     assertThat(collectableReference, is(eventually(collectedByGc())));
@@ -107,5 +134,20 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     Method runMethod = groovyScriptEngineClass.getMethod("run", String.class, groovyBinding);
     String scriptBody = "example.groovy";
     return (String) runMethod.invoke(scriptEngine, scriptBody, groovyBinding.getConstructor().newInstance());
+  }
+
+  private static class RegionClassLoader extends URLClassLoader {
+
+    private final MuleArtifactClassLoader registeredClassLoader;
+
+    public RegionClassLoader(MuleArtifactClassLoader registeredClassLoader) {
+      super(new URL[] {});
+      this.registeredClassLoader = registeredClassLoader;
+    }
+
+    @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+      return registeredClassLoader.loadClass(name);
+    }
   }
 }
