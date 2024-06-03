@@ -15,6 +15,8 @@ import static org.mule.runtime.extension.privileged.spi.ExtensionsApiSpiUtils.lo
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getLoaderById;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_SKIP;
+import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -79,7 +81,9 @@ import com.google.common.base.Joiner;
 @SupportedSourceVersion(RELEASE_8)
 @SupportedOptions({
     BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION,
-    BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES
+    BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES,
+    EXPORTED_PACKAGES_VALIDATOR_SKIP,
+    EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION
 })
 public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor {
 
