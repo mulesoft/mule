@@ -282,7 +282,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       shouldReleaseActiveMQReferences = true;
     }
 
-    if (!shouldReleaseGroovyReferences && name.startsWith("org.codehaus.groovy")) {
+    if (!shouldReleaseGroovyReferences && name.startsWith("org.codehaus.groovy") && clazz.getClassLoader() == this) {
       shouldReleaseGroovyReferences = true;
     }
     return clazz;
