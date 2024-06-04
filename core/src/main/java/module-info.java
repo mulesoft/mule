@@ -57,6 +57,7 @@ module org.mule.runtime.core {
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
 
+  requires org.mule.runtime.core.utils;
   requires org.mule.runtime.metrics.api;
   requires org.mule.runtime.tracer.api;
   requires org.mule.runtime.tracer.customization.api;

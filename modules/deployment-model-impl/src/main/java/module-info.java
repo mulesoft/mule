@@ -17,6 +17,7 @@ module org.mule.runtime.deployment.model.impl {
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.container;
+  requires org.mule.runtime.core.utils;
   requires org.mule.runtime.core;
   requires org.mule.runtime.deployment.model;
   requires org.mule.runtime.extension.model;

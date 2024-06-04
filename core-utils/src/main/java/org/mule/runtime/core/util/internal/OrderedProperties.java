@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util;
+package org.mule.runtime.core.util.internal;
 
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -29,7 +29,7 @@ public class OrderedProperties extends Properties {
 
     while (keys.hasMoreElements()) {
       Object key = keys.nextElement();
-      entries.add(new DefaultMapEntry(key, this.getProperty((String) key)));
+      entries.add(new DefaultMapEntry<>(key, this.getProperty((String) key)));
     }
 
     return entries;

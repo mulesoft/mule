@@ -12,7 +12,7 @@ import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
 
-import org.mule.runtime.core.api.util.PropertiesUtils;
+import org.mule.runtime.core.util.api.PropertiesUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 
 import java.io.File;

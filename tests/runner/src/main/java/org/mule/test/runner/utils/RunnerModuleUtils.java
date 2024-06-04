@@ -7,7 +7,7 @@
 package org.mule.test.runner.utils;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+import static org.mule.runtime.core.util.api.PropertiesUtils.discoverProperties;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;

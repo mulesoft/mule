@@ -4,10 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util;
+package org.mule.runtime.core.util.internal;
 
-import static junit.framework.Assert.assertEquals;
-import org.mule.tck.size.SmallTest;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -16,10 +15,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang3.RandomStringUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 
-@SmallTest
 public class OrderedPropertiesTestCase {
 
   private final int count = 100;

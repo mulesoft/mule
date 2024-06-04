@@ -98,7 +98,7 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
+            <artifactId>mule-core-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

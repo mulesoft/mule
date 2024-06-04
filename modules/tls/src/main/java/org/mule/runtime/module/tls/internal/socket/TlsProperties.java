@@ -7,7 +7,7 @@
 package org.mule.runtime.module.tls.internal.socket;
 
 
-import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
+import static org.mule.runtime.core.util.api.PropertiesUtils.loadProperties;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 

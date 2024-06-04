@@ -4,12 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util;
+package org.mule.runtime.core.util.internal;
 
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_BASE_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +21,9 @@ import java.util.Optional;
  * @since 4.0
  */
 public class StandaloneServerUtils {
+
+  public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
+  public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
 
   /**
    * @return the MULE_HOME directory of this instance. Returns null if the property is not set

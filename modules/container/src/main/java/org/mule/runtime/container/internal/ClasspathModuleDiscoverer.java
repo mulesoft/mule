@@ -8,19 +8,19 @@ package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
-import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
-import static org.mule.runtime.core.api.util.PropertiesUtils.discoverProperties;
+import static org.mule.runtime.core.util.api.PropertiesUtils.discoverProperties;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.createTempFile;
 import static java.util.Collections.emptyList;
 
 import static org.apache.commons.io.FileUtils.cleanDirectory;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
@@ -73,20 +73,25 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   public ClasspathModuleDiscoverer(File temporaryFolder, String modulePropertiesResource) {
     this.serviceInterfaceToServiceFile =
-        serviceInterface -> wrappingInIllegalStateException(() -> createTempFile(temporaryFolder.toPath(), serviceInterface,
-                                                                                 TMP_FOLDER_SUFFIX).toFile(),
-                                                            serviceInterface);
+        serviceInterface -> {
+          try {
+            return createTempFile(temporaryFolder.toPath(), serviceInterface,
+                                  TMP_FOLDER_SUFFIX).toFile();
+          } catch (Exception e) {
+            throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface),
+                                            e);
+          }
+        };
     this.fileToResource =
-        (serviceInterface, serviceFile) -> wrappingInIllegalStateException(() -> serviceFile.toURI().toURL(), serviceInterface);
+        (serviceInterface, serviceFile) -> {
+          try {
+            return serviceFile.toURI().toURL();
+          } catch (Exception e) {
+            throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface),
+                                            e);
+          }
+        };
     this.modulePropertiesResource = modulePropertiesResource;
-  }
-
-  private <T> T wrappingInIllegalStateException(CheckedSupplier<T> supplier, String serviceInterface) {
-    try {
-      return supplier.get();
-    } catch (Exception e) {
-      throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);
-    }
   }
 
   public ClasspathModuleDiscoverer(Function<String, File> serviceInterfaceToServiceFile,
@@ -180,7 +185,7 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
         File serviceFile = serviceInterfaceToServiceFile.apply(serviceInterface);
         serviceFile.deleteOnExit();
 
-        stringToFile(serviceFile.getAbsolutePath(), serviceImplementation);
+        writeStringToFile(serviceFile, serviceImplementation, UTF_8);
         resource = fileToResource.apply(serviceInterface, serviceFile);
       } catch (IOException e) {
         throw new IllegalStateException(format("Error creating temporary service provider file for '%s'", serviceInterface), e);

@@ -15,6 +15,7 @@ module org.mule.runtime.tls {
 
   requires org.mule.runtime.api;
   requires org.mule.runtime.container;
+  requires org.mule.runtime.core.utils;
   requires org.mule.runtime.core;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.extension.model;

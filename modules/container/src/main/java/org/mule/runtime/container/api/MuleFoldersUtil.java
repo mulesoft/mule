@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.container.api;
 
+import static org.mule.runtime.core.util.internal.StandaloneServerUtils.getMuleBase;
+import static org.mule.runtime.core.util.internal.StandaloneServerUtils.getMuleHome;
+
 import static java.io.File.separator;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
-import org.mule.runtime.core.api.util.StringUtils;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import java.io.File;
 
@@ -74,7 +76,7 @@ public class MuleFoldersUtil {
    * @return a {@link File} pointing to the folder that corresponds to the provided service name when installed.
    */
   public static File getServiceFolder(String name) {
-    checkArgument(!StringUtils.isEmpty(name), "name cannot be empty");
+    checkArgument(!isEmpty(name), "name cannot be empty");
     return new File(getServicesFolder(), name);
   }
 
