@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.api.resources;
 
 import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES;
 import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
+import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_SKIP;
+import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION;
 
 import static javax.lang.model.SourceVersion.RELEASE_8;
 
@@ -30,7 +32,9 @@ import javax.annotation.processing.SupportedSourceVersion;
 @SupportedSourceVersion(RELEASE_8)
 @SupportedOptions({
     EXTENSION_VERSION,
-    EXTENSION_RESOURCES
+    EXTENSION_RESOURCES,
+    EXPORTED_PACKAGES_VALIDATOR_SKIP,
+    EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION
 })
 public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensionResourcesGeneratorAnnotationProcessor {
 
@@ -39,7 +43,7 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensi
     super.configureLoadingRequest(requestBuilder);
 
     requestBuilder.addEnricher(new DescriptionDeclarationEnricher());
-    requestBuilder.addValidator(new ExportedPackagesValidator());
+    requestBuilder.addValidator(new ExportedPackagesValidator(processingEnv));
   }
 
   @Override

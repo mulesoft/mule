@@ -14,11 +14,11 @@ import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClas
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedPackagesCollector;
 import org.mule.runtime.module.extension.internal.resources.manifest.ProcessingEnvironmentClassPackageFinder;
 
-import javax.annotation.processing.ProcessingEnvironment;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.processing.ProcessingEnvironment;
 
 /**
  * {@link ExtensionModelValidator} which validates that the exported packages for the current extension exports API declared
@@ -28,16 +28,12 @@ import java.util.Map;
  */
 public class ExportedPackagesValidator implements ExtensionModelValidator {
 
-  private static final String EXPORTED_PACKAGES_VALIDATOR_SKIP = "exportedPackagesValidator.skip";
-  private static final String EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION = "exportedPackagesValidator.strictValidation";
-  private ProcessingEnvironment processingEnv;
+  public static final String EXPORTED_PACKAGES_VALIDATOR_SKIP = "exportedPackagesValidator.skip";
+  public static final String EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION = "exportedPackagesValidator.strictValidation";
+  private final ProcessingEnvironment processingEnv;
 
   public ExportedPackagesValidator(ProcessingEnvironment processingEnv) {
     this.processingEnv = processingEnv;
-  }
-
-  public ExportedPackagesValidator() {
-
   }
 
   @Override
@@ -94,12 +90,18 @@ public class ExportedPackagesValidator implements ExtensionModelValidator {
   }
 
   private boolean shouldValidate() {
-    String skip = System.getProperty(EXPORTED_PACKAGES_VALIDATOR_SKIP);
+    String skip = processingEnv.getOptions().get(EXPORTED_PACKAGES_VALIDATOR_SKIP);
+    if (skip == null) {
+      skip = System.getProperty(EXPORTED_PACKAGES_VALIDATOR_SKIP);
+    }
     return !(skip != null ? Boolean.valueOf(skip) : false);
   }
 
   private boolean strictValidation() {
-    String strictValidation = System.getProperty(EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION);
+    String strictValidation = processingEnv.getOptions().get(EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION);
+    if (strictValidation == null) {
+      strictValidation = System.getProperty(EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION);
+    }
     return strictValidation != null ? Boolean.valueOf(strictValidation) : true;
   }
 
