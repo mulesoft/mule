@@ -33,24 +33,28 @@ module org.mule.runtime.tls {
   exports org.mule.runtime.module.tls.api.socket;
 
   exports org.mule.runtime.module.tls.internal.config to
-      org.mule.runtime.spring.config,
-      spring.beans;
+          org.mule.runtime.spring.config,
+          spring.beans;
+
+  exports org.mule.runtime.module.tls.internal.revocation to
+          spring.beans;
+
   exports org.mule.runtime.module.tls.internal.util to
-      org.mule.runtime.launcher;
+          org.mule.runtime.launcher;
 
   provides org.mule.runtime.api.tls.AbstractTlsContextFactoryBuilderFactory with
-      org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory;
+          org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory;
 
   provides org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider with
-      org.mule.runtime.module.tls.api.extension.TlsRuntimeExtensionModelProvider;
+          org.mule.runtime.module.tls.api.extension.TlsRuntimeExtensionModelProvider;
 
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
-      org.mule.runtime.module.tls.internal.config.TlsComponentBuildingDefinitionProvider;
+          org.mule.runtime.module.tls.internal.config.TlsComponentBuildingDefinitionProvider;
 
   provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider with
-      org.mule.runtime.module.tls.internal.config.TlsXmlNamespaceInfoProvider;
+          org.mule.runtime.module.tls.internal.config.TlsXmlNamespaceInfoProvider;
 
   opens org.mule.runtime.module.tls.internal.config to
-      net.bytebuddy;
+          net.bytebuddy;
 
 }
