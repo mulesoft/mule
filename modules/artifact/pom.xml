@@ -8,6 +8,7 @@
         <version>4.4.0-20240520</version>
     </parent>
     <artifactId>mule-module-artifact</artifactId>
+    <version>4.4.0-20240520-W-15750766</version>
     <packaging>jar</packaging>
     <name>Mule Artifact Module</name>
 
@@ -20,7 +21,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vdurmont</groupId>
@@ -37,7 +38,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -54,7 +55,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -90,7 +91,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
-            <version>${project.version}</version>
+            <version>${parent.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
