@@ -105,6 +105,12 @@
             <version>${muleMavenClientImpl}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectjVersion}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
