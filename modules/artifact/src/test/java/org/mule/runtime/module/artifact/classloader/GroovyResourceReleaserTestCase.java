@@ -15,7 +15,7 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 
 import static java.lang.Class.forName;
 import static java.lang.Thread.currentThread;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -51,7 +51,8 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
   @BeforeClass
   public static void avoidAspectjAgentLeak() {
     oldAjLoadersToSkip = Aj.loadersToSkip;
-    Aj.loadersToSkip = singletonList(MuleArtifactClassLoader.class.getName());
+    Aj.loadersToSkip = asList(MuleArtifactClassLoader.class.getName(),
+                              "groovy.lang.GroovyClassLoader$InnerLoader");
   }
 
   @AfterClass
@@ -64,10 +65,10 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
   private static final String GROOVY_SCRIPT_ENGINE = "groovy.util.GroovyScriptEngine";
   private static final String GROOVY_LANG_BINDING = "groovy.lang.Binding";
 
-  private final String groovyVersion;
+  private final URL groovyUrl;
 
   public GroovyResourceReleaserTestCase(String groovyVersion) {
-    this.groovyVersion = groovyVersion;
+    groovyUrl = getDependencyFromMaven(GROOVY_GROUP_ID, GROOVY_ARTIFACT_ID, groovyVersion);
   }
 
   @Parameterized.Parameters(name = "Testing artifact {0}")
@@ -81,47 +82,50 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void runGroovyScriptAndDispose() throws ReflectiveOperationException {
-    createAppClassLoaderRunAndAssert(currentThread().getContextClassLoader(),
-                                     new URL[] {getDependencyFromMaven(GROOVY_GROUP_ID,
-                                                                       GROOVY_ARTIFACT_ID,
-                                                                       groovyVersion)});
+    createAppClassLoaderRunAndAssert(currentThread().getContextClassLoader(), new URL[] {groovyUrl});
   }
 
   @Test
   @Issue("W-15750766")
   public void runGroovyScriptAndDisposeWhenGroovyIsInDomain() throws ReflectiveOperationException {
-    MuleArtifactClassLoader domainClassLoader = new MuleArtifactClassLoader("Domain",
-                                                                            mock(ArtifactDescriptor.class),
-                                                                            new URL[] {
-                                                                                getDependencyFromMaven(GROOVY_GROUP_ID,
-                                                                                                       GROOVY_ARTIFACT_ID,
-                                                                                                       groovyVersion)},
-                                                                            currentThread().getContextClassLoader(),
-                                                                            CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY);
+    CollectableReference<MuleArtifactClassLoader> domainClassLoader = createClassLoader("Domain",
+                                                                                        currentThread().getContextClassLoader(),
+                                                                                        new URL[] {groovyUrl});
     // This is to make the hierarchy more similar to reality, in particular, this affects the way in which classloaders are
     // reachable through the parents.
-    RegionClassLoader regionClassLoader = new RegionClassLoader(domainClassLoader);
+    RegionClassLoader regionClassLoader = new RegionClassLoader(domainClassLoader.get());
 
     createAppClassLoaderRunAndAssert(regionClassLoader);
     createAppClassLoaderRunAndAssert(regionClassLoader);
+
+    regionClassLoader = null;
+    disposeClassLoaderAndAssertCollected(domainClassLoader);
   }
 
   private void createAppClassLoaderRunAndAssert(ClassLoader parentClassLoader) throws ReflectiveOperationException {
     createAppClassLoaderRunAndAssert(parentClassLoader, new URL[] {});
   }
 
+  private CollectableReference<MuleArtifactClassLoader> createClassLoader(String name, ClassLoader parentClassLoader,
+                                                                          URL[] classPaths) {
+    return new CollectableReference<>(new MuleArtifactClassLoader(name,
+                                                                  mock(ArtifactDescriptor.class),
+                                                                  classPaths,
+                                                                  parentClassLoader,
+                                                                  CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY));
+  }
+
   private void createAppClassLoaderRunAndAssert(ClassLoader parentClassLoader, URL[] classPaths)
       throws ReflectiveOperationException {
     CollectableReference<MuleArtifactClassLoader> collectableReference =
-        new CollectableReference<>(new MuleArtifactClassLoader("Application",
-                                                               mock(ArtifactDescriptor.class),
-                                                               classPaths,
-                                                               parentClassLoader,
-                                                               CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY));
+        createClassLoader("Application", parentClassLoader, classPaths);
 
     assertThat(runScript(collectableReference.get()), is("hello"));
-    collectableReference.get().dispose();
+    disposeClassLoaderAndAssertCollected(collectableReference);
+  }
 
+  private void disposeClassLoaderAndAssertCollected(CollectableReference<MuleArtifactClassLoader> collectableReference) {
+    collectableReference.get().dispose();
     assertThat(collectableReference, is(eventually(collectedByGc())));
   }
 
