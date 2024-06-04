@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.MULE_SDK;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;

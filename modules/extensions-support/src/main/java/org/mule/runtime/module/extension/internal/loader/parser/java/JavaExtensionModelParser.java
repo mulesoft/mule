@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.JAVA_SDK;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
