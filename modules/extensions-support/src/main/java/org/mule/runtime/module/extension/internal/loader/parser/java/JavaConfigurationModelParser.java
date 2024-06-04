@@ -6,20 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
-import static java.util.Collections.sort;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveConfigurationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveConfigurationMinMuleVersion;
+
+import static java.lang.String.format;
+import static java.util.Collections.sort;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Comparator.comparing;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -110,11 +112,11 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<OperationModelParser> getOperationParsers() {
-    ArrayList<OperationModelParser> operationModelParsers = new ArrayList<>(JavaExtensionModelParserUtils.getOperationParsers(
-                                                                                                                              extensionModelParser,
-                                                                                                                              extensionElement,
-                                                                                                                              configElement,
-                                                                                                                              loadingContext)
+    List<OperationModelParser> operationModelParsers = new ArrayList<>(JavaExtensionModelParserUtils.getOperationParsers(
+                                                                                                                         extensionModelParser,
+                                                                                                                         extensionElement,
+                                                                                                                         configElement,
+                                                                                                                         loadingContext)
         .collect(toList()));
     sort(operationModelParsers, comparing(OperationModelParser::getName));
     return unmodifiableList(operationModelParsers);
