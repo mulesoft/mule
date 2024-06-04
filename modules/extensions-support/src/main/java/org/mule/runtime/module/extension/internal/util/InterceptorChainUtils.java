@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static org.mule.runtime.extension.internal.util.ExtensionConnectivityUtils.isConnectionProvisioningRequired;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isConnectionProvisioningRequired;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.addCursorResetInterceptorsIfRequired;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -59,7 +59,7 @@ public class InterceptorChainUtils {
     // Only connectable components that require a connection to be provided beforehand should add the connection interceptors
     if (componentModel instanceof ConnectableComponentModel) {
       return ((ConnectableComponentModel) componentModel).requiresConnection()
-          && isConnectionProvisioningRequired(extensionModel, (ConnectableComponentModel) componentModel);
+          && isConnectionProvisioningRequired((ConnectableComponentModel) componentModel);
     }
 
     return false;
