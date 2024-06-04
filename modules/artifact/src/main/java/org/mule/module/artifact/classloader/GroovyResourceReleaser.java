@@ -6,10 +6,6 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
@@ -17,9 +13,6 @@ import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 
 import org.slf4j.Logger;
 
@@ -34,10 +27,6 @@ public class GroovyResourceReleaser implements ResourceReleaser {
   private static final Logger LOGGER = getLogger(GroovyResourceReleaser.class);
   private static final String GROOVY_CLASS_INFO = "org.codehaus.groovy.reflection.ClassInfo";
   private static final String GROOVY_INVOKER_HELPER = "org.codehaus.groovy.runtime.InvokerHelper";
-  private static final String GROOVY_SCRIPT_ENGINE_FACTORY = "org.codehaus.groovy.jsr223.GroovyScriptEngineFactory";
-  private static final String LOGGER_ABSTRACT_MANAGER = "org.apache.logging.log4j.core.appender.AbstractManager";
-  private static final String LOGGER_STREAM_MANAGER = "org.apache.logging.log4j.core.appender.OutputStreamManager";
-  private static final String LOGGER_CONFIGURATION = "org.apache.logging.log4j.core.config.Configuration";
 
   /**
    * Creates a new Instance of GroovyResourceReleaser
@@ -51,68 +40,57 @@ public class GroovyResourceReleaser implements ResourceReleaser {
   @Override
   public void release() {
     unregisterInvokerHelper();
-    cleanSpisEngines();
   }
 
   private void unregisterInvokerHelper() {
     try {
-      Class classInfoClass = this.classLoader.loadClass(GROOVY_CLASS_INFO);
+      Class<?> classInfoClass = this.classLoader.loadClass(GROOVY_CLASS_INFO);
       Method getAllClassInfoMethod = classInfoClass.getMethod("getAllClassInfo");
       Method getTheClassMethod = classInfoClass.getMethod("getTheClass");
-      Class invokerHelperClass = this.classLoader.loadClass(GROOVY_INVOKER_HELPER);
+      Class<?> invokerHelperClass = this.classLoader.loadClass(GROOVY_INVOKER_HELPER);
       Method removeClassMethod = invokerHelperClass.getMethod("removeClass", Class.class);
-      Object classes = getAllClassInfoMethod.invoke(null);
-      if (classes != null && classes instanceof Collection) {
-        for (Object classInfo : ((Collection) classes)) {
-          Object clazz = null;
-          try {
-            clazz = getTheClassMethod.invoke(classInfo);
-            removeClassMethod.invoke(null, clazz);
-          } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
-            String className = clazz instanceof Class ? ((Class) clazz).getName() : "Unknown";
-            LOGGER.warn("Could not remove the {} class from the Groovy's InvokerHelper", className, e);
-          }
-        }
+      Object classInfos = getAllClassInfoMethod.invoke(null);
+      if (classInfos instanceof Collection) {
+        // If the ClassInfo class was loaded by this classloader, then it means it is the owner of the Groovy dependency itself.
+        // In that case we want to make sure there are no classes retained by the ClassInfos.
+        boolean unregisterAllClasses = isOwnedClassLoader(classInfoClass.getClassLoader(), classLoader);
+        unregisterClassesFromInvokerHelper(removeClassMethod, getTheClassMethod, (Collection<?>) classInfos,
+                                           unregisterAllClasses);
       }
     } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException e) {
       LOGGER.warn("Error trying to remove the Groovy's InvokerHelper classes", e);
     }
   }
 
-  private void cleanSpisEngines() {
-    try {
-      Class<?> abstractManager = loadClass(LOGGER_ABSTRACT_MANAGER, this.classLoader);
-      HashMap hashMap = getStaticFieldValue(abstractManager, "MAP", true);
-      Iterator it = hashMap.values().iterator();
-      Class<?> streamManagerClass = loadClass(LOGGER_STREAM_MANAGER, this.classLoader);
-      Object rfmInstance = null;
-      while (it.hasNext()) {
-        Object o = it.next();
-        if (streamManagerClass.isInstance(o)) {
-          rfmInstance = o;
-          Object layout = getFieldValue(rfmInstance, "layout", true);
-          Object configuration = getFieldValue(layout, "configuration", true);
+  private void unregisterClassesFromInvokerHelper(Method removeClassMethod,
+                                                  Method getTheClassMethod,
+                                                  Collection<?> classes,
+                                                  boolean unregisterAllClasses) {
+    for (Object classInfo : classes) {
+      Class<?> clazz = null;
+      try {
+        clazz = (Class<?>) getTheClassMethod.invoke(classInfo);
 
-          Class<?> configurationClass = loadClass(LOGGER_CONFIGURATION, this.classLoader);
-          Method getScriptManagerMethod = configurationClass.getMethod("getScriptManager");
-          Object scriptManager = getScriptManagerMethod.invoke(configuration);
-          if (scriptManager != null) {
-            Object manager = getFieldValue(scriptManager, "manager", true);
-            HashSet engineSpis = getFieldValue(manager, "engineSpis", true);
-            Class groovy = loadClass(GROOVY_SCRIPT_ENGINE_FACTORY, this.classLoader);
-            Iterator engineSpisIterator = engineSpis.iterator();
-            while (engineSpisIterator.hasNext()) {
-              Object i = engineSpisIterator.next();
-              if (groovy.isInstance(i) && i.getClass().getClassLoader().equals(groovy.getClassLoader())) {
-                engineSpis.remove(i);
-              }
-            }
-          }
+        // Only unregister classes owned by this classloader, unless specified otherwise
+        // This is to avoid interference between sibling artifacts
+        if (unregisterAllClasses || isOwnedClassLoader(classLoader, clazz.getClassLoader())) {
+          removeClassMethod.invoke(null, clazz);
         }
+      } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
+        String className = clazz != null ? clazz.getName() : "Unknown";
+        LOGGER.warn("Could not remove the {} class from the Groovy's InvokerHelper", className, e);
       }
-    } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException | InvocationTargetException
-        | IllegalAccessException e) {
-      LOGGER.warn("Error trying to unregister the Groovy's Scripting Engine", e);
     }
+  }
+
+  private boolean isOwnedClassLoader(ClassLoader ownerClassLoader, ClassLoader classLoader) {
+    // Traverse the hierarchy for this ClassLoader searching for the same instance of the ownerClassLoader.
+    while (classLoader != null) {
+      if (classLoader == ownerClassLoader) {
+        return true;
+      }
+      classLoader = classLoader.getParent();
+    }
+    return false;
   }
 }
