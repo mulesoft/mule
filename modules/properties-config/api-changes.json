@@ -1,0 +1,24 @@
+{
+  "4.8.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.returnTypeChanged",
+            "old": "method java.util.function.UnaryOperator<java.lang.String> org.mule.runtime.config.api.properties.ConfigurationPropertiesResolverProvider::getConfigurationPropertiesResolver()",
+            "new": "method org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver org.mule.runtime.config.api.properties.ConfigurationPropertiesResolverProvider::getConfigurationPropertiesResolver()",
+            "justification": "W-15607279: Provide apis for configuring properties resolvers from mule-fwk and ang-is"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.returnTypeChanged",
+            "old": "method java.util.function.UnaryOperator<java.lang.String> org.mule.runtime.config.api.properties.ConfigurationPropertiesResolverProvider::getConfigurationPropertiesResolver()",
+            "new": "method org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver org.mule.runtime.config.api.properties.ConfigurationPropertiesResolverProvider::getConfigurationPropertiesResolver()",
+            "justification": "W-15607279: Provide apis for configuring properties resolvers from mule-fwk and ang-is"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -31,26 +31,28 @@
     </properties>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-test-jar</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <configuration>
-                            <includes>
-                                <include>org/mule/runtime/module/artifact/api/classloader/test/**</include>
-                                <include>org/mule/runtime/module/artifact/internal/util/test/**</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-                </executions>                
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-test-jar</id>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                            <configuration>
+                                <includes>
+                                    <include>org/mule/runtime/module/artifact/api/classloader/test/**</include>
+                                    <include>org/mule/runtime/module/artifact/internal/util/test/**</include>
+                                </includes>
+                            </configuration>
+                        </execution>
+                    </executions>                
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <dependencies>

@@ -30,19 +30,9 @@
             <plugin>
                 <groupId>org.mule.tools.maven</groupId>
                 <artifactId>mule-maven-plugin</artifactId>
-                <version>${mule.maven.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <classifier>mule-plugin</classifier>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgs>
-                        <args>-parameters</args>
-                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>
