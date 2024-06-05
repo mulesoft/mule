@@ -68,7 +68,7 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     this.initialExportInfo = resolveInitialExporterInfo(tracingLevelExportInfo);
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain
         || name.equals(OPERATION_EXECUTION_SPAN_NAME);
-    this.rootSpan = isComponentOfName(component, FLOW);
+    this.rootSpan = isComponentOfName(component, FLOW) || component instanceof PolicyChain;
 
     this.apiId = apiId;
     if (apiId != null) {
