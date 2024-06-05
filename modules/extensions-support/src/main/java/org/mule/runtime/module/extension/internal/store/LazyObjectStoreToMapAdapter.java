@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.store;
 
-import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.api.map.EntryListener;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreToMapAdapter;
+import org.mule.runtime.api.util.LazyValue;
 
 import java.io.Serializable;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
@@ -34,5 +36,31 @@ public class LazyObjectStoreToMapAdapter<T extends Serializable> extends ObjectS
   @Override
   public ObjectStore<T> getObjectStore() {
     return objectStore.get();
+  }
+
+  @Override
+  public UUID addEntryListener(EntryListener<String, T> listener) {
+    return null;
+  }
+
+  @Override
+  public boolean removeEntryListener(UUID id) {
+    return false;
+  }
+
+  @Override public T putIfAbsent(String key, T value) {
+    return null;
+  }
+
+  @Override public boolean remove(Object key, Object value) {
+    return false;
+  }
+
+  @Override public boolean replace(String key, T oldValue, T newValue) {
+    return false;
+  }
+
+  @Override public T replace(String key, T value) {
+    return null;
   }
 }
