@@ -122,6 +122,7 @@ import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.AllowsExpressionWithoutMarkersModelProperty;
+import org.mule.runtime.core.internal.extension.CollectionChainInputTypeResolver;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
@@ -135,7 +136,6 @@ import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
-import org.mule.sdk.api.annotation.metadata.PassThroughInputChainResolver;
 
 import java.util.Map;
 
@@ -618,7 +618,7 @@ public class MuleExtensionModelDeclarer {
         .withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(MULTIPLE_OR_NONE);
 
     configurerFactory.create()
-        .setChainInputTypeResolver(CollectionChainInputTypeResolver.INSTANCE)
+        .setChainInputTypeResolver(new CollectionChainInputTypeResolver("collection"))
         .configure(forEach);
 
     forEach.onDefaultParameterGroup()
@@ -872,7 +872,7 @@ public class MuleExtensionModelDeclarer {
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
     configurerFactory.create()
-        .setChainInputTypeResolver(CollectionChainInputTypeResolver.INSTANCE)
+        .setChainInputTypeResolver(new CollectionChainInputTypeResolver("collection"))
         .asPassthroughScope()
         .configure(parallelForeach);
   }

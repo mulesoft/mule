@@ -120,7 +120,8 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     } catch (ConnectionException e) {
       return connectivityFailure(e);
     } catch (Exception e) {
-      return failure(newFailure(e).withMessage("Failed to resolve input types for scope inner chain").onComponent());
+      return failure(newFailure(e).withMessage(format("Failed to resolve input types for scope inner chain: %s", e.getMessage()))
+          .onComponent());
     }
   }
 
