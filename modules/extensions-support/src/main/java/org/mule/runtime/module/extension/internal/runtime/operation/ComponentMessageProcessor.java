@@ -740,6 +740,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return from(event)
           .getOperationExecutionParams(getLocation(), event.getContext().getId());
     } catch (NullPointerException npe) {
+      LOGGER.debug("Null SDK Context at {} for event - {}", getLocation() != null ? getLocation().getLocation() : "null",
+                   event.getContext().getId());
       throw propagateWrappingFatal(new EventProcessingException(createStaticMessage("Maybe the non-blocking operation @ '"
           + getLocation().getLocation() + "' used its callback more than once?"),
                                                                 event, npe));

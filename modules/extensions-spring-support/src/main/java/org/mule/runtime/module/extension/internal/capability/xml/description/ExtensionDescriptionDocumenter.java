@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.internal.loader.util.JavaParserUtils.mapReduceAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaParserUtils.mapReduceAnnotation;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;

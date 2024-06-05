@@ -15,13 +15,17 @@ import static org.mule.runtime.extension.privileged.spi.ExtensionsApiSpiUtils.lo
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getLoaderById;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_SKIP;
+import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
+import static javax.lang.model.SourceVersion.RELEASE_8;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
@@ -40,6 +44,10 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.Extensio
 import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorProblemsHandler;
 import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorResourceGenerator;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +60,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
@@ -71,8 +78,13 @@ import com.google.common.base.Joiner;
  * @since 3.7.0
  */
 @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedOptions(BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION)
+@SupportedSourceVersion(RELEASE_8)
+@SupportedOptions({
+    BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION,
+    BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES,
+    EXPORTED_PACKAGES_VALIDATOR_SKIP,
+    EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION
+})
 public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends AbstractProcessor {
 
   static final ExtensionAnnotationProcessor processor = new ExtensionAnnotationProcessor();
@@ -82,6 +94,7 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   public static final String ROUND_ENVIRONMENT = "ROUND_ENVIRONMENT";
   public static final String PROBLEMS_HANDLER = "PROBLEMS_HANDLER";
   public static final String EXTENSION_VERSION = "extension.version";
+  public static final String EXTENSION_RESOURCES = "extension.resources";
   public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
 
   private static final String EXTENSION_LOADING_MODE_SYSTEM_PROPERTY = "modelLoader.runtimeMode";
@@ -103,8 +116,17 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
         Optional<Class<Object>> annotatedClass = processor.classFor(extensionElement, processingEnv);
         ExtensionElement extension = toExtensionElement(extensionElement, processingEnv);
         ClassLoader classLoader = annotatedClass.map(Class::getClassLoader).orElseGet(ExtensionModel.class::getClassLoader);
+
+        final String extensionResourcesLocation = processingEnv.getOptions().get(EXTENSION_RESOURCES);
+        if (extensionResourcesLocation != null) {
+          // make sure the static resource files from the extension are available through the TCCL, even if not available through
+          // the processor CL.
+          classLoader = createClassloaderWithExtensionResources(extensionResourcesLocation, classLoader);
+        }
+
         withContextClassLoader(classLoader, () -> {
-          ExtensionModel extensionModel = parseExtension(extensionElement, extension, roundEnv, classLoader);
+          ExtensionModel extensionModel =
+              parseExtension(extensionElement, extension, roundEnv, currentThread().getContextClassLoader());
           generator.generateFor(extensionModel);
         });
       });
@@ -119,6 +141,19 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
       processingEnv.getMessager().printMessage(ERROR, format("%s\n%s", e.getMessage(), getStackTrace(e)));
       throw e;
     }
+  }
+
+  private ClassLoader createClassloaderWithExtensionResources(String extensionResourcesLocation, ClassLoader parentClassLoader) {
+    ClassLoader classLoaderWithExtensionResources;
+    try {
+      classLoaderWithExtensionResources =
+          new URLClassLoader(new URL[] {Paths.get(extensionResourcesLocation).toUri().toURL()},
+                             parentClassLoader);
+    } catch (MalformedURLException e) {
+      processingEnv.getMessager().printMessage(ERROR, format("%s\n%s", e.getMessage(), getStackTrace(e)));
+      throw new RuntimeException(e);
+    }
+    return classLoaderWithExtensionResources;
   }
 
   /**

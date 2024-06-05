@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.capability.xml.description;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.extension.internal.loader.util.JavaParserUtils;
+import org.mule.runtime.module.extension.internal.loader.utils.JavaParserUtils;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 

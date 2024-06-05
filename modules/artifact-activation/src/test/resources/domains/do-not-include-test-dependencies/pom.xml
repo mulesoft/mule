@@ -14,7 +14,6 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <app.runtime>4.4.0</app.runtime>
-        <mule.maven.plugin.version>3.7.0-SNAPSHOT</mule.maven.plugin.version>
     </properties>
 
     <build>
@@ -37,7 +36,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-jms-connector</artifactId>
-            <version>1.8.4</version>
+            <version>${mule.jms.connector.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
