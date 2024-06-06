@@ -341,6 +341,26 @@
         </testResources>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+					<execution>
+						<id>default-testCompile</id>
+		                <configuration>
+							<compilerArgs>
+								<arg>--add-exports=org.mule.runtime.metadata.support/org.mule.runtime.metadata.internal.cache=org.mule.runtime.extensions.support</arg>
+								<arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader=org.mule.runtime.extensions.support</arg>
+								<arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader.enricher=org.mule.runtime.extensions.support</arg>
+								<arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader.validator=org.mule.runtime.extensions.support</arg>
+								<arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.property=org.mule.runtime.extensions.support</arg>
+								<arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.runtime.extensions.support</arg>
+								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.extensions.support</arg>
+							</compilerArgs>
+						</configuration>
+					</execution>
+				</executions>
+            </plugin>
             <!-- Required by mule-extension-ast-loader -->
             <!-- Force creation of the test-jar before the shade-plugin runs -->
             <plugin>
