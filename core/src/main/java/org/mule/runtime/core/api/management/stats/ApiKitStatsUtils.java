@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
-import java.util.regex.Pattern;
-
 import static java.util.regex.Pattern.compile;
+import java.util.regex.Pattern;
 
 /**
  * Utils to perform validations and operations related to ApiKit.
