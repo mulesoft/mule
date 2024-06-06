@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.Util
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,14 +29,12 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.ast.internal.model.DefaultExtensionModelHelper;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Helper class for building {@link MuleSdkParameterModelParser} instances for testing by mocking {@link ComponentAst}.
@@ -137,14 +136,24 @@ class MuleSdkParameterModelParserSdkBuilder {
       return emptySet();
     }
 
-    return loadExtensionModels(createLoadingRequest(), new ExtensionModelFactory());
+    return loadExtensionModels(createLoadingRequest());
   }
 
-  private Set<ExtensionModel> loadExtensionModels(ExtensionModelLoadingRequest loadingRequest,
-                                                  ExtensionModelFactory extensionModelFactory) {
+  private Set<ExtensionModel> loadExtensionModels(ExtensionModelLoadingRequest loadingRequest) {
     return extensionDeclarers.stream()
-        .map(declarer -> extensionModelFactory.create(contextFor(declarer, loadingRequest)))
-        .collect(Collectors.toSet());
+        .map(declarer -> new ExtensionModelLoader() {
+
+          @Override
+          public String getId() {
+            return MuleSdkParameterModelParserSdkBuilder.class.getName() + "#" + declarer.getDeclaration().getName();
+          }
+
+          @Override
+          protected void declareExtension(ExtensionLoadingContext context) {
+            // nothing to do
+          }
+        }.loadExtensionModel(declarer, loadingRequest))
+        .collect(toSet());
   }
 
   private ExtensionModelLoadingRequest createLoadingRequest() {
@@ -153,7 +162,4 @@ class MuleSdkParameterModelParserSdkBuilder {
         .build();
   }
 
-  private ExtensionLoadingContext contextFor(ExtensionDeclarer extensionDeclarer, ExtensionModelLoadingRequest loadingRequest) {
-    return new DefaultExtensionLoadingContext(extensionDeclarer, loadingRequest);
-  }
 }

@@ -31,9 +31,9 @@ import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.xml.validator.TestConnectionValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -145,10 +145,19 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
         .ofType(typeLoader.load(String.class))
         .asComponentId();
 
-    return new ExtensionModelFactory().create(
-                                              new DefaultExtensionLoadingContext(extensionDeclarer,
-                                                                                 builder(currentThread().getContextClassLoader(),
-                                                                                         nullDslResolvingContext()).build()));
+    return new ExtensionModelLoader() {
+
+      @Override
+      public String getId() {
+        return ConnectivityTestingFailuresTestCase.class.getName();
+      }
+
+      @Override
+      protected void declareExtension(ExtensionLoadingContext context) {
+        // nothing to do
+      }
+    }.loadExtensionModel(extensionDeclarer, builder(currentThread().getContextClassLoader(),
+                                                    nullDslResolvingContext()).build());
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {
