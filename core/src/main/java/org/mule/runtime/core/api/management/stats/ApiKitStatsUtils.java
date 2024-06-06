@@ -35,6 +35,10 @@ public class ApiKitStatsUtils {
   private static final Pattern APIKIT_FLOWNAME_PATTERN = compile(APIKIT_FLOWNAME_REGEX);
   private static final Pattern APIKIT_SOAP_FLOWNAME_PATTERN = compile(APIKIT_SOAP_FLOWNAME_REGEX);
 
+  private ApiKitStatsUtils() {
+
+  }
+
   /**
    * Determines if the name of a flow follows the conventions of ApiKit.
    *
