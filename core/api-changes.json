@@ -1,4 +1,29 @@
 {
+  "4.6.5": {
+    "revapi": {
+      "ignore": [
+	{
+	  "ignore": true,
+	  "code": "java.class.visibilityReduced",
+	  "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
+	  "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
+	  "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"	
+	},
+	{
+	 "ignore": true,	
+	 "code": "java.method.added",
+         "new": "method boolean org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::getEnableNotifications()",	
+	 "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"
+	},
+	{
+	 "ignore": true,
+	 "code": "java.method.added",
+	 "new": "method void org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::setEnableNotifications(boolean)",
+	 "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"	
+	}
+      ]
+    }
+  },
   "4.6.2": {
     "revapi": {
       "ignore": [
