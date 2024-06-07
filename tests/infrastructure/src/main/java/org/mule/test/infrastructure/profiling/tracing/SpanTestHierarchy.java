@@ -107,6 +107,11 @@ public class SpanTestHierarchy {
     return this;
   }
 
+  public SpanTestHierarchy addKindToAssert(String kind) {
+    currentNode.addKindToAssert(kind);
+    return this;
+  }
+
   public SpanTestHierarchy addAttributeToAssertValue(String key, String value) {
     currentNode.addAttributeThatShouldMatch(key, value);
     return this;
@@ -180,12 +185,20 @@ public class SpanTestHierarchy {
                hasCorrectTraceId(actualSpan, actualParent != null ? actualParent.getName() : null));
     assertAttributes(actualSpan, expectedNode);
     assertTraceState(actualSpan, expectedNode);
+    assertKind(actualSpan, expectedNode);
     assertException(actualSpan, expectedNode);
     assertThat("Expected span: " + expectedNode.spanName + " has incorrect start or end time",
                actualSpan.getStartEpochSpanNanos(),
                is(lessThan(actualSpan.getEndSpanEpochNanos())));
     visitedSpans.add(actualSpan.getSpanId());
     return actualSpan;
+  }
+
+  private void assertKind(CapturedExportedSpan actualSpan, SpanNode expectedNode) {
+    if (expectedNode.getKind() != null && !expectedNode.getKind().equals(actualSpan.getSpanKindName())) {
+      fail("The span " + expectedNode.spanName + " was expected to have the kind " + expectedNode.getKind() + " but had "
+          + actualSpan.getSpanKindName());
+    }
   }
 
   private void assertTraceState(CapturedExportedSpan actualSpan, SpanNode expectedNode) {
@@ -295,6 +308,7 @@ public class SpanTestHierarchy {
     private final Map<String, String> traceStateEntriesToAssert = new HashMap<>();
     private List<String> traceStateKeyExistence = new ArrayList<>();
     private List<String> traceStateKeyNotExistence = new ArrayList<>();
+    private String kindToAssert;
 
     public SpanNode(String spanName) {
       this.spanName = spanName;
@@ -380,6 +394,14 @@ public class SpanTestHierarchy {
 
     public void addTraceStateKeyAssertExistence(String key) {
       this.traceStateKeyExistence.add(key);
+    }
+
+    public void addKindToAssert(String kindToAssert) {
+      this.kindToAssert = kindToAssert;
+    }
+
+    public String getKind() {
+      return kindToAssert;
     }
   }
 }
