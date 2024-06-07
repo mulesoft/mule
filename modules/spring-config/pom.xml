@@ -52,25 +52,6 @@
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-testCompile</id>
-                        <configuration>
-                            <compilerArgs>
-                                <arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal=org.mule.runtime.spring.config</arg>
-                                <arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.validation=org.mule.runtime.spring.config</arg>
-                            </compilerArgs>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
