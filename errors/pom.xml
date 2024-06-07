@@ -17,19 +17,6 @@
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.revapi</groupId>
-                <artifactId>revapi-maven-plugin</artifactId>
-                <configuration>
-                    <!-- TODO (W-15278731): unskip after 4.7 release -->
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
