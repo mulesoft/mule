@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -355,8 +356,8 @@ public class DependencyResolver implements AutoCloseable {
     PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
     node.accept(nlg);
 
-    List<File> muleDependencyFiles = new ArrayList<>();
-    List<File> optDependencyFiles = new ArrayList<>();
+    LinkedHashSet<File> muleDependencyFiles = new LinkedHashSet<>();
+    LinkedHashSet<File> optDependencyFiles = new LinkedHashSet<>();
 
     nlg.getNodes()
         .stream()
@@ -375,7 +376,7 @@ public class DependencyResolver implements AutoCloseable {
           }
         });
 
-    return new Pair<>(muleDependencyFiles, optDependencyFiles);
+    return new Pair<>(new ArrayList<>(muleDependencyFiles), new ArrayList<>(optDependencyFiles));
   }
 
   // Implementation note: this must be kept consistent with the equivalent logic in embedded-api and the distro assemblies
