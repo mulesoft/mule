@@ -19,7 +19,7 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERA
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,7 +29,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.ast.internal.model.DefaultExtensionModelHelper;
+import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -66,7 +66,7 @@ public class MuleSdkOperationModelParserTestCase extends AbstractMuleTestCase {
     when(typeLoader.load("some")).thenReturn(Optional.of(someMetadataType));
 
     operationModelParser = new MuleSdkOperationModelParser(operationAst, APP_LOCAL_EXTENSION_NAMESPACE, typeLoader,
-                                                           new DefaultExtensionModelHelper(emptySet()));
+                                                           mock(ExtensionModelHelper.class));
   }
 
   // ------------------------------- //

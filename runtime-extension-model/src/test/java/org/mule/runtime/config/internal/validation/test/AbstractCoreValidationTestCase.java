@@ -30,12 +30,12 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
+import org.mule.runtime.config.internal.dsl.utils.DslConstants;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.config.internal.dsl.utils.DslConstants;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 import java.io.InputStream;
 import java.io.StringReader;
@@ -88,10 +88,19 @@ public abstract class AbstractCoreValidationTestCase {
 
     parser = AstXmlParser.builder()
         .withExtensionModels(resolveRuntimeExtensionModels())
-        .withExtensionModel(new ExtensionModelFactory()
-            .create(new DefaultExtensionLoadingContext(extensionDeclarer,
-                                                       builder(AbstractCoreValidationTestCase.class.getClassLoader(),
-                                                               nullDslResolvingContext()).build())))
+        .withExtensionModel(new ExtensionModelLoader() {
+
+          @Override
+          public String getId() {
+            return AbstractCoreValidationTestCase.class.getName();
+          }
+
+          @Override
+          protected void declareExtension(ExtensionLoadingContext context) {
+            // nothing to do
+          }
+        }.loadExtensionModel(extensionDeclarer, builder(AbstractCoreValidationTestCase.class.getClassLoader(),
+                                                        nullDslResolvingContext()).build()))
         .withSchemaValidationsDisabled()
         .build();
   }

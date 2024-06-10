@@ -39,7 +39,6 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.xml.validator.InnerConnectionParametersAsConnectionParameters;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
@@ -61,7 +60,8 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Issue;
 
 /**
- * Tests the defaults {@link org.apache.maven.model.validation.ModelValidator}s provided by the {@link ExtensionModelFactory}
+ * Tests the defaults {@link org.apache.maven.model.validation.ModelValidator}s provided by the
+ * {@link org.mule.runtime.extension.internal.loader.ExtensionModelFactory}
  *
  * @since 4.0
  */
