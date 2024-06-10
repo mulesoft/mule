@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.test.logging;
 
+import static java.util.Optional.ofNullable;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -196,7 +197,7 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
 
     LoggingEventMatcher(Matcher<String> messageMatcher, Matcher<String> artifactIdMatcher) {
       this.messageMatcher = messageMatcher;
-      this.artifactIdMatcher = Optional.ofNullable(artifactIdMatcher);
+      this.artifactIdMatcher = ofNullable(artifactIdMatcher);
     }
 
     LoggingEventMatcher(Matcher<String> messageMatcher) {
