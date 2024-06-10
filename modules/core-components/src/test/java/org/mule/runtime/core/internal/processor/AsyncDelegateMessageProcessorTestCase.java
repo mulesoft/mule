@@ -15,8 +15,8 @@ import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.AsyncStory.ASYNC;
+import static org.mule.test.allure.AllureConstants.ScopeFeature.SCOPE;
+import static org.mule.test.allure.AllureConstants.ScopeFeature.AsyncStory.ASYNC;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
@@ -24,11 +24,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -41,7 +40,7 @@ import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
-@Feature(ROUTERS)
+@Feature(SCOPE)
 @Story(ASYNC)
 public class AsyncDelegateMessageProcessorTestCase extends AbstractAsyncDelegateMessageProcessorTestCase {
 
@@ -62,8 +61,6 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractAsyncDelegate
     Transaction transaction = new TestTransactionFactory(false)
         .beginTransaction("appName", getNotificationDispatcher(muleContext), null);
 
-    TransactionCoordination.getInstance().bindTransaction(transaction);
-
     try {
       CoreEvent request = testEvent();
       CoreEvent result = process(async, request);
@@ -75,7 +72,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractAsyncDelegate
       assertTargetEvent(request);
       assertResponse(result);
     } finally {
-      TransactionCoordination.getInstance().unbindTransaction(transaction);
+      transaction.commit();
     }
   }
 
