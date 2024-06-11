@@ -11,26 +11,27 @@ import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjecti
 
 import static java.util.Optional.of;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.graph.internal.DefaultArtifactAstDependencyGraph;
-import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 
 import java.util.Collection;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
 
 
 @Issue("MULE-19984")
@@ -39,11 +40,11 @@ import org.junit.Test;
 public class ConfigurationDependencyResolverTestCase {
 
   private ConfigurationDependencyResolver configurationDependencyResolver;
-  private DefaultArtifactAstDependencyGraph graph;
+  private ArtifactAstDependencyGraph graph;
 
   @Before
   public void setUp() throws Exception {
-    graph = mock(DefaultArtifactAstDependencyGraph.class);
+    graph = mock(ArtifactAstDependencyGraph.class);
     configurationDependencyResolver = new ConfigurationDependencyResolver(graph);
   }
 
@@ -56,7 +57,7 @@ public class ConfigurationDependencyResolverTestCase {
                                                    createComponentWithId("B"));
     when(graph.getRequiredComponents(any())).thenReturn(components);
     Collection<String> result = configurationDependencyResolver.getDirectComponentDependencies("component");
-    assertThat(result.size(), Matchers.is(2));
+    assertThat(result, iterableWithSize(2));
   }
 
   @Test
@@ -67,7 +68,7 @@ public class ConfigurationDependencyResolverTestCase {
                                                    createComponentWithoutId("D"), createComponentWithoutId("E"));
     when(graph.getRequiredComponents(any())).thenReturn(components);
     Collection<String> result = configurationDependencyResolver.getDirectComponentDependencies("component");
-    assertThat(result.size(), Matchers.is(3));
+    assertThat(result, iterableWithSize(3));
   }
 
   private ComponentAst createComponentWithId(String componentName) {

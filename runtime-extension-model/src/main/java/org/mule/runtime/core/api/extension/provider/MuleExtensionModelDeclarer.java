@@ -535,7 +535,7 @@ public class MuleExtensionModelDeclarer {
 
     withNoErrorMapping(parseTemplate);
 
-    parseTemplate.withOutput().ofType(ANY_TYPE);
+    parseTemplate.withOutput().ofType(STRING_TYPE);
     parseTemplate.withOutputAttributes().ofType(VOID_TYPE);
 
     parseTemplate.onDefaultParameterGroup()

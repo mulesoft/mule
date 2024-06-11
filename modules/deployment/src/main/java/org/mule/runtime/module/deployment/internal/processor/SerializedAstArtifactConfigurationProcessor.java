@@ -13,6 +13,7 @@ import static java.util.Collections.emptySet;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
@@ -25,6 +26,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
@@ -46,14 +48,17 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
   @Override
   public boolean check(ArtifactContextConfiguration artifactContextConfiguration) {
     MuleContext muleContext = artifactContextConfiguration.getMuleContext();
-    InputStream seralizedAstStream =
-        muleContext.getExecutionClassLoader().getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION);
-    if (seralizedAstStream == null) {
-      LOGGER.info("Serialized AST not avaliable for artifact '"
-          + muleContext.getConfiguration().getId() + "'");
-    }
+    try (InputStream seralizedAstStream = muleContext.getExecutionClassLoader()
+        .getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION)) {
+      if (seralizedAstStream == null) {
+        LOGGER.info("Serialized AST not avaliable for artifact '"
+            + muleContext.getConfiguration().getId() + "'");
+      }
 
-    return seralizedAstStream != null;
+      return seralizedAstStream != null;
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   @Override
@@ -61,23 +66,26 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
       throws ConfigurationException {
     try {
       MuleContext muleContext = artifactContextConfiguration.getMuleContext();
-      ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
-          .deserialize(muleContext.getExecutionClassLoader()
-              .getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION),
-                       name -> getExtensions(muleContext.getExtensionManager())
-                           .stream()
-                           .filter(x -> x.getName().equals(name))
-                           .findFirst()
-                           .orElse(null));
+      try (InputStream inputStream = muleContext.getExecutionClassLoader()
+          .getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION)) {
 
-      if (!isEquivalentAstArtifactType(artifactContextConfiguration.getArtifactType(),
-                                       deserializedArtifactAst.getArtifactType())) {
-        throw new IllegalStateException(format("Expected artifact type '%s' but serialized ast was '%s'",
-                                               artifactContextConfiguration.getArtifactType(),
-                                               deserializedArtifactAst.getArtifactType()));
+        ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
+            .deserialize(inputStream,
+                         name -> getExtensions(muleContext.getExtensionManager())
+                             .stream()
+                             .filter(x -> x.getName().equals(name))
+                             .findFirst()
+                             .orElse(null));
+
+        if (!isEquivalentAstArtifactType(artifactContextConfiguration.getArtifactType(),
+                                         deserializedArtifactAst.getArtifactType())) {
+          throw new IllegalStateException(format("Expected artifact type '%s' but serialized ast was '%s'",
+                                                 artifactContextConfiguration.getArtifactType(),
+                                                 deserializedArtifactAst.getArtifactType()));
+        }
+
+        return deserializedArtifactAst;
       }
-
-      return deserializedArtifactAst;
     } catch (Exception e) {
       throw new ConfigurationException(e);
     }
