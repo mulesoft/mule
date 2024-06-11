@@ -231,7 +231,6 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
         mismatchDescription.appendText("and artifact id that ");
         artifactIdMatcher.get().describeMismatch(getArtifactId(loggingEvent), mismatchDescription);
       }
-
     }
   }
 
