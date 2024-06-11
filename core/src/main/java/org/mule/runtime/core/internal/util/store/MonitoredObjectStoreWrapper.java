@@ -97,6 +97,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
   protected void doStore(String key, T value) throws ObjectStoreException {
     Long time = Long.valueOf(System.currentTimeMillis());
     getStore().store(key, new StoredObject<>(value, time, key));
+    // todo : add entryUpdated() if the object already exists
+    // todo: add entryAdded() if the object is newly added
   }
 
   @Override
@@ -120,6 +122,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     if (object == null) {
       return null;
     } else {
+      // todo: entryRemoved()
       return object.getItem();
     }
   }
