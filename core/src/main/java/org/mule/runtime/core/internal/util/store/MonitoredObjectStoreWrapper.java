@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.store;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Comparator.comparing;
+import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
@@ -32,9 +33,11 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 import org.slf4j.Logger;
@@ -52,6 +55,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
   private Scheduler scheduler;
   private ScheduledFuture<?> scheduledTask;
   ObjectStore<StoredObject<T>> baseStore;
+  Map<java.util.UUID, EventListener> listenerMap;
 
   /**
    * the maximum number of entries that this store keeps around. Specify <em>-1</em> if the store is supposed to be "unbounded".
@@ -81,6 +85,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     maxEntries = settings.getMaxEntries().orElse(null);
     entryTtl = settings.getEntryTTL().orElse(null);
     expirationInterval = settings.getExpirationInterval();
+    listenerMap = new ConcurrentHashMap<>();
   }
 
   @Override
@@ -117,6 +122,19 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     } else {
       return object.getItem();
     }
+  }
+
+  @Override protected java.util.UUID doAddEntryListener(EventListener listener) {
+    java.util.UUID uuid = randomUUID();
+    listenerMap.put(uuid, listener);
+    return uuid;
+  }
+
+  @Override protected boolean doRemoveEntryListener(java.util.UUID key) {
+    if (listenerMap.remove(key) == null) {
+      return false;
+    }
+    return true;
   }
 
   @Override
