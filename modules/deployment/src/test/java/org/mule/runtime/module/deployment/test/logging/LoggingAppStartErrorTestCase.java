@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.deployment.test.logging;
 
+import static java.util.Optional.ofNullable;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
@@ -18,7 +21,6 @@ import static java.util.Collections.emptyList;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +29,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+import com.github.valfirst.slf4jtest.LoggingEvent;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -141,9 +147,8 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
       application.start();
     } finally {
       assertStatus(DEPLOYMENT_FAILED);
-      assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().size(), is(1));
-      assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getMessage(),
-                 containsString(expectedLogMessage));
+      assertThat(loggerDefaultMuleApplication.getAllLoggingEvents(),
+                 hasItem(new LoggingEventMatcher(containsString(expectedLogMessage))));
     }
   }
 
@@ -176,15 +181,57 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
 
     assertDeploymentFailure(applicationDeploymentListener, dummyErrorAppOnStartDescriptorFileBuilder.getId());
 
-    assertThat(loggerDefaultArtifactDeployer.getAllLoggingEvents().size(), is(1));
-    assertThat(loggerDefaultArtifactDeployer.getAllLoggingEvents().get(0).getMessage(),
-               containsString(expectedLogMessageDefaultArtifactDeployer));
+    assertThat(loggerDefaultArtifactDeployer.getAllLoggingEvents(),
+               hasItem(new LoggingEventMatcher(containsString(expectedLogMessageDefaultArtifactDeployer))));
 
-    assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().size(), is(1));
-    assertThat(loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getMessage(),
-               containsString(expectedLogMessageDefaultMuleApplication));
-    assertThat(((MuleArtifactClassLoader) loggerDefaultMuleApplication.getAllLoggingEvents().get(0).getThreadContextClassLoader())
-        .getArtifactId(),
-               containsString("dummy-error-app-start"));
+    assertThat(loggerDefaultMuleApplication.getAllLoggingEvents(),
+               hasItem(new LoggingEventMatcher(containsString(expectedLogMessageDefaultMuleApplication),
+                                               containsString("dummy-error-app-start"))));
   }
+
+  private static class LoggingEventMatcher extends TypeSafeMatcher<LoggingEvent> {
+
+    private final Matcher<String> messageMatcher;
+
+    private final Optional<Matcher<String>> artifactIdMatcher;
+
+    LoggingEventMatcher(Matcher<String> messageMatcher, Matcher<String> artifactIdMatcher) {
+      this.messageMatcher = messageMatcher;
+      this.artifactIdMatcher = ofNullable(artifactIdMatcher);
+    }
+
+    LoggingEventMatcher(Matcher<String> messageMatcher) {
+      this(messageMatcher, null);
+    }
+
+    @Override
+    protected boolean matchesSafely(LoggingEvent loggingEvent) {
+      return messageMatcher.matches(loggingEvent.getMessage()) &&
+          artifactIdMatcher
+              .map(m -> m.matches(getArtifactId(loggingEvent)))
+              .orElse(true);
+    }
+
+    private String getArtifactId(LoggingEvent loggingEvent) {
+      return ((MuleArtifactClassLoader) loggingEvent.getThreadContextClassLoader()).getArtifactId();
+    }
+
+    @Override
+    public void describeTo(Description description) {
+      description.appendText("a logging event with a message matching ").appendDescriptionOf(messageMatcher);
+      artifactIdMatcher
+          .ifPresent(m -> description.appendText("\n\tand with artifact id matching ").appendDescriptionOf(m));
+    }
+
+    @Override
+    protected void describeMismatchSafely(LoggingEvent loggingEvent, Description mismatchDescription) {
+      mismatchDescription.appendText("got a logging event with a message that ");
+      messageMatcher.describeMismatch(loggingEvent.getMessage(), mismatchDescription);
+      if (artifactIdMatcher.isPresent()) {
+        mismatchDescription.appendText("and artifact id that ");
+        artifactIdMatcher.get().describeMismatch(getArtifactId(loggingEvent), mismatchDescription);
+      }
+    }
+  }
+
 }
