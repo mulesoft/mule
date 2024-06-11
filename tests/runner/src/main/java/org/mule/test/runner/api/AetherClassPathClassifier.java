@@ -124,7 +124,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
   private static final String MULE_SERVICE_CLASSIFIER = "mule-service";
 
   private static final String RUNTIME_BOOT_GROUP_ID = "org.mule.runtime.boot";
+  private static final String RUNTIME_GROUP_ID = "org.mule.runtime";
   private static final String LOGGING_ARTIFACT_ID = "mule-module-logging";
+  private static final String LOG4J_CONFIGURATOR_ARTIFACT_ID = "mule-module-log4j-configurator";
 
   private static final String MULE_ARTIFACT_JSON_PATH = "META-INF/mule-artifact/mule-artifact.json";
 
@@ -429,6 +431,20 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
 
+    // Add logging dependencies to avoid every module from having to declare this dependencies.
+    // This brings the slf4j bridges required by transitive dependencies of the container to its classpath
+    // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
+    directDependencies
+        .add(new Dependency(new DefaultArtifact(RUNTIME_BOOT_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion),
+                            COMPILE));
+    directDependencies
+        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOG4J_CONFIGURATOR_ARTIFACT_ID, JAR_EXTENSION, muleVersion),
+                            COMPILE));
+
+    // TODO: MULE-19762 remove once forward compatiblity is finished
+    directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
+    directDependencies.add(new Dependency(getDefaultSdkCompatibilityApiArtifact(), COMPILE));
+
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
 
@@ -437,17 +453,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
     logger.debug("Collected managed dependencies from direct provided dependencies to be used for resolving container "
         + "dependency graph: {}", managedDependencies);
-
-    // Add logging dependencies to avoid every module from having to declare this dependency.
-    // This brings the slf4j bridges required by transitive dependencies of the container to its classpath
-    // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
-    directDependencies
-        .add(new Dependency(new DefaultArtifact(RUNTIME_BOOT_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion),
-                            COMPILE));
-
-    // TODO: MULE-19762 remove once forward compatiblity is finished
-    directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
-    directDependencies.add(new Dependency(getDefaultSdkCompatibilityApiArtifact(), COMPILE));
 
     List<String> excludedFilterPattern = newArrayList(context.getProvidedExclusions());
     excludedFilterPattern.addAll(context.getExcludedArtifacts());

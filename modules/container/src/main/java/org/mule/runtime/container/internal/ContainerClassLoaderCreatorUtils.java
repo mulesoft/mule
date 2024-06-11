@@ -79,6 +79,10 @@ public class ContainerClassLoaderCreatorUtils {
     final Map<String, LookupStrategy> result = new HashMap<>();
     for (MuleContainerModule muleModule : modules) {
       for (String exportedPackage : muleModule.getExportedPackages()) {
+        if ("org.apache.logging.log4j".equals(exportedPackage)) {
+          System.out.println("!");
+        }
+
         LookupStrategy specialLookupStrategy = getSpecialLookupStrategy(exportedPackage);
         result.put(exportedPackage, specialLookupStrategy == null ? containerOnlyLookupStrategy : specialLookupStrategy);
       }

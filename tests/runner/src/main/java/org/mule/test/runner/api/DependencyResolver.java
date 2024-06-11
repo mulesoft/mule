@@ -342,7 +342,10 @@ public class DependencyResolver implements AutoCloseable {
     PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
     node.accept(nlg);
 
-    return nlg.getFiles().stream().map(File::getAbsoluteFile).collect(toList());
+    return nlg.getFiles().stream()
+        .map(File::getAbsoluteFile)
+        .distinct()
+        .collect(toList());
   }
 
   /**

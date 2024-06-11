@@ -227,5 +227,9 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
       }
     }
 
+    @Override
+    public String toString() {
+      return "ReflectionAdapterMuleContainerModule_" + adaptedModule.toString();
+    }
   }
 }

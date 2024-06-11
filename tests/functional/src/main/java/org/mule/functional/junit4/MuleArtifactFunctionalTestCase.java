@@ -48,13 +48,18 @@ import org.mockito.junit.MockitoRule;
     },
     testExclusions = {
         "org.mule.runtime:*:*:*:*",
+        "org.mule.runtime.boot:*:*:*:*",
         "org.mule.modules*:*:*:*:*",
         "org.mule.transports:*:*:*:*",
         "org.mule.extensions:*:*:*:*",
         "org.mule.connectors:*:*:*:*",
         "org.mule.tests.plugin:*:*:*:*",
         "com.mulesoft.mule.runtime*:*:*:*:*",
-        "com.mulesoft.licm:*:*:*:*"
+        "com.mulesoft.licm:*:*:*:*",
+        // Force logging libs to be used form the container
+        "org.slf4j:*:*:*:*",
+        "org.apache.logging.log4j:*:*:*:*",
+        "com.lmax.disruptor:*:*:*:*"
     },
     testInclusions = {
         "*:*:jar:tests:*",
