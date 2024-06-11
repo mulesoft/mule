@@ -18,6 +18,7 @@ import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.AT
 import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.MULTIPLE_OR_NONE;
 import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE;
 import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE_OR_NONE;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONNECTION;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
@@ -66,6 +67,9 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
@@ -77,7 +81,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SERIALIZER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_ABSTRACT_RECONNECTION_STRATEGY_QNAME;
 import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoErrorMapping;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
 
@@ -104,7 +108,9 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -119,9 +125,11 @@ import org.mule.runtime.core.internal.extension.AllowsExpressionWithoutMarkersMo
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
+import org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
+import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.NoRedeliveryPolicyModelProperty;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
@@ -144,6 +152,8 @@ public class MuleExtensionModelDeclarer {
   static final String DEFAULT_LOG_LEVEL = "INFO";
   private static final ClassValueModel NOTIFICATION_CLASS_VALUE_MODEL =
       new ClassValueModel(singletonList(NotificationListener.class.getName()));
+  private static final MetadataType RECONNECTION_STRATEGY_TYPE =
+      new ReconnectionStrategyTypeBuilder().buildReconnectionStrategyType();
 
   final ErrorModel anyError = newError(ANY).build();
   final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
@@ -276,8 +286,8 @@ public class MuleExtensionModelDeclarer {
         .describedAs("Source that schedules periodic execution of a flow.")
         .withModelProperty(NoRedeliveryPolicyModelProperty.INSTANCE);
 
-    scheduler.withOutput().ofType(ANY_TYPE);
-    scheduler.withOutputAttributes().ofType(ANY_TYPE);
+    scheduler.withOutput().ofType(VOID_TYPE);
+    scheduler.withOutputAttributes().ofType(VOID_TYPE);
 
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
@@ -525,7 +535,7 @@ public class MuleExtensionModelDeclarer {
 
     withNoErrorMapping(parseTemplate);
 
-    parseTemplate.withOutput().ofType(ANY_TYPE);
+    parseTemplate.withOutput().ofType(STRING_TYPE);
     parseTemplate.withOutputAttributes().ofType(VOID_TYPE);
 
     parseTemplate.onDefaultParameterGroup()
@@ -1153,6 +1163,29 @@ public class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(REQUIRED)
         .describedAs("The default correlation id generation expression for every source. This must be DataWeave expression.");
+  }
+
+  private static void addReconnectionStrategyParameter(ParameterizedDeclaration declaration) {
+    ParameterDeclaration parameter = new ParameterDeclaration(RECONNECTION_STRATEGY_PARAMETER_NAME);
+    parameter.setDescription(RECONNECTION_STRATEGY_PARAMETER_DESCRIPTION);
+    parameter.setExpressionSupport(NOT_SUPPORTED);
+    parameter.setRequired(false);
+    parameter.setParameterRole(BEHAVIOUR);
+    parameter.setType(RECONNECTION_STRATEGY_TYPE, false);
+    parameter.setLayoutModel(LayoutModel.builder().tabName(ADVANCED_TAB).build());
+    parameter.setDslConfiguration(ParameterDslConfiguration.builder()
+        .allowsInlineDefinition(true)
+        .allowsReferences(false)
+        .allowTopLevelDefinition(false)
+        .build());
+    parameter.addModelProperty(new QNameModelProperty(MULE_ABSTRACT_RECONNECTION_STRATEGY_QNAME));
+    markAsInfrastructure(parameter, 3);
+
+    declaration.getParameterGroup(CONNECTION).addParameter(parameter);
+  }
+
+  private static void markAsInfrastructure(ParameterDeclaration parameter, int sequence) {
+    parameter.addModelProperty(new InfrastructureParameterModelProperty(sequence));
   }
 
   // See the "abstract-configuration-element" in the mule-core-common.xsd file. It represents the same placeholder.

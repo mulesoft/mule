@@ -6,8 +6,9 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
@@ -82,9 +83,7 @@ public class TestBootstrapServiceDiscovererConfigurationBuilder extends Abstract
     // Uses reflection to access the class loader as classes were loaded from different class loaders so they cannot be casted
     ClassLoader classLoader =
         (ClassLoader) artifactClassLoader.getClass().getMethod("getClassLoader").invoke(artifactClassLoader);
-    final Enumeration<URL> resources =
-        (Enumeration<URL>) classLoader.getClass().getMethod("findResources", String.class).invoke(classLoader,
-                                                                                                  BOOTSTRAP_PROPERTIES);
+    final Enumeration<URL> resources = classLoader.getResources(BOOTSTRAP_PROPERTIES);
 
     final List<BootstrapService> bootstrapServices = new ArrayList<>();
     if (resources.hasMoreElements()) {

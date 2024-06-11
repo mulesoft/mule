@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.extension.api.loader.xml.declaration;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
+import static org.mule.metadata.persistence.api.util.SerializationUtils.deserializeMetadataType;
+import static org.mule.metadata.persistence.api.util.SerializationUtils.serializeMetadataType;
+
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.persistence.MetadataTypeGsonTypeAdapter;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Map;
+
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Declaration of a {@link OperationModel} inferred by the chain of {@link Processor}s within a <operation/>s body
@@ -61,8 +61,7 @@ public class DeclarationOperation {
    * @return a serialized JSON string
    */
   public static String toString(Map<String, DeclarationOperation> operationMap) {
-    final Gson gson = new GsonBuilder().registerTypeAdapter(MetadataType.class, new MetadataTypeGsonTypeAdapter()).create();
-    return gson.toJson(operationMap);
+    return serializeMetadataType(operationMap);
   }
 
   /**
@@ -73,11 +72,6 @@ public class DeclarationOperation {
    * @return a {@link Map<String, DeclarationOperation>} where each key is an operation of the current <module/>
    */
   public static Map<String, DeclarationOperation> fromString(String json) {
-    try {
-      final Gson gson = new GsonBuilder().registerTypeAdapter(MetadataType.class, new MetadataTypeGsonTypeAdapter()).create();
-      return gson.fromJson(json, new TypeToken<Map<String, DeclarationOperation>>() {}.getType());
-    } catch (JsonParseException jpe) {
-      throw new IllegalArgumentException("The declarations content does not match the expected format", jpe);
-    }
+    return deserializeMetadataType(json, new TypeToken<Map<String, DeclarationOperation>>() {}.getType());
   }
 }

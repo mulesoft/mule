@@ -31,4 +31,9 @@ public class ParentFirstLookupStrategy implements LookupStrategy {
     classLoaders.add(classLoader);
     return classLoaders;
   }
+
+  @Override
+  public String toString() {
+    return "ParentFirstLookupStrategy";
+  }
 }

@@ -42,7 +42,7 @@
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
 
         <maven.compat.version>3.3.9</maven.compat.version>
-        <commonsIoVersion>2.16.0</commonsIoVersion>
+        <commonsIoVersion>2.16.1</commonsIoVersion>
         <commonsCollections4Version>4.4</commonsCollections4Version>
     </properties>
     

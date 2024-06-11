@@ -21,15 +21,16 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.a
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.dictionaryOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static javax.lang.model.SourceVersion.latestSupported;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -164,6 +165,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
     processingEnvironment = mock(ProcessingEnvironment.class);
     when(processingEnvironment.getTypeUtils()).thenReturn(compilationRule.getTypes());
     when(processingEnvironment.getElementUtils()).thenReturn(compilationRule.getElements());
+    when(processingEnvironment.getSourceVersion()).thenReturn(latestSupported());
   }
 
   @Test

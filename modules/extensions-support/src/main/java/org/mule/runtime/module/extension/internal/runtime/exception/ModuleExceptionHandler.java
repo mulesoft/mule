@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.exception.ExceptionHelper.suppressIfPresent;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter.from;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 

@@ -56,7 +56,7 @@ import io.qameta.allure.Story;
 @RunWith(Parameterized.class)
 public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
 
-  @Parameters
+  @Parameters(name = "{0}")
   public static Collection<String> data() {
     return asList("apps", "domains");
   }

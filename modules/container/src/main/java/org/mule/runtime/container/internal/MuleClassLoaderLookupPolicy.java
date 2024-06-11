@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
+
+import static java.lang.System.lineSeparator;
+import static java.util.Objects.requireNonNull;
 
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 
@@ -44,8 +46,8 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
    *                           system package root will use the same approach.
    */
   public MuleClassLoaderLookupPolicy(Map<String, LookupStrategy> lookupStrategies, Set<String> rootSystemPackages) {
-    checkArgument(lookupStrategies != null, "Lookup strategies cannot be null");
-    checkArgument(rootSystemPackages != null, "System packages cannot be null");
+    requireNonNull(lookupStrategies, "Lookup strategies cannot be null");
+    requireNonNull(rootSystemPackages, "System packages cannot be null");
     this.rootSystemPackages = normalizeRootSystemPackages(rootSystemPackages);
     this.configuredLookupStrategies = normalizeLookupStrategies(lookupStrategies);
     this.lookupStrategies = copy(configuredLookupStrategies);
@@ -169,5 +171,14 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   private boolean isSystemPackage(String packageName) {
     return rootSystemPackages.contains(packageName + PACKAGE_SEPARATOR)
         || rootSystemPackages.contains(packageName);
+  }
+
+  @Override
+  public String toString() {
+    return "MuleClassLoaderLookupPolicy{" + lineSeparator() +
+        "\tconfiguredLookupStrategies: " + configuredLookupStrategies + lineSeparator() +
+        "\trootSystemPackages: " + rootSystemPackages + lineSeparator() +
+        "\tlookupStrategies: " + lookupStrategies + lineSeparator() +
+        "}";
   }
 }

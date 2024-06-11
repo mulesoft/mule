@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.resolveProcessorRepresentation;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;

@@ -13,16 +13,17 @@ import static java.util.Collections.emptySet;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.runner.api.PluginUrlClassification;
@@ -50,14 +51,27 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
   public void setUp() {
     factory = new PluginLookPolicyFactory();
     fooPluginClassification =
-        new PluginUrlClassification(FOO_PLUGIN_ID, emptyList(), emptyList(), emptyList(), newHashSet(FOO_PACKAGE), emptySet(),
+        new PluginUrlClassification(FOO_PLUGIN_ID, emptyList(), emptyList(),
+                                    new BundleDescriptor.Builder()
+                                        .setGroupId("g")
+                                        .setArtifactId("a")
+                                        .setVersion("v")
+                                        .build(),
+                                    emptyList(),
+                                    newHashSet(FOO_PACKAGE), emptySet(),
                                     emptySet(), emptySet());
   }
 
   @Test
   public void lookupPoliciesForPluginThatDeclaresDependency() {
     PluginUrlClassification barPluginClassification =
-        new PluginUrlClassification(BAR_PLUGIN_ID, emptyList(), emptyList(), newArrayList(FOO_PLUGIN_ID));
+        new PluginUrlClassification(BAR_PLUGIN_ID, emptyList(), emptyList(),
+                                    new BundleDescriptor.Builder()
+                                        .setGroupId("g")
+                                        .setArtifactId("a")
+                                        .setVersion("v")
+                                        .build(),
+                                    newArrayList(FOO_PLUGIN_ID));
     List<PluginUrlClassification> pluginClassifications = newArrayList(barPluginClassification, fooPluginClassification);
     ClassLoaderLookupPolicy parentLookupPolicies = getParentClassLoaderLookupPolicy();
 
@@ -69,7 +83,13 @@ public class PluginLookPolicyFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void lookupPoliciesForPluginThatDoesNotDeclareDependency() {
     PluginUrlClassification barPluginClassification =
-        new PluginUrlClassification(BAR_PLUGIN_ID, emptyList(), emptyList(), emptyList());
+        new PluginUrlClassification(BAR_PLUGIN_ID, emptyList(), emptyList(),
+                                    new BundleDescriptor.Builder()
+                                        .setGroupId("g")
+                                        .setArtifactId("a")
+                                        .setVersion("v")
+                                        .build(),
+                                    emptyList());
     List<PluginUrlClassification> pluginClassifications = newArrayList(barPluginClassification, fooPluginClassification);
     ClassLoaderLookupPolicy parentLookupPolicies = getParentClassLoaderLookupPolicy();
 

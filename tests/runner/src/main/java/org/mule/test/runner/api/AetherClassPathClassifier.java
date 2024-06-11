@@ -47,6 +47,7 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 import org.mule.test.runner.utils.RunnerModuleUtils;
@@ -122,8 +123,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
   private static final String TESTS_JAR = "-tests.jar";
   private static final String MULE_SERVICE_CLASSIFIER = "mule-service";
 
+  private static final String RUNTIME_BOOT_GROUP_ID = "org.mule.runtime.boot";
   private static final String RUNTIME_GROUP_ID = "org.mule.runtime";
   private static final String LOGGING_ARTIFACT_ID = "mule-module-logging";
+  private static final String LOG4J_CONFIGURATOR_ARTIFACT_ID = "mule-module-log4j-configurator";
 
   private static final String MULE_ARTIFACT_JSON_PATH = "META-INF/mule-artifact/mule-artifact.json";
 
@@ -428,12 +431,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
 
-    // Add logging dependencies to avoid every module from having to declare this dependency.
+    // Add logging dependencies to avoid every module from having to declare this dependencies.
     // This brings the slf4j bridges required by transitive dependencies of the container to its classpath
     // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
-    // TODO W-15453073 make this work with the same version as the runner, with `org.mule.runtime.boot` groupId.
     directDependencies
-        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, "4.6.0"),
+        .add(new Dependency(new DefaultArtifact(RUNTIME_BOOT_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion),
+                            COMPILE));
+    directDependencies
+        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOG4J_CONFIGURATOR_ARTIFACT_ID, JAR_EXTENSION, muleVersion),
                             COMPILE));
 
     // TODO: MULE-19762 remove once forward compatiblity is finished
@@ -533,6 +538,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
             }
           })
           .flatMap(l -> l.stream())
+          .distinct()
           .collect(Collectors.toCollection(() -> new TreeSet<>((d1, d2) -> {
             if (toVersionlessId(d1.getArtifact()).equals(toVersionlessId(d2.getArtifact()))) {
               try {
@@ -722,10 +728,20 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
           .map(dependency -> toVersionlessId(dependency.getArtifact()))
           .collect(toList());
       final String versionLessId = toVersionlessId(node.getArtifact());
+
+      final BundleDescriptor bundleDescriptorForNode = new BundleDescriptor.Builder()
+          .setGroupId(node.getArtifact().getGroupId())
+          .setArtifactId(node.getArtifact().getArtifactId())
+          .setVersion(node.getArtifact().getVersion())
+          .setBaseVersion(node.getArtifact().getBaseVersion())
+          .setType(node.getArtifact().getExtension())
+          .setClassifier(node.getArtifact().getClassifier())
+          .build();
+
       final PluginUrlClassification pluginUrlClassification =
-          pluginResourcesResolver.resolvePluginResourcesFor(
-                                                            new PluginUrlClassification(versionLessId, node.getUrls(),
+          pluginResourcesResolver.resolvePluginResourcesFor(new PluginUrlClassification(versionLessId, node.getUrls(),
                                                                                         node.getExportClasses(),
+                                                                                        bundleDescriptorForNode,
                                                                                         pluginDependencies));
 
       classifiedPluginUrls.put(versionLessId, pluginUrlClassification);

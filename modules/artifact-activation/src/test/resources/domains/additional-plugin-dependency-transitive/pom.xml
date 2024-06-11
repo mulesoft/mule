@@ -14,7 +14,6 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <app.runtime>4.4.0</app.runtime>
-        <mule.maven.plugin.version>3.7.0-SNAPSHOT</mule.maven.plugin.version>
     </properties>
 
     <build>
@@ -39,7 +38,7 @@
                                 <dependency>
                                     <groupId>org.springframework</groupId>
                                     <artifactId>spring-context</artifactId>
-                                    <version>5.1.0.RELEASE</version>
+                                    <version>${spring.version}</version>
                                 </dependency>
                             </additionalDependencies>
                         </plugin>
@@ -53,7 +52,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-spring-module</artifactId>
-            <version>1.3.6</version>
+            <version>${mule.spring.module.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>

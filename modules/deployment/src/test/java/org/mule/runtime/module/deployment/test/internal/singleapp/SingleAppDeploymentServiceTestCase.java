@@ -28,6 +28,7 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.StartupListener;
 import org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer;
+import org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher;
 import org.mule.runtime.module.deployment.internal.DeploymentFileResolver;
 import org.mule.runtime.module.deployment.internal.DomainArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.singleapp.SingleAppApplicationDeployerBuilder;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -115,6 +117,29 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
 
     singleAppDeploymentService.deploy(ARCHIVE_URI);
     verify(archiveDeployer).deployPackagedArtifact(eq(ARCHIVE_URI), any());
+  }
+
+  @Test
+  public void whenSingleAppDeploymentServiceStopsTheWatcherIsStoppedAndDisposesArtifacts() throws IOException {
+    DomainArchiveDeployer appDomainDeployer = mock(DomainArchiveDeployer.class);
+    SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder = mockSingleAppDomainDeployerBuilder(appDomainDeployer);
+    SingleAppApplicationDeployerBuilder singleAppApplicationDeployerBuilder = mockSingleAppApplicationDeployerBuilder();
+    DefaultArchiveDeployer archiveDeployer = mock(DefaultArchiveDeployer.class);
+    when(singleAppApplicationDeployerBuilder.build()).thenReturn(archiveDeployer);
+    DeploymentDirectoryWatcher deploymentDirectoryWatcher = mock(DeploymentDirectoryWatcher.class);
+
+    SingleAppDeploymentService singleAppDeploymentService =
+        new TestSingleAppDeploymentService(singleAppDomainDeployerBuilder,
+                                           singleAppApplicationDeployerBuilder,
+                                           mock(DeploymentFileResolver.class),
+                                           new ArrayList<>(),
+                                           new ArrayList<>(),
+                                           () -> mock(SchedulerService.class),
+                                           deploymentDirectoryWatcher);
+
+    singleAppDeploymentService.start();
+    singleAppDeploymentService.stop();
+    verify(deploymentDirectoryWatcher).stop(true);
   }
 
   @Test
@@ -307,5 +332,27 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
     when(singleAppDomainDeployerBuilder.withDomainDeploymentListener(any())).thenReturn(singleAppDomainDeployerBuilder);
     when(singleAppDomainDeployerBuilder.build()).thenReturn(appDomainDeployer);
     return singleAppDomainDeployerBuilder;
+  }
+
+  private class TestSingleAppDeploymentService extends SingleAppDeploymentService {
+
+    private DeploymentDirectoryWatcher deploymentDirectoryWatcher;
+
+    public TestSingleAppDeploymentService(SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder,
+                                          SingleAppApplicationDeployerBuilder applicationDeployerBuilder,
+                                          DeploymentFileResolver fileResolver,
+                                          List<Application> applications,
+                                          List<Domain> domains,
+                                          Supplier<SchedulerService> artifactStartExecutorSupplier,
+                                          DeploymentDirectoryWatcher deploymentDirectoryWatcher) {
+      super(singleAppDomainDeployerBuilder, applicationDeployerBuilder, fileResolver, applications, domains,
+            artifactStartExecutorSupplier);
+      this.deploymentDirectoryWatcher = deploymentDirectoryWatcher;
+    }
+
+    @Override
+    protected DeploymentDirectoryWatcher resolveDeploymentDirectoryWatcher() {
+      return deploymentDirectoryWatcher;
+    }
   }
 }

@@ -31,23 +31,26 @@ import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
+import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -67,6 +70,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -241,7 +245,9 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
                                                               }
                                                             });
 
-    verify(artifactClassLoaderResolver, times(1)).createMulePluginClassLoader(any(), eq(plugin2Descriptor), any());
+    verify(artifactClassLoaderResolver, times(1))
+        .createMulePluginClassLoader(argThat(any(MuleDeployableArtifactClassLoader.class)), eq(plugin2Descriptor),
+                                     argThat(any(PluginDescriptorResolver.class)));
 
     final RegionClassLoader regionClassLoader = (RegionClassLoader) domainClassLoader.getParent();
 
@@ -352,7 +358,9 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
                                                                    }
                                                                  });
 
-    verify(artifactClassLoaderResolver, times(1)).createMulePluginClassLoader(any(), eq(plugin2Descriptor), any());
+    verify(artifactClassLoaderResolver, times(1))
+        .createMulePluginClassLoader(argThat(any(MuleDeployableArtifactClassLoader.class)), eq(plugin2Descriptor),
+                                     argThat(any(PluginDescriptorResolver.class)));
 
     final RegionClassLoader regionClassLoader = (RegionClassLoader) applicationClassLoader.getParent();
 
@@ -390,8 +398,18 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     when(privilegedModule.getPrivilegedArtifacts()).thenReturn(singleton(PLUGIN_ARTIFACT_ID1));
     when(privilegedModule.getPrivilegedExportedPackages()).thenReturn(singleton(PRIVILEGED_PACKAGE));
     when(moduleRepository.getModules()).thenReturn(singletonList(privilegedModule));
+
+    final ArtifactClassLoader containerClassLoader = spy(createContainerClassLoader(moduleRepository));
+    final ClassLoaderLookupPolicy containerLookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(containerLookupPolicy.getClassLookupStrategy(argThat(any(String.class))))
+        .thenReturn(new ContainerOnlyLookupStrategy(this.getClass().getClassLoader()));
+    when(containerLookupPolicy.extend(argThat(any(Map.class))))
+        .thenReturn(containerLookupPolicy);
+    when(containerClassLoader.getClassLoaderLookupPolicy())
+        .thenReturn(containerLookupPolicy);
+
     // refresh the artifactClassLoaderResolver with the updated modules in the moduleRepository
-    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
+    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(containerClassLoader,
                                                                              moduleRepository, nativeLibraryFinderFactory));
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
