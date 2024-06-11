@@ -530,7 +530,7 @@ public class MuleExtensionModelDeclarer {
         .describedAs("Parses a template defined inline.")
         .withModelProperty(new NoErrorMappingModelProperty());
 
-    parseTemplate.withOutput().ofType(ANY_TYPE);
+    parseTemplate.withOutput().ofType(STRING_TYPE);
     parseTemplate.withOutputAttributes().ofType(VOID_TYPE);
 
     parseTemplate.onDefaultParameterGroup()
