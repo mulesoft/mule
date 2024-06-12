@@ -8,12 +8,15 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppNativeLibrariesTempFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
@@ -44,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.slf4j.Logger;
 
@@ -309,9 +313,13 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
-        final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
+        final String appName = artifact.getDescriptor().getDataFolderName();
+        final File dataFolder = getAppDataFolder(appName);
         try {
           deleteDirectory(dataFolder);
+          if (getAppNativeLibrariesTempFolder(appName).exists()) {
+            executeSchedulerFileDeletion(appName);
+          }
         } catch (IOException e) {
           logger.warn(
                       format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
@@ -326,6 +334,13 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
       throw e;
     }
+  }
+
+  private void executeSchedulerFileDeletion(String appName) {
+    ScheduledExecutorService scheduler = newScheduledThreadPool(1);
+    RetryScheduledFileDeletionTask retryTask =
+        new RetryScheduledFileDeletionTask(scheduler, 5, new NativeLibrariesFileDeletion(appName));
+    scheduler.scheduleWithFixedDelay(retryTask, 10, 10, SECONDS);
   }
 
   private void logRequestToUndeployArtifact(T artifact) {

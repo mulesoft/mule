@@ -34,7 +34,8 @@ public class DefaultNativeLibraryFinderFactory implements NativeLibraryFinderFac
     checkArgument(!isEmpty(name), "appName cannot be empty");
     checkArgument(urls != null, "urls cannot be null");
 
-    return new ArtifactCopyNativeLibraryFinder(new File(tempFolderChildFunction.apply(name), "temp"), urls);
+    File tempFolder = new File(new File(tempFolderChildFunction.apply("native-libraries"), name), "temp");
+    return new ArtifactCopyNativeLibraryFinder(tempFolder, urls);
   }
 
 }
