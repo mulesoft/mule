@@ -90,7 +90,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
 
       @Override
       public void entryAdded(java.util.UUID key, Object value) {
-        listenerMap.remove(key);
+        listenerMap.put(key, (ObjectStoreEntryListener) value);
       }
 
       @Override
