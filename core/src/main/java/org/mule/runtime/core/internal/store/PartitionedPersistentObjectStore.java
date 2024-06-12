@@ -10,6 +10,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
@@ -65,6 +66,17 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
       initialized = true;
     }
   }
+
+  @Override
+  public java.util.UUID addEntryListener(ObjectStoreEntryListener listener) {
+    return null;
+  }
+
+  @Override
+  public boolean removeEntryListener(java.util.UUID key) {
+    return false;
+  }
+
 
   private void createDefaultPartition() throws ObjectStoreException {
     if (!partitionsByName.containsKey(DEFAULT_PARTITION_NAME)) {

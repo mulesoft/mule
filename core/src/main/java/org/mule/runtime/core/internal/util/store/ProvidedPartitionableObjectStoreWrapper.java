@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.internal.store.AbstractPartitionableObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
@@ -13,6 +14,7 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
@@ -61,6 +63,16 @@ public class ProvidedPartitionableObjectStoreWrapper<T extends Serializable> ext
   @Override
   public List<String> allKeys() throws ObjectStoreException {
     return wrapped.allKeys();
+  }
+
+  @Override
+  public UUID addEntryListener(ObjectStoreEntryListener listener) {
+    return null;
+  }
+
+  @Override
+  public boolean removeEntryListener(UUID key) {
+    return false;
   }
 
   @Override

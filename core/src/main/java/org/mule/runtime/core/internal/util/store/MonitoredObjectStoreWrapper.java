@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.util.store;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Comparator.comparing;
-import static java.util.UUID.randomUUID;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
@@ -19,6 +18,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
@@ -33,7 +33,6 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
-import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -55,7 +54,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
   private Scheduler scheduler;
   private ScheduledFuture<?> scheduledTask;
   ObjectStore<StoredObject<T>> baseStore;
-  Map<java.util.UUID, EventListener> listenerMap;
+  Map<java.util.UUID, ObjectStoreEntryListener> listenerMap;
+  ObjectStoreEntryListener listener;
 
   /**
    * the maximum number of entries that this store keeps around. Specify <em>-1</em> if the store is supposed to be "unbounded".
@@ -86,6 +86,23 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     entryTtl = settings.getEntryTTL().orElse(null);
     expirationInterval = settings.getExpirationInterval();
     listenerMap = new ConcurrentHashMap<>();
+    listener = new ObjectStoreEntryListener() {
+
+      @Override
+      public void entryAdded(java.util.UUID key, Object value) {
+        listenerMap.remove(key);
+      }
+
+      @Override
+      public void entryRemoved(java.util.UUID key) {
+        listenerMap.remove(key);
+      }
+
+      @Override
+      public void entryUpdated(java.util.UUID key, Object value) {
+        listenerMap.put(key, (ObjectStoreEntryListener) value);
+      }
+    };
   }
 
   @Override
@@ -96,9 +113,13 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
   @Override
   protected void doStore(String key, T value) throws ObjectStoreException {
     Long time = Long.valueOf(System.currentTimeMillis());
+
+    if (getStore().contains(key)) {
+      listener.entryUpdated(java.util.UUID.fromString(key), value);
+    } else {
+      listener.entryAdded(java.util.UUID.fromString(key), value);
+    }
     getStore().store(key, new StoredObject<>(value, time, key));
-    // todo : add entryUpdated() if the object already exists
-    // todo: add entryAdded() if the object is newly added
   }
 
   @Override
@@ -122,18 +143,20 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     if (object == null) {
       return null;
     } else {
-      // todo: entryRemoved()
+      listener.entryRemoved(java.util.UUID.fromString(key));
       return object.getItem();
     }
   }
 
-  @Override protected java.util.UUID doAddEntryListener(EventListener listener) {
-    java.util.UUID uuid = randomUUID();
+  @Override
+  protected java.util.UUID doAddEntryListener(ObjectStoreEntryListener listener) {
+    java.util.UUID uuid = java.util.UUID.randomUUID();
     listenerMap.put(uuid, listener);
     return uuid;
   }
 
-  @Override protected boolean doRemoveEntryListener(java.util.UUID key) {
+  @Override
+  protected boolean doRemoveEntryListener(java.util.UUID key) {
     if (listenerMap.remove(key) == null) {
       return false;
     }

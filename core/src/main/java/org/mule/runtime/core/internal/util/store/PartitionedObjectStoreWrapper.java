@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
@@ -19,6 +20,7 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 
@@ -83,6 +85,18 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> extends Templ
   protected T doRemove(String key) throws ObjectStoreException {
     return getStore().remove(partitioned(key));
   }
+
+  @Override
+  protected UUID doAddEntryListener(ObjectStoreEntryListener listener) {
+    return null;
+  }
+
+
+  @Override
+  protected boolean doRemoveEntryListener(UUID key) {
+    return false;
+  }
+
 
   @Override
   public boolean isPersistent() {

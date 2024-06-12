@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util.store;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 
@@ -60,6 +62,17 @@ public class ObjectStorePartition<T extends Serializable> extends TemplateObject
   protected T doRemove(String key) throws ObjectStoreException {
     return partitionedObjectStore.remove(key, partitionName);
   }
+
+  @Override
+  protected UUID doAddEntryListener(ObjectStoreEntryListener listener) {
+    return null;
+  }
+
+  @Override
+  protected boolean doRemoveEntryListener(UUID key) {
+    return false;
+  }
+
 
   @Override
   public boolean isPersistent() {

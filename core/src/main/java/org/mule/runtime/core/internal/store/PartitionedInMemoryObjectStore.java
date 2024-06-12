@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.store;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
+
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -20,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -39,6 +42,17 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   public boolean isPersistent() {
     return false;
   }
+
+  @Override
+  public UUID addEntryListener(ObjectStoreEntryListener listener) {
+    return null;
+  }
+
+  @Override
+  public boolean removeEntryListener(UUID key) {
+    return false;
+  }
+
 
   @Override
   protected boolean doContains(String key, String partitionName) throws ObjectStoreException {

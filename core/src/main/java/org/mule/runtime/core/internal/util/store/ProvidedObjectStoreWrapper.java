@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util.store;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
@@ -14,6 +15,7 @@ import org.mule.runtime.api.store.TemplateObjectStore;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
@@ -63,6 +65,17 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> extends Template
   protected T doRemove(String key) throws ObjectStoreException {
     return getWrapped().remove(key);
   }
+
+  @Override
+  protected UUID doAddEntryListener(ObjectStoreEntryListener listener) {
+    return null;
+  }
+
+  @Override
+  protected boolean doRemoveEntryListener(UUID key) {
+    return false;
+  }
+
 
   @Override
   public boolean isPersistent() {
