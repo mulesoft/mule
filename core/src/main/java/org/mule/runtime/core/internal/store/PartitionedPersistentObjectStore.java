@@ -67,16 +67,6 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     }
   }
 
-  @Override
-  public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override
-  public boolean removeEntryListener(String key) {
-    return false;
-  }
-
   private void createDefaultPartition() throws ObjectStoreException {
     if (!partitionsByName.containsKey(DEFAULT_PARTITION_NAME)) {
       createPartition(DEFAULT_PARTITION_NAME);

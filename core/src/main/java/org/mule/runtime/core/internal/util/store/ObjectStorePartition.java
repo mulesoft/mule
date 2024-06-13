@@ -87,16 +87,6 @@ public class ObjectStorePartition<T extends Serializable> extends TemplateObject
     return partitionedObjectStore.retrieveAll(partitionName);
   }
 
-  @Override
-  public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override
-  public boolean removeEntryListener(String key) {
-    return false;
-  }
-
   public PartitionableObjectStore<T> getBaseStore() {
     return partitionedObjectStore;
   }

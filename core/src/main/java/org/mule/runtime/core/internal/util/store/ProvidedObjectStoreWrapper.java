@@ -103,16 +103,6 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> extends Template
     return getWrapped().retrieveAll();
   }
 
-  @Override
-  public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override
-  public boolean removeEntryListener(String key) {
-    return false;
-  }
-
   protected ObjectStore<T> getWrapped() {
     return wrapped;
   }

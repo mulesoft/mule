@@ -65,16 +65,6 @@ public class ProvidedPartitionableObjectStoreWrapper<T extends Serializable> ext
   }
 
   @Override
-  public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override
-  public boolean removeEntryListener(String key) {
-    return false;
-  }
-
-  @Override
   protected boolean doContains(String key, String partitionName) throws ObjectStoreException {
     return wrapped.contains(key, partitionName);
   }

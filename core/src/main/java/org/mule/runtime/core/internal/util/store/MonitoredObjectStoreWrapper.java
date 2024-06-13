@@ -106,16 +106,6 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
   }
 
   @Override
-  public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override
-  public boolean removeEntryListener(String key) {
-    return false;
-  }
-
-  @Override
   public void clear() throws ObjectStoreException {
     this.getStore().clear();
   }

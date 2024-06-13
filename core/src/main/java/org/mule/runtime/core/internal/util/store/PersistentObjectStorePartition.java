@@ -223,16 +223,6 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
     }
   }
 
-  @Override
-  public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override
-  public boolean removeEntryListener(String key) {
-    return false;
-  }
-
   private T load(String key) throws ObjectStoreException {
     String filename = (String) realKeyToUUIDIndex.get(key);
     File file = getValueFile(filename);

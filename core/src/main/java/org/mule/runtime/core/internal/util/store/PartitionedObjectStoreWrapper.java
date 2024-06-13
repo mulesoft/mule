@@ -124,16 +124,6 @@ public class PartitionedObjectStoreWrapper<T extends Serializable> extends Templ
     return result;
   }
 
-  @Override
-  public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override
-  public boolean removeEntryListener(String key) {
-    return false;
-  }
-
   private ObjectStore<T> getStore() {
     return baseStore;
   }

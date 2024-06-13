@@ -43,16 +43,6 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
   }
 
   @Override
-  public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override
-  public boolean removeEntryListener(String key) {
-    return false;
-  }
-
-  @Override
   protected boolean doContains(String key, String partitionName) throws ObjectStoreException {
     if (partitions.containsKey(partitionName)) {
       return partitions.get(partitionName).containsKey(key);
