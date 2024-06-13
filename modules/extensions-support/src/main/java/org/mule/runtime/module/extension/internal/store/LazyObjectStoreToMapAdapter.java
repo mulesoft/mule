@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.store;
 
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreToMapAdapter;
@@ -34,5 +35,13 @@ public class LazyObjectStoreToMapAdapter<T extends Serializable> extends ObjectS
   @Override
   public ObjectStore<T> getObjectStore() {
     return objectStore.get();
+  }
+
+  @Override public String addEntryListener(ObjectStoreEntryListener listener) {
+    return "";
+  }
+
+  @Override public boolean removeEntryListener(String id) {
+    return false;
   }
 }
