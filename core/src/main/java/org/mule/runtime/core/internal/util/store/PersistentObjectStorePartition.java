@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ExpirableObjectStore;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
@@ -220,6 +221,16 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
     } finally {
       rLock.unlock();
     }
+  }
+
+  @Override
+  public String addEntryListener(ObjectStoreEntryListener listener) {
+    return "";
+  }
+
+  @Override
+  public boolean removeEntryListener(String key) {
+    return false;
   }
 
   private T load(String key) throws ObjectStoreException {

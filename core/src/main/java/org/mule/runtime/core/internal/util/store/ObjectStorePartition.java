@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.util.store;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
@@ -84,6 +85,16 @@ public class ObjectStorePartition<T extends Serializable> extends TemplateObject
   @Override
   public Map<String, T> retrieveAll() throws ObjectStoreException {
     return partitionedObjectStore.retrieveAll(partitionName);
+  }
+
+  @Override
+  public String addEntryListener(ObjectStoreEntryListener listener) {
+    return "";
+  }
+
+  @Override
+  public boolean removeEntryListener(String key) {
+    return false;
   }
 
   public PartitionableObjectStore<T> getBaseStore() {

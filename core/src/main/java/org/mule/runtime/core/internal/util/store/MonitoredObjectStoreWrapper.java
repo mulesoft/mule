@@ -18,6 +18,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
@@ -102,6 +103,16 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
   @Override
   public Map<String, T> retrieveAll() throws ObjectStoreException {
     return getStore().retrieveAll().values().stream().collect(toMap(StoredObject::getKey, StoredObject::getItem));
+  }
+
+  @Override
+  public String addEntryListener(ObjectStoreEntryListener listener) {
+    return "";
+  }
+
+  @Override
+  public boolean removeEntryListener(String key) {
+    return false;
   }
 
   @Override

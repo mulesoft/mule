@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util.store;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
@@ -100,6 +101,16 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> extends Template
   @Override
   public Map<String, T> retrieveAll() throws ObjectStoreException {
     return getWrapped().retrieveAll();
+  }
+
+  @Override
+  public String addEntryListener(ObjectStoreEntryListener listener) {
+    return "";
+  }
+
+  @Override
+  public boolean removeEntryListener(String key) {
+    return false;
   }
 
   protected ObjectStore<T> getWrapped() {
