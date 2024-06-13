@@ -33,6 +33,9 @@ module org.mule.runtime.tls {
       org.mule.runtime.spring.config,
       spring.beans;
 
+  exports org.mule.runtime.module.tls.internal.revocation to
+      spring.beans;
+
   provides org.mule.runtime.api.tls.AbstractTlsContextFactoryBuilderFactory with
       org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory;
 
