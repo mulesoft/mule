@@ -12,6 +12,8 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetada
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeResolverAdapter;
@@ -24,9 +26,16 @@ import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeRes
 public class JavaAttributesResolverModelParser implements AttributesResolverModelParser {
 
   private final Class<?> attributesTypeResolverDeclarationClass;
+  private final LazyValue<AttributesTypeResolver<?>> instance;
 
   public JavaAttributesResolverModelParser(Class<?> attributesTypeResolverDeclarationClass) {
     this.attributesTypeResolverDeclarationClass = attributesTypeResolverDeclarationClass;
+    this.instance = new LazyValue<>(() -> instantiateResolver(attributesTypeResolverDeclarationClass));
+  }
+
+  public JavaAttributesResolverModelParser(AttributesTypeResolver<?> attributesTypeResolver) {
+    this.attributesTypeResolverDeclarationClass = attributesTypeResolver.getClass();
+    this.instance = new LazyValue<>(attributesTypeResolver);
   }
 
   public boolean hasAttributesResolver() {
@@ -34,7 +43,7 @@ public class JavaAttributesResolverModelParser implements AttributesResolverMode
   }
 
   public AttributesTypeResolver getAttributesResolver() {
-    return instantiateResolver(attributesTypeResolverDeclarationClass);
+    return instance.get();
   }
 
   private AttributesTypeResolver instantiateResolver(Class<?> factoryType) {

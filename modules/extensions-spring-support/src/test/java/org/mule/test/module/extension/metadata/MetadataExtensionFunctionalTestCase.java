@@ -99,8 +99,11 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_ID = "outputMetadataWithoutKeysWithKeyId";
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER = "contentAndOutputWithCacheResolver";
   protected static final String SCOPE_WITH_OUTPUT_RESOLVER = "scopeWithOutputResolver";
+  protected static final String SCOPE_WITH_PASS_THROUGH_OUTPUT_RESOLVER = "scopeWithPassThroughOutputResolver";
   protected static final String SCOPE_WITH_INPUT_RESOLVER = "scopeWithInputResolver";
   protected static final String ROUTER_WITH_METADATA_RESOLVER = "routerWithMetadataResolver";
+  protected static final String ROUTER_WITH_ONE_OF_ROUTES_METADATA_RESOLVER = "routerWithOneOfRoutesMetadataResolver";
+  protected static final String ROUTER_WITH_ALL_OF_ROUTES_METADATA_RESOLVER = "routerWithAllOfRoutesMetadataResolver";
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG =
       "contentAndOutputWithCacheResolverWithSpecificConfig";
   protected static final String QUERY_FLOW = "queryOperation";
@@ -144,14 +147,16 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String ERROR_OBJECT_PARAMETER_NAME = "errorObject";
   protected static final String RESPONSE_PARAMETER_NAME = "response";
 
-  protected final static MetadataKey PERSON_METADATA_KEY = newKey(PERSON).build();
+  protected static final MetadataKey PERSON_METADATA_KEY = newKey(PERSON).build();
   protected static final MetadataKey CAR_KEY = newKey(CAR).build();
   protected static final MetadataKey LOCATION_MULTILEVEL_KEY =
       MultilevelMetadataKeyBuilder.newKey(AMERICA, CONTINENT).withChild(MultilevelMetadataKeyBuilder.newKey(USA, COUNTRY)
           .withChild(MultilevelMetadataKeyBuilder.newKey(SAN_FRANCISCO, CITY))).build();
 
-  protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
-  protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
+  protected static final NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
+  protected static final ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
+
+  protected static final MetadataType VOID_TYPE = BaseTypeBuilder.create(JAVA).voidType().build();
 
   @Inject
   @Named(METADATA_SERVICE_KEY)

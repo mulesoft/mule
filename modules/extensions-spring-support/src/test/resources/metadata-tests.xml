@@ -306,6 +306,12 @@
         </metadata:scope-with-metadata-resolver>
     </flow>
 
+    <flow name="scopeWithPassThroughOutputResolver">
+        <metadata:scope-with-pass-through-metadata-resolver>
+            <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+        </metadata:scope-with-pass-through-metadata-resolver>
+    </flow>
+
     <flow name="scopeWithInputResolver">
         <metadata:scope-with-input-metadata-resolver jsonValue="#[vars.json]">
             <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
@@ -318,6 +324,28 @@
                 <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
             </metadata:metaroute>
         </metadata:router-with-metadata-resolver>
+    </flow>
+
+    <flow name="routerWithOneOfRoutesMetadataResolver">
+        <metadata:router-with-one-of-routes-metadata-resolver>
+            <metadata:metaroute1>
+                <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+            </metadata:metaroute1>
+            <metadata:metaroute2>
+                <metadata:output-and-multiple-input-with-key-id config-ref="config" type="CAR"/>
+            </metadata:metaroute2>
+        </metadata:router-with-one-of-routes-metadata-resolver>
+    </flow>
+
+    <flow name="routerWithAllOfRoutesMetadataResolver">
+        <metadata:router-with-all-of-routes-metadata-resolver>
+            <metadata:metaroute1>
+                <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+            </metadata:metaroute1>
+            <metadata:metaroute2>
+                <metadata:output-and-multiple-input-with-key-id config-ref="config" type="CAR"/>
+            </metadata:metaroute2>
+        </metadata:router-with-all-of-routes-metadata-resolver>
     </flow>
 
 </mule>
