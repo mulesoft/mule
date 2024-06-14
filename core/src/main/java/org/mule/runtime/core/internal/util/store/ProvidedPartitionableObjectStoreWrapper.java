@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.internal.store.AbstractPartitionableObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.internal.store.AbstractPartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.List;

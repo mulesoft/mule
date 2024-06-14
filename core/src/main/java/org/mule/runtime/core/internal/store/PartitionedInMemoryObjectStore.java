@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.store;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
 
-import org.mule.runtime.api.map.ObjectStoreEntryListener;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;

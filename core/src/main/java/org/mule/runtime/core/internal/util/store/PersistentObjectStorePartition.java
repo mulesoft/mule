@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import static java.lang.String.format;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
 
+import static java.lang.String.format;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.Collections.unmodifiableList;
+
+import static org.apache.commons.io.FileUtils.readFileToString;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ExpirableObjectStore;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;

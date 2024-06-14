@@ -7,12 +7,13 @@
 package org.mule.runtime.core.internal.util.store;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
+import org.mule.runtime.api.store.TemplateObjectStore;
 
 import java.io.Serializable;
 import java.util.List;

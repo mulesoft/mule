@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.util.store;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
