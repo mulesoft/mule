@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.store;
 
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreToMapAdapter;
-import org.mule.runtime.api.util.LazyValue;
 
 import java.io.Serializable;
 import java.util.function.Supplier;

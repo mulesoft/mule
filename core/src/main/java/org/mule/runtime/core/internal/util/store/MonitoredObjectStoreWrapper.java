@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
-
 import static java.lang.System.currentTimeMillis;
 import static java.util.Comparator.comparing;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;

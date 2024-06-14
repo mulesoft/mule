@@ -6,12 +6,9 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-
 import static java.util.stream.Collectors.toList;
-
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
