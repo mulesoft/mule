@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.metrics.exporter.api;
 
-import org.mule.runtime.metrics.api.instrument.ErrorCounters;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
@@ -38,8 +37,6 @@ public interface MeterExporter {
    * @param upDownCounter the instrument to export.
    */
   void enableExport(LongUpDownCounter upDownCounter);
-
-  void enableExport(ErrorCounters errorCounters);
 
   /**
    * Disposes the {@link MeterExporter}.

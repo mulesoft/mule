@@ -25,7 +25,6 @@ public interface Instrument {
    */
   String getDescription();
 
-
   /**
    * @return the {@link Meter} associated to the {@link Instrument}
    */

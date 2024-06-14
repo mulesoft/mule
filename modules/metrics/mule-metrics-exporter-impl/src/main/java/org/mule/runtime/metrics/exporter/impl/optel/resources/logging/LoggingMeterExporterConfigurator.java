@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.metrics.exporter.impl.optel.resources.logging;
 
-import io.opentelemetry.sdk.metrics.export.MetricExporter;
+import static org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory.METER_LOGGING_EXPORTER;
+
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.optel.resources.MeterExporterConfigurator;
 import org.mule.runtime.metrics.exporter.impl.optel.resources.MeterExporterConfiguratorException;
 
-import static org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory.METER_LOGGING_EXPORTER;
+import io.opentelemetry.sdk.metrics.export.MetricExporter;
 
 public class LoggingMeterExporterConfigurator implements MeterExporterConfigurator {
 

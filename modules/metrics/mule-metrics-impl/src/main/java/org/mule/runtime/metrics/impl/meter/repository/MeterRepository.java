@@ -15,23 +15,16 @@ import java.util.function.Function;
 /**
  * A repository for {@link Meter}.
  */
-public class MeterRepository {
+public class MeterRepository<T extends Meter> {
 
-  Map<String, Meter> meterMap = new ConcurrentHashMap<>();
+  Map<String, T> meterMap = new ConcurrentHashMap<>();
 
   /**
    * @param name            the name of the meter
    * @param builderFunction the builder function to create {@link Meter} if not present.
    */
-  public Meter create(String name, Function<String, Meter> builderFunction) {
+  public T getOrCreate(String name, Function<String, T> builderFunction) {
     return meterMap.computeIfAbsent(name, builderFunction);
   }
 
-  /**
-   * @param name of the meter
-   * @return the {@link Meter}
-   */
-  public Meter get(String name) {
-    return meterMap.get(name);
-  }
 }

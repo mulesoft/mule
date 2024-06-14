@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
@@ -37,16 +36,16 @@ public class DefaultMeterProviderTestCase {
     String meterName = "test-meter";
     String meterDescription = "Test Meter";
     DefaultMeterProvider defaultMeterProvider = new DefaultMeterProvider();
-    MuleContext muleContext = mock(MuleContext.class);
     MeterExporterFactory muterExporterFactory = mock(MeterExporterFactory.class);
-    defaultMeterProvider.muleContext = muleContext;
     defaultMeterProvider.meterExporterFactory = muterExporterFactory;
     MeterExporter meterExporter = mock(MeterExporter.class);
     when(muterExporterFactory.getMeterExporter(any())).thenReturn(meterExporter);
     Meter meter = defaultMeterProvider.getMeterBuilder(meterName).withDescription(meterDescription).build();
     assertThat(meter.getName(), equalTo(meterName));
     assertThat(meter.getDescription(), equalTo(meterDescription));
-    assertThat(defaultMeterProvider.getMeterRepository().get(meterName).getName(), equalTo(meterName));
+    assertThat(defaultMeterProvider.getMeterRepository().getOrCreate(meterName, s -> {
+      throw new AssertionError("Expected meter not found in repository");
+    }).getName(), equalTo(meterName));
     verify(meterExporter).registerMeterToExport(meter);
   }
 
@@ -55,9 +54,7 @@ public class DefaultMeterProviderTestCase {
     String meterName = "test-meter";
     String meterDescription = "Test Meter";
     DefaultMeterProvider defaultMeterProvider = new DefaultMeterProvider();
-    MuleContext muleContext = mock(MuleContext.class);
     MeterExporterFactory muterExporterFactory = mock(MeterExporterFactory.class);
-    defaultMeterProvider.muleContext = muleContext;
     defaultMeterProvider.meterExporterFactory = muterExporterFactory;
     MeterExporter meterExporter = mock(MeterExporter.class);
     when(muterExporterFactory.getMeterExporter(any())).thenReturn(meterExporter);
@@ -67,7 +64,9 @@ public class DefaultMeterProviderTestCase {
         .build();
     assertThat(meter.getName(), equalTo(meterName));
     assertThat(meter.getDescription(), equalTo(meterDescription));
-    assertThat(defaultMeterProvider.getMeterRepository().get(meterName).getName(), equalTo(meterName));
+    assertThat(defaultMeterProvider.getMeterRepository().getOrCreate(meterName, s -> {
+      throw new AssertionError("Expected meter not found in repository");
+    }).getName(), equalTo(meterName));
     verify(meterExporter).registerMeterToExport(meter);
   }
 
@@ -79,9 +78,7 @@ public class DefaultMeterProviderTestCase {
     String instrumentDescription = "Long Counter test";
     String unit = "test-unit";
     DefaultMeterProvider defaultMeterProvider = new DefaultMeterProvider();
-    MuleContext muleContext = mock(MuleContext.class);
     MeterExporterFactory muterExporterFactory = mock(MeterExporterFactory.class);
-    defaultMeterProvider.muleContext = muleContext;
     defaultMeterProvider.meterExporterFactory = muterExporterFactory;
     MeterExporter meterExporter = mock(MeterExporter.class);
     when(muterExporterFactory.getMeterExporter(any())).thenReturn(meterExporter);
@@ -105,9 +102,7 @@ public class DefaultMeterProviderTestCase {
     String unit = "test-unit";
     long initialValue = 50L;
     DefaultMeterProvider defaultMeterProvider = new DefaultMeterProvider();
-    MuleContext muleContext = mock(MuleContext.class);
     MeterExporterFactory muterExporterFactory = mock(MeterExporterFactory.class);
-    defaultMeterProvider.muleContext = muleContext;
     defaultMeterProvider.meterExporterFactory = muterExporterFactory;
     MeterExporter meterExporter = mock(MeterExporter.class);
     when(muterExporterFactory.getMeterExporter(any())).thenReturn(meterExporter);
