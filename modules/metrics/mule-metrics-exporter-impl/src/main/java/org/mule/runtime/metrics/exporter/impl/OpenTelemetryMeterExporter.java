@@ -14,7 +14,6 @@ import static java.lang.Long.parseLong;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.metrics.api.instrument.ErrorCounters;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
@@ -104,11 +103,6 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
     upDownCounters
         .add(longUpDownCounter.buildWithCallback(measurement -> measurement.record(upDownCounter.getValueAsLong(), attributes)));
-  }
-
-  @Override
-  public void enableExport(ErrorCounters errorCounters) {
-    errorCounters.onNewError(this::enableExport);
   }
 
   @Override

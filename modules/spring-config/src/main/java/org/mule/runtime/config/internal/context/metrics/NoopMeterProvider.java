@@ -6,40 +6,37 @@
  */
 package org.mule.runtime.config.internal.context.metrics;
 
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.metrics.api.MeterProvider;
-import org.mule.runtime.metrics.api.instrument.ErrorCounters;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
-import org.mule.runtime.metrics.api.instrument.builder.ErrorCountersBuilder;
-import org.mule.runtime.metrics.api.instrument.builder.InstrumentBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
 
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
  * Noop classes in case metering is not enabled.
  */
-public class NoopMeterProvider implements MeterProvider {
+public class NoopMeterProvider implements MeterProvider<Meter> {
 
   public static final String NOOP = "NOOP";
-  private final MeterBuilder METER_BUILDER_INSTANCE = new NoopMeterBuilder();
+  private final MeterBuilder<Meter> METER_BUILDER_INSTANCE = new NoopMeterBuilder();
 
   @Override
-  public MeterBuilder getMeterBuilder(String meterName) {
+  public MeterBuilder<Meter> getMeterBuilder(String meterName) {
     return METER_BUILDER_INSTANCE;
   }
 
-  private static class NoopMeterBuilder implements MeterBuilder {
+  private static class NoopMeterBuilder implements MeterBuilder<Meter> {
 
     private final LongUpDownCounterBuilder LONG_UP_DOWN_COUNTER_BUILDER_INSTANCE = new NoopLongUpDownCounterBuilder();
     private final LongCounterBuilder LONG_COUNTER_BUILDER_INSTANCE = new NoopLongCounterBuilder();
-    private final ErrorCountersBuilder ERROR_COUNTERS_BUILDER_INSTANCE = new NoopErrorCountersBuilder();
     private final Meter METER_INSTANCE = new NoopMeter();
 
     @Override
@@ -48,12 +45,12 @@ public class NoopMeterProvider implements MeterProvider {
     }
 
     @Override
-    public MeterBuilder withDescription(String description) {
+    public MeterBuilder<Meter> withDescription(String description) {
       return this;
     }
 
     @Override
-    public MeterBuilder withMeterAttribute(String key, String value) {
+    public MeterBuilder<Meter> withMeterAttribute(String key, String value) {
       return this;
     }
 
@@ -84,10 +81,6 @@ public class NoopMeterProvider implements MeterProvider {
         return LONG_COUNTER_BUILDER_INSTANCE;
       }
 
-      @Override
-      public ErrorCountersBuilder errorCountersBuilder(String name) {
-        return ERROR_COUNTERS_BUILDER_INSTANCE;
-      }
     }
 
     private class NoopLongUpDownCounterBuilder implements LongUpDownCounterBuilder {
@@ -215,12 +208,12 @@ public class NoopMeterProvider implements MeterProvider {
       }
 
       @Override
-      public LongCounterBuilder withConsumerForAddOperation(Consumer<Long> consumerForAddOperation) {
+      public LongCounterBuilder withAddOperation(BiConsumer<Long, Map<String, String>> addOperation) {
         return this;
       }
 
       @Override
-      public LongCounterBuilder withSupplierForIncrementAndGetOperation(Supplier<Long> supplierForIncrementAndGetOperation) {
+      public LongCounterBuilder withIncrementAndGetOperation(Function<Map<String, String>, Long> incrementAndGetOperation) {
         return this;
       }
 
@@ -248,7 +241,12 @@ public class NoopMeterProvider implements MeterProvider {
 
         @Override
         public void add(long value) {
+          // Nothing to do.
+        }
 
+        @Override
+        public void add(long value, Map<String, String> attributes) {
+          // Nothing to do.
         }
 
         @Override
@@ -267,6 +265,11 @@ public class NoopMeterProvider implements MeterProvider {
         }
 
         @Override
+        public void onAddition(BiConsumer<Long, Map<String, String>> consumer) {
+          // Nothing to do.
+        }
+
+        @Override
         public int incrementAndGetAsInt() {
           return 0;
         }
@@ -275,59 +278,7 @@ public class NoopMeterProvider implements MeterProvider {
         public long incrementAndGetAsLong() {
           return 0;
         }
-      }
-    }
 
-    private class NoopErrorCountersBuilder implements ErrorCountersBuilder {
-
-      private final ErrorCounters NOOP_ERROR_COUNTERS = new NoopErrorCounters();
-
-      @Override
-      public InstrumentBuilder<ErrorCounters> withDescription(String description) {
-        return this;
-      }
-
-      @Override
-      public InstrumentBuilder<ErrorCounters> withUnit(String unit) {
-        return this;
-      }
-
-      @Override
-      public ErrorCounters build() {
-        return NOOP_ERROR_COUNTERS;
-      }
-
-      private class NoopErrorCounters implements ErrorCounters {
-
-        @Override
-        public void add(Error value) {
-          // Nothing to do
-        }
-
-        @Override
-        public void add(Throwable value) {
-          // Nothing to do
-        }
-
-        @Override
-        public void onNewError(Consumer<LongCounter> newErrorCounterConsumer) {
-          // Nothing to do
-        }
-
-        @Override
-        public String getName() {
-          return NOOP;
-        }
-
-        @Override
-        public String getDescription() {
-          return NOOP;
-        }
-
-        @Override
-        public Meter getMeter() {
-          return new NoopMeter();
-        }
       }
     }
   }

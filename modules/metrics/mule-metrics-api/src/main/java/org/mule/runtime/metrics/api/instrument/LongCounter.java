@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.metrics.api.instrument;
 
+import java.util.Map;
+import java.util.function.BiConsumer;
+
 /**
  * A counter for registering long measurements, only incremental.
  *
@@ -20,17 +23,7 @@ public interface LongCounter extends Instrument {
    */
   void add(long value);
 
-  /**
-   * @return the value for the counter.
-   */
-  long getValueAsLong();
-
-  /**
-   * @return the unit for this measurement.
-   */
-  String getUnit();
-
-  int getValueAsInt();
+  void add(long value, Map<String, String> attributes);
 
   /**
    * Increments the counter and gets the value as an int.
@@ -45,4 +38,19 @@ public interface LongCounter extends Instrument {
    * @return the resulting value as long.
    */
   long incrementAndGetAsLong();
+
+  /**
+   * @return the value for the counter.
+   */
+  long getValueAsLong();
+
+  /**
+   * @return the unit for this measurement.
+   */
+  String getUnit();
+
+  int getValueAsInt();
+
+  // REVIEW NOTE: This could also be part of an internal api (I.e InternalLongCounter extends LongCounter)
+  void onAddition(BiConsumer<Long, Map<String, String>> consumer);
 }

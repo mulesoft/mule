@@ -4,18 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metrics.api.instrument;
+package org.mule.runtime.metrics.api.internal.error;
 
 import org.mule.runtime.api.message.Error;
 
-import java.util.function.Consumer;
+public interface ErrorMetrics {
 
-public interface ErrorCounters extends Instrument {
+  void measure(Error value);
 
-  void add(Error value);
-
-  void add(Throwable value);
-
-  void onNewError(Consumer<LongCounter> newErrorCounterConsumer);
+  void measure(Throwable value);
 
 }

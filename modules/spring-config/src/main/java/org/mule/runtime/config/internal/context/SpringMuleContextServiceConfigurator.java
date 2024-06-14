@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONEN
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_SPAN_FACTORY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_FACTORY_KEY;
@@ -137,9 +138,11 @@ import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
+import org.mule.runtime.metrics.api.internal.error.ErrorMetrics;
 import org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory;
 import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConfigurableMeterExporterConfiguration;
 import org.mule.runtime.metrics.impl.DefaultMeterProvider;
+import org.mule.runtime.metrics.impl.meter.error.DefaultErrorMetrics;
 import org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwardCompatibilityHelper;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.extension.internal.store.SdkObjectStoreManagerAdapter;
@@ -244,6 +247,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(MULE_CORE_EVENT_TRACER_KEY, getBeanDefinition(SelectableCoreEventTracer.class))
       .put(MULE_CORE_COMPONENT_TRACER_FACTORY_KEY, getBeanDefinition(CoreEventComponentTracerFactory.class))
       .put(MULE_METER_PROVIDER_KEY, resolveMeterProvider())
+      .put(MULE_ERROR_METRICS_KEY, resolveErrorMetrics())
       .put(MULE_METER_EXPORTER_CONFIGURATION_KEY,
            getBeanDefinition(OpenTelemetryAutoConfigurableMeterExporterConfiguration.class))
       .put(MULE_METER_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetryMeterExporterFactory.class))
@@ -465,8 +469,15 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     if (getBoolean(METRIC_EXPORTER_ENABLED_PROPERTY)) {
       return getBeanDefinition(DefaultMeterProvider.class);
     }
-
     return getBeanDefinition(NoopMeterProvider.class);
-
   }
+
+  private static BeanDefinition resolveErrorMetrics() {
+    if (getBoolean(METRIC_EXPORTER_ENABLED_PROPERTY)) {
+      return getBeanDefinition(DefaultErrorMetrics.class);
+    }
+    // TODO: This should be a NoOp.
+    return getBeanDefinition(DefaultErrorMetrics.class);
+  }
+
 }
