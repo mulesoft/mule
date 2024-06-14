@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.metrics.api.meter;
 
-import org.mule.runtime.metrics.api.instrument.builder.ErrorCountersBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder;
 
@@ -52,5 +51,4 @@ public interface Meter {
    */
   LongCounterBuilder counterBuilder(String name);
 
-  ErrorCountersBuilder errorCountersBuilder(String name);
 }

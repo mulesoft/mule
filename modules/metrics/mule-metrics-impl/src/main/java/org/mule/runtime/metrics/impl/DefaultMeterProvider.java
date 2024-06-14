@@ -10,8 +10,8 @@ import static org.mule.runtime.metrics.impl.meter.DefaultMeter.builder;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.api.MeterExporterFactory;
@@ -23,18 +23,15 @@ import javax.inject.Inject;
 /**
  * A default implementation of the {@link MeterProvider}
  */
-public class DefaultMeterProvider implements MeterProvider, Disposable {
+public class DefaultMeterProvider implements MeterProvider<Meter>, Disposable {
 
   @Inject
   MeterExporterFactory meterExporterFactory;
 
   @Inject
-  MuleContext muleContext;
-
-  @Inject
   MeterExporterConfiguration meterExporterConfiguration;
 
-  MeterRepository meterRepository = new MeterRepository();
+  MeterRepository<Meter> meterRepository = new MeterRepository<>();
   private final LazyValue<MeterExporter> meterExporter = new LazyValue<>(this::resolveMeterExporter);
 
   private MeterExporter resolveMeterExporter() {
@@ -42,13 +39,13 @@ public class DefaultMeterProvider implements MeterProvider, Disposable {
   }
 
   @Override
-  public MeterBuilder getMeterBuilder(String meterName) {
+  public MeterBuilder<Meter> getMeterBuilder(String meterName) {
     return builder(meterName)
         .withMeterExporter(meterExporter.get())
         .withMeterRepository(meterRepository);
   }
 
-  public MeterRepository getMeterRepository() {
+  public MeterRepository<Meter> getMeterRepository() {
     return meterRepository;
   }
 
