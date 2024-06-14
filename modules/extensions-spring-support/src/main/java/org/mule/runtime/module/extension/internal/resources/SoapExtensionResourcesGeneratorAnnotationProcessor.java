@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getLoaderById;
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_CLASSES;
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
+
 import static javax.lang.model.SourceVersion.RELEASE_8;
 
-import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getLoaderById;
-import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
-
-import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
+import org.mule.runtime.module.extension.api.resources.ClassExtensionResourcesGeneratorAnnotationProcessor;
 import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -28,7 +30,10 @@ import javax.annotation.processing.SupportedSourceVersion;
  */
 @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
 @SupportedSourceVersion(RELEASE_8)
-@SupportedOptions(EXTENSION_VERSION)
+@SupportedOptions({
+    EXTENSION_VERSION,
+    EXTENSION_CLASSES
+})
 public class SoapExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensionResourcesGeneratorAnnotationProcessor {
 
   @Override

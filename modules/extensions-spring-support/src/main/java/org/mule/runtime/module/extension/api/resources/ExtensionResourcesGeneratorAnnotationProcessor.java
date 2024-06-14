@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.resources;
 
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_CLASSES;
 import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES;
 import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_SKIP;
@@ -28,11 +29,15 @@ import javax.annotation.processing.SupportedSourceVersion;
  *
  * @since 4.6.0
  */
-@SupportedAnnotationTypes({"org.mule.runtime.extension.api.annotation.Extension"})
+@SupportedAnnotationTypes({
+    "org.mule.runtime.extension.api.annotation.Extension",
+    "org.mule.sdk.api.annotation.Extension"
+})
 @SupportedSourceVersion(RELEASE_8)
 @SupportedOptions({
     EXTENSION_VERSION,
     EXTENSION_RESOURCES,
+    EXTENSION_CLASSES,
     EXPORTED_PACKAGES_VALIDATOR_SKIP,
     EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION
 })
