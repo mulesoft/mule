@@ -18,7 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
-import static org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics.isApiKitFlow;
+import static org.mule.runtime.core.api.management.stats.ApiKitStatsUtils.isApiKitFlow;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
