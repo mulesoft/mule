@@ -36,12 +36,4 @@ public class LazyObjectStoreToMapAdapter<T extends Serializable> extends ObjectS
   public ObjectStore<T> getObjectStore() {
     return objectStore.get();
   }
-
-  @Override public String addEntryListener(ObjectStoreEntryListener listener) {
-    return "";
-  }
-
-  @Override public boolean removeEntryListener(String id) {
-    return false;
-  }
 }
