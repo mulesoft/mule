@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static javax.lang.model.util.ElementFilter.fieldsIn;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.getParameterGroups;
 import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.isParameterGroupAnnotation;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocReader.parseJavaDoc;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
+import static javax.lang.model.util.ElementFilter.fieldsIn;
+
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.doc.JavaDocModel;
@@ -50,6 +54,8 @@ import com.google.common.collect.ImmutableMap;
  */
 public final class ExtensionAnnotationProcessor {
 
+  private ClassLoader extensionClassLoader = ExtensionModel.class.getClassLoader();
+
   /**
    * Returns the {@link Class} object that is associated to the {@code typeElement}
    *
@@ -59,11 +65,13 @@ public final class ExtensionAnnotationProcessor {
    * @return the {@link Class} represented by {@code typeElement}
    */
   public <T> Optional<Class<T>> classFor(TypeElement typeElement, ProcessingEnvironment processingEnvironment) {
-    try {
-      return of(loadClass(getClassName(typeElement, processingEnvironment), typeElement.getClass()));
-    } catch (ClassNotFoundException e) {
-      return empty();
-    }
+    return withContextClassLoader(getExtensionClassLoader(), () -> {
+      try {
+        return of(loadClass(getClassName(typeElement, processingEnvironment), typeElement.getClass()));
+      } catch (ClassNotFoundException e) {
+        return empty();
+      }
+    });
   }
 
   /**
@@ -202,5 +210,13 @@ public final class ExtensionAnnotationProcessor {
 
   public String getJavaDocSummary(ProcessingEnvironment processingEnv, Element element) {
     return parseJavaDoc(processingEnv, element).getBody();
+  }
+
+  public void setExtensionClassLoader(ClassLoader extensionClassLoader) {
+    this.extensionClassLoader = extensionClassLoader;
+  }
+
+  public ClassLoader getExtensionClassLoader() {
+    return extensionClassLoader;
   }
 }

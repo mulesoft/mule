@@ -82,6 +82,7 @@ import com.google.common.base.Joiner;
 @SupportedOptions({
     BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION,
     BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES,
+    BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_CLASSES,
     EXPORTED_PACKAGES_VALIDATOR_SKIP,
     EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION
 })
@@ -95,6 +96,7 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   public static final String PROBLEMS_HANDLER = "PROBLEMS_HANDLER";
   public static final String EXTENSION_VERSION = "extension.version";
   public static final String EXTENSION_RESOURCES = "extension.resources";
+  public static final String EXTENSION_CLASSES = "extension.classes";
   public static final String EXTENSION_TYPE = "EXTENSION_TYPE";
 
   private static final String EXTENSION_LOADING_MODE_SYSTEM_PROPERTY = "modelLoader.runtimeMode";
@@ -113,15 +115,16 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
         if (!shouldProcess(extensionElement, processingEnv)) {
           return;
         }
-        Optional<Class<Object>> annotatedClass = processor.classFor(extensionElement, processingEnv);
         ExtensionElement extension = toExtensionElement(extensionElement, processingEnv);
-        ClassLoader classLoader = annotatedClass.map(Class::getClassLoader).orElseGet(ExtensionModel.class::getClassLoader);
 
+        ClassLoader classLoader;
         final String extensionResourcesLocation = processingEnv.getOptions().get(EXTENSION_RESOURCES);
         if (extensionResourcesLocation != null) {
           // make sure the static resource files from the extension are available through the TCCL, even if not available through
           // the processor CL.
-          classLoader = createClassloaderWithExtensionResources(extensionResourcesLocation, classLoader);
+          classLoader = createClassloaderWithExtensionResources(extensionResourcesLocation, processor.getExtensionClassLoader());
+        } else {
+          classLoader = processor.getExtensionClassLoader();
         }
 
         withContextClassLoader(classLoader, () -> {
