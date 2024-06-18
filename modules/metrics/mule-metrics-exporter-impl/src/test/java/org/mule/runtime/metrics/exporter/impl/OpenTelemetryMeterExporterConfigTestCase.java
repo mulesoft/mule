@@ -22,10 +22,12 @@ import static org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterEx
 import static java.lang.Boolean.TRUE;
 
 import static org.mockito.Mockito.mock;
-import static org.testcontainers.Testcontainers.exposeHostPorts;
-import static org.testcontainers.containers.BindMode.READ_ONLY;
-import static org.testcontainers.utility.MountableFile.forHostPath;
+import static org.mule.runtime.metrics.exporter.impl.utils.TestServerRule.GRPC_ENDPOINT_PATH;
+import static org.mule.runtime.metrics.exporter.impl.utils.TestServerRule.HTTP_ENDPOINT_PATH;
+import static org.mule.runtime.metrics.exporter.impl.utils.TestServerRule.HTTP_GZIP_ENDPOINT_PATH;
 
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
@@ -48,75 +50,31 @@ import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.PullPolicy;
-import org.testcontainers.utility.DockerImageName;
 
-@Ignore("W-15586397")
 public class OpenTelemetryMeterExporterConfigTestCase {
 
   private static final int TIMEOUT_MILLIS = 30000;
   private static final int POLL_DELAY_MILLIS = 100;
-
-  private static final Integer COLLECTOR_OTLP_GRPC_PORT = 4317;
-  private static final Integer COLLECTOR_OTLP_HTTP_PORT = 4318;
-  private static final Integer COLLECTOR_OTLP_GRPC_MTLS_PORT = 5317;
-  private static final Integer COLLECTOR_OTLP_HTTP_MTLS_PORT = 5318;
-  private static final Integer COLLECTOR_HEALTH_CHECK_PORT = 13133;
-
   private static final String METER_EXPORTER_INTERVAL = "1";
   private static final String METER_NAME = "testMetricName";
   private static final String LONG_COUNTER_NAME = "long-counter-test";
   private static final String LONG_COUNTER_DESCRIPTION = "Long Counter test";
   private static final String UNIT_NAME = "test-unit";
 
-  private static final DockerImageName COLLECTOR_IMAGE =
-      DockerImageName.parse("otel/opentelemetry-collector:0.99.0");
+  @Rule
+  public final TestServerRule server = new TestServerRule();
 
   private MeterExporter openTelemetryMeterExporter;
   private Meter meter;
   private LongCounter longCounter;
-  private GenericContainer<?> collector;
 
   @ClassRule
   public static SelfSignedCertificateRule serverTls = new SelfSignedCertificateRule();
 
   @ClassRule
   public static SelfSignedCertificateRule clientTls = new SelfSignedCertificateRule();
-
-  @ClassRule
-  public static final TestServerRule server = new TestServerRule();
-
-  @Before
-  public void before() {
-    exposeHostPorts(server.httpPort());
-
-    // Configuring the collector test-container
-    collector =
-        new GenericContainer<>(COLLECTOR_IMAGE)
-            .withImagePullPolicy(PullPolicy.alwaysPull())
-            .withCopyFileToContainer(forHostPath(serverTls.certificateFile().toPath(), 365), "/server.cert")
-            .withCopyFileToContainer(forHostPath(serverTls.privateKeyFile().toPath(), 365), "/server.key")
-            .withCopyFileToContainer(forHostPath(clientTls.certificateFile().toPath(), 365), "/client.cert")
-            .withEnv("MTLS_CLIENT_CERTIFICATE", "/client.cert")
-            .withEnv("MTLS_SERVER_CERTIFICATE", "/server.cert")
-            .withEnv("MTLS_SERVER_KEY", "/server.key")
-            .withEnv("OTLP_EXPORTER_ENDPOINT", "host.testcontainers.internal:" + server.httpPort())
-            .withClasspathResourceMapping("otel.yaml", "/otel.yaml", READ_ONLY)
-            .withCommand("--config", "/otel.yaml")
-            .withExposedPorts(COLLECTOR_OTLP_GRPC_PORT,
-                              COLLECTOR_OTLP_HTTP_PORT,
-                              COLLECTOR_OTLP_GRPC_MTLS_PORT,
-                              COLLECTOR_OTLP_HTTP_MTLS_PORT,
-                              COLLECTOR_HEALTH_CHECK_PORT)
-            .waitingFor(Wait.forHttp("/").forPort(COLLECTOR_HEALTH_CHECK_PORT));
-
-    collector.start();
-  }
 
   @Before
   public void setUp() {
@@ -133,15 +91,13 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
   @After
   public void after() {
-    openTelemetryMeterExporter.dispose();
-    collector.stop();
     server.reset();
+    openTelemetryMeterExporter.dispose();
   }
 
   @Test
   public void defaultGrpcExporterShouldExportLongCounterMetricSuccessfully() {
-    String meterExporterEndpoint = "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_PORT);
-
+    String meterExporterEndpoint = "http://localhost:" + server.httpPort();
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT, meterExporterEndpoint);
@@ -172,13 +128,11 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
   @Test
   public void defaultHttpExporterShouldExportLongCounterMetricSuccessfully() {
-    String meterExporterEndpoint =
-        "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_PORT) + "/v1/metrics";
-
+    String meterExporterEndpoint = "http://localhost:" + server.httpPort() + HTTP_ENDPOINT_PATH;
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED, TRUE.toString());
-    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE, HTTP.toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT, meterExporterEndpoint);
+    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE, HTTP.toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL, METER_EXPORTER_INTERVAL);
 
     MeterExporterConfiguration configuration = getMeterExporterConfiguration(properties);
@@ -205,10 +159,11 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   }
 
   @Test
+  @Ignore("W-16037386")
   public void configuredGrpcInsecureExporterShouldExportLongCounterMetricSuccessfully() {
-    String meterExporterEndpoint = "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_PORT);
     String meterExporterHeaders = "{\"Header\": \"Header Value\"}";
     String meterExporterCompressionType = "gzip";
+    String meterExporterEndpoint = "http://localhost:" + server.httpPort() + GRPC_ENDPOINT_PATH;
 
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED, TRUE.toString());
@@ -243,16 +198,15 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
   @Test
   public void configuredHttpInsecureExporterShouldExportLongCounterMetricSuccessfully() {
-    String meterExporterEndpoint =
-        "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_PORT) + "/v1/metrics";
+    String meterExporterEndpoint = "http://localhost:" + server.httpPort() + HTTP_GZIP_ENDPOINT_PATH;
     String meterExporterHeaders = "{\"Header\": \"Header Value\"}";
     String meterExporterCompressionType = "gzip";
 
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE, HTTP.toString());
-    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT, meterExporterEndpoint);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_HEADERS, meterExporterHeaders);
+    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT, meterExporterEndpoint);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_COMPRESSION_TYPE, meterExporterCompressionType);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL, METER_EXPORTER_INTERVAL);
 
@@ -280,21 +234,21 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   }
 
   @Test
+  @Ignore("W-16037386")
   public void configuredGrpcSecureExporterShouldExportLongCounterMetricSuccessfully() {
-    String meterExporterEndpoint =
-        "https://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_MTLS_PORT);
     String meterExporterHeaders = "{\"Header\": \"Header Value\"}";
     String meterExporterCompressionType = "gzip";
+    String meterExporterEndpoint = "http://localhost:" + server.httpPort() + GRPC_ENDPOINT_PATH;
 
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE, GRPC.toString());
-    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT, meterExporterEndpoint);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TLS_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION, clientTls.privateKeyFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_CERT_FILE_LOCATION, clientTls.certificateFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION, serverTls.certificateFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_HEADERS, meterExporterHeaders);
+    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT, meterExporterEndpoint);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_COMPRESSION_TYPE, meterExporterCompressionType);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL, METER_EXPORTER_INTERVAL);
 
@@ -323,21 +277,19 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
   @Test
   public void configuredHttpSecureExporterShouldExportLongCounterMetricSuccessfully() {
-    String meterExporterEndpoint =
-        "https://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_MTLS_PORT)
-            + "/v1/metrics";
+    String meterExporterEndpoint = "http://localhost:" + server.httpPort() + HTTP_GZIP_ENDPOINT_PATH;
     String meterExporterHeaders = "{\"Header\": \"Header Value\"}";
     String meterExporterCompressionType = "gzip";
 
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE, HTTP.toString());
-    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT, meterExporterEndpoint);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TLS_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION, clientTls.privateKeyFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_CERT_FILE_LOCATION, clientTls.certificateFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION, serverTls.certificateFile().toPath().toString());
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_HEADERS, meterExporterHeaders);
+    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT, meterExporterEndpoint);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_COMPRESSION_TYPE, meterExporterCompressionType);
     properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL, METER_EXPORTER_INTERVAL);
 
