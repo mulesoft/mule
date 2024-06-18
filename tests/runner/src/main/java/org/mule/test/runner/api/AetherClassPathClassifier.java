@@ -48,6 +48,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.test.runner.api.DependencyResolver.ContainerDependencies;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 import org.mule.test.runner.utils.RunnerModuleUtils;
@@ -219,7 +220,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
           .map(serviceUrlClassification -> serviceUrlClassification.getName()).collect(toList()));
     }
 
-    Pair<List<URL>, List<URL>> containerUrls =
+    ContainerDependencies containerUrls =
         buildContainerUrlClassification(context, directDependencies, applicationSharedLibArtifactUrlClassifications,
                                         serviceUrlClassifications, pluginUrlClassifications, rootArtifactType,
                                         remoteRepositories);
@@ -232,8 +233,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
     resolveSnapshotVersionsToTimestampedFromClassPath(applicationSharedLibUrls, context.getClassPathURLs());
 
-    return new ArtifactsUrlClassification(containerUrls.getFirst(),
-                                          containerUrls.getSecond(),
+    return new ArtifactsUrlClassification(containerUrls.getMuleDependencyUrls(),
+                                          containerUrls.getOptDependencyUrls(),
+                                          containerUrls.getMuleApisDependencyUrls(),
                                           serviceUrlClassifications,
                                           testRunnerLibUrls,
                                           applicationLibUrls,
@@ -403,16 +405,15 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
    * @param pluginUrlClassifications       {@link PluginUrlClassification}s to check if rootArtifact was classified as plugin
    * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
-   * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jar urls, second are
-   *         jar urls for third parties.
+   * @return the {@link ContainerDependencies} with the {@link URL}s for the container class loader.
    */
-  private Pair<List<URL>, List<URL>> buildContainerUrlClassification(ClassPathClassifierContext context,
-                                                                     List<Dependency> directDependencies,
-                                                                     List<ArtifactUrlClassification> applicationSharedLibUrls,
-                                                                     List<ServiceUrlClassification> serviceUrlClassifications,
-                                                                     List<PluginUrlClassification> pluginUrlClassifications,
-                                                                     ArtifactClassificationType rootArtifactType,
-                                                                     List<RemoteRepository> rootArtifactRemoteRepositories) {
+  private ContainerDependencies buildContainerUrlClassification(ClassPathClassifierContext context,
+                                                                List<Dependency> directDependencies,
+                                                                List<ArtifactUrlClassification> applicationSharedLibUrls,
+                                                                List<ServiceUrlClassification> serviceUrlClassifications,
+                                                                List<PluginUrlClassification> pluginUrlClassifications,
+                                                                ArtifactClassificationType rootArtifactType,
+                                                                List<RemoteRepository> rootArtifactRemoteRepositories) {
     directDependencies = directDependencies.stream()
         .filter(getContainerDirectDependenciesFilter(rootArtifactType))
         .filter(dependency -> {
@@ -469,20 +470,25 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
     logger.debug("Resolving dependencies for container using exclusion filter patterns: {}", excludedFilterPattern);
 
-    final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
-
+    List<URL> containerMuleApisUrls;
     List<URL> containerMuleUrls;
     List<URL> containerOptUrls;
     try {
-      final Pair<List<File>, List<File>> resolvedDependencies =
+      final ContainerDependencies resolvedDependencies =
           dependencyResolver.resolveContainerDependencies(null, directDependencies, managedDependencies,
-                                                          dependencyFilter,
+                                                          excludedFilterPattern,
                                                           rootArtifactRemoteRepositories);
-      containerMuleUrls = toUrl(resolvedDependencies.getFirst());
-      containerOptUrls = toUrl(resolvedDependencies.getSecond());
+      containerMuleApisUrls = resolvedDependencies.getMuleApisDependencyUrls();
+      containerMuleUrls = resolvedDependencies.getMuleDependencyUrls();
+      containerOptUrls = resolvedDependencies.getOptDependencyUrls();
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
+    containerMuleApisUrls = containerMuleApisUrls.stream().filter(url -> {
+      String file = toFile(url).getAbsolutePath();
+      return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
+                                                                                                                  ZIP_EXTENSION));
+    }).collect(toList());
     containerMuleUrls = containerMuleUrls.stream().filter(url -> {
       String file = toFile(url).getAbsolutePath();
       return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
@@ -505,7 +511,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
     resolveSnapshotVersionsToTimestampedFromClassPath(containerMuleUrls, context.getClassPathURLs());
 
-    return new Pair<>(containerMuleUrls, containerOptUrls);
+    return new ContainerDependencies(containerOptUrls, containerMuleUrls, containerMuleApisUrls);
   }
 
   /**

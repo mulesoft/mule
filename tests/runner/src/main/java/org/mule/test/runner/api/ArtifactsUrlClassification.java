@@ -27,13 +27,16 @@ public class ArtifactsUrlClassification {
   private final List<URL> testRunnerLibUrls;
   private final List<URL> applicationLibUrls;
   private final List<URL> testRunnerExportedLibUrls;
+  private final List<URL> containerMuleApisUrls;
 
   /**
    * Creates a instance with the list of {@link URL}s classified in container, plugins and application.
-   * 
+   *
    * @param containerMuleUrls         list of {@link URL} that define the artifacts that would be loaded with the container
    *                                  {@link ClassLoader} exporting its api. Not null.
    * @param containerOptUrls          list of {@link URL} that define the artifacts that would be loaded with the container
+   *                                  {@link ClassLoader} encapsulating its api. Not null.
+   * @param containerMuleApisUrls     list of {@link URL} that define the artifacts that would be loaded with the container
    *                                  {@link ClassLoader} encapsulating its api. Not null.
    * @param serviceUrlClassifications for each plugin discovered a list of {@link ArtifactUrlClassification} that defines the
    *                                  artifact that would be loaded by the service {@link ClassLoader}. Not null.
@@ -49,6 +52,7 @@ public class ArtifactsUrlClassification {
    */
   public ArtifactsUrlClassification(List<URL> containerMuleUrls,
                                     List<URL> containerOptUrls,
+                                    List<URL> containerMuleApisUrls,
                                     List<ServiceUrlClassification> serviceUrlClassifications,
                                     List<URL> testRunnerLibUrls,
                                     List<URL> applicationLibUrls,
@@ -57,6 +61,7 @@ public class ArtifactsUrlClassification {
                                     List<URL> testRunnerExportedLibUrls) {
     requireNonNull(containerMuleUrls, "containerMuleUrls cannot be null");
     requireNonNull(containerOptUrls, "containerOptUrls cannot be null");
+    requireNonNull(containerMuleApisUrls, "containerMuleApisUrls cannot be null");
     requireNonNull(serviceUrlClassifications, "serviceUrlClassifications cannot be null");
     requireNonNull(testRunnerLibUrls, "testRunnerLibUrls cannot be null");
     requireNonNull(applicationLibUrls, "applicationLibUrls cannot be null");
@@ -66,6 +71,7 @@ public class ArtifactsUrlClassification {
 
     this.containerMuleUrls = containerMuleUrls;
     this.containerOptUrls = containerOptUrls;
+    this.containerMuleApisUrls = containerMuleApisUrls;
     this.serviceUrlClassifications = serviceUrlClassifications;
     this.applicationSharedLibUrls = applicationSharedLibUrls;
     this.pluginUrlClassifications = pluginUrlClassifications;
@@ -80,6 +86,10 @@ public class ArtifactsUrlClassification {
 
   public List<URL> getContainerOptUrls() {
     return containerOptUrls;
+  }
+
+  public List<URL> getContainerMuleApisUrls() {
+    return containerMuleApisUrls;
   }
 
   public List<ServiceUrlClassification> getServiceUrlClassifications() {
@@ -105,4 +115,5 @@ public class ArtifactsUrlClassification {
   public List<URL> getTestRunnerExportedLibUrls() {
     return testRunnerExportedLibUrls;
   }
+
 }

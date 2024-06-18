@@ -99,10 +99,24 @@ public abstract class AbstractMuleContainerFactory implements MuleContainerFacto
   private ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
     DefaultMuleClassPathConfig config = createMuleClassPathConfig(muleHome, muleBase);
 
-    return createModuleLayerClassLoader(config.getOptURLs().toArray(new URL[config.getOptURLs().size()]),
-                                        config.getMuleURLs().toArray(new URL[config.getMuleURLs().size()]),
-                                        MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                        getSystemClassLoader());
+    ClassLoader moduleLayerClassLoader =
+        createModuleLayerClassLoader(config.getOptURLs().toArray(new URL[config.getOptURLs().size()]),
+                                     config.getMuleURLs().toArray(new URL[config.getMuleURLs().size()]),
+                                     MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
+                                     getSystemClassLoader());
+
+    Class<?> muleApisServicesImplLoaderUtilsClass;
+    try {
+      muleApisServicesImplLoaderUtilsClass =
+          moduleLayerClassLoader.loadClass("org.mule.runtime.api.util.classloader.MuleImplementationLoaderUtils");
+      muleApisServicesImplLoaderUtilsClass.getMethod("setMuleImplementationsLoader", ClassLoader.class)
+          .invoke(null, moduleLayerClassLoader);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+
+    return moduleLayerClassLoader;
   }
 
   private File lookupMuleHome() throws IOException {

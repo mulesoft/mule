@@ -131,7 +131,8 @@ public class IsolatedClassLoaderFactory {
       final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
           create(extraBootPackages, extraPrivilegedArtifacts,
                  artifactsUrlClassification.getContainerMuleUrls(),
-                 artifactsUrlClassification.getContainerOptUrls());
+                 artifactsUrlClassification.getContainerOptUrls(),
+                 artifactsUrlClassification.getContainerMuleApisUrls());
 
       final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
 

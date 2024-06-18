@@ -12,6 +12,7 @@ import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL
 
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
+import static java.util.Optional.of;
 
 import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
 
@@ -40,13 +41,15 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
   private final Set<String> extraPrivilegedArtifacts;
   private final URL[] muleUrls;
   private final URL[] optUrls;
+  private final URL[] muleApisUrls;
 
   public DefaultTestContainerClassLoaderAssembler(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
-                                                  List<URL> muleUrls, List<URL> optUrls) {
+                                                  List<URL> muleUrls, List<URL> optUrls, List<URL> muleApisUrls) {
     this.extraBootPackages = extraBootPackages;
     this.extraPrivilegedArtifacts = extraPrivilegedArtifacts;
     this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
     this.optUrls = optUrls.toArray(new URL[optUrls.size()]);
+    this.muleApisUrls = muleApisUrls.toArray(new URL[muleApisUrls.size()]);
   }
 
   /**
@@ -70,9 +73,27 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
+    ClassLoader muleApisClassloader = createModuleLayerClassLoader(muleApisUrls, launcherArtifact);
+
+    Class<?> muleImplementationsLoaderUtilsClass;
+    try {
+      muleImplementationsLoaderUtilsClass =
+          muleApisClassloader.loadClass("org.mule.runtime.api.util.classloader.MuleImplementationLoaderUtils");
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+
     ClassLoader containerSystemClassloader = createModuleLayerClassLoader(optUrls, muleUrls,
                                                                           MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                                                          launcherArtifact);
+                                                                          muleApisClassloader,
+                                                                          of(muleImplementationsLoaderUtilsClass));
+
+    try {
+      muleImplementationsLoaderUtilsClass.getMethod("setMuleImplementationsLoader", ClassLoader.class)
+          .invoke(null, containerSystemClassloader);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
 
     TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =
         new TestPreFilteredContainerClassLoaderCreator(containerSystemClassloader, bootPackages, extraPrivilegedArtifacts);

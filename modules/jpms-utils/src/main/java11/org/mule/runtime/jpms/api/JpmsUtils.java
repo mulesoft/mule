@@ -259,11 +259,13 @@ public final class JpmsUtils {
 
     ModuleFinder modulesFinder = ModuleFinder.of(paths);
 
+    final Set<String> muleContainerModuleNames = getMuleContainerModuleNames(parentLayer);
+
     Map<Boolean, List<ModuleReference>> modulesByIsolation = modulesFinder
         .findAll()
         .stream()
         .filter(moduleRef -> !modulesToFilter.contains(moduleRef.descriptor().name()))
-        .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, parentLayer)));
+        .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, muleContainerModuleNames)));
 
     ModuleLayer resolvedParentLayer = parentLayer.orElse(boot());
 
@@ -336,6 +338,14 @@ public final class JpmsUtils {
     return controller.layer();
   }
 
+  private static Set<String> getMuleContainerModuleNames(Optional<ModuleLayer> containerLayer) {
+    return containerLayer.map(layer -> getParentLayersModules(layer).stream().map(Module::getName)
+        .filter(containerModuleName -> containerModuleName.startsWith("org.mule")
+            || containerModuleName.startsWith("com.mulesoft"))
+        .collect(toSet()))
+        .orElse(emptySet());
+  }
+
   private static Set<Module> getParentLayersModules(ModuleLayer moduleLayer) {
     Set<Module> modules = new HashSet<>(moduleLayer.modules());
     for (ModuleLayer parent : moduleLayer.parents()) {
@@ -348,10 +358,10 @@ public final class JpmsUtils {
   /**
    *
    * @param moduleRef
-   * @param containerLayer
+   * @param containerModuleNames
    * @return {@code true} the the referenced module is automatic or does not read any module from the container.
    */
-  private static boolean isolateInOrphanLayer(ModuleReference moduleRef, Optional<ModuleLayer> containerLayer) {
+  private static boolean isolateInOrphanLayer(ModuleReference moduleRef, Set<String> muleContainerModuleNames) {
     if (moduleRef.descriptor().isAutomatic()
         // TODO W-13761983 remove this condition
         && SERVICE_MODULE_NAME_PREFIXES.stream()
@@ -359,16 +369,8 @@ public final class JpmsUtils {
       return true;
     }
 
-    final Set<String> containerModuleNames = containerLayer
-        .map(layer -> layer.modules().stream()
-            .map(Module::getName)
-            .collect(toSet()))
-        .orElse(emptySet());
-
-    return containerLayer
-        .map(layer -> moduleRef.descriptor().requires().stream()
-            .noneMatch(req -> containerModuleNames.contains(req.name())))
-        .orElse(false);
+    return moduleRef.descriptor().requires().stream()
+        .noneMatch(req -> muleContainerModuleNames.contains(req.name()));
   }
 
   /**
