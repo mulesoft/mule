@@ -231,7 +231,6 @@
 
         <junitVersion>4.13.2</junitVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
-        <allureJunitVersion>2.22.2</allureJunitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <tikaVersion>1.28.3</tikaVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
@@ -301,11 +300,6 @@
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest</artifactId>
                 <version>${hamcrestVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.qameta.allure</groupId>
-                <artifactId>allure-junit4</artifactId>
-                <version>${allureJunitVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tika</groupId>
