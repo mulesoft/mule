@@ -32,6 +32,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.api.runtime.executor.MethodExecutor;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 

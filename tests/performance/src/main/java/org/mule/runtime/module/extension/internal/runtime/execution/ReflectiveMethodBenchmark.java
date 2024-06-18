@@ -11,7 +11,7 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutor;
+import org.mule.runtime.module.extension.api.runtime.executor.MethodExecutor;
 import org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutorGenerator;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 
