@@ -27,8 +27,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.api.runtime.executor.MethodExecutor;
 import org.mule.runtime.module.extension.internal.runtime.exception.SdkMethodInvocationException;
-import org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutor;
 import org.mule.runtime.module.extension.internal.runtime.execution.executor.MethodExecutorGenerator;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 

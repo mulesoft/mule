@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.execution.executor;
+package org.mule.runtime.module.extension.api.runtime.executor;
 
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
