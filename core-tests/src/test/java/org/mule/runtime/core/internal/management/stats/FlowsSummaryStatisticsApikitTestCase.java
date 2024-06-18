@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
-import static org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics.isApiKitFlow;
+import static org.mule.runtime.core.api.management.stats.ApiKitStatsUtils.isApiKitFlow;
 import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.PRICING_METRICS;
 import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.FlowSummaryStory.ACTIVE_FLOWS_SUMMARY;
 
