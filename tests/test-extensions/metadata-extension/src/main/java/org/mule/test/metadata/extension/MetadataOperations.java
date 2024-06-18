@@ -29,7 +29,10 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.annotation.metadata.AllOfRoutesOutputChainResolver;
 import org.mule.sdk.api.annotation.metadata.ChainInputResolver;
+import org.mule.sdk.api.annotation.metadata.OneOfRoutesOutputChainResolver;
+import org.mule.sdk.api.annotation.metadata.PassThroughOutputChainResolver;
 import org.mule.sdk.api.annotation.metadata.PassThroughInputChainResolver;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
@@ -395,6 +398,13 @@ public class MetadataOperations {
   }
 
   @MediaType(value = ANY, strict = false)
+  @PassThroughOutputChainResolver
+  public void scopeWithPassThroughMetadataResolver(@PassThroughInputChainResolver Chain chain,
+                                                   CompletionCallback<Object, Object> cb) {
+    chain.process(cb::success, (t, e) -> cb.error(t));
+  }
+
+  @MediaType(value = ANY, strict = false)
   @OutputResolver(output = ScopeTestResolver.class)
   public void scopeWithInputMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) Chain chain,
                                              @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
@@ -408,5 +418,29 @@ public class MetadataOperations {
                                          @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
                                          CompletionCallback<Object, Void> cb) {
     metaroute.getChain().process(cb::success, (t, e) -> cb.error(t));
+  }
+
+  @MediaType(value = ANY, strict = false)
+  @OneOfRoutesOutputChainResolver
+  public void routerWithOneOfRoutesMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute1,
+                                                    @ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute2,
+                                                    @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
+                                                    CompletionCallback<Object, Object> cb) {
+    if (jsonValue != null) {
+      metaroute1.getChain().process(cb::success, (t, e) -> cb.error(t));
+    } else {
+      metaroute2.getChain().process(cb::success, (t, e) -> cb.error(t));
+    }
+  }
+
+  @MediaType(value = ANY, strict = false)
+  @AllOfRoutesOutputChainResolver
+  public void routerWithAllOfRoutesMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute1,
+                                                    @ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute2,
+                                                    @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
+                                                    CompletionCallback<Object, Void> cb) {
+    // Technically we should be simulating that we call both routes and collect the result into something resembling a map.
+    // But what we do here doesn't really matter, we just want to test the MetadataType of the output not the output itself.
+    metaroute1.getChain().process(cb::success, (t, e) -> cb.error(t));
   }
 }

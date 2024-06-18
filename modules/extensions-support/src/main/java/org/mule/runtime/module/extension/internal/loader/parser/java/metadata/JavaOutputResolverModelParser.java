@@ -12,6 +12,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetada
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.MuleOutputTypeResolverAdapter;
@@ -24,9 +25,16 @@ import org.mule.runtime.module.extension.internal.metadata.MuleOutputTypeResolve
 public class JavaOutputResolverModelParser implements OutputResolverModelParser {
 
   private final Class<?> outputTypeResolverDeclarationClass;
+  private final LazyValue<OutputTypeResolver<?>> instance;
 
   public JavaOutputResolverModelParser(Class<?> outputTypeResolverDeclarationClass) {
     this.outputTypeResolverDeclarationClass = outputTypeResolverDeclarationClass;
+    this.instance = new LazyValue<>(() -> instantiateResolver(outputTypeResolverDeclarationClass));
+  }
+
+  public JavaOutputResolverModelParser(OutputTypeResolver<?> outputTypeResolver) {
+    this.outputTypeResolverDeclarationClass = outputTypeResolver.getClass();
+    this.instance = new LazyValue<>(outputTypeResolver);
   }
 
   public boolean hasOutputResolver() {
@@ -34,7 +42,7 @@ public class JavaOutputResolverModelParser implements OutputResolverModelParser 
   }
 
   public OutputTypeResolver getOutputResolver() {
-    return instantiateResolver(outputTypeResolverDeclarationClass);
+    return instance.get();
   }
 
   private OutputTypeResolver instantiateResolver(Class<?> factoryType) {
