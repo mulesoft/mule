@@ -29,7 +29,6 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import static com.linecorp.armeria.common.HttpResponse.from;
 import static com.linecorp.armeria.common.HttpStatus.OK;
@@ -37,7 +36,9 @@ import static com.linecorp.armeria.common.HttpStatus.OK;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.server.AbstractHttpService;
-import org.junit.Ignore;
+import com.linecorp.armeria.server.grpc.GrpcService;
+import io.grpc.stub.StreamObserver;
+import io.opentelemetry.proto.collector.trace.v1.TraceServiceGrpc;
 import org.junit.Rule;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
@@ -51,12 +52,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.ServiceRequestContext;
-import com.linecorp.armeria.server.grpc.protocol.AbstractUnaryGrpcService;
 import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
 import com.linecorp.armeria.testing.junit4.server.ServerRule;
 import io.opentelemetry.api.OpenTelemetry;
@@ -129,7 +128,6 @@ public class OpenTelemetryExporterConfigTestCase {
   }
 
   @Test
-  @Ignore("W-16037386")
   public void configuredGrpcInsecureExporter() throws Exception {
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, GRPC.toString());
@@ -149,7 +147,6 @@ public class OpenTelemetryExporterConfigTestCase {
   }
 
   @Test
-  @Ignore("W-16037386")
   public void configuredGrpcSecureExporter() throws Exception {
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
@@ -242,23 +239,26 @@ public class OpenTelemetryExporterConfigTestCase {
 
     @Override
     protected void configure(ServerBuilder sb) throws Exception {
-      sb.service(
-                 "/opentelemetry.proto.collector.trace.v1.TraceService/Export",
-                 new AbstractUnaryGrpcService() {
+      sb.service(GrpcService.builder()
+          // OTLP spans
+          .addService(
+                      new TraceServiceGrpc.TraceServiceImplBase() {
 
-                   @Override
-                   protected @NotNull CompletionStage<byte[]> handleMessage(
-                                                                            @NotNull ServiceRequestContext ctx,
-                                                                            byte @NotNull [] message) {
-                     try {
-                       traceRequests.add(ExportTraceServiceRequest.parseFrom(message));
-                     } catch (InvalidProtocolBufferException e) {
-                       throw new UncheckedIOException(e);
-                     }
-                     return completedFuture(ExportTraceServiceResponse.getDefaultInstance().toByteArray());
-                   }
-                 });
-
+                        @Override
+                        public void export(
+                                           ExportTraceServiceRequest request,
+                                           StreamObserver<ExportTraceServiceResponse> responseObserver) {
+                          try {
+                            traceRequests.add(request);
+                          } catch (Throwable t) {
+                            responseObserver.onError(t);
+                            return;
+                          }
+                          responseObserver.onNext(ExportTraceServiceResponse.getDefaultInstance());
+                          responseObserver.onCompleted();
+                        }
+                      })
+          .build());
 
       sb.service(
                  "/v1/traces",

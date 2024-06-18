@@ -26,8 +26,6 @@ import static org.mule.runtime.metrics.exporter.impl.utils.TestServerRule.GRPC_E
 import static org.mule.runtime.metrics.exporter.impl.utils.TestServerRule.HTTP_ENDPOINT_PATH;
 import static org.mule.runtime.metrics.exporter.impl.utils.TestServerRule.HTTP_GZIP_ENDPOINT_PATH;
 
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
@@ -51,6 +49,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class OpenTelemetryMeterExporterConfigTestCase {
@@ -159,7 +158,6 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   }
 
   @Test
-  @Ignore("W-16037386")
   public void configuredGrpcInsecureExporterShouldExportLongCounterMetricSuccessfully() {
     String meterExporterHeaders = "{\"Header\": \"Header Value\"}";
     String meterExporterCompressionType = "gzip";
@@ -234,7 +232,6 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   }
 
   @Test
-  @Ignore("W-16037386")
   public void configuredGrpcSecureExporterShouldExportLongCounterMetricSuccessfully() {
     String meterExporterHeaders = "{\"Header\": \"Header Value\"}";
     String meterExporterCompressionType = "gzip";
