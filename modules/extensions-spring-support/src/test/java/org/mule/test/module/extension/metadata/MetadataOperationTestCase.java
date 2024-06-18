@@ -32,6 +32,7 @@ import static java.util.Collections.singletonMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
@@ -44,6 +45,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 
 import org.mule.functional.listener.Callback;
+import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -85,6 +87,7 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -293,25 +296,40 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Issue("W-15158118")
   public void outputResolverForScope() throws Exception {
     location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    ScopeOutputMetadataContext scopeContext = new ScopeOutputMetadataContext() {
 
-      @Override
-      public Supplier<MessageMetadataType> getInnerChainOutputMessageType() {
-        return () -> MessageMetadataType.builder().payload(carType).build();
-      }
+    MessageMetadataType chainOutputMessageType = MessageMetadataType.builder()
+        .payload(carType)
+        .build();
 
-      @Override
-      public Supplier<MessageMetadataType> getScopeInputMessageType() {
-        // TODO: implement in W-14969942
-        return () -> null;
-      }
-    };
+    ScopeOutputMetadataContext scopeContext = new TestScopeOutputMetadataContext(chainOutputMessageType);
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
         metadataService.getScopeOutputMetadata(location, CAR_KEY, scopeContext);
+
     assertThat(outputMetadataResult.isSuccess(), is(true));
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
     assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
     assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+  }
+
+  @Test
+  public void passThroughOutputResolverForScope() {
+    location = Location.builder().globalName(SCOPE_WITH_PASS_THROUGH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    MessageMetadataType chainOutputMessageType = MessageMetadataType.builder()
+        .payload(carType)
+        .attributes(VOID_TYPE)
+        .build();
+
+    ScopeOutputMetadataContext scopeContext = new TestScopeOutputMetadataContext(chainOutputMessageType);
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getScopeOutputMetadata(location, CAR_KEY, scopeContext);
+
+    assertThat(outputMetadataResult.getFailures(), is(empty()));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+    assertThat(outputMetadataDescriptor.getAttributesMetadata().isDynamic(), is(true));
+    assertExpectedType(outputMetadataDescriptor.getAttributesMetadata().getType(), VOID_TYPE);
   }
 
   @Test
@@ -321,7 +339,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
     MessageMetadataType inputMessageType = MessageMetadataType.builder()
         .payload(carType)
-        .attributes(typeBuilder.voidType().build())
+        .attributes(VOID_TYPE)
         .build();
 
     MetadataResult<ScopeInputMetadataDescriptor> inputMetadata =
@@ -376,6 +394,56 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
     assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
     assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+  }
+
+  @Test
+  public void oneOfRoutesOutputResolverForRouter() {
+    location =
+        Location.builder().globalName(ROUTER_WITH_ONE_OF_ROUTES_METADATA_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    Map<String, Supplier<MessageMetadataType>> routeOutputTypes = new LinkedHashMap<>();
+    routeOutputTypes.put("metaroute1", () -> MessageMetadataType.builder().payload(carType).build());
+    routeOutputTypes.put("metaroute2", () -> MessageMetadataType.builder().payload(personType).build());
+
+    RouterOutputMetadataContext routerOutputMetadataContext = new TestRouterOutputMetadataContext(routeOutputTypes);
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getRouterOutputMetadata(location, CAR_KEY, routerOutputMetadataContext);
+
+    assertThat(outputMetadataResult.getFailures(), is(empty()));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+
+    MetadataType expectedPayloadType = typeBuilder.unionType()
+        .of(carType)
+        .of(personType)
+        .build();
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), expectedPayloadType);
+    assertExpectedType(outputMetadataDescriptor.getAttributesMetadata().getType(), VOID_TYPE);
+  }
+
+  @Test
+  public void allOfRoutesOutputResolverForRouter() {
+    location =
+        Location.builder().globalName(ROUTER_WITH_ALL_OF_ROUTES_METADATA_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    Map<String, Supplier<MessageMetadataType>> routeOutputTypes = new LinkedHashMap<>();
+    routeOutputTypes.put("metaroute1", () -> MessageMetadataType.builder().payload(carType).build());
+    routeOutputTypes.put("metaroute2", () -> MessageMetadataType.builder().payload(personType).build());
+
+    RouterOutputMetadataContext routerOutputMetadataContext = new TestRouterOutputMetadataContext(routeOutputTypes);
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getRouterOutputMetadata(location, CAR_KEY, routerOutputMetadataContext);
+
+    assertThat(outputMetadataResult.getFailures(), is(empty()));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+
+    ObjectTypeBuilder objectTypeBuilder = typeBuilder.objectType();
+    objectTypeBuilder.addField().key("metaroute1").value(routeOutputTypes.get("metaroute1").get());
+    objectTypeBuilder.addField().key("metaroute2").value(routeOutputTypes.get("metaroute2").get());
+    MetadataType expectedPayloadType = objectTypeBuilder.build();
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), expectedPayloadType);
+    assertExpectedType(outputMetadataDescriptor.getAttributesMetadata().getType(), VOID_TYPE);
   }
 
   @Test
@@ -874,5 +942,45 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     return model.getParameterGroupModels().stream()
         .filter(p -> p.getName().equals(parameterName)).findFirst()
         .orElseThrow(() -> new IllegalArgumentException("Parameter Group not found"));
+  }
+
+  private static class TestScopeOutputMetadataContext implements ScopeOutputMetadataContext {
+
+    private final MessageMetadataType innerChainOutputMessage;
+
+    private TestScopeOutputMetadataContext(MessageMetadataType innerChainOutputMessage) {
+      this.innerChainOutputMessage = innerChainOutputMessage;
+    }
+
+    @Override
+    public Supplier<MessageMetadataType> getInnerChainOutputMessageType() {
+      return () -> innerChainOutputMessage;
+    }
+
+    @Override
+    public Supplier<MessageMetadataType> getScopeInputMessageType() {
+      // Not needed for this test
+      return () -> null;
+    }
+  }
+
+  private static class TestRouterOutputMetadataContext implements RouterOutputMetadataContext {
+
+    private final Map<String, Supplier<MessageMetadataType>> routeOutputMessageTypes;
+
+    private TestRouterOutputMetadataContext(Map<String, Supplier<MessageMetadataType>> routeOutputMessageTypes) {
+      this.routeOutputMessageTypes = routeOutputMessageTypes;
+    }
+
+    @Override
+    public Map<String, Supplier<MessageMetadataType>> getRouteOutputMessageTypes() {
+      return routeOutputMessageTypes;
+    }
+
+    @Override
+    public Supplier<MessageMetadataType> getRouterInputMessageType() {
+      // Not needed for this test
+      return () -> null;
+    }
   }
 }
