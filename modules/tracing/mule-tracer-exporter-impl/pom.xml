@@ -112,9 +112,10 @@
             <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Needed for running almeria tests -->
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
