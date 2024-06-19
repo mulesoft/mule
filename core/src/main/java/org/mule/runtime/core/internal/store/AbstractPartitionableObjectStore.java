@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.store;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.store.AbstractObjectStoreSupport;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -16,9 +18,12 @@ import org.mule.runtime.api.store.PartitionableObjectStore;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractPartitionableObjectStore<T extends Serializable> extends AbstractObjectStoreSupport<T>
     implements PartitionableObjectStore<T> {
+
+  private Map<String, ObjectStoreEntryListener> listenerMap = new ConcurrentHashMap<>();
 
   @Override
   public void open() throws ObjectStoreException {
@@ -48,6 +53,13 @@ public abstract class AbstractPartitionableObjectStore<T extends Serializable> e
   @Override
   public void store(String key, T value) throws ObjectStoreException {
     store(key, value, DEFAULT_PARTITION_NAME);
+    entryAdded(key, value);
+  }
+
+  private void entryAdded(String key, T value) {
+    for (ObjectStoreEntryListener listener : listenerMap.values()) {
+      listener.entryAdded(key, value);
+    }
   }
 
   @Override
@@ -57,7 +69,15 @@ public abstract class AbstractPartitionableObjectStore<T extends Serializable> e
 
   @Override
   public T remove(String key) throws ObjectStoreException {
-    return remove(key, DEFAULT_PARTITION_NAME);
+    T res = remove(key, DEFAULT_PARTITION_NAME);
+    entryRemoved(key);
+    return res;
+  }
+
+  private void entryRemoved(String key) {
+    for (ObjectStoreEntryListener listener : listenerMap.values()) {
+      listener.entryRemoved(key);
+    }
   }
 
   @Override
