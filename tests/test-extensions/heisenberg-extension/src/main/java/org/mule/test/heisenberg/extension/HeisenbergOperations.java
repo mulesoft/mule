@@ -11,7 +11,6 @@ import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.sdk.api.annotation.route.ChainExecutionOccurrence.ONCE;
 import static org.mule.sdk.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
@@ -99,6 +98,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
@@ -629,13 +629,13 @@ public class HeisenbergOperations implements Disposable {
 
   @MediaType(TEXT_PLAIN)
   public String executeKillWithClient(String configName, ExtensionsClient client) {
-    OperationParameters params = builder().configName(configName)
-        .addParameter("victim", "Juani")
-        .addParameter("goodbyeMessage", "ADIOS")
-        .build();
     try {
-      return (String) client.execute(HEISENBERG, "kill", params).getOutput();
-    } catch (MuleException e) {
+      return (String) client.execute(HEISENBERG, "kill", parameterizer -> {
+        parameterizer.withConfigRef(configName);
+        parameterizer.withParameter("victim", "Juani");
+        parameterizer.withParameter("goodbyeMessage", "ADIOS");
+      }).get().getOutput();
+    } catch (InterruptedException | ExecutionException e) {
       throw new RuntimeException(e);
     }
   }
@@ -644,15 +644,15 @@ public class HeisenbergOperations implements Disposable {
   public String executeRemoteKill(String extension, String configName, String operation,
                                   @Content Map<String, String> parameters,
                                   ExtensionsClient client) {
-    DefaultOperationParametersBuilder paramsBuilder = builder().configName(configName);
-    for (Entry<String, String> param : parameters.entrySet()) {
-      paramsBuilder = paramsBuilder.addParameter(param.getKey(), param.getValue());
-    }
-
     try {
-      client.execute(extension, operation, paramsBuilder.build()).getOutput();
+      client.execute(extension, operation, parameterizer -> {
+        parameterizer.withConfigRef(configName);
+        for (Entry<String, String> param : parameters.entrySet()) {
+          parameterizer.withParameter(param.getKey(), param.getValue());
+        }
+      }).get().getOutput();
       return "Now he sleeps with the fishes.";
-    } catch (MuleException e) {
+    } catch (InterruptedException | ExecutionException e) {
       throw new RuntimeException(e);
     }
   }
