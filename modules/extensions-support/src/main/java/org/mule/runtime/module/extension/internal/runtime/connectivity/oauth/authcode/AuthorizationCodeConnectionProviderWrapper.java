@@ -43,6 +43,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private final AuthorizationCodeOAuthHandler oauthHandler;
   private final FieldSetter<Object, Object> authCodeStateSetter;
   private final RunOnce dance;
+  private boolean tokenStatus;
 
   private AuthorizationCodeOAuthDancer dancer;
 
@@ -76,16 +77,19 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                                                                   callbackValues,
                                                                                                   updatedContext)));
     updateOAuthParameters(delegate, callbackValues, context);
+    // get delegate's authorizationCodeState's invalidate's value and set the val
   }
 
   @Override
   public void refreshToken(String resourceOwnerId) {
     oauthHandler.refreshToken(oauthConfig.getOwnerConfigName(), resourceOwnerId);
+    // get delegate's authorizationCodeState's invalidate's value and set the val
   }
 
   @Override
   public void invalidate(String resourceOwnerId) {
     oauthHandler.invalidate(oauthConfig.getOwnerConfigName(), resourceOwnerId);
+    // get delegate's authorizationCodeState's invalidate's value and set the val
   }
 
   @Override

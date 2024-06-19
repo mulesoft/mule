@@ -23,8 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractPartitionableObjectStore<T extends Serializable> extends AbstractObjectStoreSupport<T>
     implements PartitionableObjectStore<T> {
 
-  private Map<String, ObjectStoreEntryListener> listenerMap = new ConcurrentHashMap<>();
-
   @Override
   public void open() throws ObjectStoreException {
     open(DEFAULT_PARTITION_NAME);
@@ -56,11 +54,6 @@ public abstract class AbstractPartitionableObjectStore<T extends Serializable> e
     entryAdded(key, value);
   }
 
-  private void entryAdded(String key, T value) {
-    for (ObjectStoreEntryListener listener : listenerMap.values()) {
-      listener.entryAdded(key, value);
-    }
-  }
 
   @Override
   public T retrieve(String key) throws ObjectStoreException {
@@ -72,12 +65,6 @@ public abstract class AbstractPartitionableObjectStore<T extends Serializable> e
     T res = remove(key, DEFAULT_PARTITION_NAME);
     entryRemoved(key);
     return res;
-  }
-
-  private void entryRemoved(String key) {
-    for (ObjectStoreEntryListener listener : listenerMap.values()) {
-      listener.entryRemoved(key);
-    }
   }
 
   @Override

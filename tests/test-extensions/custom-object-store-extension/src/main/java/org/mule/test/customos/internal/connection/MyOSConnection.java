@@ -7,6 +7,8 @@
 package org.mule.test.customos.internal.connection;
 
 import static org.mule.test.customos.internal.MyOSConnector.VALUES;
+
+import org.mule.runtime.api.map.ObjectStoreEntryListener;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
@@ -90,6 +92,16 @@ public class MyOSConnection implements ObjectStoreManager {
     @Override
     public Map<String, TypedValue<String>> retrieveAll() throws ObjectStoreException {
       return VALUES;
+    }
+
+    @Override
+    public String addEntryListener(ObjectStoreEntryListener listener) {
+      return "";
+    }
+
+    @Override
+    public boolean removeEntryListener(String key) {
+      return false;
     }
   }
 }
