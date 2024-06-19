@@ -85,6 +85,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.runtime.compatibility;
   exports org.mule.runtime.module.extension.api.runtime.config;
   exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
+  exports org.mule.runtime.module.extension.api.runtime.executor;
   exports org.mule.runtime.module.extension.api.runtime.resolver;
   exports org.mule.runtime.module.extension.api.tooling;
   exports org.mule.runtime.module.extension.api.tooling.metadata;

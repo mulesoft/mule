@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
+import org.mule.runtime.module.extension.api.runtime.executor.MethodExecutor;
 import org.mule.runtime.module.extension.internal.runtime.execution.ArgumentResolverDelegate;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ArgumentResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
