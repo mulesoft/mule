@@ -49,7 +49,6 @@ import static java.util.stream.Collectors.toSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.CachedIntrospectionResults.clearClassLoader;
-import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
@@ -92,7 +91,6 @@ import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurat
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
-import org.mule.runtime.config.internal.factories.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
@@ -694,10 +692,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) beanFactory;
 
-    if (!findComponentDefinitionModel(applicationModel, CONFIGURATION_IDENTIFIER).isPresent()) {
-      registerMuleConfigurationBean(beanDefinitionRegistry);
-    }
-
     if (!findComponentDefinitionModel(applicationModel, NOTIFICATIONS_IDENTIFIER).isPresent()) {
       registerNotificationManagerBean(beanDefinitionRegistry);
     }
@@ -727,12 +721,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                                              ExtensionNotification.class))
                                         .build())
                                     .getBeanDefinition());
-  }
-
-  private void registerMuleConfigurationBean(BeanDefinitionRegistry beanDefinitionRegistry) {
-    beanDefinitionRegistry
-        .registerBeanDefinition(OBJECT_MULE_CONFIGURATION,
-                                genericBeanDefinition(MuleConfigurationConfigurator.class).getBeanDefinition());
   }
 
   private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
