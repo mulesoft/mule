@@ -29,11 +29,9 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.concurrent.CompletableFuture.completedFuture;
 
-import static org.testcontainers.Testcontainers.exposeHostPorts;
-import static org.testcontainers.containers.BindMode.READ_ONLY;
-import static org.testcontainers.utility.MountableFile.forHostPath;
+import static com.linecorp.armeria.common.HttpResponse.from;
+import static com.linecorp.armeria.common.HttpStatus.OK;
 
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
@@ -46,18 +44,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.linecorp.armeria.common.HttpRequest;
+import com.linecorp.armeria.common.HttpResponse;
+import com.linecorp.armeria.server.AbstractHttpService;
+import com.linecorp.armeria.server.grpc.GrpcService;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.ServiceRequestContext;
-import com.linecorp.armeria.server.grpc.protocol.AbstractUnaryGrpcService;
 import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
 import com.linecorp.armeria.testing.junit4.server.ServerRule;
+import io.grpc.stub.StreamObserver;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceResponse;
+import io.opentelemetry.proto.collector.trace.v1.TraceServiceGrpc;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
@@ -67,37 +70,20 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.images.PullPolicy;
-import org.testcontainers.utility.DockerImageName;
 
 @Feature(PROFILING)
 @Story(OPEN_TELEMETRY_EXPORTER)
-@Ignore("W-15586397")
 public class OpenTelemetryExporterConfigTestCase {
 
   public static final String TEST_SERVICE_NAME = "test-service-name";
-
-  private static final DockerImageName COLLECTOR_IMAGE =
-      DockerImageName.parse("otel/opentelemetry-collector:0.99.0");
-
-  private static final Integer COLLECTOR_OTLP_GRPC_PORT = 4317;
-  private static final Integer COLLECTOR_OTLP_HTTP_PORT = 4318;
-  private static final Integer COLLECTOR_OTLP_GRPC_MTLS_PORT = 5317;
-  private static final Integer COLLECTOR_OTLP_HTTP_MTLS_PORT = 5318;
-  private static final Integer COLLECTOR_HEALTH_CHECK_PORT = 13133;
 
   public static final int TIMEOUT_MILLIS = 30000;
 
   private static final String MULE_INSTRUMENTATION_NAME = "mule-tracer";
   private static final String INSTRUMENTATION_VERSION = "1.0.0";
-
-  private GenericContainer<?> collector;
 
   @ClassRule
   public static SelfSignedCertificateRule serverTls = new SelfSignedCertificateRule();
@@ -105,42 +91,8 @@ public class OpenTelemetryExporterConfigTestCase {
   @ClassRule
   public static SelfSignedCertificateRule clientTls = new SelfSignedCertificateRule();
 
-  @ClassRule
-  public static final GrpcServerRule server = new GrpcServerRule();
-
-  @Before
-  public void before() {
-    exposeHostPorts(server.httpPort());
-    // Configuring the collector test-container
-    collector =
-        new GenericContainer<>(COLLECTOR_IMAGE)
-            .withImagePullPolicy(PullPolicy.alwaysPull())
-            .withCopyFileToContainer(
-                                     forHostPath(serverTls.certificateFile().toPath(), 365),
-                                     "/server.cert")
-            .withCopyFileToContainer(
-                                     forHostPath(serverTls.privateKeyFile().toPath(), 365), "/server.key")
-            .withCopyFileToContainer(
-                                     forHostPath(clientTls.certificateFile().toPath(), 365),
-                                     "/client.cert")
-            .withEnv("MTLS_CLIENT_CERTIFICATE", "/client.cert")
-            .withEnv("MTLS_SERVER_CERTIFICATE", "/server.cert")
-            .withEnv("MTLS_SERVER_KEY", "/server.key")
-            .withEnv(
-                     "OTLP_EXPORTER_ENDPOINT", "host.testcontainers.internal:" + server.httpPort())
-            .withClasspathResourceMapping(
-                                          "otel.yaml", "/otel.yaml", READ_ONLY)
-            .withCommand("--config", "/otel.yaml")
-            .withExposedPorts(
-                              COLLECTOR_OTLP_GRPC_PORT,
-                              COLLECTOR_OTLP_HTTP_PORT,
-                              COLLECTOR_OTLP_GRPC_MTLS_PORT,
-                              COLLECTOR_OTLP_HTTP_MTLS_PORT,
-                              COLLECTOR_HEALTH_CHECK_PORT)
-            .waitingFor(Wait.forHttp("/").forPort(COLLECTOR_HEALTH_CHECK_PORT));
-
-    collector.start();
-  }
+  @Rule
+  public final TestServerRule server = new TestServerRule();
 
   @After
   public void after() {
@@ -153,7 +105,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER, "always_on");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
-                   "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_PORT));
+                   "http://localhost:" + server.httpPort());
 
     exportSpan(properties);
 
@@ -167,7 +119,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, HTTP.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
-                   "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_PORT) + "/v1/traces");
+                   "http://localhost:" + server.httpPort() + "/v1/traces");
 
     exportSpan(properties);
 
@@ -181,7 +133,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, GRPC.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
-                   "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_PORT));
+                   "http://localhost:" + server.httpPort());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, "512");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_COMPRESSION_TYPE, "gzip");
     properties
@@ -200,7 +152,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, GRPC.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
-                   "https://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_MTLS_PORT));
+                   "http://localhost:" + server.httpPort());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, "512");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "true");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION, clientTls.privateKeyFile().toPath().toString());
@@ -224,7 +176,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, HTTP.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
-                   "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_PORT) + "/v1/traces");
+                   "http://localhost:" + server.httpPort() + "/v1/traces");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, "512");
     properties
         .put(MULE_OPEN_TELEMETRY_EXPORTER_HEADERS,
@@ -242,8 +194,7 @@ public class OpenTelemetryExporterConfigTestCase {
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TYPE, HTTP.toString());
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
-                   "https://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_MTLS_PORT)
-                       + "/v1/traces");
+                   "http://localhost:" + server.httpPort() + "/v1/traces");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, "512");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED, "true");
     properties
@@ -282,26 +233,51 @@ public class OpenTelemetryExporterConfigTestCase {
     }
 
   }
-  private static class GrpcServerRule extends ServerRule {
+  private static class TestServerRule extends ServerRule {
 
     private final List<ExportTraceServiceRequest> traceRequests = new ArrayList<>();
 
     @Override
     protected void configure(ServerBuilder sb) throws Exception {
+      sb.service(GrpcService.builder()
+          // OTLP spans
+          .addService(
+                      new TraceServiceGrpc.TraceServiceImplBase() {
+
+                        @Override
+                        public void export(
+                                           ExportTraceServiceRequest request,
+                                           StreamObserver<ExportTraceServiceResponse> responseObserver) {
+                          try {
+                            traceRequests.add(request);
+                          } catch (Throwable t) {
+                            responseObserver.onError(t);
+                            return;
+                          }
+                          responseObserver.onNext(ExportTraceServiceResponse.getDefaultInstance());
+                          responseObserver.onCompleted();
+                        }
+                      })
+          .build());
+
       sb.service(
-                 "/opentelemetry.proto.collector.trace.v1.TraceService/Export",
-                 new AbstractUnaryGrpcService() {
+                 "/v1/traces",
+                 new AbstractHttpService() {
 
                    @Override
-                   protected @NotNull CompletionStage<byte[]> handleMessage(
-                                                                            @NotNull ServiceRequestContext ctx,
-                                                                            byte @NotNull [] message) {
-                     try {
-                       traceRequests.add(ExportTraceServiceRequest.parseFrom(message));
-                     } catch (InvalidProtocolBufferException e) {
-                       throw new UncheckedIOException(e);
-                     }
-                     return completedFuture(ExportTraceServiceResponse.getDefaultInstance().toByteArray());
+                   protected HttpResponse doPost(ServiceRequestContext ctx, HttpRequest req) {
+                     return HttpResponse.from(req.aggregate().handle((aReq, cause) -> {
+                       CompletableFuture<HttpResponse> responseFuture = new CompletableFuture<>();
+                       HttpResponse res = from(responseFuture);
+
+                       try {
+                         traceRequests.add(ExportTraceServiceRequest.parseFrom(aReq.content().array()));
+                       } catch (InvalidProtocolBufferException e) {
+                         throw new UncheckedIOException(e);
+                       }
+                       responseFuture.complete(HttpResponse.of(OK));
+                       return res;
+                     }));
                    }
                  });
 
