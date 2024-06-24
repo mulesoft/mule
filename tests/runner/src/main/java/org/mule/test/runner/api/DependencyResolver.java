@@ -6,6 +6,8 @@
  */
 package org.mule.test.runner.api;
 
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
@@ -238,9 +240,9 @@ public class DependencyResolver implements AutoCloseable {
       apisExcludedFilterPattern.add("org.mule.distributions:*:*:*:*");
       final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(apisExcludedFilterPattern);
       // TODO - review BOM name and find a way to avoid hardcoding the version
-      ArtifactDescriptorResult pom =
-          readArtifactDescriptor(new DefaultArtifact("org.mule.distributions", "mule-runtime-split-bom", "pom",
-                                                     "4.8.0-SNAPSHOT"));
+      final String groupId = getBoolean("use.mule.apis.ee.bom") ? "com.mulesoft.mule.distributions" : "org.mule.distributions";
+      ArtifactDescriptorResult pom = readArtifactDescriptor(new DefaultArtifact(groupId, "mule-runtime-split-bom", "pom",
+                                                                                "4.8.0-SNAPSHOT"));
       DependencyNode node = resolveDependencyNode(null, pom.getDependencies(), pom.getManagedDependencies(), dependencyFilter,
                                                   pom.getRepositories());
       PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
