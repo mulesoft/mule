@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.RESOLVE_MULE_IMPLEMENTATIONS_LOADER_DYNAMICALLY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
@@ -198,6 +199,9 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
           originalSystemPropertyValues.put(sp.getKey(), getProperty(sp.getKey()));
           setProperty(sp.getKey(), sp.getValue());
         });
+    originalSystemPropertyValues.put(RESOLVE_MULE_IMPLEMENTATIONS_LOADER_DYNAMICALLY,
+                                     getProperty(RESOLVE_MULE_IMPLEMENTATIONS_LOADER_DYNAMICALLY));
+    setProperty(RESOLVE_MULE_IMPLEMENTATIONS_LOADER_DYNAMICALLY, "true");
     return originalSystemPropertyValues;
   }
 
