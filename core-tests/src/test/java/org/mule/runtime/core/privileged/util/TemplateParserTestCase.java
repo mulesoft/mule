@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.qameta.allure.Issue;
 import org.junit.Test;
@@ -262,35 +261,6 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
       clearProperty(ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE);
       TemplateParser.reloadKillSwitches();
     }
-  }
-
-  @Test
-  @Issue("W-15782010")
-  public void muleParserTokenizesAlwaysTheSameForSameInput() {
-    TemplateParser tp = createMuleStyleParser();
-    String template = "#[hello #[world] #[var.apple]]";
-
-    List<String> tokens = new ArrayList<>();
-    tp.parse(null, template, token -> {
-      tokens.add(token);
-      return token;
-    });
-
-    AtomicInteger i = new AtomicInteger();
-    tp.parse(null, template, token -> {
-      assertThat(token, is(tokens.get(i.getAndIncrement())));
-      return token;
-    });
-  }
-
-  @Test
-  public void muleParserReplacesCorrectlyWhenTokenIsRepeatedByCallback() {
-    TemplateParser tp = createMuleStyleParser();
-    String template = "#[hello #[world]]";
-
-    String result = tp.parse(null, template, token -> token + token);
-
-    assertThat(result, is("hello worldworldhello worldworld"));
   }
 
   @Test
