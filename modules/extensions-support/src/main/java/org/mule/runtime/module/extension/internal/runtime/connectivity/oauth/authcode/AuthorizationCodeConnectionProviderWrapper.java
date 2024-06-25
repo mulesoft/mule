@@ -89,6 +89,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   @Override
   public void invalidate(String resourceOwnerId) {
     oauthHandler.invalidate(oauthConfig.getOwnerConfigName(), resourceOwnerId);
+    // todo: context.setIsInvalidated
     // get delegate's authorizationCodeState's invalidate's value and set the val
   }
 

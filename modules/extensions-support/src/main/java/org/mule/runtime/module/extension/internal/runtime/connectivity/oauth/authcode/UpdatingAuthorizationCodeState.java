@@ -26,11 +26,13 @@ public class UpdatingAuthorizationCodeState
 
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
+  private final ResourceOwnerOAuthContext context;
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {
+    context = initialContext;
     delegate = toAuthorizationCodeState(config, initialContext);
     dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
@@ -47,6 +49,7 @@ public class UpdatingAuthorizationCodeState
       @Override
       public void onTokenInvalidated() {
         invalidated = true;
+        context.setIsInvalidated(true);
       }
 
       private void update(ResourceOwnerOAuthContext context) {
@@ -59,7 +62,7 @@ public class UpdatingAuthorizationCodeState
 
   @Override
   public String getAccessToken() {
-    if (invalidated) {
+    if (invalidated || context.getIsInvalidated()) {
       throw new TokenInvalidatedException(
                                           "OAuth token for resource owner id " + delegate.getResourceOwnerId()
                                               + " has been invalidated");
