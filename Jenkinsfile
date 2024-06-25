@@ -1,4 +1,4 @@
-def UPSTREAM_PROJECTS_LIST = [ "Mule-runtime/metadata-model-api/1.3.0-APRIL-2023",
+def UPSTREAM_PROJECTS_LIST = [ "Mule-runtime/metadata-model-api/1.3.0-APRIL-2023-WITH-W-15141905-W-15782010",
                                "Mule-runtime/mule-api/1.3.0-APRIL-2023-WITH-W-15141905-W-15782010",
                                "Mule-runtime/mule-extensions-api/1.3.0-APRIL-2023-WITH-W-15141905-W-15782010",
                                "Mule-runtime/mule-artifact-ast/0.8.0-APRIL-2023-WITH-W-15141905-W-15782010",
