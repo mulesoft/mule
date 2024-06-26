@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config;
 
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
@@ -13,6 +14,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_PROPERTIES_STORY;
@@ -39,7 +41,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.api.time.TimeSupplier;
@@ -51,7 +55,11 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.EventContextFactory;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToInputStream;
@@ -59,6 +67,7 @@ import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
+import org.mule.tck.junit4.matcher.EventMatcher;
 
 import java.util.Calendar;
 
@@ -215,6 +224,12 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
   }
 
   @Test
+  public void whenBeanFromConfigFileDependsOnMuleConfigurationThenItSeesTheCorrectValues() throws MuleException {
+    initMuleContext("withGlobalConfig.xml");
+    assertThat(runFlow("mainFlow"), EventMatcher.hasMessage(hasPayload(is("errorHandler"))));
+  }
+
+  @Test
   @Issue("MULE-19006")
   public void configuratorExpirationPolicyUsesManagedTimeSupplier() throws Exception {
     MuleConfiguration configuration = getMuleContext().getRegistry()
@@ -245,6 +260,15 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
     assertThat(actual.getFrequency().getUnit(), is(expected.getFrequency().getUnit()));
     assertThat(actual.getExpirationPolicy().getMaxIdleTime(), is(expected.getExpirationPolicy().getMaxIdleTime()));
     assertThat(actual.getExpirationPolicy().getTimeUnit(), is(expected.getExpirationPolicy().getTimeUnit()));
+  }
+
+  private CoreEvent runFlow(String flowName) throws MuleException {
+    FlowConstruct flow = getMuleContext().getRegistry().lookupFlowConstruct(flowName);
+    EventContext eventContext = EventContextFactory.create(flow, from(flow.getName()));
+    CoreEvent event = CoreEvent.builder(eventContext)
+        .message(Message.builder().nullValue().build())
+        .build();
+    return ((Flow) flow).process(event);
   }
 
   private MuleContextWithRegistry getMuleContext() throws MuleException {

@@ -6,6 +6,9 @@
     <object name="customObjectSerializer"
             class="org.mule.runtime.config.MuleConfigurationConfiguratorTestCase.TestSerializationProtocol"/>
 
+    <object name="testProcessor"
+            class="org.mule.runtime.config.internal.bean.TestProcessorDependingOnMuleConfiguration"/>
+
     <error-handler name="errorHandler">
         <on-error-continue type="ANY">
             <logger/>
@@ -25,8 +28,9 @@
         </dynamic-config-expiration>
     </configuration>
 
-    <flow name="service">
+    <flow name="mainFlow">
         <logger/>
+        <flow-ref name="testProcessor"/>
     </flow>
 
 </mule>
