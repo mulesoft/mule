@@ -339,16 +339,17 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
 
   private void deleteNativeLibraries(T artifact) {
     final String appName = artifact.getDescriptor().getDataFolderName();
-    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appName, artifact.getDescriptor().getIdentifier());
+    final File appNativeLibrariesFolder =
+        getAppNativeLibrariesTempFolder(appName, artifact.getDescriptor().getLoadedNativeLibrariesFolderName());
 
     if (appNativeLibrariesFolder.exists()) {
       try {
         deleteDirectory(appNativeLibrariesFolder);
       } catch (IOException e) {
-        logger.warn(
-                    format("Cannot delete native libraries data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used. Scheduling a task to removed them.",
-                           appNativeLibrariesFolder, artifact.getArtifactName()),
-                    e);
+        logger.debug(
+                     format("Cannot delete native libraries data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used. Scheduling a task to removed them.",
+                            appNativeLibrariesFolder, artifact.getArtifactName()),
+                     e);
         executeSchedulerFileDeletion(artifact);
       }
     }
@@ -356,7 +357,8 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
 
   private void executeSchedulerFileDeletion(T artifact) {
     final String appName = artifact.getDescriptor().getDataFolderName();
-    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appName, artifact.getDescriptor().getIdentifier());
+    final File appNativeLibrariesFolder =
+        getAppNativeLibrariesTempFolder(appName, artifact.getDescriptor().getLoadedNativeLibrariesFolderName());
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
     RetryScheduledFileDeletionTask retryTask =

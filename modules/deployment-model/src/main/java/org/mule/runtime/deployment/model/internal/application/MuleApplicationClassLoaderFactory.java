@@ -61,7 +61,7 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
 
     return new MuleApplicationClassLoader(artifactId, descriptor, parent.getClassLoader(),
                                           nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
-                                                                            descriptor.getIdentifier(),
+                                                                            descriptor.getLoadedNativeLibrariesFolderName(),
                                                                             descriptor.getClassLoaderConfiguration().getUrls()),
                                           Arrays.asList(descriptor.getClassLoaderConfiguration().getUrls()),
                                           classLoaderLookupPolicy);

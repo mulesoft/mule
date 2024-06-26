@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTOR
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import static java.lang.String.valueOf;
-import static java.lang.System.currentTimeMillis;
+import static java.util.UUID.randomUUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
@@ -43,7 +43,7 @@ public class DefaultNativeLibraryFinderFactoryTestCase extends AbstractMuleTestC
                            () -> {
                              NativeLibraryFinder nativeLibraryFinder =
                                  nativeLibraryFinderFactory.create("testApp",
-                                                                   valueOf(currentTimeMillis()),
+                                                                   valueOf(randomUUID()),
                                                                    new URL[0]);
 
                              assertThat(nativeLibraryFinder,

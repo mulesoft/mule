@@ -7,10 +7,10 @@
 package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.lang.String.valueOf;
-import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
+import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
@@ -42,7 +42,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private File logConfigFile;
   private Optional<Properties> deploymentProperties = empty();
   private Set<String> supportedJavaVersions = emptySet();
-  private final String identifier = valueOf(currentTimeMillis());
+  private final String nativeLibrariesFolderName = valueOf(randomUUID());
 
   /**
    * Creates a new deployable artifact descriptor
@@ -162,11 +162,11 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   }
 
   /**
-   * Returns a {@link String} representing the identifier of the descriptor
+   * Returns a {@link String} representing the Native Libraries Folder Name of the descriptor
    *
-   * @return the descriptor identifier
+   * @return the descriptor's Native Libraries Folder Name
    */
-  public String getIdentifier() {
-    return identifier;
+  public String getLoadedNativeLibrariesFolderName() {
+    return nativeLibrariesFolderName;
   }
 }

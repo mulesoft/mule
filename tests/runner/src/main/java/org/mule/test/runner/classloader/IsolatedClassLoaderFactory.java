@@ -526,7 +526,7 @@ public class IsolatedClassLoaderFactory {
     return new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, parent,
                                           new DefaultNativeLibraryFinderFactory()
                                               .create(APP_NAME,
-                                                      applicationDescriptor.getIdentifier(),
+                                                      applicationDescriptor.getLoadedNativeLibrariesFolderName(),
                                                       applicationUrls.toArray(new URL[applicationUrls.size()])),
                                           applicationUrls,
                                           childClassLoaderLookupPolicy);
