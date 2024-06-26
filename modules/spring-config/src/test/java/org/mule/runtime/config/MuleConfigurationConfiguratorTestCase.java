@@ -10,11 +10,15 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 import static org.mule.tck.junit4.matcher.IsEmptyOptional.empty;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_PROPERTIES_STORY;
@@ -44,10 +48,13 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.api.time.TimeSupplier;
-import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.xml.AstXmlParser;
+import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.internal.bean.TestCustomServiceDependingOnMuleConfiguration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -64,22 +71,22 @@ import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToInputStream;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
 import org.mule.tck.junit4.matcher.EventMatcher;
 
 import java.util.Calendar;
-
-import org.slf4j.Logger;
-
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import java.util.Set;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.slf4j.Logger;
 
 @Feature(CONFIGURATION_PROPERTIES)
 @Story(COMPONENT_CONFIGURATION_PROPERTIES_STORY)
@@ -284,23 +291,53 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
 
   private void initMuleContext(String configPath) throws MuleException {
     String[] configFiles = configPath != null ? new String[] {configPath} : new String[] {};
+
     muleContext = (MuleContextWithRegistry) new DefaultMuleContextFactory()
         .createMuleContext(testServicesConfigurationBuilder,
                            new AbstractConfigurationBuilder() {
 
                              @Override
                              protected void doConfigure(MuleContext muleContext) {
-                               muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_TIME_SUPPLIER,
-                                                                                                timeSupplier);
+                               muleContext.getCustomizationService()
+                                   .interceptDefaultServiceImpl(OBJECT_TIME_SUPPLIER, si -> si.overrideServiceImpl(timeSupplier));
                                muleContext.getCustomizationService()
                                    .registerCustomServiceClass(CUSTOM_SERVICE_DEPENDING_ON_MULE_CONFIGURATION,
                                                                TestCustomServiceDependingOnMuleConfiguration.class);
                              }
                            },
                            new MockExtensionManagerConfigurationBuilder(singleton(getExtensionModel())),
-                           new SpringXmlConfigurationBuilder(configFiles, emptyMap()));
+                           new AppParserConfigurationBuilder(configFiles));
     muleContext.start();
     muleContext.getRegistry().lookupByType(Calendar.class);
+  }
+
+  private static class AppParserConfigurationBuilder extends AbstractConfigurationBuilder implements AstXmlParserSupplier {
+
+    private final String[] configFiles;
+
+    private AppParserConfigurationBuilder(String[] configFiles) {
+      this.configFiles = configFiles;
+    }
+
+    @Override
+    protected void doConfigure(MuleContext muleContext) throws Exception {
+      ArtifactAst artifactAst;
+      if (configFiles.length == 0) {
+        artifactAst = emptyArtifact();
+      } else {
+        artifactAst = parseAndBuildAppExtensionModel(configFiles, this, muleContext.getExtensionManager().getExtensions(), false,
+                                                     muleContext, null);
+      }
+      new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false, false)
+          .configure(muleContext);
+    }
+
+    public AstXmlParser getParser(Set<ExtensionModel> extensions, boolean disableValidations) {
+      return AstXmlParser.builder()
+          .withArtifactType(APPLICATION)
+          .withExtensionModels(extensions)
+          .build();
+    }
   }
 
   /**
