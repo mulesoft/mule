@@ -9,6 +9,9 @@ package org.mule.runtime.module.artifact.activation.internal.nativelib;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import static java.lang.String.valueOf;
+import static java.lang.System.currentTimeMillis;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 
@@ -39,7 +42,9 @@ public class DefaultNativeLibraryFinderFactoryTestCase extends AbstractMuleTestC
     testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getAbsolutePath(),
                            () -> {
                              NativeLibraryFinder nativeLibraryFinder =
-                                 nativeLibraryFinderFactory.create("testApp", new URL[0]);
+                                 nativeLibraryFinderFactory.create("testApp",
+                                                                   valueOf(currentTimeMillis()),
+                                                                   new URL[0]);
 
                              assertThat(nativeLibraryFinder,
                                         instanceOf(expectedNativeLibraryFinderClass));

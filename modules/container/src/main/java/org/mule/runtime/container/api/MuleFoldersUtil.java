@@ -220,4 +220,13 @@ public class MuleFoldersUtil {
   public static File getAppNativeLibrariesTempFolder(String appName) {
     return new File(getNativeLibrariesTempFolder(), appName);
   }
+
+  /**
+   * @param appName    name of the application to look for
+   * @param identifier of the application instance
+   * @return the native libraries folder in the execution folder with the given name.
+   */
+  public static File getAppNativeLibrariesTempFolder(String appName, String identifier) {
+    return new File(new File(getNativeLibrariesTempFolder(), appName), identifier);
+  }
 }
