@@ -16,9 +16,10 @@ public interface NativeLibraryFinderFactory {
   /**
    * Creates a native library finder for a given Mule artifact
    *
-   * @param name name of the artifact owning the finder
-   * @param urls all the URLs that are contained on the artifact's class loader
+   * @param name       name of the artifact owning the finder
+   * @param identifier of the artifact
+   * @param urls       all the URLs that are contained on the artifact's class loader
    * @return a non null instance
    */
-  NativeLibraryFinder create(String name, URL[] urls);
+  NativeLibraryFinder create(String name, String identifier, URL[] urls);
 }

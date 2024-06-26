@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,19 +34,21 @@ public class RetryScheduledFileDeletionTask implements Runnable {
   @Override
   public void run() {
     int attempt = attempts.incrementAndGet();
-    try {
-      performAction();
+    if (performAction()) {
       scheduler.shutdown();
-    } catch (Exception e) {
-      LOGGER.info(format("Attempt %s. Failed to perform action. Retrying... %s Exception: %s",
-                         attempt, System.lineSeparator(), e.getMessage()));
+    } else {
+      String message;
       if (attempt >= maxAttempts) {
+        message = "Failed to perform the action. No further retries will be made.";
         scheduler.shutdown();
+      } else {
+        message = format("Attempt %s. Failed to perform the action. Retrying...", attempt);
       }
+      LOGGER.info(message);
     }
   }
 
-  private void performAction() {
-    fileDeletion.doAction();
+  private boolean performAction() {
+    return fileDeletion.doAction();
   }
 }

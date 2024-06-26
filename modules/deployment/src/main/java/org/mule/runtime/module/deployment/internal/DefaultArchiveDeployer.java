@@ -58,12 +58,15 @@ import org.slf4j.Logger;
 public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T extends DeployableArtifact<D>>
     implements ArchiveDeployer<D, T> {
 
-  public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
   private static final Logger logger = getLogger(DefaultArchiveDeployer.class);
   private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
   public static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
+  private static final int CORE_POOL_SIZE = 1;
+  private static final int MAX_ATTEMPTS = 5;
+  private static final int INITIAL_DELAY = 10;
+  private static final int DELAY = 10;
 
   private final ArtifactDeployer<T> deployer;
   private final ArtifactArchiveInstaller artifactArchiveInstaller;
@@ -314,16 +317,14 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
         final String appName = artifact.getDescriptor().getDataFolderName();
-        final File dataFolder = getAppDataFolder(appName);
+        final File appDataFolder = getAppDataFolder(appName);
         try {
-          deleteDirectory(dataFolder);
-          if (getAppNativeLibrariesTempFolder(appName).exists()) {
-            executeSchedulerFileDeletion(appName);
-          }
+          deleteDirectory(appDataFolder);
+          deleteNativeLibraries(artifact);
         } catch (IOException e) {
           logger.warn(
                       format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
-                             dataFolder, artifact.getArtifactName()),
+                             appDataFolder, artifact.getArtifactName()),
                       e);
         }
       }
@@ -336,11 +337,32 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     }
   }
 
-  private void executeSchedulerFileDeletion(String appName) {
-    ScheduledExecutorService scheduler = newScheduledThreadPool(1);
+  private void deleteNativeLibraries(T artifact) {
+    final String appName = artifact.getDescriptor().getDataFolderName();
+    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appName, artifact.getDescriptor().getIdentifier());
+
+    if (appNativeLibrariesFolder.exists()) {
+      try {
+        deleteDirectory(appNativeLibrariesFolder);
+      } catch (IOException e) {
+        logger.warn(
+                    format("Cannot delete native libraries data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used. Scheduling a task to removed them.",
+                           appNativeLibrariesFolder, artifact.getArtifactName()),
+                    e);
+        executeSchedulerFileDeletion(artifact);
+      }
+    }
+  }
+
+  private void executeSchedulerFileDeletion(T artifact) {
+    final String appName = artifact.getDescriptor().getDataFolderName();
+    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appName, artifact.getDescriptor().getIdentifier());
+
+    ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
     RetryScheduledFileDeletionTask retryTask =
-        new RetryScheduledFileDeletionTask(scheduler, 5, new NativeLibrariesFileDeletion(appName));
-    scheduler.scheduleWithFixedDelay(retryTask, 10, 10, SECONDS);
+        new RetryScheduledFileDeletionTask(scheduler, MAX_ATTEMPTS,
+                                           new NativeLibrariesFileDeletion(appName, appNativeLibrariesFolder));
+    scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
   }
 
   private void logRequestToUndeployArtifact(T artifact) {

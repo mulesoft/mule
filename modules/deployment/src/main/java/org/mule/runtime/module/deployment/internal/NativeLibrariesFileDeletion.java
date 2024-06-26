@@ -7,39 +7,38 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static java.lang.String.format;
-import static org.apache.commons.io.FileUtils.listFiles;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppNativeLibrariesTempFolder;
+
+import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
-import java.util.Collection;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 
 public class NativeLibrariesFileDeletion {
 
   private final String applicationName;
-  private final String[] nativeLibrariesExtensions = {"dylib", "dll", "jnilib", "so"};
+  private final File appNativeLibrariesFolder;
   private static final Logger LOGGER = getLogger(NativeLibrariesFileDeletion.class);
 
-  public NativeLibrariesFileDeletion(String applicationName) {
+  public NativeLibrariesFileDeletion(String applicationName, File appNativeLibrariesFolder) {
     this.applicationName = applicationName;
+    this.appNativeLibrariesFolder = appNativeLibrariesFolder;
   }
 
-  public void doAction() {
-    File appNativeLibrariesTempFolder = getAppNativeLibrariesTempFolder(applicationName);
-    Collection<File> nativeLibraries =
-        listFiles(appNativeLibrariesTempFolder, nativeLibrariesExtensions, true);
-    for (File nativeLib : nativeLibraries) {
-      try {
-        if (nativeLib.delete()) {
-          LOGGER.info(format("Native library file deleted: '%s'", nativeLib.getAbsolutePath()));
-        }
-      } catch (Exception e) {
-        LOGGER.warn(
-                    format("Cannot delete native library '%s' while undeploying the artifact '%s'. This could be related to some files still being used and can cause a memory leak.",
-                           nativeLib, applicationName));
-      }
+  public boolean doAction() {
+    boolean actionPerformed = true;
+
+    try {
+      deleteDirectory(appNativeLibrariesFolder);
+    } catch (IOException e) {
+      LOGGER.warn(
+                  format("Cannot delete App Native Libraries folder '%s' from artifact '%s'. This could be related to some files still being used. Exception: %s",
+                         appNativeLibrariesFolder, applicationName, e.getMessage()));
+      actionPerformed = false;
     }
+
+    return actionPerformed;
   }
 }
