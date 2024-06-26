@@ -38,6 +38,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -244,6 +245,29 @@ public final class JpmsUtils {
 
   private static boolean useModuleLayer() {
     return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "" + (JAVA_MAJOR_VERSION >= 17)));
+  }
+
+  /**
+   * Creates a {@link ModuleLayer} for the given {@code modulePathEntries} and with the given {@code parent}.
+   * <p>
+   * Note: By definition, automatic modules have transitive readability on ALL other modules on the same layer and the parents.
+   * This may cause a situation where a layer that is supposed to be isolated will instead be able to read all the modules in the
+   * parent layers. To prevent this, the {@code isolateDependenciesInTheirOwnLayer} parameter must be passed as {@code true}.
+   *
+   * @param modulePathEntries                  the URLs from which to find the modules
+   * @param parent                             the parent class loader for delegation
+   * @param parentLayer                        a layer of modules that will be visible from the newly created {@link ModuleLayer}.
+   * @param isolateDependenciesInTheirOwnLayer whether an additional {@link ModuleLayer} having only the {@code boot} layer as
+   *                                           parent will be created for modules that need to be isolated.
+   * @param filterParentModules                whether modules already present in parent layers should be removed from the given
+   *                                           {@code modulePathEntries}.
+   * @return a new {@link ModuleLayer}.
+   */
+  public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, Optional<ModuleLayer> parentLayer,
+                                              boolean isolateDependenciesInTheirOwnLayer,
+                                              boolean filterParentModules) {
+    return createModuleLayer(modulePathEntries, parent, parentLayer.map(Collections::singletonList).orElse(emptyList()),
+                             isolateDependenciesInTheirOwnLayer, filterParentModules);
   }
 
   /**
