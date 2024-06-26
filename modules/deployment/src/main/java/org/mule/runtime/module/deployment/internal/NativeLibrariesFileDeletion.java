@@ -12,7 +12,6 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.slf4j.Logger;
 
@@ -32,7 +31,7 @@ public class NativeLibrariesFileDeletion {
 
     try {
       deleteDirectory(appNativeLibrariesFolder);
-    } catch (IOException e) {
+    } catch (Exception e) {
       LOGGER.warn(
                   format("Cannot delete App Native Libraries folder '%s' from artifact '%s'. This could be related to some files still being used. Exception: %s",
                          appNativeLibrariesFolder, applicationName, e.getMessage()));

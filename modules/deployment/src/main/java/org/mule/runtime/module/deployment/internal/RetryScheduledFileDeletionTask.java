@@ -37,14 +37,12 @@ public class RetryScheduledFileDeletionTask implements Runnable {
     if (performAction()) {
       scheduler.shutdown();
     } else {
-      String message;
       if (attempt >= maxAttempts) {
-        message = "Failed to perform the action. No further retries will be made.";
+        LOGGER.error("Failed to perform the action. No further retries will be made.");
         scheduler.shutdown();
       } else {
-        message = format("Attempt %s. Failed to perform the action. Retrying...", attempt);
+        LOGGER.warn(format("Attempt %s. Failed to perform the action. Retrying...", attempt));
       }
-      LOGGER.info(message);
     }
   }
 

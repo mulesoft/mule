@@ -119,7 +119,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
       domainClassLoader = getDefaultDomainClassLoader(regionClassLoader, regionClassLoader.getClassLoaderLookupPolicy());
     } else {
       NativeLibraryFinder nativeLibraryFinder =
-          nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getIdentifier(),
+          nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getLoadedNativeLibrariesFolderName(),
                                             descriptor.getClassLoaderConfiguration().getUrls());
       domainClassLoader =
           getCustomDomainClassLoader(regionClassLoader, descriptor, nativeLibraryFinder, additionalClassloaderUrls);
@@ -243,7 +243,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     MuleDeployableArtifactClassLoader appClassLoader =
         new MuleApplicationClassLoader(artifactId, descriptor, regionClassLoader,
                                        nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
-                                                                         descriptor.getIdentifier(),
+                                                                         descriptor.getLoadedNativeLibrariesFolderName(),
                                                                          descriptor.getClassLoaderConfiguration().getUrls()),
                                        resourcesPath,
                                        classLoaderLookupPolicy);

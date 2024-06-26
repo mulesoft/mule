@@ -30,11 +30,11 @@ public class DefaultNativeLibraryFinderFactory implements NativeLibraryFinderFac
   }
 
   @Override
-  public NativeLibraryFinder create(String name, String identifier, URL[] urls) {
+  public NativeLibraryFinder create(String name, String folderName, URL[] urls) {
     checkArgument(!isEmpty(name), "appName cannot be empty");
     checkArgument(urls != null, "urls cannot be null");
 
-    File tempFolder = new File(new File(tempFolderChildFunction.apply("native-libraries"), name), identifier);
+    File tempFolder = new File(new File(tempFolderChildFunction.apply("native-libraries"), name), folderName);
     return new ArtifactCopyNativeLibraryFinder(tempFolder, urls);
   }
 
