@@ -233,9 +233,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
     resolveSnapshotVersionsToTimestampedFromClassPath(applicationSharedLibUrls, context.getClassPathURLs());
 
-    return new ArtifactsUrlClassification(containerUrls.getMuleDependencyUrls(),
-                                          containerUrls.getOptDependencyUrls(),
+    return new ArtifactsUrlClassification(containerUrls.getMuleApisOptDependencyUrls(),
                                           containerUrls.getMuleApisDependencyUrls(),
+                                          containerUrls.getMuleDependencyUrls(),
+                                          containerUrls.getOptDependencyUrls(),
                                           serviceUrlClassifications,
                                           testRunnerLibUrls,
                                           applicationLibUrls,
@@ -471,6 +472,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
     logger.debug("Resolving dependencies for container using exclusion filter patterns: {}", excludedFilterPattern);
 
     List<URL> containerMuleApisUrls;
+    List<URL> containerMuleApisOptUrls;
     List<URL> containerMuleUrls;
     List<URL> containerOptUrls;
     try {
@@ -478,12 +480,18 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
           dependencyResolver.resolveContainerDependencies(null, directDependencies, managedDependencies,
                                                           excludedFilterPattern,
                                                           rootArtifactRemoteRepositories);
+      containerMuleApisOptUrls = resolvedDependencies.getMuleApisOptDependencyUrls();
       containerMuleApisUrls = resolvedDependencies.getMuleApisDependencyUrls();
       containerMuleUrls = resolvedDependencies.getMuleDependencyUrls();
       containerOptUrls = resolvedDependencies.getOptDependencyUrls();
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
+    containerMuleApisOptUrls = containerMuleApisOptUrls.stream().filter(url -> {
+      String file = toFile(url).getAbsolutePath();
+      return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
+                                                                                                                  ZIP_EXTENSION));
+    }).collect(toList());
     containerMuleApisUrls = containerMuleApisUrls.stream().filter(url -> {
       String file = toFile(url).getAbsolutePath();
       return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
@@ -511,7 +519,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
     resolveSnapshotVersionsToTimestampedFromClassPath(containerMuleUrls, context.getClassPathURLs());
 
-    return new ContainerDependencies(containerOptUrls, containerMuleUrls, containerMuleApisUrls);
+    return new ContainerDependencies(containerMuleApisOptUrls, containerMuleApisUrls, containerOptUrls, containerMuleUrls);
   }
 
   /**

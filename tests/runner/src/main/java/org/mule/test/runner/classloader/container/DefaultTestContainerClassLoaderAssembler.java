@@ -10,8 +10,10 @@ import static org.mule.runtime.container.internal.PreFilteredContainerClassLoade
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
 import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 
 import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
@@ -25,6 +27,7 @@ import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLo
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
@@ -39,17 +42,20 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
   private ModuleRepository moduleRepository;
   private final List<String> extraBootPackages;
   private final Set<String> extraPrivilegedArtifacts;
-  private final URL[] muleUrls;
-  private final URL[] optUrls;
+  private final URL[] muleApisOptUrls;
   private final URL[] muleApisUrls;
+  private final URL[] optUrls;
+  private final URL[] muleUrls;
 
   public DefaultTestContainerClassLoaderAssembler(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
-                                                  List<URL> muleUrls, List<URL> optUrls, List<URL> muleApisUrls) {
+                                                  List<URL> muleApisOptUrls, List<URL> muleApisUrls, List<URL> optUrls,
+                                                  List<URL> muleUrls) {
     this.extraBootPackages = extraBootPackages;
     this.extraPrivilegedArtifacts = extraPrivilegedArtifacts;
-    this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
-    this.optUrls = optUrls.toArray(new URL[optUrls.size()]);
+    this.muleApisOptUrls = muleApisOptUrls.toArray(new URL[muleApisOptUrls.size()]);
     this.muleApisUrls = muleApisUrls.toArray(new URL[muleApisUrls.size()]);
+    this.optUrls = optUrls.toArray(new URL[optUrls.size()]);
+    this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
   }
 
   /**
@@ -73,20 +79,27 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
-    ClassLoader muleApisClassloader = createModuleLayerClassLoader(muleApisUrls, launcherArtifact);
+    ClassLoader muleApisOptClassloader = createModuleLayerClassLoader(muleApisOptUrls, launcherArtifact);
 
-    Class<?> muleImplementationsLoaderUtilsClass;
-    try {
-      muleImplementationsLoaderUtilsClass =
-          muleApisClassloader.loadClass("org.mule.runtime.api.util.classloader.MuleImplementationLoaderUtils");
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
-    }
+    Class<?> muleApisOptClass = loadClass("org.apache.commons.lang3.StringUtils", muleApisOptClassloader);
 
-    ClassLoader containerSystemClassloader = createModuleLayerClassLoader(optUrls, muleUrls,
-                                                                          MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                                                          muleApisClassloader,
-                                                                          of(muleImplementationsLoaderUtilsClass));
+    ClassLoader muleApisClassloader =
+        createModuleLayerClassLoader(muleApisUrls, muleApisOptClassloader,
+                                     singletonList(muleApisOptClass));
+
+    ClassLoader optClassloader =
+        createModuleLayerClassLoader(optUrls, muleApisOptClassloader,
+                                     singletonList(muleApisOptClass));
+
+    Class<?> muleImplementationsLoaderUtilsClass =
+        loadClass("org.mule.runtime.api.util.classloader.MuleImplementationLoaderUtils", muleApisClassloader);
+
+    Class<?> optClass =
+        loadClass("org.mule.maven.client.api.MavenClient", optClassloader);
+
+    ClassLoader containerSystemClassloader = createModuleLayerClassLoader(muleUrls, muleApisClassloader,
+                                                                          asList(muleImplementationsLoaderUtilsClass,
+                                                                                 optClass));
 
     try {
       muleImplementationsLoaderUtilsClass.getMethod("setMuleImplementationsLoader", ClassLoader.class)
@@ -101,6 +114,14 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
 
     return new ContainerClassLoaderFactory(testContainerClassLoaderCreator, cl -> launcherArtifact)
         .createContainerClassLoader(containerSystemClassloader);
+  }
+
+  private Class<?> loadClass(String name, ClassLoader classLoader) {
+    try {
+      return classLoader.loadClass(name);
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -224,16 +225,16 @@ public class DependencyResolver implements AutoCloseable {
                                                             List<String> excludedFilterPattern,
                                                             List<RemoteRepository> remoteRepositories)
       throws DependencyCollectionException, DependencyResolutionException {
-    List<File> muleApisLayerDependencies = getMuleApisFiles(unmodifiableList(excludedFilterPattern));
+    DependencyNode muleApisNode = getMuleApisNode(unmodifiableList(excludedFilterPattern));
 
     final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
-    DependencyNode node =
+    DependencyNode muleLibsNode =
         resolveDependencyNode(root, directDependencies, managedDependencies, dependencyFilter, remoteRepositories);
 
-    return getContainerFiles(node, muleApisLayerDependencies);
+    return getContainerFiles(muleApisNode, muleLibsNode);
   }
 
-  private List<File> getMuleApisFiles(List<String> excludedFilterPattern)
+  private DependencyNode getMuleApisNode(List<String> excludedFilterPattern)
       throws DependencyCollectionException, DependencyResolutionException {
     try {
       final List<String> apisExcludedFilterPattern = new ArrayList<>(excludedFilterPattern);
@@ -243,15 +244,8 @@ public class DependencyResolver implements AutoCloseable {
       final String groupId = getBoolean("use.mule.apis.ee.bom") ? "com.mulesoft.mule.distributions" : "org.mule.distributions";
       ArtifactDescriptorResult pom = readArtifactDescriptor(new DefaultArtifact(groupId, "mule-runtime-split-bom", "pom",
                                                                                 "4.8.0-SNAPSHOT"));
-      DependencyNode node = resolveDependencyNode(null, pom.getDependencies(), pom.getManagedDependencies(), dependencyFilter,
-                                                  pom.getRepositories());
-      PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-      node.accept(nlg);
-
-      return nlg.getNodes().stream()
-          .filter(depNode -> depNode.getArtifact().getFile() != null)
-          .map(depNode -> depNode.getArtifact().getFile().getAbsoluteFile())
-          .collect(toList());
+      return resolveDependencyNode(null, pom.getDependencies(), pom.getManagedDependencies(), dependencyFilter,
+                                   pom.getRepositories());
     } catch (ArtifactDescriptorException e) {
       throw new RuntimeException(e);
     }
@@ -384,19 +378,29 @@ public class DependencyResolver implements AutoCloseable {
   /**
    * Traverse the {@link DependencyNode} to get the files for each artifact.
    *
-   * @param node                      {@link DependencyNode} that represents the dependency graph
-   * @param muleApisLayerDependencies
+   * @param muleApisNode
+   * @param muleLibsNode {@link DependencyNode} that represents the dependency graph
    * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jars urls, second
    *         are jar urls for third parties.
    */
-  private ContainerDependencies getContainerFiles(DependencyNode node, List<File> muleApisLayerDependencies) {
-    PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-    node.accept(nlg);
-
-    // TODO - can we rely on this or it might be a subset and that matters?
-    List<URL> muleApisDependencyUrls = muleApisLayerDependencies.stream().map(this::toUrl).collect(toList());
+  private ContainerDependencies getContainerFiles(DependencyNode muleApisNode, DependencyNode muleLibsNode) {
+    LinkedHashSet<URL> muleApisDependencyUrls = new LinkedHashSet<>();
+    LinkedHashSet<URL> muleApisOptDependencyUrls = new LinkedHashSet<>();
     LinkedHashSet<URL> muleDependencyUrls = new LinkedHashSet<>();
     LinkedHashSet<URL> optDependencyUrls = new LinkedHashSet<>();
+
+    splitMuleAndOpt(muleApisNode, muleApisDependencyUrls, muleApisOptDependencyUrls);
+    splitMuleAndOpt(muleLibsNode, muleDependencyUrls, optDependencyUrls);
+
+    return new ContainerDependencies(new ArrayList<>(muleApisOptDependencyUrls), new ArrayList<>(muleApisDependencyUrls),
+                                     new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls));
+  }
+
+  private void splitMuleAndOpt(DependencyNode node, Set<URL> muleDependencyUrls, Set<URL> optDependencyUrls) {
+    // TODO see if the missing muleApisLayerDependencies.contains(absoluteFile) affects
+
+    PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+    node.accept(nlg);
 
     nlg.getNodes()
         .stream()
@@ -408,19 +412,12 @@ public class DependencyResolver implements AutoCloseable {
 
           final File absoluteFile = artifact.getFile().getAbsoluteFile();
 
-          if (muleApisLayerDependencies.contains(absoluteFile)) {
-            return;
-          }
-
           if (isMuleContainerGroupId(artifact.getGroupId())) {
             muleDependencyUrls.add(toUrl(absoluteFile));
           } else {
             optDependencyUrls.add(toUrl(absoluteFile));
           }
         });
-
-    return new ContainerDependencies(new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls),
-                                     muleApisDependencyUrls);
   }
 
   /**
@@ -442,14 +439,25 @@ public class DependencyResolver implements AutoCloseable {
    */
   public static class ContainerDependencies {
 
+    private final List<URL> muleApisDependencyUrls;
+    private final List<URL> muleApisOptDependencyUrls;
     private final List<URL> muleDependencyUrls;
     private final List<URL> optDependencyUrls;
-    private final List<URL> muleApisDependencyUrls;
 
-    ContainerDependencies(List<URL> optDependencyUrls, List<URL> muleDependencyUrls, List<URL> muleApisDependencyUrls) {
+    ContainerDependencies(List<URL> muleApisDependencyUrls, List<URL> muleApisOptDependencyUrls, List<URL> optDependencyUrls,
+                          List<URL> muleDependencyUrls) {
+      this.muleApisDependencyUrls = unmodifiableList(muleApisDependencyUrls);
+      this.muleApisOptDependencyUrls = unmodifiableList(muleApisOptDependencyUrls);
       this.muleDependencyUrls = unmodifiableList(muleDependencyUrls);
       this.optDependencyUrls = unmodifiableList(optDependencyUrls);
-      this.muleApisDependencyUrls = unmodifiableList(muleApisDependencyUrls);
+    }
+
+    public List<URL> getMuleApisDependencyUrls() {
+      return muleApisDependencyUrls;
+    }
+
+    public List<URL> getMuleApisOptDependencyUrls() {
+      return muleApisOptDependencyUrls;
     }
 
     public List<URL> getOptDependencyUrls() {
@@ -459,11 +467,6 @@ public class DependencyResolver implements AutoCloseable {
     public List<URL> getMuleDependencyUrls() {
       return muleDependencyUrls;
     }
-
-    public List<URL> getMuleApisDependencyUrls() {
-      return muleApisDependencyUrls;
-    }
-
   }
 
   // Implementation note: this must be kept consistent with the equivalent logic in embedded-api and the distro assemblies

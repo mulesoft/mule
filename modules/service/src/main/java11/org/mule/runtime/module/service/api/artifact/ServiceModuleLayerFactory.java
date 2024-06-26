@@ -11,6 +11,7 @@ import static org.mule.runtime.jpms.api.JpmsUtils.openToModule;
 
 import static java.lang.ModuleLayer.boot;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 import org.mule.api.annotation.jpms.RequiredOpens;
@@ -26,6 +27,7 @@ import org.mule.runtime.module.service.internal.artifact.ModuleLayerGraph;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -70,7 +72,7 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
     LOGGER.debug(" >> Creating ModuleLayer for service: '" + artifactId + "'...");
     ModuleLayer artifactLayer = createModuleLayer(classLoaderConfigurationUrls, parent,
-                                                  parentLayer, true, true);
+                                                  parentLayer.map(Collections::singletonList).orElse(emptyList()), true, true);
 
     final Class<? extends Annotation> serviceModuleAnnotationClass = getServiceModuleAnnotationClass(parent);
 
