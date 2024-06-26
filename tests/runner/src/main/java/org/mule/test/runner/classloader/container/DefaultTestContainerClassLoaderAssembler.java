@@ -14,9 +14,10 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
 
 import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.JavaVersion;
 
 /**
  * Default implementation of {@link TestContainerClassLoaderAssembler}.
@@ -87,8 +89,9 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         createModuleLayerClassLoader(muleApisUrls, muleApisOptClassloader,
                                      singletonList(muleApisOptClass));
 
+    ClassLoader optClassloaderParent = isJavaVersionAtLeast(JAVA_17) ? muleApisOptClassloader : muleApisClassloader;
     ClassLoader optClassloader =
-        createModuleLayerClassLoader(optUrls, muleApisOptClassloader,
+        createModuleLayerClassLoader(optUrls, optClassloaderParent,
                                      singletonList(muleApisOptClass));
 
     Class<?> muleImplementationsLoaderUtilsClass =
@@ -97,7 +100,8 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
     Class<?> optClass =
         loadClass("org.mule.maven.client.api.MavenClient", optClassloader);
 
-    ClassLoader containerSystemClassloader = createModuleLayerClassLoader(muleUrls, muleApisClassloader,
+    ClassLoader containerSystemClassloaderParent = isJavaVersionAtLeast(JAVA_17) ? muleApisClassloader : optClassloader;
+    ClassLoader containerSystemClassloader = createModuleLayerClassLoader(muleUrls, containerSystemClassloaderParent,
                                                                           asList(muleImplementationsLoaderUtilsClass,
                                                                                  optClass));
 
