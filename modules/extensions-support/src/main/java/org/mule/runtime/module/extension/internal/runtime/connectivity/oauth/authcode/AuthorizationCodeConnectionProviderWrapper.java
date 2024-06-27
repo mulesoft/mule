@@ -86,6 +86,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   @Override
   public void invalidate(String resourceOwnerId) {
     oauthHandler.invalidate(oauthConfig.getOwnerConfigName(), resourceOwnerId);
+    dancer.getContextForResourceOwner(resourceOwnerId).setIsTokenInvalidated(true);
   }
 
   @Override

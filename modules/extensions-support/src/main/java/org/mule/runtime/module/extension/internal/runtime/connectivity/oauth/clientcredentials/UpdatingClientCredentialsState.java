@@ -28,11 +28,13 @@ public class UpdatingClientCredentialsState
   private ClientCredentialsState delegate;
   private boolean invalidated = false;
   private ClientCredentialsListener clientCredentialsListener;
+  private ResourceOwnerOAuthContext context;
 
   public UpdatingClientCredentialsState(ClientCredentialsOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {
     this.dancer = dancer;
+    this.context = initialContext;
     updateDelegate(initialContext);
     clientCredentialsListener = new ClientCredentialsListener() {
 
@@ -45,6 +47,9 @@ public class UpdatingClientCredentialsState
       @Override
       public void onTokenInvalidated() {
         invalidated = true;
+        dancer.invalidateContext();
+        dancer.getContext().setIsTokenInvalidated(true);
+        context.setIsTokenInvalidated(true);
       }
     };
     dancer.addListener(clientCredentialsListener);
@@ -57,7 +62,7 @@ public class UpdatingClientCredentialsState
 
   @Override
   public String getAccessToken() {
-    if (invalidated) {
+    if (invalidated || dancer.getContext().getIsTokenInvalidated() || context.getIsTokenInvalidated()) {
       try {
         dancer.accessToken().get();
         updateDelegate(dancer.getContext());
