@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.memoize;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -92,8 +94,15 @@ public class SpringConfigurationComponentLocator implements ConfigurationCompone
   @Override
   public List<Component> find(ComponentIdentifier componentIdentifier) {
     return componentsMap.values().stream()
-        .filter(component -> component.getLocation().getComponentIdentifier().getIdentifier().equals(componentIdentifier))
-        .collect(toList());
+        .filter(component -> {
+          TypedComponentIdentifier identifier;
+          try {
+            identifier = component.getLocation().getComponentIdentifier();
+          } catch (NoSuchElementException e) {
+            return false;
+          }
+          return identifier.getIdentifier().equals(componentIdentifier);
+        }).collect(toList());
   }
 
   /**
