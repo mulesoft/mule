@@ -1,4 +1,16 @@
 {
+  "4.6.5": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContextWithRefreshState",
+          "justification": "Needed for runtime upgrades to avoid deserialization problems"
+
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "_comment": "TODO W-13186030 Review these changes",
