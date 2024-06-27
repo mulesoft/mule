@@ -71,19 +71,19 @@ public final class ReflectiveHttpConfigBasedRequester {
                                                          String url,
                                                          Map<String, String> headers,
                                                          InputStream body) {
-    DefaultOperationParametersBuilder params = builder().configName(configName)
-        .addParameter("method", method)
-        .addParameter("url", url)
-        .addParameter("headers", new MultiMap<>(headers))
-        // TODO(MULE-13066): REMOVE THIS LINE WHEN DONE!
-        .addParameter("targetValue", "#[payload]");
-
-    if (body != null) {
-      params.addParameter("body", new TypedValue<>(body, INPUT_STREAM));
-    }
-
     try {
-      Result<Object, Object> result = client.executeAsync("HTTP", "request", params.build()).get();
+      Result<Object, Object> result = client.execute("HTTP", "request", parameterizer -> {
+        parameterizer.withConfigRef(configName);
+        parameterizer.withParameter("method", method);
+        parameterizer.withParameter("url", url);
+        parameterizer.withParameter("headers", new MultiMap<>(headers));
+        // TODO(MULE-13066): REMOVE THIS LINE WHEN DONE!
+        parameterizer.withParameter("targetValue", "#[payload]");
+
+        if (body != null) {
+          parameterizer.withParameter("body", new TypedValue<>(body, INPUT_STREAM));
+        }
+      }).get();
       Map<String, String> httpHeaders = getHttpHeaders(result);
       InputStream content = getContent(result);
       return new Pair<>(content, httpHeaders);
