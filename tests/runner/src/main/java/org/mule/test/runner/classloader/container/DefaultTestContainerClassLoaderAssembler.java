@@ -6,13 +6,10 @@
  */
 package org.mule.test.runner.classloader.container;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.RESOLVE_MULE_IMPLEMENTATIONS_LOADER_DYNAMICALLY;
 import static org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator.BOOT_PACKAGES;
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
 import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
 
-import static java.lang.System.clearProperty;
-import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
@@ -31,13 +28,11 @@ import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLo
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.JavaVersion;
 
 /**
  * Default implementation of {@link TestContainerClassLoaderAssembler}.
@@ -108,18 +103,11 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
                                                                           asList(muleImplementationsLoaderUtilsClass,
                                                                                  optClass));
 
-    String originalValue = setProperty(RESOLVE_MULE_IMPLEMENTATIONS_LOADER_DYNAMICALLY, "true");
     try {
       muleImplementationsLoaderUtilsClass.getMethod("setMuleImplementationsLoader", ClassLoader.class)
           .invoke(null, containerSystemClassloader);
     } catch (Exception e) {
       throw new RuntimeException(e);
-    } finally {
-      if (originalValue != null) {
-        setProperty(RESOLVE_MULE_IMPLEMENTATIONS_LOADER_DYNAMICALLY, originalValue);
-      } else {
-        clearProperty(RESOLVE_MULE_IMPLEMENTATIONS_LOADER_DYNAMICALLY);
-      }
     }
 
     TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =
