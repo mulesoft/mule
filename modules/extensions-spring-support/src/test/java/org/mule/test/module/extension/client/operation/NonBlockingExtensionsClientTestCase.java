@@ -8,9 +8,12 @@ package org.mule.test.module.extension.client.operation;
 
 import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
 import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.ExtensionsClientStory.NON_BLOCKING_CLIENT;
+import static org.mule.test.runner.classloader.container.DefaultTestContainerClassLoaderAssembler.TEST_RUNNER_LEGACY_LAYER_HIERARCHY_MODE;
 
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+import org.mule.test.runner.RunnerConfigSystemProperty;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -20,6 +23,15 @@ import io.qameta.allure.Story;
 
 @Feature(EXTENSIONS_CLIENT)
 @Story(NON_BLOCKING_CLIENT)
+@ArtifactClassLoaderRunnerConfig(
+    // TODO - analyze if applicationSharedRuntimeLibs can be changed from `readAttributeFromClass` to `readAttributeFromHierarchy`
+    // to avoid this
+    applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"},
+    systemProperties = {
+        @RunnerConfigSystemProperty(
+            key = TEST_RUNNER_LEGACY_LAYER_HIERARCHY_MODE,
+            value = "true")
+    })
 public class NonBlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
 
   @Override
@@ -29,7 +41,7 @@ public class NonBlockingExtensionsClientTestCase extends ExtensionsClientTestCas
     try {
       return future.get();
     } catch (InterruptedException e) {
-      throw new RuntimeException("Failure. The test throw an exception: " + e.getMessage(), e);
+      throw new RuntimeException("Failure. The  test throw an exception: " + e.getMessage(), e);
     } catch (ExecutionException e) {
       throw e.getCause();
     }

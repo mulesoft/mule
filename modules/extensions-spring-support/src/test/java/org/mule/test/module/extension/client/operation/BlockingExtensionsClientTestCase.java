@@ -8,16 +8,28 @@ package org.mule.test.module.extension.client.operation;
 
 import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
 import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.ExtensionsClientStory.BLOCKING_CLIENT;
+import static org.mule.test.runner.classloader.container.DefaultTestContainerClassLoaderAssembler.TEST_RUNNER_LEGACY_LAYER_HIERARCHY_MODE;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+import org.mule.test.runner.RunnerConfigSystemProperty;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @Feature(EXTENSIONS_CLIENT)
 @Story(BLOCKING_CLIENT)
+@ArtifactClassLoaderRunnerConfig(
+    // TODO - analyze if applicationSharedRuntimeLibs can be changed from `readAttributeFromClass` to `readAttributeFromHierarchy`
+    // to avoid this
+    applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"},
+    systemProperties = {
+        @RunnerConfigSystemProperty(
+            key = TEST_RUNNER_LEGACY_LAYER_HIERARCHY_MODE,
+            value = "true")
+    })
 public class BlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
 
   @Override
