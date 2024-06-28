@@ -191,7 +191,6 @@
         <mule.extensions.maven.plugin.version>1.8.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.8.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
-        <exchange-mule-maven-plugin.version>0.0.23</exchange-mule-maven-plugin.version>
 
         <awaitilityVersion>3.0.0</awaitilityVersion>
 
@@ -682,10 +681,6 @@
                     </configuration>
                 </plugin>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                </plugin>
                 <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
                     where <packaging>jar</packaging> is used. -->
                 <plugin>
@@ -821,21 +816,12 @@
                     <artifactId>mule-module-maven-plugin</artifactId>
                     <version>${mule.module.maven.plugin.version}</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.revapi</groupId>
-                    <artifactId>revapi-maven-plugin</artifactId>
-                </plugin>
                 <!-- This is used in test poms -->
                 <!-- It is declared here so that version upgrading bots keep the version property up to date -->
                 <plugin>
                     <groupId>org.mule.tools.maven</groupId>
                     <artifactId>mule-maven-plugin</artifactId>
                     <version>${mule.maven.plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.mule.tools.maven</groupId>
-                    <artifactId>exchange-mule-maven-plugin</artifactId>
-                    <version>${exchange-mule-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
