@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL_PROPERTY;
+
+import static java.lang.Boolean.getBoolean;
 import static java.lang.String.format;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -15,16 +18,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 
-public class RetryScheduledFileDeletionTask implements Runnable {
+public class RetryScheduledFolderDeletionTask implements Runnable {
 
   private final ScheduledExecutorService scheduler;
   private final int maxAttempts;
   private final AtomicInteger attempts;
-  private final NativeLibrariesFileDeletion fileDeletion;
-  private static final Logger LOGGER = getLogger(RetryScheduledFileDeletionTask.class);
+  private final NativeLibrariesFolderDeletion fileDeletion;
+  private static final Logger LOGGER = getLogger(RetryScheduledFolderDeletionTask.class);
+  private static final boolean DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL =
+      getBoolean(DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL_PROPERTY);
 
-  public RetryScheduledFileDeletionTask(ScheduledExecutorService scheduler, int maxAttempts,
-                                        NativeLibrariesFileDeletion fileDeletion) {
+
+  public RetryScheduledFolderDeletionTask(ScheduledExecutorService scheduler, int maxAttempts,
+                                          NativeLibrariesFolderDeletion fileDeletion) {
     this.scheduler = scheduler;
     this.maxAttempts = maxAttempts;
     this.attempts = new AtomicInteger(0);
@@ -34,6 +40,11 @@ public class RetryScheduledFileDeletionTask implements Runnable {
   @Override
   public void run() {
     int attempt = attempts.incrementAndGet();
+
+    if (!DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL && attempt == maxAttempts) {
+      System.gc();
+    }
+
     if (performAction()) {
       scheduler.shutdown();
     } else {

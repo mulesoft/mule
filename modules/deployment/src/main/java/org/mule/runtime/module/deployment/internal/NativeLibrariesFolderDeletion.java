@@ -15,13 +15,13 @@ import java.io.File;
 
 import org.slf4j.Logger;
 
-public class NativeLibrariesFileDeletion {
+public class NativeLibrariesFolderDeletion {
 
   private final String applicationName;
   private final File appNativeLibrariesFolder;
-  private static final Logger LOGGER = getLogger(NativeLibrariesFileDeletion.class);
+  private static final Logger LOGGER = getLogger(NativeLibrariesFolderDeletion.class);
 
-  public NativeLibrariesFileDeletion(String applicationName, File appNativeLibrariesFolder) {
+  public NativeLibrariesFolderDeletion(String applicationName, File appNativeLibrariesFolder) {
     this.applicationName = applicationName;
     this.appNativeLibrariesFolder = appNativeLibrariesFolder;
   }

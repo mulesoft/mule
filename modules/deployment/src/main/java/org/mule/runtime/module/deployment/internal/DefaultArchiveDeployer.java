@@ -339,8 +339,8 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
 
   private void deleteNativeLibraries(T artifact) {
     final String appName = artifact.getDescriptor().getDataFolderName();
-    final File appNativeLibrariesFolder =
-        getAppNativeLibrariesTempFolder(appName, artifact.getDescriptor().getLoadedNativeLibrariesFolderName());
+    final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
+    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appName, loadedNativeLibrariesFolderName);
 
     if (appNativeLibrariesFolder.exists()) {
       try {
@@ -357,13 +357,13 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
 
   private void executeSchedulerFileDeletion(T artifact) {
     final String appName = artifact.getDescriptor().getDataFolderName();
-    final File appNativeLibrariesFolder =
-        getAppNativeLibrariesTempFolder(appName, artifact.getDescriptor().getLoadedNativeLibrariesFolderName());
+    final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
+    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appName, loadedNativeLibrariesFolderName);
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
-    RetryScheduledFileDeletionTask retryTask =
-        new RetryScheduledFileDeletionTask(scheduler, MAX_ATTEMPTS,
-                                           new NativeLibrariesFileDeletion(appName, appNativeLibrariesFolder));
+    RetryScheduledFolderDeletionTask retryTask =
+        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS,
+                                             new NativeLibrariesFolderDeletion(appName, appNativeLibrariesFolder));
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
   }
 
