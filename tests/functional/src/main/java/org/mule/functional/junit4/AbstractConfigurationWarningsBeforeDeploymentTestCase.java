@@ -73,14 +73,14 @@ public abstract class AbstractConfigurationWarningsBeforeDeploymentTestCase exte
     }
 
     ValidationResult validationResult = validatorBuilder()
-        .ignoreParamsWithProperties(true)
+        .ignoreParamsWithProperties(ignoreParamsWithProperties())
         .build()
         .validate(ast);
 
     validationResult.getItems()
         .stream()
         .filter(vri -> vri.getValidation().getLevel().equals(ERROR))
-        .forEach(vri -> fail(vri.getMessage()));
+        .forEach(vri -> fail(vri.getValidation() + ": " + vri.getMessage()));
 
     this.warningMessages.addAll(validationResult.getItems()
         .stream()
@@ -92,5 +92,9 @@ public abstract class AbstractConfigurationWarningsBeforeDeploymentTestCase exte
 
   public List<String> getWarningMessages() {
     return warningMessages;
+  }
+
+  public boolean ignoreParamsWithProperties() {
+    return false;
   }
 }

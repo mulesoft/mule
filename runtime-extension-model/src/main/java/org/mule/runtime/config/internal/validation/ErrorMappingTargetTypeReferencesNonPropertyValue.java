@@ -30,12 +30,6 @@ import java.util.function.Predicate;
  */
 public class ErrorMappingTargetTypeReferencesNonPropertyValue extends AbstractErrorValidation {
 
-  private final boolean enabled;
-
-  public ErrorMappingTargetTypeReferencesNonPropertyValue(boolean enabled) {
-    this.enabled = enabled;
-  }
-
   @Override
   public String getName() {
     return "Error Type references fixed";
@@ -53,11 +47,7 @@ public class ErrorMappingTargetTypeReferencesNonPropertyValue extends AbstractEr
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    if (enabled) {
-      return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent));
-    } else {
-      return c -> false;
-    }
+    return currentElemement(((Predicate<ComponentAst>) this::errorMappingPresent));
   }
 
   @Override
