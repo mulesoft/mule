@@ -16,6 +16,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 
 import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
@@ -91,7 +92,13 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
                                                                 MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
                                                                 launcherArtifact);
     } else {
-      ClassLoader muleApisOptClassloader = createModuleLayerClassLoader(muleApisOptUrls, launcherArtifact);
+      List<URL> log4jUrls = of(optUrls).filter(url -> url.toString().contains("log4j") || url.toString().contains("lmax"))
+          .collect(toList());
+      List<URL> tmpMuleApisOptUrls = of(muleApisOptUrls).collect(toList());
+      tmpMuleApisOptUrls.addAll(log4jUrls);
+      URL[] effectiveMuleApisOptUrls = tmpMuleApisOptUrls.toArray(new URL[0]);
+      URL[] effectiveOptUrls = of(optUrls).filter(url -> !url.toString().contains("log4j")).toArray(URL[]::new);
+      ClassLoader muleApisOptClassloader = createModuleLayerClassLoader(effectiveMuleApisOptUrls, launcherArtifact);
 
       Class<?> muleApisOptClass = loadClass("org.apache.commons.lang3.StringUtils", muleApisOptClassloader);
 
@@ -101,7 +108,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
 
       ClassLoader optClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisOptClassloader : muleApisClassloader;
       ClassLoader optClassloader =
-          createModuleLayerClassLoader(optUrls, optClassloaderParent,
+          createModuleLayerClassLoader(effectiveOptUrls, optClassloaderParent,
                                        singletonList(muleApisOptClass));
 
       Class<?> muleImplementationsLoaderUtilsClass =
