@@ -6,6 +6,7 @@
  */
 package org.mule.test.runner.classloader.container;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
 import static org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator.BOOT_PACKAGES;
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
 import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
@@ -18,8 +19,6 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Stream.of;
 
 import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
-import static org.apache.commons.lang3.JavaVersion.JAVA_17;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
@@ -100,7 +99,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
           createModuleLayerClassLoader(muleApisUrls, muleApisOptClassloader,
                                        singletonList(muleApisOptClass));
 
-      ClassLoader optClassloaderParent = isJavaVersionAtLeast(JAVA_17) ? muleApisOptClassloader : muleApisClassloader;
+      ClassLoader optClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisOptClassloader : muleApisClassloader;
       ClassLoader optClassloader =
           createModuleLayerClassLoader(optUrls, optClassloaderParent,
                                        singletonList(muleApisOptClass));
@@ -111,7 +110,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
       Class<?> optClass =
           loadClass("org.mule.maven.client.api.MavenClient", optClassloader);
 
-      ClassLoader containerSystemClassloaderParent = isJavaVersionAtLeast(JAVA_17) ? muleApisClassloader : optClassloader;
+      ClassLoader containerSystemClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisClassloader : optClassloader;
       containerSystemClassloader = createModuleLayerClassLoader(muleUrls, containerSystemClassloaderParent,
                                                                 asList(muleImplementationsLoaderUtilsClass,
                                                                        optClass));
