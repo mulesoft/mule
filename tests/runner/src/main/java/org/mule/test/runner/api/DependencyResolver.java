@@ -7,7 +7,6 @@
 package org.mule.test.runner.api;
 
 import static java.lang.Boolean.getBoolean;
-import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
@@ -392,13 +391,15 @@ public class DependencyResolver implements AutoCloseable {
     splitMuleAndOpt(muleApisNode, muleApisDependencyUrls, muleApisOptDependencyUrls);
     splitMuleAndOpt(muleLibsNode, muleDependencyUrls, optDependencyUrls);
 
+    // sanitize dependencies
+    optDependencyUrls.removeAll(muleApisOptDependencyUrls);
+    muleDependencyUrls.removeAll(muleApisDependencyUrls);
+
     return new ContainerDependencies(new ArrayList<>(muleApisOptDependencyUrls), new ArrayList<>(muleApisDependencyUrls),
                                      new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls));
   }
 
   private void splitMuleAndOpt(DependencyNode node, Set<URL> muleDependencyUrls, Set<URL> optDependencyUrls) {
-    // TODO see if the missing muleApisLayerDependencies.contains(absoluteFile) affects
-
     PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
     node.accept(nlg);
 
