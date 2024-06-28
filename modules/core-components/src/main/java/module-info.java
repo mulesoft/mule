@@ -26,6 +26,7 @@ module org.mule.runtime.core.components {
   // QName
   requires java.xml;
   requires reactor.core;
+  requires org.apache.commons.lang3;
   requires org.reactivestreams;
 
   exports org.mule.runtime.core.internal.routing to
