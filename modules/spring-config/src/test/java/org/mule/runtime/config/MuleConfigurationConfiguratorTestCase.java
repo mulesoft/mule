@@ -325,8 +325,8 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
       if (configFiles.length == 0) {
         artifactAst = emptyArtifact();
       } else {
-        artifactAst = parseAndBuildAppExtensionModel(configFiles, this, muleContext.getExtensionManager().getExtensions(), false,
-                                                     muleContext, null);
+        artifactAst = parseAndBuildAppExtensionModel(configFiles, this, muleContext.getExtensionManager().getExtensions(),
+                                                     APPLICATION, false, muleContext, null);
       }
       new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false, false)
           .configure(muleContext);
