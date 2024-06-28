@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <object name="customObjectSerializer"
+            class="org.mule.runtime.config.MuleConfigurationConfiguratorTestCase.TestSerializationProtocol"/>
+
+    <object name="testProcessor"
+            class="org.mule.runtime.config.internal.bean.TestProcessorDependingOnMuleConfiguration"/>
+
+    <error-handler name="errorHandler">
+        <on-error-continue type="ANY">
+            <logger/>
+        </on-error-continue>
+    </error-handler>
+
+    <configuration defaultErrorHandler-ref="errorHandler"
+                   defaultResponseTimeout="5000"
+                   maxQueueTransactionFilesSize="100"
+                   defaultTransactionTimeout="20000"
+                   shutdownTimeout="2000"
+                   defaultObjectSerializer-ref="customObjectSerializer"
+                   inheritIterableRepeatability="true"
+                   correlationIdGeneratorExpression="#['correlationId']">
+        <dynamic-config-expiration frequency="7" timeUnit="DAYS">
+            <expiration-policy maxIdleTime="40" timeUnit="HOURS"/>
+        </dynamic-config-expiration>
+    </configuration>
+
+    <flow name="mainFlow">
+        <logger/>
+        <flow-ref name="testProcessor"/>
+    </flow>
+
+</mule>
