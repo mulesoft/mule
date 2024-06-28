@@ -45,13 +45,19 @@ public class UpdatingAuthorizationCodeState
       }
 
       @Override
-      public void onTokenInvalidated() {
-        invalidated = true;
+      public void onTokenInvalidated(ResourceOwnerOAuthContext context) {
+        updateAfterInvalidation(context);
       }
 
       private void update(ResourceOwnerOAuthContext context) {
         delegate = toAuthorizationCodeState(config, context);
         invalidated = false;
+        onUpdate.accept(context);
+      }
+
+      private void updateAfterInvalidation(ResourceOwnerOAuthContext context) {
+        delegate = toAuthorizationCodeState(config, context);
+        invalidated = true;
         onUpdate.accept(context);
       }
     });

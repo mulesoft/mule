@@ -43,7 +43,7 @@ public class UpdatingClientCredentialsState
       }
 
       @Override
-      public void onTokenInvalidated() {
+      public void onTokenInvalidated(ResourceOwnerOAuthContext context) {
         invalidated = true;
       }
     };

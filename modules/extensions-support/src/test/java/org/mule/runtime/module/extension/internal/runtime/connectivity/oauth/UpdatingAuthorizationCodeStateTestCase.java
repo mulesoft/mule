@@ -118,7 +118,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
 
     AuthorizationCodeListener listener = listenerCaptor.getValue();
-    listener.onTokenInvalidated();
+    listener.onTokenInvalidated(dancer.getContextForResourceOwner(RESOURCE_OWNER_ID));
 
     try {
       state.getAccessToken();
@@ -146,7 +146,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
 
     AuthorizationCodeListener listener = listenerCaptor.getValue();
-    listener.onTokenInvalidated();
+    listener.onTokenInvalidated(dancer.getContextForResourceOwner(RESOURCE_OWNER_ID));
 
     try {
       state.getAccessToken();
