@@ -39,8 +39,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
-import static org.junit.Assert.assertThrows;
-import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -86,6 +85,7 @@ import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
 @Feature(CONFIGURATION_PROPERTIES)
@@ -97,6 +97,9 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   private final TimeSupplier timeSupplier = mock(TimeSupplier.class);
 
@@ -225,9 +228,10 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
   }
 
   @Test
-  public void whenMultipleConfigsInFileThenFails() {
-    ConfigurationException e = assertThrows(ConfigurationException.class, () -> initMuleContext("withMultipleGlobalConfig.xml"));
-    assertThat(e, hasMessage(containsString("The configuration element 'configuration' can only appear once")));
+  public void whenMultipleConfigsInFileThenFails() throws MuleException {
+    expectedException.expect(ConfigurationException.class);
+    expectedException.expectMessage(containsString("The configuration element 'configuration' can only appear once"));
+    initMuleContext("withMultipleGlobalConfig.xml");
   }
 
   @Test
