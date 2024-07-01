@@ -10,8 +10,8 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
-import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -41,7 +41,13 @@ public abstract class AbstractErrorValidation implements Validation {
       builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
 
   protected boolean isErrorTypePresentAndPropertyDependant(ComponentAst component) {
-    String errorTypeString = getErrorTypeParam(component).getRawValue();
+    final ComponentParameterAst errorTypeParam = getErrorTypeParam(component);
+    if (errorTypeParam == null) {
+      // no `type`, must have a `ref`
+      return false;
+    }
+
+    String errorTypeString = errorTypeParam.getRawValue();
     return !isEmpty(errorTypeString)
         && hasPropertyPlaceholder(errorTypeString);
   }

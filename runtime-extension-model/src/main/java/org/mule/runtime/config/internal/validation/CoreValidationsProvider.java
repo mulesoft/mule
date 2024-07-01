@@ -62,7 +62,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new NameHasValidCharacters(),
                                                           new NameIsNotRepeated(),
                                                           // make these general for all references via stereotypes
-                                                          new FlowRefPointsToNonPropertyValue(ignoreParamsWithProperties),
+                                                          new FlowRefPointsToNonPropertyValue(),
                                                           new FlowRefPointsToExistingFlow(ignoreParamsWithProperties),
                                                           // --
 
@@ -73,18 +73,18 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
-                                                          new RaiseErrorTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new RaiseErrorTypeReferencesNonPropertyValue(),
                                                           new RaiseErrorTypeReferencesExist(featureFlaggingService,
                                                                                             ignoreParamsWithProperties),
-                                                          new ErrorMappingTargetTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorMappingTargetTypeReferencesNonPropertyValue(),
                                                           new ErrorMappingTargetTypeReferencesExist(featureFlaggingService,
                                                                                                     ignoreParamsWithProperties),
                                                           new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService,
                                                                                                                          ignoreParamsWithProperties),
-                                                          new ErrorMappingSourceTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorMappingSourceTypeReferencesNonPropertyValue(),
                                                           new ErrorMappingSourceTypeReferencesExist(featureFlaggingService,
                                                                                                     ignoreParamsWithProperties),
-                                                          new ErrorHandlerOnErrorTypeNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorHandlerOnErrorTypeNonPropertyValue(),
                                                           new ErrorHandlerOnErrorTypeExists(featureFlaggingService,
                                                                                             ignoreParamsWithProperties),
                                                           // --
@@ -93,7 +93,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new ParameterGroupExclusiveness(),
                                                           new NumberParameterWithinRange(),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
-                                                          new ExpressionsInRequiredExpressionsParamsNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ExpressionsInRequiredExpressionsParamsNonPropertyValue(),
                                                           new ExpressionsInRequiredExpressionsParams(featureFlaggingService,
                                                                                                      ignoreParamsWithProperties),
                                                           new OperationParameterDefaultValueDoesntSupportExpressions(),
@@ -153,8 +153,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
         artifactAstDependencyGraphProvider.orElse(new DefaultArtifactAstDependencyGraphProvider());
 
     return asList(new ImportValidTarget(),
-                  new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties,
-                                                                           artifactAstDependencyGraphProviderForValidator),
+                  new ConfigReferenceParametersNonPropertyValueValidations(artifactAstDependencyGraphProviderForValidator),
                   new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
                                                                       artifactAstDependencyGraphProviderForValidator),
                   new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProviderForValidator),

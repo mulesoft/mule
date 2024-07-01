@@ -41,12 +41,6 @@ public class FlowRefPointsToNonPropertyValue implements Validation {
   public static final ComponentIdentifier FLOW_REF_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(FLOW_REF_ELEMENT).build();
 
-  private final boolean enabled;
-
-  public FlowRefPointsToNonPropertyValue(boolean enabled) {
-    this.enabled = enabled;
-  }
-
   @Override
   public String getName() {
     return "'flow-ref's point to fixed flows";
@@ -64,12 +58,8 @@ public class FlowRefPointsToNonPropertyValue implements Validation {
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    if (enabled) {
-      return currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER))
-          .and(currentElemement(component -> !isEmpty(component.getParameter(DEFAULT_GROUP_NAME, "name").getRawValue())));
-    } else {
-      return c -> false;
-    }
+    return currentElemement(equalsIdentifier(FLOW_REF_IDENTIFIER))
+        .and(currentElemement(component -> !isEmpty(component.getParameter(DEFAULT_GROUP_NAME, "name").getRawValue())));
   }
 
   @Override
