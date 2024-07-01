@@ -240,9 +240,9 @@ public class DependencyResolver implements AutoCloseable {
       apisExcludedFilterPattern.add("org.mule.distributions:*:*:*:*");
       final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(apisExcludedFilterPattern);
       // TODO - review BOM name and find a way to avoid hardcoding the version
-      final String groupId = getBoolean("use.mule.apis.ee.bom") ? "com.mulesoft.mule.distributions" : "org.mule.distributions";
-      ArtifactDescriptorResult pom = readArtifactDescriptor(new DefaultArtifact(groupId, "mule-runtime-split-bom", "pom",
-                                                                                "4.8.0-SNAPSHOT"));
+      ArtifactDescriptorResult pom =
+          readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-split-bom", "pom",
+                                                     "4.8.0-SNAPSHOT"));
       return resolveDependencyNode(null, pom.getDependencies(), pom.getManagedDependencies(), dependencyFilter,
                                    pom.getRepositories());
     } catch (ArtifactDescriptorException e) {
