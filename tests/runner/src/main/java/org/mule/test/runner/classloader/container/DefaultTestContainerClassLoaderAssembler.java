@@ -9,15 +9,11 @@ package org.mule.test.runner.classloader.container;
 import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
 import static org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator.BOOT_PACKAGES;
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
-import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.of;
 
 import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
 
@@ -33,7 +29,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableSet;
 
