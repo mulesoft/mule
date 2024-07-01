@@ -6,11 +6,12 @@
  */
 package org.mule.functional.api.flow;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
@@ -39,6 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import org.hamcrest.Matcher;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -402,4 +404,5 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
       return super.getFlowConstruct();
     }
   }
+
 }
