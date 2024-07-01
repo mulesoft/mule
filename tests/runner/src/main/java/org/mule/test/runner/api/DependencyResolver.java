@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.base.Joiner.on;
@@ -24,12 +25,8 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,8 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -242,9 +237,7 @@ public class DependencyResolver implements AutoCloseable {
   private DependencyNode getMuleApisNode(List<String> excludedFilterPattern)
       throws DependencyCollectionException, DependencyResolutionException {
     try {
-      final List<String> apisExcludedFilterPattern = new ArrayList<>(excludedFilterPattern);
-      apisExcludedFilterPattern.add("org.mule.distributions:*:*:*:*");
-      final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(apisExcludedFilterPattern);
+      final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
       final String version = this.getClass().getPackage().getImplementationVersion();
       // TODO - review BOM name
       ArtifactDescriptorResult pom =
@@ -409,6 +402,12 @@ public class DependencyResolver implements AutoCloseable {
             .collect(toList());
     muleApisOptDependencyUrls.addAll(log4jUrls);
     log4jUrls.forEach(optDependencyUrls::remove);
+
+    // check whether kryo is needed for tests
+    if (!getBoolean("tests.require.kryo")) {
+      muleApisOptDependencyUrls = muleApisOptDependencyUrls.stream().filter(dependency -> !dependency.toString().contains("kryo"))
+          .collect(toCollection(LinkedHashSet::new));
+    }
 
     return new ContainerDependencies(new ArrayList<>(muleApisOptDependencyUrls), new ArrayList<>(muleApisDependencyUrls),
                                      new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls));
