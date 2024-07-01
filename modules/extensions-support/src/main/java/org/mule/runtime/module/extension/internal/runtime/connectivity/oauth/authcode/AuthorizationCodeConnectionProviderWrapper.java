@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbac
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
+import org.mule.runtime.module.extension.internal.hazelcast.TokenService;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
@@ -45,6 +46,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private final RunOnce dance;
 
   private AuthorizationCodeOAuthDancer dancer;
+  private final TokenService tokenService;
 
   public AuthorizationCodeConnectionProviderWrapper(ConnectionProvider<C> delegate,
                                                     AuthorizationCodeConfig oauthConfig,
@@ -54,6 +56,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
+    this.tokenService = new TokenService();
     authCodeStateSetter =
         getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
@@ -74,7 +77,8 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                           context,
                                                           updatedContext -> updateOAuthParameters(delegate,
                                                                                                   callbackValues,
-                                                                                                  updatedContext)));
+                                                                                                  updatedContext),
+                                                          tokenService));
     updateOAuthParameters(delegate, callbackValues, context);
   }
 

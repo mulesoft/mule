@@ -26,6 +26,7 @@ import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.module.extension.internal.hazelcast.TokenService;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.OAuthCallbackConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.UpdatingAuthorizationCodeState;
@@ -33,6 +34,8 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exc
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,15 +57,21 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   public MockitoRule mockitorule = MockitoJUnit.rule();
 
   private AuthorizationCodeConfig oAuthConfig;
+  private AuthorizationCodeConfig additionalOAuthConfig;
 
   @Mock
   private AuthorizationCodeOAuthDancer dancer;
+
+  @Mock
+  private AuthorizationCodeOAuthDancer additionalDancer;
 
   @Mock
   private ResourceOwnerOAuthContext initialContext;
 
   @Mock
   private ResourceOwnerOAuthContext refreshedContext;
+
+  private TokenService tokenService;
 
   @Before
   public void before() {
@@ -73,6 +82,13 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
                                               new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
                                               mock(OAuthCallbackConfig.class),
                                               "key", "secret", "url", "url", "scope", RESOURCE_OWNER_ID, null, null);
+    additionalOAuthConfig = new AuthorizationCodeConfig("configName",
+                                                        empty(),
+                                                        new CustomOAuthParameters(),
+                                                        emptyMap(),
+                                                        new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
+                                                        mock(OAuthCallbackConfig.class),
+                                                        "key", "secret", "url", "url", "scope", RESOURCE_OWNER_ID, null, null);
 
     when(initialContext.getAccessToken()).thenReturn(ACCESS_TOKEN);
     when(initialContext.getRefreshToken()).thenReturn(REFRESH_TOKEN);
@@ -81,6 +97,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     when(refreshedContext.getAccessToken()).thenReturn(NEW_TOKEN);
     when(refreshedContext.getRefreshToken()).thenReturn(NEW_REFRESH_TOKEN);
     when(refreshedContext.getResourceOwnerId()).thenReturn(RESOURCE_OWNER_ID);
+    tokenService = new TokenService();
   }
 
   @Test
@@ -91,7 +108,8 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set,
+                                                                              tokenService);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -110,7 +128,8 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set,
+                                                                              tokenService);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -138,7 +157,8 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set,
+                                                                              tokenService);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -167,7 +187,8 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set,
+                                                                              tokenService);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -191,5 +212,44 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     assertThat(state.getRefreshToken().get(), equalTo(NEW_REFRESH_TOKEN));
 
     assertThat(newContext.get(), is(sameInstance(refreshedContext)));
+  }
+
+  @Test
+  @Issue("W-15154658")
+  @Description("Test a scenario where two listeners synchronize token invalidation status when they are using the same token.")
+  public void secondAuthorizationCodeStateOnTokenInvalidated() {
+    ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
+    Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
+
+    UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
+                                                                              dancer,
+                                                                              initialContext,
+                                                                              newContext::set,
+                                                                              tokenService);
+
+    ArgumentCaptor<AuthorizationCodeListener> secondListenerCaptor = forClass(AuthorizationCodeListener.class);
+    Reference<ResourceOwnerOAuthContext> secondNewContext = new Reference<>();
+    UpdatingAuthorizationCodeState secondState = new UpdatingAuthorizationCodeState(additionalOAuthConfig,
+                                                                                    additionalDancer,
+                                                                                    initialContext,
+                                                                                    secondNewContext::set,
+                                                                                    tokenService);
+
+    verify(dancer).addListener(anyString(), listenerCaptor.capture());
+    verify(additionalDancer).addListener(anyString(), secondListenerCaptor.capture());
+    AuthorizationCodeListener listener = listenerCaptor.getValue();
+
+    // The same token is invalidated only for the first listener.
+    listener.onTokenInvalidated();
+
+    try {
+      // The same token should be invalidated for the second listener as well.
+      secondState.getAccessToken();
+      fail("This should have failed");
+    } catch (TokenInvalidatedException e) {
+      // carry on... nothing to see here
+    }
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+    assertThat(newContext.get(), is(nullValue()));
   }
 }

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.au
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
+import org.mule.runtime.module.extension.internal.hazelcast.TokenService;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
@@ -25,13 +26,16 @@ public class UpdatingAuthorizationCodeState
     implements AuthorizationCodeState, org.mule.sdk.api.connectivity.oauth.AuthorizationCodeState {
 
   private AuthorizationCodeState delegate;
-  private boolean invalidated = false;
+  private TokenService tokenService;
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
-                                        Consumer<ResourceOwnerOAuthContext> onUpdate) {
+                                        Consumer<ResourceOwnerOAuthContext> onUpdate,
+                                        TokenService tokenService) {
     delegate = toAuthorizationCodeState(config, initialContext);
+    this.tokenService = tokenService;
+    tokenService.registerToken(delegate.getAccessToken());
     dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
       @Override
@@ -46,12 +50,12 @@ public class UpdatingAuthorizationCodeState
 
       @Override
       public void onTokenInvalidated() {
-        invalidated = true;
+        tokenService.invalidateToken(delegate.getAccessToken());
       }
 
       private void update(ResourceOwnerOAuthContext context) {
         delegate = toAuthorizationCodeState(config, context);
-        invalidated = false;
+        tokenService.registerToken(delegate.getAccessToken());
         onUpdate.accept(context);
       }
     });
@@ -59,7 +63,7 @@ public class UpdatingAuthorizationCodeState
 
   @Override
   public String getAccessToken() {
-    if (invalidated) {
+    if (tokenService.isTokenInvalidated(delegate.getAccessToken())) {
       throw new TokenInvalidatedException(
                                           "OAuth token for resource owner id " + delegate.getResourceOwnerId()
                                               + " has been invalidated");
