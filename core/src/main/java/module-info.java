@@ -392,6 +392,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.security to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
