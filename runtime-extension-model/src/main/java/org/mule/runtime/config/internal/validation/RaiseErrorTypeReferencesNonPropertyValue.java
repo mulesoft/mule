@@ -29,12 +29,6 @@ import java.util.function.Predicate;
  */
 public class RaiseErrorTypeReferencesNonPropertyValue extends AbstractErrorValidation {
 
-  private final boolean enabled;
-
-  public RaiseErrorTypeReferencesNonPropertyValue(boolean enabled) {
-    this.enabled = enabled;
-  }
-
   @Override
   public String getName() {
     return "Error Type references fixed";
@@ -52,12 +46,8 @@ public class RaiseErrorTypeReferencesNonPropertyValue extends AbstractErrorValid
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    if (enabled) {
-      return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER)
-          .and(this::isErrorTypePresentAndPropertyDependant));
-    } else {
-      return c -> false;
-    }
+    return currentElemement(equalsIdentifier(RAISE_ERROR_IDENTIFIER)
+        .and(this::isErrorTypePresentAndPropertyDependant));
   }
 
   @Override
