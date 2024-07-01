@@ -12,8 +12,8 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -41,12 +41,6 @@ public class ExpressionsInRequiredExpressionsParamsNonPropertyValue implements V
   protected static final ComponentIdentifier CONFIGURATION_IDENTIFIER =
       builder().namespace(CORE_PREFIX).name(CONFIGURATION_NAME).build();
 
-  private final boolean enabled;
-
-  public ExpressionsInRequiredExpressionsParamsNonPropertyValue(boolean enabled) {
-    this.enabled = enabled;
-  }
-
   @Override
   public String getName() {
     return "Expression in expressionsRequired params are fixed";
@@ -64,17 +58,13 @@ public class ExpressionsInRequiredExpressionsParamsNonPropertyValue implements V
 
   @Override
   public Predicate<List<ComponentAst>> applicable() {
-    if (enabled) {
-      return currentElemement(component -> component.getModel(ParameterizedModel.class)
-          .map(pmz -> pmz.getAllParameterModels())
-          .orElse(emptyList())
-          .stream()
-          .filter(pm -> REQUIRED.equals(pm.getExpressionSupport()))
-          .findAny()
-          .isPresent());
-    } else {
-      return c -> false;
-    }
+    return currentElemement(component -> component.getModel(ParameterizedModel.class)
+        .map(pmz -> pmz.getAllParameterModels())
+        .orElse(emptyList())
+        .stream()
+        .filter(pm -> REQUIRED.equals(pm.getExpressionSupport()))
+        .findAny()
+        .isPresent());
   }
 
   @Override
