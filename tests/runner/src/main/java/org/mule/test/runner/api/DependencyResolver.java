@@ -239,10 +239,9 @@ public class DependencyResolver implements AutoCloseable {
     try {
       final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
       final String version = this.getClass().getPackage().getImplementationVersion();
-      // TODO - review BOM name
       ArtifactDescriptorResult pom =
-          readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-split-bom", "pom",
-                                                     version));
+          readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-apis-split-loader-bom",
+                                                     "pom", version));
       return resolveDependencyNode(null, pom.getDependencies(), pom.getManagedDependencies(), dependencyFilter,
                                    pom.getRepositories());
     } catch (ArtifactDescriptorException e) {
@@ -403,7 +402,7 @@ public class DependencyResolver implements AutoCloseable {
     muleApisOptDependencyUrls.addAll(log4jUrls);
     log4jUrls.forEach(optDependencyUrls::remove);
 
-    // check whether kryo is needed for tests
+    // remove kryo if not needed for tests
     if (!getBoolean("tests.require.kryo")) {
       muleApisOptDependencyUrls = muleApisOptDependencyUrls.stream().filter(dependency -> !dependency.toString().contains("kryo"))
           .collect(toCollection(LinkedHashSet::new));
