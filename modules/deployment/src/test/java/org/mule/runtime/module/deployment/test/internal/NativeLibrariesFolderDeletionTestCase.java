@@ -14,6 +14,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 
+import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -34,25 +36,30 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Prober;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.github.valfirst.slf4jtest.LoggingEvent;
+import com.github.valfirst.slf4jtest.TestLogger;
 import io.qameta.allure.Issue;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 @Issue("W-15894519")
-public class NativeLibrariesFolderDeletionTestCase {
+public class NativeLibrariesFolderDeletionTestCase extends AbstractMuleTestCase {
 
   private static final int TIMEOUT_MILLIS = 60000;
   private static final int POLL_DELAY_MILLIS = 100;
   private static final int CORE_POOL_SIZE = 1;
-  private static final int MAX_ATTEMPTS = 5;
+  private static final int MAX_ATTEMPTS = 3;
   private static final int INITIAL_DELAY = 0;
   private static final int DELAY = 1;
 
   private static final String ARTIFACT_ID = "application-test";
+
+  private static final TestLogger retryScheduledFolderDeletionTaskLogger = getTestLogger(RetryScheduledFolderDeletionTask.class);
 
   @Rule
   public TemporaryFolder nativeLibraryFolder = new TemporaryFolder();
@@ -86,9 +93,10 @@ public class NativeLibrariesFolderDeletionTestCase {
     prober.check(new JUnitProbe() {
 
       @Override
-      protected boolean test() throws Exception {
+      protected boolean test() {
         assertTrue(scheduler.isShutdown());
         assertTrue(nativeLibraryFolder.getRoot().exists());
+        assertNativeLibrariesTempFolderIsNotDeleteLogging();
         return true;
       }
 
@@ -115,6 +123,7 @@ public class NativeLibrariesFolderDeletionTestCase {
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
         assertFalse(nativeLibraryFolder.getRoot().exists());
+        assertNativeLibrariesTempFolderIsDeleteAtFirstAttemptLogging();
         return true;
       }
 
@@ -141,6 +150,7 @@ public class NativeLibrariesFolderDeletionTestCase {
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
         assertFalse(nativeLibraryFolder.getRoot().exists());
+        assertNativeLibrariesTempFolderIsDeleteAtSecondAttemptLogging();
         return true;
       }
 
@@ -209,5 +219,24 @@ public class NativeLibrariesFolderDeletionTestCase {
   private File getNativeLibrariesFolder(Application application) {
     String loadedNativeLibrariesFolderName = application.getDescriptor().getLoadedNativeLibrariesFolderName();
     return getAppNativeLibrariesTempFolder(ARTIFACT_ID, loadedNativeLibrariesFolderName);
+  }
+
+  private void assertNativeLibrariesTempFolderIsNotDeleteLogging() {
+    List<LoggingEvent> loggingEvents = retryScheduledFolderDeletionTaskLogger.getAllLoggingEvents();
+    assertEquals(MAX_ATTEMPTS, loggingEvents.size());
+    assertTrue(loggingEvents.get(0).getMessage().contains("Attempt 1. Failed to perform the action. Retrying..."));
+    assertTrue(loggingEvents.get(1).getMessage().contains("Attempt 2. Failed to perform the action. Retrying..."));
+    assertTrue(loggingEvents.get(2).getMessage().contains("Failed to perform the action. No further retries will be made."));
+  }
+
+  private void assertNativeLibrariesTempFolderIsDeleteAtFirstAttemptLogging() {
+    List<LoggingEvent> loggingEvents = retryScheduledFolderDeletionTaskLogger.getAllLoggingEvents();
+    assertEquals(0, loggingEvents.size());
+  }
+
+  private void assertNativeLibrariesTempFolderIsDeleteAtSecondAttemptLogging() {
+    List<LoggingEvent> loggingEvents = retryScheduledFolderDeletionTaskLogger.getAllLoggingEvents();
+    assertEquals(1, loggingEvents.size());
+    assertTrue(loggingEvents.get(0).getMessage().contains("Attempt 1. Failed to perform the action. Retrying..."));
   }
 }
