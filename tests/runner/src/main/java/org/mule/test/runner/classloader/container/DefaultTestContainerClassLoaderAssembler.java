@@ -84,50 +84,35 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
-    ClassLoader containerSystemClassloader;
-    if (getBoolean(TEST_RUNNER_LEGACY_LAYER_HIERARCHY_MODE)) {
-      URL[] fullOptUrls = of(muleApisOptUrls, optUrls).flatMap(Stream::of).toArray(URL[]::new);
-      URL[] fullMuleUrls = of(muleApisUrls, muleUrls).flatMap(Stream::of).toArray(URL[]::new);
-      containerSystemClassloader = createModuleLayerClassLoader(fullOptUrls, fullMuleUrls,
-                                                                MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                                                launcherArtifact);
-    } else {
-      List<URL> log4jUrls = of(optUrls).filter(url -> url.toString().contains("log4j") || url.toString().contains("lmax"))
-          .collect(toList());
-      List<URL> tmpMuleApisOptUrls = of(muleApisOptUrls).collect(toList());
-      tmpMuleApisOptUrls.addAll(log4jUrls);
-      URL[] effectiveMuleApisOptUrls = tmpMuleApisOptUrls.toArray(new URL[0]);
-      URL[] effectiveOptUrls = of(optUrls).filter(url -> !url.toString().contains("log4j")).toArray(URL[]::new);
-      ClassLoader muleApisOptClassloader = createModuleLayerClassLoader(effectiveMuleApisOptUrls, launcherArtifact);
+    ClassLoader muleApisOptClassloader = createModuleLayerClassLoader(muleApisOptUrls, launcherArtifact);
 
-      Class<?> muleApisOptClass = loadClass("org.apache.commons.lang3.StringUtils", muleApisOptClassloader);
+    Class<?> muleApisOptClass = loadClass("org.apache.commons.lang3.StringUtils", muleApisOptClassloader);
 
-      ClassLoader muleApisClassloader =
-          createModuleLayerClassLoader(muleApisUrls, muleApisOptClassloader,
-                                       singletonList(muleApisOptClass));
+    ClassLoader muleApisClassloader =
+        createModuleLayerClassLoader(muleApisUrls, muleApisOptClassloader,
+                                     singletonList(muleApisOptClass));
 
-      ClassLoader optClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisOptClassloader : muleApisClassloader;
-      ClassLoader optClassloader =
-          createModuleLayerClassLoader(effectiveOptUrls, optClassloaderParent,
-                                       singletonList(muleApisOptClass));
+    ClassLoader optClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisOptClassloader : muleApisClassloader;
+    ClassLoader optClassloader =
+        createModuleLayerClassLoader(optUrls, optClassloaderParent,
+                                     singletonList(muleApisOptClass));
 
-      Class<?> muleImplementationsLoaderUtilsClass =
-          loadClass("org.mule.runtime.api.util.classloader.MuleImplementationLoaderUtils", muleApisClassloader);
+    Class<?> muleImplementationsLoaderUtilsClass =
+        loadClass("org.mule.runtime.api.util.classloader.MuleImplementationLoaderUtils", muleApisClassloader);
 
-      Class<?> optClass =
-          loadClass("org.mule.maven.client.api.MavenClient", optClassloader);
+    Class<?> optClass =
+        loadClass("org.mule.maven.client.api.MavenClient", optClassloader);
 
-      ClassLoader containerSystemClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisClassloader : optClassloader;
-      containerSystemClassloader = createModuleLayerClassLoader(muleUrls, containerSystemClassloaderParent,
-                                                                asList(muleImplementationsLoaderUtilsClass,
-                                                                       optClass));
+    ClassLoader containerSystemClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisClassloader : optClassloader;
+    ClassLoader containerSystemClassloader = createModuleLayerClassLoader(muleUrls, containerSystemClassloaderParent,
+                                                                          asList(muleImplementationsLoaderUtilsClass,
+                                                                                 optClass));
 
-      try {
-        muleImplementationsLoaderUtilsClass.getMethod("setMuleImplementationsLoader", ClassLoader.class)
-            .invoke(null, containerSystemClassloader);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
+    try {
+      muleImplementationsLoaderUtilsClass.getMethod("setMuleImplementationsLoader", ClassLoader.class)
+          .invoke(null, containerSystemClassloader);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
 
     TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =

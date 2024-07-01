@@ -201,7 +201,7 @@ public class DependencyResolver implements AutoCloseable {
   }
 
   /**
-   * Resolves and filters transitive dependencies for the root and direct dependencies.
+   * Resolves and filters transitive dependencies for the root and direct dependencies for the Mule Runtime container.
    * <p/>
    * If both a root dependency and direct dependencies are given, the direct dependencies will be merged with the direct
    * dependencies from the root dependency's artifact descriptor, giving higher priority to the dependencies from the root.
@@ -215,9 +215,9 @@ public class DependencyResolver implements AutoCloseable {
    *                              {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}
    * @param remoteRepositories    remote repositories to be used in addition to the one in context.
    * @return the {@link ContainerDependencies} with the {@link URL}s for the container class loader.
-   * @throws {@link DependencyCollectionException} if the dependency tree could not be built
-   * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
-   *         be resolved
+   * @throws DependencyCollectionException if the dependency tree could not be built
+   * @throws DependencyResolutionException if the dependency tree could not be built or any dependency artifact could not be
+   *                                       resolved
    */
   public ContainerDependencies resolveContainerDependencies(Dependency root, List<Dependency> directDependencies,
                                                             List<Dependency> managedDependencies,
@@ -230,7 +230,7 @@ public class DependencyResolver implements AutoCloseable {
     DependencyNode muleLibsNode =
         resolveDependencyNode(root, directDependencies, managedDependencies, dependencyFilter, remoteRepositories);
 
-    return getContainerFiles(muleApisNode, muleLibsNode);
+    return getContainerDependencies(muleApisNode, muleLibsNode);
   }
 
   private DependencyNode getMuleApisNode(List<String> excludedFilterPattern)
@@ -266,9 +266,9 @@ public class DependencyResolver implements AutoCloseable {
    * @param remoteRepositories  {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already
    *                            defined in the context.
    * @return a {@link List} of {@link File}s for each dependency resolved
-   * @throws {@link DependencyCollectionException} if the dependency tree could not be built
-   * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
-   *         be resolved
+   * @throws DependencyCollectionException if the dependency tree could not be built
+   * @throws DependencyResolutionException if the dependency tree could not be built or any dependency artifact could not be
+   *                                       resolved
    */
   public List<File> resolveDependencies(Dependency root, List<Dependency> directDependencies,
                                         List<Dependency> managedDependencies,
@@ -382,7 +382,7 @@ public class DependencyResolver implements AutoCloseable {
    * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jars urls, second
    *         are jar urls for third parties.
    */
-  private ContainerDependencies getContainerFiles(DependencyNode muleApisNode, DependencyNode muleLibsNode) {
+  private ContainerDependencies getContainerDependencies(DependencyNode muleApisNode, DependencyNode muleLibsNode) {
     LinkedHashSet<URL> muleApisDependencyUrls = new LinkedHashSet<>();
     LinkedHashSet<URL> muleApisOptDependencyUrls = new LinkedHashSet<>();
     LinkedHashSet<URL> muleDependencyUrls = new LinkedHashSet<>();
@@ -394,6 +394,14 @@ public class DependencyResolver implements AutoCloseable {
     // sanitize dependencies
     optDependencyUrls.removeAll(muleApisOptDependencyUrls);
     muleDependencyUrls.removeAll(muleApisDependencyUrls);
+
+    // move log4j dependencies to the upper third-party layer (they're not directly present in the BOM because it's not something
+    // for it to provide, the client must do it)
+    List<URL> log4jUrls =
+        optDependencyUrls.stream().filter(url -> url.toString().contains("log4j") || url.toString().contains("lmax"))
+            .collect(toList());
+    muleApisOptDependencyUrls.addAll(log4jUrls);
+    log4jUrls.forEach(optDependencyUrls::remove);
 
     return new ContainerDependencies(new ArrayList<>(muleApisOptDependencyUrls), new ArrayList<>(muleApisDependencyUrls),
                                      new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls));
