@@ -24,8 +24,12 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,6 +37,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -239,10 +245,11 @@ public class DependencyResolver implements AutoCloseable {
       final List<String> apisExcludedFilterPattern = new ArrayList<>(excludedFilterPattern);
       apisExcludedFilterPattern.add("org.mule.distributions:*:*:*:*");
       final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(apisExcludedFilterPattern);
-      // TODO - review BOM name and find a way to avoid hardcoding the version
+      final String version = this.getClass().getPackage().getImplementationVersion();
+      // TODO - review BOM name
       ArtifactDescriptorResult pom =
           readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-split-bom", "pom",
-                                                     "4.8.0-SNAPSHOT"));
+                                                     version));
       return resolveDependencyNode(null, pom.getDependencies(), pom.getManagedDependencies(), dependencyFilter,
                                    pom.getRepositories());
     } catch (ArtifactDescriptorException e) {
