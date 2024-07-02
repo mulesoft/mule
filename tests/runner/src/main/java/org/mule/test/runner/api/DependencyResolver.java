@@ -402,12 +402,6 @@ public class DependencyResolver implements AutoCloseable {
     muleApisOptDependencyUrls.addAll(log4jUrls);
     log4jUrls.forEach(optDependencyUrls::remove);
 
-    // remove kryo if not needed for tests
-    if (!getBoolean("tests.require.kryo")) {
-      muleApisOptDependencyUrls = muleApisOptDependencyUrls.stream().filter(dependency -> !dependency.toString().contains("kryo"))
-          .collect(toCollection(LinkedHashSet::new));
-    }
-
     return new ContainerDependencies(new ArrayList<>(muleApisOptDependencyUrls), new ArrayList<>(muleApisDependencyUrls),
                                      new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls));
   }
