@@ -44,7 +44,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   private Optional<ArtifactAstDependencyGraphProvider> artifactAstDependencyGraphProvider = empty();
 
   @Inject
-  private Optional<FeatureFlaggingService> featureFlaggingService = empty();
+  private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
 
   @Inject
   private ExpressionLanguage expressionLanguage;
@@ -153,6 +153,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
         artifactAstDependencyGraphProvider.orElse(new DefaultArtifactAstDependencyGraphProvider());
 
     return asList(new ImportValidTarget(),
+                  new ImportTargetElement(featureFlaggingService),
                   new ConfigReferenceParametersNonPropertyValueValidations(artifactAstDependencyGraphProviderForValidator),
                   new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
                                                                       artifactAstDependencyGraphProviderForValidator),
