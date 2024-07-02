@@ -100,6 +100,11 @@ public class CoreExtensionDeclarerTestCase {
     }
 
     @Override
+    public ComponentMetadataConfigurer withPassThroughChainInputTypeResolver() {
+      return this;
+    }
+
+    @Override
     public ComponentMetadataConfigurer addInputResolver(String parameterName, InputTypeResolver resolver) {
       return this;
     }

@@ -122,6 +122,7 @@ import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.AllowsExpressionWithoutMarkersModelProperty;
+import org.mule.runtime.core.internal.extension.CollectionChainInputTypeResolver;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
@@ -399,6 +400,10 @@ public class MuleExtensionModelDeclarer {
         .describedAs("Processes the nested list of message processors asynchronously.").blocking(false);
 
     async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
+    configurerFactory.create()
+        .withPassThroughChainInputTypeResolver()
+        .configure(async);
+
     async.onDefaultParameterGroup()
         .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
@@ -612,6 +617,10 @@ public class MuleExtensionModelDeclarer {
     forEach.withChain()
         .withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(MULTIPLE_OR_NONE);
 
+    configurerFactory.create()
+        .setChainInputTypeResolver(new CollectionChainInputTypeResolver("collection"))
+        .configure(forEach);
+
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
@@ -697,7 +706,7 @@ public class MuleExtensionModelDeclarer {
         .setExecutionOccurrence(ONCE_OR_NONE);
     choice.withOutput().ofDynamicType(ANY_TYPE);
     choice.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asOneOfRouter().configure(choice);
+    configurerFactory.create().withPassThroughChainInputTypeResolver().asOneOfRouter().configure(choice);
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer) {
@@ -760,7 +769,7 @@ public class MuleExtensionModelDeclarer {
 
     firstSuccessful.withOutput().ofDynamicType(ANY_TYPE);
     firstSuccessful.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asOneOfRouter().configure(firstSuccessful);
+    configurerFactory.create().withPassThroughChainInputTypeResolver().asOneOfRouter().configure(firstSuccessful);
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
@@ -779,7 +788,7 @@ public class MuleExtensionModelDeclarer {
 
     roundRobin.withOutput().ofDynamicType(ANY_TYPE);
     roundRobin.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asOneOfRouter().configure(roundRobin);
+    configurerFactory.create().withPassThroughChainInputTypeResolver().asOneOfRouter().configure(roundRobin);
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -823,7 +832,7 @@ public class MuleExtensionModelDeclarer {
 
     scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asAllOfRouter().configure(scatterGather);
+    configurerFactory.create().withPassThroughChainInputTypeResolver().asAllOfRouter().configure(scatterGather);
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)
@@ -862,7 +871,10 @@ public class MuleExtensionModelDeclarer {
 
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asPassthroughScope().configure(parallelForeach);
+    configurerFactory.create()
+        .setChainInputTypeResolver(new CollectionChainInputTypeResolver("collection"))
+        .asPassthroughScope()
+        .configure(parallelForeach);
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer) {
