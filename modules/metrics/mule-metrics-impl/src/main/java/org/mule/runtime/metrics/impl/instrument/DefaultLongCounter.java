@@ -14,6 +14,8 @@ import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -42,7 +44,7 @@ public class DefaultLongCounter implements LongCounter {
   private Function<Map<String, String>, Long> incrementAndGetOperation = getDefaultIncrementAndGetOperation();
 
   // TODO: Need to handle weak references in order to not retain observers
-  List<BiConsumer<Long, Map<String, String>>> onAdditionObservers;
+  List<BiConsumer<Long, Map<String, String>>> onAdditionObservers = new ArrayList<>();
 
   private DefaultLongCounter(String name, String description, String unit, Meter meter) {
     this.name = name;
@@ -100,7 +102,7 @@ public class DefaultLongCounter implements LongCounter {
 
   @Override
   public void onAddition(BiConsumer<Long, Map<String, String>> consumer) {
-
+    this.onAdditionObservers.add(consumer);
   }
 
   @Override
@@ -120,7 +122,7 @@ public class DefaultLongCounter implements LongCounter {
 
   private BiConsumer<Long, Map<String, String>> getDefaultAddOperation() {
     return (delta, context) -> {
-      this.add(delta);
+      value.addAndGet(delta);
       this.notifyOnAdditionObservers(delta, context);
     };
   }
@@ -179,10 +181,6 @@ public class DefaultLongCounter implements LongCounter {
           .map(repository -> (LongCounter) repository.create(name, name -> doBuild()))
           .orElse(doBuild());
 
-      if (meterExporter != null) {
-        meterExporter.enableExport(longCounter);
-      }
-
       return longCounter;
     }
 
@@ -199,6 +197,10 @@ public class DefaultLongCounter implements LongCounter {
 
       if (incrementAndGetOperation != null) {
         longCounter.setIncrementAndGetOperation(incrementAndGetOperation);
+      }
+
+      if (meterExporter != null) {
+        meterExporter.enableExport(longCounter);
       }
 
       return longCounter;

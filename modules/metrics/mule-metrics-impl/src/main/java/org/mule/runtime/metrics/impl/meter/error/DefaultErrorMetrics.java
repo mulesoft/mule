@@ -6,52 +6,79 @@
  */
 package org.mule.runtime.metrics.impl.meter.error;
 
-import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
+
 import static java.util.Collections.singletonMap;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.metrics.api.MeterProvider;
-import org.mule.runtime.metrics.api.internal.error.ErrorMetrics;
+import org.mule.runtime.metrics.api.error.ErrorIdProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetrics;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
+
 import org.mule.runtime.metrics.impl.util.StackHasher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultErrorMetrics implements ErrorMetrics {
 
-  private final Meter errorMeter;
-  private final LongCounter totalErrorsCounter = buildNewErrorCounter();
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultErrorMetrics.class);
 
-  // TODO: Make an ErrorIdGenerator interface in order to encapsulate the stack hash implementation
-  private final StackHasher errorIdGenerator = new StackHasher();
+  private final LongCounter totalErrorsCounter;
 
-  public DefaultErrorMetrics(MeterProvider<Meter> errorMeterProvider) {
-    requireNonNull(errorMeterProvider);
-    this.errorMeter =
-        errorMeterProvider.getMeterBuilder("mule-error-meter").withDescription("Mule runtime execution errors").build();
+  private final ErrorIdProvider errorIdProvider;
+
+  public DefaultErrorMetrics(Meter errorMetricsMeter) {
+    totalErrorsCounter = buildNewErrorCounter(errorMetricsMeter);
+    this.errorIdProvider = getDefaultErrorIdProvider();
+  }
+
+  public DefaultErrorMetrics(Meter errorMetricsMeter, ErrorIdProvider errorIdProvider) {
+    this.totalErrorsCounter = buildNewErrorCounter(errorMetricsMeter);
+    this.errorIdProvider = errorIdProvider;
   }
 
   @Override
   public void measure(Error error) {
-    totalErrorsCounter.add(1, singletonMap("error-id", getErrorId(error)));
+    try {
+      measure(error.getCause());
+    } catch (Throwable e) {
+      LOGGER.error("Failed to measure an error. This will only affect the error metrics data.", e);
+    }
   }
 
   @Override
   public void measure(Throwable error) {
-    totalErrorsCounter.add(1, singletonMap("error-id", getErrorId(error)));
+    try {
+      totalErrorsCounter.add(1, singletonMap("error-id", errorIdProvider.getErrorId(error)));
+    } catch (Throwable e) {
+      LOGGER.error("Failed to measure an error. This will only affect the error metrics data.", e);
+    }
   }
 
-  private LongCounter buildNewErrorCounter() {
-    return errorMeter.counterBuilder("error-count")
+  private LongCounter buildNewErrorCounter(Meter errorMetricsMeter) {
+    return errorMetricsMeter.counterBuilder("error-count")
         .withDescription("Mule runtime error count").build();
   }
 
-  private String getErrorId(Error error) {
-    return errorIdGenerator.hexHash(getRootException(error.getCause()));
-  }
+  private ErrorIdProvider getDefaultErrorIdProvider() {
+    return new ErrorIdProvider() {
 
-  private String getErrorId(Throwable error) {
-    return errorIdGenerator.hexHash(getRootException(error));
-  }
+      private final StackHasher stackHasher = new StackHasher();
 
+      @Override
+      public String getErrorId(Error error) {
+        return rootHash(error.getCause());
+      }
+
+      @Override
+      public String getErrorId(Throwable error) {
+        return rootHash(error);
+      }
+
+      private String rootHash(Throwable error) {
+        return stackHasher.hexHash(getRootException(error));
+      }
+    };
+  }
 }

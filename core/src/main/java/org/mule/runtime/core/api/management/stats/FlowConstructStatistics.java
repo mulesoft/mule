@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.management.stats;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.metrics.api.MeterProvider;
-import org.mule.runtime.metrics.api.internal.error.ErrorMetrics;
 
 /**
  * Maintains different statistics for {@link org.mule.runtime.core.api.construct.FlowConstruct} instances
@@ -197,5 +196,4 @@ public interface FlowConstructStatistics extends Statistics {
    */
   default void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {}
 
-  default void trackUsingErrorMetrics(ErrorMetrics errorMetrics) {}
 }

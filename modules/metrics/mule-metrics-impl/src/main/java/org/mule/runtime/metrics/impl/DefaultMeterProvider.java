@@ -11,7 +11,6 @@ import static org.mule.runtime.metrics.impl.meter.DefaultMeter.builder;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.metrics.api.MeterProvider;
-import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.api.MeterExporterFactory;
@@ -23,29 +22,31 @@ import javax.inject.Inject;
 /**
  * A default implementation of the {@link MeterProvider}
  */
-public class DefaultMeterProvider implements MeterProvider<Meter>, Disposable {
+public class DefaultMeterProvider implements MeterProvider, Disposable {
 
-  @Inject
-  MeterExporterFactory meterExporterFactory;
-
-  @Inject
-  MeterExporterConfiguration meterExporterConfiguration;
-
-  MeterRepository<Meter> meterRepository = new MeterRepository<>();
+  private final MeterExporterFactory meterExporterFactory;
+  private final MeterExporterConfiguration meterExporterConfiguration;
+  private final MeterRepository meterRepository = new MeterRepository();
   private final LazyValue<MeterExporter> meterExporter = new LazyValue<>(this::resolveMeterExporter);
+
+  @Inject
+  public DefaultMeterProvider(MeterExporterFactory meterExporterFactory, MeterExporterConfiguration meterExporterConfiguration) {
+    this.meterExporterFactory = meterExporterFactory;
+    this.meterExporterConfiguration = meterExporterConfiguration;
+  }
 
   private MeterExporter resolveMeterExporter() {
     return meterExporterFactory.getMeterExporter(meterExporterConfiguration);
   }
 
   @Override
-  public MeterBuilder<Meter> getMeterBuilder(String meterName) {
+  public MeterBuilder getMeterBuilder(String meterName) {
     return builder(meterName)
         .withMeterExporter(meterExporter.get())
         .withMeterRepository(meterRepository);
   }
 
-  public MeterRepository<Meter> getMeterRepository() {
+  public MeterRepository getMeterRepository() {
     return meterRepository;
   }
 

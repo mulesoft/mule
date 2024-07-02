@@ -137,6 +137,11 @@ public class ErrorHandlerContextManager {
     errorHandlerContext.errorCallback.accept(exception);
   }
 
+  public static boolean isHandling(MessagingException exception) {
+    ErrorHandlerContextManager errorHandlerContextManager = from(exception.getEvent());
+    return errorHandlerContextManager != null && !errorHandlerContextManager.items.isEmpty();
+  }
+
   /**
    * Constructs the key that will be used to store a {@link ErrorHandlerContextManager} instance as an {@link CoreEvent} internal
    * parameter.
