@@ -19,7 +19,7 @@ import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
  * {@link ChainInputTypeResolver} implementation that resolves to the type of the elements of a given parameter that is expected
  * to resolve to an array type.
  *
- * @since 4.7.0
+ * @since 4.8.0
  */
 public class CollectionChainInputTypeResolver implements ChainInputTypeResolver {
 
