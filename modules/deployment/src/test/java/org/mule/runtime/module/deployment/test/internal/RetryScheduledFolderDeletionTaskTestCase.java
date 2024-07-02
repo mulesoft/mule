@@ -11,9 +11,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.module.deployment.internal.NativeLibrariesFolderDeletion;
@@ -23,42 +24,34 @@ import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Prober;
 
-import java.io.File;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
 import io.qameta.allure.Issue;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 @Issue("W-15894519")
 public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCase {
 
-  private static final int TIMEOUT_MILLIS = 60000;
+  private static final int TIMEOUT_MILLIS = 5000;
   private static final int POLL_DELAY_MILLIS = 100;
   private static final int CORE_POOL_SIZE = 1;
   private static final int MAX_ATTEMPTS = 3;
   private static final int INITIAL_DELAY = 0;
   private static final int DELAY = 1;
 
-  private static final String ARTIFACT_ID = "application-test";
-
   private static final TestLogger retryScheduledFolderDeletionTaskLogger = getTestLogger(RetryScheduledFolderDeletionTask.class);
 
-  @Rule
-  public TemporaryFolder nativeLibrariesFolder = new TemporaryFolder();
-
   @Test
-  public void retryScheduledFileDeletionTaskAtFirstAttemptDeletesTheTempFolder() {
+  public void retryScheduledFolderDeletionTaskAtFirstAttemptDeletesTheTempFolder() {
+    NativeLibrariesFolderDeletion nativeLibrariesFolderDeletion = mock(NativeLibrariesFolderDeletion.class);
+    when(nativeLibrariesFolderDeletion.doAction()).thenReturn(true);
+
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
     RetryScheduledFolderDeletionTask retryTask =
-        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS,
-                                             new NativeLibrariesFolderDeletion(ARTIFACT_ID,
-                                                                               nativeLibrariesFolder.getRoot()));
+        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion);
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
     Prober prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
@@ -67,7 +60,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       @Override
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
-        assertFalse(nativeLibrariesFolder.getRoot().exists());
+        verify(nativeLibrariesFolderDeletion, times(1)).doAction();
         assertNativeLibrariesTempFolderIsDeleteAtFirstAttemptLogging();
         return true;
       }
@@ -80,12 +73,13 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   }
 
   @Test
-  public void retryScheduledFileDeletionTaskAtSecondAttemptDeletesTheTempFolder() {
+  public void retryScheduledFolderDeletionTaskAtSecondAttemptDeletesTheTempFolder() {
+    NativeLibrariesFolderDeletion nativeLibrariesFolderDeletion = mock(NativeLibrariesFolderDeletion.class);
+    when(nativeLibrariesFolderDeletion.doAction()).thenReturn(false).thenReturn(true);
+
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
     RetryScheduledFolderDeletionTask retryTask =
-        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS,
-                                             new TestAtSecondAttemptNativeLibrariesFileDeletion(ARTIFACT_ID,
-                                                                                                nativeLibrariesFolder.getRoot()));
+        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion);
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
     Prober prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
@@ -94,7 +88,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       @Override
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
-        assertFalse(nativeLibrariesFolder.getRoot().exists());
+        verify(nativeLibrariesFolderDeletion, times(2)).doAction();
         assertNativeLibrariesTempFolderIsDeleteAtSecondAttemptLogging();
         return true;
       }
@@ -107,7 +101,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   }
 
   @Test
-  public void retryScheduledFileDeletionTaskNeverDeletesTheTempFolder() {
+  public void retryScheduledFolderDeletionTaskNeverDeletesTheTempFolder() {
     NativeLibrariesFolderDeletion nativeLibrariesFolderDeletion = mock(NativeLibrariesFolderDeletion.class);
     when(nativeLibrariesFolderDeletion.doAction()).thenReturn(false);
 
@@ -122,7 +116,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       @Override
       protected boolean test() {
         assertTrue(scheduler.isShutdown());
-        assertTrue(nativeLibrariesFolder.getRoot().exists());
+        verify(nativeLibrariesFolderDeletion, times(3)).doAction();
         assertNativeLibrariesTempFolderIsNotDeleteLogging();
         return true;
       }
@@ -132,26 +126,6 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
         return "Failed to test the deletion task.";
       }
     });
-  }
-
-  private static class TestAtSecondAttemptNativeLibrariesFileDeletion extends NativeLibrariesFolderDeletion {
-
-    private final int MAX_ATTEMPTS = 2;
-    private final AtomicInteger attempts = new AtomicInteger(0);
-
-    public TestAtSecondAttemptNativeLibrariesFileDeletion(String applicationName, File appNativeLibrariesFolder) {
-      super(applicationName, appNativeLibrariesFolder);
-    }
-
-    @Override
-    public boolean doAction() {
-      int attempt = attempts.incrementAndGet();
-      if (attempt < MAX_ATTEMPTS) {
-        return false;
-      } else {
-        return super.doAction();
-      }
-    }
   }
 
   private void assertNativeLibrariesTempFolderIsNotDeleteLogging() {

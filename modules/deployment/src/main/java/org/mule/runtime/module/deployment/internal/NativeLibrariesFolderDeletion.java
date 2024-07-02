@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 public class NativeLibrariesFolderDeletion {
 
   private final String applicationName;
-  private File appNativeLibrariesFolder;
+  private final File appNativeLibrariesFolder;
   private static final Logger LOGGER = getLogger(NativeLibrariesFolderDeletion.class);
 
   public NativeLibrariesFolderDeletion(String applicationName, File appNativeLibrariesFolder) {
@@ -31,10 +31,11 @@ public class NativeLibrariesFolderDeletion {
 
     try {
       deleteDirectory(appNativeLibrariesFolder);
-    } catch (Exception e) {
-      LOGGER.warn(
-                  format("Cannot delete App Native Libraries folder '%s' from artifact '%s'. This could be related to some files still being used. Exception: %s",
-                         appNativeLibrariesFolder, applicationName, e.getMessage()));
+      LOGGER.debug("App Native Libraries folder deleted: {}", appNativeLibrariesFolder.getAbsolutePath());
+    } catch (Throwable e) {
+      LOGGER
+          .warn(format("Cannot delete App Native Libraries folder '%s' from artifact '%s'. This could be related to some files still being used. Exception: %s",
+                       appNativeLibrariesFolder, applicationName, e.getMessage()));
       actionPerformed = false;
     }
 
