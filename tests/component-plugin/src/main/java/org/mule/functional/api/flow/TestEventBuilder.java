@@ -25,6 +25,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
@@ -50,6 +51,7 @@ public class TestEventBuilder {
 
   private String sourceCorrelationId = null;
   private ItemSequenceInfo itemSequenceInfo;
+  private SecurityContext securityContext;
 
   private final Map<String, TypedValue> variables = new HashMap<>();
 
@@ -127,6 +129,17 @@ public class TestEventBuilder {
     return this;
   }
 
+  /**
+   * Configures the product event to have the provided {@code securityContext}. See {@link CoreEvent#getSecurityContext()}.
+   *
+   * @return this {@link TestEventBuilder}
+   */
+  public TestEventBuilder withSecurityContext(SecurityContext securityContext) {
+    this.securityContext = securityContext;
+
+    return this;
+  }
+
 
   /**
    * Prepares a flow variable with the given key and value to be set in the product.
@@ -191,10 +204,13 @@ public class TestEventBuilder {
     EventContext eventContext = getEventContext(flow);
 
     CoreEvent.Builder builder = CoreEvent.builder(eventContext)
-        .message(spyMessage.apply(muleMessage)).itemSequenceInfo(ofNullable(itemSequenceInfo));
+        .message(spyMessage.apply(muleMessage))
+        .itemSequenceInfo(ofNullable(itemSequenceInfo))
+        .securityContext(securityContext);
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
     }
+
     CoreEvent event = builder.build();
 
     return spyEvent.apply(event);
