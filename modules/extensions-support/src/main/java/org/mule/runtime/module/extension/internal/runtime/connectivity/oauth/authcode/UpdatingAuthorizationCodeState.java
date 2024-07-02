@@ -29,8 +29,7 @@ public class UpdatingAuthorizationCodeState
   private boolean invalidated = false;
   private AuthorizationCodeOAuthDancer dancer;
   private AuthorizationCodeConfig config;
-
-  MuleContext muleContext;
+  private MuleContext muleContext;
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
