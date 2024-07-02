@@ -13,7 +13,6 @@ import static org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterEx
 import static java.lang.Long.parseLong;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import io.opentelemetry.api.common.AttributesBuilder;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
@@ -27,6 +26,7 @@ import java.util.Map;
 import java.util.List;
 
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounterBuilder;
 import io.opentelemetry.api.metrics.LongUpDownCounterBuilder;
 import io.opentelemetry.api.metrics.ObservableLongCounter;
