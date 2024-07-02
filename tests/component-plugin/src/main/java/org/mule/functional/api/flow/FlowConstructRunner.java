@@ -6,9 +6,11 @@
  */
 package org.mule.functional.api.flow;
 
-import static java.lang.String.format;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
+
+import static org.junit.Assert.fail;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -16,17 +18,18 @@ import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import org.mockito.Mockito;
-
 import java.io.Serializable;
 import java.util.Map;
 
 import javax.activation.DataHandler;
+
+import org.mockito.Mockito;
 
 /**
  * Provides a fluent API for running events through batch FlowConstructs.
@@ -168,6 +171,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
    * @return this {@link TestEventBuilder}
    * @deprecated use {@link #withItemSequenceInfo(ItemSequenceInfo)}
    */
+  @Deprecated
   public R withCorrelation(GroupCorrelation correlation) {
     return withItemSequenceInfo(fromGroupCorrelation(correlation));
   }
@@ -183,7 +187,16 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
     return (R) this;
   }
 
+  /**
+   * Configures the product event to have the provided {@code securityContext}. See {@link CoreEvent#getSecurityContext()}.
+   *
+   * @return this {@link TestEventBuilder}
+   */
+  public R withSecurityContext(SecurityContext securityContext) {
+    eventBuilder.withSecurityContext(securityContext);
 
+    return (R) this;
+  }
 
   /**
    * Prepares a flow variable with the given key and value to be set in the {@link Message} to the configured flow.
