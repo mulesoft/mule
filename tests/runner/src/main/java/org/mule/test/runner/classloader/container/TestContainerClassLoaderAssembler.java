@@ -24,9 +24,12 @@ import java.util.Set;
 public interface TestContainerClassLoaderAssembler {
 
   static TestContainerClassLoaderAssembler create(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
-                                                  List<URL> muleUrls,
-                                                  List<URL> optUrls) {
-    return new DefaultTestContainerClassLoaderAssembler(extraBootPackages, extraPrivilegedArtifacts, muleUrls, optUrls);
+                                                  List<URL> muleApisOptUrls,
+                                                  List<URL> muleApisUrls,
+                                                  List<URL> optUrls,
+                                                  List<URL> muleUrls) {
+    return new DefaultTestContainerClassLoaderAssembler(extraBootPackages, extraPrivilegedArtifacts, muleApisOptUrls,
+                                                        muleApisUrls, optUrls, muleUrls);
   }
 
   /**

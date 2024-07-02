@@ -32,7 +32,7 @@ public interface MultiLevelClassLoaderFactory {
    * {@code "parent" classloader <- "intermediate" classloader <- "child" classlaoder}
    * <p>
    * Arrows represent the {@code parent} relationship.
-   * 
+   *
    * @param parent              the {@link ClassLoader} to use as parent of the intermediate one.
    * @param intermediateEntries the entries that the intermediate {@link ClassLoader} will contain.
    * @param childEntries        the entries that the child {@link ClassLoader} will contain.

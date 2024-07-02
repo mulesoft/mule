@@ -21,6 +21,7 @@ import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.io.InputStream;
 import java.lang.module.ModuleDescriptor.Exports;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
       return fallbackClasspathModuleDiscoverer.discover();
     }
 
-    final List<MuleContainerModule> discoveredModules = this.getClass().getModule().getLayer().modules()
+    final List<MuleContainerModule> discoveredModules = getModules(this.getClass().getModule().getLayer())
         .stream()
         .map(jpmsModule -> {
           if (jpmsModule.getDescriptor().isAutomatic()) {
@@ -78,6 +79,17 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
         .forEach(discoveredModules::add);
 
     return discoveredModules;
+  }
+
+  private Set<Module> getModules(ModuleLayer layer) {
+    Set<Module> modules = new HashSet<>(layer.modules());
+    for (ModuleLayer parent : layer.parents()) {
+      modules.addAll(getModules(parent));
+    }
+
+    return modules.stream()
+        .filter(module -> module.getName().startsWith("org.mule") || module.getName().startsWith("com.mulesoft"))
+        .collect(toSet());
   }
 
 

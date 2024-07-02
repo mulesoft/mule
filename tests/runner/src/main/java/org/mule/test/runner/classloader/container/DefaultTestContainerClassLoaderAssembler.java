@@ -6,12 +6,17 @@
  */
 package org.mule.test.runner.classloader.container;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
 import static org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator.BOOT_PACKAGES;
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
 import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
 
+import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Stream.of;
 
 import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
 
@@ -27,6 +32,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -35,18 +41,25 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DefaultTestContainerClassLoaderAssembler implements TestContainerClassLoaderAssembler {
 
+  public static final String TEST_RUNNER_LEGACY_LAYER_HIERARCHY_MODE = "test.runner.legacy.layer.hierarchy";
+
   private ModuleRepository moduleRepository;
   private final List<String> extraBootPackages;
   private final Set<String> extraPrivilegedArtifacts;
-  private final URL[] muleUrls;
+  private final URL[] muleApisOptUrls;
+  private final URL[] muleApisUrls;
   private final URL[] optUrls;
+  private final URL[] muleUrls;
 
   public DefaultTestContainerClassLoaderAssembler(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
-                                                  List<URL> muleUrls, List<URL> optUrls) {
+                                                  List<URL> muleApisOptUrls, List<URL> muleApisUrls, List<URL> optUrls,
+                                                  List<URL> muleUrls) {
     this.extraBootPackages = extraBootPackages;
     this.extraPrivilegedArtifacts = extraPrivilegedArtifacts;
-    this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
+    this.muleApisOptUrls = muleApisOptUrls.toArray(new URL[muleApisOptUrls.size()]);
+    this.muleApisUrls = muleApisUrls.toArray(new URL[muleApisUrls.size()]);
     this.optUrls = optUrls.toArray(new URL[optUrls.size()]);
+    this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
   }
 
   /**
@@ -70,9 +83,45 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
-    ClassLoader containerSystemClassloader = createModuleLayerClassLoader(optUrls, muleUrls,
-                                                                          MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                                                          launcherArtifact);
+    ClassLoader containerSystemClassloader;
+    if (getBoolean(TEST_RUNNER_LEGACY_LAYER_HIERARCHY_MODE)) {
+      URL[] fullOptUrls = of(muleApisOptUrls, optUrls).flatMap(Stream::of).toArray(URL[]::new);
+      URL[] fullMuleUrls = of(muleApisUrls, muleUrls).flatMap(Stream::of).toArray(URL[]::new);
+      containerSystemClassloader = createModuleLayerClassLoader(fullOptUrls, fullMuleUrls,
+                                                                MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
+                                                                launcherArtifact);
+    } else {
+      ClassLoader muleApisOptClassloader = createModuleLayerClassLoader(muleApisOptUrls, launcherArtifact);
+
+      Class<?> muleApisOptClass = loadClass("org.apache.commons.lang3.StringUtils", muleApisOptClassloader);
+
+      ClassLoader muleApisClassloader =
+          createModuleLayerClassLoader(muleApisUrls, muleApisOptClassloader,
+                                       singletonList(muleApisOptClass));
+
+      ClassLoader optClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisOptClassloader : muleApisClassloader;
+      ClassLoader optClassloader =
+          createModuleLayerClassLoader(optUrls, optClassloaderParent,
+                                       singletonList(muleApisOptClass));
+
+      Class<?> muleImplementationsLoaderUtilsClass =
+          loadClass("org.mule.runtime.api.util.classloader.MuleImplementationLoaderUtils", muleApisClassloader);
+
+      Class<?> optClass =
+          loadClass("org.mule.maven.client.api.MavenClient", optClassloader);
+
+      ClassLoader containerSystemClassloaderParent = classloaderContainerJpmsModuleLayer() ? muleApisClassloader : optClassloader;
+      containerSystemClassloader = createModuleLayerClassLoader(muleUrls, containerSystemClassloaderParent,
+                                                                asList(muleImplementationsLoaderUtilsClass,
+                                                                       optClass));
+
+      try {
+        muleImplementationsLoaderUtilsClass.getMethod("setMuleImplementationsLoader", ClassLoader.class)
+            .invoke(null, containerSystemClassloader);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
 
     TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =
         new TestPreFilteredContainerClassLoaderCreator(containerSystemClassloader, bootPackages, extraPrivilegedArtifacts);
@@ -80,6 +129,14 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
 
     return new ContainerClassLoaderFactory(testContainerClassLoaderCreator, cl -> launcherArtifact)
         .createContainerClassLoader(containerSystemClassloader);
+  }
+
+  private Class<?> loadClass(String name, ClassLoader classLoader) {
+    try {
+      return classLoader.loadClass(name);
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

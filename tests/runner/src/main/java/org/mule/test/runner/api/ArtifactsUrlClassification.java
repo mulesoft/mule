@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class ArtifactsUrlClassification {
 
+  private final List<URL> containerMuleApisOptUrls;
+  private final List<URL> containerMuleApisUrls;
   private final List<URL> containerMuleUrls;
   private final List<URL> containerOptUrls;
   private final List<ServiceUrlClassification> serviceUrlClassifications;
@@ -30,10 +32,14 @@ public class ArtifactsUrlClassification {
 
   /**
    * Creates a instance with the list of {@link URL}s classified in container, plugins and application.
-   * 
-   * @param containerMuleUrls         list of {@link URL} that define the artifacts that would be loaded with the container
+   *
+   * @param containerMuleApisOptUrls  list of {@link URL}s that define the artifacts that would be loaded with the container
+   *                                  {@link ClassLoader} encapsulating its api. Not null.
+   * @param containerMuleApisUrls     list of {@link URL}s that define the artifacts that would be loaded with the container
+   *                                  {@link ClassLoader} encapsulating its api. Not null.
+   * @param containerMuleUrls         list of {@link URL}s that define the artifacts that would be loaded with the container
    *                                  {@link ClassLoader} exporting its api. Not null.
-   * @param containerOptUrls          list of {@link URL} that define the artifacts that would be loaded with the container
+   * @param containerOptUrls          list of {@link URL}s that define the artifacts that would be loaded with the container
    *                                  {@link ClassLoader} encapsulating its api. Not null.
    * @param serviceUrlClassifications for each plugin discovered a list of {@link ArtifactUrlClassification} that defines the
    *                                  artifact that would be loaded by the service {@link ClassLoader}. Not null.
@@ -47,7 +53,9 @@ public class ArtifactsUrlClassification {
    * @param testRunnerExportedLibUrls define the artifacts that will exported on the test runner plugin in addition to the test
    *                                  classes and resources from the module being tested
    */
-  public ArtifactsUrlClassification(List<URL> containerMuleUrls,
+  public ArtifactsUrlClassification(List<URL> containerMuleApisOptUrls,
+                                    List<URL> containerMuleApisUrls,
+                                    List<URL> containerMuleUrls,
                                     List<URL> containerOptUrls,
                                     List<ServiceUrlClassification> serviceUrlClassifications,
                                     List<URL> testRunnerLibUrls,
@@ -55,6 +63,8 @@ public class ArtifactsUrlClassification {
                                     List<URL> applicationSharedLibUrls,
                                     List<PluginUrlClassification> pluginUrlClassifications,
                                     List<URL> testRunnerExportedLibUrls) {
+    requireNonNull(containerMuleApisOptUrls, "containerMuleApisOptUrls cannot be null");
+    requireNonNull(containerMuleApisUrls, "containerMuleApisUrls cannot be null");
     requireNonNull(containerMuleUrls, "containerMuleUrls cannot be null");
     requireNonNull(containerOptUrls, "containerOptUrls cannot be null");
     requireNonNull(serviceUrlClassifications, "serviceUrlClassifications cannot be null");
@@ -64,6 +74,8 @@ public class ArtifactsUrlClassification {
     requireNonNull(pluginUrlClassifications, "pluginUrlClassifications cannot be null");
     requireNonNull(testRunnerExportedLibUrls, "testRunnerExportedLibUrls cannot be null");
 
+    this.containerMuleApisOptUrls = containerMuleApisOptUrls;
+    this.containerMuleApisUrls = containerMuleApisUrls;
     this.containerMuleUrls = containerMuleUrls;
     this.containerOptUrls = containerOptUrls;
     this.serviceUrlClassifications = serviceUrlClassifications;
@@ -72,6 +84,14 @@ public class ArtifactsUrlClassification {
     this.testRunnerLibUrls = testRunnerLibUrls;
     this.testRunnerExportedLibUrls = testRunnerExportedLibUrls;
     this.applicationLibUrls = applicationLibUrls;
+  }
+
+  public List<URL> getContainerMuleApisOptUrls() {
+    return containerMuleApisOptUrls;
+  }
+
+  public List<URL> getContainerMuleApisUrls() {
+    return containerMuleApisUrls;
   }
 
   public List<URL> getContainerMuleUrls() {
@@ -105,4 +125,5 @@ public class ArtifactsUrlClassification {
   public List<URL> getTestRunnerExportedLibUrls() {
     return testRunnerExportedLibUrls;
   }
+
 }
