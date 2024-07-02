@@ -173,9 +173,6 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
 
   @Override
   public DefaultComponentMetadataConfigurer asOneOfRouter() {
-    if (chainInputTypeResolver == null) {
-      withPassThroughChainInputTypeResolver();
-    }
     setOutputTypeResolver(OneOfRoutesOutputTypeResolver.INSTANCE);
     setAttributesTypeResolver(OneOfRoutesOutputTypeResolver.INSTANCE);
 
@@ -195,9 +192,6 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
 
   @Override
   public DefaultComponentMetadataConfigurer asAllOfRouter() {
-    if (chainInputTypeResolver == null) {
-      withPassThroughChainInputTypeResolver();
-    }
     setOutputTypeResolver(AllOfRoutesOutputTypeResolver.INSTANCE);
     return this;
   }
