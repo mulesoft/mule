@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppNativeLibrariesTempFolder;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -1639,6 +1640,31 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     // Check the tmp directory was effectively removed
     assertThat(metaFolder, not(exists));
+  }
+
+  @Test
+  @Story(UNDEPLOYMENT)
+  public void undeploysAppRemovesTemporaryNativeLibrariesData() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+
+    File nativeLibrariesTempFolder = getAppNativeLibrariesTempFolder(app.getArtifactName());
+
+    // As this app has a plugin, the tmp directory must exist
+    assertThat(nativeLibrariesTempFolder.listFiles().length, is(1));
+
+    // Remove the anchor file so undeployment starts
+    assertTrue("Unable to remove anchor file", removeAppAnchorFile(dummyAppDescriptorFileBuilder.getId()));
+
+    assertUndeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    assertStatus(app, DESTROYED);
+
+    // Check the tmp directory was effectively removed
+    assertThat(nativeLibrariesTempFolder.listFiles().length, is(0));
   }
 
   @Test
