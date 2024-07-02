@@ -17,12 +17,13 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_C
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_RESET;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_RESET;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_IMPORT_TARGET_SAME_TYPE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
@@ -364,6 +365,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDisableXmlSdkImplicitConfigurationCreation();
       configureEnableXmlSdkReset();
       configureUnsupportedExtensionsClientRunAsync();
+      configureEnforceImportTargetSameType();
     }
   }
 
@@ -1597,6 +1599,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC,
                                                 minMuleVersion("4.8.0").and(minJavaVersion(JAVA_21)));
+  }
+
+  private static void configureEnforceImportTargetSameType() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENFORCE_IMPORT_TARGET_SAME_TYPE,
+                                                minMuleVersion("4.8.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
