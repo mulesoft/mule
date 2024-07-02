@@ -23,18 +23,18 @@ public class RetryScheduledFolderDeletionTask implements Runnable {
   private final ScheduledExecutorService scheduler;
   private final int maxAttempts;
   private final AtomicInteger attempts;
-  private final NativeLibrariesFolderDeletion fileDeletion;
+  private final NativeLibrariesFolderDeletion folderDeletion;
   private static final Logger LOGGER = getLogger(RetryScheduledFolderDeletionTask.class);
   private static final boolean DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL =
       getBoolean(DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL_PROPERTY);
 
 
   public RetryScheduledFolderDeletionTask(ScheduledExecutorService scheduler, int maxAttempts,
-                                          NativeLibrariesFolderDeletion fileDeletion) {
+                                          NativeLibrariesFolderDeletion folderDeletion) {
     this.scheduler = scheduler;
     this.maxAttempts = maxAttempts;
     this.attempts = new AtomicInteger(0);
-    this.fileDeletion = fileDeletion;
+    this.folderDeletion = folderDeletion;
   }
 
   @Override
@@ -58,6 +58,6 @@ public class RetryScheduledFolderDeletionTask implements Runnable {
   }
 
   private boolean performAction() {
-    return fileDeletion.doAction();
+    return folderDeletion.doAction();
   }
 }

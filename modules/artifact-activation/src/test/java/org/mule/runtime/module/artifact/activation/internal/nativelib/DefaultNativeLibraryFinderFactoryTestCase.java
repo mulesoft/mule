@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.activation.internal.nativelib;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
-import static java.lang.String.valueOf;
 import static java.util.UUID.randomUUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,7 +42,7 @@ public class DefaultNativeLibraryFinderFactoryTestCase extends AbstractMuleTestC
                            () -> {
                              NativeLibraryFinder nativeLibraryFinder =
                                  nativeLibraryFinderFactory.create("testApp",
-                                                                   valueOf(randomUUID()),
+                                                                   randomUUID().toString(),
                                                                    new URL[0]);
 
                              assertThat(nativeLibraryFinder,

@@ -316,15 +316,14 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
       if (removeData) {
-        final String appName = artifact.getDescriptor().getDataFolderName();
-        final File appDataFolder = getAppDataFolder(appName);
+        final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
         try {
-          deleteDirectory(appDataFolder);
+          deleteDirectory(dataFolder);
           deleteNativeLibraries(artifact);
         } catch (IOException e) {
           logger.warn(
                       format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
-                             appDataFolder, artifact.getArtifactName()),
+                             dataFolder, artifact.getArtifactName()),
                       e);
         }
       }
@@ -338,9 +337,9 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   }
 
   private void deleteNativeLibraries(T artifact) {
-    final String appName = artifact.getDescriptor().getDataFolderName();
+    final String appDataFolderName = artifact.getDescriptor().getDataFolderName();
     final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
-    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appName, loadedNativeLibrariesFolderName);
+    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appDataFolderName, loadedNativeLibrariesFolderName);
 
     if (appNativeLibrariesFolder.exists()) {
       try {
@@ -356,14 +355,14 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   }
 
   private void executeSchedulerFileDeletion(T artifact) {
-    final String appName = artifact.getDescriptor().getDataFolderName();
+    final String appDataFolderName = artifact.getDescriptor().getDataFolderName();
     final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
-    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appName, loadedNativeLibrariesFolderName);
+    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appDataFolderName, loadedNativeLibrariesFolderName);
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
     RetryScheduledFolderDeletionTask retryTask =
         new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS,
-                                             new NativeLibrariesFolderDeletion(appName, appNativeLibrariesFolder));
+                                             new NativeLibrariesFolderDeletion(appDataFolderName, appNativeLibrariesFolder));
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
   }
 

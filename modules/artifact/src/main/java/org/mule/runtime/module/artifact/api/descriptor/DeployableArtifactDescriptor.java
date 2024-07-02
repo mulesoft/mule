@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static java.lang.String.valueOf;
 import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
@@ -42,7 +41,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private File logConfigFile;
   private Optional<Properties> deploymentProperties = empty();
   private Set<String> supportedJavaVersions = emptySet();
-  private final String nativeLibrariesFolderName = valueOf(randomUUID());
+  private final String nativeLibrariesFolderName = randomUUID().toString();
 
   /**
    * Creates a new deployable artifact descriptor

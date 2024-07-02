@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
-import static java.util.Optional.empty;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppNativeLibrariesTempFolder;
 
+import static java.util.Optional.empty;
+import static java.util.UUID.randomUUID;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
@@ -75,6 +80,26 @@ public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
     verify(deploymentListener).onDeploymentFailure(anyString(), same(exceptionWithNoCause));
   }
 
+  @Test
+  @Issue("W-15894519")
+  public void undeployDeletesTheNativeLibrariesTempFolder() {
+    AbstractDeployableArtifactFactory artifactFactory = mock(AbstractDeployableArtifactFactory.class);
+    ArtifactDeployer artifactDeployer = mock(ArtifactDeployer.class);
+    DefaultArchiveDeployer<ApplicationDescriptor, Application> deployer = createDeployer(artifactDeployer, artifactFactory);
+    Application application = createMockApplicationWithoutExceptions();
+    String loadedNativeLibrariesFolderName = application.getDescriptor().getLoadedNativeLibrariesFolderName();
+    File nativeLibrariesTempFolder = getAppNativeLibrariesTempFolder(ARTIFACT_ID, loadedNativeLibrariesFolderName);
+
+    nativeLibrariesTempFolder.mkdirs();
+
+    deployer.setDeploymentListener(mock(DeploymentListener.class));
+    deployer.deployArtifact(application, empty());
+    assertTrue(nativeLibrariesTempFolder.exists());
+
+    deployer.undeployArtifact(ARTIFACT_ID);
+    assertFalse(nativeLibrariesTempFolder.exists());
+  }
+
   @NotNull
   private static DefaultArchiveDeployer createDeployer(ArtifactDeployer artifactDeployer,
                                                        AbstractDeployableArtifactFactory artifactFactory) {
@@ -85,6 +110,17 @@ public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
     Application artifact = mock(Application.class);
     ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
     when(descriptor.getDataFolderName()).thenReturn(ARTIFACT_ID).thenThrow(new RuntimeException((new IOException())));
+    when(artifact.getDescriptor()).thenReturn(descriptor);
+    when(artifact.getArtifactName()).thenReturn(ARTIFACT_ID);
+    when(artifact.getResourceFiles()).thenReturn(new File[0]);
+    return artifact;
+  }
+
+  private Application createMockApplicationWithoutExceptions() {
+    Application artifact = mock(Application.class);
+    ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
+    when(descriptor.getDataFolderName()).thenReturn(ARTIFACT_ID);
+    when(descriptor.getLoadedNativeLibrariesFolderName()).thenReturn(randomUUID().toString());
     when(artifact.getDescriptor()).thenReturn(descriptor);
     when(artifact.getArtifactName()).thenReturn(ARTIFACT_ID);
     when(artifact.getResourceFiles()).thenReturn(new File[0]);
