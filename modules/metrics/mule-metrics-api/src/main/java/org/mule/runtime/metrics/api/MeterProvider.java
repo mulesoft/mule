@@ -16,12 +16,14 @@ import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
  *
  * @since 4.5.0
  */
-public interface MeterProvider<T extends Meter> {
+public interface MeterProvider {
+
+  MeterProvider NO_OP = meterName -> MeterBuilder.NO_OP;
 
   /**
    * @param meterName the meter name.
    *
    * @return a {@link Meter} with the corresponding name.
    */
-  MeterBuilder<T> getMeterBuilder(String meterName);
+  MeterBuilder getMeterBuilder(String meterName);
 }

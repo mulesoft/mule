@@ -13,6 +13,7 @@ import static org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterEx
 import static java.lang.Long.parseLong;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import io.opentelemetry.api.common.AttributesBuilder;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
@@ -78,16 +79,19 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
   @Override
   public synchronized void enableExport(LongCounter longCounter) {
     Meter openTelemetryMeter = openTelemetryMeters.get(longCounter.getMeter().getName());
-    Attributes attributes = new OpentelemetryExporterAttributes(longCounter.getMeter());
     LongCounterBuilder longCounterBuilder =
         openTelemetryMeter.counterBuilder(longCounter.getName()).setDescription(longCounter.getDescription());
-
     if (longCounter.getUnit() != null) {
       longCounterBuilder = longCounterBuilder.setUnit(longCounter.getUnit());
     }
+    io.opentelemetry.api.metrics.LongCounter otelLongCounter = longCounterBuilder.build();
+    longCounter.onAddition((value, stringStringMap) -> otelLongCounter.add(value, getOtelAttributes(stringStringMap)));
+  }
 
-    counters
-        .add(longCounterBuilder.buildWithCallback(measurement -> measurement.record(longCounter.getValueAsLong(), attributes)));
+  private Attributes getOtelAttributes(Map<String, String> stringStringMap) {
+    AttributesBuilder attributesBuilder = Attributes.builder();
+    stringStringMap.forEach(attributesBuilder::put);
+    return attributesBuilder.build();
   }
 
   @Override

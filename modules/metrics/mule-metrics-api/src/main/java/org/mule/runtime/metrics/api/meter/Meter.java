@@ -21,6 +21,34 @@ import java.util.function.BiConsumer;
  **/
 public interface Meter {
 
+  Meter NO_OP = new Meter() {
+
+    @Override
+    public String getName() {
+      return "NO_OP";
+    }
+
+    @Override
+    public String getDescription() {
+      return "NO_OP";
+    }
+
+    @Override
+    public void forEachAttribute(BiConsumer<String, String> biConsumer) {
+      // Nothing to do.
+    }
+
+    @Override
+    public LongUpDownCounterBuilder upDownCounterBuilder(String name) {
+      return LongUpDownCounterBuilder.NO_OP;
+    }
+
+    @Override
+    public LongCounterBuilder counterBuilder(String name) {
+      return LongCounterBuilder.NO_OP;
+    }
+  };
+
   /**
    * @return name of the meter.
    */

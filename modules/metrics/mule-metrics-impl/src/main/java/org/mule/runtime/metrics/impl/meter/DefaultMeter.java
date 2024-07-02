@@ -26,8 +26,8 @@ public class DefaultMeter implements Meter {
   private final MeterExporter meterExporter;
   private final Map<String, String> meterAttributes;
 
-  public static MeterBuilderWithRepository<Meter> builder(String meterName) {
-    return new BaseMeterBuilder<Meter>(meterName) {
+  public static MeterBuilderWithRepository builder(String meterName) {
+    return new BaseMeterBuilder(meterName) {
 
       @Override
       protected DefaultMeter doBuild(String meterName, String description, MeterExporter meterExporter,

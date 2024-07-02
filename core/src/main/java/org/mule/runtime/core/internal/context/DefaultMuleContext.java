@@ -43,8 +43,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATIO
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ARTIFACT_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
@@ -186,7 +185,6 @@ import java.util.function.Predicate;
 
 import javax.transaction.TransactionManager;
 
-import org.mule.runtime.metrics.api.internal.error.ErrorMetrics;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Hooks;
@@ -400,11 +398,10 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
             .filter(generator -> generator instanceof ExpressionCorrelationIdGenerator)
             .ifPresent(generator -> ((ExpressionCorrelationIdGenerator) generator).initializeGenerator());
 
-        MeterProvider meterProvider = muleRegistryHelper.lookupObject(MULE_METER_PROVIDER_KEY);
+        MeterProvider meterProvider = muleRegistryHelper.lookupObject(MULE_ARTIFACT_METER_PROVIDER_KEY);
         if (meterProvider != null) {
           stats.trackUsingMeterProvider(meterProvider, this.getConfiguration().getId());
         }
-        stats.trackUsingErrorMetrics(muleRegistryHelper.lookupObject(MULE_ERROR_METRICS_KEY));
 
       } catch (InitialisationException e) {
         dispose();
