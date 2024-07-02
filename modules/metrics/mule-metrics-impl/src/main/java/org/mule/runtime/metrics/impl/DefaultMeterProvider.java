@@ -10,7 +10,6 @@ import static org.mule.runtime.metrics.impl.meter.DefaultMeter.builder;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
@@ -25,17 +24,16 @@ import javax.inject.Inject;
  */
 public class DefaultMeterProvider implements MeterProvider, Disposable {
 
-  @Inject
-  MeterExporterFactory meterExporterFactory;
-
-  @Inject
-  MuleContext muleContext;
-
-  @Inject
-  MeterExporterConfiguration meterExporterConfiguration;
-
-  MeterRepository meterRepository = new MeterRepository();
+  private final MeterExporterFactory meterExporterFactory;
+  private final MeterExporterConfiguration meterExporterConfiguration;
+  private final MeterRepository meterRepository = new MeterRepository();
   private final LazyValue<MeterExporter> meterExporter = new LazyValue<>(this::resolveMeterExporter);
+
+  @Inject
+  public DefaultMeterProvider(MeterExporterFactory meterExporterFactory, MeterExporterConfiguration meterExporterConfiguration) {
+    this.meterExporterFactory = meterExporterFactory;
+    this.meterExporterConfiguration = meterExporterConfiguration;
+  }
 
   private MeterExporter resolveMeterExporter() {
     return meterExporterFactory.getMeterExporter(meterExporterConfiguration);

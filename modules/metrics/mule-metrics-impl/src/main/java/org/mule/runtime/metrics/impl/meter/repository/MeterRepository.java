@@ -23,15 +23,8 @@ public class MeterRepository {
    * @param name            the name of the meter
    * @param builderFunction the builder function to create {@link Meter} if not present.
    */
-  public Meter create(String name, Function<String, Meter> builderFunction) {
+  public Meter getOrCreate(String name, Function<String, Meter> builderFunction) {
     return meterMap.computeIfAbsent(name, builderFunction);
   }
 
-  /**
-   * @param name of the meter
-   * @return the {@link Meter}
-   */
-  public Meter get(String name) {
-    return meterMap.get(name);
-  }
 }

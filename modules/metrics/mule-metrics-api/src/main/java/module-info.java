@@ -12,10 +12,13 @@
  */
 module org.mule.runtime.metrics.api {
 
+  requires org.mule.runtime.api;
+
   exports org.mule.runtime.metrics.api;
   exports org.mule.runtime.metrics.api.instrument;
   exports org.mule.runtime.metrics.api.instrument.builder;
   exports org.mule.runtime.metrics.api.meter;
   exports org.mule.runtime.metrics.api.meter.builder;
+  exports org.mule.runtime.metrics.api.error;
 
 }

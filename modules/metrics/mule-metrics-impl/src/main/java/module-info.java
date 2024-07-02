@@ -27,5 +27,7 @@ module org.mule.runtime.metrics.internal.impl {
 
   opens org.mule.runtime.metrics.impl to
       spring.core;
+    exports org.mule.runtime.metrics.impl.meter.error to org.mule.runtime.spring.config, spring.beans;
+    opens org.mule.runtime.metrics.impl.meter.error to spring.core;
 
 }

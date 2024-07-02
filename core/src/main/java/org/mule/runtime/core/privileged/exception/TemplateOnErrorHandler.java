@@ -62,6 +62,9 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetrics;
+import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
@@ -92,6 +95,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
+  public static final String MULE_RUNTIME_ERROR_METRICS = "Mule runtime error metrics";
   private ComponentTracer<CoreEvent> componentTracer;
 
   private boolean fromGlobalErrorHandler = false;
@@ -127,6 +131,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
 
   private final CopyOnWriteArrayList<String> suppressedErrorTypeMatches = new CopyOnWriteArrayList<>();
+
+  @Inject
+  MeterProvider meterProvider;
+  @Inject
+  ErrorMetricsFactory errorMetricsFactory;
+  private ErrorMetrics errorMetrics;
 
   private final class OnErrorHandlerFluxObjectFactory
       implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
@@ -200,6 +210,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Override
   public synchronized void initialise() throws InitialisationException {
     componentTracer = componentTracerFactory.fromComponent(TemplateOnErrorHandler.this);
+    errorMetrics = errorMetricsFactory.create(meterProvider.getMeterBuilder(MULE_RUNTIME_ERROR_METRICS).build());
     super.initialise();
   }
 
@@ -217,11 +228,19 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       }
 
       @Override
+      // All calling methods will end up transforming any error class other than MessagingException into that one.
       public void accept(Exception error) {
-        // All calling methods will end up transforming any error class other than MessagingException into that one
+        // We must measure the error only once. The following check is to measure it only when entering the error handler logic
+        // and not bubbling inside it.
+        if (!ErrorHandlerContextManager.isHandling((MessagingException) error))
+          measure((MessagingException) error);
         fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));
       }
     };
+  }
+
+  private void measure(MessagingException error) {
+    errorMetrics.measure(error);
   }
 
   @Override
@@ -234,7 +253,6 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       final Consumer<Exception> router = router(identity(),
                                                 handledEvent -> sink.success(handledEvent),
                                                 rethrownError -> sink.error(rethrownError));
-
       try {
         router.accept(exception);
       } finally {
@@ -252,12 +270,13 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
-        // Do nothing
         logger.warn(ex.getMessage());
       }
       CoreEvent result = afterRouting().apply(((MessagingException) me).getEvent());
       fireEndNotification(ErrorHandlerContextManager.from(this, ((MessagingException) me).getEvent()).getOriginalEvent(), result,
                           me);
+      // We measure the error because it's an error during the handling of an error X(
+      measure((MessagingException) me);
       ErrorHandlerContextManager.resolveHandling(this, (MessagingException) me);
     };
   }
@@ -451,7 +470,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   protected Function<CoreEvent, CoreEvent> beforeRouting() {
     return event -> {
-      Exception exception = getException(event);
+      MessagingException exception = (MessagingException) getException(event);
 
       getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
 
@@ -460,14 +479,19 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         getExceptionListener().fireNotification(exception, event);
       }
       logException(exception, event);
-      getExceptionListener().processStatistics();
+      getExceptionListener().processStatistics(exception, getError(event));
       markExceptionAsHandledIfRequired(exception);
       return event;
     };
   }
 
   protected Exception getException(CoreEvent event) {
+    // #getException() will always return a MessagingException but cannot be changed without breaking backwards compatibility
     return ErrorHandlerContextManager.from(this, event).getException();
+  }
+
+  protected Error getError(CoreEvent event) {
+    return ((MessagingException) getException(event)).getEvent().getError().orElse(null);
   }
 
   /**

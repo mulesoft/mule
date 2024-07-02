@@ -14,8 +14,10 @@ import org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
 
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -35,10 +37,11 @@ public class NoopMeterProvider implements MeterProvider {
 
     private final LongUpDownCounterBuilder LONG_UP_DOWN_COUNTER_BUILDER_INSTANCE = new NoopLongUpDownCounterBuilder();
     private final LongCounterBuilder LONG_COUNTER_BUILDER_INSTANCE = new NoopLongCounterBuilder();
+    private final Meter METER_INSTANCE = new NoopMeter();
 
     @Override
     public Meter build() {
-      return new NoopMeter();
+      return METER_INSTANCE;
     }
 
     @Override
@@ -77,6 +80,7 @@ public class NoopMeterProvider implements MeterProvider {
       public LongCounterBuilder counterBuilder(String name) {
         return LONG_COUNTER_BUILDER_INSTANCE;
       }
+
     }
 
     private class NoopLongUpDownCounterBuilder implements LongUpDownCounterBuilder {
@@ -204,12 +208,12 @@ public class NoopMeterProvider implements MeterProvider {
       }
 
       @Override
-      public LongCounterBuilder withConsumerForAddOperation(Consumer<Long> consumerForAddOperation) {
+      public LongCounterBuilder withAddOperation(BiConsumer<Long, Map<String, String>> addOperation) {
         return this;
       }
 
       @Override
-      public LongCounterBuilder withSupplierForIncrementAndGetOperation(Supplier<Long> supplierForIncrementAndGetOperation) {
+      public LongCounterBuilder withIncrementAndGetOperation(Function<Map<String, String>, Long> incrementAndGetOperation) {
         return this;
       }
 
@@ -237,7 +241,12 @@ public class NoopMeterProvider implements MeterProvider {
 
         @Override
         public void add(long value) {
+          // Nothing to do.
+        }
 
+        @Override
+        public void add(long value, Map<String, String> attributes) {
+          // Nothing to do.
         }
 
         @Override
@@ -256,6 +265,11 @@ public class NoopMeterProvider implements MeterProvider {
         }
 
         @Override
+        public void onAddition(BiConsumer<Long, Map<String, String>> consumer) {
+          // Nothing to do.
+        }
+
+        @Override
         public int incrementAndGetAsInt() {
           return 0;
         }
@@ -264,6 +278,7 @@ public class NoopMeterProvider implements MeterProvider {
         public long incrementAndGetAsLong() {
           return 0;
         }
+
       }
     }
   }

@@ -18,6 +18,8 @@ import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
  */
 public interface MeterProvider {
 
+  MeterProvider NO_OP = meterName -> MeterBuilder.NO_OP;
+
   /**
    * @param meterName the meter name.
    *
