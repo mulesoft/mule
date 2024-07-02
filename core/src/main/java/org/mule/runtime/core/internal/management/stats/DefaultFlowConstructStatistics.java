@@ -10,7 +10,6 @@ import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTI
 
 import static java.lang.System.currentTimeMillis;
 
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
@@ -51,7 +50,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   private transient final AtomicLong connectionErrors = new AtomicLong(0);
   private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> messagesDispatchedCounters = new CopyOnWriteArrayList<>();
-  private transient final List<DefaultResetOnQueryCounter> totalExecutionErrorsCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> connectionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
 
@@ -181,7 +180,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   public void incExecutionError() {
     if (isEnabled()) {
       executionError.addAndGet(1);
-      totalExecutionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+      executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
     }
   }
 
@@ -226,7 +225,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public ResetOnQueryCounter getExecutionErrorsCounter() {
     DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
-    totalExecutionErrorsCounters.add(counter);
+    executionErrorsCounters.add(counter);
     counter.add(getExecutionErrors());
     return counter;
   }
