@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.au
 
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
@@ -26,11 +27,16 @@ public class UpdatingAuthorizationCodeState
 
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
+  private AuthorizationCodeOAuthDancer dancer;
+  private AuthorizationCodeConfig config;
+
+  MuleContext muleContext;
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
-                                        Consumer<ResourceOwnerOAuthContext> onUpdate) {
+                                        Consumer<ResourceOwnerOAuthContext> onUpdate,
+                                        MuleContext muleContext) {
     delegate = toAuthorizationCodeState(config, initialContext);
     dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
@@ -55,14 +61,22 @@ public class UpdatingAuthorizationCodeState
         onUpdate.accept(context);
       }
     });
+    this.dancer = dancer;
+    this.config = config;
+    this.muleContext = muleContext;
   }
 
   @Override
   public String getAccessToken() {
-    if (invalidated) {
-      throw new TokenInvalidatedException(
-                                          "OAuth token for resource owner id " + delegate.getResourceOwnerId()
-                                              + " has been invalidated");
+    if (invalidated || !muleContext.getClusterId().isEmpty()) {
+      try {
+        dancer.accessToken(getResourceOwnerId());
+        delegate = toAuthorizationCodeState(config, dancer.getContextForResourceOwner(getResourceOwnerId()));
+      } catch (Exception e) {
+        throw new TokenInvalidatedException(
+                                            "OAuth token for resource owner id " + delegate.getResourceOwnerId()
+                                                + " has been invalidated");
+      }
     }
     return delegate.getAccessToken();
   }

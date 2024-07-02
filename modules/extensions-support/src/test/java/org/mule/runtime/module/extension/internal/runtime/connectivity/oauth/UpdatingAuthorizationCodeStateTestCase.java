@@ -25,6 +25,7 @@ import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.OAuthCallbackConfig;
@@ -64,6 +65,9 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   @Mock
   private ResourceOwnerOAuthContext refreshedContext;
 
+  @Mock
+  private MuleContext muleContext;
+
   @Before
   public void before() {
     oAuthConfig = new AuthorizationCodeConfig("configName",
@@ -91,7 +95,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, muleContext);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -110,7 +114,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, muleContext);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -138,7 +142,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, muleContext);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -167,7 +171,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, muleContext);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 

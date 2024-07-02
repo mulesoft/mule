@@ -61,6 +61,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
   private final AuthorizationCodeOAuthHandler authCodeHandler;
   private final AuthorizationCodeGrantType grantType;
   private final Map<Field, String> callbackValues;
+  private MuleContext muleContext;
 
   public AuthorizationCodeConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                                           ResolverSet resolverSet,
@@ -75,6 +76,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
     this.authCodeHandler = authCodeHandler;
     this.grantType = grantType;
     callbackValues = getCallbackValuesExtractors(providerModel);
+    this.muleContext = muleContext;
   }
 
   @Override
@@ -108,7 +110,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
                                                                 config,
                                                                 callbackValues,
                                                                 authCodeHandler,
-                                                                reconnectionConfig);
+                                                                reconnectionConfig, muleContext);
     return provider;
   }
 
@@ -139,7 +141,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
                                                                 config,
                                                                 callbackValues,
                                                                 authCodeHandler,
-                                                                reconnectionConfig);
+                                                                reconnectionConfig, muleContext);
     return new Pair<>(provider, result);
   }
 
