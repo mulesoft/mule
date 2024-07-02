@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 public class NativeLibrariesFolderDeletion {
 
   private final String applicationName;
-  private final File appNativeLibrariesFolder;
+  private File appNativeLibrariesFolder;
   private static final Logger LOGGER = getLogger(NativeLibrariesFolderDeletion.class);
 
   public NativeLibrariesFolderDeletion(String applicationName, File appNativeLibrariesFolder) {
