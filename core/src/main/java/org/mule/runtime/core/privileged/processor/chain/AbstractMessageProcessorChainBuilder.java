@@ -69,5 +69,4 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   public void setComponentTracer(ComponentTracer<CoreEvent> chainComponentTracer) {
     this.chainComponentTracer = chainComponentTracer;
   }
-
 }

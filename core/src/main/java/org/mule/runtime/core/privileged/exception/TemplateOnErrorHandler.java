@@ -478,7 +478,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         getExceptionListener().fireNotification(exception, event);
       }
       logException(exception, event);
-      getExceptionListener().processStatistics(exception, getError(event));
+      getExceptionListener().processStatistics();
       markExceptionAsHandledIfRequired(exception);
       return event;
     };

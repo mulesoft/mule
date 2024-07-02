@@ -15,7 +15,6 @@ import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
