@@ -201,5 +201,4 @@ public class AllStatistics {
     this.flowConstructStats.values()
         .forEach(flowConstructStatsValue -> flowConstructStatsValue.trackUsingMeterProvider(this.meterProvider));
   }
-
 }
