@@ -36,6 +36,9 @@ public class ImportValidTarget extends AbstractImportValidation {
 
   @Override
   protected boolean appliesValidationFor(String resolutionFailureMessage) {
+    // this specific error is added in ast 1.4, but we need to maintain backwards compatibility with previous apps, so this
+    // validation ignores this error.
+    // Refer to MuleRuntimeFeature#ENFORCE_IMPORT_TARGET_SAME_TYPE
     return !IMPORT_ROOT_ELEMENT_MISMATCH_MESSAGE_PATTERN.matcher(resolutionFailureMessage).matches();
   }
 
