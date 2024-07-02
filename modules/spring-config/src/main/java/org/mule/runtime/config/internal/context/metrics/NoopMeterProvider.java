@@ -23,17 +23,17 @@ import java.util.function.Supplier;
 /**
  * Noop classes in case metering is not enabled.
  */
-public class NoopMeterProvider implements MeterProvider<Meter> {
+public class NoopMeterProvider implements MeterProvider {
 
   public static final String NOOP = "NOOP";
-  private final MeterBuilder<Meter> METER_BUILDER_INSTANCE = new NoopMeterBuilder();
+  private final MeterBuilder METER_BUILDER_INSTANCE = new NoopMeterBuilder();
 
   @Override
-  public MeterBuilder<Meter> getMeterBuilder(String meterName) {
+  public MeterBuilder getMeterBuilder(String meterName) {
     return METER_BUILDER_INSTANCE;
   }
 
-  private static class NoopMeterBuilder implements MeterBuilder<Meter> {
+  private static class NoopMeterBuilder implements MeterBuilder {
 
     private final LongUpDownCounterBuilder LONG_UP_DOWN_COUNTER_BUILDER_INSTANCE = new NoopLongUpDownCounterBuilder();
     private final LongCounterBuilder LONG_COUNTER_BUILDER_INSTANCE = new NoopLongCounterBuilder();
@@ -45,12 +45,12 @@ public class NoopMeterProvider implements MeterProvider<Meter> {
     }
 
     @Override
-    public MeterBuilder<Meter> withDescription(String description) {
+    public MeterBuilder withDescription(String description) {
       return this;
     }
 
     @Override
-    public MeterBuilder<Meter> withMeterAttribute(String key, String value) {
+    public MeterBuilder withMeterAttribute(String key, String value) {
       return this;
     }
 

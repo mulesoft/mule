@@ -13,19 +13,37 @@ import org.mule.runtime.metrics.api.meter.Meter;
  *
  * @since 4.5.0
  */
-public interface MeterBuilder<T extends Meter> {
+public interface MeterBuilder {
+
+  MeterBuilder NO_OP = new MeterBuilder() {
+
+    @Override
+    public Meter build() {
+      return Meter.NO_OP;
+    }
+
+    @Override
+    public MeterBuilder withDescription(String description) {
+      return this;
+    }
+
+    @Override
+    public MeterBuilder withMeterAttribute(String key, String value) {
+      return this;
+    }
+  };
 
   /**
    * @return the meter built.
    */
-  T build();
+  Meter build();
 
   /**
    * @param description the description.
    *
    * @return the {@link MeterBuilder}
    */
-  MeterBuilder<T> withDescription(String description);
+  MeterBuilder withDescription(String description);
 
   /**
    * An attribute associated with the meter.
@@ -35,5 +53,5 @@ public interface MeterBuilder<T extends Meter> {
    *
    * @return the {@link MeterBuilder}
    */
-  MeterBuilder<T> withMeterAttribute(String key, String value);
+  MeterBuilder withMeterAttribute(String key, String value);
 }

@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.runtime.metrics.api.MeterProvider;
-import org.mule.runtime.metrics.api.internal.error.ErrorMetrics;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,7 +41,6 @@ public class AllStatistics {
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
   private final Map<String, PayloadStatistics> payloadStatistics = emptyMap();
   private ArtifactMeterProvider meterProvider;
-  private ErrorMetrics errorMetrics;
 
   /**
    *
@@ -104,7 +102,6 @@ public class AllStatistics {
       if (meterProvider != null) {
         stat.trackUsingMeterProvider(meterProvider);
       }
-      stat.trackUsingErrorMetrics(errorMetrics);
       flowConstructStats.put(stat.getName(), stat);
     }
   }
@@ -205,9 +202,4 @@ public class AllStatistics {
         .forEach(flowConstructStatsValue -> flowConstructStatsValue.trackUsingMeterProvider(this.meterProvider));
   }
 
-  public void trackUsingErrorMetrics(ErrorMetrics errorMetrics) {
-    this.errorMetrics = errorMetrics;
-    this.flowConstructStats.values()
-            .forEach(flowConstructStatsValue -> flowConstructStatsValue.trackUsingErrorMetrics(this.errorMetrics));
-  }
 }
