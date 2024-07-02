@@ -44,7 +44,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   private Optional<ArtifactAstDependencyGraphProvider> artifactAstDependencyGraphProvider = empty();
 
   @Inject
-  private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
+  private Optional<FeatureFlaggingService> featureFlaggingService = empty();
 
   @Inject
   private ExpressionLanguage expressionLanguage;
