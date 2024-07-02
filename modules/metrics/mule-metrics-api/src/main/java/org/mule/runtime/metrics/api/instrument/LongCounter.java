@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.metrics.api.instrument;
 
+import org.mule.runtime.metrics.api.meter.Meter;
+
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -15,6 +17,64 @@ import java.util.function.BiConsumer;
  * @since 4.5.0
  */
 public interface LongCounter extends Instrument {
+
+  LongCounter NO_OP = new LongCounter() {
+
+    @Override
+    public String getName() {
+      return "NO_OP";
+    }
+
+    @Override
+    public String getDescription() {
+      return "NO_OP";
+    }
+
+    @Override
+    public Meter getMeter() {
+      return Meter.NO_OP;
+    }
+
+    @Override
+    public void add(long value) {
+      // Nothing to do
+    }
+
+    @Override
+    public void add(long value, Map<String, String> attributes) {
+      // Nothing to do
+    }
+
+    @Override
+    public int incrementAndGetAsInt() {
+      return 0;
+    }
+
+    @Override
+    public long incrementAndGetAsLong() {
+      return 0;
+    }
+
+    @Override
+    public long getValueAsLong() {
+      return 0;
+    }
+
+    @Override
+    public String getUnit() {
+      return "";
+    }
+
+    @Override
+    public int getValueAsInt() {
+      return 0;
+    }
+
+    @Override
+    public void onAddition(BiConsumer<Long, Map<String, String>> consumer) {
+      // Nothing to do
+    }
+  };
 
   /**
    * Add a value. Should only be positive.

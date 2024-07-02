@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.management.stats.ResetOnQueryCounter;
-import org.mule.runtime.metrics.api.internal.error.ErrorMetrics;
+import org.mule.runtime.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.meter.Meter;
 
 import java.util.List;
@@ -54,7 +54,6 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   private transient final List<DefaultResetOnQueryCounter> totalExecutionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> connectionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
-  private transient ErrorMetrics errorMetrics;
 
   public DefaultFlowConstructStatistics(String flowConstructType, String name) {
     this.name = name;
@@ -184,11 +183,6 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
       executionError.addAndGet(1);
       totalExecutionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
     }
-    if (error != null) {
-      errorMetrics.measure(error);
-    } else {
-      errorMetrics.measure(exception);
-    }
   }
 
   @Override
@@ -256,9 +250,8 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {
     String artifactId = getName() + "-" + meterProvider.getArtifactId();
-    Meter meter = meterProvider.getMeterBuilder(FLOW_CONSTRUCT_STATISTICS_NAME)
-        .withDescription(FLOW_CONSTRUCT_STATISTICS_DESCRIPTION)
-        .withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId).build();
+
+    Meter meter = getMeter(meterProvider, artifactId);
 
     // Register the declared private flows.
     meter.counterBuilder(RECEIVED_EVENTS_NAME)
@@ -287,10 +280,13 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
         .withAddOperation((delta, context) -> fatalError.addAndGet(delta))
         .withIncrementAndGetOperation(context -> fatalError.incrementAndGet())
         .withDescription(FATAL_ERRORS_DESCRIPTION).build();
+
   }
 
-  @Override
-  public void trackUsingErrorMetrics(ErrorMetrics errorMetrics) {
-    this.errorMetrics = errorMetrics;
+  private static Meter getMeter(MeterProvider meterProvider, String artifactId) {
+    return meterProvider.getMeterBuilder(FLOW_CONSTRUCT_STATISTICS_NAME)
+        .withDescription(FLOW_CONSTRUCT_STATISTICS_DESCRIPTION)
+        .withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId).build();
   }
+
 }

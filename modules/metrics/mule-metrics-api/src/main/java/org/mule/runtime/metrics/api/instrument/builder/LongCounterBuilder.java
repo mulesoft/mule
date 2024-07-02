@@ -7,6 +7,7 @@
 package org.mule.runtime.metrics.api.instrument.builder;
 
 import org.mule.runtime.metrics.api.instrument.LongCounter;
+import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -20,6 +21,39 @@ import java.util.function.Supplier;
  * @since 4.5.0
  */
 public interface LongCounterBuilder extends InstrumentBuilder<LongCounter> {
+
+  LongCounterBuilder NO_OP = new LongCounterBuilder() {
+
+    @Override
+    public LongCounterBuilder withDescription(String description) {
+      return this;
+    }
+
+    @Override
+    public LongCounterBuilder withUnit(String unit) {
+      return this;
+    }
+
+    @Override
+    public LongCounter build() {
+      return LongCounter.NO_OP;
+    }
+
+    @Override
+    public LongCounterBuilder withAddOperation(BiConsumer<Long, Map<String, String>> addOperation) {
+      return this;
+    }
+
+    @Override
+    public LongCounterBuilder withIncrementAndGetOperation(Function<Map<String, String>, Long> incrementAndGetOperation) {
+      return this;
+    }
+
+    @Override
+    public LongCounterBuilder withValueSupplier(Supplier<Long> valueSupplier) {
+      return this;
+    }
+  };
 
   /**
    * @param consumerForAddOperation the {@link Consumer} to be invoked when the {@link LongCounter#add(long)} is invoked.
