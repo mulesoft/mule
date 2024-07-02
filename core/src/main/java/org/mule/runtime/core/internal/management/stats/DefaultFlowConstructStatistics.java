@@ -72,6 +72,14 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   }
 
   @Override
+  public void incExecutionError() {
+    if (isEnabled()) {
+      executionError.addAndGet(1);
+      executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
+  }
+
+  @Override
   public void incFatalError() {
     if (isEnabled()) {
       fatalError.addAndGet(1);
@@ -173,14 +181,6 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
     if (isEnabled()) {
       dispatchedMessages.addAndGet(1);
       messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
-    }
-  }
-
-  @Override
-  public void incExecutionError() {
-    if (isEnabled()) {
-      executionError.addAndGet(1);
-      executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
     }
   }
 
