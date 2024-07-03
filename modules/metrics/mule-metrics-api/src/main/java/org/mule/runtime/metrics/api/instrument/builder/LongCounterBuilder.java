@@ -22,8 +22,8 @@ import java.util.function.Supplier;
 public interface LongCounterBuilder extends InstrumentBuilder<LongCounter> {
 
   /**
-   * No operation {@link LongCounterBuilder} implementation.
-   * It will always return a no operation {@link LongCounter} implementation.
+   * No operation {@link LongCounterBuilder} implementation. It will always return a no operation {@link LongCounter}
+   * implementation.
    */
   LongCounterBuilder NO_OP = new LongCounterBuilder() {
 
