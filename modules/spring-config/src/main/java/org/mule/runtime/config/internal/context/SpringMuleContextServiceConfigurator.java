@@ -20,7 +20,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.FORWARD_COMPATIBIL
 import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CONTAINER_METER_PROVIDER_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ARTIFACT_BASE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONENT_TRACER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
@@ -250,7 +250,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(MULE_CORE_EVENT_TRACER_KEY, getBeanDefinition(SelectableCoreEventTracer.class))
       .put(MULE_CORE_COMPONENT_TRACER_FACTORY_KEY, getBeanDefinition(CoreEventComponentTracerFactory.class))
       .put(MULE_ERROR_METRICS_FACTORY_KEY, resolveErrorMetricsFactory())
-      .put(MULE_CONTAINER_METER_PROVIDER_KEY, resolveContainerMeterProvider())
+      .put(MULE_ARTIFACT_BASE_METER_PROVIDER_KEY, resolveBaseArtifactMeterProvider())
       .put(MULE_METER_EXPORTER_CONFIGURATION_KEY,
            getBeanDefinition(OpenTelemetryAutoConfigurableMeterExporterConfiguration.class))
       .put(MULE_METER_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetryMeterExporterFactory.class))
@@ -314,7 +314,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     registerConstantBeanDefinition(OBJECT_STATISTICS, muleContext.getStatistics());
     registerConstantBeanDefinition(OBJECT_RESOURCE_LOCATOR, resourceLocator);
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
-    registerBeanDefinition(MULE_ARTIFACT_METER_PROVIDER_KEY, resolveArtifactMeterProvider());
+    registerBeanDefinition(MULE_ARTIFACT_METER_PROVIDER_KEY, resolveArtifactIdMeterProvider());
     loadServiceConfigurators();
 
     registerContextServices(defaultContextServices);
@@ -476,16 +476,16 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     return memoryManagementService;
   }
 
-  private BeanDefinition resolveArtifactMeterProvider() {
+  private BeanDefinition resolveArtifactIdMeterProvider() {
     if (getBoolean(METRIC_EXPORTER_ENABLED_PROPERTY)) {
       return getBeanDefinitionBuilder(ArtifactMeterProvider.class)
-          .addConstructorArgReference(MULE_CONTAINER_METER_PROVIDER_KEY)
+          .addConstructorArgReference(MULE_ARTIFACT_BASE_METER_PROVIDER_KEY)
           .addConstructorArgValue(muleContext.getId()).setPrimary(true).getBeanDefinition();
     }
     return getPrimaryBeanDefinition(MeterProvider.NO_OP);
   }
 
-  private BeanDefinition resolveContainerMeterProvider() {
+  private BeanDefinition resolveBaseArtifactMeterProvider() {
     if (getBoolean(METRIC_EXPORTER_ENABLED_PROPERTY)) {
       return getBeanDefinition(DefaultMeterProvider.class);
     }

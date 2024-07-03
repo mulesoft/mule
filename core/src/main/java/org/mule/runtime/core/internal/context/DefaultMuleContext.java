@@ -200,7 +200,6 @@ import java.util.function.Predicate;
 import javax.transaction.TransactionManager;
 
 import org.apache.commons.lang3.JavaVersion;
-import org.mule.runtime.metrics.api.internal.error.ErrorMetrics;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
 

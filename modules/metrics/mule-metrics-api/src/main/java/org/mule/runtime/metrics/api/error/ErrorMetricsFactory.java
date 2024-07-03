@@ -8,8 +8,17 @@ package org.mule.runtime.metrics.api.error;
 
 import org.mule.runtime.metrics.api.meter.Meter;
 
+/**
+ * Defines a factory for the {@link ErrorMetrics} interface.
+ *
+ * @since 4.9.0
+ */
 public interface ErrorMetricsFactory {
 
+  /**
+   * No operation {@link ErrorMetricsFactory} implementation.
+   * It will always return a no operation {@link ErrorMetrics} implementation.
+   */
   ErrorMetricsFactory NO_OP = new ErrorMetricsFactory() {
 
     @Override
@@ -23,7 +32,18 @@ public interface ErrorMetricsFactory {
     }
   };
 
+  /**
+   * Returns an {@link ErrorMetrics} implementation.
+   * @param errorMetricsMeter {@link Meter} that will be used for creating all {@link ErrorMetrics} instruments.
+   * @return An {@link ErrorMetrics} implementation.
+   */
   ErrorMetrics create(Meter errorMetricsMeter);
 
+  /**
+   * Returns an {@link ErrorMetrics} implementation.
+   * @param errorMetricsMeter {@link Meter} that will be used for creating all {@link ErrorMetrics} instruments.
+   * @param errorIdProvider {@link ErrorIdProvider} that will be used to create the error IDs of the measured errors.
+   * @return An {@link ErrorMetrics} implementation.
+   */
   ErrorMetrics create(Meter errorMetricsMeter, ErrorIdProvider errorIdProvider);
 }
