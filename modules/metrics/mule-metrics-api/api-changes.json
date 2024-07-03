@@ -1,0 +1,80 @@
+{
+  "4.8.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.metrics.api.instrument.LongCounter::add(long, java.util.Map<java.lang.String, java.lang.String>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.metrics.api.instrument.LongCounter::add(long, java.util.Map<java.lang.String, java.lang.String>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.metrics.api.instrument.LongCounter::onAddition(java.util.function.BiConsumer<java.lang.Long, java.util.Map<java.lang.String, java.lang.String>>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.metrics.api.instrument.LongCounter::onAddition(java.util.function.BiConsumer<java.lang.Long, java.util.Map<java.lang.String, java.lang.String>>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder::withAddOperation(java.util.function.BiConsumer<java.lang.Long, java.util.Map<java.lang.String, java.lang.String>>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder::withAddOperation(java.util.function.BiConsumer<java.lang.Long, java.util.Map<java.lang.String, java.lang.String>>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder::withConsumerForAddOperation(java.util.function.Consumer<java.lang.Long>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder::withConsumerForAddOperation(java.util.function.Consumer<java.lang.Long>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder::withIncrementAndGetOperation(java.util.function.Function<java.util.Map<java.lang.String, java.lang.String>, java.lang.Long>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder::withIncrementAndGetOperation(java.util.function.Function<java.util.Map<java.lang.String, java.lang.String>, java.lang.Long>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder::withSupplierForIncrementAndGetOperation(java.util.function.Supplier<java.lang.Long>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder::withSupplierForIncrementAndGetOperation(java.util.function.Supplier<java.lang.Long>)",
+          "justification": "W-15943796: Implement an error count metric (refactor over this non GA API)"
+        }
+      ]
+    }
+  }
+}
