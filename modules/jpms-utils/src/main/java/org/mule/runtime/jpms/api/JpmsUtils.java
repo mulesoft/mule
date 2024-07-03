@@ -8,6 +8,7 @@ package org.mule.runtime.jpms.api;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -30,6 +31,19 @@ public final class JpmsUtils {
    * @return a new classLoader.
    */
   public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntries, ClassLoader parent) {
+    return new URLClassLoader(modulePathEntries, parent);
+  }
+
+  /**
+   * Creates a {@link ModuleLayer} for the given {@code modulePathEntries} and with the given {@code parent}, and returns a
+   * classLoader from which its modules can be read.
+   *
+   * @param modulePathEntries the URLs from which to find the modules
+   * @param parent            the parent class loader for delegation
+   * @param classes           classes from which to get the parent layers
+   * @return a new classLoader.
+   */
+  public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntries, ClassLoader parent, List<Class<?>> classes) {
     return new URLClassLoader(modulePathEntries, parent);
   }
 

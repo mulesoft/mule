@@ -10,10 +10,12 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
-import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.vegan.extension.VeganExtension.VEGAN;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -22,6 +24,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -34,9 +37,6 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.test.heisenberg.extension.HeisenbergOperations;
-import org.mule.test.heisenberg.extension.model.KnockeableDoor;
-import org.mule.test.heisenberg.extension.model.Ricin;
-import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.IntegerAttributes;
 import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 import org.mule.test.vegan.extension.VeganPolicy;
@@ -44,8 +44,11 @@ import org.mule.test.vegan.extension.VeganPolicy;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -61,10 +64,10 @@ import org.junit.rules.ExpectedException;
 public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigTestCase {
 
   @Rule
-  public ExpectedException exception = ExpectedException.none();
+  public ExpectedException exception = none();
 
-  private static final String HEISENBERG_EXT_NAME = HEISENBERG;
-  private static final String HEISENBERG_CONFIG = "heisenberg";
+  protected static final String HEISENBERG_EXT_NAME = HEISENBERG;
+  protected static final String HEISENBERG_CONFIG = "heisenberg";
   private static final String ALIAS_OUTPUT = "jeje, my name is Juani and I'm 23 years old";
   private static final String ANOTHER_ALIAS_OUTPUT = "jeje, my name is Heisenberg and I'm 23 years old";
 
@@ -92,24 +95,30 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     return new String[] {"vegan-config.xml", "heisenberg-config.xml"};
   }
 
-  abstract <T, A> Result<T, A> doExecute(String extension, String operation, OperationParameters params)
+  protected abstract <T, A> Result<T, A> doExecute(String extension, String operation, Optional<String> configName,
+                                                   Map<String, Object> params, boolean isPagedOperation,
+                                                   boolean supportsStreaming)
       throws Throwable;
+
+  private <T, A> Result<T, A> doExecute(String extension, String operation, String configName, Map<String, Object> params)
+      throws Throwable {
+    return doExecute(extension, operation, of(configName), params, false, false);
+  }
 
   @Test
   @Description("Executes a simple operation using the client and checks the output")
   public void executeSimpleOperation() throws Throwable {
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG)
-        .addParameter("victim", "Juani")
-        .addParameter("goodbyeMessage", "ADIOS")
-        .build();
-    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);
+    Map<String, Object> params = new HashMap<>();
+    params.put("victim", "Juani");
+    params.put("goodbyeMessage", "ADIOS");
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "kill", HEISENBERG_CONFIG, params);
     assertThat(result.getOutput(), is("ADIOS, Juani"));
   }
 
   @Test
   public void executePagedOperation() throws Throwable {
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
-    Result<CursorIteratorProvider, Object> result = doExecute(HEISENBERG_EXT_NAME, "getPagedBlocklist", params);
+    Result<CursorIteratorProvider, Object> result =
+        doExecute(HEISENBERG_EXT_NAME, "getPagedBlocklist", of(HEISENBERG_CONFIG), emptyMap(), true, false);
     CursorIteratorProvider provider = result.getOutput();
     AtomicInteger count = new AtomicInteger(0);
     Iterator<Message> iterator = provider.openCursor();
@@ -123,21 +132,9 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   }
 
   @Test
-  public void executeNonRepeatablePagedOperation() throws Throwable {
-    Result<Iterator<Message>, Object> result = client
-        .<Iterator<Message>, Object>execute(HEISENBERG_EXT_NAME, "getPagedBlocklist",
-                                            params -> params.withConfigRef(HEISENBERG_CONFIG))
-        .get();
-
-    AtomicInteger count = new AtomicInteger(0);
-    result.getOutput().forEachRemaining(m -> count.addAndGet(1));
-    assertThat(count.get(), is(6));
-  }
-
-  @Test
   public void executeInputStreamOperation() throws Throwable {
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
-    Result<CursorStreamProvider, Object> result = doExecute(HEISENBERG_EXT_NAME, "nameAsStream", params);
+    Result<CursorStreamProvider, Object> result =
+        doExecute(HEISENBERG_EXT_NAME, "nameAsStream", of(HEISENBERG_CONFIG), emptyMap(), false, true);
 
     CursorStreamProvider streamProvider = result.getOutput();
     String value = IOUtils.toString(streamProvider);
@@ -145,23 +142,6 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
       assertThat(value, equalTo("Heisenberg"));
     } finally {
       streamProvider.close();
-    }
-  }
-
-  @Test
-  public void executeNonRepeatableInputStreamOperation() throws Throwable {
-    Result<InputStream, Object> result =
-        client
-            .<InputStream, Object>execute(HEISENBERG_EXT_NAME, "nameAsStream",
-                                          params -> params.withConfigRef(HEISENBERG_CONFIG))
-            .get();
-
-
-    String value = IOUtils.toString(result.getOutput());
-    try {
-      assertThat(value, equalTo("Heisenberg"));
-    } finally {
-      closeQuietly(result.getOutput());
     }
   }
 
@@ -175,57 +155,34 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   @Description("Executes a simple operation with an expression as parameter using the client and checks the output")
   public void executeSimpleOperationWithExpression() throws Throwable {
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG)
-        .addParameter("victim", "#['Juani']")
-        .addParameter("goodbyeMessage", "ADIOS")
-        .build();
-    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "kill", params);
+    Map<String, Object> params = new HashMap<>();
+    params.put("victim", "#['Juani']");
+    params.put("goodbyeMessage", "ADIOS");
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "kill", HEISENBERG_CONFIG, params);
     assertThat(result.getOutput(), is("ADIOS, Juani"));
-  }
-
-  @Test
-  @Description("Executes an operation with a complex type parameter using the client and the DefaultOperationParametersBuilder")
-  public void executeOperationWithComplexType() throws Throwable {
-    Weapon.WeaponAttributes attributes = new Weapon.WeaponAttributes();
-    attributes.setBrand("brand");
-    OperationParameters params = builder()
-        .configName(HEISENBERG_CONFIG)
-        // Builds the complex type Ricin.
-        .addParameter("weapon", Ricin.class, builder()
-            .addParameter("destination", KnockeableDoor.class, builder()
-                .addParameter("address", "ADdresss")
-                .addParameter("victim", "victim!1231"))
-            .addParameter("microgramsPerKilo", 123L))
-        .addParameter("type", FIRE_WEAPON)
-        .addParameter("attributesOfWeapon", attributes)
-        .build();
-    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "killWithWeapon", params);
-    assertThat(result.getOutput(), is("Killed with: You have been killed with Ricin , Type FIRE_WEAPON and attribute brand"));
   }
 
 
   @Test
   @Description("Executes an operation that has a parameter group using the client and checks the output")
   public void executeOperationWithParameterGroup() throws Throwable {
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG)
-        .addParameter("greeting", "jeje")
-        .addParameter("age", 23)
-        .addParameter("myName", "Juani")
-        .addParameter("knownAddresses", emptyList())
-        .build();
-    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "alias", params);
+    Map<String, Object> params = new HashMap<>();
+    params.put("greeting", "jeje");
+    params.put("age", 23);
+    params.put("myName", "Juani");
+    params.put("knownAddresses", emptyList());
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "alias", HEISENBERG_CONFIG, params);
     assertThat(result.getOutput(), is(ALIAS_OUTPUT));
   }
 
   @Test
   @Description("Executes an operation that has a parameter group using the client and checks the output")
   public void executeOperationWithParameterGroupUsingOptional() throws Throwable {
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG)
-        .addParameter("greeting", "jeje")
-        .addParameter("age", 23)
-        .addParameter("knownAddresses", emptyList())
-        .build();
-    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "alias", params);
+    Map<String, Object> params = new HashMap<>();
+    params.put("greeting", "jeje");
+    params.put("age", 23);
+    params.put("knownAddresses", emptyList());
+    Result<String, Object> result = doExecute(HEISENBERG_EXT_NAME, "alias", HEISENBERG_CONFIG, params);
     assertThat(result.getOutput(), is(ANOTHER_ALIAS_OUTPUT));
   }
 
@@ -246,8 +203,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   @Description("Executes an operation that has a parameter with default value using the client and checks the output")
   public void executeOperationWithDefaultValueParameter() throws Throwable {
-    OperationParameters params = builder().configName("apple").build();
-    Result<Collection<?>, Object> result = doExecute(VEGAN, "tryToEatThisListOfMaps", params);
+    Result<Collection<?>, Object> result = doExecute(VEGAN, "tryToEatThisListOfMaps", "apple", emptyMap());
     assertThat(result.getOutput(), instanceOf(List.class));
     assertThat(result.getOutput(), hasSize(0));
   }
@@ -255,8 +211,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   @Description("Executes an operation that has a @NullSafe annotated parameter using the client and checks the output")
   public void executeOperationWithNullSafeParameter() throws Throwable {
-    OperationParameters params = builder().configName("banana").build();
-    Result<VeganPolicy, Object> result = doExecute(VEGAN, "applyPolicy", params);
+    Result<VeganPolicy, Object> result = doExecute(VEGAN, "applyPolicy", "banana", emptyMap());
     assertThat(result.getOutput().getMeetAllowed(), is(false));
     assertThat(result.getOutput().getIngredients().getSaltMiligrams(), is(0));
   }
@@ -264,8 +219,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   @Description("Executes an operation that returns attributes metadata using the client and checks the output and the attributes")
   public void executeOperationThatReturnsAttributes() throws Throwable {
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
-    Result<String, IntegerAttributes> result = doExecute(HEISENBERG_EXT_NAME, "getEnemy", params);
+    Result<String, IntegerAttributes> result = doExecute(HEISENBERG_EXT_NAME, "getEnemy", HEISENBERG_CONFIG, emptyMap());
     assertThat(result.getOutput(), is("Gustavo Fring"));
     assertThat(result.getAttributes().isPresent(), is(true));
     assertThat(result.getAttributes().get().getValue(), is(0));
@@ -274,8 +228,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   @Description("Executes a void operation using the client")
   public void executeVoidOperation() throws Throwable {
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
-    Result<Object, Object> result = doExecute(HEISENBERG_EXT_NAME, "die", params);
+    Result<Object, Object> result = doExecute(HEISENBERG_EXT_NAME, "die", HEISENBERG_CONFIG, emptyMap());
     assertThat(result.getOutput(), is(nullValue()));
     assertThat(result.getAttributes().isPresent(), is(false));
   }
@@ -286,8 +239,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     exception.expect(MuleException.class);
     exception.expectCause(instanceOf(ConnectionException.class));
     exception.expectMessage("You are not allowed to speak with gus.");
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
-    doExecute(HEISENBERG_EXT_NAME, "callGusFring", params);
+    doExecute(HEISENBERG_EXT_NAME, "callGusFring", HEISENBERG_CONFIG, emptyMap());
   }
 
   @Test
@@ -296,8 +248,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
     exception.expect(MuleException.class);
     exception.expectCause(instanceOf(ConnectionException.class));
     exception.expectMessage("You are not allowed to speak with gus.");
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG).build();
-    doExecute(HEISENBERG_EXT_NAME, "callGusFringNonBlocking", params);
+    doExecute(HEISENBERG_EXT_NAME, "callGusFringNonBlocking", HEISENBERG_CONFIG, emptyMap());
   }
 
   @Test
@@ -305,8 +256,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   public void nonExistentExtension() throws Throwable {
     exception.expect(MuleRuntimeException.class);
     exception.expectMessage("No Extension [no-exist] Found");
-    OperationParameters params = builder().configName("config").build();
-    doExecute("no-exist", "operation", params);
+    doExecute("no-exist", "operation", "config", emptyMap());
   }
 
   @Test
@@ -314,8 +264,7 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   public void nonExistentOperation() throws Throwable {
     exception.expect(MuleRuntimeException.class);
     exception.expectMessage("No Operation [operationDontExist] Found");
-    OperationParameters params = builder().configName("config").build();
-    doExecute(VEGAN, "operationDontExist", params);
+    doExecute(VEGAN, "operationDontExist", "config", emptyMap());
   }
 
   @Test
@@ -323,14 +272,12 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   public void nonExistentConfiguration() throws Throwable {
     exception.expect(MuleRuntimeException.class);
     exception.expectMessage("No configuration [configDontExist] found");
-    OperationParameters params = builder().configName("configDontExist").build();
-    doExecute(VEGAN, "applyPolicy", params);
+    doExecute(VEGAN, "applyPolicy", "configDontExist", emptyMap());
   }
 
   @Test
   @Description("Tries to execute an operation that takes a long time")
   public void longOperation() throws Throwable {
-    OperationParameters params = builder().build();
-    assertThat(doExecute(VEGAN, "longDigest", params), not(nullValue()));
+    assertThat(doExecute(VEGAN, "longDigest", empty(), emptyMap(), false, false), not(nullValue()));
   }
 }
