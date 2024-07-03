@@ -15,6 +15,9 @@ import org.mule.runtime.metrics.api.meter.Meter;
  */
 public interface LongUpDownCounter extends Instrument {
 
+  /**
+   * No operation {@link LongUpDownCounter} implementation.
+   */
   LongUpDownCounter NO_OP = new LongUpDownCounter() {
 
     public static final String NOOP = "NOOP";

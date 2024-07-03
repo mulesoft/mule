@@ -18,6 +18,9 @@ import java.util.function.BiConsumer;
  */
 public interface LongCounter extends Instrument {
 
+  /**
+   * No operation {@link LongCounter} implementation.
+   */
   LongCounter NO_OP = new LongCounter() {
 
     @Override
