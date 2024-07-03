@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
+import org.mule.oauth.client.api.exception.RequestAuthenticationException;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.util.Reference;
@@ -69,7 +70,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   private MuleContext muleContext;
 
   @Before
-  public void before() {
+  public void before() throws RequestAuthenticationException {
     oAuthConfig = new AuthorizationCodeConfig("configName",
                                               empty(),
                                               new CustomOAuthParameters(),
@@ -85,6 +86,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     when(refreshedContext.getAccessToken()).thenReturn(NEW_TOKEN);
     when(refreshedContext.getRefreshToken()).thenReturn(NEW_REFRESH_TOKEN);
     when(refreshedContext.getResourceOwnerId()).thenReturn(RESOURCE_OWNER_ID);
+    when(muleContext.getClusterId()).thenReturn("");
   }
 
   @Test
