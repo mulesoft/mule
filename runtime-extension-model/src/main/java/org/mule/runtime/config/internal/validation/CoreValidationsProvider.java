@@ -153,6 +153,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
         artifactAstDependencyGraphProvider.orElse(new DefaultArtifactAstDependencyGraphProvider());
 
     return asList(new ImportValidTarget(),
+                  new ImportTargetElement(featureFlaggingService),
                   new ConfigReferenceParametersNonPropertyValueValidations(artifactAstDependencyGraphProviderForValidator),
                   new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
                                                                       artifactAstDependencyGraphProviderForValidator),
