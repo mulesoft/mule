@@ -21,6 +21,9 @@ import java.util.function.BiConsumer;
  **/
 public interface Meter {
 
+  /**
+   * No operation {@link Meter} implementation.
+   */
   Meter NO_OP = new Meter() {
 
     @Override

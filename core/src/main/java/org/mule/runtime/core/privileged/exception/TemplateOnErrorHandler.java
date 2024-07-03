@@ -229,8 +229,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       @Override
       // All calling methods will end up transforming any error class other than MessagingException into that one.
       public void accept(Exception error) {
-        // We must measure the error only once. The following check is to measure it only when entering the error handler logic
-        // and not bubbling inside it.
+        // Measure only when enter the error handling scope and not when bubbling inside it.
         if (!ErrorHandlerContextManager.isHandling((MessagingException) error))
           measure((MessagingException) error);
         fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));

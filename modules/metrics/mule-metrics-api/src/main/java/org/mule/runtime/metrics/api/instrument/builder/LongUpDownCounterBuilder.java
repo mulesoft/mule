@@ -19,6 +19,10 @@ import java.util.function.Supplier;
  */
 public interface LongUpDownCounterBuilder extends InstrumentBuilder<LongUpDownCounter> {
 
+  /**
+   * No operation {@link LongUpDownCounterBuilder} implementation.
+   * It will always return a no operation {@link LongUpDownCounter} implementation.
+   */
   LongUpDownCounterBuilder NO_OP = new LongUpDownCounterBuilder() {
 
     @Override
