@@ -139,8 +139,8 @@ public class ErrorHandlerContextManager {
   }
 
   /**
-   * Determines if a {@link MessagingException} has an associated error handling context.
-   * True means that it's currently inside what can be called the error handling scope.
+   * Determines if a {@link MessagingException} has an associated error handling context. True means that it's currently inside
+   * what can be called the error handling scope.
    *
    * @param exception A {@link MessagingException}.
    * @return True if the exception has an associated error handling context.
