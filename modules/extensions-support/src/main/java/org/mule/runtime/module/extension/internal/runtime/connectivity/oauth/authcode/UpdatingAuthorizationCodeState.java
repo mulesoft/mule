@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.au
 
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 
-import org.mule.runtime.core.api.MuleContext;
+import static java.lang.String.format;
+
+import org.mule.oauth.client.api.exception.RequestAuthenticationException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
@@ -17,6 +19,9 @@ import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
 
 /**
  * An implementation of {@link AuthorizationCodeListener} which registers an {@link AuthorizationCodeListener} in order to get
@@ -27,15 +32,19 @@ public class UpdatingAuthorizationCodeState
 
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
-  private AuthorizationCodeOAuthDancer dancer;
-  private AuthorizationCodeConfig config;
-  private MuleContext muleContext;
+  // private AuthorizationCodeConfig config;
+  // private Supplier<ResourceOwnerOAuthContext> contextSupplier;
+  private Supplier<String> tokenFromDancer;
+  private boolean isClusterEnabled;
+
+  private static final String INVALIDATED_MESSAGE_TEMPLATE =
+      "OAuth token for resource owner id %s has been invalidated";
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate,
-                                        MuleContext muleContext) {
+                                        boolean isClusterEnabled) {
     delegate = toAuthorizationCodeState(config, initialContext);
     dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
@@ -60,21 +69,27 @@ public class UpdatingAuthorizationCodeState
         onUpdate.accept(context);
       }
     });
-    this.dancer = dancer;
-    this.config = config;
-    this.muleContext = muleContext;
+    // this.config = config;
+    // this.contextSupplier = () -> dancer.getContextForResourceOwner(getResourceOwnerId());
+    this.tokenFromDancer = () -> {
+      try {
+        return String.valueOf(dancer.accessToken(getResourceOwnerId()));
+      } catch (RequestAuthenticationException e) {
+        throw new RuntimeException(e);
+      }
+    };
+    this.isClusterEnabled = isClusterEnabled;
   }
 
   @Override
   public String getAccessToken() {
-    if (invalidated || !muleContext.getClusterId().isEmpty()) {
+    if (invalidated) {
+      throw new TokenInvalidatedException(format(INVALIDATED_MESSAGE_TEMPLATE, getResourceOwnerId()));
+    } else if (isClusterEnabled) {
       try {
-        dancer.accessToken(getResourceOwnerId());
-        delegate = toAuthorizationCodeState(config, dancer.getContextForResourceOwner(getResourceOwnerId()));
+        tokenFromDancer.get();
       } catch (Exception e) {
-        throw new TokenInvalidatedException(
-                                            "OAuth token for resource owner id " + delegate.getResourceOwnerId()
-                                                + " has been invalidated");
+        throw new TokenInvalidatedException(format(INVALIDATED_MESSAGE_TEMPLATE, getResourceOwnerId()));
       }
     }
     return delegate.getAccessToken();

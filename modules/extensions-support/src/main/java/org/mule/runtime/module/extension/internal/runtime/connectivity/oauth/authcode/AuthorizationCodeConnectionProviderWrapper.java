@@ -45,21 +45,9 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private final FieldSetter<Object, Object> authCodeStateSetter;
   private final RunOnce dance;
   private MuleContext muleContext;
+  private boolean isClusterEnabled;
 
   private AuthorizationCodeOAuthDancer dancer;
-
-  public AuthorizationCodeConnectionProviderWrapper(ConnectionProvider<C> delegate,
-                                                    AuthorizationCodeConfig oauthConfig,
-                                                    Map<Field, String> callbackValues,
-                                                    AuthorizationCodeOAuthHandler oauthHandler,
-                                                    ReconnectionConfig reconnectionConfig) {
-    super(delegate, reconnectionConfig, callbackValues);
-    this.oauthConfig = oauthConfig;
-    this.oauthHandler = oauthHandler;
-    authCodeStateSetter =
-        getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
-    dance = Once.of(this::updateAuthState);
-  }
 
   public AuthorizationCodeConnectionProviderWrapper(ConnectionProvider<C> delegate,
                                                     AuthorizationCodeConfig oauthConfig,
@@ -84,6 +72,9 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private void updateAuthState() {
     final Object delegate = getDelegateForInjection();
     ResourceOwnerOAuthContext context = getContext();
+    if (!muleContext.getClusterId().isEmpty()) {
+      isClusterEnabled = true;
+    }
     authCodeStateSetter
         .set(delegate, new UpdatingAuthorizationCodeState(oauthConfig,
                                                           dancer,
@@ -91,7 +82,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                           updatedContext -> updateOAuthParameters(delegate,
                                                                                                   callbackValues,
                                                                                                   updatedContext),
-                                                          muleContext));
+                                                          isClusterEnabled));
     updateOAuthParameters(delegate, callbackValues, context);
   }
 
