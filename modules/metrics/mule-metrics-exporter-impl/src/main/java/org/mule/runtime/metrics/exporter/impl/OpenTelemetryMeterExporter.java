@@ -14,6 +14,7 @@ import static java.lang.Long.parseLong;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
@@ -24,12 +25,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounterBuilder;
 import io.opentelemetry.api.metrics.LongUpDownCounterBuilder;
-import io.opentelemetry.api.metrics.ObservableLongCounter;
 import io.opentelemetry.api.metrics.ObservableLongUpDownCounter;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.api.metrics.Meter;
@@ -45,8 +46,8 @@ import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
  */
 public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
-  private final List<ObservableLongCounter> counters = new ArrayList<>();
-  private final List<ObservableLongUpDownCounter> upDownCounters = new ArrayList<>();
+  private final List<Pair<LongCounter, BiConsumer<Long, Map<String, String>>>> longCounters = new ArrayList<>();
+  private final List<ObservableLongUpDownCounter> longUpDownCounters = new ArrayList<>();
   private final Map<String, Meter> openTelemetryMeters = new HashMap<>();
   private final MeterProvider meterProvider;
   private final PeriodicMetricReader periodicMetricReader;
@@ -78,14 +79,25 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
   @Override
   public synchronized void enableExport(LongCounter longCounter) {
-    Meter openTelemetryMeter = openTelemetryMeters.get(longCounter.getMeter().getName());
+    longCounters.add(new Pair<>(longCounter, bindCounters(longCounter, getOtelLongCounter(longCounter))));
+  }
+
+  private BiConsumer<Long, Map<String, String>> bindCounters(LongCounter longCounter,
+                                                             io.opentelemetry.api.metrics.LongCounter otelLongCounter) {
+    BiConsumer<Long, Map<String, String>> muleCounterObserver =
+        (value, context) -> otelLongCounter.add(value, getOtelAttributes(context));
+    longCounter.onAddition(muleCounterObserver);
+    return muleCounterObserver;
+  }
+
+  private io.opentelemetry.api.metrics.LongCounter getOtelLongCounter(LongCounter muleLongCounter) {
+    Meter openTelemetryMeter = openTelemetryMeters.get(muleLongCounter.getMeter().getName());
     LongCounterBuilder longCounterBuilder =
-        openTelemetryMeter.counterBuilder(longCounter.getName()).setDescription(longCounter.getDescription());
-    if (longCounter.getUnit() != null) {
-      longCounterBuilder = longCounterBuilder.setUnit(longCounter.getUnit());
+        openTelemetryMeter.counterBuilder(muleLongCounter.getName()).setDescription(muleLongCounter.getDescription());
+    if (muleLongCounter.getUnit() != null) {
+      longCounterBuilder = longCounterBuilder.setUnit(muleLongCounter.getUnit());
     }
-    io.opentelemetry.api.metrics.LongCounter otelLongCounter = longCounterBuilder.build();
-    longCounter.onAddition((value, stringStringMap) -> otelLongCounter.add(value, getOtelAttributes(stringStringMap)));
+    return longCounterBuilder.build();
   }
 
   private Attributes getOtelAttributes(Map<String, String> stringStringMap) {
@@ -105,7 +117,7 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
       longUpDownCounter = longUpDownCounter.setUnit(upDownCounter.getUnit());
     }
 
-    upDownCounters
+    longUpDownCounters
         .add(longUpDownCounter.buildWithCallback(measurement -> measurement.record(upDownCounter.getValueAsLong(), attributes)));
   }
 
@@ -116,9 +128,9 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
   @Override
   public void dispose() {
-    counters.forEach(ObservableLongCounter::close);
-    upDownCounters.forEach(ObservableLongUpDownCounter::close);
-
+    longCounters
+        .forEach(longCounterBiConsumerPair -> longCounterBiConsumerPair.getFirst().remove(longCounterBiConsumerPair.getSecond()));
+    longUpDownCounters.forEach(ObservableLongUpDownCounter::close);
     if (periodicMetricReader != null) {
       periodicMetricReader.shutdown();
     }

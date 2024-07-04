@@ -14,9 +14,9 @@ import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -40,10 +40,11 @@ public class DefaultLongCounter implements LongCounter {
   private Supplier<Long> valueSupplier = value::get;
 
   private BiConsumer<Long, Map<String, String>> addOperation = getDefaultAddOperation();
+
   private Function<Map<String, String>, Long> incrementAndGetOperation = getDefaultIncrementAndGetOperation();
 
-  // TODO: Need to handle weak references in order to not retain observers
-  List<BiConsumer<Long, Map<String, String>>> onAdditionObservers = new ArrayList<>();
+  // This list MUST be thread safe (observers can call #remove at any time).
+  private final List<BiConsumer<Long, Map<String, String>>> onAdditionObservers = new CopyOnWriteArrayList<>();
 
   private DefaultLongCounter(String name, String description, String unit, Meter meter) {
     this.name = name;
@@ -100,8 +101,13 @@ public class DefaultLongCounter implements LongCounter {
   }
 
   @Override
-  public void onAddition(BiConsumer<Long, Map<String, String>> consumer) {
-    this.onAdditionObservers.add(consumer);
+  public void onAddition(BiConsumer<Long, Map<String, String>> onAdditionObserver) {
+    onAdditionObservers.add(onAdditionObserver);
+  }
+
+  @Override
+  public void remove(BiConsumer<Long, Map<String, String>> onAdditionObserver) {
+    onAdditionObservers.remove(onAdditionObserver);
   }
 
   @Override
