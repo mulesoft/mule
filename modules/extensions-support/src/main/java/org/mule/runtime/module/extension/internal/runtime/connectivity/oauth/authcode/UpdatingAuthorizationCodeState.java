@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.au
 
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 
+import static java.lang.String.*;
 import static java.lang.String.format;
 
 import org.mule.oauth.client.api.exception.RequestAuthenticationException;
@@ -21,8 +22,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.google.common.base.Suppliers;
-
 /**
  * An implementation of {@link AuthorizationCodeListener} which registers an {@link AuthorizationCodeListener} in order to get
  * updated state when a refresh token operation is completed or the resource is simply re-authorized.
@@ -32,10 +31,8 @@ public class UpdatingAuthorizationCodeState
 
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
-  // private AuthorizationCodeConfig config;
-  // private Supplier<ResourceOwnerOAuthContext> contextSupplier;
-  private Supplier<String> tokenFromDancer;
-  private boolean isClusterEnabled;
+  private final Supplier<String> tokenSupplier;
+  private final boolean isClusterEnabled;
 
   private static final String INVALIDATED_MESSAGE_TEMPLATE =
       "OAuth token for resource owner id %s has been invalidated";
@@ -69,11 +66,9 @@ public class UpdatingAuthorizationCodeState
         onUpdate.accept(context);
       }
     });
-    // this.config = config;
-    // this.contextSupplier = () -> dancer.getContextForResourceOwner(getResourceOwnerId());
-    this.tokenFromDancer = () -> {
+    this.tokenSupplier = () -> {
       try {
-        return String.valueOf(dancer.accessToken(getResourceOwnerId()));
+        return valueOf(dancer.accessToken(getResourceOwnerId()));
       } catch (RequestAuthenticationException e) {
         throw new RuntimeException(e);
       }
@@ -85,9 +80,11 @@ public class UpdatingAuthorizationCodeState
   public String getAccessToken() {
     if (invalidated) {
       throw new TokenInvalidatedException(format(INVALIDATED_MESSAGE_TEMPLATE, getResourceOwnerId()));
-    } else if (isClusterEnabled) {
+    }
+
+    if (isClusterEnabled) {
       try {
-        tokenFromDancer.get();
+        tokenSupplier.get();
       } catch (Exception e) {
         throw new TokenInvalidatedException(format(INVALIDATED_MESSAGE_TEMPLATE, getResourceOwnerId()));
       }
