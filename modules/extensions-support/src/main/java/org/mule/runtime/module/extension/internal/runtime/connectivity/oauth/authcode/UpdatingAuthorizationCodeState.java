@@ -86,6 +86,7 @@ public class UpdatingAuthorizationCodeState
       try {
         tokenSupplier.get();
       } catch (Exception e) {
+        invalidated = true;
         throw new TokenInvalidatedException(format(INVALIDATED_MESSAGE_TEMPLATE, getResourceOwnerId()));
       }
     }
