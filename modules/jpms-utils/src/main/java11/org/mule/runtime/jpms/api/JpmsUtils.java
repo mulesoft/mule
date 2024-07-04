@@ -241,6 +241,8 @@ public final class JpmsUtils {
                  singletonList("org.mule.runtime.module.boot.internal"));
     openToModule(layer, "kryo.shaded", "java.base",
                  asList("java.lang", "java.lang.reflect"));
+    openToModule(layer, "org.mule.runtime.jpms.utils", "java.base",
+                 asList("java.lang", "java.lang.reflect"));
   }
 
   private static boolean useModuleLayer() {
