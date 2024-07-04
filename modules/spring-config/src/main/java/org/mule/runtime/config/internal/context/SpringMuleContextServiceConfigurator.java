@@ -30,6 +30,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGE
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ARTIFACT_METER_PROVIDER_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY;
@@ -478,7 +479,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
   private BeanDefinition resolveArtifactIdMeterProvider() {
     if (getBoolean(METRIC_EXPORTER_ENABLED_PROPERTY)) {
       return getBeanDefinitionBuilder(ArtifactMeterProvider.class)
-          .addConstructorArgReference(MULE_ARTIFACT_BASE_METER_PROVIDER_KEY)
+          .addConstructorArgReference(MULE_METER_PROVIDER_KEY)
           .addConstructorArgValue(muleContext.getId()).setPrimary(true).getBeanDefinition();
     }
     return getPrimaryBeanDefinition(MeterProvider.NO_OP);
