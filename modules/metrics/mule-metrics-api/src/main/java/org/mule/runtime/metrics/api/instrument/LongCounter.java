@@ -77,6 +77,11 @@ public interface LongCounter extends Instrument {
     public void onAddition(BiConsumer<Long, Map<String, String>> consumer) {
       // Nothing to do
     }
+
+    @Override
+    public void remove(BiConsumer<Long, Map<String, String>> consumer) {
+      // Nothing to do
+    }
   };
 
   /**
@@ -114,6 +119,19 @@ public interface LongCounter extends Instrument {
 
   int getValueAsInt();
 
-  // REVIEW NOTE: This could also be part of an internal api (I.e InternalLongCounter extends LongCounter)
-  void onAddition(BiConsumer<Long, Map<String, String>> consumer);
+  /**
+   * Makes this counter observable. Consumer will be called for every add operation.
+   * 
+   * @param onAdditionConsumer {@link java.util.function.Consumer} that will be called for every addition to this counter.
+   */
+  void onAddition(BiConsumer<Long, Map<String, String>> onAdditionConsumer);
+
+  /**
+   * Removes a previously registered observer. MUST be called by the observer in order to free the reference that this counter
+   * might hold and avoid leaks.
+   * 
+   * @param onAdditionConsumer {@link java.util.function.Consumer} that will no longer observe this counter.
+   * @see #onAddition(BiConsumer)
+   */
+  void remove(BiConsumer<Long, Map<String, String>> onAdditionConsumer);
 }
