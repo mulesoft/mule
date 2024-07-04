@@ -37,11 +37,7 @@ public class CollectionChainInputTypeResolver implements ChainInputTypeResolver 
     messageMetadataType.getAttributesType()
         .ifPresent(chainMessageMetadataTypeBuilder::attributes);
 
-    // TODO: actually evaluate the "collection" parameter once it actually returns the resolved type
-    // chainMessageMetadataTypeBuilder.payload(resolveChainPayloadType(context.getParameterResolvedType(collectionParameterName)));
-    messageMetadataType.getPayloadType()
-        .map(this::resolveChainPayloadType)
-        .ifPresent(chainMessageMetadataTypeBuilder::payload);
+    chainMessageMetadataTypeBuilder.payload(resolveChainPayloadType(context.getParameterResolvedType(collectionParameterName)));
 
     return chainMessageMetadataTypeBuilder.build();
   }

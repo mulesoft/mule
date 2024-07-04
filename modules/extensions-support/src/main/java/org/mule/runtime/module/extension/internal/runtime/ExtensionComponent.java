@@ -91,6 +91,7 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.api.tooling.metadata.ParameterExpressionMetadataResolver;
 import org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProviderMediator;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.DefaultSampleDataProviderMediator;
@@ -697,9 +698,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                             Supplier<MessageMetadataType> scopeInputMessageType)
       throws MetadataResolvingException {
     try {
+      // TODO: provide parameterization
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getScopeInputMetadata(context, key, scopeInputMessageType)));
+                                        .getScopeInputMetadata(context, key, scopeInputMessageType,
+                                                               ParameterExpressionMetadataResolver.noOp())));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
@@ -710,9 +713,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                               Supplier<MessageMetadataType> routerInputMessageType)
       throws MetadataResolvingException {
     try {
+      // TODO: provide parameterization
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getRouterInputMetadata(context, key, routerInputMessageType)));
+                                        .getRouterInputMetadata(context, key, routerInputMessageType,
+                                                                ParameterExpressionMetadataResolver.noOp())));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }

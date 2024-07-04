@@ -45,6 +45,7 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
+import org.mule.runtime.module.extension.api.tooling.metadata.ParameterExpressionMetadataResolver;
 import org.mule.runtime.module.extension.internal.metadata.chain.DefaultChainInputMetadataContext;
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
@@ -108,12 +109,14 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    */
   MetadataResult<MessageMetadataType> getScopeChainInputType(MetadataContext context,
                                                              Supplier<MessageMetadataType> scopeInputMessageType,
-                                                             InputMetadataDescriptor inputMetadataDescriptor) {
+                                                             InputMetadataDescriptor inputMetadataDescriptor,
+                                                             ParameterExpressionMetadataResolver parameterExpressionMetadataResolver) {
     try {
       return resolveWithOAuthRefresh(context, () -> {
         ChainInputTypeResolver resolver = resolverFactory.getScopeChainInputTypeResolver().orElse(NULL_INSTANCE);
         ChainInputMetadataContext chainCtx =
-            new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor, context);
+            new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor,
+                                                 parameterExpressionMetadataResolver, context);
 
         return success(resolver.getChainInputMetadataType(chainCtx));
       });
@@ -136,12 +139,14 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    */
   MetadataResult<Map<String, MessageMetadataType>> getRoutesChainInputType(MetadataContext context,
                                                                            Supplier<MessageMetadataType> scopeInputMessageType,
-                                                                           InputMetadataDescriptor inputMetadataDescriptor) {
+                                                                           InputMetadataDescriptor inputMetadataDescriptor,
+                                                                           ParameterExpressionMetadataResolver parameterExpressionMetadataResolver) {
     try {
       return resolveWithOAuthRefresh(context, () -> {
         List<String> routeNames = getRouteNames();
         ChainInputMetadataContext chainCtx =
-            new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor, context);
+            new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor,
+                                                 parameterExpressionMetadataResolver, context);
         Map<String, ChainInputTypeResolver> routerChainInputResolvers = resolverFactory.getRouterChainInputResolvers();
         Map<String, MessageMetadataType> result = new LinkedHashMap<>();
         for (String routeName : routeNames) {
