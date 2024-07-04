@@ -340,7 +340,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     final String expectedErrorLog = readFileToString(logContent);
     final Optional<String> secondOptionExpectedErrorLog = secondOptionLog.map(path -> {
       try {
-        return readFileToString(new File(getResourceAsUrl(fileLocation, ClassloadingTroubleshootingTestCase.class).toURI()));
+        return readFileToString(new File(getResourceAsUrl(path, ClassloadingTroubleshootingTestCase.class).toURI()));
       } catch (URISyntaxException | IOException e) {
         throw new RuntimeException(e);
       }
