@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.au
 
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 
-import static java.lang.String.*;
+import static java.lang.String.valueOf;
 import static java.lang.String.format;
 
 import org.mule.oauth.client.api.exception.RequestAuthenticationException;
