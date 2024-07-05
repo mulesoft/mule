@@ -8,7 +8,8 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL_PROPERTY;
 
-import static java.lang.Boolean.getBoolean;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -25,7 +26,7 @@ public class RetryScheduledFolderDeletionTask implements Runnable {
   private final NativeLibrariesFolderDeletion folderDeletion;
   private static final Logger LOGGER = getLogger(RetryScheduledFolderDeletionTask.class);
   private static final boolean DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL =
-      getBoolean(DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL_PROPERTY);
+      parseBoolean(getProperty(DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL_PROPERTY, "false"));
 
 
   public RetryScheduledFolderDeletionTask(ScheduledExecutorService scheduler, int maxAttempts,
@@ -42,6 +43,7 @@ public class RetryScheduledFolderDeletionTask implements Runnable {
 
     if (!DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL && attempt == maxAttempts) {
       System.gc();
+      LOGGER.debug("Attempt {}. System.gc() executed.", attempt);
     }
 
     if (performAction()) {
