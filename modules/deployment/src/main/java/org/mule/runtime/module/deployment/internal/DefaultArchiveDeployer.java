@@ -344,6 +344,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     if (appNativeLibrariesFolder.exists()) {
       try {
         deleteDirectory(appNativeLibrariesFolder);
+        logger.debug("App Native Libraries folder deleted: {}", appNativeLibrariesFolder.getAbsolutePath());
       } catch (IOException e) {
         logger.debug(
                      format("Cannot delete native libraries data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used. Scheduling a task to removed them.",
