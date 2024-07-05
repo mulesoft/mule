@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL_PROPERTY;
 
 import static java.lang.Boolean.getBoolean;
-import static java.lang.String.format;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -52,7 +51,7 @@ public class RetryScheduledFolderDeletionTask implements Runnable {
         LOGGER.error("Failed to perform the action. No further retries will be made.");
         scheduler.shutdown();
       } else {
-        LOGGER.warn(format("Attempt %s. Failed to perform the action. Retrying...", attempt));
+        LOGGER.warn("Attempt {}. Failed to perform the action. Retrying...", attempt);
       }
     }
   }
