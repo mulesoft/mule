@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.FORWARD_COMPATIBIL
 import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ARTIFACT_BASE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONENT_TRACER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
@@ -250,7 +249,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(MULE_CORE_EVENT_TRACER_KEY, getBeanDefinition(SelectableCoreEventTracer.class))
       .put(MULE_CORE_COMPONENT_TRACER_FACTORY_KEY, getBeanDefinition(CoreEventComponentTracerFactory.class))
       .put(MULE_ERROR_METRICS_FACTORY_KEY, resolveErrorMetricsFactory())
-      .put(MULE_ARTIFACT_BASE_METER_PROVIDER_KEY, resolveBaseArtifactMeterProvider())
+      .put(MULE_METER_PROVIDER_KEY, resolveBaseArtifactMeterProvider())
       .put(MULE_METER_EXPORTER_CONFIGURATION_KEY,
            getBeanDefinition(OpenTelemetryAutoConfigurableMeterExporterConfiguration.class))
       .put(MULE_METER_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetryMeterExporterFactory.class))
