@@ -115,6 +115,11 @@ public class CoreExtensionDeclarerTestCase {
     }
 
     @Override
+    public ComponentMetadataConfigurer addRoutePassThroughChainInputResolver(String routeName) {
+      return this;
+    }
+
+    @Override
     public ComponentMetadataConfigurer addRouteChainInputResolver(String routeName, ChainInputTypeResolver resolver) {
       return this;
     }

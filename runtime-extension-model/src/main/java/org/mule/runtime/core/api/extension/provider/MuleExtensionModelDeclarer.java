@@ -706,7 +706,11 @@ public class MuleExtensionModelDeclarer {
         .setExecutionOccurrence(ONCE_OR_NONE);
     choice.withOutput().ofDynamicType(ANY_TYPE);
     choice.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().withPassThroughChainInputTypeResolver().asOneOfRouter().configure(choice);
+    configurerFactory.create()
+        .addRoutePassThroughChainInputResolver("when")
+        .addRoutePassThroughChainInputResolver("otherwise")
+        .asOneOfRouter()
+        .configure(choice);
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer) {
@@ -769,7 +773,10 @@ public class MuleExtensionModelDeclarer {
 
     firstSuccessful.withOutput().ofDynamicType(ANY_TYPE);
     firstSuccessful.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().withPassThroughChainInputTypeResolver().asOneOfRouter().configure(firstSuccessful);
+    configurerFactory.create()
+        .addRoutePassThroughChainInputResolver("route")
+        .asOneOfRouter()
+        .configure(firstSuccessful);
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
@@ -788,7 +795,10 @@ public class MuleExtensionModelDeclarer {
 
     roundRobin.withOutput().ofDynamicType(ANY_TYPE);
     roundRobin.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().withPassThroughChainInputTypeResolver().asOneOfRouter().configure(roundRobin);
+    configurerFactory.create()
+        .addRoutePassThroughChainInputResolver("route")
+        .asOneOfRouter()
+        .configure(roundRobin);
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -832,7 +842,10 @@ public class MuleExtensionModelDeclarer {
 
     scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().withPassThroughChainInputTypeResolver().asAllOfRouter().configure(scatterGather);
+    configurerFactory.create()
+        .addRoutePassThroughChainInputResolver("route")
+        .asAllOfRouter()
+        .configure(scatterGather);
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)
