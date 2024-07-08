@@ -62,7 +62,7 @@ public abstract class AbstractOSController {
   protected static final String STATUS_WRAPPER_GROUP_NAME = "wrapper";
   protected static final String STATUS_JAVA_GROUP_NAME = "java";
   protected static final String STATUS_LABELS =
-      format("Mule(?:(\\sEnterprise Edition)? \\(standalone\\))? is running:\\sPID:(?<%s>[0-9]+), Wrapper:(?<%s>\\w+), Java:(?<%s>\\w+)",
+      format("Mule(?:(\\sEnterprise Edition)? \\([^\\)]+\\))? is running:\\sPID:(?<%s>[0-9]+), Wrapper:(?<%s>\\w+), Java:(?<%s>\\w+)",
              STATUS_PID_GROUP_NAME, STATUS_WRAPPER_GROUP_NAME, STATUS_JAVA_GROUP_NAME);
   protected static final Pattern STATUS_LABELS_PATTERN = compile(STATUS_LABELS);
   private static final int DEFAULT_TIMEOUT = 30000;
