@@ -154,7 +154,9 @@ public class CoreExtensionDeclarerTestCase {
 
     @Override
     public <T extends ParameterizedDeclarer, D extends ParameterizedDeclaration> void configure(ParameterizedDeclarer<T, D> declarer) {
-      selected.add(declarer);
+      if (selected != null) {
+        selected.add(declarer);
+      }
     }
 
     @Override
