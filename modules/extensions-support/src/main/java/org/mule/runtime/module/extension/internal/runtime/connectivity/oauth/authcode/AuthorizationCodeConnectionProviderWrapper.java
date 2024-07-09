@@ -55,7 +55,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
     authCodeStateSetter =
-      getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
+        getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
   }
 
