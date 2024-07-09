@@ -39,6 +39,7 @@ module org.mule.runtime.extensions.support {
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.extensions.api.persistence;
   requires org.mule.runtime.featureManagement;
+  requires org.mule.runtime.global.config;
   requires org.mule.runtime.http.api;
   requires org.mule.runtime.metadata.model.api;
   requires org.mule.runtime.metadata.model.catalog;

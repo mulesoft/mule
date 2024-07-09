@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getClusterConfig;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 
 import static java.lang.String.valueOf;
@@ -13,6 +14,7 @@ import static java.lang.String.format;
 
 import org.mule.oauth.client.api.exception.RequestAuthenticationException;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
+import org.mule.runtime.globalconfig.api.cluster.ClusterConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
@@ -32,7 +34,7 @@ public class UpdatingAuthorizationCodeState
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
   private final Supplier<String> tokenSupplier;
-  private final boolean isClusterEnabled;
+  private final ClusterConfig clusterConfig = getClusterConfig();
 
   private static final String INVALIDATED_MESSAGE_TEMPLATE =
       "OAuth token for resource owner id %s has been invalidated";
@@ -40,8 +42,7 @@ public class UpdatingAuthorizationCodeState
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
-                                        Consumer<ResourceOwnerOAuthContext> onUpdate,
-                                        boolean isClusterEnabled) {
+                                        Consumer<ResourceOwnerOAuthContext> onUpdate) {
     delegate = toAuthorizationCodeState(config, initialContext);
     dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
@@ -73,7 +74,6 @@ public class UpdatingAuthorizationCodeState
         throw new RuntimeException(e);
       }
     };
-    this.isClusterEnabled = isClusterEnabled;
   }
 
   @Override
@@ -82,7 +82,7 @@ public class UpdatingAuthorizationCodeState
       throw new TokenInvalidatedException(format(INVALIDATED_MESSAGE_TEMPLATE, getResourceOwnerId()));
     }
 
-    if (isClusterEnabled) {
+    if (clusterConfig.getClusterService().isEnabled()) {
       try {
         tokenSupplier.get();
       } catch (Exception e) {
