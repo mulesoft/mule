@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -22,15 +25,20 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
 
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -88,6 +96,35 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
   public void defaultProcessTypeIsCpuLite() {
     LoggerMessageProcessor logger = buildLoggerMessageProcessorWithLevel("INFO");
     assertThat(logger.getProcessingType(), is(CPU_LITE));
+  }
+
+  @Test
+  public void verifyClassloaderForLogging() {
+    ClassLoader initClassloader = mock(ClassLoader.class);
+    ClassLoader executionClassloader = mock(ClassLoader.class);
+    Reference<ClassLoader> holder = new Reference<>();
+    LoggerMessageProcessor logger = buildLoggerMessageProcessorForCapturingClassloader(initClassloader, holder);
+    CoreEvent coreEvent = mock(CoreEvent.class);
+    withContextClassLoader(executionClassloader, () -> logger.log(coreEvent));
+    assertThat(holder.get(), equalTo(initClassloader));
+  }
+
+  private LoggerMessageProcessor buildLoggerMessageProcessorForCapturingClassloader(ClassLoader initClassloader,
+                                                                                    Reference<ClassLoader> classloaderHolder) {
+    LoggerMessageProcessor loggerMessageProcessor = new LoggerMessageProcessor();
+    loggerMessageProcessor.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+    withContextClassLoader(initClassloader, () -> loggerMessageProcessor.initLogger());
+    loggerMessageProcessor.initProcessingTypeIfPossible();
+    Logger mockLogger = mock(Logger.class);
+    doAnswer((Answer<Void>) invocation -> {
+      classloaderHolder.set(currentThread().getContextClassLoader());
+      return null;
+    }).when(mockLogger).info(any());
+
+    when(mockLogger.isInfoEnabled()).thenReturn(true);
+    loggerMessageProcessor.logger = mockLogger;
+    loggerMessageProcessor.setLevel("INFO");
+    return loggerMessageProcessor;
   }
 
   // Verifies if the right call to the logger was made depending on the level enabled
