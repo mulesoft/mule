@@ -739,7 +739,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         }
       }
 
-      reallyDoInitialise();
+      withContextClassLoader(classLoader, () -> {
+        reallyDoInitialise();
+        return null;
+      });
     } else {
       LOGGER
           .debug("Message source '{}' on flow '{}' cannot initialize. This Message source can only run on the primary node of the cluster",
