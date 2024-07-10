@@ -60,17 +60,18 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void setUpClass() throws Exception {
-    File fromMuleModuleJarFile = new JarFileBuilder("mule-module",
-                                                    new JarCompiler()
-                                                        .compiling(getResourceFile("/org/test/mule/FromMuleModule.java"))
-                                                        .compile("mule-module.jar"))
-                                                            .getArtifactFile();
-
     File fromThirdPartyLibJarFile = new JarFileBuilder("third-party-lib",
                                                        new JarCompiler()
                                                            .compiling(getResourceFile("/org/test/opt/FromThirdPartyLib.java"))
                                                            .compile("third-party-lib.jar"))
                                                                .getArtifactFile();
+
+    File fromMuleModuleJarFile = new JarFileBuilder("mule-module",
+                                                    new JarCompiler()
+                                                        .compiling(getResourceFile("/org/test/mule/FromMuleModule.java"))
+                                                        .dependingOn(fromThirdPartyLibJarFile)
+                                                        .compile("mule-module.jar"))
+                                                            .getArtifactFile();
 
     File fromUserLibJarFile = new JarFileBuilder("user-lib",
                                                  new JarCompiler()
