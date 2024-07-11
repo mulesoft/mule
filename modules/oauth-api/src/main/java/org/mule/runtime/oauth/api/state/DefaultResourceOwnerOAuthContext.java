@@ -125,4 +125,14 @@ public final class DefaultResourceOwnerOAuthContext
   public Lock getRefreshOAuthContextLock(String lockNamePrefix, LockFactory lockFactory) {
     return createRefreshOAuthContextLock(lockNamePrefix, lockFactory, resourceOwnerId);
   }
+
+  @Override
+  public boolean getInvalidated() {
+    return false;
+  }
+
+  @Override
+  public void setInvalidated(boolean invalidated) {
+
+  }
 }

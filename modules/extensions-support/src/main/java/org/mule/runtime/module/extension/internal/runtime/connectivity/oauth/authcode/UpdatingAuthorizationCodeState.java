@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getClusterConfig;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -17,6 +18,8 @@ import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.google.common.base.Supplier;
+
 /**
  * An implementation of {@link AuthorizationCodeListener} which registers an {@link AuthorizationCodeListener} in order to get
  * updated state when a refresh token operation is completed or the resource is simply re-authorized.
@@ -26,6 +29,8 @@ public class UpdatingAuthorizationCodeState
 
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
+  private Supplier<Boolean> getInvalidationStatusFromTokenStore;
+  private final boolean isClusterEnabled = getClusterConfig().getClusterService().isEnabled();
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
@@ -55,6 +60,7 @@ public class UpdatingAuthorizationCodeState
         onUpdate.accept(context);
       }
     });
+    getInvalidationStatusFromTokenStore = () -> dancer.getInvalidateFromTokensStore(getResourceOwnerId());
   }
 
   @Override
@@ -63,6 +69,14 @@ public class UpdatingAuthorizationCodeState
       throw new TokenInvalidatedException(
                                           "OAuth token for resource owner id " + delegate.getResourceOwnerId()
                                               + " has been invalidated");
+    }
+    if (isClusterEnabled) {
+      this.invalidated = getInvalidationStatusFromTokenStore.get();
+      if (invalidated) {
+        throw new TokenInvalidatedException(
+                                            "OAuth token for resource owner id " + delegate.getResourceOwnerId()
+                                                + " has been invalidated");
+      }
     }
     return delegate.getAccessToken();
   }
