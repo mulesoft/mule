@@ -35,6 +35,7 @@ public class MuleFoldersUtil {
   public static final String ARTIFACT_PATCHES_FOLDER = "mule-artifact-patches";
   public static final String SERVICES_FOLDER = "services";
   private static final String MODULES_FOLDER = "modules";
+  private static final String NATIVE_LIBRARIES_FOLDER = "native-libraries";
 
 
   private MuleFoldersUtil() {}
@@ -206,4 +207,27 @@ public class MuleFoldersUtil {
     return new File(getExecutionFolder(), MODULES_FOLDER);
   }
 
+  /**
+   * @return a {@link File} pointing to the container folder used to temporarily store the native libraries loaded for the app.
+   */
+  public static File getNativeLibrariesTempFolder() {
+    return new File(getExecutionFolder(), NATIVE_LIBRARIES_FOLDER);
+  }
+
+  /**
+   * @param appName name of the application to look for
+   * @return the native libraries folder in the execution folder with the given name.
+   */
+  public static File getAppNativeLibrariesTempFolder(String appName) {
+    return new File(getNativeLibrariesTempFolder(), appName);
+  }
+
+  /**
+   * @param appName    name of the application to look for
+   * @param identifier of the application instance
+   * @return the native libraries folder in the execution folder with the given name.
+   */
+  public static File getAppNativeLibrariesTempFolder(String appName, String identifier) {
+    return new File(new File(getNativeLibrariesTempFolder(), appName), identifier);
+  }
 }

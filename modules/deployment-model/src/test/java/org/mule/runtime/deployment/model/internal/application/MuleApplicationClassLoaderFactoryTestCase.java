@@ -9,6 +9,7 @@ package org.mule.runtime.deployment.model.internal.application;
 
 import static java.lang.System.setProperty;
 import static java.util.Collections.emptyList;
+import static java.util.UUID.randomUUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -88,7 +89,7 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     final MuleApplicationClassLoader artifactClassLoader =
         (MuleApplicationClassLoader) classLoaderFactory.create(APP_ID, parentArtifactClassLoader, descriptor, emptyList());
 
-    verify(nativeLibraryFinderFactory).create(APP_NAME, new URL[0]);
+    verify(nativeLibraryFinderFactory).create(APP_NAME, randomUUID().toString(), new URL[0]);
     assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));
     assertThat(artifactClassLoader.getArtifactId(), is(APP_ID));
   }

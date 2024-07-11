@@ -36,6 +36,7 @@ import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilterFactory;
@@ -543,9 +544,12 @@ public class IsolatedClassLoaderFactory {
     applicationUrls.addAll(artifactsUrlClassification.getApplicationSharedLibUrls());
 
     logClassLoaderUrls("APP", applicationUrls);
-    return new MuleApplicationClassLoader(APP_NAME, new ArtifactDescriptor(APP_NAME), parent,
+    ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
+    return new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, parent,
                                           new DefaultNativeLibraryFinderFactory()
-                                              .create(APP_NAME, applicationUrls.toArray(new URL[applicationUrls.size()])),
+                                              .create(APP_NAME,
+                                                      applicationDescriptor.getLoadedNativeLibrariesFolderName(),
+                                                      applicationUrls.toArray(new URL[applicationUrls.size()])),
                                           applicationUrls,
                                           childClassLoaderLookupPolicy, pluginsArtifactClassLoaders);
   }
