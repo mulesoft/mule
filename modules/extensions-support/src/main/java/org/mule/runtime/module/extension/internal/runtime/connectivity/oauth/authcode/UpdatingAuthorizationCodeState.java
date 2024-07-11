@@ -65,20 +65,20 @@ public class UpdatingAuthorizationCodeState
 
   @Override
   public String getAccessToken() {
+    checkTokenNotInvalidated();
+    if (isClusterEnabled) {
+      this.invalidated = getInvalidationStatusFromTokenStore.get();
+      checkTokenNotInvalidated();
+    }
+    return delegate.getAccessToken();
+  }
+
+  private void checkTokenNotInvalidated() {
     if (invalidated) {
       throw new TokenInvalidatedException(
                                           "OAuth token for resource owner id " + delegate.getResourceOwnerId()
                                               + " has been invalidated");
     }
-    if (isClusterEnabled) {
-      this.invalidated = getInvalidationStatusFromTokenStore.get();
-      if (invalidated) {
-        throw new TokenInvalidatedException(
-                                            "OAuth token for resource owner id " + delegate.getResourceOwnerId()
-                                                + " has been invalidated");
-      }
-    }
-    return delegate.getAccessToken();
   }
 
   @Override

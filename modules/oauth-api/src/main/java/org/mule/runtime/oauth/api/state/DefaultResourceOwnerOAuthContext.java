@@ -127,12 +127,12 @@ public final class DefaultResourceOwnerOAuthContext
   }
 
   @Override
-  public boolean getInvalidated() {
+  public boolean isTokenInvalid() {
     return false;
   }
 
   @Override
-  public void setInvalidated(boolean invalidated) {
+  public void markTokenAsInvalid() {
 
   }
 }
