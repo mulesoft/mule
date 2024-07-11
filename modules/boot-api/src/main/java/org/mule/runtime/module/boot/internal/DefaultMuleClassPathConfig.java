@@ -45,8 +45,8 @@ public class DefaultMuleClassPathConfig {
      */
     addMuleBaseUserLibs(muleHome, muleBase);
 
-    addLibraryDirectory(muleUrls, muleHome, USER_DIR);
     addLibraryDirectory(muleUrls, muleHome, MULE_DIR);
+    addLibraryDirectory(optUrls, muleHome, USER_DIR);
     addLibraryDirectory(optUrls, muleHome, OPT_DIR);
 
     // Do not use commons-lang3 to avoid having to add that jar to lib/boot

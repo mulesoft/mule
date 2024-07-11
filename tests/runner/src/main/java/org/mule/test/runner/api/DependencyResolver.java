@@ -6,9 +6,12 @@
  */
 package org.mule.test.runner.api;
 
+import static java.lang.Boolean.getBoolean;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.base.Joiner.on;
@@ -19,20 +22,25 @@ import org.mule.maven.client.internal.MuleMavenRepositoryState;
 import org.mule.maven.client.internal.MuleMavenRepositoryStateFactory;
 import org.mule.maven.client.internal.MuleMavenResolutionContext;
 import org.mule.runtime.api.util.Pair;
+import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
@@ -194,34 +202,51 @@ public class DependencyResolver implements AutoCloseable {
   }
 
   /**
-   * Resolves and filters transitive dependencies for the root and direct dependencies.
+   * Resolves and filters transitive dependencies for the root and direct dependencies for the Mule Runtime container.
    * <p/>
    * If both a root dependency and direct dependencies are given, the direct dependencies will be merged with the direct
    * dependencies from the root dependency's artifact descriptor, giving higher priority to the dependencies from the root.
    *
-   * @param root                {@link Dependency} node from to collect its dependencies, may be {@code null}
-   * @param directDependencies  {@link List} of direct {@link Dependency} to collect its transitive dependencies, may be
-   *                            {@code null}
-   * @param managedDependencies {@link List} of managed {@link Dependency}s to be used for resolving the depedency graph, may be
-   *                            {@code null}
-   * @param dependencyFilter    {@link DependencyFilter} to include/exclude dependency nodes during collection and resolve
-   *                            operation. May be {@code null} to no filter
-   * @param remoteRepositories  a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule
-   *                            jar urls, second are jar urls for third parties.
-   * @return a {@link List} of {@link File}s for each dependency resolved
-   * @throws {@link DependencyCollectionException} if the dependency tree could not be built
-   * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
-   *         be resolved
+   * @param root                  {@link Dependency} node from to collect its dependencies, may be {@code null}
+   * @param directDependencies    {@link List} of direct {@link Dependency} to collect its transitive dependencies, may be
+   *                              {@code null}
+   * @param managedDependencies   {@link List} of managed {@link Dependency}s to be used for resolving the depedency graph, may be
+   *                              {@code null}
+   * @param excludedFilterPattern exclusion patterns in the form of
+   *                              {@code [groupId]:[artifactId]:[extension]:[classifier]:[version]}
+   * @param remoteRepositories    remote repositories to be used in addition to the one in context.
+   * @return the {@link ContainerDependencies} with the {@link URL}s for the container class loader.
+   * @throws DependencyCollectionException if the dependency tree could not be built
+   * @throws DependencyResolutionException if the dependency tree could not be built or any dependency artifact could not be
+   *                                       resolved
    */
-  public Pair<List<File>, List<File>> resolveContainerDependencies(Dependency root, List<Dependency> directDependencies,
-                                                                   List<Dependency> managedDependencies,
-                                                                   DependencyFilter dependencyFilter,
-                                                                   List<RemoteRepository> remoteRepositories)
+  public ContainerDependencies resolveContainerDependencies(Dependency root, List<Dependency> directDependencies,
+                                                            List<Dependency> managedDependencies,
+                                                            List<String> excludedFilterPattern,
+                                                            List<RemoteRepository> remoteRepositories)
       throws DependencyCollectionException, DependencyResolutionException {
-    DependencyNode node =
+    DependencyNode muleApisNode = getMuleApisNode(unmodifiableList(excludedFilterPattern));
+
+    final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
+    DependencyNode muleLibsNode =
         resolveDependencyNode(root, directDependencies, managedDependencies, dependencyFilter, remoteRepositories);
 
-    return getContainerFiles(node);
+    return getContainerDependencies(muleApisNode, muleLibsNode);
+  }
+
+  private DependencyNode getMuleApisNode(List<String> excludedFilterPattern)
+      throws DependencyCollectionException, DependencyResolutionException {
+    try {
+      final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
+      final String version = this.getClass().getPackage().getImplementationVersion();
+      ArtifactDescriptorResult pom =
+          readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-apis-split-loader-bom",
+                                                     "pom", version));
+      return resolveDependencyNode(null, pom.getDependencies(), pom.getManagedDependencies(), dependencyFilter,
+                                   pom.getRepositories());
+    } catch (ArtifactDescriptorException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -240,9 +265,9 @@ public class DependencyResolver implements AutoCloseable {
    * @param remoteRepositories  {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already
    *                            defined in the context.
    * @return a {@link List} of {@link File}s for each dependency resolved
-   * @throws {@link DependencyCollectionException} if the dependency tree could not be built
-   * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
-   *         be resolved
+   * @throws DependencyCollectionException if the dependency tree could not be built
+   * @throws DependencyResolutionException if the dependency tree could not be built or any dependency artifact could not be
+   *                                       resolved
    */
   public List<File> resolveDependencies(Dependency root, List<Dependency> directDependencies,
                                         List<Dependency> managedDependencies,
@@ -351,16 +376,39 @@ public class DependencyResolver implements AutoCloseable {
   /**
    * Traverse the {@link DependencyNode} to get the files for each artifact.
    *
-   * @param node {@link DependencyNode} that represents the dependency graph
+   * @param muleApisNode
+   * @param muleLibsNode {@link DependencyNode} that represents the dependency graph
    * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jars urls, second
    *         are jar urls for third parties.
    */
-  private Pair<List<File>, List<File>> getContainerFiles(DependencyNode node) {
+  private ContainerDependencies getContainerDependencies(DependencyNode muleApisNode, DependencyNode muleLibsNode) {
+    LinkedHashSet<URL> muleApisDependencyUrls = new LinkedHashSet<>();
+    LinkedHashSet<URL> muleApisOptDependencyUrls = new LinkedHashSet<>();
+    LinkedHashSet<URL> muleDependencyUrls = new LinkedHashSet<>();
+    LinkedHashSet<URL> optDependencyUrls = new LinkedHashSet<>();
+
+    splitMuleAndOpt(muleApisNode, muleApisDependencyUrls, muleApisOptDependencyUrls);
+    splitMuleAndOpt(muleLibsNode, muleDependencyUrls, optDependencyUrls);
+
+    // sanitize dependencies
+    optDependencyUrls.removeAll(muleApisOptDependencyUrls);
+    muleDependencyUrls.removeAll(muleApisDependencyUrls);
+
+    // move log4j dependencies to the upper third-party layer (they're not directly present in the BOM because it's not something
+    // for it to provide, the client must do it)
+    List<URL> log4jUrls =
+        optDependencyUrls.stream().filter(url -> url.toString().contains("log4j") || url.toString().contains("lmax"))
+            .collect(toList());
+    muleApisOptDependencyUrls.addAll(log4jUrls);
+    log4jUrls.forEach(optDependencyUrls::remove);
+
+    return new ContainerDependencies(new ArrayList<>(muleApisOptDependencyUrls), new ArrayList<>(muleApisDependencyUrls),
+                                     new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls));
+  }
+
+  private void splitMuleAndOpt(DependencyNode node, Set<URL> muleDependencyUrls, Set<URL> optDependencyUrls) {
     PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
     node.accept(nlg);
-
-    LinkedHashSet<File> muleDependencyFiles = new LinkedHashSet<>();
-    LinkedHashSet<File> optDependencyFiles = new LinkedHashSet<>();
 
     nlg.getNodes()
         .stream()
@@ -373,13 +421,60 @@ public class DependencyResolver implements AutoCloseable {
           final File absoluteFile = artifact.getFile().getAbsoluteFile();
 
           if (isMuleContainerGroupId(artifact.getGroupId())) {
-            muleDependencyFiles.add(absoluteFile);
+            muleDependencyUrls.add(toUrl(absoluteFile));
           } else {
-            optDependencyFiles.add(absoluteFile);
+            optDependencyUrls.add(toUrl(absoluteFile));
           }
         });
+  }
 
-    return new Pair<>(new ArrayList<>(muleDependencyFiles), new ArrayList<>(optDependencyFiles));
+  /**
+   * Converts the {@link File} to {@link URL}
+   *
+   * @param file {@link File} to get its {@link URL}
+   * @return {@link URL} for the file
+   */
+  private URL toUrl(File file) {
+    try {
+      return file.toURI().toURL();
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException("Couldn't get URL", e);
+    }
+  }
+
+  /**
+   * Groups of dependencies that form the Runtime's container class loader.
+   */
+  public static class ContainerDependencies {
+
+    private final List<URL> muleApisDependencyUrls;
+    private final List<URL> muleApisOptDependencyUrls;
+    private final List<URL> muleDependencyUrls;
+    private final List<URL> optDependencyUrls;
+
+    ContainerDependencies(List<URL> muleApisDependencyUrls, List<URL> muleApisOptDependencyUrls, List<URL> optDependencyUrls,
+                          List<URL> muleDependencyUrls) {
+      this.muleApisDependencyUrls = unmodifiableList(muleApisDependencyUrls);
+      this.muleApisOptDependencyUrls = unmodifiableList(muleApisOptDependencyUrls);
+      this.muleDependencyUrls = unmodifiableList(muleDependencyUrls);
+      this.optDependencyUrls = unmodifiableList(optDependencyUrls);
+    }
+
+    public List<URL> getMuleApisDependencyUrls() {
+      return muleApisDependencyUrls;
+    }
+
+    public List<URL> getMuleApisOptDependencyUrls() {
+      return muleApisOptDependencyUrls;
+    }
+
+    public List<URL> getOptDependencyUrls() {
+      return optDependencyUrls;
+    }
+
+    public List<URL> getMuleDependencyUrls() {
+      return muleDependencyUrls;
+    }
   }
 
   // Implementation note: this must be kept consistent with the equivalent logic in embedded-api and the distro assemblies
