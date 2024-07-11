@@ -96,6 +96,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
           } else {
             NativeLibraryFinder nativeLibraryFinder =
                 nativeLibraryFinderFactory.create(descriptor.getDataFolderName(),
+                                                  descriptor.getLoadedNativeLibrariesFolderName(),
                                                   descriptor.getClassLoaderConfiguration().getUrls());
             domainClassLoader = getCustomDomainClassLoader(parent, descriptor, nativeLibraryFinder);
           }
