@@ -223,7 +223,8 @@ public final class JpmsUtils {
       return childClassLoaderFactory.create(parentClassLoader, modulePathEntriesParent, modulePathEntriesChild);
     }
 
-    List<ModuleLayer> resolvedParentLayers = clazz.map(cl -> singletonList(cl.getModule().getLayer())).orElse(emptyList());
+    List<ModuleLayer> resolvedParentLayers =
+        clazz.map(cl -> cl.getModule().getLayer()).map(Collections::singletonList).orElse(emptyList());
     final ModuleLayer parentLayer =
         createModuleLayer(modulePathEntriesParent, parentClassLoader, resolvedParentLayers, false, true);
     ClassLoader childParentClassLoader = parentLayer.findLoader(parentLayer.modules().iterator().next().getName());
