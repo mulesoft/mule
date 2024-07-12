@@ -462,17 +462,14 @@ public final class JpmsUtils {
       throw new UnsupportedOperationException("This is for internal use only.");
     }
 
-    layer.findModule(moduleName)
-        .ifPresent(module -> {
-          if (module != getCallerModule(callerClass)) {
-            boot().findModule(bootModuleName)
-                .ifPresent(bootModule -> {
-                  for (String pkg : packages) {
-                    bootModule.addOpens(pkg, module);
-                  }
-                });
-          }
-        });
+    Module callerModule = getCallerModule(callerClass);
+    layer.findModule(moduleName).filter(module -> module != callerModule)
+        .ifPresent(module -> boot().findModule(bootModuleName)
+            .ifPresent(bootModule -> {
+              for (String pkg : packages) {
+                bootModule.addOpens(pkg, module);
+              }
+            }));
   }
 
   /**
