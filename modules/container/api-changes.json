@@ -1,4 +1,37 @@
 {
+  "4.6.6": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method java.io.File org.mule.runtime.container.api.MuleFoldersUtil::getNativeLibrariesTempFolder()",
+          "package": "org.mule.runtime.container.api",
+          "classSimpleName": "MuleFoldersUtil",
+          "methodName": "getNativeLibrariesTempFolder",
+          "elementKind": "method",
+          "justification": "W-15894519: Deleting an App with DLL on Windows can cause a memory leak"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.io.File org.mule.runtime.container.api.MuleFoldersUtil::getAppNativeLibrariesTempFolder(java.lang.String)",
+          "package": "org.mule.runtime.container.api",
+          "classSimpleName": "MuleFoldersUtil",
+          "methodName": "getAppNativeLibrariesTempFolder",
+          "elementKind": "method",
+          "justification": "W-15894519: Deleting an App with DLL on Windows can cause a memory leak"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.io.File org.mule.runtime.container.api.MuleFoldersUtil::getAppNativeLibrariesTempFolder(java.lang.String, java.lang.String)",
+          "package": "org.mule.runtime.container.api",
+          "classSimpleName": "MuleFoldersUtil",
+          "methodName": "getAppNativeLibrariesTempFolder",
+          "elementKind": "method",
+          "justification": "W-15894519: Deleting an App with DLL on Windows can cause a memory leak"
+        }
+      ]
+    }
+  },
   "4.6.0": {
     "revapi": {
       "ignore": [

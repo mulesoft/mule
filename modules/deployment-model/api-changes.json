@@ -1,4 +1,46 @@
 {
+  "4.6.6": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::getLoadedNativeLibrariesFolderName() @ org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "methodName": "getLoadedNativeLibrariesFolderName",
+          "elementKind": "method",
+          "justification": "W-15894519: Deleting an App with DLL on Windows can cause a memory leak"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::getLoadedNativeLibrariesFolderName() @ org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classSimpleName": "ApplicationDescriptor",
+          "methodName": "getLoadedNativeLibrariesFolderName",
+          "elementKind": "method",
+          "justification": "W-15894519: Deleting an App with DLL on Windows can cause a memory leak"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::getLoadedNativeLibrariesFolderName() @ org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classSimpleName": "DomainDescriptor",
+          "methodName": "getLoadedNativeLibrariesFolderName",
+          "elementKind": "method",
+          "justification": "W-15894519: Deleting an App with DLL on Windows can cause a memory leak"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::getLoadedNativeLibrariesFolderName() @ org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.policy",
+          "classSimpleName": "PolicyTemplateDescriptor",
+          "methodName": "getLoadedNativeLibrariesFolderName",
+          "elementKind": "method",
+          "justification": "W-15894519: Deleting an App with DLL on Windows can cause a memory leak"
+        }
+      ]
+    }
+  },
   "4.6.0": {
     "revapi": {
       "ignore": [
