@@ -30,7 +30,7 @@ public class UpdatingAuthorizationCodeState
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
   private Supplier<Boolean> getInvalidationStatusFromTokenStore;
-  private final boolean isClusterEnabled = getClusterConfig().getClusterService().isEnabled();
+  private final boolean forceInvalidateStatusRetrieval = getClusterConfig().getClusterService().isEnabled();
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
@@ -66,7 +66,7 @@ public class UpdatingAuthorizationCodeState
   @Override
   public String getAccessToken() {
     checkTokenNotInvalidated();
-    if (isClusterEnabled) {
+    if (forceInvalidateStatusRetrieval) {
       this.invalidated = getInvalidationStatusFromTokenStore.get();
       checkTokenNotInvalidated();
     }
