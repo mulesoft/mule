@@ -41,6 +41,7 @@ public final class DefaultResourceOwnerOAuthContext
   private String state;
   private String expiresIn;
   private Map<String, Object> tokenResponseParameters = new HashMap<>();
+  private boolean invalidated;
 
 
   public DefaultResourceOwnerOAuthContext(final Lock refreshUserOAuthContextLock, final String resourceOwnerId) {
@@ -133,6 +134,6 @@ public final class DefaultResourceOwnerOAuthContext
 
   @Override
   public void markTokenAsInvalid() {
-
+    this.invalidated = true;
   }
 }
