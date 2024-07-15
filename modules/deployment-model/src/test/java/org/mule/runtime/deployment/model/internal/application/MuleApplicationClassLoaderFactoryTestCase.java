@@ -7,9 +7,14 @@
 
 package org.mule.runtime.deployment.model.internal.application;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import static java.lang.System.setProperty;
 import static java.util.Collections.emptyList;
-import static java.util.UUID.randomUUID;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -17,10 +22,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.internal.nativelib.NativeLibraryFinderFactory;
@@ -40,7 +42,6 @@ import org.junit.rules.TemporaryFolder;
 
 public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
-  private static final String DOMAIN_NAME = "test-domain";
   private static final String APP_NAME = "test-app";
   private static final String APP_ID = "test-app-id";
 
@@ -84,12 +85,11 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
   }
 
   @Test
-  public void createsClassLoader() throws Exception {
-
+  public void createsClassLoader() {
     final MuleApplicationClassLoader artifactClassLoader =
         (MuleApplicationClassLoader) classLoaderFactory.create(APP_ID, parentArtifactClassLoader, descriptor, emptyList());
 
-    verify(nativeLibraryFinderFactory).create(APP_NAME, randomUUID().toString(), new URL[0]);
+    verify(nativeLibraryFinderFactory).create(APP_NAME, descriptor.getLoadedNativeLibrariesFolderName(), new URL[0]);
     assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));
     assertThat(artifactClassLoader.getArtifactId(), is(APP_ID));
   }
