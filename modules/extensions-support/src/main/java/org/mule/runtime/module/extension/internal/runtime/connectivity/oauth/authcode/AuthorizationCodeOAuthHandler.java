@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getClusterConfig;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
 
@@ -77,6 +78,8 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
 
   // TODO: MULE-10837 this should be a plain old @Inject
   private LazyValue<HttpService> httpService;
+
+  private final boolean forceInvalidateStatusRetrieval = getClusterConfig().getClusterService().isEnabled();
 
   /**
    * Becomes aware of the given {@code config} and makes sure that the access token callback and authorization endpoints are
@@ -146,7 +149,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
       return;
     }
 
-    dancer.invalidateContext(resourceOwnerId);
+    dancer.invalidateContext(resourceOwnerId, forceInvalidateStatusRetrieval);
   }
 
   private AuthorizationCodeOAuthDancer createDancer(AuthorizationCodeConfig config, List<AuthorizationCodeListener> listeners)
