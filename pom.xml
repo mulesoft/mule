@@ -253,6 +253,7 @@
         <protobufVersion>3.21.9</protobufVersion>
         <openTelemetryProtoVersion>1.7.1-alpha</openTelemetryProtoVersion>
         <springSecurityVersion>5.7.12</springSecurityVersion>
+        <jmh.version>1.35</jmh.version>
 
         <!-- These are declared here so that version upgrading bots keep the version property up to date -->
         <springVersion>5.3.33</springVersion>
@@ -527,6 +528,19 @@
                 <version>${springSecurityVersion}</version>
             </dependency>
 
+            <!-- JMH -->
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${jmh.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <version>${jmh.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
             <!-- NOT the service (with mule-service classifier) -->
             <!-- this raw jar is used in unit tests only -->
             <dependency>
@@ -631,7 +645,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <proc>none</proc>
                         <source>${javaVersion}</source>
                         <target>${javaVersion}</target>
                         <testRelease>${javaReleaseVersion}</testRelease>
@@ -672,14 +685,6 @@
                             </configuration>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.bsc.maven</groupId>
-                    <artifactId>maven-processor-plugin</artifactId>
-                    <version>4.5</version>
-                    <configuration>
-                        <skipSourcesUnchanged>true</skipSourcesUnchanged>
-                    </configuration>
                 </plugin>
 
                 <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules

@@ -13,7 +13,6 @@
 
     <properties>
         <javaModuleName>org.mule.test.performance</javaModuleName>
-        <jmh.version>1.21</jmh.version>
     
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -21,24 +20,19 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>process</id>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <phase>generate-sources</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <processors>
-                        <processor>org.openjdk.jmh.generators.BenchmarkProcessor</processor>
-                    </processors>
-                </configuration>
-            </plugin>
+	        <plugin>
+	            <groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-compiler-plugin</artifactId>
+	            <configuration>
+	                <annotationProcessorPaths>
+	                    <path>
+	                        <groupId>org.openjdk.jmh</groupId>
+	                        <artifactId>jmh-generator-annprocess</artifactId>
+	                        <version>${jmh.version}</version>
+	                    </path>
+	                </annotationProcessorPaths>
+	            </configuration>
+	        </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -133,13 +127,6 @@
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
-            <version>${jmh.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${jmh.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
     <profiles>
@@ -268,40 +255,28 @@
                             <argLine>-Djmh.ignoreLock=false</argLine>
                         </configuration>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <finalName>mule-runtime-benchmarks-${project.version}</finalName>
-                                    <transformers>
-                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>org.openjdk.jmh.Main</mainClass>
-                                        </transformer>
-                                    </transformers>
-                                    <filters>
-                                        <filter>
-                                            <!--
-                                                Shading signed JARs will fail without this.
-                                                http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
-                                            -->
-                                            <artifact>*:*</artifact>
-                                            <excludes>
-                                                <exclude>META-INF/*.SF</exclude>
-                                                <exclude>META-INF/*.DSA</exclude>
-                                                <exclude>META-INF/*.RSA</exclude>
-                                            </excludes>
-                                        </filter>
-                                    </filters>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+					<plugin>
+					    <groupId>org.apache.maven.plugins</groupId>
+					    <artifactId>maven-assembly-plugin</artifactId>
+					    <executions>
+					        <execution>
+					            <phase>package</phase>
+					            <goals>
+					                <goal>single</goal>
+					            </goals>
+					            <configuration>
+					                <archive>
+						                <manifest>
+						                    <mainClass>org.openjdk.jmh.Main</mainClass>
+						                </manifest>
+					                </archive>
+					                <descriptorRefs>
+					                    <descriptorRef>jar-with-dependencies</descriptorRef>
+					                </descriptorRefs>
+					            </configuration>
+					        </execution>
+					    </executions>
+					</plugin>
                 </plugins>
             </build>
         </profile>
