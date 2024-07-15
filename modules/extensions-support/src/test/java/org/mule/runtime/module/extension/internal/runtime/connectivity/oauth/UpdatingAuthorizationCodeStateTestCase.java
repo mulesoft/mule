@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
+import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getClusterConfig;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
@@ -16,16 +19,20 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.globalconfig.api.cluster.ClusterConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.OAuthCallbackConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.UpdatingAuthorizationCodeState;
@@ -126,6 +133,8 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     } catch (TokenInvalidatedException e) {
       // carry on... nothing to see here
     }
+
+    verify(dancer, times(1)).getInvalidateFromTokensStore(any());
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
     assertThat(newContext.get(), is(nullValue()));
   }
@@ -192,4 +201,29 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
 
     assertThat(newContext.get(), is(sameInstance(refreshedContext)));
   }
+
+  @Test
+  public void accessTokenVisitsTokensStoreIfClusterIsEnabled() throws Exception {
+    testWithSystemProperty("muleRuntimeConfig.cluster.clusterService.enabled", "true", () -> {
+      ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
+      Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
+
+      UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
+                                                                                dancer,
+                                                                                initialContext,
+                                                                                newContext::set);
+
+      verify(dancer).addListener(anyString(), listenerCaptor.capture());
+
+      assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
+      assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+
+      assertThat(getClusterConfig().getClusterService().isEnabled(), is(true));
+      state.getAccessToken();
+
+      // with cluster being enabled, getAccessToken() will call getInvalidateFromTokensStore method in dancer again
+      verify(dancer, times(2)).getInvalidateFromTokensStore(any());
+    });
+  }
+
 }
