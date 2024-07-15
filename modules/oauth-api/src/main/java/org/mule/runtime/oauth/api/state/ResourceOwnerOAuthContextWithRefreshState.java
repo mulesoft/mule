@@ -36,6 +36,7 @@ public final class ResourceOwnerOAuthContextWithRefreshState implements Resource
   private String state;
   private String expiresIn;
   private Map<String, Object> tokenResponseParameters = new HashMap<>();
+  private transient boolean invalidated;
 
   public ResourceOwnerOAuthContextWithRefreshState(final String resourceOwnerId) {
     this.resourceOwnerId = resourceOwnerId;
@@ -59,6 +60,7 @@ public final class ResourceOwnerOAuthContextWithRefreshState implements Resource
     this.state = original.getState();
     this.expiresIn = original.getExpiresIn();
     this.tokenResponseParameters.putAll(original.getTokenResponseParameters());
+    this.invalidated = original.isTokenInvalid();
   }
 
   @Override
@@ -127,6 +129,16 @@ public final class ResourceOwnerOAuthContextWithRefreshState implements Resource
   @Override
   public Lock getRefreshOAuthContextLock(String lockNamePrefix, LockFactory lockProvider) {
     return createRefreshOAuthContextLock(lockNamePrefix, lockProvider, resourceOwnerId);
+  }
+
+  @Override
+  public boolean isTokenInvalid() {
+    return invalidated;
+  }
+
+  @Override
+  public void markTokenAsInvalid() {
+    this.invalidated = true;
   }
 
   /**
