@@ -63,8 +63,8 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
-  private static final String HEISENBERG_EXT_NAME = HEISENBERG;
-  private static final String HEISENBERG_CONFIG = "heisenberg";
+  protected static final String HEISENBERG_EXT_NAME = HEISENBERG;
+  protected static final String HEISENBERG_CONFIG = "heisenberg";
   private static final String ALIAS_OUTPUT = "jeje, my name is Juani and I'm 23 years old";
   private static final String ANOTHER_ALIAS_OUTPUT = "jeje, my name is Heisenberg and I'm 23 years old";
 
