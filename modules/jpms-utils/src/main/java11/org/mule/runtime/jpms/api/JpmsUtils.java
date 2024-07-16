@@ -210,6 +210,8 @@ public final class JpmsUtils {
                  asList("org.mule.runtime.module.boot.internal"));
     openToModule(childLayer, "kryo.shaded", "java.base",
                  asList("java.lang", "java.lang.reflect"));
+    openToModule(childLayer, "org.mule.runtime.jpms.utils", "java.base",
+                 asList("java.lang", "java.lang.reflect"));
 
     return childLayer.findLoader(childLayer.modules().iterator().next().getName());
   }
@@ -380,19 +382,28 @@ public final class JpmsUtils {
    */
   public static void openToModule(ModuleLayer layer, String moduleName, String bootModuleName, List<String> packages) {
     // Make sure only allowed users within the Mule Runtime use this
-    final String callerClassName = StackWalker.getInstance(RETAIN_CLASS_REFERENCE).getCallerClass().getName();
+    final Class<?> callerClass = StackWalker.getInstance(RETAIN_CLASS_REFERENCE).getCallerClass();
+    final String callerClassName = callerClass.getName();
     if (!(callerClassName.equals("org.mule.runtime.module.service.api.artifact.ServiceModuleLayerFactory")
         || callerClassName.equals("org.mule.runtime.jpms.api.JpmsUtils"))) {
       throw new UnsupportedOperationException("This is for internal use only.");
     }
 
-    layer.findModule(moduleName)
+    Module callerModule = getCallerModule(callerClass);
+    layer.findModule(moduleName).filter(module -> module != callerModule)
         .ifPresent(module -> boot().findModule(bootModuleName)
             .ifPresent(bootModule -> {
               for (String pkg : packages) {
                 bootModule.addOpens(pkg, module);
               }
             }));
+  }
+
+  /**
+   * Returns the module that a given caller class is a member of. Returns {@code null} if the caller is {@code null}.
+   */
+  private static Module getCallerModule(Class<?> caller) {
+    return (caller != null) ? caller.getModule() : null;
   }
 
 }
