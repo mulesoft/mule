@@ -29,12 +29,12 @@ public class UpdatingAuthorizationCodeState
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
   private Supplier<Boolean> getInvalidationStatusFromTokenStore;
-  private final boolean forceInvalidateStatusRetrieval = getClusterConfig().getClusterService().isEnabled();
+  private final boolean forceInvalidateStatusRetrieval;
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
-                                        Consumer<ResourceOwnerOAuthContext> onUpdate) {
+                                        Consumer<ResourceOwnerOAuthContext> onUpdate, boolean forceInvalidateStatusRetrieval) {
     delegate = toAuthorizationCodeState(config, initialContext);
     dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
@@ -59,6 +59,7 @@ public class UpdatingAuthorizationCodeState
         onUpdate.accept(context);
       }
     });
+    this.forceInvalidateStatusRetrieval = forceInvalidateStatusRetrieval;
     getInvalidationStatusFromTokenStore = () -> dancer.getInvalidateFromTokensStore(getResourceOwnerId());
   }
 

@@ -97,7 +97,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, false);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -116,7 +116,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, false);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -146,7 +146,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, false);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -175,7 +175,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, false);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -211,7 +211,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
       UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                                 dancer,
                                                                                 initialContext,
-                                                                                newContext::set);
+                                                                                newContext::set, false);
 
       verify(dancer).addListener(anyString(), listenerCaptor.capture());
 

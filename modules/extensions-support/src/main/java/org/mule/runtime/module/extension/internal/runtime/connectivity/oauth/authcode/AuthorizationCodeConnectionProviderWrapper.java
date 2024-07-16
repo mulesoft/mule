@@ -13,6 +13,7 @@ import static org.mule.runtime.module.extension.internal.runtime.connectivity.oa
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
@@ -43,6 +44,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private final AuthorizationCodeOAuthHandler oauthHandler;
   private final FieldSetter<Object, Object> authCodeStateSetter;
   private final RunOnce dance;
+  private MuleContext muleContext;
 
   private AuthorizationCodeOAuthDancer dancer;
 
@@ -50,13 +52,14 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                     AuthorizationCodeConfig oauthConfig,
                                                     Map<Field, String> callbackValues,
                                                     AuthorizationCodeOAuthHandler oauthHandler,
-                                                    ReconnectionConfig reconnectionConfig) {
+                                                    ReconnectionConfig reconnectionConfig, MuleContext muleContext) {
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
     authCodeStateSetter =
         getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
+    this.muleContext = muleContext;
   }
 
   @Override
@@ -68,13 +71,15 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private void updateAuthState() {
     final Object delegate = getDelegateForInjection();
     ResourceOwnerOAuthContext context = getContext();
+    boolean forceInvalidateStatusRetrieval = !muleContext.getClusterId().isEmpty();
     authCodeStateSetter
         .set(delegate, new UpdatingAuthorizationCodeState(oauthConfig,
                                                           dancer,
                                                           context,
                                                           updatedContext -> updateOAuthParameters(delegate,
                                                                                                   callbackValues,
-                                                                                                  updatedContext)));
+                                                                                                  updatedContext),
+                                                          forceInvalidateStatusRetrieval));
     updateOAuthParameters(delegate, callbackValues, context);
   }
 

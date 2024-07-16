@@ -79,7 +79,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
   // TODO: MULE-10837 this should be a plain old @Inject
   private LazyValue<HttpService> httpService;
 
-  private final boolean forceInvalidateStatusRetrieval = getClusterConfig().getClusterService().isEnabled();
+  private boolean forceInvalidateStatusRetrieval;
 
   /**
    * Becomes aware of the given {@code config} and makes sure that the access token callback and authorization endpoints are
@@ -148,7 +148,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     if (dancer == null) {
       return;
     }
-
+    forceInvalidateStatusRetrieval = !muleContext.getClusterId().isEmpty();
     dancer.invalidateContext(resourceOwnerId, forceInvalidateStatusRetrieval);
   }
 
