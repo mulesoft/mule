@@ -17,8 +17,7 @@ import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import com.google.common.base.Supplier;
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link AuthorizationCodeListener} which registers an {@link AuthorizationCodeListener} in order to get

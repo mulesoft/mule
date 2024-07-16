@@ -29,10 +29,8 @@ import static org.mockito.Mockito.when;
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
-import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
-import org.mule.runtime.globalconfig.api.cluster.ClusterConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.OAuthCallbackConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.UpdatingAuthorizationCodeState;
@@ -40,6 +38,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exc
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -203,6 +202,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   }
 
   @Test
+  @Issue("W-15154658")
   public void accessTokenVisitsTokensStoreIfClusterIsEnabled() throws Exception {
     testWithSystemProperty("muleRuntimeConfig.cluster.clusterService.enabled", "true", () -> {
       ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);

@@ -62,6 +62,7 @@
             ${surefire.test.unit.open.args}
         </surefire.args>
 
+        <allure.version>2.25.0</allure.version>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
@@ -317,6 +318,12 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-sample-data-extension</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-java-commons</artifactId>
+            <version>${allure.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
