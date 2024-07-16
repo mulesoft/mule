@@ -68,6 +68,7 @@ import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
+import org.mule.test.heisenberg.extension.internal.SecretParameterGroup;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
@@ -721,6 +722,11 @@ public class HeisenbergOperations implements Disposable {
         return -1;
       }
     };
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String whisperSecret(@ParameterGroup(name = "internalGroup", showInDsl = true) SecretParameterGroup secret) {
+    return secret.getSecret();
   }
 
   public void futureSdkImplicitHandling(SecretSdkFutureFeature secretSdkFutureFeature) {

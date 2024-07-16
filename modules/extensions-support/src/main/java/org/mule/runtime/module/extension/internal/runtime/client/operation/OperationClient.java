@@ -26,6 +26,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -95,6 +96,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
@@ -231,6 +233,10 @@ public class OperationClient implements Lifecycle {
       }
     };
 
+    final ClassLoader originalContextClassLoader = currentThread().getContextClassLoader();
+    final ClassLoader extensionClassLoader = MuleExtensionUtils.getClassLoader(extensionModel);
+
+    currentThread().setContextClassLoader(extensionClassLoader);
     ResolverSet resolverSet;
     try {
       resolverSet = getResolverSetFromParameters(operationModel,
@@ -254,6 +260,8 @@ public class OperationClient implements Lifecycle {
       absentParameterResolvers = absentResolverSet.getResolvers();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
+    } finally {
+      currentThread().setContextClassLoader(originalContextClassLoader);
     }
     return resolverSet;
   }
