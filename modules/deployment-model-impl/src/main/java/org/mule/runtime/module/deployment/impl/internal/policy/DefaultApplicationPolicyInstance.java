@@ -56,6 +56,7 @@ import java.util.Optional;
 public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstance {
 
   public static final String CLUSTER_MANAGER_ID = "_muleClusterManager";
+  public static final String IS_SILENT_DEPLOY = "isSilentDeploy";
 
   private final Application application;
   private final PolicyTemplate template;
@@ -129,6 +130,10 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     });
     try {
       policyContext = artifactBuilder.build();
+      if (isSilentDeploy(this.parametrization)) {
+        policyContext.getMuleContext().setDebugSplashScreenLevel();
+      }
+
       enableNotificationListeners(parametrization.getNotificationListeners());
       policyContext.getMuleContext().start();
     } catch (MuleException e) {
@@ -214,4 +219,14 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
         .map(chain -> new Policy(chain, parametrization.getId()));
   }
 
+
+  /**
+   * Check if ApiGateway sent
+   *
+   * @param parametrization
+   * @return true if the parametrization corresponds to a silent deploy. false otherwise.
+   */
+  private boolean isSilentDeploy(PolicyParametrization parametrization) {
+    return parametrization.getParameters().getOrDefault(IS_SILENT_DEPLOY, "false").equalsIgnoreCase("true");
+  }
 }

@@ -382,5 +382,10 @@ public interface MuleContext extends Lifecycle {
    */
   Properties getDeploymentProperties();
 
+
+  /**
+   * Sets the log level at which the Splash Screen will be logged to debug.
+   */
+  default void setDebugSplashScreenLevel() {}
 }
 
