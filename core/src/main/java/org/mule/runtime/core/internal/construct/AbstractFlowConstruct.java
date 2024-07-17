@@ -121,7 +121,8 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   @Override
   public final void start() throws MuleException {
     boolean usePersistedState =
-        featureFlaggingService.isEnabled(HONOUR_PERSISTED_FLOW_STATE) && flowStoppedPersistenceListener != null
+        featureFlaggingService != null && featureFlaggingService.isEnabled(HONOUR_PERSISTED_FLOW_STATE)
+            && flowStoppedPersistenceListener != null
             && flowStoppedPersistenceListener.isStatePersisted();
     // Check if Initial State is Stopped
     if (muleContext.isStarting() &&
