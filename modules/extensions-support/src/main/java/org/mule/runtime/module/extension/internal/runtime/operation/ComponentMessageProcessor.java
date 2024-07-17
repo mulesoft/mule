@@ -370,10 +370,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   // That's why an `Either` is used here,
                   // so the error can be propagated afterwards in a way consistent with our expected error handling.
                   errorSwitchSinkSinkRef.next(left(mapped, CoreEvent.class));
-                } else {
-                  throw propagateWrappingFatal(mapped);
+                  return null;
                 }
-                return null;
+                throw propagateWrappingFatal(mapped);
               }
             })
             .doOnNext(event -> {
