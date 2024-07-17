@@ -109,7 +109,9 @@ public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
   private Application createMockApplication() {
     Application artifact = mock(Application.class);
     ApplicationDescriptor descriptor = mock(ApplicationDescriptor.class);
-    when(descriptor.getDataFolderName()).thenReturn(ARTIFACT_ID).thenThrow(new RuntimeException((new IOException())));
+    when(descriptor.getDataFolderName()).thenReturn(ARTIFACT_ID).thenReturn(ARTIFACT_ID)
+        .thenThrow(new RuntimeException((new IOException())));
+    when(descriptor.getLoadedNativeLibrariesFolderName()).thenReturn(randomUUID().toString());
     when(artifact.getDescriptor()).thenReturn(descriptor);
     when(artifact.getArtifactName()).thenReturn(ARTIFACT_ID);
     when(artifact.getResourceFiles()).thenReturn(new File[0]);
