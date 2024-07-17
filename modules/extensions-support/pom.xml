@@ -322,8 +322,7 @@
         </dependency>
         <dependency>
             <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-java-commons</artifactId>
-            <version>${allure.version}</version>
+            <artifactId>allure-junit4</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
