@@ -90,6 +90,7 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
    *                                 scope components
    * @param routerPropagationContext an optional {@link RouterOutputMetadataContext} with routes information. Value is only
    *                                 present for router components
+   * @since 4.8
    */
   public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
                                 ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,

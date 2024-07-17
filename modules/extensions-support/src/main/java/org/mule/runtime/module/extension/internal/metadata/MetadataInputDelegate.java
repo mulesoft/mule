@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Metadata service delegate implementations that handles the resolution of a {@link ComponentModel}
@@ -120,7 +121,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     } catch (ConnectionException e) {
       return connectivityFailure(e);
     } catch (Exception e) {
-      return failure(newFailure(e).withMessage(format("Failed to resolve input types for scope inner chain: %s", e.getMessage()))
+      return failure(newFailure(e).withMessage("Failed to resolve input types for scope inner chain: " + e.getMessage())
           .onComponent());
     }
   }
@@ -139,11 +140,11 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
                                                                            InputMetadataDescriptor inputMetadataDescriptor) {
     try {
       return resolveWithOAuthRefresh(context, () -> {
-        List<String> routeNames = getRouteNames();
         ChainInputMetadataContext chainCtx =
             new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor, context);
         Map<String, ChainInputTypeResolver> routerChainInputResolvers = resolverFactory.getRouterChainInputResolvers();
         Map<String, MessageMetadataType> result = new LinkedHashMap<>();
+        Iterable<String> routeNames = getRouteNames()::iterator;
         for (String routeName : routeNames) {
           try {
             // If there is no resolver for the route, resolves to ANY
@@ -163,11 +164,10 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     }
   }
 
-  private List<String> getRouteNames() {
+  private Stream<String> getRouteNames() {
     return ((ComposableModel) model).getNestedComponents().stream()
         .filter(nested -> nested instanceof NestedRouteModel)
-        .map(NamedObject::getName)
-        .collect(toList());
+        .map(NamedObject::getName);
   }
 
   private static <T> MetadataResult<T> connectivityFailure(ConnectionException e) {
