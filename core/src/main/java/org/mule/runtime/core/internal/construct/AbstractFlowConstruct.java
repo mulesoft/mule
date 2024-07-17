@@ -16,7 +16,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.getSimpleName;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -43,7 +45,9 @@ import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAccep
 import org.mule.runtime.core.privileged.processor.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
+import java.io.IOException;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -121,7 +125,8 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   @Override
   public final void start() throws MuleException {
     boolean ignoreInitialState =
-        flowStoppedPersistenceListener != null && featureFlaggingService.isEnabled(HONOUR_PERSISTED_FLOW_STATE);
+        featureFlaggingService.isEnabled(HONOUR_PERSISTED_FLOW_STATE) && flowStoppedPersistenceListener != null
+            && flowStoppedPersistenceListener.ignoreInitialState();
     // Check if Initial State is Stopped
     if (muleContext.isStarting() &&
         (!ignoreInitialState && initialState.equals(INITIAL_STATE_STOPPED)

@@ -36,4 +36,9 @@ public interface FlowStoppedPersistenceListener {
    * Indicates if the flow should start or not
    */
   Boolean shouldStart();
+
+  /**
+   * Indicates if the initial state of the flow should be ignored.
+   */
+  Boolean ignoreInitialState();
 }
