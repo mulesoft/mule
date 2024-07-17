@@ -16,18 +16,13 @@ import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
 /**
- * {@link ChainInputTypeResolver} implementation that resolves to the type of the elements of a given parameter that is expected
- * to resolve to an array type.
+ * {@link ChainInputTypeResolver} for the ForEach and ParallelForEach scopes.
  *
  * @since 4.8.0
  */
-public class CollectionChainInputTypeResolver implements ChainInputTypeResolver {
+public class ForEachChainInputTypeResolver implements ChainInputTypeResolver {
 
-  private final String collectionParameterName;
-
-  public CollectionChainInputTypeResolver(String collectionParameterName) {
-    this.collectionParameterName = collectionParameterName;
-  }
+  private static final String PARAMETER_NAME = "collection";
 
   @Override
   public MessageMetadataType getChainInputMetadataType(ChainInputMetadataContext context) {
@@ -37,25 +32,24 @@ public class CollectionChainInputTypeResolver implements ChainInputTypeResolver 
     messageMetadataType.getAttributesType()
         .ifPresent(chainMessageMetadataTypeBuilder::attributes);
 
-    chainMessageMetadataTypeBuilder.payload(resolveChainPayloadType(context.getParameterResolvedType(collectionParameterName)));
+    chainMessageMetadataTypeBuilder.payload(resolveChainPayloadType(context.getParameterResolvedType(PARAMETER_NAME)));
 
     return chainMessageMetadataTypeBuilder.build();
   }
 
   @Override
   public String getCategoryName() {
-    return "SCOPE_COLLECTION";
+    return "FOREACH";
   }
 
   @Override
   public String getResolverName() {
-    return "SCOPE_INPUT_COLLECTION";
+    return "FOREACH_CHAIN_INPUT";
   }
 
   private MetadataType resolveChainPayloadType(MetadataType collectionType) {
     if (!(collectionType instanceof ArrayType)) {
-      throw new IllegalArgumentException(format("Collection Expression of parameter `%s` does not resolve to a collection",
-                                                collectionParameterName));
+      throw new IllegalArgumentException(format("Expected a collection from parameter `%s`", PARAMETER_NAME));
     }
     return ((ArrayType) collectionType).getType();
   }

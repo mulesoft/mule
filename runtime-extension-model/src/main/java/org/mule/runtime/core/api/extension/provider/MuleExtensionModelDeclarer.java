@@ -122,15 +122,18 @@ import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.AllowsExpressionWithoutMarkersModelProperty;
-import org.mule.runtime.core.internal.extension.CollectionChainInputTypeResolver;
+import org.mule.runtime.core.internal.extension.ForEachChainInputTypeResolver;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.core.internal.extension.ForEachCollectionTypeResolver;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.NoRedeliveryPolicyModelProperty;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
@@ -617,19 +620,17 @@ public class MuleExtensionModelDeclarer {
     forEach.withChain()
         .withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(MULTIPLE_OR_NONE);
 
-    configurerFactory.create()
-        .setChainInputTypeResolver(new CollectionChainInputTypeResolver("collection"))
-        .configure(forEach);
-
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
-        .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
+        .ofDynamicType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
         }.getType()))
         .defaultingTo("#[payload]")
         .withExpressionSupport(REQUIRED)
         .describedAs("Expression that defines the collection to iterate over.")
-        .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty());
+        .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
+        // TODO: add support for doing this on the MetadataConfigurer
+        .withModelProperty(new MetadataKeyPartModelProperty(1, false, true));
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
@@ -654,6 +655,11 @@ public class MuleExtensionModelDeclarer {
     forEach.withOutput().ofType(VOID_TYPE);
     forEach.withOutputAttributes().ofType(VOID_TYPE);
 
+    configurerFactory.create()
+        .setKeysResolver(new NullMetadataResolver(), "collection", STRING_TYPE, false)
+        .addInputResolver("collection", new ForEachCollectionTypeResolver())
+        .setChainInputTypeResolver(new ForEachChainInputTypeResolver())
+        .configure(forEach);
   }
 
   private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer) {
@@ -860,13 +866,15 @@ public class MuleExtensionModelDeclarer {
 
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
-        .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
+        .ofDynamicType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
         }.getType()))
         .withRole(BEHAVIOUR)
         .withExpressionSupport(REQUIRED)
         .defaultingTo("#[payload]")
         .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
+        // TODO: add support for doing this on the MetadataConfigurer
+        .withModelProperty(new MetadataKeyPartModelProperty(1, false, true))
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
 
     parallelForeach.onDefaultParameterGroup()
@@ -885,7 +893,9 @@ public class MuleExtensionModelDeclarer {
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
     configurerFactory.create()
-        .setChainInputTypeResolver(new CollectionChainInputTypeResolver("collection"))
+        .setKeysResolver(new NullMetadataResolver(), "collection", STRING_TYPE, false)
+        .addInputResolver("collection", new ForEachCollectionTypeResolver())
+        .setChainInputTypeResolver(new ForEachChainInputTypeResolver())
         .asPassthroughScope()
         .configure(parallelForeach);
   }

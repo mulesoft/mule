@@ -43,38 +43,34 @@ public interface MetadataMediator {
    * <p>
    * <b>NOTE:</b> Experimental feature. Backwards compatibility not guaranteed.
    *
-   * @param context                             current {@link MetadataContext} that will be used by the metadata resolvers.
-   * @param key                                 {@link MetadataKey} of the type which structure has to be resolved, used both for
-   *                                            input and output types
-   * @param scopeInputMessageType               a {@link MessageMetadataType} for the message that originally entered the scope
-   * @param parameterExpressionMetadataResolver a resolver for the actual type of parameters that have an expression as value
+   * @param context               current {@link MetadataContext} that will be used by the metadata resolvers.
+   * @param key                   {@link MetadataKey} of the type which structure has to be resolved, used both for input and
+   *                              output types
+   * @param scopeInputMessageType a {@link MessageMetadataType} for the message that originally entered the scope
    * @return a {@link MetadataResult} of {@link ScopeInputMetadataDescriptor}
    * @since 4.8.0
    */
   @Experimental
   MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataContext context,
                                                                      MetadataKey key,
-                                                                     Supplier<MessageMetadataType> scopeInputMessageType,
-                                                                     ParameterExpressionMetadataResolver parameterExpressionMetadataResolver);
+                                                                     Supplier<MessageMetadataType> scopeInputMessageType);
 
   /**
    * Resolves the {@link RouterInputMetadataDescriptor}. Only to be used for router components
    * <p>
    * <b>NOTE:</b> Experimental feature. Backwards compatibility not guaranteed.
    *
-   * @param context                             current {@link MetadataContext} that will be used by the metadata resolvers.
-   * @param key                                 {@link MetadataKey} of the type which structure has to be resolved, used both for
-   *                                            input and output types
-   * @param routerInputMessageType              a {@link MessageMetadataType} for the message that originally entered the router
-   * @param parameterExpressionMetadataResolver a resolver for the actual type of parameters that have an expression as value
+   * @param context                current {@link MetadataContext} that will be used by the metadata resolvers.
+   * @param key                    {@link MetadataKey} of the type which structure has to be resolved, used both for input and
+   *                               output types
+   * @param routerInputMessageType a {@link MessageMetadataType} for the message that originally entered the router
    * @return a {@link MetadataResult} of {@link RouterInputMetadataDescriptor}
    * @since 4.8.0
    */
   @Experimental
   MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataContext context,
                                                                        MetadataKey key,
-                                                                       Supplier<MessageMetadataType> routerInputMessageType,
-                                                                       ParameterExpressionMetadataResolver parameterExpressionMetadataResolver);
+                                                                       Supplier<MessageMetadataType> routerInputMessageType);
 
   MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataContext context, MetadataKey key);
 

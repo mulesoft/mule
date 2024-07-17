@@ -12,9 +12,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
-import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.module.extension.api.tooling.metadata.ParameterExpressionMetadataResolver;
 import org.mule.runtime.module.extension.internal.metadata.SdkMetadataContextAdapter;
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.MetadataCache;
@@ -35,35 +33,26 @@ public class DefaultChainInputMetadataContext implements ChainInputMetadataConte
 
   private final Supplier<MessageMetadataType> inputMessageMetadataType;
   private final InputMetadataDescriptor inputMetadataDescriptor;
-  private final ParameterExpressionMetadataResolver parameterExpressionMetadataResolver;
   private final MetadataContext rootContext;
 
   public DefaultChainInputMetadataContext(Supplier<MessageMetadataType> inputMessageMetadataType,
                                           InputMetadataDescriptor inputMetadataDescriptor,
-                                          ParameterExpressionMetadataResolver parameterExpressionMetadataResolver,
                                           MetadataContext rootContext) {
     this.inputMessageMetadataType = new LazyValue<>(inputMessageMetadataType);
     this.inputMetadataDescriptor = inputMetadataDescriptor;
-    this.parameterExpressionMetadataResolver = parameterExpressionMetadataResolver;
     this.rootContext = rootContext;
   }
 
   public DefaultChainInputMetadataContext(Supplier<MessageMetadataType> inputMessageMetadataType,
                                           InputMetadataDescriptor inputMetadataDescriptor,
-                                          ParameterExpressionMetadataResolver parameterExpressionMetadataResolver,
                                           org.mule.runtime.api.metadata.MetadataContext rootContext) {
-    this(inputMessageMetadataType, inputMetadataDescriptor, parameterExpressionMetadataResolver,
-         new SdkMetadataContextAdapter(rootContext));
+    this(inputMessageMetadataType, inputMetadataDescriptor, new SdkMetadataContextAdapter(rootContext));
   }
 
   @Override
   public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException {
     try {
-      return parameterExpressionMetadataResolver.getActualInputMetadataIfExpression(parameterName)
-          // We can't propagate an eventual error because of how the API is defined, so we just fall back
-          .filter(MetadataResult::isSuccess)
-          .map(MetadataResult::get)
-          .orElse(inputMetadataDescriptor.getParameterMetadata(parameterName).getType());
+      return inputMetadataDescriptor.getParameterMetadata(parameterName).getType();
     } catch (IllegalArgumentException e) {
       throw new NoSuchElementException(e.getMessage());
     }

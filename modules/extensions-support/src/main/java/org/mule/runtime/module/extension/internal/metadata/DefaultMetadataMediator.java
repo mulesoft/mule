@@ -66,7 +66,6 @@ import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator;
-import org.mule.runtime.module.extension.api.tooling.metadata.ParameterExpressionMetadataResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.LinkedList;
@@ -211,8 +210,7 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
   @Override
   public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataContext context,
                                                                             MetadataKey key,
-                                                                            Supplier<MessageMetadataType> scopeInputMessageType,
-                                                                            ParameterExpressionMetadataResolver parameterExpressionMetadataResolver) {
+                                                                            Supplier<MessageMetadataType> scopeInputMessageType) {
     if (!isScope(component)) {
       return failure(MetadataFailure.Builder.newFailure()
           .withMessage("The given component is not a scope").onComponent());
@@ -223,8 +221,7 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
     }
 
     MetadataResult<MessageMetadataType> scopeChainInputType =
-        inputDelegate.getScopeChainInputType(context, scopeInputMessageType, inputMetadata.get(),
-                                             parameterExpressionMetadataResolver);
+        inputDelegate.getScopeChainInputType(context, scopeInputMessageType, inputMetadata.get());
 
     if (scopeChainInputType.isSuccess()) {
       return success(ScopeInputMetadataDescriptor.builder()
@@ -239,8 +236,7 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
   @Override
   public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataContext context,
                                                                               MetadataKey key,
-                                                                              Supplier<MessageMetadataType> routerInputMessageType,
-                                                                              ParameterExpressionMetadataResolver parameterExpressionMetadataResolver) {
+                                                                              Supplier<MessageMetadataType> routerInputMessageType) {
     if (!isRouter(component)) {
       return failure(MetadataFailure.Builder.newFailure()
           .withMessage("The given component is not a router").onComponent());
@@ -251,8 +247,7 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
     }
 
     MetadataResult<Map<String, MessageMetadataType>> routesInputTypes =
-        inputDelegate.getRoutesChainInputType(context, routerInputMessageType, inputMetadata.get(),
-                                              parameterExpressionMetadataResolver);
+        inputDelegate.getRoutesChainInputType(context, routerInputMessageType, inputMetadata.get());
 
     if (routesInputTypes.isSuccess()) {
       return success(RouterInputMetadataDescriptor.builder()
