@@ -92,7 +92,8 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
   }
 
   @Override
-  public Boolean ignoreInitialState() {
+  // TODO W-16263219: refactor this.
+  public Boolean isStatePersisted() {
     Properties deploymentProperties = null;
     try {
       deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
