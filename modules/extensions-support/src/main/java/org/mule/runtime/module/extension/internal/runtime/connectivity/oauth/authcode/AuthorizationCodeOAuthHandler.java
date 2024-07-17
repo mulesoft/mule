@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
-import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getClusterConfig;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
 

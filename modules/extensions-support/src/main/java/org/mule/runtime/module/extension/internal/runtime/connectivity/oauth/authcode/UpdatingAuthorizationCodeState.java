@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
-import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getClusterConfig;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
