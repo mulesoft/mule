@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getClusterConfig;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
@@ -22,6 +19,7 @@ import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -132,8 +130,6 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     } catch (TokenInvalidatedException e) {
       // carry on... nothing to see here
     }
-
-    verify(dancer, times(1)).getInvalidateFromTokensStore(any());
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
     assertThat(newContext.get(), is(nullValue()));
   }
@@ -204,26 +200,40 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   @Test
   @Issue("W-15154658")
   public void accessTokenVisitsTokensStoreIfClusterIsEnabled() throws Exception {
-    testWithSystemProperty("muleRuntimeConfig.cluster.clusterService.enabled", "true", () -> {
-      ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
-      Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
+    ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
+    Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
 
-      UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
-                                                                                dancer,
-                                                                                initialContext,
-                                                                                newContext::set, false);
+    UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
+                                                                              dancer,
+                                                                              initialContext,
+                                                                              newContext::set, true);
 
-      verify(dancer).addListener(anyString(), listenerCaptor.capture());
+    verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
-      assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
-      assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+    assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
 
-      assertThat(getClusterConfig().getClusterService().isEnabled(), is(true));
-      state.getAccessToken();
-
-      // with cluster being enabled, getAccessToken() will call getInvalidateFromTokensStore method in dancer again
-      verify(dancer, times(2)).getInvalidateFromTokensStore(any());
-    });
+    // with cluster being enabled, getAccessToken() will call getInvalidateFromTokensStore method in dancer
+    verify(dancer, times(1)).getInvalidateFromTokensStore(any());
   }
 
+  @Test
+  @Issue("W-15154658")
+  public void accessTokenVisitsTokensStoreWithoutCluster() throws Exception {
+    ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
+    Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
+
+    UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
+                                                                              dancer,
+                                                                              initialContext,
+                                                                              newContext::set, false);
+
+    verify(dancer).addListener(anyString(), listenerCaptor.capture());
+
+    assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+
+    // with cluster not being enabled, getAccessToken() won't call getInvalidateFromTokensStore method in dancer
+    verify(dancer, never()).getInvalidateFromTokensStore(any());
+  }
 }
