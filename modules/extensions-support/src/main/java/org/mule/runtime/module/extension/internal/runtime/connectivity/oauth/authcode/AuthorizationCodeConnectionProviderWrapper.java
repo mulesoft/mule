@@ -13,7 +13,6 @@ import static org.mule.runtime.module.extension.internal.runtime.connectivity.oa
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
@@ -29,6 +28,7 @@ import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A {@link ReconnectableConnectionProviderWrapper} which makes sure that by the time the {@link ConnectionProvider#connect()}
@@ -44,7 +44,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private final AuthorizationCodeOAuthHandler oauthHandler;
   private final FieldSetter<Object, Object> authCodeStateSetter;
   private final RunOnce dance;
-  private MuleContext muleContext;
+  private Supplier<Boolean> forceInvalidateStatusRetrievalSupplier;
 
   private AuthorizationCodeOAuthDancer dancer;
 
@@ -52,14 +52,15 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                     AuthorizationCodeConfig oauthConfig,
                                                     Map<Field, String> callbackValues,
                                                     AuthorizationCodeOAuthHandler oauthHandler,
-                                                    ReconnectionConfig reconnectionConfig, MuleContext muleContext) {
+                                                    ReconnectionConfig reconnectionConfig,
+                                                    Supplier<Boolean> forceInvalidateStatusRetrievalSupplier) {
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
     authCodeStateSetter =
         getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
-    this.muleContext = muleContext;
+    this.forceInvalidateStatusRetrievalSupplier = forceInvalidateStatusRetrievalSupplier;
   }
 
   @Override
@@ -71,7 +72,6 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private void updateAuthState() {
     final Object delegate = getDelegateForInjection();
     ResourceOwnerOAuthContext context = getContext();
-    boolean forceInvalidateStatusRetrieval = !muleContext.getClusterId().isEmpty();
     authCodeStateSetter
         .set(delegate, new UpdatingAuthorizationCodeState(oauthConfig,
                                                           dancer,
@@ -79,7 +79,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                           updatedContext -> updateOAuthParameters(delegate,
                                                                                                   callbackValues,
                                                                                                   updatedContext),
-                                                          forceInvalidateStatusRetrieval));
+                                                          forceInvalidateStatusRetrievalSupplier.get()));
     updateOAuthParameters(delegate, callbackValues, context);
   }
 
@@ -90,6 +90,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
 
   @Override
   public void invalidate(String resourceOwnerId) {
+    oauthHandler.setForceInvalidateStatusRetrieval(forceInvalidateStatusRetrievalSupplier.get());
     oauthHandler.invalidate(oauthConfig.getOwnerConfigName(), resourceOwnerId);
   }
 

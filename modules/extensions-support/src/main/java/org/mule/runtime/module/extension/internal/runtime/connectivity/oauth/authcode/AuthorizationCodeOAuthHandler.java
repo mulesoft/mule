@@ -147,8 +147,11 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     if (dancer == null) {
       return;
     }
-    forceInvalidateStatusRetrieval = !muleContext.getClusterId().isEmpty();
     dancer.invalidateContext(resourceOwnerId, forceInvalidateStatusRetrieval);
+  }
+
+  protected void setForceInvalidateStatusRetrieval(boolean forceInvalidateStatusRetrieval) {
+    this.forceInvalidateStatusRetrieval = forceInvalidateStatusRetrieval;
   }
 
   private AuthorizationCodeOAuthDancer createDancer(AuthorizationCodeConfig config, List<AuthorizationCodeListener> listeners)
