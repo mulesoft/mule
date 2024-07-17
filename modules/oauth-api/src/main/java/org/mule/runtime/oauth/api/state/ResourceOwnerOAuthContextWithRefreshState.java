@@ -16,6 +16,7 @@ import java.util.concurrent.locks.Lock;
 
 import static org.mule.oauth.client.api.state.DancerState.HAS_TOKEN;
 import static org.mule.oauth.client.api.state.DancerState.NO_TOKEN;
+import static org.mule.oauth.client.api.state.DancerState.TOKEN_INVALIDATED;
 
 /**
  * OAuth state for a particular resource owner which typically represents an user. Only used for compatibility purposes in case of
@@ -36,7 +37,6 @@ public final class ResourceOwnerOAuthContextWithRefreshState implements Resource
   private String state;
   private String expiresIn;
   private Map<String, Object> tokenResponseParameters = new HashMap<>();
-  private transient boolean invalidated;
 
   public ResourceOwnerOAuthContextWithRefreshState(final String resourceOwnerId) {
     this.resourceOwnerId = resourceOwnerId;
@@ -60,7 +60,6 @@ public final class ResourceOwnerOAuthContextWithRefreshState implements Resource
     this.state = original.getState();
     this.expiresIn = original.getExpiresIn();
     this.tokenResponseParameters.putAll(original.getTokenResponseParameters());
-    this.invalidated = original.isTokenInvalid();
   }
 
   @Override
@@ -133,12 +132,12 @@ public final class ResourceOwnerOAuthContextWithRefreshState implements Resource
 
   @Override
   public boolean isTokenInvalid() {
-    return invalidated;
+    return getDancerState() == TOKEN_INVALIDATED;
   }
 
   @Override
   public void markTokenAsInvalid() {
-    this.invalidated = true;
+    setDancerState(TOKEN_INVALIDATED);
   }
 
   /**
