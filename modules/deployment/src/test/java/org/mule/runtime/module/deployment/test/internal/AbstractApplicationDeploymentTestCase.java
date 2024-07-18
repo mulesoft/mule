@@ -44,6 +44,8 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
   protected ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
   protected ApplicationFileBuilder dummyAppDescriptorWithStoppedFlowFileBuilder;
 
+  protected ApplicationFileBuilder dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48;
+
   public AbstractApplicationDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
   }
