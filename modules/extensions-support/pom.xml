@@ -62,7 +62,6 @@
             ${surefire.test.unit.open.args}
         </surefire.args>
 
-        <allure.version>2.25.0</allure.version>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
