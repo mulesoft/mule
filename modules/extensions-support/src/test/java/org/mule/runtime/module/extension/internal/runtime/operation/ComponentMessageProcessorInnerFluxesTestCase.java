@@ -32,6 +32,10 @@ import io.qameta.allure.Story;
 @Issue("W-13563214")
 public class ComponentMessageProcessorInnerFluxesTestCase extends ComponentMessageProcessorTestCase {
 
+  public ComponentMessageProcessorInnerFluxesTestCase(boolean isWithinProcessToApply) {
+    super(isWithinProcessToApply);
+  }
+
   @Override
   protected ComponentMessageProcessor<ComponentModel> createProcessor() {
     return new TestComponentMessageProcessor(extensionModel,
