@@ -12,18 +12,21 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.EXECUTION_ENGINE;
+import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.Arrays.asList;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,6 +48,8 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.processor.MessageProcessors;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
@@ -53,41 +58,55 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetRe
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 
+
 @Feature(EXECUTION_ENGINE)
+@RunWith(Parameterized.class)
 public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComponentMessageProcessorTestCase.class);
 
   protected ComponentMessageProcessor<ComponentModel> processor;
-
   protected ExtensionModel extensionModel;
   protected ComponentModel componentModel;
-
   protected ResolverSet resolverSet;
   protected ExtensionManager extensionManager;
 
   protected PolicyManager mockPolicyManager;
 
-  @Rule
-  public ExpectedException expected = ExpectedException.none();
-
   // A cached flow for creating test events. It doesn't even have to contain the processor we are going to test, because we will
   // be sending the events directly through the processor, without using the flow.
   private Flow testFlow;
+
+  private final boolean isWithinProcessToApply;
+
+  @Parameterized.Parameters(name = "Is within process to apply: {0}")
+  public static List<Object[]> parameters() {
+    return asList(
+                  new Object[] {false},
+                  new Object[] {true});
+  }
+
+  public ComponentMessageProcessorTestCase(boolean isWithinProcessToApply) {
+    this.isWithinProcessToApply = isWithinProcessToApply;
+  }
 
   @Before
   public void before() throws MuleException {
@@ -151,40 +170,58 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
   @Test
   public void happyPath() throws MuleException {
     final ResolverSetResult resolverSetResult = mock(ResolverSetResult.class);
-
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenReturn(resolverSetResult);
-
-    assertNotNull(from(processor.apply(just(testEvent()))).block());
+    assertNotNull(from(processor.apply(just(testEvent())))
+        .subscriberContext(ctx -> ctx.put(MessageProcessors.WITHIN_PROCESS_TO_APPLY, isWithinProcessToApply)).block());
   }
 
   @Test
   public void muleRuntimeExceptionInResolutionResult() throws MuleException {
     final Exception thrown = new ExpressionRuntimeException(createStaticMessage("Expected"));
-
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
-
-    expectWrapped(thrown);
-    from(processor.apply(just(testEvent()))).block();
+    assertMessagingExceptionCausedBy(thrown, isWithinProcessToApply);
   }
 
   @Test
   public void muleExceptionInResolutionResult() throws MuleException {
     final Exception thrown = new DefaultMuleException(createStaticMessage("Expected"));
-
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
-
-    expectWrapped(thrown);
-    from(processor.apply(just(testEvent()))).block();
+    assertMessagingExceptionCausedBy(thrown, isWithinProcessToApply);
   }
 
   @Test
   public void runtimeExceptionInResolutionResult() throws MuleException {
     final Exception thrown = new NullPointerException("Expected");
-
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenThrow(thrown);
+    assertMessagingExceptionCausedBy(thrown, isWithinProcessToApply);
+  }
 
-    expectWrapped(thrown);
-    from(processor.apply(just(testEvent()))).block();
+  private void assertMessagingExceptionCausedBy(Exception thrown, boolean isWithinProcessToApply) throws MuleException {
+    final List<Throwable> processingErrors = new ArrayList<>();
+    FluxSinkRecorder<CoreEvent> emitter = new FluxSinkRecorder<>();
+    emitter.next(testEvent());
+    emitter.complete();
+
+    Flux<CoreEvent> processorFlux =
+        Flux.create(emitter).transform(objectFlux -> processor.apply(objectFlux)).onErrorContinue((throwable, o) -> {
+          processingErrors.add(throwable);
+        });
+
+    Subscriber<CoreEvent> assertingSubscriber = new BaseSubscriber<CoreEvent>() {
+
+      @Override
+      protected void hookOnComplete() {
+        super.hookOnComplete();
+        assertThat("Only one error should be returned has part of the event processing", processingErrors, hasSize(1));
+        assertThat("Error should be wrapper in a MessagingException", processingErrors,
+                   contains(is(instanceOf(MessagingException.class))));
+        assertThat("Error is not the expected one", processingErrors,
+                   contains(hasProperty("cause", equalTo(thrown))));
+      }
+    };
+
+    processorFlux.subscriberContext(ctx -> ctx.put(MessageProcessors.WITHIN_PROCESS_TO_APPLY, isWithinProcessToApply))
+        .subscribeWith(assertingSubscriber);
   }
 
   @Test
@@ -207,10 +244,12 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     Flux.create(eventsEmitter)
         .transform(processor)
+        .subscriberContext(ctx -> ctx.put(MessageProcessors.WITHIN_PROCESS_TO_APPLY, isWithinProcessToApply))
         .subscribe(eventsConsumer);
 
     Flux.create(eventsEmitter2)
         .transform(processor)
+        .subscriberContext(ctx -> ctx.put(MessageProcessors.WITHIN_PROCESS_TO_APPLY, isWithinProcessToApply))
         .subscribe(eventsConsumer2);
 
     eventsEmitter.start();
@@ -234,25 +273,6 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     subscribeToParallelPublisherAndAwait(4);
   }
 
-  private void expectWrapped(Exception expect) {
-    expected.expect(new BaseMatcher<Exception>() {
-
-      @Override
-      public boolean matches(Object o) {
-        Exception e = (Exception) unwrap((Exception) o);
-        assertThat(e, is(instanceOf(MessagingException.class)));
-        assertThat(e.getCause(), is(sameInstance(expect)));
-
-        return true;
-      }
-
-      @Override
-      public void describeTo(Description description) {
-        description.appendText("condition not met");
-      }
-    });
-  }
-
   private void subscribeToParallelPublisherAndAwait(int numEvents) throws InterruptedException {
     InfiniteEmitter<CoreEvent> eventsEmitter = new InfiniteEmitter<>(this::newEvent);
     ItemsConsumer<CoreEvent> eventsConsumer = new ItemsConsumer<>(numEvents);
@@ -260,6 +280,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     Flux.create(eventsEmitter)
         .transform(processor)
         .doOnNext(Assert::assertNotNull)
+        .subscriberContext(ctx -> ctx.put(MessageProcessors.WITHIN_PROCESS_TO_APPLY, isWithinProcessToApply))
         .subscribe(eventsConsumer);
 
     eventsEmitter.start();
