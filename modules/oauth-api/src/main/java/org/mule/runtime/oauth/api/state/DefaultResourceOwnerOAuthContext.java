@@ -121,4 +121,12 @@ public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAut
   public Lock getRefreshOAuthContextLock(String lockNamePrefix, LockFactory lockFactory) {
     return createRefreshOAuthContextLock(lockNamePrefix, lockFactory, resourceOwnerId);
   }
+
+  @Override
+  public boolean isTokenInvalid() {
+    return false;
+  }
+
+  @Override
+  public void markTokenAsInvalid() {}
 }
