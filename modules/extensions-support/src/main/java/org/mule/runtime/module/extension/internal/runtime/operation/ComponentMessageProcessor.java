@@ -347,7 +347,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
         pub -> from(pub)
-            .map(event -> {
+            .mapNotNull(event -> {
               try {
                 return addContextToEvent(event, ctx);
               } catch (Exception t) {
@@ -366,8 +366,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   // That's why an `Either` is used here,
                   // so the error can be propagated afterwards in a way consistent with our expected error handling.
                   errorSwitchSinkSinkRef.next(left(mapped, CoreEvent.class));
+                  return null;
                 }
-
                 throw propagateWrappingFatal(mapped);
               }
             })
