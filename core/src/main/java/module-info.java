@@ -604,6 +604,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.connectivity to
       spring.core;
+  opens org.mule.runtime.core.internal.construct to
+      spring.core;
   opens org.mule.runtime.core.internal.context.notification to
       kryo.shaded,
       spring.core;

@@ -175,6 +175,12 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
         .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
+    dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48 = appFileBuilder("dummy-app-with-stopped-flow-config")
+        .withMinMuleVersion("4.8.0")
+        .definedBy("dummy-app-with-stopped-flow-config.xml")
+        .dependingOn(callbackExtensionPlugin)
+        .containingClass(echoTestClassFile,
+                         "org/foo/EchoTest.class");
   }
 
   @Test
@@ -1121,6 +1127,38 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     for (Flow flow : app_2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(false));
       flow.start();
+      assertThat(flow.getLifecycleState().isStarted(), is(true));
+    }
+  }
+
+  @Test
+  @Issue("W-15750334")
+  public void restartAppWithStartedFlowWithInitialStateStoppedBefore48() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorWithStoppedFlowFileBuilder);
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+      flow.start();
+    }
+    reset(applicationDeploymentListener);
+    redeploy(deploymentService, dummyAppDescriptorWithStoppedFlowFileBuilder.getId());
+
+    final Application app2 = assertAppDeploymentAndStatus(dummyAppDescriptorWithStoppedFlowFileBuilder, STARTED);
+    for (Flow flow : app2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+      assertThat(flow.getLifecycleState().isStarted(), is(false));
+    }
+  }
+
+  @Test
+  @Issue("W-15750334")
+  public void restartAppWithStartedFlowWithInitialStateStoppedAfter48() throws Exception {
+    final Application app = deployApplication(dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48);
+    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+      flow.start();
+    }
+    reset(applicationDeploymentListener);
+    redeploy(deploymentService, dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48.getId());
+
+    final Application app2 = assertAppDeploymentAndStatus(dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48, STARTED);
+    for (Flow flow : app2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
       assertThat(flow.getLifecycleState().isStarted(), is(true));
     }
   }
