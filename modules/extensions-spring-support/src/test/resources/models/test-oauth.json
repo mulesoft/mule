@@ -425,7 +425,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -1799,7 +1800,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -5867,7 +5869,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -24831,7 +24834,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -25506,7 +25510,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -29574,7 +29579,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -35217,7 +35223,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -35892,7 +35899,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -39960,7 +39968,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -47354,7 +47363,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -48029,7 +48039,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -52097,7 +52108,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -58132,7 +58144,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -58807,7 +58820,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -62875,7 +62889,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },

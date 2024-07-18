@@ -630,7 +630,7 @@ public class MuleExtensionModelDeclarer {
         .describedAs("Expression that defines the collection to iterate over.")
         .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
         // TODO: add support for doing this on the MetadataConfigurer
-        .withModelProperty(new MetadataKeyPartModelProperty(1, false, true));
+        .withModelProperty(new MetadataKeyPartModelProperty(1, false, REQUIRED));
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
@@ -874,7 +874,7 @@ public class MuleExtensionModelDeclarer {
         .defaultingTo("#[payload]")
         .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
         // TODO: add support for doing this on the MetadataConfigurer
-        .withModelProperty(new MetadataKeyPartModelProperty(1, false, true))
+        .withModelProperty(new MetadataKeyPartModelProperty(1, false, REQUIRED))
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
 
     parallelForeach.onDefaultParameterGroup()
