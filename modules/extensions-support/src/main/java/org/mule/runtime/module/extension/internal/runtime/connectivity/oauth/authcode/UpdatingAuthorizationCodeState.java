@@ -16,6 +16,7 @@ import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link AuthorizationCodeListener} which registers an {@link AuthorizationCodeListener} in order to get
@@ -26,11 +27,13 @@ public class UpdatingAuthorizationCodeState
 
   private AuthorizationCodeState delegate;
   private boolean invalidated = false;
+  private Supplier<Boolean> getInvalidationStatusFromTokenStore;
+  private final boolean forceInvalidateStatusRetrieval;
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
                                         AuthorizationCodeOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
-                                        Consumer<ResourceOwnerOAuthContext> onUpdate) {
+                                        Consumer<ResourceOwnerOAuthContext> onUpdate, boolean forceInvalidateStatusRetrieval) {
     delegate = toAuthorizationCodeState(config, initialContext);
     dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
@@ -55,16 +58,26 @@ public class UpdatingAuthorizationCodeState
         onUpdate.accept(context);
       }
     });
+    this.forceInvalidateStatusRetrieval = forceInvalidateStatusRetrieval;
+    getInvalidationStatusFromTokenStore = () -> dancer.getInvalidateFromTokensStore(getResourceOwnerId());
   }
 
   @Override
   public String getAccessToken() {
+    checkTokenNotInvalidated();
+    if (forceInvalidateStatusRetrieval) {
+      this.invalidated = getInvalidationStatusFromTokenStore.get();
+      checkTokenNotInvalidated();
+    }
+    return delegate.getAccessToken();
+  }
+
+  private void checkTokenNotInvalidated() {
     if (invalidated) {
       throw new TokenInvalidatedException(
                                           "OAuth token for resource owner id " + delegate.getResourceOwnerId()
                                               + " has been invalidated");
     }
-    return delegate.getAccessToken();
   }
 
   @Override
