@@ -7,8 +7,11 @@
 package org.mule.runtime.deployment.model.api;
 
 import static java.util.Collections.emptySet;
+import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toSet;
+
 import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
+
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -35,6 +38,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private Set<String> configResources;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
   private File logConfigFile;
+  private final String nativeLibrariesFolderName = randomUUID().toString();
 
   /**
    * Creates a new deployable artifact descriptor
@@ -129,6 +133,15 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   public File getLogConfigFile() {
     return logConfigFile;
+  }
+
+  /**
+   * Returns a {@link String} representing the Native Libraries Folder Name of the descriptor
+   *
+   * @return the descriptor's Native Libraries Folder Name
+   */
+  public String getLoadedNativeLibrariesFolderName() {
+    return nativeLibrariesFolderName;
   }
 
 }

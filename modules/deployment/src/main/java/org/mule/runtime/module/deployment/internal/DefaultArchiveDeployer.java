@@ -6,20 +6,25 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppNativeLibrariesTempFolder;
+import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
+import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
-import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
-import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
-import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
@@ -42,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +58,14 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultArchiveDeployer<T extends DeployableArtifact> implements ArchiveDeployer<T> {
 
-  public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
   static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
+  private static final int CORE_POOL_SIZE = 1;
+  private static final int MAX_ATTEMPTS = 5;
+  private static final int INITIAL_DELAY = 10;
+  private static final int DELAY = 10;
 
   private final ArtifactDeployer<T> deployer;
   private final ArtifactArchiveInstaller artifactArchiveInstaller;
@@ -309,6 +318,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
         try {
           deleteDirectory(dataFolder);
+          deleteNativeLibraries(artifact);
         } catch (IOException e) {
           logger.warn(
                       format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
@@ -323,6 +333,37 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       deploymentListener.onUndeploymentFailure(artifact.getArtifactName(), e);
       throw e;
     }
+  }
+
+  private void deleteNativeLibraries(T artifact) {
+    final String appDataFolderName = artifact.getDescriptor().getDataFolderName();
+    final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
+    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appDataFolderName, loadedNativeLibrariesFolderName);
+
+    if (appNativeLibrariesFolder.exists()) {
+      try {
+        deleteDirectory(appNativeLibrariesFolder);
+        logger.debug("App Native Libraries folder deleted: {}", appNativeLibrariesFolder.getAbsolutePath());
+      } catch (IOException e) {
+        logger.debug(
+                     format("Cannot delete native libraries data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used. Scheduling a task to removed them.",
+                            appNativeLibrariesFolder, artifact.getArtifactName()),
+                     e);
+        executeSchedulerFileDeletion(artifact);
+      }
+    }
+  }
+
+  private void executeSchedulerFileDeletion(T artifact) {
+    final String appDataFolderName = artifact.getDescriptor().getDataFolderName();
+    final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
+    final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appDataFolderName, loadedNativeLibrariesFolderName);
+
+    ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
+    RetryScheduledFolderDeletionTask retryTask =
+        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS,
+                                             new NativeLibrariesFolderDeletion(appDataFolderName, appNativeLibrariesFolder));
+    scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
   }
 
   private void logRequestToUndeployArtifact(T artifact) {

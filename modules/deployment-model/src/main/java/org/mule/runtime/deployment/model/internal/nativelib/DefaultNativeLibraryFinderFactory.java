@@ -20,11 +20,12 @@ import java.net.URL;
 public class DefaultNativeLibraryFinderFactory implements NativeLibraryFinderFactory {
 
   @Override
-  public NativeLibraryFinder create(String name, URL[] urls) {
+  public NativeLibraryFinder create(String name, String folderName, URL[] urls) {
     checkArgument(!isEmpty(name), "appName cannot be empty");
     checkArgument(urls != null, "urls cannot be null");
 
-    return new ArtifactCopyNativeLibraryFinder(new File(getAppDataFolder(name), "temp"), urls);
+    File tempFolder = new File(new File(getAppDataFolder("native-libraries"), name), folderName);
+    return new ArtifactCopyNativeLibraryFinder(tempFolder, urls);
   }
 
 }

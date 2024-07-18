@@ -1,4 +1,19 @@
 {
+  "4.4.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method java.lang.String org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::getLoadedNativeLibrariesFolderName()",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "methodName": "getLoadedNativeLibrariesFolderName",
+          "elementKind": "method",
+          "justification": "W-15894519: Deleting an App with DLL on Windows can cause a memory leak"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
