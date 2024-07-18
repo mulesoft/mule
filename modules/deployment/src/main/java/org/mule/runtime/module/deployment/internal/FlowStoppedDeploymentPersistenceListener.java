@@ -91,4 +91,18 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
     return deploymentProperties != null
         && parseBoolean(deploymentProperties.getProperty(propertyName, "true"));
   }
+
+  @Override
+  // TODO W-16263219: refactor this.
+  public Boolean isStatePersisted() {
+    Properties deploymentProperties = null;
+    try {
+      deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
+    } catch (IOException e) {
+      logger.error("FlowStoppedDeploymentListener failed to process ignoreInitialState for flow "
+          + flowName, e);
+    }
+    return deploymentProperties != null
+        && deploymentProperties.getProperty(propertyName) != null;
+  }
 }
