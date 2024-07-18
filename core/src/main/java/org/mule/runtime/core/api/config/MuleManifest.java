@@ -14,6 +14,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.jar.Attributes;
@@ -37,7 +38,23 @@ public class MuleManifest {
 
   public static String getProductVersion() {
     final String version = getManifestProperty("Implementation-Version");
-    return version == null ? "4.8.0" : version;
+    if (version == null) {
+      return getProductVersionFromFromPropertiesFile();
+    } else {
+      return version;
+    }
+  }
+
+  public static String getProductVersionFromFromPropertiesFile() {
+    final String VERSION_PROPERTIES_PATH = "version.properties";
+    InputStream versionPropsInputStream = MuleManifest.class.getClassLoader().getResourceAsStream(VERSION_PROPERTIES_PATH);
+    Properties versionProps = new Properties();
+    try {
+      versionProps.load(versionPropsInputStream);
+    } catch (IOException e) {
+      logger.warn("Failure reading " + VERSION_PROPERTIES_PATH + " properties file to get productVersion: " + e.getMessage(), e);
+    }
+    return versionProps.getProperty("mule.version");
   }
 
   public static String getVendorName() {
