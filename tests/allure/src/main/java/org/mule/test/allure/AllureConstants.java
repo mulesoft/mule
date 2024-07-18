@@ -1303,4 +1303,9 @@ public interface AllureConstants {
 
     String CUSTOMIZATION_SERVICE = "Customization Service";
   }
+
+  interface BootstrapLegacyModeFeature {
+
+    String BOOTSTRAP_LEGACY_MODE = "Bootstrap legacy mode";
+  }
 }
