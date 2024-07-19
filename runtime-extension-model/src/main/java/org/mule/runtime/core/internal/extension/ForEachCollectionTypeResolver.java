@@ -44,22 +44,30 @@ public class ForEachCollectionTypeResolver implements InputTypeResolver<String> 
   @Override
   public MetadataType getInputMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
-    if (context instanceof InternalMetadataContext) {
-      InternalMetadataContext internalContext = (InternalMetadataContext) context;
-      if (internalContext.getExpressionLanguageMetadataService().isPresent() && internalContext.getTypeBindings().isPresent()) {
-        String expression = sanitizeExpression(key);
-        MetadataType resolvedType = resolveExpressionType(internalContext.getTypeBindings().get(),
-                                                          internalContext.getExpressionLanguageMetadataService().get(),
-                                                          expression);
-        if (!(resolvedType instanceof ArrayType)) {
-          throw new IllegalArgumentException(format("Expression `%s` does not resolve to a collection", expression));
-        }
-        return ((ArrayType) resolvedType).getType();
-      }
+
+    if (!(context instanceof InternalMetadataContext)) {
+      // This should never happen at runtime, all MetadataContext implementations should also implement InternalMetadataContext
+      // if we are here it means we broke that premise, and we need to fix it
+      throw new MetadataResolvingException("Internal error: missing required contextual data", UNKNOWN);
     }
 
-    // Fallback to any
-    return ANY_TYPE;
+    InternalMetadataContext internalContext = (InternalMetadataContext) context;
+    if (!internalContext.getExpressionLanguageMetadataService().isPresent() || !internalContext.getTypeBindings().isPresent()) {
+      // It is possible for the type bindings information to not be available when doing type resolution or when using the
+      // legacy MTS support.
+      // We don't have enough information to supply a more precise metadata type information for this input parameter, so we
+      // return ANY, but it is not a failure.
+      return ANY_TYPE;
+    }
+
+    String expression = sanitizeExpression(key);
+    MetadataType resolvedType = resolveExpressionType(internalContext.getTypeBindings().get(),
+                                                      internalContext.getExpressionLanguageMetadataService().get(),
+                                                      expression);
+    if (!(resolvedType instanceof ArrayType)) {
+      throw new IllegalArgumentException(format("Expression `%s` does not resolve to a collection", expression));
+    }
+    return ((ArrayType) resolvedType).getType();
   }
 
   private String sanitizeExpression(String expression) {
