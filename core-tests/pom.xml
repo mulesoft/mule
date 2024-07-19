@@ -112,14 +112,14 @@
             <testResource>
                 <directory>src/test/resources</directory>
                 <includes>
-                    <include>**/test-version.properties</include>
+                    <include>product-version/test-version.properties</include>
                 </includes>
                 <filtering>true</filtering>
             </testResource>
             <testResource>
                 <directory>src/test/resources</directory>
                 <excludes>
-                    <exclude>**/test-version.properties</exclude>
+                    <exclude>product-version/test-version.properties</exclude>
                 </excludes>
                 <filtering>false</filtering>
             </testResource>

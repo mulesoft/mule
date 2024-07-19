@@ -39,14 +39,14 @@ public class MuleManifest {
   public static String getProductVersion() {
     final String version = getManifestProperty("Implementation-Version");
     if (version == null) {
-      return getProductVersionFromFromPropertiesFile();
+      return getProductVersionFromPropertiesFile();
     } else {
       return version;
     }
   }
 
-  public static String getProductVersionFromFromPropertiesFile() {
-    final String VERSION_PROPERTIES_PATH = "version.properties";
+  public static String getProductVersionFromPropertiesFile() {
+    final String VERSION_PROPERTIES_PATH = "product-version/version.properties";
     InputStream versionPropsInputStream = MuleManifest.class.getClassLoader().getResourceAsStream(VERSION_PROPERTIES_PATH);
     Properties versionProps = new Properties();
     try {

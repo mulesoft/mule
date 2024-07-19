@@ -12,19 +12,22 @@ import static org.hamcrest.Matchers.equalTo;
 
 import org.mule.tck.size.SmallTest;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
 
 import org.junit.Test;
 
 @SmallTest
 public class MuleManifestTestCase {
 
-  private static final String TEST_VERSION_PROPERTIES_PATH = "/test-version.properties";
+  private static final String TEST_VERSION_PROPERTIES_PATH = "/product-version/test-version.properties";
   private static final String MULE_VERSION_PROPERTY_NAME = "mule.version";
 
   @Test
@@ -72,7 +75,7 @@ public class MuleManifestTestCase {
 
   @Test
   public void getVersionFromFallbackOption() throws Exception {
-    String fallbackVersion = MuleManifest.getProductVersionFromFromPropertiesFile();
+    String fallbackVersion = MuleManifest.getProductVersionFromPropertiesFile();
     String mavenVersion = getPropertyFromPropertiesFile(TEST_VERSION_PROPERTIES_PATH, MULE_VERSION_PROPERTY_NAME);
     assertThat(fallbackVersion, equalTo(mavenVersion));
   }
