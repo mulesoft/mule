@@ -19,10 +19,55 @@
         <!-- because this module requires transitive jakarta.jms.api -->
         <revapi.checkDependencies>true</revapi.checkDependencies>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
+
+        <mule.version>${project.version}</mule.version>
     </properties>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+                <executions>
+                    <!-- To avoid hardcoding the mule version in the MuleManifest.java getProductVersion() method
+                         this workaround is done which replaces the @mule.version@ placeholder before compiling and after
+                         the compilation is finished it returns to the original placeholder @mule.version@ to avoid
+                         having changes in the source code -->
+                    <execution>
+                        <id>replace-placeholder-with-mule-version</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <file>src/main/java/org/mule/runtime/core/api/config/MuleManifest.java</file>
+                            <replacements>
+                                <replacement>
+                                    <token>@mule.version@</token>
+                                    <value>${mule.version}</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>revert-replace-placeholder-with-mule-version</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <file>src/main/java/org/mule/runtime/core/api/config/MuleManifest.java</file>
+                            <replacements>
+                                <replacement>
+                                    <token>${mule.version}</token>
+                                    <value>@mule.version@</value>
+                                </replacement>
+                            </replacements>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
