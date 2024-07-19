@@ -656,6 +656,10 @@ public class MuleExtensionModelDeclarer {
     forEach.withOutputAttributes().ofType(VOID_TYPE);
 
     configurerFactory.create()
+        // The metadata key type is String even though the parameter is Array because the key object will be the unresolved
+        // expression (we can't evaluate expressions during metadata resolution)
+        // The InputTypeResolver will then take the expression and resolve its actual output type, providing more precise
+        // metadata information than just "Array of Any"
         .setKeysResolver(new NullMetadataResolver(), "collection", STRING_TYPE, false)
         .addInputResolver("collection", new ForEachCollectionTypeResolver())
         .setChainInputTypeResolver(new ForEachChainInputTypeResolver())
@@ -893,6 +897,10 @@ public class MuleExtensionModelDeclarer {
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
     configurerFactory.create()
+        // The metadata key type is String even though the parameter is Array because the key object will be the unresolved
+        // expression (we can't evaluate expressions during metadata resolution)
+        // The InputTypeResolver will then take the expression and resolve its actual output type, providing more precise
+        // metadata information than just "Array of Any"
         .setKeysResolver(new NullMetadataResolver(), "collection", STRING_TYPE, false)
         .addInputResolver("collection", new ForEachCollectionTypeResolver())
         .setChainInputTypeResolver(new ForEachChainInputTypeResolver())
