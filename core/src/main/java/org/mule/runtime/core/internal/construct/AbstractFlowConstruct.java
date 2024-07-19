@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_PERSISTED_FLOW_STATE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -18,6 +19,7 @@ import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static java.lang.String.format;
 import static java.util.Optional.of;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -42,6 +44,8 @@ import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAccep
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +77,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   private final FlowExceptionHandler exceptionListener;
   private volatile FlowConstructStatistics statistics;
   protected FlowStoppedPersistenceListener flowStoppedPersistenceListener;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   /**
    * Determines the initial state of this flow when the mule starts. Can be 'stopped' or 'started' (default)
@@ -113,9 +120,13 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   @Override
   public final void start() throws MuleException {
+    boolean usePersistedState =
+        featureFlaggingService != null && featureFlaggingService.isEnabled(HONOUR_PERSISTED_FLOW_STATE)
+            && flowStoppedPersistenceListener != null
+            && flowStoppedPersistenceListener.isStatePersisted();
     // Check if Initial State is Stopped
     if (muleContext.isStarting() &&
-        (initialState.equals(INITIAL_STATE_STOPPED)
+        (!usePersistedState && initialState.equals(INITIAL_STATE_STOPPED)
             || flowStoppedPersistenceListener != null && !flowStoppedPersistenceListener.shouldStart())) {
       lifecycleManager.fireStartPhase(new EmptyLifecycleCallback<>());
       lifecycleManager.fireStopPhase(new EmptyLifecycleCallback<>());
