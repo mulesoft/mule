@@ -16,8 +16,11 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +36,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exc
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,7 +95,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, false);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -110,7 +114,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, false);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -138,7 +142,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, false);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -167,7 +171,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
                                                                               dancer,
                                                                               initialContext,
-                                                                              newContext::set);
+                                                                              newContext::set, false);
 
     verify(dancer).addListener(anyString(), listenerCaptor.capture());
 
@@ -191,5 +195,45 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
     assertThat(state.getRefreshToken().get(), equalTo(NEW_REFRESH_TOKEN));
 
     assertThat(newContext.get(), is(sameInstance(refreshedContext)));
+  }
+
+  @Test
+  @Issue("W-15154658")
+  public void accessTokenVisitsTokensStoreIfClusterIsEnabled() throws Exception {
+    ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
+    Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
+
+    UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
+                                                                              dancer,
+                                                                              initialContext,
+                                                                              newContext::set, true);
+
+    verify(dancer).addListener(anyString(), listenerCaptor.capture());
+
+    assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+
+    // with cluster being enabled, getAccessToken() will call getInvalidateFromTokensStore method in dancer
+    verify(dancer, times(1)).getInvalidateFromTokensStore(any());
+  }
+
+  @Test
+  @Issue("W-15154658")
+  public void accessTokenVisitsTokensStoreWithoutCluster() throws Exception {
+    ArgumentCaptor<AuthorizationCodeListener> listenerCaptor = forClass(AuthorizationCodeListener.class);
+    Reference<ResourceOwnerOAuthContext> newContext = new Reference<>();
+
+    UpdatingAuthorizationCodeState state = new UpdatingAuthorizationCodeState(oAuthConfig,
+                                                                              dancer,
+                                                                              initialContext,
+                                                                              newContext::set, false);
+
+    verify(dancer).addListener(anyString(), listenerCaptor.capture());
+
+    assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
+    assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+
+    // with cluster not being enabled, getAccessToken() won't call getInvalidateFromTokensStore method in dancer
+    verify(dancer, never()).getInvalidateFromTokensStore(any());
   }
 }
