@@ -250,6 +250,7 @@
         <surefire.test.unit.open.args>
             -XX:+IgnoreUnrecognizedVMOptions
             --add-opens=java.base/java.lang=ALL-UNNAMED
+            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.test.unit.open.args>
         <!-- Emulate the behaviour in standalone, where slf4j is loaded in the boot layer -->
@@ -257,7 +258,7 @@
             -XX:+IgnoreUnrecognizedVMOptions
             --module-path=${org.slf4j:slf4j-api:jar}
             --add-modules=org.slf4j
-            ${surefire.args.base}
+            ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
