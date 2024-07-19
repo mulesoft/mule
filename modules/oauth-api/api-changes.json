@@ -1,4 +1,29 @@
 {
+  "4.4.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.oauth.api.state.DancerState.TOKEN_INVALIDATED",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "DancerState",
+          "fieldName": "TOKEN_INVALIDATED",
+          "elementKind": "enumConstant",
+          "justification": "W-15154658: Added Dancer state type to track token invalidation status"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::isTokenInvalid()",
+          "justification": "W-15154658: Added method to check token status to sync token status"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::markTokenAsInvalid()",
+          "justification": "W-15154658: Added method to update token status to sync token status"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [
