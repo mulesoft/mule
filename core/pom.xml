@@ -28,7 +28,6 @@
             <plugin>
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
                 <artifactId>replacer</artifactId>
-                <version>1.5.3</version>
                 <executions>
                     <!-- To avoid hardcoding the mule version in the MuleManifest.java getProductVersion() method
                          this workaround is done which replaces the @mule.version@ placeholder before compiling and after
