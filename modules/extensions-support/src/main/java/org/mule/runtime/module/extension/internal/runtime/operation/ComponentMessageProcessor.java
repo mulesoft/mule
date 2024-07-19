@@ -30,6 +30,7 @@ import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProce
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.createRoundRobinFluxSupplier;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.mapNotNull;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateErrorResponseMapper;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
@@ -350,31 +351,30 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
-        pub -> from(pub)
-            .mapNotNull(event -> {
-              try {
-                return addContextToEvent(event, ctx);
-              } catch (Exception t) {
-                // Force the error mapper from the chain to be used.
-                // When using Mono.create with sink.error, the error mapper from the
-                // context is ignored, so it has to be explicitly used here.
-                final Throwable mapped = localOperatorErrorHook.apply(t, event);
+        pub -> mapNotNull(from(pub), event -> {
+          try {
+            return addContextToEvent(event, ctx);
+          } catch (Exception t) {
+            // Force the error mapper from the chain to be used.
+            // When using Mono.create with sink.error, the error mapper from the
+            // context is ignored, so it has to be explicitly used here.
+            final Throwable mapped = localOperatorErrorHook.apply(t, event);
 
-                if (outerFluxTerminationTimeout < 0
-                    // When there is a mono involved in some part of the chain, we cannot use the termination timeout because that
-                    // would
-                    // impose a timeout in the operation, which we don't want to.
-                    // In this case, the flux will be complete when there are no more inflight operations.
-                    || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
-                  // if `sink.error` is called here, it will cancel the flux altogether.
-                  // That's why an `Either` is used here,
-                  // so the error can be propagated afterwards in a way consistent with our expected error handling.
-                  errorSwitchSinkSinkRef.next(left(mapped, CoreEvent.class));
-                  return null;
-                }
-                throw propagateWrappingFatal(mapped);
-              }
-            })
+            if (outerFluxTerminationTimeout < 0
+                // When there is a mono involved in some part of the chain, we cannot use the termination timeout because that
+                // would
+                // impose a timeout in the operation, which we don't want to.
+                // In this case, the flux will be complete when there are no more inflight operations.
+                || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
+              // if `sink.error` is called here, it will cancel the flux altogether.
+              // That's why an `Either` is used here,
+              // so the error can be propagated afterwards in a way consistent with our expected error handling.
+              errorSwitchSinkSinkRef.next(left(mapped, CoreEvent.class));
+              return null;
+            }
+            throw propagateWrappingFatal(mapped);
+          }
+        })
             .doOnNext(event -> {
 
               final ExecutorCallback executorCallback = new ExecutorCallback() {
@@ -397,7 +397,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 }
               };
 
-              if (!mayCompleteInDifferentThread && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
+              if (!mayCompleteInDifferentThread
+                  && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
                 onEvent(event, executorCallback, ctx);

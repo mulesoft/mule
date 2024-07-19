@@ -36,8 +36,10 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
@@ -403,6 +405,31 @@ public class RxUtils {
     return result -> result.reduce(me -> {
       throw propagateWrappingFatal(me);
     }, identity());
+  }
+
+  /**
+   * <b>Taken from reactor-core 3.4.x (upgrading may introduce breaking changes).</b>
+   * <p>
+   * Transform the items emitted by the provided {@link Flux} by applying a synchronous function to each item, which may produce
+   * {@code null} values. In that case, no value is emitted.
+   *
+   * <strong>Error Mode Support:</strong> This operator supports onErrorContinue(BiConsumer) resuming on errors (including when
+   * fusion is enabled). Exceptions thrown by the mapper then cause the source value to be dropped and a new element
+   * ({@code request(1)}) being requested from upstream.
+   *
+   * @param flux   The {@link Flux} to be transformed.
+   * @param mapper the synchronous transforming {@link Function}
+   * @param <V>    the transformed type.
+   *
+   * @return a transformed {@link Flux}
+   */
+  public static <V, U> Flux<V> mapNotNull(Flux<U> flux, Function<? super U, ? extends V> mapper) {
+    return flux.handle((t, sink) -> {
+      V v = mapper.apply(t);
+      if (v != null) {
+        sink.next(v);
+      }
+    });
   }
 
 }
