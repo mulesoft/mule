@@ -37,4 +37,9 @@ public interface FlowStoppedPersistenceListener {
    * Indicates if the flow should start or not
    */
   Boolean shouldStart();
+
+  /**
+   * Indicates if the flow state is persisted or not.
+   */
+  Boolean isStatePersisted();
 }

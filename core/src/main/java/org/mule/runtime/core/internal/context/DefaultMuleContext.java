@@ -19,6 +19,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_PERSISTED_FLOW_STATE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
@@ -335,6 +336,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDisableSchedulerLogging();
       configureErrorAndRollbackTxWhenTimeout();
       configureEnableXmlSdkReset();
+      configureHonourPersistedFlowState();
     }
   }
 
@@ -1450,6 +1452,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureEnableXmlSdkReset() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_XML_SDK_MDC_RESET, minMuleVersion("4.8.0"));
+  }
+
+  private static void configureHonourPersistedFlowState() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(HONOUR_PERSISTED_FLOW_STATE,
+                                                minMuleVersion("4.8.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
