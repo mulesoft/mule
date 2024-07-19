@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.extension;
 
+import static org.mule.runtime.api.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.ANY_TYPE;
 
@@ -60,7 +61,7 @@ public class ForEachCollectionTypeResolver implements InputTypeResolver<String> 
       return ANY_TYPE;
     }
 
-    String expression = sanitizeExpression(key);
+    String expression = sanitize(key);
     MetadataType resolvedType = resolveExpressionType(internalContext.getTypeBindings().get(),
                                                       internalContext.getExpressionLanguageMetadataService().get(),
                                                       expression);
@@ -68,17 +69,6 @@ public class ForEachCollectionTypeResolver implements InputTypeResolver<String> 
       throw new IllegalArgumentException(format("Expression `%s` does not resolve to a collection", expression));
     }
     return ((ArrayType) resolvedType).getType();
-  }
-
-  private String sanitizeExpression(String expression) {
-    String sanitizedExpression;
-    if (expression.startsWith("#[") && expression.endsWith("]")) {
-      sanitizedExpression = expression.substring("#[".length(), expression.length() - "]".length());
-    } else {
-      sanitizedExpression = expression;
-    }
-
-    return sanitizedExpression;
   }
 
   private MetadataType resolveExpressionType(TypeBindings typeBindings,

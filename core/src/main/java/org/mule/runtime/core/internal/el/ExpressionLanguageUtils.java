@@ -57,27 +57,6 @@ public final class ExpressionLanguageUtils {
   }
 
   /**
-   * Returns a sanitized version of the given {@code expression}
-   *
-   * @param expression the expression to sanitize
-   * @return the sanitized expression
-   */
-  public static String sanitize(String expression) {
-    String sanitizedExpression;
-    if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
-      if (!expression.endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
-        throw new ExpressionExecutionException(createStaticMessage(format("Unbalanced brackets in expression '%s'", expression)));
-      }
-      sanitizedExpression =
-          expression.substring(DEFAULT_EXPRESSION_PREFIX.length(), expression.length() - DEFAULT_EXPRESSION_POSTFIX.length());
-    } else {
-      sanitizedExpression = expression;
-    }
-
-    return sanitizedExpression;
-  }
-
-  /**
    * @param expression the expression to test
    * @return Whether the given {@code sanitized} is a sanitized version of the {@code payload} expression
    */

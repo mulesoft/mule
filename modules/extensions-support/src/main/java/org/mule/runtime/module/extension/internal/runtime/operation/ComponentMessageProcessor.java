@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
+import static org.mule.runtime.api.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -20,7 +21,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
