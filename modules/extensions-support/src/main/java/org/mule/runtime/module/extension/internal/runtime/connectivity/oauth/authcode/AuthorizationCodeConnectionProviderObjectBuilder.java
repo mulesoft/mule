@@ -47,6 +47,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvin
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * A specialization of {@link BaseOAuthConnectionProviderObjectBuilder} to wrap the {@link ConnectionProvider} into
@@ -60,6 +61,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
   private final AuthorizationCodeOAuthHandler authCodeHandler;
   private final AuthorizationCodeGrantType grantType;
   private final Map<Field, String> callbackValues;
+  Supplier<Boolean> forceInvalidateStatusRetrievalSupplier;
 
   public AuthorizationCodeConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                                           ResolverSet resolverSet,
@@ -74,6 +76,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
     this.authCodeHandler = authCodeHandler;
     this.grantType = grantType;
     callbackValues = getCallbackValuesExtractors(providerModel);
+    this.forceInvalidateStatusRetrievalSupplier = () -> !muleContext.getClusterId().isEmpty();
   }
 
   @Override
@@ -108,7 +111,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
                                                                 config,
                                                                 callbackValues,
                                                                 authCodeHandler,
-                                                                reconnectionConfig);
+                                                                reconnectionConfig, forceInvalidateStatusRetrievalSupplier);
     return provider;
   }
 
@@ -140,7 +143,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
                                                                 config,
                                                                 callbackValues,
                                                                 authCodeHandler,
-                                                                reconnectionConfig);
+                                                                reconnectionConfig, forceInvalidateStatusRetrievalSupplier);
     return new Pair<>(provider, result);
   }
 

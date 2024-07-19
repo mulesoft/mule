@@ -76,6 +76,8 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
   // TODO: MULE-10837 this should be a plain old @Inject
   private LazyValue<HttpService> httpService;
 
+  private boolean forceInvalidateStatusRetrieval;
+
   /**
    * Becomes aware of the given {@code config} and makes sure that the access token callback and authorization endpoints are
    * provisioned.
@@ -143,8 +145,11 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     if (dancer == null) {
       return;
     }
+    dancer.invalidateContext(resourceOwnerId, forceInvalidateStatusRetrieval);
+  }
 
-    dancer.invalidateContext(resourceOwnerId);
+  protected void setForceInvalidateStatusRetrieval(boolean forceInvalidateStatusRetrieval) {
+    this.forceInvalidateStatusRetrieval = forceInvalidateStatusRetrieval;
   }
 
   private AuthorizationCodeOAuthDancer createDancer(AuthorizationCodeConfig config, List<AuthorizationCodeListener> listeners)
