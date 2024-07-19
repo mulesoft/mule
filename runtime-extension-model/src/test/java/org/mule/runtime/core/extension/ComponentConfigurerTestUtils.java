@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.extension;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,15 +20,11 @@ public final class ComponentConfigurerTestUtils {
   }
 
   public static ComponentMetadataConfigurerFactory createMockedFactory() {
-    ComponentMetadataConfigurer mockConfigurer = mock(ComponentMetadataConfigurer.class);
-    when(mockConfigurer.asAllOfRouter()).thenReturn(mockConfigurer);
-    when(mockConfigurer.asPassthroughScope()).thenReturn(mockConfigurer);
-    when(mockConfigurer.asOneOfRouter()).thenReturn(mockConfigurer);
     return new ComponentMetadataConfigurerFactory() {
 
       @Override
       public ComponentMetadataConfigurer create() {
-        return mockConfigurer;
+        return mock(ComponentMetadataConfigurer.class, RETURNS_DEEP_STUBS);
       }
     };
   }

@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -108,15 +109,11 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
   }
 
   private static ComponentMetadataConfigurerFactory createMockedFactory() {
-    ComponentMetadataConfigurer mockConfigurer = mock(ComponentMetadataConfigurer.class);
-    when(mockConfigurer.asAllOfRouter()).thenReturn(mockConfigurer);
-    when(mockConfigurer.asPassthroughScope()).thenReturn(mockConfigurer);
-    when(mockConfigurer.asOneOfRouter()).thenReturn(mockConfigurer);
     return new ComponentMetadataConfigurerFactory() {
 
       @Override
       public ComponentMetadataConfigurer create() {
-        return mockConfigurer;
+        return mock(ComponentMetadataConfigurer.class, RETURNS_DEEP_STUBS);
       }
     };
   }

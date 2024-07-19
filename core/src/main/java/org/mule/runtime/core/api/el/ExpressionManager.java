@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
+import org.mule.runtime.api.el.ExpressionLanguageUtils;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -29,8 +30,8 @@ import java.util.Iterator;
 @NoImplement
 public interface ExpressionManager extends MuleExpressionLanguage {
 
-  String DEFAULT_EXPRESSION_PREFIX = "#[";
-  String DEFAULT_EXPRESSION_POSTFIX = "]";
+  String DEFAULT_EXPRESSION_PREFIX = ExpressionLanguageUtils.DEFAULT_EXPRESSION_PREFIX;
+  String DEFAULT_EXPRESSION_POSTFIX = ExpressionLanguageUtils.DEFAULT_EXPRESSION_POSTFIX;
 
   /**
    * Execute the expression returning the result. The expression will be executed by the expression language implementation
