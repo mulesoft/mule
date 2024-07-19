@@ -7,6 +7,21 @@
           "new": "class org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContextWithRefreshState",
           "justification": "Needed for runtime upgrades to avoid deserialization problems"
 
+        },
+        {
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.oauth.client.api.state.DancerState.TOKEN_INVALIDATED",
+          "justification": "W-15154658: Added Dancer state type to track token invalidation status"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::isTokenInvalid()",
+          "justification": "W-15154658: Added method to check token status to sync token status"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::markTokenAsInvalid()",
+          "justification": "W-15154658: Added method to update token status to sync token status"
         }
       ]
     }
