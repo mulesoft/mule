@@ -91,7 +91,8 @@
             <name>Alejandro Garcia Marra</name>
         </developer>
         <developer>
-            <id>estebanwasinger</id>                                        <requireReleaseDeps>
+            <id>estebanwasinger</id>                                        
+                                        <requireReleaseDeps>
                                             <message>No Snapshots Allowed in Deps!</message>
                                             <excludes>
                                                 <exclude>org.mule.weave:*</exclude>
