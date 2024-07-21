@@ -91,7 +91,18 @@
             <name>Alejandro Garcia Marra</name>
         </developer>
         <developer>
-            <id>estebanwasinger</id>
+            <id>estebanwasinger</id>                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <exclude>org.mule.weave:*</exclude>
+                                                <exclude>org.mule.runtime:mule-dwb-api</exclude>
+                                                <exclude>org.mule.services:*</exclude>
+                                                <exclude>org.mule.tools.maven:mule-classloader-model</exclude>
+
+                                                <exclude>org.raml:raml-parser-2</exclude>
+                                                <exclude>org.raml:yagi</exclude>
+                                            </excludes>
+                                        </requireReleaseDeps>
             <name>Esteban Wasinger</name>
         </developer>
         <developer>
@@ -867,6 +878,14 @@
                         </goals>
                         <configuration>
                             <rules>
+                                <requireReleaseDeps>
+                                   <message>No Snapshots Allowed in Deps!</message>
+                                   <excludes>
+                                       <exclude>org.mule.weave:*</exclude>
+                                       <exclude>org.mule.runtime:mule-dwb-api</exclude>
+                                       <exclude>org.mule.services:*</exclude>
+                                   </excludes>
+                               </requireReleaseDeps>
                                 <requireMavenVersion>
                                     <version>[3.3.1,)</version>
                                 </requireMavenVersion>
