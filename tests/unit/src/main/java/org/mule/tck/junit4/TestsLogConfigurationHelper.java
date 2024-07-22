@@ -11,8 +11,6 @@ import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 
@@ -60,7 +58,7 @@ public class TestsLogConfigurationHelper {
   }
 
   private static String findLogConfigurationPath(Class<?> testClass) {
-    String encodedFolder = testClass.getClassLoader().getResource("").getPath();
+    String encodedFolder = testClass.getProtectionDomain().getCodeSource().getLocation().getPath();
 
     String folderPath;
     try {
@@ -69,12 +67,7 @@ public class TestsLogConfigurationHelper {
       return NULL_CONFIG_FILE;
     }
 
-    File folder;
-    try {
-      folder = new File(new URI("file", null, folderPath, null));
-    } catch (URISyntaxException e) {
-      return NULL_CONFIG_FILE;
-    }
+    File folder = new File(folderPath);
 
     if ("target".equals(folder.getParentFile().getName())) {
       folder = folder.getParentFile();
