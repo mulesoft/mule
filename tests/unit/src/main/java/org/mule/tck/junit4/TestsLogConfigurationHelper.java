@@ -71,7 +71,7 @@ public class TestsLogConfigurationHelper {
 
     File folder;
     try {
-      folder = new File(new URI(folderPath));
+      folder = new File(new URI("file", null, folderPath, null));
     } catch (URISyntaxException e) {
       return NULL_CONFIG_FILE;
     }
