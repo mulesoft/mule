@@ -867,6 +867,14 @@
                         </goals>
                         <configuration>
                             <rules>
+                                <requireReleaseDeps>
+                                   <message>No Snapshots Allowed in Deps!</message>
+                                   <excludes>
+                                       <exclude>org.mule.weave:*</exclude>
+                                       <exclude>org.mule.runtime:mule-dwb-api</exclude>
+                                       <exclude>org.mule.services:*</exclude>
+                                   </excludes>
+                               </requireReleaseDeps>
                                 <requireMavenVersion>
                                     <version>[3.3.1,)</version>
                                 </requireMavenVersion>
