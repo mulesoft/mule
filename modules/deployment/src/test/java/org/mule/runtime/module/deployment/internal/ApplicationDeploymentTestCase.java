@@ -1645,6 +1645,34 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
   @Test
   @Story(APPLICATION_REDEPLOYMENT)
+  public void redeployAppRemovesTemporaryNativeLibrariesData() throws Exception {
+    addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
+    final Application app = findApp(dummyAppDescriptorFileBuilder.getId(), 1);
+
+    File nativeLibrariesTempFolder = getAppNativeLibrariesTempFolder(app.getArtifactName());
+    File nativeLibrariesTempFolderFirstDeployment =
+        getAppNativeLibrariesTempFolder(app.getArtifactName(), app.getDescriptor().getLoadedNativeLibrariesFolderName());
+
+    // As this app has a plugin, the tmp directory must exist
+    assertThat(nativeLibrariesTempFolder.listFiles().length, is(1));
+    assertTrue(nativeLibrariesTempFolderFirstDeployment.exists());
+
+    // Run redeploy
+    reset(applicationDeploymentListener);
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getId());
+    assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
+
+    // Check the first deployment tmp directory was effectively removed and the one of the second one exists
+    assertThat(nativeLibrariesTempFolder.listFiles().length, is(1));
+    assertFalse(nativeLibrariesTempFolderFirstDeployment.exists());
+  }
+
+  @Test
+  @Story(APPLICATION_REDEPLOYMENT)
   public void explodedAppRedeploymentDoesNotDeleteTempFile() throws Exception {
     testTempFileOnRedeployment(() -> addExplodedAppFromBuilder(emptyAppFileBuilder),
                                () -> addExplodedAppFromBuilder(emptyAppFileBuilder));
