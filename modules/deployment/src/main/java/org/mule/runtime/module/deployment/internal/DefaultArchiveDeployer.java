@@ -457,6 +457,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       deploymentListener.onUndeploymentStart(artifactName);
       try {
         deployer.undeploy(artifact);
+        deleteNativeLibraries(artifact);
         artifact = null;
         deploymentListener.onUndeploymentSuccess(artifactName);
       } catch (Throwable e) {
