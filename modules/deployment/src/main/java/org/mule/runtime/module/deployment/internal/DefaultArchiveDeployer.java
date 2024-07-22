@@ -456,6 +456,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       deploymentListener.onUndeploymentStart(artifactName);
       try {
         deployer.undeploy(artifact);
+        deleteNativeLibraries(artifact);
         artifact = null;
         deploymentListener.onUndeploymentSuccess(artifactName);
       } catch (Throwable e) {
