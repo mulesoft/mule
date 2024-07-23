@@ -17,7 +17,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -29,6 +28,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
 import io.qameta.allure.Issue;
+import org.junit.Before;
 import org.junit.Test;
 
 @Issue("W-15894519")
