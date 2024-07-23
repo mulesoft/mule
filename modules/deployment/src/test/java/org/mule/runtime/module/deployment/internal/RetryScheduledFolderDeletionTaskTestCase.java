@@ -17,8 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.module.deployment.internal.NativeLibrariesFolderDeletion;
-import org.mule.runtime.module.deployment.internal.RetryScheduledFolderDeletionTask;
+import org.junit.Before;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -42,7 +41,12 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   private static final int INITIAL_DELAY = 0;
   private static final int DELAY = 1;
 
-  private static final TestLogger retryScheduledFolderDeletionTaskLogger = getTestLogger(RetryScheduledFolderDeletionTask.class);
+  private final TestLogger retryScheduledFolderDeletionTaskLogger = getTestLogger(RetryScheduledFolderDeletionTask.class);
+
+  @Before
+  public void before() {
+    retryScheduledFolderDeletionTaskLogger.clearAll();
+  }
 
   @Test
   public void retryScheduledFolderDeletionTaskAtFirstAttemptDeletesTheTempFolder() {
@@ -51,7 +55,8 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
     RetryScheduledFolderDeletionTask retryTask =
-        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion);
+        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion,
+                                             new Log4jWrapperRetryScheduledFolderDeletionTaskLogger(retryScheduledFolderDeletionTaskLogger));
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
     Prober prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
@@ -79,7 +84,8 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
     RetryScheduledFolderDeletionTask retryTask =
-        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion);
+        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion,
+                                             new Log4jWrapperRetryScheduledFolderDeletionTaskLogger(retryScheduledFolderDeletionTaskLogger));
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
     Prober prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
@@ -107,7 +113,8 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
     RetryScheduledFolderDeletionTask retryTask =
-        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion);
+        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion,
+                                             new Log4jWrapperRetryScheduledFolderDeletionTaskLogger(retryScheduledFolderDeletionTaskLogger));
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
     Prober prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
