@@ -60,6 +60,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private final ExpressionLanguage expressionExecutor;
   private final MuleContext muleContext;
 
+  private boolean disposed = false;
+
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
                                             DefaultExpressionLanguageFactoryService service,
@@ -250,8 +252,11 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public void dispose() {
-    expressionExecutor.dispose();
+  public synchronized void dispose() {
+    if (expressionExecutor != null && !disposed) {
+      expressionExecutor.dispose();
+      disposed = true;
+    }
   }
 
   @Override
