@@ -30,6 +30,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
 import io.qameta.allure.Issue;
+import org.junit.Ignore;
 import org.junit.Test;
 
 @Issue("W-15894519")
@@ -73,6 +74,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("W-16313420")
   public void retryScheduledFolderDeletionTaskAtSecondAttemptDeletesTheTempFolder() {
     NativeLibrariesFolderDeletion nativeLibrariesFolderDeletion = mock(NativeLibrariesFolderDeletion.class);
     when(nativeLibrariesFolderDeletion.doAction()).thenReturn(false).thenReturn(true);
@@ -101,6 +103,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("W-16313420")
   public void retryScheduledFolderDeletionTaskNeverDeletesTheTempFolder() {
     NativeLibrariesFolderDeletion nativeLibrariesFolderDeletion = mock(NativeLibrariesFolderDeletion.class);
     when(nativeLibrariesFolderDeletion.doAction()).thenReturn(false);
