@@ -10,9 +10,11 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOGGING_BLOCKING_CATEGORIES;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
 import static java.util.Arrays.asList;
+import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -56,6 +58,7 @@ public class LoggerMessageProcessor extends AbstractComponent
   ExtendedExpressionManager expressionManager;
 
   private volatile ProcessingType processingType;
+  private transient ClassLoader loggerExecutionClassloader;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -65,6 +68,7 @@ public class LoggerMessageProcessor extends AbstractComponent
   }
 
   protected void initLogger() {
+    this.loggerExecutionClassloader = currentThread().getContextClassLoader();
     if (category != null) {
       logger = LoggerFactory.getLogger(category);
     } else {
@@ -104,6 +108,17 @@ public class LoggerMessageProcessor extends AbstractComponent
   }
 
   protected void log(CoreEvent event) {
+    if (loggerExecutionClassloader != null) {
+      // The logger should be the one the log4j was initialized with.
+      // This guarantees that the logger is always is the one from the appropriate artifact
+      // independently of the TCCL.
+      withContextClassLoader(loggerExecutionClassloader, () -> doLog(event));
+    } else {
+      doLog(event);
+    }
+  }
+
+  private void doLog(CoreEvent event) {
     if (event == null) {
       logWithLevel(null);
     } else {
