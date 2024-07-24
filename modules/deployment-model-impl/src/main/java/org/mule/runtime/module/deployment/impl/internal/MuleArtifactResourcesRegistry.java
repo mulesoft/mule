@@ -203,8 +203,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       ArtifactClassLoader containerClassLoader;
       if (moduleRepository == null) {
         moduleRepository = MODULE_REPOSITORY;
-        containerClassLoader = CONTAINER_CLASS_LOADER;
-      } else if (bootPackages.isEmpty() && additionalResourceDirectories.isEmpty()) {
+      }
+      if (bootPackages.isEmpty() && additionalResourceDirectories.isEmpty()) {
         containerClassLoader = createContainerClassLoader(moduleRepository);
       } else {
         containerClassLoader = createContainerClassLoader(moduleRepository, bootPackages, additionalResourceDirectories);
