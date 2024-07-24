@@ -22,6 +22,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -77,6 +78,27 @@ public final class JpmsUtils {
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
       "--add-opens=java.base/java.lang.reflect=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_JDK_INTERNAL_REF =
+      "--add-opens=java.base/jdk.internal.ref=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_JAVA_NIO =
+      "--add-opens=java.base/java.nio=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_SUN_NIO_CH =
+      "--add-opens=java.base/sun.nio.ch=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_SUN_MANAGEMENT =
+      "--add-opens=java.management/sun.management=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_COM_IBM_LANG_MANAGEMENT_INTERNAL =
+      "--add-opens=jdk.management/com.ibm.lang.management.internal=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_COM_SUN_MANAGEMENT_INTERNAL =
+      "--add-opens=jdk.management/com.sun.management.internal=org.mule.runtime.jpms.utils";
+
+  private static final List<String> REQUIRED_ADD_OPENS = asList(REQUIRED_ADD_OPENS_JAVA_LANG,
+                                                                REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT,
+                                                                REQUIRED_ADD_OPENS_JDK_INTERNAL_REF,
+                                                                REQUIRED_ADD_OPENS_JAVA_NIO,
+                                                                REQUIRED_ADD_OPENS_SUN_NIO_CH,
+                                                                REQUIRED_ADD_OPENS_SUN_MANAGEMENT,
+                                                                REQUIRED_ADD_OPENS_COM_IBM_LANG_MANAGEMENT_INTERNAL,
+                                                                REQUIRED_ADD_OPENS_COM_SUN_MANAGEMENT_INTERNAL);
 
   /**
    * Validates that no module tweaking jvm options (i.e: {@code --add-opens}, {@code --add-exports}, ...) have been provided in
@@ -104,8 +126,7 @@ public final class JpmsUtils {
             || arg.startsWith("--add-reads")
             || arg.startsWith("--patch-module"))
         .filter(arg -> !(arg.equals(REQUIRED_ADD_MODULES)
-            || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG)
-            || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT)))
+            || REQUIRED_ADD_OPENS.contains(arg)))
         .collect(toList());
 
     if (!illegalArguments.isEmpty()) {
@@ -203,6 +224,21 @@ public final class JpmsUtils {
                  asList("java.lang", "java.lang.reflect"));
     openToModule(childLayer, "org.mule.runtime.jpms.utils", "java.base",
                  asList("java.lang", "java.lang.reflect"));
+
+    // To avoid a performance-related warning from Hazelcast according to
+    // https://docs.hazelcast.com/hazelcast/5.2/getting-started/install-hazelcast#using-modular-java
+    try {
+      openToModule(childLayer, "com.hazelcast.core", "java.base",
+                   asList("java.lang", "jdk.internal.ref", "java.nio", "sun.nio.ch"));
+      openToModule(childLayer, "com.hazelcast.core", "jdk.management",
+                   asList("com.sun.management.internal", "com.ibm.lang.management.internal"));
+      openToModule(childLayer, "com.hazelcast.core", "java.management",
+                   singletonList("sun.management"));
+    } catch (IllegalCallerException e) {
+      // It is fine to continue because the feature may not even be used
+      // Logging here is possible, but it could be confusing for people not using clustering, a warning will be printed by
+      // Hazelcast
+    }
 
     return childLayer.findLoader(childLayer.modules().iterator().next().getName());
   }
@@ -368,7 +404,9 @@ public final class JpmsUtils {
         .ifPresent(module -> boot().findModule(bootModuleName)
             .ifPresent(bootModule -> {
               for (String pkg : packages) {
-                bootModule.addOpens(pkg, module);
+                if (bootModule.getPackages().contains(pkg)) {
+                  bootModule.addOpens(pkg, module);
+                }
               }
             }));
   }
