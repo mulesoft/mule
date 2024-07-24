@@ -94,6 +94,8 @@ import static org.apache.commons.lang3.JavaVersion.JAVA_21;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.INFO;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
@@ -193,6 +195,7 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.lang3.JavaVersion;
 import org.slf4j.Logger;
 
+import org.slf4j.event.Level;
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
@@ -318,6 +321,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private ConfigurationComponentLocator componentLocator;
 
   private LifecycleStrategy lifecycleStrategy = new DefaultLifecycleStrategy();
+  private Level splashScrenLevel = INFO;
 
   private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
 
@@ -465,9 +469,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       startLatch.release();
 
-      if (SPLASH_LOGGER.isInfoEnabled()) {
+      if (SPLASH_LOGGER.isEnabledForLevel(splashScrenLevel)) {
         SplashScreen startupScreen = buildStartupSplash();
-        SPLASH_LOGGER.info(startupScreen.toString());
+        SPLASH_LOGGER.atLevel(splashScrenLevel).log(startupScreen.toString());;
       }
     }
   }
@@ -559,9 +563,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       disposeManagers();
 
-      if ((getStartDate() > 0) && SPLASH_LOGGER.isInfoEnabled()) {
+      if ((getStartDate() > 0) && SPLASH_LOGGER.isEnabledForLevel(splashScrenLevel)) {
         SplashScreen shutdownScreen = buildShutdownSplash();
-        SPLASH_LOGGER.info(shutdownScreen.toString());
+        SPLASH_LOGGER.atLevel(splashScrenLevel).log(shutdownScreen.toString());
       }
 
       setExecutionClassLoader(null);
@@ -1235,6 +1239,10 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   @Override
   public Properties getDeploymentProperties() {
     return deploymentProperties;
+  }
+
+  public void setDebugSplashScreenLevel() {
+    this.splashScrenLevel = DEBUG;
   }
 
   /**
