@@ -33,7 +33,6 @@ import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.PolicyNotification.PROCESS_START;
-import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
@@ -41,7 +40,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.IS_POLICY_REORDER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultApplicationPolicyInstance.IS_SILENT_DEPLOY;
+import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultApplicationPolicyInstance.IS_SILENT_DEPLOY_PARAMETER_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
@@ -64,6 +63,8 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POL
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_SILENT_DEPLOY;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
+import static uk.org.lidalia.slf4jext.Level.DEBUG;
+import static uk.org.lidalia.slf4jext.Level.INFO;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -383,7 +384,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
   @Test
   @Story(POLICY_SILENT_DEPLOY)
-  public void silentApplicationPolicyDoesNotLogSplash() throws Exception {
+  public void silentApplicationPolicyLogsWithDebugLevel() throws Exception {
     policyManager.registerPolicyTemplate(fooPolicyFileBuilder.getArtifactFile());
     policyManager.registerPolicyTemplate(barPolicyFileBuilder.getArtifactFile());
 
@@ -396,11 +397,11 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     TestLogger testLogger = getTestLogger("org.mule.runtime.core.internal.logging");
     testLogger.clearAll();
-    testLogger.setEnabledLevels(Level.DEBUG, Level.INFO);
+    testLogger.setEnabledLevels(DEBUG, INFO);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(POLICY_PROPERTY_KEY, FOO_POLICY_NAME);
-    parameters.put(IS_SILENT_DEPLOY, "true");
+    parameters.put(IS_SILENT_DEPLOY_PARAMETER_NAME, "true");
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
@@ -421,9 +422,9 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
         .filter(event -> event.getMessage().contains(BAR_POLICY_ID)).collect(Collectors.toList());
 
     assertThat(fooEvents, hasSize(2));
-    fooEvents.forEach(event -> assertThat(event.getLevel(), is(Level.DEBUG)));
+    fooEvents.forEach(event -> assertThat(event.getLevel(), is(DEBUG)));
     assertThat(barEvents, hasSize(2));
-    barEvents.forEach(event -> assertThat(event.getLevel(), is(Level.INFO)));
+    barEvents.forEach(event -> assertThat(event.getLevel(), is(INFO)));
   }
 
   @Test

@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -56,7 +57,7 @@ import java.util.Optional;
 public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstance {
 
   public static final String CLUSTER_MANAGER_ID = "_muleClusterManager";
-  public static final String IS_SILENT_DEPLOY = "isSilentDeploy";
+  public static final String IS_SILENT_DEPLOY_PARAMETER_NAME = "isSilentDeploy";
 
   private final Application application;
   private final PolicyTemplate template;
@@ -130,8 +131,8 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     });
     try {
       policyContext = artifactBuilder.build();
-      if (isSilentDeploy(this.parametrization)) {
-        policyContext.getMuleContext().setDebugSplashScreenLevel();
+      if (isSilentDeploy(this.parametrization) && policyContext.getMuleContext() instanceof DefaultMuleContext) {
+        ((DefaultMuleContext) policyContext.getMuleContext()).setDebugSplashScreenLevel();
       }
 
       enableNotificationListeners(parametrization.getNotificationListeners());
@@ -221,12 +222,12 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
 
 
   /**
-   * Check if ApiGateway sent
+   * Check if the policy should avoid logging the splash screen.
    *
    * @param parametrization
    * @return true if the parametrization corresponds to a silent deploy. false otherwise.
    */
   private boolean isSilentDeploy(PolicyParametrization parametrization) {
-    return parametrization.getParameters().getOrDefault(IS_SILENT_DEPLOY, "false").equalsIgnoreCase("true");
+    return parametrization.getParameters().getOrDefault(IS_SILENT_DEPLOY_PARAMETER_NAME, "false").equalsIgnoreCase("true");
   }
 }

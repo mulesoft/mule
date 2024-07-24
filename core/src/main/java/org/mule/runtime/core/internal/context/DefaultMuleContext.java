@@ -94,6 +94,8 @@ import static org.apache.commons.lang3.JavaVersion.JAVA_21;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.INFO;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
@@ -319,7 +321,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private ConfigurationComponentLocator componentLocator;
 
   private LifecycleStrategy lifecycleStrategy = new DefaultLifecycleStrategy();
-  private Level splashScrenLevel = Level.INFO;
+  private Level splashScrenLevel = INFO;
 
   private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
 
@@ -1239,9 +1241,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     return deploymentProperties;
   }
 
-  @Override
   public void setDebugSplashScreenLevel() {
-    this.splashScrenLevel = Level.DEBUG;
+    this.splashScrenLevel = DEBUG;
   }
 
   /**
