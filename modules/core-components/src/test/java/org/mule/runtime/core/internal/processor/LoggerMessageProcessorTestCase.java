@@ -30,7 +30,7 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory.LOGGER;
 
-import org.mockito.invocation.InvocationOnMock;
+import io.qameta.allure.Issue;
 import org.mockito.stubbing.Answer;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.el.BindingContext;
@@ -38,7 +38,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -99,6 +98,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-15286605")
   public void verifyClassloaderForLogging() {
     ClassLoader initClassloader = mock(ClassLoader.class);
     ClassLoader executionClassloader = mock(ClassLoader.class);
