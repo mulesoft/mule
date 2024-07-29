@@ -97,7 +97,7 @@ public abstract class AbstractMuleContainerFactory implements MuleContainerFacto
    */
   protected abstract DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase);
 
-  private ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
+  ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
     DefaultMuleClassPathConfig config = createMuleClassPathConfig(muleHome, muleBase);
 
     return createModuleLayerClassLoader(config.getOptURLs().toArray(new URL[config.getOptURLs().size()]),

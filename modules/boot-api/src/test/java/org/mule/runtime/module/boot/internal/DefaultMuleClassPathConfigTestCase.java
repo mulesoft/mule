@@ -107,13 +107,14 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
   public void setUp() {
     final DefaultMuleClassPathConfig muleClassPathConfig = new DefaultMuleClassPathConfig(muleHome, muleHome);
 
-    containerClassLoader =
-        createModuleLayerClassLoader(muleClassPathConfig.getOptURLs().toArray(new URL[muleClassPathConfig.getOptURLs().size()]),
-                                     muleClassPathConfig.getMuleURLs().toArray(new URL[muleClassPathConfig.getMuleURLs().size()]),
-                                     MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                     new URLClassLoader(muleClassPathConfig.getResourceURLs()
-                                         .toArray(new URL[muleClassPathConfig.getResourceURLs().size()]),
-                                                        getSystemClassLoader()));
+    containerClassLoader = new AbstractMuleContainerFactory(null, null) {
+
+      @Override
+      protected DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase) {
+        return new DefaultMuleClassPathConfig(muleHome, muleHome);
+      }
+
+    }.createContainerSystemClassLoader(muleHome, muleHome);
 
     try {
       fromMuleModule = containerClassLoader.loadClass("org.test.mule.FromMuleModule");
