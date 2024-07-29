@@ -61,7 +61,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
         verify(nativeLibrariesFolderDeletion, times(1)).doAction();
-        assertNativeLibrariesTempFolderIsDeleteAtFirstAttemptLogging();
+        assertNativeLibrariesTempFolderIsDeletedAtFirstAttemptLogging();
         return true;
       }
 
@@ -73,7 +73,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   }
 
   @Test
-  public void retryScheduledFolderDeletionTaskAtSecondAttemptDeletesTheTempFolder() {
+  public void retryScheduledFolderDeletionTaskAtSecondToLastAttemptDeletesTheTempFolder() {
     NativeLibrariesFolderDeletion nativeLibrariesFolderDeletion = mock(NativeLibrariesFolderDeletion.class);
     when(nativeLibrariesFolderDeletion.doAction()).thenReturn(false).thenReturn(true);
 
@@ -89,7 +89,35 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
         verify(nativeLibrariesFolderDeletion, times(2)).doAction();
-        assertNativeLibrariesTempFolderIsDeleteAtSecondAttemptLogging();
+        assertNativeLibrariesTempFolderIsDeletedAtSecondToLastAttemptLogging();
+        return true;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "Failed to test the deletion task.";
+      }
+    });
+  }
+
+  @Test
+  public void retryScheduledFolderDeletionTaskAtLastAttemptDeletesTheTempFolder() {
+    NativeLibrariesFolderDeletion nativeLibrariesFolderDeletion = mock(NativeLibrariesFolderDeletion.class);
+    when(nativeLibrariesFolderDeletion.doAction()).thenReturn(false).thenReturn(false).thenReturn(true);
+
+    ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
+    RetryScheduledFolderDeletionTask retryTask =
+        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletion);
+    scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
+
+    Prober prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+    prober.check(new JUnitProbe() {
+
+      @Override
+      protected boolean test() throws Exception {
+        assertTrue(scheduler.isShutdown());
+        verify(nativeLibrariesFolderDeletion, times(3)).doAction();
+        assertNativeLibrariesTempFolderIsDeletedAtLastAttemptLogging();
         return true;
       }
 
@@ -117,7 +145,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       protected boolean test() {
         assertTrue(scheduler.isShutdown());
         verify(nativeLibrariesFolderDeletion, times(3)).doAction();
-        assertNativeLibrariesTempFolderIsNotDeleteLogging();
+        assertNativeLibrariesTempFolderIsNotDeletedLogging();
         return true;
       }
 
@@ -128,23 +156,32 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
     });
   }
 
-  private void assertNativeLibrariesTempFolderIsNotDeleteLogging() {
+  private void assertNativeLibrariesTempFolderIsNotDeletedLogging() {
     List<LoggingEvent> loggingEvents = retryScheduledFolderDeletionTaskLogger.getAllLoggingEvents();
     assertEquals(4, loggingEvents.size());
     assertEquals("Attempt 1. Failed to perform the action. Retrying...", loggingEvents.get(0).getFormattedMessage());
-    assertEquals("Attempt 2. Failed to perform the action. Retrying...", loggingEvents.get(1).getFormattedMessage());
-    assertEquals("Attempt 3. System.gc() executed.", loggingEvents.get(2).getFormattedMessage());
+    assertEquals("Attempt 2. System.gc() executed.", loggingEvents.get(1).getFormattedMessage());
+    assertEquals("Attempt 2. Failed to perform the action. Retrying...", loggingEvents.get(2).getFormattedMessage());
     assertEquals("Failed to perform the action. No further retries will be made.", loggingEvents.get(3).getFormattedMessage());
   }
 
-  private void assertNativeLibrariesTempFolderIsDeleteAtFirstAttemptLogging() {
+  private void assertNativeLibrariesTempFolderIsDeletedAtFirstAttemptLogging() {
     List<LoggingEvent> loggingEvents = retryScheduledFolderDeletionTaskLogger.getAllLoggingEvents();
     assertEquals(0, loggingEvents.size());
   }
 
-  private void assertNativeLibrariesTempFolderIsDeleteAtSecondAttemptLogging() {
+  private void assertNativeLibrariesTempFolderIsDeletedAtSecondToLastAttemptLogging() {
     List<LoggingEvent> loggingEvents = retryScheduledFolderDeletionTaskLogger.getAllLoggingEvents();
-    assertEquals(1, loggingEvents.size());
+    assertEquals(2, loggingEvents.size());
     assertEquals("Attempt 1. Failed to perform the action. Retrying...", loggingEvents.get(0).getFormattedMessage());
+    assertEquals("Attempt 2. System.gc() executed.", loggingEvents.get(1).getFormattedMessage());
+  }
+
+  private void assertNativeLibrariesTempFolderIsDeletedAtLastAttemptLogging() {
+    List<LoggingEvent> loggingEvents = retryScheduledFolderDeletionTaskLogger.getAllLoggingEvents();
+    assertEquals(MAX_ATTEMPTS, loggingEvents.size());
+    assertEquals("Attempt 1. Failed to perform the action. Retrying...", loggingEvents.get(0).getFormattedMessage());
+    assertEquals("Attempt 2. System.gc() executed.", loggingEvents.get(1).getFormattedMessage());
+    assertEquals("Attempt 2. Failed to perform the action. Retrying...", loggingEvents.get(2).getFormattedMessage());
   }
 }

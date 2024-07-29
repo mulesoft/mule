@@ -41,7 +41,7 @@ public class RetryScheduledFolderDeletionTask implements Runnable {
   public void run() {
     int attempt = attempts.incrementAndGet();
 
-    if (!DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL && attempt == maxAttempts) {
+    if (!DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL && (attempt == (maxAttempts - 1))) {
       System.gc();
       LOGGER.debug("Attempt {}. System.gc() executed.", attempt);
     }

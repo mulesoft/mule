@@ -64,7 +64,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
   public static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
   private static final int CORE_POOL_SIZE = 1;
-  private static final int MAX_ATTEMPTS = 5;
+  private static final int MAX_ATTEMPTS = 6;
   private static final int INITIAL_DELAY = 10;
   private static final int DELAY = 10;
 
