@@ -52,7 +52,7 @@ public class ExpressionParametersNotUsingMel implements Validation {
             .anyMatch(pmg -> pmg.getParameterModels().stream()
                 .anyMatch(pm -> {
                   ComponentParameterAst param = c.getParameter(pmg.getName(), pm.getName());
-                  return param != null && param.getValue().isLeft();
+                  return param != null && param.getValueOrResolutionError().isLeft();
                 })))
         .orElse(false));
   }
@@ -62,7 +62,7 @@ public class ExpressionParametersNotUsingMel implements Validation {
     return component.getModel(ParameterizedModel.class)
         .map(pmz -> getGroupAndParametersPairs(pmz)
             .map(gnp -> component.getParameter(gnp.getFirst().getName(), gnp.getSecond().getName()))
-            .filter(param -> param != null && param.getValue().isLeft())
+            .filter(param -> param != null && param.getValueOrResolutionError().isLeft())
             .flatMap(param -> validateNoMelExpression(component, param, param.getValue().getLeft())
                 .map(Stream::of).orElseGet(Stream::empty))
             .collect(toList()))

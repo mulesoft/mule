@@ -16,6 +16,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.ast.api.ParameterResolutionException;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
@@ -63,18 +65,38 @@ public class RequiredParametersPresent implements Validation {
   public List<ValidationResultItem> validateMany(ComponentAst component, ArtifactAst artifact) {
     return requiredParamsStream(component)
         .map(param -> {
-          if (param.getSecond() == null || !param.getSecond().getValueOrResolutionError().getValue().isPresent()) {
+          if (param.getSecond() == null) {
             return of(create(component, param.getSecond(), this,
                              format("Element <%s> is missing required parameter '%s'.",
                                     component.getIdentifier().toString(),
                                     param.getFirst().getName())));
-          } else if (param.getSecond().getValueOrResolutionError().isRight()
-              && param.getSecond().getValueOrResolutionError().getRight().getRight() instanceof ComponentAst) {
-            // validate any nested pojos as well...
-            return validate((ComponentAst) param.getSecond().getValueOrResolutionError().getRight().getRight(), artifact);
-          } else {
-            return Optional.<ValidationResultItem>empty();
           }
+
+          final Either<String, Either<ParameterResolutionException, Object>> valueOrResolutionError =
+              param.getSecond().getValueOrResolutionError();
+
+          if (!valueOrResolutionError.getValue().isPresent()) {
+            return of(create(component, param.getSecond(), this,
+                             format("Element <%s> is missing required parameter '%s'.",
+                                    component.getIdentifier().toString(),
+                                    param.getFirst().getName())));
+          }
+
+          if (valueOrResolutionError.isRight()) {
+            if (valueOrResolutionError.getRight().isLeft()) {
+              return of(create(component, param.getSecond(), this,
+                               format("Element <%s> is missing required parameter '%s': %s",
+                                      component.getIdentifier().toString(),
+                                      param.getFirst().getName(),
+                                      valueOrResolutionError.getRight().getLeft())));
+            }
+            if (valueOrResolutionError.getRight().getRight() instanceof ComponentAst) {
+              // validate any nested pojos as well...
+              return validate((ComponentAst) param.getSecond().getValueOrResolutionError().getRight().getRight(), artifact);
+            }
+          }
+
+          return Optional.<ValidationResultItem>empty();
         })
         .filter(Optional::isPresent)
         .map(Optional::get)

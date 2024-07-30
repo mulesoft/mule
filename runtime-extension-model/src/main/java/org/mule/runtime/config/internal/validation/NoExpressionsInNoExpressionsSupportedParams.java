@@ -12,16 +12,18 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.curren
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.isExpression;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.isExpression;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.ParameterResolutionException;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnnotation;
@@ -67,11 +69,23 @@ public class NoExpressionsInNoExpressionsSupportedParams implements Validation {
     return component.getParameters()
         .stream()
         .filter(param -> !param.getModel().isComponentId())
-        .filter(param -> param.getValueOrResolutionError().isRight()
-            && param.getResolvedRawValue() instanceof String)
         .filter(param -> NOT_SUPPORTED.equals(param.getModel().getExpressionSupport())
             && !param.getModel().getType().getAnnotation(LiteralTypeAnnotation.class).isPresent())
-        .filter(param -> isExpression(param.getResolvedRawValue()))
+        .filter(param -> {
+          final Either<String, Either<ParameterResolutionException, Object>> valueOrResolutionError =
+              param.getValueOrResolutionError();
+          if (valueOrResolutionError.isLeft()) {
+            return true;
+          }
+
+          if (valueOrResolutionError.getRight() != null
+              && valueOrResolutionError.getRight().isRight()
+              && param.getResolvedRawValue() instanceof String) {
+            return isExpression(param.getResolvedRawValue());
+          }
+
+          return false;
+        })
         .map(param -> create(component, param, this,
                              format("An expression value was given for parameter '%s' but it doesn't support expressions",
                                     param.getModel().getName())))
