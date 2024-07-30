@@ -22,6 +22,7 @@
     <properties>
         <javaModuleName>org.mule.test.extension.reusable.app</javaModuleName>
         <mule.maven.plugin.version>4.0.0</mule.maven.plugin.version>
+        <exchange-mule-maven-plugin.version>0.0.23</exchange-mule-maven-plugin.version>
         <skipMuleModuleMojos>true</skipMuleModuleMojos>
     </properties>
 
@@ -35,6 +36,11 @@
                 <configuration>
                     <classifier>mule-plugin</classifier>
                 </configuration>
+            </plugin>
+            <plugin>      
+                 <groupId>org.mule.tools.maven</groupId>
+                 <artifactId>exchange-mule-maven-plugin</artifactId>
+                 <version>${exchange-mule-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
