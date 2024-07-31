@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.Map;
 import java.util.function.Supplier;
