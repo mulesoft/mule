@@ -10,8 +10,8 @@ import org.mule.runtime.api.interception.SourceInterceptor;
 import org.mule.runtime.api.interception.SourceInterceptorFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.event.InternalEvent;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 /**
  * Hooks the {@link SourceInterceptor}s for a {@link MessageSource} failure callback into the {@code Reactor} response handling
