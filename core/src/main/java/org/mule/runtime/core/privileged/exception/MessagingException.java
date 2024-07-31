@@ -25,13 +25,13 @@ import static org.mule.runtime.core.internal.config.ExceptionHelper.traverseCaus
 
 public class MessagingException extends EventProcessingException {
 
-  public static final String PAYLOAD_INFO_KEY = "Payload";
-  public static final String PAYLOAD_TYPE_INFO_KEY = "Payload Type";
-
   /**
    * Serial version
    */
   private static final long serialVersionUID = 5419631874341149626L;
+
+  public static final String PAYLOAD_INFO_KEY = "Payload";
+  public static final String PAYLOAD_TYPE_INFO_KEY = "Payload Type";
 
   /**
    * The Message being processed when the error occurred
