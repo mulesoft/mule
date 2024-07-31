@@ -157,12 +157,6 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
         .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
-    dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48 = appFileBuilder("dummy-app-with-stopped-flow-config")
-        .withMinMuleVersion("4.8.0")
-        .definedBy("dummy-app-with-stopped-flow-config.xml")
-        .dependingOn(callbackExtensionPlugin)
-        .containingClass(echoTestClassFile,
-                         "org/foo/EchoTest.class");
 
     // Application plugin artifact builders
     echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")

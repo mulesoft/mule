@@ -57,7 +57,6 @@ public abstract class AbstractApplicationDeploymentTestCase extends AbstractDepl
   protected ApplicationFileBuilder waitAppFileBuilder;
   protected ApplicationFileBuilder dummyAppDescriptorWithPropsFileBuilder;
   protected ApplicationFileBuilder dummyAppDescriptorWithStoppedFlowFileBuilder;
-  protected ApplicationFileBuilder dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48;
 
   // Application plugin artifact builders
   protected ArtifactPluginFileBuilder echoPluginWithLib1;
