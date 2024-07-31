@@ -315,17 +315,17 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       artifacts.remove(artifact);
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
-      if (removeData) {
-        final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
-        try {
+      final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
+      try {
+        if (removeData) {
           deleteDirectory(dataFolder);
-          deleteNativeLibraries(artifact);
-        } catch (IOException e) {
-          logger.warn(
-                      format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
-                             dataFolder, artifact.getArtifactName()),
-                      e);
         }
+        deleteNativeLibraries(artifact);
+      } catch (IOException e) {
+        logger.warn(
+                    format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
+                           dataFolder, artifact.getArtifactName()),
+                    e);
       }
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
 
