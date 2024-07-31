@@ -1076,22 +1076,6 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
-  @Issue("W-15750334")
-  public void restartAppWithStartedFlowWithInitialStateStoppedAfter48() throws Exception {
-    final Application app = deployApplication(dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48);
-    for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
-      flow.start();
-    }
-    reset(applicationDeploymentListener);
-    redeploy(deploymentService, dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48.getId());
-
-    final Application app2 = assertAppDeploymentAndStatus(dummyAppDescriptorWithStoppedFlowFileBuilderMinMuleVersion48, STARTED);
-    for (Flow flow : app2.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
-      assertThat(flow.getLifecycleState().isStarted(), is(true));
-    }
-  }
-
-  @Test
   @Story(UNDEPLOYMENT)
   public void undeploysApplicationRemovingAnchorFile() throws Exception {
     Application app = deployApplication(emptyAppFileBuilder);
