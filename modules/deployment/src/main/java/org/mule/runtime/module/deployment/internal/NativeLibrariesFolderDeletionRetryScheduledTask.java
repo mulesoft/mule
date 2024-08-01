@@ -18,30 +18,30 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 
-public class RetryScheduledFolderDeletionTask implements Runnable {
+public class NativeLibrariesFolderDeletionRetryScheduledTask implements RetryScheduledTask {
 
   private final ScheduledExecutorService scheduler;
   private final int maxAttempts;
   private final AtomicInteger attempts;
-  private final NativeLibrariesFolderDeletion folderDeletion;
-  private static final Logger LOGGER = getLogger(RetryScheduledFolderDeletionTask.class);
+  private final ActionTask actionTask;
+  private static final Logger LOGGER = getLogger(NativeLibrariesFolderDeletionRetryScheduledTask.class);
   private static final boolean DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL =
       parseBoolean(getProperty(DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL_PROPERTY, "false"));
 
 
-  public RetryScheduledFolderDeletionTask(ScheduledExecutorService scheduler, int maxAttempts,
-                                          NativeLibrariesFolderDeletion folderDeletion) {
+  public NativeLibrariesFolderDeletionRetryScheduledTask(ScheduledExecutorService scheduler, int maxAttempts,
+                                                         ActionTask actionTask) {
     this.scheduler = scheduler;
     this.maxAttempts = maxAttempts;
     this.attempts = new AtomicInteger(0);
-    this.folderDeletion = folderDeletion;
+    this.actionTask = actionTask;
   }
 
   @Override
   public void run() {
     int attempt = attempts.incrementAndGet();
 
-    if (!DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL && attempt == maxAttempts) {
+    if (!DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL && (attempt == (maxAttempts - 1))) {
       System.gc();
       LOGGER.debug("Attempt {}. System.gc() executed.", attempt);
     }
@@ -58,7 +58,8 @@ public class RetryScheduledFolderDeletionTask implements Runnable {
     }
   }
 
-  private boolean performAction() {
-    return folderDeletion.doAction();
+  @Override
+  public boolean performAction() {
+    return actionTask.doAction();
   }
 }

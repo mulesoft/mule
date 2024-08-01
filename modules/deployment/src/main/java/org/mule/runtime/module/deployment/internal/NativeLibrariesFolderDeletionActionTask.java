@@ -15,17 +15,18 @@ import java.io.File;
 
 import org.slf4j.Logger;
 
-public class NativeLibrariesFolderDeletion {
+public class NativeLibrariesFolderDeletionActionTask implements ActionTask {
 
   private final String applicationName;
   private final File appNativeLibrariesFolder;
-  private static final Logger LOGGER = getLogger(NativeLibrariesFolderDeletion.class);
+  private static final Logger LOGGER = getLogger(NativeLibrariesFolderDeletionActionTask.class);
 
-  public NativeLibrariesFolderDeletion(String applicationName, File appNativeLibrariesFolder) {
+  public NativeLibrariesFolderDeletionActionTask(String applicationName, File appNativeLibrariesFolder) {
     this.applicationName = applicationName;
     this.appNativeLibrariesFolder = appNativeLibrariesFolder;
   }
 
+  @Override
   public boolean doAction() {
     boolean actionPerformed = true;
 
