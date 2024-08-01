@@ -47,14 +47,22 @@ public class MuleManifest {
 
   public static String getProductVersionFromPropertiesFile() {
     final String VERSION_PROPERTIES_PATH = "product-version/version.properties";
-    InputStream versionPropsInputStream = MuleManifest.class.getClassLoader().getResourceAsStream(VERSION_PROPERTIES_PATH);
+    final String WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED = "Failure reading {} properties file to get productVersion";
+    final String COULDNT_BE_RESOLVED_PLACEHOLDER = "<Mule version could not be resolved>";
+
     Properties versionProps = new Properties();
-    try {
+    try (InputStream versionPropsInputStream = MuleManifest.class.getClassLoader().getResourceAsStream(VERSION_PROPERTIES_PATH)) {
+      if (versionPropsInputStream == null) {
+        logger.warn(WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED, VERSION_PROPERTIES_PATH);
+        return COULDNT_BE_RESOLVED_PLACEHOLDER;
+      }
+
       versionProps.load(versionPropsInputStream);
+      return versionProps.getProperty("mule.version");
     } catch (IOException e) {
-      logger.warn("Failure reading " + VERSION_PROPERTIES_PATH + " properties file to get productVersion: " + e.getMessage(), e);
+      logger.warn(WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED, VERSION_PROPERTIES_PATH, e);
+      return COULDNT_BE_RESOLVED_PLACEHOLDER;
     }
-    return versionProps.getProperty("mule.version");
   }
 
   public static String getVendorName() {

@@ -27,17 +27,13 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources-filtering</directory>
                 <includes>
                     <include>product-version/version.properties</include>
                 </includes>
                 <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>product-version/version.properties</exclude>
-                </excludes>
-                <filtering>false</filtering>
             </resource>
         </resources>
         <plugins>

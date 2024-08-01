@@ -111,17 +111,13 @@
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources-filtering</directory>
                 <includes>
                     <include>product-version/test-version.properties</include>
                 </includes>
                 <filtering>true</filtering>
-            </testResource>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <excludes>
-                    <exclude>product-version/test-version.properties</exclude>
-                </excludes>
-                <filtering>false</filtering>
             </testResource>
         </testResources>
         <plugins>

@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.mule.tck.size.SmallTest;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -27,7 +29,8 @@ import org.junit.Test;
 @SmallTest
 public class MuleManifestTestCase {
 
-  private static final String TEST_VERSION_PROPERTIES_PATH = "/product-version/test-version.properties";
+  private static final String TEST_VERSION_PROPERTIES_PATH =
+      "/product-version/test-version.properties";
   private static final String MULE_VERSION_PROPERTY_NAME = "mule.version";
 
   @Test
@@ -81,10 +84,17 @@ public class MuleManifestTestCase {
   }
 
   private String getPropertyFromPropertiesFile(String propertiesFilePath, String propertyName) throws IOException {
-    InputStream versionPropsInputStream = getClass().getResourceAsStream(propertiesFilePath);
-    Properties versionProps = new Properties();
-    versionProps.load(versionPropsInputStream);
-    return versionProps.getProperty(propertyName);
+    String propertyValue;
+    try (InputStream versionPropsInputStream = getClass().getResourceAsStream(propertiesFilePath)) {
+      if (versionPropsInputStream == null) {
+        throw new FileNotFoundException(format("Properties file '%s' not found", propertiesFilePath));
+      }
+
+      Properties versionProps = new Properties();
+      versionProps.load(versionPropsInputStream);
+      propertyValue = versionProps.getProperty(propertyName);
+    }
+    return propertyValue;
   }
 
 
