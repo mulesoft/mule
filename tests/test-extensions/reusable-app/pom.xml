@@ -10,6 +10,7 @@
         <artifactId>mule</artifactId>
         <version>4.8.0-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
+        <exchange-mule-maven-plugin.version>0.0.23</exchange-mule-maven-plugin.version>
     </parent>
 
     <groupId>org.mule.tests</groupId>
@@ -34,6 +35,11 @@
                 <configuration>
                     <classifier>mule-plugin</classifier>
                 </configuration>
+            </plugin>
+            <plugin>      
+                 <groupId>org.mule.tools.maven</groupId>
+                 <artifactId>exchange-mule-maven-plugin</artifactId>
+                 <version>${exchange-mule-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
