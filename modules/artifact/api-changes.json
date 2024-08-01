@@ -1,4 +1,76 @@
 {
+  "4.8.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader::supportsArtifactType(===org.mule.runtime.core.api.config.bootstrap.ArtifactType===)",
+            "new": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader::supportsArtifactType(===org.mule.runtime.api.artifact.ArtifactType===)",
+            "parameterIndex": "0",
+            "justification": "W-: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader::supportsArtifactType(===org.mule.runtime.core.api.config.bootstrap.ArtifactType===)",
+            "new": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader::supportsArtifactType(===org.mule.runtime.api.artifact.ArtifactType===)",
+            "parameterIndex": "0",
+            "justification": "W-: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::load(java.io.File, java.util.Map<java.lang.String, java.lang.Object>, ===org.mule.runtime.core.api.config.bootstrap.ArtifactType===) throws org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+            "new": "parameter T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::load(java.io.File, java.util.Map<java.lang.String, java.lang.Object>, ===org.mule.runtime.api.artifact.ArtifactType===) throws org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+            "parameterIndex": "2",
+            "justification": "W-: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::load(java.io.File, java.util.Map<java.lang.String, java.lang.Object>, ===org.mule.runtime.core.api.config.bootstrap.ArtifactType===) throws org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+            "new": "parameter T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::load(java.io.File, java.util.Map<java.lang.String, java.lang.Object>, ===org.mule.runtime.api.artifact.ArtifactType===) throws org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+            "parameterIndex": "2",
+            "justification": "W-: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::supportsArtifactType(===org.mule.runtime.core.api.config.bootstrap.ArtifactType===)",
+            "new": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::supportsArtifactType(===org.mule.runtime.api.artifact.ArtifactType===)",
+            "parameterIndex": "0",
+            "justification": "W-: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::supportsArtifactType(===org.mule.runtime.core.api.config.bootstrap.ArtifactType===)",
+            "new": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::supportsArtifactType(===org.mule.runtime.api.artifact.ArtifactType===)",
+            "parameterIndex": "0",
+            "justification": "W-: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T extends org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader> T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository::get(java.lang.String, ===org.mule.runtime.core.api.config.bootstrap.ArtifactType===, java.lang.Class<T>) throws org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+            "new": "parameter <T extends org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader> T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository::get(java.lang.String, ===org.mule.runtime.api.artifact.ArtifactType===, java.lang.Class<T>) throws org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+            "parameterIndex": "1",
+            "justification": "W-: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T extends org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader> T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository::get(java.lang.String, ===org.mule.runtime.core.api.config.bootstrap.ArtifactType===, java.lang.Class<T>) throws org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+            "new": "parameter <T extends org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader> T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository::get(java.lang.String, ===org.mule.runtime.api.artifact.ArtifactType===, java.lang.Class<T>) throws org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+            "parameterIndex": "1",
+            "justification": "W-: Move ArtifactType to mule-api"
+          }
+        ]
+      }
+	}
+  },
   "4.6.0": {
     "revapi": {
       "ignore": [

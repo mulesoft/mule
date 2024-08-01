@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.service.internal.artifact;
 
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVER_PLUGIN;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
+import static org.mule.runtime.api.artifact.ArtifactType.SERVER_PLUGIN;
+import static org.mule.runtime.api.artifact.ArtifactType.SERVICE;
 import static org.mule.runtime.module.service.internal.artifact.LibraryByJavaVersion.resolveJvmDependantLibs;
 
 import static java.lang.Integer.parseInt;
@@ -16,7 +16,7 @@ import static java.util.Arrays.asList;
 
 import static org.apache.commons.lang3.SystemUtils.JAVA_VM_SPECIFICATION_VERSION;
 
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;

@@ -11,8 +11,6 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.pom.parser.api.model.BundleScope.SYSTEM;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
@@ -128,7 +126,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     Properties pomProperties;
     Optional<String> version = empty();
 
-    if (projectFolder.equals(APP) || projectFolder.equals(DOMAIN) || projectFolder.isDirectory()) {
+    if (projectFolder.isDirectory()) {
       try {
         // 1) look for pom.properties, get the version info from there
         pomProperties = getPomPropertiesFolder(projectFolder);

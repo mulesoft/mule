@@ -7,11 +7,11 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.maven.pom.parser.api.model.BundleScope.COMPILE;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.api.artifact.ArtifactType.APP;
+import static org.mule.runtime.api.artifact.ArtifactType.PLUGIN;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
@@ -28,6 +28,7 @@ import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,11 +36,10 @@ import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.collection.IsIn.isIn;
+import static org.hamcrest.collection.IsIn.in;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -77,14 +77,14 @@ import java.util.function.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Stories;
-import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Stories({@Story(CLASSLOADER_CONFIGURATION_LOADER), @Story(CLASSLOADER_CONFIGURATION)})
@@ -126,11 +126,11 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
 
     assertThat(classLoaderConfiguration.getExportedPackages(), hasItems("com.mycompany.api", "org.apache.commons.csv"));
     assertThat(classLoaderConfiguration.getLocalPackages(),
-               everyItem(not(isIn(newArrayList("com.mycompany.api", "org.apache.commons.csv")))));
+               everyItem(not(in(newArrayList("com.mycompany.api", "org.apache.commons.csv")))));
     assertThat(classLoaderConfiguration.getLocalPackages(), hasItems("com.mycompany.internal", "org.apache.commons.io"));
 
     assertThat(classLoaderConfiguration.getExportedResources(), hasItem("tls.properties"));
-    assertThat(classLoaderConfiguration.getLocalResources(), everyItem(not(isIn(newArrayList("tls.properties")))));
+    assertThat(classLoaderConfiguration.getLocalResources(), everyItem(not(in(newArrayList("tls.properties")))));
     assertThat(classLoaderConfiguration.getLocalResources(), hasItem("META-INF/maven/com/mycompany/test/pom.xml"));
 
     Optional<BundleDependency> mulePluginBundleDependency = classLoaderConfiguration.getDependencies().stream().filter(
@@ -162,13 +162,13 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
                                             pluginExtendedClassLoaderConfigurationAttributes);
     assertThat(pluginClassLoaderConfiguration.getExportedPackages(), hasItem("org.mule.tests.simple.plugin.api"));
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(),
-               everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
+               everyItem(not(in(newArrayList("org.mule.tests.simple.plugin.api")))));
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(),
                hasItems("org.mule.tests.simple.plugin.internal", "org.apache.commons.collections"));
 
     assertThat(pluginClassLoaderConfiguration.getExportedResources(), hasItem("simple-plugin.properties"));
     assertThat(pluginClassLoaderConfiguration.getLocalResources(),
-               everyItem(not(isIn(newArrayList("simple-plugin.properties")))));
+               everyItem(not(in(newArrayList("simple-plugin.properties")))));
     assertThat(pluginClassLoaderConfiguration.getLocalResources(),
                hasItems("META-INF/simple-plugin/internal.txt", "META-INF/maven/commons-collections/commons-collections/pom.xml"));
   }
@@ -259,11 +259,11 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
         buildPluginClassLoaderConfiguration(toFile(bundleDependency.getBundleUri().toURL()),
                                             pluginExtendedClassLoaderConfigurationAttributes);
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(),
-               everyItem(not(isIn(newArrayList("org.mule.tests.simple.plugin.api")))));
+               everyItem(not(in(newArrayList("org.mule.tests.simple.plugin.api")))));
     assertThat(pluginClassLoaderConfiguration.getLocalPackages(), contains("org.mule.tests.simple.plugin.internal"));
 
     assertThat(pluginClassLoaderConfiguration.getLocalResources(),
-               everyItem(not(isIn(newArrayList("simple-plugin.properties")))));
+               everyItem(not(in(newArrayList("simple-plugin.properties")))));
     assertThat(pluginClassLoaderConfiguration.getLocalResources(), contains("META-INF/simple-plugin/internal.txt"));
   }
 
