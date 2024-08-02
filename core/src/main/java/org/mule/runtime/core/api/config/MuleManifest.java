@@ -14,6 +14,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
+import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.jar.Attributes;
@@ -37,7 +38,31 @@ public class MuleManifest {
 
   public static String getProductVersion() {
     final String version = getManifestProperty("Implementation-Version");
-    return version == null ? "4.8.0" : version;
+    if (version == null) {
+      return getProductVersionFromPropertiesFile();
+    } else {
+      return version;
+    }
+  }
+
+  public static String getProductVersionFromPropertiesFile() {
+    final String VERSION_PROPERTIES_PATH = "product-version/version.properties";
+    final String WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED = "Failure reading {} properties file to get productVersion";
+    final String COULDNT_BE_RESOLVED_PLACEHOLDER = "<Mule version could not be resolved>";
+
+    Properties versionProps = new Properties();
+    try (InputStream versionPropsInputStream = MuleManifest.class.getClassLoader().getResourceAsStream(VERSION_PROPERTIES_PATH)) {
+      if (versionPropsInputStream == null) {
+        logger.warn(WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED, VERSION_PROPERTIES_PATH);
+        return COULDNT_BE_RESOLVED_PLACEHOLDER;
+      }
+
+      versionProps.load(versionPropsInputStream);
+      return versionProps.getProperty("mule.version");
+    } catch (IOException e) {
+      logger.warn(WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED, VERSION_PROPERTIES_PATH, e);
+      return COULDNT_BE_RESOLVED_PLACEHOLDER;
+    }
   }
 
   public static String getVendorName() {
