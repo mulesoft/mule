@@ -17,6 +17,7 @@ import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -28,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -79,11 +81,14 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
                                                      .compile("user-lib.jar"))
                                                          .getArtifactFile();
 
+    File fromUserLibPropertiesFile = getResourceFile("/org/test/user/properties.yaml");
+
     muleHome = folder.newFolder("mule_home");
 
     copyFileToDirectory(fromMuleModuleJarFile, new File(muleHome, "lib/mule"));
     copyFileToDirectory(fromThirdPartyLibJarFile, new File(muleHome, "lib/opt"));
     copyFileToDirectory(fromUserLibJarFile, new File(muleHome, "lib/user"));
+    copyFileToDirectory(fromUserLibPropertiesFile, new File(muleHome, "lib/user"));
 
   }
 
@@ -102,11 +107,14 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
   public void setUp() {
     final DefaultMuleClassPathConfig muleClassPathConfig = new DefaultMuleClassPathConfig(muleHome, muleHome);
 
-    containerClassLoader =
-        createModuleLayerClassLoader(muleClassPathConfig.getOptURLs().toArray(new URL[muleClassPathConfig.getOptURLs().size()]),
-                                     muleClassPathConfig.getMuleURLs().toArray(new URL[muleClassPathConfig.getMuleURLs().size()]),
-                                     MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                     getSystemClassLoader());
+    containerClassLoader = new AbstractMuleContainerFactory(null, null) {
+
+      @Override
+      protected DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase) {
+        return new DefaultMuleClassPathConfig(muleHome, muleHome);
+      }
+
+    }.createContainerSystemClassLoader(muleHome, muleHome);
 
     try {
       fromMuleModule = containerClassLoader.loadClass("org.test.mule.FromMuleModule");
@@ -144,5 +152,11 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
     } catch (InvocationTargetException ite) {
       throw (Exception) ite.getCause();
     }
+  }
+
+  @Test
+  @Issue("W-16188357")
+  public void findUserResource() {
+    assertThat(containerClassLoader.getResource("properties.yaml"), notNullValue());
   }
 }
