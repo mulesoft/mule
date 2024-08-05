@@ -23,6 +23,7 @@ import org.mule.runtime.module.boot.api.MuleContainerProvider;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Map;
 
 /**
@@ -96,13 +97,15 @@ public abstract class AbstractMuleContainerFactory implements MuleContainerFacto
    */
   protected abstract DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase);
 
-  private ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
+  ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
     DefaultMuleClassPathConfig config = createMuleClassPathConfig(muleHome, muleBase);
 
     return createModuleLayerClassLoader(config.getOptURLs().toArray(new URL[config.getOptURLs().size()]),
                                         config.getMuleURLs().toArray(new URL[config.getMuleURLs().size()]),
                                         MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                        getSystemClassLoader());
+                                        new URLClassLoader(config.getResourceURLs()
+                                            .toArray(new URL[config.getResourceURLs().size()]),
+                                                           getSystemClassLoader()));
   }
 
   private File lookupMuleHome() throws IOException {

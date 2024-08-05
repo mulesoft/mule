@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_MULE_SDK_PROPERTY;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.ConfigResource;
@@ -28,6 +29,8 @@ import java.util.Set;
  * @since 4.5.0
  */
 public class ArtifactAstUtils {
+
+  private static final boolean IS_MULE_SDK_ENABLED = getBoolean(ENABLE_MULE_SDK_PROPERTY);
 
   /**
    * Parses {@code configResources} for a Mule artifact and returns an {@link ArtifactAst} enriched with an additional
@@ -52,6 +55,9 @@ public class ArtifactAstUtils {
                                           ClassLoader artifactClassLoader,
                                           MuleSdkExtensionModelLoadingMediator extensionModelMediator)
       throws ConfigurationException {
+    if (!IS_MULE_SDK_ENABLED) {
+      return doParseArtifactIntoAst(configResources, parserSupplier, extensions, disableValidations, artifactClassLoader);
+    }
 
     final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true, artifactClassLoader);
 
