@@ -16,7 +16,6 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
-import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -26,6 +25,9 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -47,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +66,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
   public static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
   private static final int CORE_POOL_SIZE = 1;
-  private static final int MAX_ATTEMPTS = 5;
+  private static final int MAX_ATTEMPTS = 6;
   private static final int INITIAL_DELAY = 10;
   private static final int DELAY = 10;
 
@@ -77,7 +79,10 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   private AbstractDeployableArtifactFactory<D, T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
   private final MuleContextListenerFactory muleContextListenerFactory;
+  private Scheduler scheduler;
 
+  @Inject
+  private SchedulerService schedulerService;
 
   public DefaultArchiveDeployer(final ArtifactDeployer<T> deployer,
                                 final AbstractDeployableArtifactFactory<D, T> artifactFactory,
@@ -117,7 +122,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     this.undeployArtifact(artifactId, true);
   }
 
-  private void undeployArtifact(String artifactId, boolean removeData) {
+  protected void undeployArtifact(String artifactId, boolean removeData) {
     ZombieArtifact zombieArtifact = artifactZombieMap.get(artifactId);
     if ((zombieArtifact != null)) {
       if (zombieArtifact.exists()) {
@@ -315,17 +320,17 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       artifacts.remove(artifact);
       deployer.undeploy(artifact);
       artifactArchiveInstaller.uninstallArtifact(artifact.getArtifactName());
-      if (removeData) {
-        final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
-        try {
+      final File dataFolder = getAppDataFolder(artifact.getDescriptor().getDataFolderName());
+      try {
+        if (removeData) {
           deleteDirectory(dataFolder);
-          deleteNativeLibraries(artifact);
-        } catch (IOException e) {
-          logger.warn(
-                      format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
-                             dataFolder, artifact.getArtifactName()),
-                      e);
         }
+        deleteNativeLibraries(artifact);
+      } catch (IOException e) {
+        logger.warn(
+                    format("Cannot delete data folder '%s' while undeploying artifact '%s'. This could be related to some files still being used and can cause a memory leak",
+                           dataFolder, artifact.getArtifactName()),
+                    e);
       }
       deploymentListener.onUndeploymentSuccess(artifact.getArtifactName());
 
@@ -360,10 +365,13 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
     final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appDataFolderName, loadedNativeLibrariesFolderName);
 
-    ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
-    RetryScheduledFolderDeletionTask retryTask =
-        new RetryScheduledFolderDeletionTask(scheduler, MAX_ATTEMPTS,
-                                             new NativeLibrariesFolderDeletion(appDataFolderName, appNativeLibrariesFolder));
+    scheduler = schedulerService.customScheduler(SchedulerConfig.config()
+        .withMaxConcurrentTasks(CORE_POOL_SIZE)
+        .withName("RetryScheduledFolderDeletionTask-StaleCleaner"));
+    NativeLibrariesFolderDeletionRetryScheduledTask retryTask =
+        new NativeLibrariesFolderDeletionRetryScheduledTask(scheduler, MAX_ATTEMPTS,
+                                                            new NativeLibrariesFolderDeletionActionTask(appDataFolderName,
+                                                                                                        appNativeLibrariesFolder));
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
   }
 
