@@ -57,7 +57,7 @@ public class Java11NativeLibraryUnLoader implements NativeLibraryUnLoader {
       }
 
     } catch (Throwable e) {
-
+      LOGGER.warn(ERROR_ON_UNLOADING_NATIVE_LIBRARY_MESSAGE, e);
     }
   }
 }
