@@ -8,7 +8,10 @@ package org.mule.runtime.module.artifact.activation.internal.classloader;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPORT_NATIVE_LIBRARY_DEPENDENCIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.NativeLibraryUnLoaderUtils.getNativeLibraryUnLoader;
 import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
+
+import static java.lang.System.getProperty;
 
 import static net.bytebuddy.description.modifier.Visibility.PUBLIC;
 import static net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION;
@@ -33,11 +36,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 import net.bytebuddy.ByteBuddy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader extends MuleDeployableArtifactClassLoader {
 
+  private Logger logger = LoggerFactory.getLogger(NativeLibraryLoaderMuleDeployableArtifactClassLoader.class);
+
   public static final String METHOD_NAME = "loadLibrary";
   private final NativeLibraryFinder nativeLibraryFinder;
+
+  private final NativeLibraryUnLoader nativeLibraryUnloader = getNativeLibraryUnLoader(getProperty("java.version"));
   protected final boolean supportNativeLibraryDependencies;
   private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
   private final LazyValue<Class<?>> dynamicLibraryLoader = new LazyValue<>(this::getDynamicLibraryLoader);
@@ -106,5 +115,16 @@ public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader exten
   private static Predicate<FeatureContext> minMuleVersion(String version) {
     return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
+  }
+
+  @Override
+  public void dispose() {
+    try {
+      nativeLibraryUnloader.unloadNativeLibraries(this);
+    } catch (Throwable e) {
+      logger.warn("Could not unload native libraries");
+    }
+
+    super.dispose();
   }
 }
