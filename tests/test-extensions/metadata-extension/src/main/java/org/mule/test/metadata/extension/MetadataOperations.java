@@ -413,6 +413,13 @@ public class MetadataOperations {
   }
 
   @MediaType(value = ANY, strict = false)
+  public void scopeWithOnlyChainInputMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) Chain chain,
+                                                      @Optional String jsonValue,
+                                                      CompletionCallback<Object, Void> cb) {
+    chain.process(jsonValue, null, cb::success, (t, e) -> cb.error(t));
+  }
+
+  @MediaType(value = ANY, strict = false)
   @OutputResolver(output = RouterTestResolver.class)
   public void routerWithMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute,
                                          @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
@@ -442,5 +449,12 @@ public class MetadataOperations {
     // Technically we should be simulating that we call both routes and collect the result into something resembling a map.
     // But what we do here doesn't really matter, we just want to test the MetadataType of the output not the output itself.
     metaroute1.getChain().process(cb::success, (t, e) -> cb.error(t));
+  }
+
+  @MediaType(value = ANY, strict = false)
+  public void routerWithOnlyChainInputMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute,
+                                                       @Optional String jsonValue,
+                                                       CompletionCallback<Object, Void> cb) {
+    metaroute.getChain().process(jsonValue, null, cb::success, (t, e) -> cb.error(t));
   }
 }

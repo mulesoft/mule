@@ -157,6 +157,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
   protected static final MetadataType VOID_TYPE = BaseTypeBuilder.create(JAVA).voidType().build();
+  protected static final MetadataType STRING_TYPE = BaseTypeBuilder.create(JAVA).stringType().build();
 
   @Inject
   @Named(METADATA_SERVICE_KEY)
