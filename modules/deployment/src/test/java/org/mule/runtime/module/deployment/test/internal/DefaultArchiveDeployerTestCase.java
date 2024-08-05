@@ -100,10 +100,43 @@ public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
     assertFalse(nativeLibrariesTempFolder.exists());
   }
 
+  @Test
+  @Issue("W-16314072")
+  public void undeployTriggerTheDeletionOfTheNativeLibrariesTempFolderAlthoughRemoveDataIsFalse() {
+    AbstractDeployableArtifactFactory artifactFactory = mock(AbstractDeployableArtifactFactory.class);
+    ArtifactDeployer artifactDeployer = mock(ArtifactDeployer.class);
+    DefaultArchiveDeployer<ApplicationDescriptor, Application> deployer =
+        createDeployerWithRemoveDataInFalse(artifactDeployer, artifactFactory);
+    Application application = createMockApplicationWithoutExceptions();
+    String loadedNativeLibrariesFolderName = application.getDescriptor().getLoadedNativeLibrariesFolderName();
+    File nativeLibrariesTempFolder = getAppNativeLibrariesTempFolder(ARTIFACT_ID, loadedNativeLibrariesFolderName);
+
+    nativeLibrariesTempFolder.mkdirs();
+
+    deployer.setDeploymentListener(mock(DeploymentListener.class));
+    deployer.deployArtifact(application, empty());
+    assertTrue(nativeLibrariesTempFolder.exists());
+
+    deployer.undeployArtifact(ARTIFACT_ID);
+    assertFalse(nativeLibrariesTempFolder.exists());
+  }
+
   @NotNull
   private static DefaultArchiveDeployer createDeployer(ArtifactDeployer artifactDeployer,
                                                        AbstractDeployableArtifactFactory artifactFactory) {
     return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null);
+  }
+
+  @NotNull
+  private static DefaultArchiveDeployer createDeployerWithRemoveDataInFalse(ArtifactDeployer artifactDeployer,
+                                                                            AbstractDeployableArtifactFactory artifactFactory) {
+    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null) {
+
+      @Override
+      public void undeployArtifact(String artifactId) {
+        this.undeployArtifact(artifactId, false);
+      }
+    };
   }
 
   private Application createMockApplication() {
