@@ -11,6 +11,11 @@ package org.mule.runtime.module.deployment.internal;
  */
 public interface ActionTask {
 
-  boolean doAction();
+  /**
+   * Tries to execute the action task.
+   *
+   * @return a boolean to know if the action was done or not.
+   */
+  boolean tryAction();
 
 }

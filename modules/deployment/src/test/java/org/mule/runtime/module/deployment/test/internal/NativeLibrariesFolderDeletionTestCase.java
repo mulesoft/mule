@@ -32,7 +32,7 @@ public class NativeLibrariesFolderDeletionTestCase extends AbstractMuleTestCase 
         new NativeLibrariesFolderDeletionActionTask(ARTIFACT_ID, nativeLibrariesFolder.getRoot());
 
     assertTrue(nativeLibrariesFolder.getRoot().exists());
-    assertTrue(nativeLibrariesFolderDeletionActionTask.doAction());
+    assertTrue(nativeLibrariesFolderDeletionActionTask.tryAction());
     assertFalse(nativeLibrariesFolder.getRoot().exists());
   }
 }

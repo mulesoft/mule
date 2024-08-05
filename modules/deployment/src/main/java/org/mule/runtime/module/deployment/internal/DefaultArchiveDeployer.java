@@ -368,7 +368,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     scheduler = schedulerService.customScheduler(SchedulerConfig.config()
         .withMaxConcurrentTasks(CORE_POOL_SIZE)
         .withName("RetryScheduledFolderDeletionTask-StaleCleaner"));
-    RetryScheduledTask retryTask =
+    NativeLibrariesFolderDeletionRetryScheduledTask retryTask =
         new NativeLibrariesFolderDeletionRetryScheduledTask(scheduler, MAX_ATTEMPTS,
                                                             new NativeLibrariesFolderDeletionActionTask(appDataFolderName,
                                                                                                         appNativeLibrariesFolder));

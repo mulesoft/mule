@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.module.deployment.internal.NativeLibrariesFolderDeletionActionTask;
 import org.mule.runtime.module.deployment.internal.NativeLibrariesFolderDeletionRetryScheduledTask;
-import org.mule.runtime.module.deployment.internal.RetryScheduledTask;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -50,10 +49,10 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   public void retryScheduledFolderDeletionTaskAtFirstAttemptDeletesTheTempFolder() {
     NativeLibrariesFolderDeletionActionTask nativeLibrariesFolderDeletionActionTask =
         mock(NativeLibrariesFolderDeletionActionTask.class);
-    when(nativeLibrariesFolderDeletionActionTask.doAction()).thenReturn(true);
+    when(nativeLibrariesFolderDeletionActionTask.tryAction()).thenReturn(true);
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
-    RetryScheduledTask retryTask =
+    NativeLibrariesFolderDeletionRetryScheduledTask retryTask =
         new NativeLibrariesFolderDeletionRetryScheduledTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletionActionTask);
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
@@ -63,7 +62,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       @Override
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
-        verify(nativeLibrariesFolderDeletionActionTask, times(1)).doAction();
+        verify(nativeLibrariesFolderDeletionActionTask, times(1)).tryAction();
         assertNativeLibrariesTempFolderIsDeletedAtFirstAttemptLogging();
         return true;
       }
@@ -79,10 +78,10 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   public void retryScheduledFolderDeletionTaskAtSecondToLastAttemptDeletesTheTempFolder() {
     NativeLibrariesFolderDeletionActionTask nativeLibrariesFolderDeletionActionTask =
         mock(NativeLibrariesFolderDeletionActionTask.class);
-    when(nativeLibrariesFolderDeletionActionTask.doAction()).thenReturn(false).thenReturn(true);
+    when(nativeLibrariesFolderDeletionActionTask.tryAction()).thenReturn(false).thenReturn(true);
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
-    RetryScheduledTask retryTask =
+    NativeLibrariesFolderDeletionRetryScheduledTask retryTask =
         new NativeLibrariesFolderDeletionRetryScheduledTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletionActionTask);
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
@@ -92,7 +91,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       @Override
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
-        verify(nativeLibrariesFolderDeletionActionTask, times(2)).doAction();
+        verify(nativeLibrariesFolderDeletionActionTask, times(2)).tryAction();
         assertNativeLibrariesTempFolderIsDeletedAtSecondToLastAttemptLogging();
         return true;
       }
@@ -108,10 +107,10 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   public void retryScheduledFolderDeletionTaskAtLastAttemptDeletesTheTempFolder() {
     NativeLibrariesFolderDeletionActionTask nativeLibrariesFolderDeletionActionTask =
         mock(NativeLibrariesFolderDeletionActionTask.class);
-    when(nativeLibrariesFolderDeletionActionTask.doAction()).thenReturn(false).thenReturn(false).thenReturn(true);
+    when(nativeLibrariesFolderDeletionActionTask.tryAction()).thenReturn(false).thenReturn(false).thenReturn(true);
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
-    RetryScheduledTask retryTask =
+    NativeLibrariesFolderDeletionRetryScheduledTask retryTask =
         new NativeLibrariesFolderDeletionRetryScheduledTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletionActionTask);
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
@@ -121,7 +120,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       @Override
       protected boolean test() throws Exception {
         assertTrue(scheduler.isShutdown());
-        verify(nativeLibrariesFolderDeletionActionTask, times(3)).doAction();
+        verify(nativeLibrariesFolderDeletionActionTask, times(3)).tryAction();
         assertNativeLibrariesTempFolderIsDeletedAtLastAttemptLogging();
         return true;
       }
@@ -137,10 +136,10 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
   public void retryScheduledFolderDeletionTaskNeverDeletesTheTempFolder() {
     NativeLibrariesFolderDeletionActionTask nativeLibrariesFolderDeletionActionTask =
         mock(NativeLibrariesFolderDeletionActionTask.class);
-    when(nativeLibrariesFolderDeletionActionTask.doAction()).thenReturn(false);
+    when(nativeLibrariesFolderDeletionActionTask.tryAction()).thenReturn(false);
 
     ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
-    RetryScheduledTask retryTask =
+    NativeLibrariesFolderDeletionRetryScheduledTask retryTask =
         new NativeLibrariesFolderDeletionRetryScheduledTask(scheduler, MAX_ATTEMPTS, nativeLibrariesFolderDeletionActionTask);
     scheduler.scheduleWithFixedDelay(retryTask, INITIAL_DELAY, DELAY, SECONDS);
 
@@ -150,7 +149,7 @@ public class RetryScheduledFolderDeletionTaskTestCase extends AbstractMuleTestCa
       @Override
       protected boolean test() {
         assertTrue(scheduler.isShutdown());
-        verify(nativeLibrariesFolderDeletionActionTask, times(3)).doAction();
+        verify(nativeLibrariesFolderDeletionActionTask, times(3)).tryAction();
         assertNativeLibrariesTempFolderIsNotDeletedLogging();
         return true;
       }

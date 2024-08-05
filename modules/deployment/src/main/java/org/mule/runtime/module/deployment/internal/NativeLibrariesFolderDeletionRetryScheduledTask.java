@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 
-public class NativeLibrariesFolderDeletionRetryScheduledTask implements RetryScheduledTask {
+public class NativeLibrariesFolderDeletionRetryScheduledTask implements Runnable, ActionTask {
 
   private final ScheduledExecutorService scheduler;
   private final int maxAttempts;
@@ -41,12 +41,13 @@ public class NativeLibrariesFolderDeletionRetryScheduledTask implements RetrySch
   public void run() {
     int attempt = attempts.incrementAndGet();
 
-    if (!DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL && (attempt == (maxAttempts - 1))) {
+    boolean secondToLastAttempt = attempt == maxAttempts - 1;
+    if (!DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL && secondToLastAttempt) {
       System.gc();
       LOGGER.debug("Attempt {}. System.gc() executed.", attempt);
     }
 
-    if (performAction()) {
+    if (tryAction()) {
       scheduler.shutdown();
     } else {
       if (attempt >= maxAttempts) {
@@ -59,7 +60,7 @@ public class NativeLibrariesFolderDeletionRetryScheduledTask implements RetrySch
   }
 
   @Override
-  public boolean performAction() {
-    return actionTask.doAction();
+  public boolean tryAction() {
+    return actionTask.tryAction();
   }
 }

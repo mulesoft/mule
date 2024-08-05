@@ -27,7 +27,7 @@ public class NativeLibrariesFolderDeletionActionTask implements ActionTask {
   }
 
   @Override
-  public boolean doAction() {
+  public boolean tryAction() {
     boolean actionPerformed = true;
 
     try {
