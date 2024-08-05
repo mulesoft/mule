@@ -8,6 +8,7 @@ package org.mule.test.module.extension.metadata;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.model.MetadataFormat.JSON;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -40,6 +41,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 
@@ -356,6 +358,26 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
+  @Issue("W-16408471")
+  public void scopeWithOnlyChainInputResolver() {
+    location = builderFromStringRepresentation("scopeWithOnlyChainInputResolver/processors/0").build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(typeBuilder.withFormat(JAVA).objectType().build())
+        .attributes(typeBuilder.withFormat(JAVA).objectType().build())
+        .build();
+
+    MetadataResult<ScopeInputMetadataDescriptor> inputMetadataResult =
+        metadataService.getScopeInputMetadata(location, null, () -> inputMessageType);
+
+    assertThat(inputMetadataResult.getFailures(), is(empty()));
+    ScopeInputMetadataDescriptor inputMetadata = inputMetadataResult.get();
+
+    MessageMetadataType routeInputType = inputMetadata.getChainInputMessageType();
+    assertThat(routeInputType.getPayloadType().get(), is(STRING_TYPE));
+  }
+
+  @Test
   public void outputResolverForRouter() throws Exception {
     location = Location.builder().globalName(ROUTER_WITH_METADATA_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     RouterOutputMetadataContext routerOutputMetadataContext = new RouterOutputMetadataContext() {
@@ -395,6 +417,26 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
     MessageMetadataType routeInputType = inputMetadata.getRouteInputMessageTypes().get("metaroute");
     assertThat(routeInputType.getPayloadType().get().getMetadataFormat(), is(JSON));
+  }
+
+  @Test
+  @Issue("W-16408471")
+  public void routerWithOnlyChainInputResolver() {
+    location = builderFromStringRepresentation("routerWithOnlyChainInputMetadataResolver/processors/0").build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(typeBuilder.withFormat(JAVA).objectType().build())
+        .attributes(typeBuilder.withFormat(JAVA).objectType().build())
+        .build();
+
+    MetadataResult<RouterInputMetadataDescriptor> inputMetadataResult =
+        metadataService.getRouterInputMetadata(location, null, () -> inputMessageType);
+
+    assertThat(inputMetadataResult.getFailures(), is(empty()));
+    RouterInputMetadataDescriptor inputMetadata = inputMetadataResult.get();
+
+    MessageMetadataType routeInputType = inputMetadata.getRouteInputMessageTypes().get("metaroute");
+    assertThat(routeInputType.getPayloadType().get(), is(STRING_TYPE));
   }
 
   @Test

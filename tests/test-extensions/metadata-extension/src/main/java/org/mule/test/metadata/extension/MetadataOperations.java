@@ -403,10 +403,24 @@ public class MetadataOperations {
   }
 
   @MediaType(value = ANY, strict = false)
+  public void scopeWithOnlyChainInputMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) Chain chain,
+                                                      @Optional String jsonValue,
+                                                      CompletionCallback<Object, Void> cb) {
+    chain.process(jsonValue, null, cb::success, (t, e) -> cb.error(t));
+  }
+
+  @MediaType(value = ANY, strict = false)
   @OutputResolver(output = RouterTestResolver.class)
   public void routerWithMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute,
                                          @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
                                          CompletionCallback<Object, Void> cb) {
     metaroute.getChain().process(cb::success, (t, e) -> cb.error(t));
+  }
+
+  @MediaType(value = ANY, strict = false)
+  public void routerWithOnlyChainInputMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute,
+                                                       @Optional String jsonValue,
+                                                       CompletionCallback<Object, Void> cb) {
+    metaroute.getChain().process(jsonValue, null, cb::success, (t, e) -> cb.error(t));
   }
 }
