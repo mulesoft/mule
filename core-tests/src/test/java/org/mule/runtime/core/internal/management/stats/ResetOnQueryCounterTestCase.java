@@ -55,7 +55,8 @@ public class ResetOnQueryCounterTestCase extends AbstractMuleContextTestCase {
                   new Object[] {
                       "executionErrors",
                       (Function<FlowConstructStatistics, ResetOnQueryCounter>) FlowConstructStatistics::getExecutionErrorsCounter,
-                      (Consumer<DefaultFlowConstructStatistics>) DefaultFlowConstructStatistics::incExecutionError},
+                      (Consumer<DefaultFlowConstructStatistics>) (statistics) -> statistics.incExecutionError(new Exception(),
+                                                                                                              null)},
                   new Object[] {
                       "connectionErrors",
                       (Function<FlowConstructStatistics, ResetOnQueryCounter>) FlowConstructStatistics::getConnectionErrorsCounter,

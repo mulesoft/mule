@@ -10,10 +10,12 @@ import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTI
 
 import static java.lang.System.currentTimeMillis;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.management.stats.ResetOnQueryCounter;
+import org.mule.runtime.metrics.api.instrument.ErrorCounters;
 import org.mule.runtime.metrics.api.meter.Meter;
 
 import java.util.List;
@@ -47,12 +49,12 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   // Transient to avoid de-serialization backward compatibility problems (MULE-19020)
   private transient final AtomicLong connectionErrors = new AtomicLong(0);
-
   private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> messagesDispatchedCounters = new CopyOnWriteArrayList<>();
-  private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
+  private transient final List<DefaultResetOnQueryCounter> totalExecutionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> connectionErrorsCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> fatalErrorsCounters = new CopyOnWriteArrayList<>();
+  private transient ErrorCounters errorCounters;
 
   public DefaultFlowConstructStatistics(String flowConstructType, String name) {
     this.name = name;
@@ -69,14 +71,6 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public boolean isEnabled() {
     return enabled;
-  }
-
-  @Override
-  public void incExecutionError() {
-    if (isEnabled()) {
-      executionError.addAndGet(1);
-      executionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
-    }
   }
 
   @Override
@@ -185,6 +179,19 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   }
 
   @Override
+  public void incExecutionError(Exception exception, Error error) {
+    if (isEnabled()) {
+      executionError.addAndGet(1);
+      totalExecutionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
+    if (error != null) {
+      errorCounters.add(error);
+    } else {
+      errorCounters.add(exception);
+    }
+  }
+
+  @Override
   public void incConnectionErrors() {
     if (isEnabled()) {
       connectionErrors.addAndGet(1);
@@ -225,7 +232,7 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public ResetOnQueryCounter getExecutionErrorsCounter() {
     DefaultResetOnQueryCounter counter = new DefaultResetOnQueryCounter();
-    executionErrorsCounters.add(counter);
+    totalExecutionErrorsCounters.add(counter);
     counter.add(getExecutionErrors());
     return counter;
   }
@@ -280,5 +287,8 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
         .withConsumerForAddOperation(fatalError::addAndGet)
         .withSupplierForIncrementAndGetOperation(fatalError::incrementAndGet)
         .withDescription(FATAL_ERRORS_DESCRIPTION).build();
+
+    errorCounters = meter.errorCountersBuilder("Mule Runtime execution errors")
+        .withDescription("Mule Runtime execution errors grouped by Error ID").build();
   }
 }
