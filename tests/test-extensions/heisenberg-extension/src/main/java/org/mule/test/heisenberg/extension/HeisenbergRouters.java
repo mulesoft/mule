@@ -132,7 +132,7 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
                   @Optional @NullSafe @Expression(NOT_SUPPORTED) List<Attribute> withAttributes,
                   @Optional @ExecutionOccurrence(ONCE) BeforeCall beforeCallAssertions,
                   @Optional @ExecutionOccurrence(ONCE) AfterCall afterCallAssertions,
-                  RouterCompletionCallback callback) {
+                  org.mule.sdk.api.runtime.process.RouterCompletionCallback callback) {
     Map<String, Object> attr = withAttributes.stream().collect(toMap(Attribute::getName, r -> r));
 
     if (beforeCallAssertions != null) {
@@ -157,7 +157,7 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
       afterCallAssertions.getChain()
           .process(attr, null, callback::success, (t, e) -> callback.error(t));
     } else {
-      callback.success(Result.builder().build());
+      callback.success(org.mule.sdk.api.runtime.operation.Result.builder().build());
     }
   }
 
