@@ -95,7 +95,7 @@ public class ArtifactAstUtils {
             .parse(loadConfigResources(configs.getLeft(), artifactClassLoader));
       } else {
         return configs.mapRight(appXmlConfigDocuments -> parserSupplier
-            .getParser(extensions, disableValidations)
+            .getParser(extensions, true)
             .parseDocument(appXmlConfigDocuments.entrySet()
                 .stream()
                 .map(e -> new Pair<>(e.getKey(), e.getValue()))
