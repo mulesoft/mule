@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.Class.forName;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import static java.lang.Class.forName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class that implements the {@link NativeLibraryUnLoader} interface to provide the functionality for unloading native libraries
