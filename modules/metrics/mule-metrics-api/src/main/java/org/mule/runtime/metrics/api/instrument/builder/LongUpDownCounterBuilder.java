@@ -20,6 +20,53 @@ import java.util.function.Supplier;
 public interface LongUpDownCounterBuilder extends InstrumentBuilder<LongUpDownCounter> {
 
   /**
+   * No operation {@link LongUpDownCounterBuilder} implementation. It will always return a no operation {@link LongUpDownCounter}
+   * implementation.
+   */
+  LongUpDownCounterBuilder NO_OP = new LongUpDownCounterBuilder() {
+
+    @Override
+    public LongUpDownCounterBuilder withDescription(String description) {
+      return this;
+    }
+
+    @Override
+    public LongUpDownCounterBuilder withUnit(String unit) {
+      return this;
+    }
+
+    @Override
+    public LongUpDownCounterBuilder withInitialValue(long initialValue) {
+      return this;
+    }
+
+    @Override
+    public LongUpDownCounterBuilder withConsumerForAddOperation(Consumer<Long> consumerForAddOperation) {
+      return this;
+    }
+
+    @Override
+    public LongUpDownCounterBuilder withSupplierForIncrementAndGetOperation(Supplier<Long> supplierForIncrementAndGetOperation) {
+      return this;
+    }
+
+    @Override
+    public LongUpDownCounterBuilder withSupplierForDecrementAndGetOperation(Supplier<Long> supplierForDecrementAndGetOperation) {
+      return this;
+    }
+
+    @Override
+    public LongUpDownCounterBuilder withValueSupplier(Supplier<Long> valueSupplier) {
+      return this;
+    }
+
+    @Override
+    public LongUpDownCounter build() {
+      return LongUpDownCounter.NO_OP;
+    }
+  };
+
+  /**
    * Sets the initial value for the instrument to build.
    *
    * @param initialValue the initial value.

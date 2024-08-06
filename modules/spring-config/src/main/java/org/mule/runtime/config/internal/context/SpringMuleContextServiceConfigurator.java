@@ -23,16 +23,17 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONEN
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_SPAN_FACTORY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_FACTORY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ARTIFACT_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_TRACING_LEVEL_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_AST;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_TYPE_LOADER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
@@ -92,7 +93,6 @@ import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
-import org.mule.runtime.config.internal.context.metrics.NoopMeterProvider;
 import org.mule.runtime.config.internal.factories.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultComponentInitialStateManager;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
@@ -104,6 +104,7 @@ import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.EventContextService;
+import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
@@ -139,13 +140,15 @@ import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
+import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory;
 import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConfigurableMeterExporterConfiguration;
 import org.mule.runtime.metrics.impl.DefaultMeterProvider;
+import org.mule.runtime.metrics.impl.meter.error.DefaultErrorMetricsFactory;
 import org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwardCompatibilityHelper;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.extension.internal.store.SdkObjectStoreManagerAdapter;
-import org.mule.runtime.module.extension.internal.type.catalog.DefaultArtifactTypeLoader;
 import org.mule.runtime.tracer.customization.impl.provider.DefaultInitialSpanInfoProvider;
 import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
 import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
@@ -247,7 +250,8 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(MULE_CORE_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetrySpanExporterFactory.class))
       .put(MULE_CORE_EVENT_TRACER_KEY, getBeanDefinition(SelectableCoreEventTracer.class))
       .put(MULE_CORE_COMPONENT_TRACER_FACTORY_KEY, getBeanDefinition(CoreEventComponentTracerFactory.class))
-      .put(MULE_METER_PROVIDER_KEY, resolveMeterProvider())
+      .put(MULE_ERROR_METRICS_FACTORY_KEY, resolveErrorMetricsFactory())
+      .put(MULE_METER_PROVIDER_KEY, resolveBaseArtifactMeterProvider())
       .put(MULE_METER_EXPORTER_CONFIGURATION_KEY,
            getBeanDefinition(OpenTelemetryAutoConfigurableMeterExporterConfiguration.class))
       .put(MULE_METER_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetryMeterExporterFactory.class))
@@ -313,6 +317,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     registerConstantBeanDefinition(OBJECT_STATISTICS, muleContext.getStatistics());
     registerConstantBeanDefinition(OBJECT_RESOURCE_LOCATOR, resourceLocator);
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
+    registerBeanDefinition(MULE_ARTIFACT_METER_PROVIDER_KEY, resolveArtifactIdMeterProvider());
     loadServiceConfigurators();
 
     registerContextServices(defaultContextServices);
@@ -447,6 +452,13 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     return beanDefinition;
   }
 
+  private static BeanDefinition getPrimaryBeanDefinition(Object beanType) {
+    BeanDefinition beanDefinition = getConstantObjectBeanDefinition(beanType);
+    beanDefinition.setPrimary(true);
+
+    return beanDefinition;
+  }
+
   private static BeanDefinition getBeanDefinition(Class<?> beanType, String factoryMethodName) {
     return getBeanDefinitionBuilder(beanType).setFactoryMethod(factoryMethodName).getBeanDefinition();
   }
@@ -467,12 +479,27 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     return memoryManagementService;
   }
 
-  private static BeanDefinition resolveMeterProvider() {
+  private BeanDefinition resolveArtifactIdMeterProvider() {
+    if (getBoolean(METRIC_EXPORTER_ENABLED_PROPERTY)) {
+      return getBeanDefinitionBuilder(ArtifactMeterProvider.class)
+          .addConstructorArgReference(MULE_METER_PROVIDER_KEY)
+          .addConstructorArgValue(muleContext.getId()).setPrimary(true).getBeanDefinition();
+    }
+    return getPrimaryBeanDefinition(MeterProvider.NO_OP);
+  }
+
+  private BeanDefinition resolveBaseArtifactMeterProvider() {
     if (getBoolean(METRIC_EXPORTER_ENABLED_PROPERTY)) {
       return getBeanDefinition(DefaultMeterProvider.class);
     }
-
-    return getBeanDefinition(NoopMeterProvider.class);
-
+    return getConstantObjectBeanDefinition(MeterProvider.NO_OP);
   }
+
+  private static BeanDefinition resolveErrorMetricsFactory() {
+    if (getBoolean(METRIC_EXPORTER_ENABLED_PROPERTY)) {
+      return getBeanDefinition(DefaultErrorMetricsFactory.class);
+    }
+    return getConstantObjectBeanDefinition(ErrorMetricsFactory.NO_OP);
+  }
+
 }

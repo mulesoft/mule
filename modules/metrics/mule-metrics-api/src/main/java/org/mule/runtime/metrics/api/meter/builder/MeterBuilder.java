@@ -16,6 +16,27 @@ import org.mule.runtime.metrics.api.meter.Meter;
 public interface MeterBuilder {
 
   /**
+   * No operation {@link MeterBuilder} implementation. It will always return a no operation {@link Meter} implementation.
+   */
+  MeterBuilder NO_OP = new MeterBuilder() {
+
+    @Override
+    public Meter build() {
+      return Meter.NO_OP;
+    }
+
+    @Override
+    public MeterBuilder withDescription(String description) {
+      return this;
+    }
+
+    @Override
+    public MeterBuilder withMeterAttribute(String key, String value) {
+      return this;
+    }
+  };
+
+  /**
    * @return the meter built.
    */
   Meter build();

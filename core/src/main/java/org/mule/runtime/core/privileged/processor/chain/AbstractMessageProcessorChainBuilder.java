@@ -7,7 +7,6 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.event.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
