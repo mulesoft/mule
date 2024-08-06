@@ -24,7 +24,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.getAllMethods;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
@@ -44,7 +44,6 @@ import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.registry.InjectProcessor;
-import org.mule.runtime.core.privileged.registry.PreInitProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.lang.reflect.Field;
@@ -103,13 +102,10 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       defaultEntries.put(OBJECT_MULE_CONTEXT, getMuleContext());
       defaultEntries.put(OBJECT_REGISTRY, new DefaultRegistry(getMuleContext()));
       defaultEntries.put("_muleContextProcessor", new MuleContextProcessor(getMuleContext()));
-      defaultEntries.put("_registryProcessor", new RegistryProcessor(getMuleContext()));
       defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) getMuleContext()).getNotificationManager());
       defaultEntries.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
     }
 
-    defaultEntries.put("_muleLifecycleStateInjectorProcessor",
-                       new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
     defaultEntries.put("_muleLifecycleManager", getLifecycleManager());
     registryMap.putAll(defaultEntries);
   }
@@ -378,16 +374,6 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       }
     }
 
-    if (!hasFlag(metadata, MuleRegistry.PRE_INIT_PROCESSORS_BYPASS_FLAG)) {
-      // Then any other processors
-      Collection<PreInitProcessor> processors = lookupObjects(PreInitProcessor.class);
-      for (PreInitProcessor processor : processors) {
-        theObject = processor.process(theObject);
-        if (theObject == null) {
-          return null;
-        }
-      }
-    }
     return theObject;
   }
 
