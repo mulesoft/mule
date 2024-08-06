@@ -17,6 +17,7 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier;
@@ -87,28 +88,32 @@ public class ArtifactAstUtils {
                                                     boolean disableValidations,
                                                     ClassLoader artifactClassLoader)
       throws ConfigurationException {
-    ClassLoader currentClassLoader = currentThread().getContextClassLoader();
-    setContextClassLoader(currentThread(), currentClassLoader, artifactClassLoader);
-    try {
-      if (configs.isLeft()) {
-        return parserSupplier.getParser(extensions, disableValidations)
-            .parse(loadConfigResources(configs.getLeft(), artifactClassLoader));
-      } else {
-        return configs.mapRight(appXmlConfigDocuments -> parserSupplier
-            .getParser(extensions, true)
-            .parseDocument(appXmlConfigDocuments.entrySet()
-                .stream()
-                .map(e -> new Pair<>(e.getKey(), e.getValue()))
-                .collect(toList())))
-            .getRight();
-      }
-    } finally {
-      setContextClassLoader(currentThread(), artifactClassLoader, currentClassLoader);
+    if (configs.isLeft()) {
+      return parserSupplier.getParser(extensions, disableValidations)
+          .parse(loadConfigResources(configs.getLeft(), artifactClassLoader));
+    } else {
+      return configs.mapRight(appXmlConfigDocuments -> {
+        final AstXmlParser parser = parserSupplier.getParser(extensions, true);
+
+        ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+        setContextClassLoader(currentThread(), currentClassLoader, artifactClassLoader);
+        try {
+          return parser.parseDocument(appXmlConfigDocuments.entrySet()
+              .stream()
+              .map(e -> new Pair<>(e.getKey(), e.getValue()))
+              .collect(toList()));
+        } finally {
+          setContextClassLoader(currentThread(), artifactClassLoader, currentClassLoader);
+        }
+      })
+          .getRight();
     }
   }
 
   private static ConfigResource[] loadConfigResources(String[] configs, ClassLoader artifactClassLoader)
       throws ConfigurationException {
+    ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+    setContextClassLoader(currentThread(), currentClassLoader, artifactClassLoader);
     try {
       ConfigResource[] artifactConfigResources = new ConfigResource[configs.length];
       for (int i = 0; i < configs.length; i++) {
@@ -117,6 +122,8 @@ public class ArtifactAstUtils {
       return artifactConfigResources;
     } catch (IOException e) {
       throw new ConfigurationException(e);
+    } finally {
+      setContextClassLoader(currentThread(), artifactClassLoader, currentClassLoader);
     }
   }
 
