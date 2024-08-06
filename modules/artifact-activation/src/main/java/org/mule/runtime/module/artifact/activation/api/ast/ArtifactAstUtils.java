@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.api.ast;
 
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
@@ -18,8 +20,11 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkApplicationExtensionModelLoadingMediator;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.w3c.dom.Document;
 
 /**
  * Utilities for parsing and handling {@link ArtifactAst}
@@ -58,7 +63,7 @@ public final class ArtifactAstUtils {
                                                            MuleContext muleContext,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
-    return parseArtifact(configResources,
+    return parseArtifact(left(configResources),
                          parserSupplier,
                          extensions,
                          disableValidations,
@@ -93,7 +98,42 @@ public final class ArtifactAstUtils {
                                                            MuleContext muleContext,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
-    return parseArtifact(configResources,
+    return parseArtifact(left(configResources),
+                         parserSupplier,
+                         extensions,
+                         disableValidations,
+                         muleContext.getExecutionClassLoader(),
+                         getExtensionModelLoadingMediator(muleContext, expressionLanguageMetadataService));
+  }
+
+  /**
+   * Processes {@code appXmlConfigDocuments} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
+   * {@link ExtensionModel} which models the app itself, with all its defined operations, sources, functions, etc.
+   * <p>
+   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
+   * {@code muleContext.getConfiguration.getId()} return value
+   *
+   * @param appXmlConfigDocuments             the parsed XML DOMs for the config files
+   * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
+   *                                          the parsing
+   * @param extensions                        the initial set of extensions the app depends on.
+   * @param artifactType                      the artifact type
+   * @param disableValidations                whether to disable DSL validation
+   * @param muleContext                       the app's {@link MuleContext}
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
+   * @return an {@link ArtifactAst}
+   * @throws ConfigurationException it the app couldn't be parsed
+   * 
+   * @since 4.8
+   */
+  public static ArtifactAst parseAndBuildAppExtensionModel(Map<String, Document> appXmlConfigDocuments,
+                                                           AstXmlParserSupplier parserSupplier,
+                                                           Set<ExtensionModel> extensions,
+                                                           boolean disableValidations,
+                                                           MuleContext muleContext,
+                                                           ExpressionLanguageMetadataService expressionLanguageMetadataService)
+      throws ConfigurationException {
+    return parseArtifact(right(appXmlConfigDocuments),
                          parserSupplier,
                          extensions,
                          disableValidations,

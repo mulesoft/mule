@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
+import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.ast.api.ArtifactType.MULE_EXTENSION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
@@ -123,7 +124,7 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     try {
       // Parses the full AST of the artifact by providing a helper for loading the ExtensionModel that represents the artifact
       // itself, this is so that schema validations can be performed properly.
-      ArtifactAst artifactAst = parseArtifact(resources,
+      ArtifactAst artifactAst = parseArtifact(left(resources),
                                               this::createAstParser,
                                               dependencies,
                                               false,
