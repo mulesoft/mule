@@ -6,21 +6,21 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
-import static org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createDefault;
-
 import static java.lang.String.format;
 
 import org.mule.runtime.module.artifact.activation.api.descriptor.MuleConfigurationsFilter;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.nio.file.Path;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 public class XmlMuleConfigurationsFilter implements MuleConfigurationsFilter {
 
@@ -31,16 +31,18 @@ public class XmlMuleConfigurationsFilter implements MuleConfigurationsFilter {
   private static final String muleLocalName = "mule";
   private static final String muleDomainLocalName = "mule-domain";
 
+  private final XMLInputFactory factory = XMLInputFactory.newInstance();
+
   @Override
   public boolean filter(File candidateConfig) {
     return candidateConfig.getName().endsWith(CONFIG_FILE_EXTENSION)
         && hasMuleAsRootElement(generateDocument(candidateConfig.toPath()));
   }
 
-  private boolean hasMuleAsRootElement(Document doc) {
-    if (doc != null && doc.getDocumentElement() != null) {
-      String rootElementLocalName = doc.getDocumentElement().getLocalName();
-      String rootElementNamespace = doc.getDocumentElement().getNamespaceURI();
+  private boolean hasMuleAsRootElement(QName docRootTagName) {
+    if (docRootTagName != null) {
+      String rootElementLocalName = docRootTagName.getLocalPart();
+      String rootElementNamespace = docRootTagName.getNamespaceURI();
 
       return (rootElementLocalName.equals(muleLocalName) && rootElementNamespace.equals(CORE_NAMESPACE))
           || (rootElementLocalName.equals(muleDomainLocalName) && rootElementNamespace.equals(DOMAIN_NAMESPACE));
@@ -48,14 +50,32 @@ public class XmlMuleConfigurationsFilter implements MuleConfigurationsFilter {
     return false;
   }
 
-  private Document generateDocument(Path filePath) {
-    DocumentBuilderFactory documentBuilderFactory = createDefault().getDocumentBuilderFactory();
-    documentBuilderFactory.setNamespaceAware(true);
-
+  private QName generateDocument(Path filePath) {
+    XMLEventReader eventReader = null;
     try {
-      return documentBuilderFactory.newDocumentBuilder().parse(filePath.toFile());
-    } catch (IOException | ParserConfigurationException | SAXException e) {
+      eventReader =
+          factory.createXMLEventReader(new FileReader(filePath.toFile()));
+
+      while (eventReader.hasNext()) {
+        XMLEvent event = eventReader.nextEvent();
+
+        if (event.isStartElement()) {
+          // early return
+          return ((StartElement) event).getName();
+        }
+      }
       return null;
+    } catch (FileNotFoundException | XMLStreamException e) {
+      return null;
+    } finally {
+      if (eventReader == null) {
+        return null;
+      }
+      try {
+        eventReader.close();
+      } catch (XMLStreamException e) {
+        return null;
+      }
     }
   }
 }
