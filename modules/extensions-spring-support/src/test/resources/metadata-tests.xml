@@ -362,4 +362,12 @@
         </metadata:router-with-only-chain-input-metadata-resolver>
     </flow>
 
+    <flow name="routerWithChainInputResolverOnAliasedRoute">
+        <metadata:router-with-chain-input-resolver-on-aliased-route>
+            <metadata:aliased-route>
+                <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+            </metadata:aliased-route>
+        </metadata:router-with-chain-input-resolver-on-aliased-route>
+    </flow>
+
 </mule>
