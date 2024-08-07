@@ -13,6 +13,7 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.event.InternalEvent;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

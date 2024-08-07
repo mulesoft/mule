@@ -40,9 +40,9 @@ import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.event.InternalEvent;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 import java.util.List;

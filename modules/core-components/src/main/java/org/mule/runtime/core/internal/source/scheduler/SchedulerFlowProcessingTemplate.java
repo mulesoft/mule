@@ -13,9 +13,9 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.FlowProcessingTemplate;
 import org.mule.runtime.core.internal.execution.NotificationFunction;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.List;
 import java.util.Map;
