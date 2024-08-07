@@ -42,6 +42,7 @@ import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 
@@ -437,6 +438,27 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
 
     MessageMetadataType routeInputType = inputMetadata.getRouteInputMessageTypes().get("metaroute");
     assertThat(routeInputType.getPayloadType().get(), is(STRING_TYPE));
+  }
+
+  @Test
+  @Issue("W-16433612")
+  public void routerWithChainInputResolverOnAliasedRoute() {
+    location = builderFromStringRepresentation("routerWithChainInputResolverOnAliasedRoute/processors/0").build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(typeBuilder.withFormat(JAVA).objectType().build())
+        .attributes(typeBuilder.withFormat(JAVA).objectType().build())
+        .build();
+
+    MetadataResult<RouterInputMetadataDescriptor> inputMetadataResult =
+        metadataService.getRouterInputMetadata(location, null, () -> inputMessageType);
+
+    assertThat(inputMetadataResult.getFailures(), is(empty()));
+    RouterInputMetadataDescriptor inputMetadata = inputMetadataResult.get();
+
+    assertThat(inputMetadata.getRouteInputMessageTypes().keySet(), containsInAnyOrder("aliasedRoute"));
+    MessageMetadataType routeInputType = inputMetadata.getRouteInputMessageTypes().get("aliasedRoute");
+    assertThat(routeInputType.getPayloadType().get().getMetadataFormat(), is(JSON));
   }
 
   @Test

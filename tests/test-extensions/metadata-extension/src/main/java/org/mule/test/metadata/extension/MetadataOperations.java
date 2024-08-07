@@ -29,6 +29,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.metadata.ChainInputResolver;
 import org.mule.sdk.api.annotation.metadata.PassThroughInputChainResolver;
 import org.mule.tck.message.StringAttributes;
@@ -422,5 +423,12 @@ public class MetadataOperations {
                                                        @Optional String jsonValue,
                                                        CompletionCallback<Object, Void> cb) {
     metaroute.getChain().process(jsonValue, null, cb::success, (t, e) -> cb.error(t));
+  }
+
+  @MediaType(value = ANY, strict = false)
+  public void routerWithChainInputResolverOnAliasedRoute(@ChainInputResolver(TestChainInputTypeResolver.class) @Alias("aliasedRoute") MetadataRoute metaroute,
+                                                         @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
+                                                         CompletionCallback<Object, Void> cb) {
+    metaroute.getChain().process(cb::success, (t, e) -> cb.error(t));
   }
 }
