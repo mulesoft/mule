@@ -10,13 +10,13 @@ import org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 
 /**
- * Parses the syntactic definition of a {@link NestedChainModel} so that the semantics reflected in it can be extracted in a
+ * Parses the syntactic definition of a {@link NestedChainModel} so that the semantics reflected in it can be extracted in an
  * uniform way, regardless of the actual syntax used by the extension developer.
  *
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface NestedChainModelParser extends SemanticTermsParser, AllowedStereotypesModelParser {
+public interface NestedChainModelParser extends SemanticTermsParser, AllowedStereotypesModelParser, SdkApiAwareParser {
 
   /**
    * @return the chain's name
@@ -38,4 +38,5 @@ public interface NestedChainModelParser extends SemanticTermsParser, AllowedSter
    * @since 4.7.0
    */
   ChainExecutionOccurrence getExecutionOccurrence();
+
 }
