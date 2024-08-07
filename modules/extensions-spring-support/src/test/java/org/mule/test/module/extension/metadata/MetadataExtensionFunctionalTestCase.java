@@ -150,8 +150,9 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
       MultilevelMetadataKeyBuilder.newKey(AMERICA, CONTINENT).withChild(MultilevelMetadataKeyBuilder.newKey(USA, COUNTRY)
           .withChild(MultilevelMetadataKeyBuilder.newKey(SAN_FRANCISCO, CITY))).build();
 
-  protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
-  protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
+  protected static final NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
+  protected static final ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
+  protected static final MetadataType STRING_TYPE = BaseTypeBuilder.create(JAVA).stringType().build();
 
   @Inject
   @Named(METADATA_SERVICE_KEY)

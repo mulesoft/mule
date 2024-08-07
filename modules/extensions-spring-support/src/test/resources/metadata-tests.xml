@@ -312,12 +312,26 @@
         </metadata:scope-with-input-metadata-resolver>
     </flow>
 
+    <flow name="scopeWithOnlyChainInputResolver">
+        <metadata:scope-with-only-chain-input-metadata-resolver jsonValue="hello">
+            <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+        </metadata:scope-with-only-chain-input-metadata-resolver>
+    </flow>
+
     <flow name="routerWithMetadataResolver">
         <metadata:router-with-metadata-resolver>
             <metadata:metaroute>
                 <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
             </metadata:metaroute>
         </metadata:router-with-metadata-resolver>
+    </flow>
+
+    <flow name="routerWithOnlyChainInputMetadataResolver">
+        <metadata:router-with-only-chain-input-metadata-resolver>
+            <metadata:metaroute>
+                <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+            </metadata:metaroute>
+        </metadata:router-with-only-chain-input-metadata-resolver>
     </flow>
 
 </mule>
