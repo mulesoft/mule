@@ -618,6 +618,8 @@
                         <source>${javaVersion}</source>
                         <target>${javaVersion}</target>
                         <release>${javaReleaseVersion}</release>
+                        <testSource>${javaVersion}</testSource>
+                        <testTarget>${javaVersion}</testTarget>
                         <testRelease>${javaReleaseVersion}</testRelease>
                         <parameters>true</parameters>
                     </configuration>
