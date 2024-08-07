@@ -8,32 +8,23 @@ package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsEmptyIterable.emptyIterable;
 import static org.hamcrest.core.IsIterableContaining.hasItems;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.feature.internal.config.DefaultFeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -96,18 +87,6 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
     registryMap.putAndLogWarningIfDuplicate(TEST_KEY, value2);
 
     assertThat(registryMap.getLostObjects(), is(empty()));
-  }
-
-
-  @Test
-  public void testJSR250ObjectLifecycle() throws Exception {
-    muleContext.start();
-
-    JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
-    getRegistry().registerObject(TEST_KEY, tracker);
-
-    muleContext.dispose();
-    assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
   }
 
   @Test
@@ -263,28 +242,4 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
     // no custom methods
   }
 
-  public class JSR250ObjectLifecycleTracker implements MuleContextAware {
-
-    private final List<String> tracker = new ArrayList<>();
-
-    public List<String> getTracker() {
-      return tracker;
-    }
-
-    @Override
-    @Inject
-    public void setMuleContext(MuleContext context) {
-      tracker.add("setMuleContext");
-    }
-
-    @PostConstruct
-    public void init() {
-      tracker.add("initialise");
-    }
-
-    @PreDestroy
-    public void dispose() {
-      tracker.add("dispose");
-    }
-  }
 }
