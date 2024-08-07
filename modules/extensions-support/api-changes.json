@@ -7,6 +7,32 @@
           "code": "java.class.removed",
           "old": "class org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer",
           "justification": "W-15261626: Changed class to be the implementation of an API defined in Extensions API"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.runtime.privileged.EventedResult<T, A>",
+          "justification": "W-16420215: Class is not useful where it sits and it's impossible to consume by any 3pp component",
+          "package": "org.mule.runtime.module.extension.api.runtime.privileged",
+          "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedResult",
+          "classSimpleName": "EventedResult",
+          "elementKind": "class",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchiveRole": "primary",
+          "breaksVersioningRules": "true"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult<T, A>",
+          "justification": "W-16420215: Class is not useful where it sits and it's impossible to consume by any 3pp component",
+          "package": "org.mule.runtime.module.extension.api.runtime.privileged",
+          "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult",
+          "classSimpleName": "EventedSdkResult",
+          "elementKind": "class",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchiveRole": "primary",
+          "breaksVersioningRules": "true"
         }
       ]
     }
