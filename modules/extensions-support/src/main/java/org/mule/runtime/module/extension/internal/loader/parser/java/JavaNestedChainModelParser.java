@@ -33,7 +33,9 @@ public class JavaNestedChainModelParser implements NestedChainModelParser {
 
   public JavaNestedChainModelParser(ExtensionParameter extensionParameter) {
     this.extensionParameter = extensionParameter;
-    sdkApiDefined = Chain.class.isAssignableFrom(extensionParameter.getType().getDeclaringClass().get());
+    sdkApiDefined = extensionParameter.getType().getDeclaringClass()
+        .map(Chain.class::isAssignableFrom)
+        .orElse(false);
   }
 
   @Override

@@ -47,9 +47,13 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
   public JavaNestedRouteModelParser(ExtensionParameter route) {
     this.route = route;
 
-    Class clazz = route.getType().getDeclaringClass().get();
-    additionalModelProperties.add(new ImplementingTypeModelProperty(clazz));
-    sdkApiDefined = Route.class.isAssignableFrom(clazz);
+    Class clazz = route.getType().getDeclaringClass().orElse(null);
+    if (clazz != null) {
+      additionalModelProperties.add(new ImplementingTypeModelProperty(clazz));
+      sdkApiDefined = Route.class.isAssignableFrom(clazz);
+    } else {
+      sdkApiDefined = false;
+    }
   }
 
   @Override
