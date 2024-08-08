@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.value;
 
-import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.MISSING_REQUIRED_PARAMETERS;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.setValueIntoField;
 import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILURE;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -30,17 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Provides instances of the {@link ValueProvider}
  *
  * @since 4.0
  */
 public class ValueProviderFactory {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ValueProviderFactory.class);
 
   private final ValueProviderFactoryModelProperty factoryModelProperty;
   private final ParameterValueResolver parameterValueResolver;

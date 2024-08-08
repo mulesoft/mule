@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.source.legacy;
 
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.privileged.event.EventedResult;
+import org.mule.runtime.core.internal.util.message.EventedSdkResult;
 import org.mule.sdk.api.runtime.operation.Result;
 
 import java.util.Optional;
@@ -26,6 +28,8 @@ public class LegacyResultAdapter<T, A> extends org.mule.runtime.extension.api.ru
   public static <T, A> org.mule.runtime.extension.api.runtime.operation.Result<T, A> from(Object value) {
     if (value instanceof org.mule.runtime.extension.api.runtime.operation.Result) {
       return (org.mule.runtime.extension.api.runtime.operation.Result<T, A>) value;
+    } else if (value instanceof EventedSdkResult) {
+      return EventedResult.from(((EventedSdkResult<?, ?>) value).getEvent());
     } else if (value instanceof Result) {
       return new LegacyResultAdapter((Result<T, A>) value);
     } else {
