@@ -259,6 +259,7 @@
         <springVersion>5.3.33</springVersion>
         <commonsCliVersion>1.6.0</commonsCliVersion>
         <mule.maven.plugin.version>4.1.1</mule.maven.plugin.version>
+         <exchange-mule-maven-plugin.version>0.0.23</exchange-mule-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -985,6 +986,11 @@
                     </reportSet>
                 </reportSets>
             </plugin>
+             <plugin> 
+                 <groupId>org.mule.tools.maven</groupId>
+                  <artifactId>exchange-mule-maven-plugin</artifactId>
+                   <version>${exchange-mule-maven-plugin.version}</version>
+             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
