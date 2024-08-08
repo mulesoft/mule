@@ -10,6 +10,7 @@ import static java.io.File.separator;
 import static java.io.File.separatorChar;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
+
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
@@ -65,6 +66,7 @@ public class FileJarExplorer implements JarExplorer {
 
   @Override
   public JarInfo explore(URI library) {
+    Set<String> rawPackages = new TreeSet<>();
     Set<String> packages = new TreeSet<>();
     Set<String> resources = new TreeSet<>();
     List<ExportedService> services = new ArrayList<>();
@@ -107,14 +109,18 @@ public class FileJarExplorer implements JarExplorer {
 
                 services.add(new ExportedService(serviceInterface, resource));
               } else if (name.endsWith(CLASS_EXTENSION)) {
-                if (name.lastIndexOf('/') < 0) {
+                final int lastIndexOfSlash = name.lastIndexOf('/');
+                if (lastIndexOfSlash < 0) {
                   // skip default package
                   continue;
                 }
 
-                packages.add(SLASH_PATTERN
-                    .matcher(name.substring(0, name.lastIndexOf('/')))
-                    .replaceAll("."));
+                if (rawPackages.add(name.substring(0, lastIndexOfSlash))) {
+                  // prevent the matcher uses for already identified packages
+                  packages.add(SLASH_PATTERN
+                      .matcher(name.substring(0, lastIndexOfSlash))
+                      .replaceAll("."));
+                }
               } else {
                 resources.add(name);
               }
