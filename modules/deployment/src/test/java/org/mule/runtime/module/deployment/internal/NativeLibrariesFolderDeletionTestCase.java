@@ -9,7 +9,8 @@ package org.mule.runtime.module.deployment.internal;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.module.deployment.internal.NativeLibrariesFolderDeletion;
+import org.mule.runtime.module.deployment.internal.ActionTask;
+import org.mule.runtime.module.deployment.internal.NativeLibrariesFolderDeletionActionTask;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Issue;
@@ -27,11 +28,11 @@ public class NativeLibrariesFolderDeletionTestCase extends AbstractMuleTestCase 
 
   @Test
   public void nativeLibrariesFolderDeletionDeletesTheAppNativeLibrariesFolderWhenExistsAndReturnsTrue() {
-    NativeLibrariesFolderDeletion nativeLibrariesFolderDeletion =
-        new NativeLibrariesFolderDeletion(ARTIFACT_ID, nativeLibrariesFolder.getRoot());
+    ActionTask nativeLibrariesFolderDeletionActionTask =
+        new NativeLibrariesFolderDeletionActionTask(ARTIFACT_ID, nativeLibrariesFolder.getRoot());
 
     assertTrue(nativeLibrariesFolder.getRoot().exists());
-    assertTrue(nativeLibrariesFolderDeletion.doAction());
+    assertTrue(nativeLibrariesFolderDeletionActionTask.tryAction());
     assertFalse(nativeLibrariesFolder.getRoot().exists());
   }
 }
