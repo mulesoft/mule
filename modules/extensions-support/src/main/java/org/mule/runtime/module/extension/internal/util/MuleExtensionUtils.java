@@ -927,17 +927,33 @@ public class MuleExtensionUtils {
     return intersection;
   }
 
-  public static boolean isSdkApiDefined(EnrichableModel model) {
-    return model.getModelProperty(SdkApiDefinedModelProperty.class).isPresent();
-  }
-
+  /**
+   * if {@code value} is or contains an {@link InputEventAware}, the aware object is returned. Returns {@code null} otherwise..
+   * <p>
+   * If {@code value} itself isn't an {@link InputEventAware}, current implementation only looks inside instances of {@link Route}
+   * and {@link org.mule.sdk.api.runtime.route.Route}.
+   *
+   * @param value the tested value
+   * @return an {@link InputEventAware} or {@code null}
+   * @since 4.8.0
+   */
   public static InputEventAware asEventAware(Object value) {
     if (value instanceof Route) {
       value = ((Route) value).getChain();
     } else if (value instanceof org.mule.sdk.api.runtime.route.Route) {
       value = ((org.mule.sdk.api.runtime.route.Route) value).getChain();
+    } else if (value instanceof InputEventAware) {
+      return (InputEventAware) value;
     }
 
     return value instanceof InputEventAware ? (InputEventAware) value : null;
+  }
+
+  /**
+   * @param model an {@link EnrichableModel}
+   * @return whether the {@code model} was written using the new sdk-api
+   */
+  public static boolean isSdkApiDefined(EnrichableModel model) {
+    return model.getModelProperty(SdkApiDefinedModelProperty.class).isPresent();
   }
 }

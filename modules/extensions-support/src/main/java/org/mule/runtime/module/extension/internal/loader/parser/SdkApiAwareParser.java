@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+/**
+ * Contract for a model parser with information on whether the component was written with the extensions-api or sdk-api
+ *
+ * @since 4.8.0
+ */
 public interface SdkApiAwareParser {
 
   boolean isSdkApiDefined();

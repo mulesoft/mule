@@ -8,6 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 
+/**
+ * A component that's aware of its input {@link CoreEvent}
+ *
+ * @since 4.8.0
+ */
 public interface InputEventAware {
 
   /**

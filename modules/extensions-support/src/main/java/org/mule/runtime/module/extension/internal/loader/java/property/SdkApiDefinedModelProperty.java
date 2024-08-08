@@ -8,6 +8,11 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 
+/**
+ * Marker {@link ModelProperty} to signal that the enriched component was written using the new Java sdk-api
+ *
+ * @since 4.8.0
+ */
 public class SdkApiDefinedModelProperty implements ModelProperty {
 
   public static final SdkApiDefinedModelProperty INSTANCE = new SdkApiDefinedModelProperty();

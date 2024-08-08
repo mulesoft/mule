@@ -32,6 +32,7 @@ import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalC
 import org.mule.runtime.module.extension.internal.runtime.operation.InputEventAware;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -118,6 +119,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   }
 
   @Test
+  @Issue("W-16420215")
   public void sdkApiChain() throws Exception {
     when(chainModel.getModelProperty(SdkApiDefinedModelProperty.class)).thenReturn(of(SdkApiDefinedModelProperty.INSTANCE));
 

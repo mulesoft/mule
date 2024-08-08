@@ -21,8 +21,13 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ProcessorCha
 import org.mule.runtime.module.extension.internal.runtime.operation.SdkProcessorChainExecutorAdapter;
 
 /**
- * An {@link ValueResolver} which wraps the given {@link Processor} in a {@link Chain}, using the event of the current
- * {@link ValueResolvingContext}. This resolver returns new instances per every invocation
+ * An {@link ValueResolver} which wraps the given {@link Processor} into either an extension-api {@link Chain} or a sdk-api
+ * {@link org.mule.sdk.api.runtime.route.Chain}, using the event of the current {@link ValueResolvingContext}.
+ * <p>
+ * Because a different implementation will be returned depending on the API used to write the component, the value resolver uses
+ * {@link Object} as its return generic.
+ * <p>
+ * This resolver returns new instances per every invocation
  *
  * @since 4.0
  */

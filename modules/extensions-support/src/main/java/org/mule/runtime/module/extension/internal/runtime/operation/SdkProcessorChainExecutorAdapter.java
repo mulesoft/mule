@@ -14,11 +14,17 @@ import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacyResultAdapter;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.route.Chain;
+import org.mule.sdk.api.runtime.route.Route;
 
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * Adapts a {@link ProcessorChainExecutor} for {@link Chain} and {@link Route} implementations written with the new sdk-api
+ *
+ * @since 4.8.0
+ */
 public class SdkProcessorChainExecutorAdapter implements Chain, HasMessageProcessors, InputEventAware {
 
   private static Consumer<org.mule.runtime.extension.api.runtime.operation.Result> adapt(Consumer<Result> onSuccess) {
