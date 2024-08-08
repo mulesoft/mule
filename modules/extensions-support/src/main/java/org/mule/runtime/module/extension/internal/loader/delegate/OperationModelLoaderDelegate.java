@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
@@ -140,6 +141,10 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
         NestedChainDeclarer chainDeclarer = operation.withChain(chain.getName())
             .describedAs(chain.getDescription())
             .setRequired(chain.isRequired());
+
+        if (chain.isSdkApiDefined()) {
+          chainDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);
+        }
         addSemanticTerms(chainDeclarer.getDeclaration(), chain);
         getStereotypeModelLoaderDelegate().addAllowedStereotypes(chain, chainDeclarer);
       });
