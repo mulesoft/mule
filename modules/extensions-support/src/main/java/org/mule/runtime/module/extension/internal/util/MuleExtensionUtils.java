@@ -89,6 +89,7 @@ import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFac
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
@@ -107,6 +108,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Connectio
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
@@ -114,6 +116,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ComponentExecutorCompletableAdapterFactory;
 import org.mule.runtime.module.extension.internal.runtime.execution.deprecated.ReactiveOperationExecutorFactoryWrapper;
+import org.mule.runtime.module.extension.internal.runtime.operation.InputEventAware;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -919,5 +922,35 @@ public class MuleExtensionUtils {
     }
 
     return intersection;
+  }
+
+  /**
+   * if {@code value} is or contains an {@link InputEventAware}, the aware object is returned. Returns {@code null} otherwise..
+   * <p>
+   * If {@code value} itself isn't an {@link InputEventAware}, current implementation only looks inside instances of {@link Route}
+   * and {@link org.mule.sdk.api.runtime.route.Route}.
+   *
+   * @param value the tested value
+   * @return an {@link InputEventAware} or {@code null}
+   * @since 4.8.0
+   */
+  public static InputEventAware asEventAware(Object value) {
+    if (value instanceof Route) {
+      value = ((Route) value).getChain();
+    } else if (value instanceof org.mule.sdk.api.runtime.route.Route) {
+      value = ((org.mule.sdk.api.runtime.route.Route) value).getChain();
+    } else if (value instanceof InputEventAware) {
+      return (InputEventAware) value;
+    }
+
+    return value instanceof InputEventAware ? (InputEventAware) value : null;
+  }
+
+  /**
+   * @param model an {@link EnrichableModel}
+   * @return whether the {@code model} was written using the new sdk-api
+   */
+  public static boolean isSdkApiDefined(EnrichableModel model) {
+    return model.getModelProperty(SdkApiDefinedModelProperty.class).isPresent();
   }
 }

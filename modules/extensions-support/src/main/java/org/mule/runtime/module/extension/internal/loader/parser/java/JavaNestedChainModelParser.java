@@ -15,6 +15,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModel
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils;
 import org.mule.sdk.api.annotation.route.ExecutionOccurrence;
+import org.mule.sdk.api.runtime.route.Chain;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,9 +29,13 @@ import java.util.Set;
 public class JavaNestedChainModelParser implements NestedChainModelParser {
 
   private final ExtensionParameter extensionParameter;
+  private final boolean sdkApiDefined;
 
   public JavaNestedChainModelParser(ExtensionParameter extensionParameter) {
     this.extensionParameter = extensionParameter;
+    sdkApiDefined = extensionParameter.getType().getDeclaringClass()
+        .map(Chain.class::isAssignableFrom)
+        .orElse(false);
   }
 
   @Override
@@ -61,5 +66,10 @@ public class JavaNestedChainModelParser implements NestedChainModelParser {
   @Override
   public Set<String> getSemanticTerms() {
     return new LinkedHashSet<>();
+  }
+
+  @Override
+  public boolean isSdkApiDefined() {
+    return sdkApiDefined;
   }
 }

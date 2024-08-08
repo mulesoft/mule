@@ -21,7 +21,7 @@ import java.util.Optional;
  * @see ExtensionModelParser
  * @since 4.5.0
  */
-public interface NestedRouteModelParser extends SemanticTermsParser, AllowedStereotypesModelParser {
+public interface NestedRouteModelParser extends SemanticTermsParser, AllowedStereotypesModelParser, SdkApiAwareParser {
 
   /**
    * @return the route's name
