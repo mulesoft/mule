@@ -1,19 +1,7 @@
 {
-  "4.7.1": {
+  "4.7.3": {
     "revapi": {
       "ignore": [
-        {
-          "ignore": true,
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer",
-          "justification": "W-15261626: Changed class to be the implementation of an API defined in Extensions API"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.added",
-          "new": "class org.mule.runtime.module.extension.api.metadata.DefaultComponentMetadataConfigurer",
-          "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-        },
         {
           "ignore": true,
           "code": "java.class.removed",
@@ -23,7 +11,7 @@
           "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedResult",
           "classSimpleName": "EventedResult",
           "elementKind": "class",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -36,7 +24,7 @@
           "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult",
           "classSimpleName": "EventedSdkResult",
           "elementKind": "class",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -50,7 +38,7 @@
           "classSimpleName": "EventedResult",
           "methodName": "getAttributes",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -64,7 +52,7 @@
           "classSimpleName": "EventedResult",
           "methodName": "getAttributesMediaType",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -78,7 +66,7 @@
           "classSimpleName": "EventedResult",
           "methodName": "getByteLength",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -92,7 +80,7 @@
           "classSimpleName": "EventedResult",
           "methodName": "getEvent",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -106,7 +94,7 @@
           "classSimpleName": "EventedResult",
           "methodName": "getLength",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -120,7 +108,7 @@
           "classSimpleName": "EventedResult",
           "methodName": "getMediaType",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -134,7 +122,7 @@
           "classSimpleName": "EventedResult",
           "methodName": "getOutput",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -149,9 +137,9 @@
           "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedResult",
           "classSimpleName": "EventedResult",
           "elementKind": "class",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
-          "newArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.8.0-SNAPSHOT",
+          "newArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.3-SNAPSHOT",
           "newArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
@@ -166,11 +154,29 @@
           "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedResult",
           "classSimpleName": "EventedResult",
           "elementKind": "class",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.0-rc1",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
           "oldArchiveRole": "primary",
-          "newArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.8.0-SNAPSHOT",
+          "newArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.3-SNAPSHOT",
           "newArchiveRole": "primary",
           "breaksVersioningRules": "true"
+        }
+      ]
+    }
+  },
+  "4.7.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer",
+          "justification": "W-15261626: Changed class to be the implementation of an API defined in Extensions API"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.module.extension.api.metadata.DefaultComponentMetadataConfigurer",
+          "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
         }
       ]
     }
