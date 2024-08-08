@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 import org.mule.runtime.extension.api.runtime.route.Chain;
@@ -16,10 +15,6 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
  *
  * @since 4.4.0
  */
-public interface ProcessorChainExecutor extends Chain, HasMessageProcessors {
+public interface ProcessorChainExecutor extends Chain, HasMessageProcessors, InputEventAware {
 
-  /**
-   * @return the event prior to its execution
-   */
-  CoreEvent getOriginalEvent();
 }
