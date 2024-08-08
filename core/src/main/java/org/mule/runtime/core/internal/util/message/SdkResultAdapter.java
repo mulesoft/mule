@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.message;
 
 
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.privileged.event.EventedResult;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Optional;
@@ -27,6 +28,8 @@ public class SdkResultAdapter<T, A> extends org.mule.sdk.api.runtime.operation.R
   public static <T, A> org.mule.sdk.api.runtime.operation.Result<T, A> from(Object value) {
     if (value instanceof org.mule.sdk.api.runtime.operation.Result) {
       return (org.mule.sdk.api.runtime.operation.Result<T, A>) value;
+    } else if (value instanceof EventedResult) {
+      return EventedSdkResult.from(((EventedResult<?, ?>) value).getEvent());
     } else if (value instanceof Result) {
       return new SdkResultAdapter<>((Result) value);
     } else {

@@ -37,8 +37,10 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "com.mulesoft.munit:mtf-tools",
         "org.mule.modules:mule-aggregators-module",
         "org.mule.modules:mule-apikit-module",
+        "org.mule.modules:mule-soapkit-module",
         "org.mule.modules:mule-tracing-module",
         "org.mule.modules:mule-validation-module",
+        "org.mule.modules:mule-scripting-module",
         "org.mule.tests.plugin:mule-tests-component-plugin",
         "org.mule.tests:test-processor-chains",
         "org.mule.tests:test-components"

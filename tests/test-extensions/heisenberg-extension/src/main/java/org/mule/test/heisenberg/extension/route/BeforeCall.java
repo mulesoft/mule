@@ -6,7 +6,7 @@
  */
 package org.mule.test.heisenberg.extension.route;
 
-import org.mule.runtime.extension.api.runtime.route.Route;
+import org.mule.sdk.api.runtime.route.Route;
 
 public class BeforeCall extends Route {
 
