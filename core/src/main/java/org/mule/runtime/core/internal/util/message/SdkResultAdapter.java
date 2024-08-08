@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.message;
 
 
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.privileged.event.EventedResult;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.util.Optional;

@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
-import org.mule.runtime.core.internal.util.message.EventedResult;
+import org.mule.runtime.core.privileged.event.EventedResult;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**

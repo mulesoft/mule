@@ -10,7 +10,7 @@ import org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 
 /**
- * Parses the syntactic definition of a {@link NestedChainModel} so that the semantics reflected in it can be extracted in an
+ * Parses the syntactic definition of a {@link NestedChainModel} so that the semantics reflected in it can be extracted in a
  * uniform way, regardless of the actual syntax used by the extension developer.
  *
  * @see ExtensionModelParser

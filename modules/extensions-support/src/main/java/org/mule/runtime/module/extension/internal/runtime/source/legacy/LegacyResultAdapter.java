@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source.legacy;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.internal.util.message.EventedResult;
+import org.mule.runtime.core.privileged.event.EventedResult;
 import org.mule.runtime.core.internal.util.message.EventedSdkResult;
 import org.mule.sdk.api.runtime.operation.Result;
 
