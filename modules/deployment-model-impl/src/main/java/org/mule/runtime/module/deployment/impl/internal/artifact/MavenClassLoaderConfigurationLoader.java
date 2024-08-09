@@ -18,8 +18,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;

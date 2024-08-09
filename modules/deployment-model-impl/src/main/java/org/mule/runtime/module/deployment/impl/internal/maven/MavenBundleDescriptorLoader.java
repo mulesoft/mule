@@ -7,13 +7,13 @@
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.api.artifact.ArtifactType.APP;
+import static org.mule.runtime.api.artifact.ArtifactType.DOMAIN;
+import static org.mule.runtime.api.artifact.ArtifactType.PLUGIN;
+import static org.mule.runtime.api.artifact.ArtifactType.POLICY;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_DOMAIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASSLOADER_MODEL_JSON_DESCRIPTOR_LOCATION;
@@ -25,7 +25,7 @@ import static java.util.Collections.singletonMap;
 
 import org.mule.maven.pom.parser.api.model.MavenPomModel;
 import org.mule.maven.pom.parser.api.model.PomParentCoordinates;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;

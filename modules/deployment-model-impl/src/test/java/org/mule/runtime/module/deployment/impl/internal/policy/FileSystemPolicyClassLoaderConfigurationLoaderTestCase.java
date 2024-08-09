@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import static org.mule.runtime.api.artifact.ArtifactType.POLICY;
+import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
+import static org.mule.runtime.module.deployment.impl.internal.policy.loader.FileSystemPolicyClassLoaderConfigurationLoader.LIB_DIR;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_LOADER;
+
 import static java.util.Arrays.asList;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
-import static org.mule.runtime.module.deployment.impl.internal.policy.loader.FileSystemPolicyClassLoaderConfigurationLoader.LIB_DIR;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_LOADER;
 
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.deployment.impl.internal.policy.loader.FileSystemPolicyClassLoaderConfigurationLoader;
@@ -26,12 +28,13 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Stories;
-import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Stories({@Story(CLASSLOADER_CONFIGURATION_LOADER), @Story(CLASSLOADER_CONFIGURATION)})

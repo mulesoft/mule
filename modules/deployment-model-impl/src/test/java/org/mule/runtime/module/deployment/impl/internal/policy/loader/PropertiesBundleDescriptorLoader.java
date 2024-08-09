@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.policy.loader;
 
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;

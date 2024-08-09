@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.internal.util;
 
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
+import static org.mule.runtime.api.artifact.ArtifactType.PLUGIN;
 import static org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository.noRegisteredLoaderError;
 import static org.mule.test.allure.AllureConstants.DescriptorLoaderFeature.DESCRIPTOR_LOADER;
 import static org.mule.test.allure.AllureConstants.ServicesFeature.SERVICES;

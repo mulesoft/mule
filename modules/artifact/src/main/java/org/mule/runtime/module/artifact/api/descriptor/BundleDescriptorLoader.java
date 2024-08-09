@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.api.artifact.ArtifactType;
 
 /**
  * Loads the {@link BundleDescriptor} for Mule artifacts.
@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
  */
 public interface BundleDescriptorLoader extends DescriptorLoader<BundleDescriptor> {
 
+  @Override
   default boolean supportsArtifactType(ArtifactType artifactType) {
     return true;
   }

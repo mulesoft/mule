@@ -16,22 +16,41 @@ import java.util.Set;
  * List the possible types of deployable artifacts
  *
  * @since 3.7.0
+ * 
+ * @deprecated Since 4.9 use {@link org.mule.runtime.api.artifact.ArtifactType} instead.
  */
+@Deprecated
 public enum ArtifactType {
 
-  APP("app"), DOMAIN("domain"), PLUGIN("plugin"), POLICY("policy"), SERVICE("service"), SERVER_PLUGIN("serverPlugin"),
+  APP(org.mule.runtime.api.artifact.ArtifactType.APP, "app"),
+
+  DOMAIN(org.mule.runtime.api.artifact.ArtifactType.DOMAIN, "domain"),
+
+  PLUGIN(org.mule.runtime.api.artifact.ArtifactType.PLUGIN, "plugin"),
+
+  POLICY(org.mule.runtime.api.artifact.ArtifactType.POLICY, "policy"),
+
+  SERVICE(org.mule.runtime.api.artifact.ArtifactType.SERVICE, "service"),
+
+  SERVER_PLUGIN(org.mule.runtime.api.artifact.ArtifactType.SERVER_PLUGIN, "serverPlugin"),
 
   /**
    * @deprecated Use a {@link Set} of applicable {@link ArtifactType}s where possible.
    */
   @Deprecated
-  ALL("app/domain");
+  ALL(null, "app/domain");
 
   public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
+  private final org.mule.runtime.api.artifact.ArtifactType artifactType;
   private final String artifactTypeAsString;
 
-  ArtifactType(String artifactTypeAsString) {
+  ArtifactType(org.mule.runtime.api.artifact.ArtifactType artifactType, String artifactTypeAsString) {
+    this.artifactType = artifactType;
     this.artifactTypeAsString = artifactTypeAsString;
+  }
+
+  public org.mule.runtime.api.artifact.ArtifactType getArtifactType() {
+    return artifactType;
   }
 
   public String getAsString() {
