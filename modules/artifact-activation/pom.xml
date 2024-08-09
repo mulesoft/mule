@@ -24,7 +24,6 @@
 
         <javaModuleName>org.mule.runtime.artifact.activation</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <semver4jVersion>2.0.3</semver4jVersion>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
     
