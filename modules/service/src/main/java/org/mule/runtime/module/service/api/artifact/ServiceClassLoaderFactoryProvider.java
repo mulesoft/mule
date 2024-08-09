@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.service.api.artifact;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
+
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 
@@ -15,7 +17,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Has a factory method for obtaining a {@link ServiceClassLoaderFactory}.
  * <p>
- * This is to be overridden when running in a JVM that supports JPMS (9+).
+ * This overrides the default class when running in a JVM that supports JPMS (9+), but has a fallback mechanism to provide the
+ * previous implementation.
  * 
  * @since 4.5
  */
@@ -27,12 +30,23 @@ public class ServiceClassLoaderFactoryProvider {
     return new LibFolderClassLoaderConfigurationLoader();
   }
 
+  private static boolean withinModularizedContainer = ServiceClassLoaderFactoryProvider.class.getModule().isNamed();
+
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
-    LOGGER.debug("Default 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceClassLoaderFactory'...");
-    return new ServiceClassLoaderFactory();
+    if (classloaderContainerJpmsModuleLayer()
+        // Only if the container is modularized it makes sense to load services as module layers
+        && withinModularizedContainer) {
+      LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceModuleLayerFactory'...");
+      final ServiceModuleLayerFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
+      serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);
+      return serviceModuleLayerFactory;
+    } else {
+      LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceClassLoaderFactory'...");
+      return new ServiceClassLoaderFactory();
+    }
   }
 
   public static void setWithinModularizedContainer(boolean withinModularizedContainer) {
-    // nothing to do
+    ServiceClassLoaderFactoryProvider.withinModularizedContainer = withinModularizedContainer;
   }
 }

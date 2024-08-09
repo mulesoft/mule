@@ -27,34 +27,22 @@ import java.util.Optional;
  *
  * @since 4.5
  */
-public final class JarLoadingUtils {
+public class JarLoadingUtils {
 
   private JarLoadingUtils() {
     // utility class only
   }
 
   /**
-   * Returns a JarURLConnection used in Mule Java 8 runtime.
-   *
-   * @return a sun.net.www.protocol.jar.JarURLConnection that can be set to prevent file leaks
+   * Returns a JarURLConnection used in Mule Java 11+ runtime
+   * 
+   * @return a JarURLConnection
    *
    * @throws MalformedURLException in case the schemaURI is malformed
    * @throws IOException           an IO exception during the jar connection creation
    */
   public static JarURLConnection getJarConnection(URL possibleUrl) throws MalformedURLException, IOException {
-    return new sun.net.www.protocol.jar.JarURLConnection(possibleUrl, new sun.net.www.protocol.jar.Handler());
-  }
-
-  /**
-   * Creates an URL to a path within a jar file.
-   *
-   * @param jarFile  the jar filejava -version
-   * @param filePath the path within the jar file
-   * @return an URL to the {@code filePath} within the {@code jarFile}
-   * @throws MalformedURLException if the provided {@code filePath} is malformed
-   */
-  public static URL getUrlWithinJar(File jarFile, String filePath) throws MalformedURLException {
-    return new URL("jar:" + jarFile.toURI() + "!/" + filePath);
+    return (JarURLConnection) possibleUrl.openConnection();
   }
 
   /**
@@ -67,12 +55,7 @@ public final class JarLoadingUtils {
    */
   public static Optional<byte[]> loadFileContentFrom(File jarFile, String filePath) throws IOException {
     URL jsonDescriptorUrl = getUrlWithinJar(jarFile, filePath);
-    /*
-     * A specific implementation of JarURLConnection is required to read jar content because not all implementations support ways
-     * to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
-     */
-    JarURLConnection jarConnection =
-        new sun.net.www.protocol.jar.JarURLConnection(jsonDescriptorUrl, new sun.net.www.protocol.jar.Handler());
+    JarURLConnection jarConnection = (JarURLConnection) jsonDescriptorUrl.openConnection();
     jarConnection.setUseCaches(false);
     try (InputStream inputStream = jarConnection.getInputStream()) {
       byte[] byteArray = toByteArray(inputStream);
@@ -90,12 +73,7 @@ public final class JarLoadingUtils {
    * @throws IOException if there was a problem reading from the jar file.
    */
   public static Optional<byte[]> loadFileContentFrom(URL jarFile) throws IOException {
-    /*
-     * A specific implementation of JarURLConnection is required to read jar content because not all implementations support ways
-     * to disable connection caching. Disabling connection caching is necessary to avoid file descriptor leaks.
-     */
-    JarURLConnection jarConnection =
-        new sun.net.www.protocol.jar.JarURLConnection(jarFile, new sun.net.www.protocol.jar.Handler());
+    JarURLConnection jarConnection = (JarURLConnection) jarFile.openConnection();
     jarConnection.setUseCaches(false);
     try (InputStream inputStream = jarConnection.getInputStream()) {
       byte[] byteArray = toByteArray(inputStream);
@@ -105,4 +83,15 @@ public final class JarLoadingUtils {
     }
   }
 
+  /**
+   * Creates an URL to a path within a jar file.
+   *
+   * @param jarFile  the jar filejava -version
+   * @param filePath the path within the jar file
+   * @return an URL to the {@code filePath} within the {@code jarFile}
+   * @throws MalformedURLException if the provided {@code filePath} is malformed
+   */
+  public static URL getUrlWithinJar(File jarFile, String filePath) throws MalformedURLException {
+    return new URL("jar:" + jarFile.toURI() + "!/" + filePath);
+  }
 }

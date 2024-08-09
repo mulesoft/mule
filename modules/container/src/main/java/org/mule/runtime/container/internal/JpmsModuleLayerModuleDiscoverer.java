@@ -92,7 +92,6 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
         .collect(toSet());
   }
 
-
   public class JpmsMuleContainerModule implements MuleContainerModule {
 
     private final Module jpmsModule;
