@@ -15,7 +15,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.semver4j.Semver.SemverType.LOOSE;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.pom.parser.api.MavenPomParser;
@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import com.vdurmont.semver4j.Semver;
+import org.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
 
 

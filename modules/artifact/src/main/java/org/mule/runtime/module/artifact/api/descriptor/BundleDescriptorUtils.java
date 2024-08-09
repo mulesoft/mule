@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.semver4j.Semver.SemverType.LOOSE;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import com.vdurmont.semver4j.Semver;
-import com.vdurmont.semver4j.SemverException;
+import org.semver4j.Semver;
+import org.semver4j.SemverException;
 
 /**
  * Utilities to work with {@link BundleDescriptor}
