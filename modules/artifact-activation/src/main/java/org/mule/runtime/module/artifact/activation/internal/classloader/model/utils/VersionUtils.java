@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model.utils;
 
-import com.vdurmont.semver4j.Semver;
+import org.semver4j.Semver;
 
 /**
  * Helper methods to work with semantic versioning.

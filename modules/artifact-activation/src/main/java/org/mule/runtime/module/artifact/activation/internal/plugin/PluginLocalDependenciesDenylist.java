@@ -13,7 +13,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vdurmont.semver4j.Semver;
+import org.semver4j.Semver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
