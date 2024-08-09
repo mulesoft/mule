@@ -18,11 +18,10 @@ import static java.lang.module.Configuration.resolve;
 import static java.lang.module.ModuleFinder.ofSystem;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
@@ -36,12 +35,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -164,7 +166,8 @@ public final class JpmsUtils {
               // * obgenesis SunReflectionFactoryHelper, used by Mockito
               || moduleName.startsWith("jdk.");
         })
-        .forEach(module -> packages.addAll(module.getPackages()));
+        .forEach(module -> packages
+            .addAll(module.getDescriptor().exports().stream().map(exp -> exp.source()).collect(Collectors.toSet())));
   }
 
   /**
@@ -180,7 +183,7 @@ public final class JpmsUtils {
       return new URLClassLoader(modulePathEntries, parent);
     }
 
-    final ModuleLayer layer = createModuleLayer(modulePathEntries, parent, empty(), false, true);
+    final ModuleLayer layer = createModuleLayer(modulePathEntries, parent, emptyList(), false, true);
     return layer.findLoader(layer.modules().iterator().next().getName());
   }
 
@@ -198,7 +201,11 @@ public final class JpmsUtils {
       return new URLClassLoader(modulePathEntries, parent);
     }
 
-    final ModuleLayer layer = createModuleLayer(modulePathEntries, parent, empty(), false, true);
+    List<ModuleLayer> parentLayers = classes.stream().map(clazz -> clazz.getModule().getLayer()).collect(toList());
+    final ModuleLayer layer = createModuleLayer(modulePathEntries, parent, parentLayers, false, true);
+
+    openPackages(layer);
+
     return layer.findLoader(layer.modules().iterator().next().getName());
   }
 
@@ -239,18 +246,40 @@ public final class JpmsUtils {
       return childClassLoaderFactory.create(parentClassLoader, modulePathEntriesParent, modulePathEntriesChild);
     }
 
-    ModuleLayer resolvedParentLayer = clazz.map(cl -> cl.getModule().getLayer()).orElse(null);
+    List<ModuleLayer> resolvedParentLayers =
+        clazz.map(cl -> cl.getModule().getLayer()).map(Collections::singletonList).orElse(emptyList());
     final ModuleLayer parentLayer =
-        createModuleLayer(modulePathEntriesParent, parentClassLoader, ofNullable(resolvedParentLayer), false, true);
+        createModuleLayer(modulePathEntriesParent, parentClassLoader, resolvedParentLayers, false, true);
     ClassLoader childParentClassLoader = parentLayer.findLoader(parentLayer.modules().iterator().next().getName());
     final ModuleLayer childLayer =
-        createModuleLayer(modulePathEntriesChild, childParentClassLoader, of(parentLayer), false, true);
-    openToModule(childLayer, "org.mule.runtime.launcher", "org.mule.boot.api",
-                 asList("org.mule.runtime.module.boot.internal"));
-    openToModule(childLayer, "kryo.shaded", "java.base",
-                 asList("java.lang", "java.lang.reflect"));
+        createModuleLayer(modulePathEntriesChild, childParentClassLoader, singletonList(parentLayer), false, true);
+    openPackages(childLayer);
 
     return childLayer.findLoader(childLayer.modules().iterator().next().getName());
+  }
+
+  private static void openPackages(ModuleLayer layer) {
+    openToModule(layer, "org.mule.runtime.launcher", "org.mule.boot.api",
+                 singletonList("org.mule.runtime.module.boot.internal"));
+    openToModule(layer, "kryo.shaded", "java.base",
+                 asList("java.lang", "java.lang.reflect"));
+    openToModule(layer, "org.mule.runtime.jpms.utils", "java.base",
+                 asList("java.lang", "java.lang.reflect"));
+
+    // To avoid a performance-related warning from Hazelcast according to
+    // https://docs.hazelcast.com/hazelcast/5.2/getting-started/install-hazelcast#using-modular-java
+    try {
+      openToModule(layer, "com.hazelcast.core", "java.base",
+                   asList("java.lang", "jdk.internal.ref", "java.nio", "sun.nio.ch"));
+      openToModule(layer, "com.hazelcast.core", "jdk.management",
+                   asList("com.sun.management.internal", "com.ibm.lang.management.internal"));
+      openToModule(layer, "com.hazelcast.core", "java.management",
+                   singletonList("sun.management"));
+    } catch (IllegalCallerException e) {
+      // It is fine to continue because the feature may not even be used
+      // Logging here is possible, but it could be confusing for people not using clustering, a warning will be printed by
+      // Hazelcast
+    }
   }
 
   private static boolean useModuleLayer() {
@@ -276,10 +305,39 @@ public final class JpmsUtils {
   public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, Optional<ModuleLayer> parentLayer,
                                               boolean isolateDependenciesInTheirOwnLayer,
                                               boolean filterParentModules) {
+    return createModuleLayer(modulePathEntries, parent, parentLayer.map(Collections::singletonList).orElse(emptyList()),
+                             isolateDependenciesInTheirOwnLayer, filterParentModules);
+  }
+
+  /**
+   * Creates a {@link ModuleLayer} for the given {@code modulePathEntries} and with the given {@code parent}.
+   * <p>
+   * Note: By definition, automatic modules have transitive readability on ALL other modules on the same layer and the parents.
+   * This may cause a situation where a layer that is supposed to be isolated will instead be able to read all the modules in the
+   * parent layers. To prevent this, the {@code isolateDependenciesInTheirOwnLayer} parameter must be passed as {@code true}.
+   *
+   * @param modulePathEntries                  the URLs from which to find the modules
+   * @param parent                             the parent class loader for delegation
+   * @param parentLayers                       layers of modules that will be visible from the newly created {@link ModuleLayer}.
+   * @param isolateDependenciesInTheirOwnLayer whether an additional {@link ModuleLayer} having only the {@code boot} layer as
+   *                                           parent will be created for modules that need to be isolated.
+   * @param filterParentModules                whether modules already present in parent layers should be removed from the given
+   *                                           {@code modulePathEntries}.
+   * @return a new {@link ModuleLayer}.
+   */
+  public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, List<ModuleLayer> parentLayers,
+                                              boolean isolateDependenciesInTheirOwnLayer,
+                                              boolean filterParentModules) {
+    List<ModuleLayer> resolvedParentLayers = new ArrayList<>(parentLayers);
+    if (resolvedParentLayers.isEmpty()) {
+      resolvedParentLayers.add(boot());
+    }
+
     final Set<String> modulesToFilter;
     if (filterParentModules) {
-      ModuleLayer layer = isolateDependenciesInTheirOwnLayer ? boot() : parentLayer.orElse(boot());
-      modulesToFilter = getParentLayersModules(layer).stream()
+      List<ModuleLayer> layers = isolateDependenciesInTheirOwnLayer ? singletonList(boot()) : resolvedParentLayers;
+      Set<Module> parentLayersModules = getParentLayersModules(layers);
+      modulesToFilter = parentLayersModules.stream()
           .map(m -> m.getName())
           .collect(toSet());
     } else {
@@ -298,13 +356,13 @@ public final class JpmsUtils {
 
     ModuleFinder modulesFinder = ModuleFinder.of(paths);
 
+    final Set<String> muleContainerModuleNames = getMuleContainerModuleNames(parentLayers);
+
     Map<Boolean, List<ModuleReference>> modulesByIsolation = modulesFinder
         .findAll()
         .stream()
         .filter(moduleRef -> !modulesToFilter.contains(moduleRef.descriptor().name()))
-        .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, parentLayer)));
-
-    ModuleLayer resolvedParentLayer = parentLayer.orElse(boot());
+        .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, muleContainerModuleNames)));
 
     Controller controller;
     if (isolateDependenciesInTheirOwnLayer) {
@@ -341,13 +399,18 @@ public final class JpmsUtils {
       final List<String> notIsolatedRoots = modulesByIsolation.get(false).stream()
           .map(moduleRef -> moduleRef.descriptor().name())
           .collect(toList());
+      List<Configuration> parentConfigurations = new ArrayList<>();
+      parentConfigurations.add(isolatedModulesController.layer().configuration());
+      parentConfigurations.addAll(resolvedParentLayers.stream().map(ModuleLayer::configuration).collect(toList()));
       Configuration configuration = resolve(notIsolatedModulesFinder,
-                                            asList(isolatedModulesController.layer().configuration(),
-                                                   resolvedParentLayer.configuration()),
+                                            parentConfigurations,
                                             ofSystem(),
                                             notIsolatedRoots);
+      List<ModuleLayer> layers = new ArrayList<>();
+      layers.add(isolatedModulesController.layer());
+      layers.addAll(resolvedParentLayers);
       controller = defineModulesWithOneLoader(configuration,
-                                              asList(isolatedModulesController.layer(), resolvedParentLayer),
+                                              layers,
                                               parent);
 
     } else {
@@ -364,10 +427,12 @@ public final class JpmsUtils {
           .flatMap(Collection::stream)
           .map(moduleRef -> moduleRef.descriptor().name())
           .collect(toList());
-      Configuration configuration = resolvedParentLayer.configuration()
-          .resolve(filteredModulesFinder, ofSystem(), roots);
+      Configuration configuration = resolve(filteredModulesFinder,
+                                            resolvedParentLayers.stream().map(ModuleLayer::configuration).collect(toList()),
+                                            ofSystem(),
+                                            roots);
       controller = defineModulesWithOneLoader(configuration,
-                                              singletonList(resolvedParentLayer),
+                                              resolvedParentLayers,
                                               parent);
     }
 
@@ -375,10 +440,27 @@ public final class JpmsUtils {
     return controller.layer();
   }
 
-  private static Set<Module> getParentLayersModules(ModuleLayer moduleLayer) {
-    Set<Module> modules = new HashSet<>(moduleLayer.modules());
+  private static Set<String> getMuleContainerModuleNames(List<ModuleLayer> containerLayers) {
+    return getParentLayersModules(containerLayers).stream().map(Module::getName)
+        .filter(containerModuleName -> containerModuleName.startsWith("org.mule")
+            || containerModuleName.startsWith("com.mulesoft"))
+        .collect(toSet());
+  }
+
+  private static Set<Module> getParentLayersModules(List<ModuleLayer> moduleLayers) {
+    Set<Module> modules = new HashSet<>();
+
+    for (ModuleLayer layer : moduleLayers) {
+      getParentLayersModules(layer, modules);
+    }
+
+    return modules;
+  }
+
+  private static Set<Module> getParentLayersModules(ModuleLayer moduleLayer, Set<Module> modules) {
+    modules.addAll(moduleLayer.modules());
     for (ModuleLayer parent : moduleLayer.parents()) {
-      modules.addAll(getParentLayersModules(parent));
+      modules.addAll(getParentLayersModules(parent, modules));
     }
 
     return modules;
@@ -387,10 +469,10 @@ public final class JpmsUtils {
   /**
    *
    * @param moduleRef
-   * @param containerLayer
+   * @param containerModuleNames
    * @return {@code true} the the referenced module is automatic or does not read any module from the container.
    */
-  private static boolean isolateInOrphanLayer(ModuleReference moduleRef, Optional<ModuleLayer> containerLayer) {
+  private static boolean isolateInOrphanLayer(ModuleReference moduleRef, Set<String> muleContainerModuleNames) {
     if (moduleRef.descriptor().isAutomatic()
         // TODO W-13761983 remove this condition
         && SERVICE_MODULE_NAME_PREFIXES.stream()
@@ -398,16 +480,8 @@ public final class JpmsUtils {
       return true;
     }
 
-    final Set<String> containerModuleNames = containerLayer
-        .map(layer -> layer.modules().stream()
-            .map(Module::getName)
-            .collect(toSet()))
-        .orElse(emptySet());
-
-    return containerLayer
-        .map(layer -> moduleRef.descriptor().requires().stream()
-            .noneMatch(req -> containerModuleNames.contains(req.name())))
-        .orElse(false);
+    return moduleRef.descriptor().requires().stream()
+        .noneMatch(req -> muleContainerModuleNames.contains(req.name()));
   }
 
   /**
@@ -419,19 +493,30 @@ public final class JpmsUtils {
    */
   public static void openToModule(ModuleLayer layer, String moduleName, String bootModuleName, List<String> packages) {
     // Make sure only allowed users within the Mule Runtime use this
-    final String callerClassName = StackWalker.getInstance(RETAIN_CLASS_REFERENCE).getCallerClass().getName();
+    final Class<?> callerClass = StackWalker.getInstance(RETAIN_CLASS_REFERENCE).getCallerClass();
+    final String callerClassName = callerClass.getName();
     if (!(callerClassName.equals("org.mule.runtime.module.service.api.artifact.ServiceModuleLayerFactory")
         || callerClassName.equals("org.mule.runtime.jpms.api.JpmsUtils"))) {
       throw new UnsupportedOperationException("This is for internal use only.");
     }
 
-    layer.findModule(moduleName)
+    Module callerModule = getCallerModule(callerClass);
+    layer.findModule(moduleName).filter(module -> module != callerModule)
         .ifPresent(module -> boot().findModule(bootModuleName)
             .ifPresent(bootModule -> {
               for (String pkg : packages) {
-                bootModule.addOpens(pkg, module);
+                if (bootModule.getPackages().contains(pkg)) {
+                  bootModule.addOpens(pkg, module);
+                }
               }
             }));
+  }
+
+  /**
+   * Returns the module that a given caller class is a member of. Returns {@code null} if the caller is {@code null}.
+   */
+  private static Module getCallerModule(Class<?> caller) {
+    return (caller != null) ? caller.getModule() : null;
   }
 
 }
