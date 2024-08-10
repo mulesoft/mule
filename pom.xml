@@ -136,7 +136,7 @@
     </modules>
 
     <properties>
-        <javaVersion>11</javaVersion>
+        <javaVersion>17</javaVersion>
         <javaReleaseVersion>${javaVersion}</javaReleaseVersion>
         <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
         <javaTestModuleName>${javaModuleName}.test</javaTestModuleName>
@@ -716,7 +716,7 @@
                                 <Build-Date>${timestamp}</Build-Date>
                                 <Dev-List-Email>${dev.list}</Dev-List-Email>
                                 <Supported-Jdks>[${javaVersion},18)</Supported-Jdks>
-                                <Recommended-Jdks>[${javaVersion},12),[17,18)</Recommended-Jdks>
+                                <Recommended-Jdks>[${javaVersion},18)</Recommended-Jdks>
                                 <More-Info>For more information go to ${productUrl}</More-Info>
                                 <Support>Get commercial support: ${project.organization.url}/support</Support>
                                 <Description>Mule Runtime and Integration Platform</Description>
