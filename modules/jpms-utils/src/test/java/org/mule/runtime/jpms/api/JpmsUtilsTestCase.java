@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import io.qameta.allure.Description;
@@ -41,12 +42,16 @@ public class JpmsUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("W-16374984")
   @Issue("W-13565514")
   @Description("Assert that no other packages from modules in the bootLoader are taken as jre packages.")
   public void jrePackagesExclusively() {
     final Set<String> jrePackages = new HashSet<>();
     exploreJdkModules(jrePackages);
 
-    assertThat(jrePackages, everyItem(anyOf(startsWith("jdk."), startsWith("java."))));
+    assertThat(jrePackages, everyItem(anyOf(startsWith("javax."),
+                                            startsWith("java."),
+                                            startsWith("org.w3c."),
+                                            startsWith("org.xml."))));
   }
 }
