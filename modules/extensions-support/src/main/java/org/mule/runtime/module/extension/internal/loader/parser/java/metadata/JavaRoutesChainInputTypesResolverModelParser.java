@@ -34,7 +34,7 @@ public class JavaRoutesChainInputTypesResolverModelParser implements RoutesChain
   @Override
   public Map<String, ChainInputTypeResolver> getRoutesChainInputResolvers() {
     return routes.stream().collect(toMap(
-                                         ExtensionParameter::getName,
+                                         ExtensionParameter::getAlias,
                                          route -> getChainInputTypeResolver(route).orElse(NULL_INSTANCE)));
   }
 }

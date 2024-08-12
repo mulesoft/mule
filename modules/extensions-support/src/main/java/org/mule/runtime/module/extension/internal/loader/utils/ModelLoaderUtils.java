@@ -145,7 +145,9 @@ public final class ModelLoaderUtils {
                                                     Optional<RoutesChainInputTypesResolverModelParser> routesChainInputTypesResolverParser) {
     if (outputResolverModelParser.map(p -> p.hasOutputResolver()).orElse(false)
         || !inputResolverModelParsers.isEmpty()
-        || keyIdResolverModelParser.map(p -> p.hasKeyIdResolver()).orElse(false)) {
+        || keyIdResolverModelParser.map(p -> p.hasKeyIdResolver()).orElse(false)
+        || scopeChainInputResolverParser.isPresent()
+        || routesChainInputTypesResolverParser.isPresent()) {
       final ComponentMetadataConfigurer configurer =
           ComponentMetadataConfigurerFactory.getDefault().create().setConnected(connected);
       outputResolverModelParser.ifPresent(p -> configurer.setOutputTypeResolver(p.getOutputResolver()));

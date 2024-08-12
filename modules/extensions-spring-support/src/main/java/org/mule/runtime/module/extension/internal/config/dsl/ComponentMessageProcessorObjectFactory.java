@@ -71,18 +71,18 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
 
   @Override
   public P doGetObject() {
-    final MessageProcessorChain nestedChain;
+    final MessageProcessorChain chain;
 
     if (nestedProcessors != null) {
-      nestedChain = newChain(empty(), nestedProcessors,
-                             registry.lookupByType(ComponentTracerFactory.class).get()
-                                 .fromComponent(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
+      chain = newChain(empty(), nestedProcessors,
+                       registry.lookupByType(ComponentTracerFactory.class).get()
+                           .fromComponent(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
-          .ifPresent(chain -> parameters.put(chain.getName(),
-                                             new ProcessorChainValueResolver(registry.lookupByType(StreamingManager.class).get(),
-                                                                             nestedChain)));
+          .ifPresent(chainModel -> parameters.put(chainModel.getName(),
+                                                  new ProcessorChainValueResolver(chainModel, chain, registry
+                                                      .lookupByType(StreamingManager.class).get())));
 
       // For MULE-18771 we need access to the chain's location to create a new event and sdk context
       // Update for W-15158118: since the scope and the chain were having the same location, the chain was overriding the
@@ -92,9 +92,9 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
       ComponentLocation chainLocation = this.getLocation();
       annotations.put(LOCATION_KEY, ((DefaultComponentLocation) chainLocation).appendProcessorsPart());
       annotations.put(CHAIN_OWNER_LOCATION_KEY, chainLocation);
-      nestedChain.setAnnotations(annotations);
+      chain.setAnnotations(annotations);
     } else {
-      nestedChain = null;
+      chain = null;
     }
 
     return getMessageProcessorBuilder()
@@ -104,7 +104,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
         .setTargetValue(targetValue)
         .setCursorProviderFactory(cursorProviderFactory)
         .setRetryPolicyTemplate(retryPolicyTemplate)
-        .setNestedChain(nestedChain)
+        .setNestedChain(chain)
         .setClassLoader(Thread.currentThread().getContextClassLoader())
         .build();
   }

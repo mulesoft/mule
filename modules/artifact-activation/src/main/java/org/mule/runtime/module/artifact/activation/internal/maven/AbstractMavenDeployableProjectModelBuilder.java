@@ -46,6 +46,7 @@ import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.PomParentCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
@@ -76,6 +77,9 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMavenDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
 
+  protected static final Supplier<MavenConfiguration> DEFAULT_MAVEN_CONFIGURATION =
+      new LazyValue<>(() -> getDefaultMavenConfiguration());
+
   protected final MavenConfiguration mavenConfiguration;
   protected final File projectFolder;
   protected List<BundleDependency> deployableMavenBundleDependencies;
@@ -90,7 +94,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   private final static Pattern PLACEHOLDER_PATTERN = compile("\\$\\{\\s*([^}]*)\\s*\\}");
 
 
-  protected static MavenConfiguration getDefaultMavenConfiguration() {
+  private static MavenConfiguration getDefaultMavenConfiguration() {
     final MavenClientProvider mavenClientProvider =
         discoverProvider(MavenDeployableProjectModelBuilder.class.getClassLoader());
 

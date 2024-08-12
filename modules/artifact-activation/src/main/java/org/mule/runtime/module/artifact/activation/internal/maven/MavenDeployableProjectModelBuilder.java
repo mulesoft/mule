@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.maven;
 
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
@@ -30,8 +27,6 @@ import static java.util.stream.Stream.concat;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
 
-import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
@@ -53,7 +48,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -66,6 +60,7 @@ import java.util.function.Supplier;
  */
 public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableProjectModelBuilder {
 
+  private static final String POM_FILE_PATH = "pom.xml";
   private static final String DEFAULT_PACKAGE_EXPORT = "";
   private static final String JAVA_EXTENSION = "java";
   private static final String PACKAGE_SEPARATOR = ".";
@@ -76,10 +71,12 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   private static final String DEFAULT_MULE_DIRECTORY = "/mule";
   private static final String DEFAULT_TEST_RESOURCES_DIRECTORY = "/test/resources";
 
+  private static final MuleConfigurationsFilter MULE_CONFIGURATIONS_FILTER =
+      MuleConfigurationsFilter.defaultMuleConfigurationsFilter();
+
   private final List<Path> resourcesPath = new ArrayList<>();
   private final boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor;
   private final boolean includeTestDependencies;
-  private final MuleConfigurationsFilter muleConfigurationsFilter = MuleConfigurationsFilter.defaultMuleConfigurationsFilter();
 
   public MavenDeployableProjectModelBuilder(File projectFolder, MavenConfiguration mavenConfiguration,
                                             boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
@@ -90,42 +87,17 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder, boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor) {
-    this(projectFolder, getDefaultMavenConfiguration(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor, false);
+    this(projectFolder, DEFAULT_MAVEN_CONFIGURATION.get(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor, false);
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder, boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
                                             boolean includeTestDependencies) {
-    this(projectFolder, getDefaultMavenConfiguration(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+    this(projectFolder, DEFAULT_MAVEN_CONFIGURATION.get(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
          includeTestDependencies);
   }
 
   public MavenDeployableProjectModelBuilder(File projectFolder) {
-    this(projectFolder, getDefaultMavenConfiguration(), false, false);
-  }
-
-  protected static MavenConfiguration getDefaultMavenConfiguration() {
-    final MavenClientProvider mavenClientProvider =
-        discoverProvider(MavenDeployableProjectModelBuilder.class.getClassLoader());
-    final Supplier<File> localMavenRepository =
-        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
-
-    final SettingsSupplierFactory settingsSupplierFactory = mavenClientProvider.getSettingsSupplierFactory();
-
-    final Optional<File> globalSettings = settingsSupplierFactory.environmentGlobalSettingsSupplier();
-    final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier();
-    final Optional<File> settingsSecurity = settingsSupplierFactory.environmentSettingsSecuritySupplier();
-
-    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
-        .forcePolicyUpdateNever(true)
-        .localMavenRepositoryLocation(localMavenRepository.get());
-
-    globalSettings.ifPresent(mavenConfigurationBuilder::globalSettingsLocation);
-
-    userSettings.ifPresent(mavenConfigurationBuilder::userSettingsLocation);
-
-    settingsSecurity.ifPresent(mavenConfigurationBuilder::settingsSecurityLocation);
-
-    return mavenConfigurationBuilder.build();
+    this(projectFolder, DEFAULT_MAVEN_CONFIGURATION.get(), false, false);
   }
 
   @Override
@@ -226,7 +198,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   }
 
   private Set<String> getConfigs(String muleResourcesDirectory, List<String> muleResources) {
-    return muleResources.stream().filter(muleResource -> muleConfigurationsFilter
+    return muleResources.stream().filter(muleResource -> MULE_CONFIGURATIONS_FILTER
         .filter(resolveCandidateConfigsPath(muleResourcesDirectory, muleResource))).collect(toSet());
   }
 
@@ -347,12 +319,12 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
 
   @Override
   protected File getPomFromFolder(File projectFolder) {
-    String pomFilePath = "pom.xml";
+    File pomFile = new File(projectFolder, POM_FILE_PATH);
 
-    File pomFile = new File(projectFolder, pomFilePath);
-    checkState(pomFile.exists(),
-               format("The pom.xml file for artifact in folder %s could not be found",
-                      projectFolder.getAbsolutePath()));
+    if (!pomFile.exists()) {
+      throw new IllegalStateException(format("The pom.xml file for artifact in folder %s could not be found",
+                                             projectFolder.getAbsolutePath()));
+    }
 
     return pomFile;
   }

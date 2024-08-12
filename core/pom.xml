@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-core</artifactId>
     <packaging>jar</packaging>
@@ -19,9 +19,23 @@
         <!-- because this module requires transitive jakarta.jms.api -->
         <revapi.checkDependencies>true</revapi.checkDependencies>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
+
+        <mule.version>${project.version}</mule.version>
     </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources-filtering</directory>
+                <includes>
+                    <include>product-version/version.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -32,41 +46,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <pluginManagement>
-        	<plugins>
-        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        		<plugin>
-        			<groupId>org.eclipse.m2e</groupId>
-        			<artifactId>lifecycle-mapping</artifactId>
-        			<version>1.0.0</version>
-        			<configuration>
-        				<lifecycleMappingMetadata>
-        					<pluginExecutions>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>
-        									org.apache.maven.plugins
-        								</groupId>
-        								<artifactId>
-        									maven-enforcer-plugin
-        								</artifactId>
-        								<versionRange>
-        									[1.0-alpha-4,)
-        								</versionRange>
-        								<goals>
-        									<goal>enforce</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<ignore></ignore>
-        							</action>
-        						</pluginExecution>
-        					</pluginExecutions>
-        				</lifecycleMappingMetadata>
-        			</configuration>
-        		</plugin>
-        	</plugins>
-        </pluginManagement>
     </build>
 
     <!--

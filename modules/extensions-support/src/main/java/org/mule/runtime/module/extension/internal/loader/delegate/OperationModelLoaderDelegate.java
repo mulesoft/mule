@@ -27,6 +27,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
@@ -176,6 +177,9 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
             .setExecutionOccurrence(chain.getExecutionOccurrence());
         addSemanticTerms(chainDeclarer.getDeclaration(), chain);
         getStereotypeModelLoaderDelegate().addAllowedStereotypes(chain, chainDeclarer);
+        if (chain.isSdkApiDefined()) {
+          chainDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);
+        }
       });
     } else if (parser.isRouter()) {
       parser.getNestedRouteParsers().forEach(route -> {
@@ -184,6 +188,10 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
             .describedAs(route.getDescription())
             .withMinOccurs(route.getMinOccurs())
             .withMaxOccurs(route.getMaxOccurs().orElse(null));
+
+        if (route.isSdkApiDefined()) {
+          routeDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);
+        }
 
         NestedChainDeclarer chain = routeDeclarer
             .withChain()

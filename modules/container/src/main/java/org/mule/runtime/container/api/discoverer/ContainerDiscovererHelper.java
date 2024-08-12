@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.container.api.discoverer;
 
+import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
+
+import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
+
 /**
- * No-op implementation of ContainerDiscovererHelper to use when running on JVM 8.
+ * Utils to allow test-runner to use the module discovery mechanism for the Mule container.
  * 
  * @since 4.6
  */
@@ -17,7 +21,19 @@ public final class ContainerDiscovererHelper {
     // nothing to do
   }
 
+  /**
+   * Allows test-runner to use the module discovery mechanism for the Mule container.
+   */
   public static void exportInternalsToTestRunner() {
-    // nothing to do
+    // Make sure only allowed users within the Mule Runtime use this
+    final String callerClassName = StackWalker.getInstance(RETAIN_CLASS_REFERENCE).getCallerClass().getName();
+    if (!(callerClassName.equals("org.mule.test.runner.classloader.container.TestPreFilteredContainerClassLoaderCreator"))) {
+      throw new UnsupportedOperationException("This is for internal use only.");
+    }
+
+    ContainerDiscovererHelper.class.getModule()
+        .addExports(ContainerModuleDiscoverer.class.getPackageName(),
+                    StackWalker.getInstance(RETAIN_CLASS_REFERENCE).getCallerClass().getModule());
+
   }
 }
