@@ -44,6 +44,7 @@ import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.ERROR;
 import static org.slf4j.event.Level.INFO;
 
+import org.hamcrest.MatcherAssert;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -240,19 +241,34 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
   @Test
   public void failToStartAndStopFails() throws Exception {
+    final Latch latch = new Latch();
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
+    };
+    registerNotificationListener(listener);
+
     ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
     MuleException e = new DefaultMuleException(connectionException);
     doThrow(e).when(source).onStart(any());
     doThrow(new NullPointerException()).when(source).onStop();
+
+    // Non async retries will make the test thread fail.
     if (!this.retryPolicyTemplate.isAsync()) {
       expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
       expectedException.expectCause(is(connectionException));
-    } else {
-      expectedException.expect(is(instanceOf(DefaultMuleException.class)));
     }
 
     messageSource.initialise();
     messageSource.start();
+
+    // Async retries will fail on a different thread but must send an error notification.
+    if (this.retryPolicyTemplate.isAsync()) {
+      latch.await(TEST_TIMEOUT, SECONDS);
+      MatcherAssert.assertThat(notifications.get(0).getException(), is(instanceOf(RetryPolicyExhaustedException.class)));
+      MatcherAssert.assertThat(notifications.get(0).getException().getCause(), is(connectionException));
+    }
   }
 
   @Test
