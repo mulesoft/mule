@@ -24,10 +24,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -44,7 +44,6 @@ import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.ERROR;
 import static org.slf4j.event.Level.INFO;
 
-import org.hamcrest.MatcherAssert;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -90,6 +89,7 @@ import org.junit.runners.Parameterized;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 
 import org.mockito.InOrder;
 
@@ -266,8 +266,8 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     // Async retries will fail on a different thread but must send an error notification.
     if (this.retryPolicyTemplate.isAsync()) {
       latch.await(TEST_TIMEOUT, SECONDS);
-      MatcherAssert.assertThat(notifications.get(0).getException(), is(instanceOf(RetryPolicyExhaustedException.class)));
-      MatcherAssert.assertThat(notifications.get(0).getException().getCause(), is(connectionException));
+      assertThat(notifications.get(0).getException(), is(instanceOf(RetryPolicyExhaustedException.class)));
+      assertThat(notifications.get(0).getException().getCause(), is(connectionException));
     }
   }
 
