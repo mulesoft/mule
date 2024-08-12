@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.classloader;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPORT_NATIVE_LIBRARY_DEPENDENCIES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.MuleVersion.v4_6_0;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.NativeLibraryUnLoaderUtils.getNativeLibraryUnLoader;
 import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
 
@@ -19,6 +20,7 @@ import static net.bytebuddy.implementation.MethodDelegation.to;
 
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
@@ -35,13 +37,14 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import net.bytebuddy.ByteBuddy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.bytebuddy.ByteBuddy;
+
 public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader extends MuleDeployableArtifactClassLoader {
 
-  private Logger logger = LoggerFactory.getLogger(NativeLibraryLoaderMuleDeployableArtifactClassLoader.class);
+  private final Logger logger = LoggerFactory.getLogger(NativeLibraryLoaderMuleDeployableArtifactClassLoader.class);
 
   public static final String METHOD_NAME = "loadLibrary";
   private final NativeLibraryFinder nativeLibraryFinder;
@@ -109,10 +112,10 @@ public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader exten
    */
   private static void configureSupportNativeLibraryDependencies() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(SUPPORT_NATIVE_LIBRARY_DEPENDENCIES, minMuleVersion("4.6.0"));
+    featureFlaggingRegistry.registerFeatureFlag(SUPPORT_NATIVE_LIBRARY_DEPENDENCIES, minMuleVersion(v4_6_0));
   }
 
-  private static Predicate<FeatureContext> minMuleVersion(String version) {
+  private static Predicate<FeatureContext> minMuleVersion(MuleVersion version) {
     return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
   }
