@@ -349,7 +349,12 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
 
   @Override
   public void stop() {
-    deploymentDirectoryWatcher.stop(true);
+    // The deploymentDirectoryWatcher can be null if
+    // the MULE_APPS_PATH is set in single app mode.
+    // In this case the deploymentDirectoryWatcher is not created.
+    if (deploymentDirectoryWatcher != null) {
+      deploymentDirectoryWatcher.stop(true);
+    }
   }
 
   @Override
