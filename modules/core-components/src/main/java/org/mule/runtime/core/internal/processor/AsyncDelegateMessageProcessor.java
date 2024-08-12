@@ -25,7 +25,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
 
 import static java.lang.Thread.currentThread;
-import static java.lang.Thread.yield;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
@@ -354,7 +353,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
             }
           } catch (FromFlowRejectedExecutionException free) {
             // Nothing to do, let next iteration catch it.
-            yield();
+            Thread.yield();
           }
         }
       });

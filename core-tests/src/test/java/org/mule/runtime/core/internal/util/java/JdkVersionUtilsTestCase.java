@@ -78,13 +78,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     assertThat("Java version `" + getProperty("java.version") + "` not supported",
                isSupportedJdkVersion(), is(true));
 
-    List<String> supported = asList("11.0.0",
-                                    "12.0.0",
-                                    "13.0.0",
-                                    "14.0.0",
-                                    "15.0.0",
-                                    "16.0.0",
-                                    "17.0.0",
+    List<String> supported = asList("17.0.0",
                                     "17.0.11");
 
     for (String version : supported) {
@@ -153,8 +147,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testRecommendedJdkVersion() {
     // recommended
-    List<String> recommended = asList("11.0.0",
-                                      "17.0.0",
+    List<String> recommended = asList("17.0.0",
                                       "17.0.11");
 
     for (String version : recommended) {
