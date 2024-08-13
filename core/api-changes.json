@@ -1,4 +1,16 @@
 {
+  "4.6.7": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.core.privileged.exception.MessagingException",
+          "justification": "W-15643200: output json --- error fails with NullPointerException after MULE:RETRIES_EXHAUSTED"
+        }
+      ]
+    }
+  },
   "4.6.5": {
     "revapi": {
       "ignore": [

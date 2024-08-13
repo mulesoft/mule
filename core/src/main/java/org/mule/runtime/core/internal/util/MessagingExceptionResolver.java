@@ -32,7 +32,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessagingException;
@@ -72,7 +71,7 @@ public class MessagingExceptionResolver {
    *
    * @since 4.1.3
    */
-  public MessagingException resolve(final org.mule.runtime.core.privileged.exception.MessagingException me,
+  public MessagingException resolve(final MessagingException me,
                                     ErrorTypeLocator locator,
                                     Collection<ExceptionContextProvider> exceptionContextProviders) {
     Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, locator);
