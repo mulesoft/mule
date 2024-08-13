@@ -236,7 +236,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       CompletableFuture<Void> future = new CompletableFuture<>();
       retryScheduler.execute(() -> {
         if (retryPolicyTemplate.isAsync()) {
-          // in theory we only have to lock on started, but for avoiding deadlocks we need to lock on lifecycleManager first.
+          // in theory, we only have to lock on started, but for avoiding deadlocks we need to lock on lifecycleManager first.
           // Otherwise, doWork may internally call `stop`, which would attempt to take both these locks in this order.
           synchronized (lifecycleManager) {
             synchronized (started) {
