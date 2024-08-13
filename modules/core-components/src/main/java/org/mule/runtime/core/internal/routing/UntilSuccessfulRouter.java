@@ -16,7 +16,7 @@ import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.R
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
-import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
+import static org.mule.runtime.privileged.exception.SuppressedMuleException.suppressIfPresent;
 
 import static java.lang.Integer.parseInt;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -40,7 +40,7 @@ import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
+import org.mule.runtime.privileged.exception.SuppressedMuleException;
 
 import java.util.HashMap;
 import java.util.Map;

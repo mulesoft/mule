@@ -35,6 +35,7 @@ import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.FlowExecutionException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,7 +45,7 @@ import java.util.Optional;
 
 /**
  * Tries to resolve a new {@link MessagingException}s with the real cause of the problem from an incoming
- * {@link MessagingException} that carries a list of causes inside it so it can be thrown and no information is lost.
+ * {@link MessagingException} that carries a list of causes inside it, so it can be thrown and no information is lost.
  *
  * @since 4.0
  */
@@ -71,7 +72,8 @@ public class MessagingExceptionResolver {
    *
    * @since 4.1.3
    */
-  public MessagingException resolve(final MessagingException me, ErrorTypeLocator locator,
+  public MessagingException resolve(final org.mule.runtime.core.privileged.exception.MessagingException me,
+                                    ErrorTypeLocator locator,
                                     Collection<ExceptionContextProvider> exceptionContextProviders) {
     Optional<Pair<Throwable, ErrorType>> rootCause = findRoot(component, me, locator);
 
