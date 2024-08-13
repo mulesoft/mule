@@ -13,6 +13,25 @@
           "code": "java.class.added",
           "new": "class org.mule.runtime.module.extension.api.metadata.DefaultComponentMetadataConfigurer",
           "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+        }
+      ]
+    }
+  },
+  "4.6.7": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult<T, A>",
+          "justification": "W-16420215: Class is not useful where it sits and it's impossible to consume by any 3pp component",
+          "package": "org.mule.runtime.module.extension.api.runtime.privileged",
+          "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult",
+          "classSimpleName": "EventedSdkResult",
+          "elementKind": "class",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.6.6-rc2",
+          "oldArchiveRole": "primary",
+          "breaksSemanticVersioning": "true"
         },
         {
           "ignore": true,

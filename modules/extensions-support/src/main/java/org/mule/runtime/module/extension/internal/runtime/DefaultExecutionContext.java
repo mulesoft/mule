@@ -188,7 +188,7 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     for (Object parameterValue : parameters.values()) {
       parameterValue = asEventAware(parameterValue);
       if (parameterValue != null) {
-        CoreEvent originalEvent = ((ProcessorChainExecutor) parameterValue).getOriginalEvent();
+        CoreEvent originalEvent = ((InputEventAware) parameterValue).getOriginalEvent();
         if (originalEvent.getContext().getId().equals(event.getContext().getId())) {
           ((InternalEvent) originalEvent).setSdkInternalContext(((InternalEvent) updated).getSdkInternalContext());
         }

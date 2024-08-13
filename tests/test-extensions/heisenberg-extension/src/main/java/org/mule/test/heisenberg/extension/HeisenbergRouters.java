@@ -6,18 +6,19 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.toMap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -29,6 +30,7 @@ import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.sdk.api.annotation.deprecated.Deprecated;
 import org.mule.sdk.api.annotation.param.display.Summary;
+import org.mule.sdk.api.annotation.route.ExecutionOccurrence;
 import org.mule.test.heisenberg.extension.model.Attribute;
 import org.mule.test.heisenberg.extension.route.AfterCall;
 import org.mule.test.heisenberg.extension.route.BeforeCall;
@@ -128,7 +130,7 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
                   @Optional @NullSafe @Expression(NOT_SUPPORTED) List<Attribute> withAttributes,
                   @Optional BeforeCall beforeCallAssertions,
                   @Optional AfterCall afterCallAssertions,
-                  RouterCompletionCallback callback) {
+                  org.mule.sdk.api.runtime.process.RouterCompletionCallback callback) {
     Map<String, Object> attr = withAttributes.stream().collect(toMap(Attribute::getName, r -> r));
 
     if (beforeCallAssertions != null) {
