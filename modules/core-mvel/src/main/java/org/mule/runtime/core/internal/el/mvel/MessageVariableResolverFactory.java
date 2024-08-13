@@ -15,10 +15,10 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.el.mvel.context.MessageContext;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.el.context.EventVariablesMapContext;
 import org.mule.runtime.core.privileged.el.context.SessionVariableMapContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.Map;
 
