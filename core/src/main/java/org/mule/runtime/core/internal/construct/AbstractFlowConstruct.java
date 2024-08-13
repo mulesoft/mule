@@ -44,6 +44,7 @@ import org.mule.runtime.core.privileged.processor.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -85,6 +86,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
    * Determines the initial state of this flow when the mule starts. Can be 'stopped' or 'started' (default)
    */
   private final String initialState;
+  private Supplier<Boolean> isStatePersisted;
 
   public AbstractFlowConstruct(String name, MuleContext muleContext, Optional<FlowExceptionHandler> exceptionListener,
                                String initialState, FlowConstructStatistics statistics) {
@@ -122,8 +124,7 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   public final void start() throws MuleException {
     boolean usePersistedState =
         featureFlaggingService != null && featureFlaggingService.isEnabled(HONOUR_PERSISTED_FLOW_STATE)
-            && flowStoppedPersistenceListener != null
-            && flowStoppedPersistenceListener.isStatePersisted();
+            && isStatePersisted.get();
     // Check if Initial State is Stopped
     if (muleContext.isStarting() &&
         (!usePersistedState && initialState.equals(INITIAL_STATE_STOPPED)
@@ -296,6 +297,10 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
 
   public void addFlowStoppedListener(FlowStoppedPersistenceListener flowStoppedPersistenceListener) {
     this.flowStoppedPersistenceListener = flowStoppedPersistenceListener;
+  }
+
+  public void setIsStatePersisted(Supplier<Boolean> isStatePersisted) {
+    this.isStatePersisted = isStatePersisted;
   }
 
   public void doNotPersist() {
