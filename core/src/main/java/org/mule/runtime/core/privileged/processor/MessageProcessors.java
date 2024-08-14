@@ -8,7 +8,7 @@ package org.mule.runtime.core.privileged.processor;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SUB_FLOW;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
@@ -746,8 +746,7 @@ public class MessageProcessors {
         .filter(id -> id.getType().equals(FLOW)
             // a top level router is a policy...
             || id.getType().equals(ROUTER)
-            // a top level scope should only be a subflow
-            || id.getType().equals(SCOPE))
+            || id.getType().equals(SUB_FLOW))
         .flatMap(id -> getProcessingStrategy(locator, component.getRootContainerLocation()));
   }
 
