@@ -7,7 +7,7 @@
 package org.mule.runtime.module.artifact.api.descriptor;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.api.artifact.ArtifactType;
 
 import java.util.Optional;
 

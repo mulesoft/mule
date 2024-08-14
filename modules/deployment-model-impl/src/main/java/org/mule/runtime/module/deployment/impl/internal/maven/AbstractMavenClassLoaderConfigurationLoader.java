@@ -38,9 +38,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.client.api.VersionUtils;
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -595,7 +595,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
   }
 
   private List<String> getAttribute(Map<String, Object> attributes, String attribute) {
-    final Object attributeObject = attributes.getOrDefault(attribute, new ArrayList<String>());
+    final Object attributeObject = attributes.getOrDefault(attribute, new ArrayList<>());
     checkArgument(attributeObject instanceof List, format("The '%s' attribute must be of '%s', found '%s'", attribute,
                                                           List.class.getName(), attributeObject.getClass().getName()));
     return (List<String>) attributeObject;
