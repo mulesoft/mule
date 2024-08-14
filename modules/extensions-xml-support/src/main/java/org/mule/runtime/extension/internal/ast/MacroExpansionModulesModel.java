@@ -8,7 +8,7 @@ package org.mule.runtime.extension.internal.ast;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SUB_FLOW;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 
@@ -236,6 +236,6 @@ public class MacroExpansionModulesModel {
   }
 
   private boolean isSubFlow(ComponentAst component) {
-    return SUB_FLOW_IDENTIFIER.equals(component.getIdentifier()) && SCOPE.equals(component.getComponentType());
+    return SUB_FLOW_IDENTIFIER.equals(component.getIdentifier()) && SUB_FLOW.equals(component.getComponentType());
   }
 }
