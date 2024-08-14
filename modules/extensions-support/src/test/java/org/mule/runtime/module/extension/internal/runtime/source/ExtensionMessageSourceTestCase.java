@@ -15,10 +15,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -235,19 +235,34 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
   @Test
   public void failToStartAndStopFails() throws Exception {
+    final Latch latch = new Latch();
+    final List<ExceptionNotification> notifications = new ArrayList<>();
+    final ExceptionNotificationListener listener = notification -> {
+      notifications.add(notification);
+      latch.release();
+    };
+    registerNotificationListener(listener);
+
     ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
     MuleException e = new DefaultMuleException(connectionException);
     doThrow(e).when(source).onStart(any());
     doThrow(new NullPointerException()).when(source).onStop();
+
+    // Non async retries will make the test thread fail.
     if (!this.retryPolicyTemplate.isAsync()) {
       expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
       expectedException.expectCause(is(connectionException));
-    } else {
-      expectedException.expect(is(instanceOf(DefaultMuleException.class)));
     }
 
     messageSource.initialise();
     messageSource.start();
+
+    // Async retries will fail on a different thread but must send an error notification.
+    if (this.retryPolicyTemplate.isAsync()) {
+      latch.await(TEST_TIMEOUT, SECONDS);
+      assertThat(notifications.get(0).getException(), is(instanceOf(RetryPolicyExhaustedException.class)));
+      assertThat(notifications.get(0).getException().getCause(), is(connectionException));
+    }
   }
 
   @Test
