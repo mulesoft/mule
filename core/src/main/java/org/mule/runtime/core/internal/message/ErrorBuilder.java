@@ -25,7 +25,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
+import org.mule.runtime.privileged.exception.SuppressedMuleException;
 
 import java.io.ObjectStreamException;
 import java.util.ArrayList;

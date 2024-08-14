@@ -43,7 +43,7 @@ import org.mule.runtime.ast.internal.error.DefaultErrorTypeRepository;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
+import org.mule.runtime.privileged.exception.SuppressedMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
