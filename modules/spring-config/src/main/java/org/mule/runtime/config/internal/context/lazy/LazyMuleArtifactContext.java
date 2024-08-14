@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.context.lazy;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SUB_FLOW;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.filteredArtifactAst;
@@ -567,7 +568,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Handle orphan named components...
     orphanComponents.stream()
-        .filter(cm -> asList(SOURCE, OPERATION, SCOPE).contains(cm.getComponentType()))
+        .filter(cm -> asList(SOURCE, OPERATION, SCOPE, SUB_FLOW).contains(cm.getComponentType()))
         .filter(cm -> cm.getComponentId().isPresent())
         .forEach(cm -> {
           final String nameAttribute = cm.getComponentId().get();
