@@ -211,6 +211,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.execution to
       org.mule.runtime.properties.config,
       org.mule.runtime.spring.config;
+  // for MuleFwk, MUnit, ApiKit, DataWeave and Validation
   exports org.mule.runtime.core.privileged.exception;
   // for MUnit
   exports org.mule.runtime.core.privileged.interception;

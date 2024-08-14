@@ -9,10 +9,10 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.ResponseCompletionCallback;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.function.Consumer;
 

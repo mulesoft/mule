@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

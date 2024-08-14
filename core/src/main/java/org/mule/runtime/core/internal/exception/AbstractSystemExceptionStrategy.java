@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import javax.inject.Inject;
 

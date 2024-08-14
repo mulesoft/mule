@@ -82,7 +82,6 @@ import org.mule.runtime.core.privileged.exception.EventProcessingException;
 
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
@@ -93,6 +92,7 @@ import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadin
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
@@ -113,7 +113,6 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
