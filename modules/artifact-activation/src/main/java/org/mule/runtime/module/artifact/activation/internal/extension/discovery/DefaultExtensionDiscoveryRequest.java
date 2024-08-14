@@ -34,18 +34,22 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   private final boolean enrichDescriptions;
   private final boolean ocsEnabled;
   private final boolean forceExtensionValidation;
+  private final boolean resolveMinMuleVersion;
   private final Map<String, Object> customParameters;
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
                                           boolean parallelDiscovery,
-                                          boolean enrichDescriptions) {
-    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false, false, emptyMap());
+                                          boolean enrichDescriptions,
+                                          boolean resolveMinMuleVersion) {
+    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false, false, resolveMinMuleVersion,
+         emptyMap());
   }
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions, boolean parallelDiscovery,
                                           boolean enrichDescriptions, boolean ocsEnabled, boolean forceExtensionValidation,
+                                          boolean resolveMinMuleVersion,
                                           Map<String, Object> customParameters) {
     this.artifactPlugins = artifactPlugins;
     this.parentArtifactExtensions = parentArtifactExtensions;
@@ -53,6 +57,7 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
     this.enrichDescriptions = enrichDescriptions;
     this.ocsEnabled = ocsEnabled;
     this.forceExtensionValidation = forceExtensionValidation;
+    this.resolveMinMuleVersion = resolveMinMuleVersion;
     this.customParameters = unmodifiableMap(customParameters);
   }
 
@@ -96,4 +101,8 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
     return forceExtensionValidation;
   }
 
+  @Override
+  public boolean isResolveMinMuleVersion() {
+    return resolveMinMuleVersion;
+  }
 }

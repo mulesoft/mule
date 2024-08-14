@@ -11,9 +11,9 @@ import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
-import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -107,7 +107,9 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
       }
     };
 
-    ExtensionModelLoadingRequest.Builder builder = builder(pluginClassLoader, dslResolvingContext).addParameters(params);
+    ExtensionModelLoadingRequest.Builder builder = builder(pluginClassLoader, dslResolvingContext)
+        .setResolveMinMuleVersion(true)
+        .addParameters(params);
     if (coordinates != null) {
       builder.setArtifactCoordinates(coordinates);
     }
