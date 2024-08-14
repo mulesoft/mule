@@ -20,10 +20,10 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.interception.SourceInterceptor;
 import org.mule.runtime.api.interception.SourceInterceptorFactory;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.SourcePolicyResult;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.Map;
 import java.util.Optional;
