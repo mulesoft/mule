@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.manager.DefaultExtensio
 import static org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager.JVM_ENFORCEMENT_LOOSE;
 import static org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager.JVM_ENFORCEMENT_STRICT;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
+import static org.mule.tck.junit4.rule.SystemProperty.callWithProperty;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.tck.util.MuleContextUtils.verifyExactRegistration;
@@ -32,8 +33,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
-import static java.lang.System.clearProperty;
-import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
@@ -391,27 +390,29 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   @Story(ENFORCE_EXTENSION_JAVA_VERSION)
-  public void resolveJdkValidator() {
+  public void resolveJdkValidator() throws Throwable {
     DefaultExtensionManager extensionManager = (DefaultExtensionManager) extensionsManager;
 
     // assert default value
     assertThat(extensionManager.getExtensionJdkValidator(), is(instanceOf(StrictExtensionJdkValidator.class)));
 
-    try {
-      setProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_STRICT);
+    callWithProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_STRICT, () -> {
       extensionManager.resolveJdkValidator();
       assertThat(extensionManager.getExtensionJdkValidator(), is(instanceOf(StrictExtensionJdkValidator.class)));
+      return null;
+    });
 
-      setProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_LOOSE);
+    callWithProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_LOOSE, () -> {
       extensionManager.resolveJdkValidator();
       assertThat(extensionManager.getExtensionJdkValidator(), is(instanceOf(LooseExtensionJdkValidator.class)));
+      return null;
+    });
 
-      setProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_DISABLED);
+    callWithProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_DISABLED, () -> {
       extensionManager.resolveJdkValidator();
       assertThat(extensionManager.getExtensionJdkValidator(), is(instanceOf(NullExtensionJdkValidator.class)));
-    } finally {
-      clearProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY);
-    }
+      return null;
+    });
   }
 
   private void makeExtension1ConfigurationNotImplicit() {
