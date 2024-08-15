@@ -64,7 +64,8 @@ class ChainExecutor {
   }
 
   private void handleSuccess(CoreEvent childEvent, Consumer<Result> successHandler, BiConsumer<Throwable, Result> errorHandler) {
-    Result result = childEvent != null ? org.mule.runtime.module.extension.api.runtime.privileged.EventedResult.from(childEvent) : Result.builder().build();
+    Result result = childEvent != null ? org.mule.runtime.module.extension.api.runtime.privileged.EventedResult.from(childEvent)
+        : Result.builder().build();
     try {
       successHandler.accept(result);
     } catch (Throwable error) {
