@@ -6,7 +6,11 @@
  */
 package org.mule.tck.junit4.rule;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.rules.ExternalResource;
 
@@ -37,6 +41,7 @@ public class SystemProperty extends ExternalResource {
 
   private final String name;
   private String oldValue;
+  private static final Map<String, Lock> propertyAccessLock = new ConcurrentHashMap<>();
 
   public SystemProperty(String name) {
     this(name, null);
@@ -52,6 +57,10 @@ public class SystemProperty extends ExternalResource {
     if (initialized) {
       throw new IllegalArgumentException("System property was already initialized");
     }
+
+    // System properties are global properties.
+    // Avoid collisions with other rules running in parallel.
+    propertyAccessLock.computeIfAbsent(name, s -> new ReentrantLock()).lock();
 
     if (getValue() == null) {
       oldValue = System.clearProperty(name);
@@ -71,6 +80,8 @@ public class SystemProperty extends ExternalResource {
     restoreOldValue();
 
     initialized = false;
+
+    propertyAccessLock.get(name).unlock();
   }
 
   protected void restoreOldValue() {
