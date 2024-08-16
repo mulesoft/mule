@@ -46,4 +46,13 @@ abstract class AbstractJavaModelParser implements AdditionalPropertiesModelParse
   public final List<ModelProperty> getAdditionalModelProperties() {
     return additionalModelProperties;
   }
+
+  /**
+   * @return whether the {@link #getResolvedMinMuleVersion() minMuleVersion resolution} has to be performed.
+   * @since 4.9
+   */
+  public boolean mustResolveMinMuleVersion() {
+    return loadingContext.isResolveMinMuleVersion();
+  }
+
 }

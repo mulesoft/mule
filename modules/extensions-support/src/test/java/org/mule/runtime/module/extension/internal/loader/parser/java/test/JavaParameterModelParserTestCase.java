@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.test;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
+
+import static java.util.Collections.emptySet;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -18,7 +21,9 @@ import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParamet
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement;
+import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FieldWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaParameterModelParser;
@@ -82,7 +87,10 @@ public class JavaParameterModelParserTestCase {
     ExtensionParameter extensionParameter =
         new FieldWrapper(TestConnectionProvider.class.getField(parameterName), new DefaultExtensionsTypeLoaderFactory()
             .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    return new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    return new JavaParameterModelParser(extensionParameter, Optional.empty(),
+                                        forConnectionProvider("TestConnectionProvider", ctx));
   }
 
   protected static class TestConnectionProvider implements ConnectionProvider<Object> {

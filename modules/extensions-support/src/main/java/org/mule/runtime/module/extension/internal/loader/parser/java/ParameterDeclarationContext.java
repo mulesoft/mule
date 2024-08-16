@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.StackableTypesModelPropertyResolver.newInstance;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 
 import java.util.List;
@@ -25,47 +26,54 @@ public final class ParameterDeclarationContext {
   private final String componentName;
   private final String componentType;
 
+  private final ExtensionLoadingContext loadingContext;
+
   private final boolean keyResolverAvailable;
 
-  public static ParameterDeclarationContext forConfig(String configName) {
-    return new ParameterDeclarationContext(configName, "Configuration");
+  public static ParameterDeclarationContext forConfig(String configName, ExtensionLoadingContext loadingContext) {
+    return new ParameterDeclarationContext(configName, "Configuration", loadingContext);
   }
 
-  public static ParameterDeclarationContext forOperation(String operationName) {
-    return new ParameterDeclarationContext(operationName, "Operation");
+  public static ParameterDeclarationContext forOperation(String operationName, ExtensionLoadingContext loadingContext) {
+    return new ParameterDeclarationContext(operationName, "Operation", loadingContext);
   }
 
-  public static ParameterDeclarationContext forOperation(String operationName, boolean keyResolverAvailable) {
-    return new ParameterDeclarationContext(operationName, "Operation", keyResolverAvailable);
+  public static ParameterDeclarationContext forOperation(String operationName, ExtensionLoadingContext loadingContext,
+                                                         boolean keyResolverAvailable) {
+    return new ParameterDeclarationContext(operationName, "Operation", loadingContext, keyResolverAvailable);
   }
 
-  public static ParameterDeclarationContext forSource(String sourceName) {
-    return new ParameterDeclarationContext(sourceName, "Source");
+  public static ParameterDeclarationContext forSource(String sourceName, ExtensionLoadingContext loadingContext) {
+    return new ParameterDeclarationContext(sourceName, "Source", loadingContext);
   }
 
-  public static ParameterDeclarationContext forSource(String sourceName, boolean keyResolverAvailable) {
-    return new ParameterDeclarationContext(sourceName, "Source", keyResolverAvailable);
+  public static ParameterDeclarationContext forSource(String sourceName, ExtensionLoadingContext loadingContext,
+                                                      boolean keyResolverAvailable) {
+    return new ParameterDeclarationContext(sourceName, "Source", loadingContext, keyResolverAvailable);
   }
 
-  public static ParameterDeclarationContext forConnectionProvider(String connectionProviderName) {
-    return new ParameterDeclarationContext(connectionProviderName, "Connection Provider");
+  public static ParameterDeclarationContext forConnectionProvider(String connectionProviderName,
+                                                                  ExtensionLoadingContext loadingContext) {
+    return new ParameterDeclarationContext(connectionProviderName, "Connection Provider", loadingContext);
   }
 
-  public static ParameterDeclarationContext forFunction(String functionName) {
-    return new ParameterDeclarationContext(functionName, "Function");
+  public static ParameterDeclarationContext forFunction(String functionName, ExtensionLoadingContext loadingContext) {
+    return new ParameterDeclarationContext(functionName, "Function", loadingContext);
   }
 
-  public static ParameterDeclarationContext forRoute(String routeName) {
-    return new ParameterDeclarationContext(routeName, "Route");
+  public static ParameterDeclarationContext forRoute(String routeName, ExtensionLoadingContext loadingContext) {
+    return new ParameterDeclarationContext(routeName, "Route", loadingContext);
   }
 
-  public ParameterDeclarationContext(String componentName, String componentType) {
-    this(componentName, componentType, false);
+  public ParameterDeclarationContext(String componentName, String componentType, ExtensionLoadingContext loadingContext) {
+    this(componentName, componentType, loadingContext, false);
   }
 
-  public ParameterDeclarationContext(String componentName, String componentType, boolean keyResolverAvailable) {
+  public ParameterDeclarationContext(String componentName, String componentType, ExtensionLoadingContext loadingContext,
+                                     boolean keyResolverAvailable) {
     this.componentName = componentName;
     this.componentType = componentType;
+    this.loadingContext = loadingContext;
     this.keyResolverAvailable = keyResolverAvailable;
   }
 
@@ -81,6 +89,10 @@ public final class ParameterDeclarationContext {
    */
   public String getComponentType() {
     return componentType;
+  }
+
+  public ExtensionLoadingContext getLoadingContext() {
+    return loadingContext;
   }
 
   /**
