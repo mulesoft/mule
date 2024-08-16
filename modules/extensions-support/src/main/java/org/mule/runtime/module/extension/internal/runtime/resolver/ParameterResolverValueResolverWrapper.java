@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
+
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -39,14 +40,14 @@ public class ParameterResolverValueResolverWrapper<T>
   private MuleContext muleContext;
   private final Reference<Function<ValueResolvingContext, ParameterResolver>> parameterResolverSupplier = new Reference<>();
 
-  public ParameterResolverValueResolverWrapper(ValueResolver resolver) {
+  public ParameterResolverValueResolverWrapper(ValueResolver<T> resolver) {
     this.resolver = resolver;
     Function<ValueResolvingContext, ParameterResolver> parameterResolverFactory = (context) -> new ParameterResolver<T>() {
 
       @Override
       public T resolve() {
         try {
-          return resolveRecursively((ValueResolver<T>) resolver, context);
+          return resolveRecursively(resolver, context);
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }

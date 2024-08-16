@@ -8,7 +8,8 @@ package org.mule.runtime.module.extension.internal.loader.java.property.stackabl
 
 import static java.util.Optional.ofNullable;
 
-import org.mule.metadata.java.api.JavaTypeLoader;
+import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
@@ -79,11 +80,12 @@ public class StackableType {
   /**
    * Creates a new instance of {@link Builder Wrapper Type Builder}
    *
-   * @param type The type that the {@link StackableType} will represent
+   * @param type       The type that the {@link StackableType} will represent
+   * @param typeLoader the typeLoader to use to get {@link MetadataType}s from Java classes.
    * @return The builder
    */
-  public static <T> Builder<T> builder(Class<T> type) {
-    return new Builder<>(new TypeWrapper(type, new JavaTypeLoader(Thread.currentThread().getContextClassLoader())));
+  public static <T> Builder<T> builder(Class<T> type, ClassTypeLoader typeLoader) {
+    return new Builder<>(new TypeWrapper(type, typeLoader));
   }
 
   public static class Builder<T> {

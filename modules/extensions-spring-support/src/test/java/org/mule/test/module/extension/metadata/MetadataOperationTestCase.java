@@ -39,8 +39,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.oneOf;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
@@ -97,8 +97,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import io.qameta.allure.Issue;
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
 
@@ -851,7 +852,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     assertThat(type, is(instanceOf(ObjectType.class)));
     ObjectType objectType = (ObjectType) type;
     assertThat(objectType.getFields(), hasSize(2));
-    objectType.getFields().forEach(f -> assertThat(f.getKey().getName().getLocalPart(), isOneOf(TIRES, BRAND)));
+    objectType.getFields().forEach(f -> assertThat(f.getKey().getName().getLocalPart(), oneOf(TIRES, BRAND)));
     Optional<MetadataKey> metadataKeyOptional = result.get().getMetadataAttributes().getKey();
     assertThat(metadataKeyOptional.isPresent(), is(true));
     assertThat(metadataKeyOptional.get().getId(), is(CAR));
