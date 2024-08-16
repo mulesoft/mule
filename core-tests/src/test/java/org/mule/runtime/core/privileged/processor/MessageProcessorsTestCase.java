@@ -8,6 +8,8 @@ package org.mule.runtime.core.privileged.processor;
 
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SUB_FLOW;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -69,12 +71,12 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -906,7 +908,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     final ProcessingStrategy ps = mock(ProcessingStrategy.class);
 
     final ConfigurationComponentLocator locator = mock(ConfigurationComponentLocator.class);
-    Location location = Location.builderFromStringRepresentation("myFlow").build();
+    Location location = builderFromStringRepresentation("myFlow").build();
     final DefaultFlow flow = mock(DefaultFlow.class);
     when(flow.getProcessingStrategy()).thenReturn(ps);
     when(locator.find(location)).thenReturn(Optional.of(flow));
@@ -920,7 +922,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     final ProcessingStrategy ps = mock(ProcessingStrategy.class);
 
     final ConfigurationComponentLocator locator = mock(ConfigurationComponentLocator.class);
-    Location location = Location.builderFromStringRepresentation("myPolicy").build();
+    Location location = builderFromStringRepresentation("myPolicy").build();
     final DefaultPolicyInstance policy = mock(DefaultPolicyInstance.class);
     when(policy.getProcessingStrategy()).thenReturn(ps);
     when(locator.find(location)).thenReturn(Optional.of(policy));
@@ -930,28 +932,28 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   @Issue("MULE-19924")
-  public void processingStrategyFromFlowWhenComponentInTopLevelScope() {
+  public void processingStrategyFromFlowWhenComponentInSubFlow() {
     final ProcessingStrategy ps = mock(ProcessingStrategy.class);
 
     // The Flow acting as root container will return the processing strategy
     final Flow flow = mock(DefaultFlow.class);
     when(flow.getProcessingStrategy()).thenReturn(ps);
 
-    final Location rootContainerLocation = Location.builderFromStringRepresentation("myFlow").build();
+    final Location rootContainerLocation = builderFromStringRepresentation("myFlow").build();
 
     // When the locator is requested to find the root container location, it finds the Flow
     final ConfigurationComponentLocator locator = mock(ConfigurationComponentLocator.class);
     when(locator.find(rootContainerLocation)).thenReturn(Optional.of(flow));
 
-    // A ComponentLocation that has a Scope as top level
+    // A ComponentLocation that has a Subflow as top level
     final TypedComponentIdentifier typedComponentIdentifier = mock(TypedComponentIdentifier.class);
-    when(typedComponentIdentifier.getType()).thenReturn(TypedComponentIdentifier.ComponentType.SCOPE);
+    when(typedComponentIdentifier.getType()).thenReturn(SUB_FLOW);
     final LocationPart locationPart = mock(LocationPart.class);
     when(locationPart.getPartIdentifier()).thenReturn(Optional.of(typedComponentIdentifier));
     final ComponentLocation componentLocation = mock(ComponentLocation.class);
     when(componentLocation.getParts()).thenReturn(singletonList(locationPart));
 
-    // Any component that has the Flow as root container but a scope as top level (i.e.: subflow)
+    // Any component that has the Flow as root container but a Subflow as top level
     final Component nestedComponent = mock(AbstractComponent.class);
     when(nestedComponent.getRootContainerLocation()).thenReturn(rootContainerLocation);
     when(nestedComponent.getLocation()).thenReturn(componentLocation);

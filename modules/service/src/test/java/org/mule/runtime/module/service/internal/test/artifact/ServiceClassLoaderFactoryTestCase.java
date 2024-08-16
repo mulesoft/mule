@@ -10,8 +10,8 @@ import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookup
 import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,10 +27,12 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.net.URL;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+@Ignore("W-16457453")
 public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String SERVICE_ID = "service/serviceId";

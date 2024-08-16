@@ -7,7 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.api.artifact.ArtifactType.APP;
 import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderConfigurationLoaderConfigurationTestCase.MULE_RUNTIME_CONFIG_MAVEN_REPOSITORY_LOCATION;
 import static org.mule.tck.MavenTestUtils.installArtifact;
@@ -31,12 +31,14 @@ import java.io.File;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Stories;
-import io.qameta.allure.Story;
+
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Stories({@Story(CLASSLOADER_CONFIGURATION_LOADER), @Story(CLASSLOADER_CONFIGURATION)})

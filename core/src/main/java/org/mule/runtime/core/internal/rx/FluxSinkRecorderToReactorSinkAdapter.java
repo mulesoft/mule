@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.rx;
 
-import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import reactor.core.publisher.Flux;
 

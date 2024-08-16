@@ -17,7 +17,7 @@ import java.net.URLStreamHandlerFactory;
 public class CachingURLStreamHandlerFactory {
 
   public static URLStreamHandlerFactory getCachingURLStreamHandlerFactory() {
-    return new NonCachingURLStreamHandlerFactory();
+    return null;
   }
 
 }
