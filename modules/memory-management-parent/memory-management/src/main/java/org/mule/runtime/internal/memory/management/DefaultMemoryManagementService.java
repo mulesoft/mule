@@ -63,10 +63,12 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
   }
 
   @Override
-  public synchronized void dispose() {
-    byteBufferProviders.values().forEach(ByteBufferProvider::dispose);
-    byteBufferProviders.clear();
-    byteBufferProvidersUsageCount.clear();
+  public void dispose() {
+    synchronized (byteBufferProvidersUsageCount) {
+      byteBufferProviders.values().forEach(ByteBufferProvider::dispose);
+      byteBufferProviders.clear();
+      byteBufferProvidersUsageCount.clear();
+    }
   }
 
   @Override
@@ -81,7 +83,7 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
   }
 
   @Override
-  public synchronized ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType) {
+  public ByteBufferProvider<ByteBuffer> getByteBufferProvider(String name, ByteBufferType byteBufferType) {
     return doGetByteBufferProvider(name, byteBufferType, null);
   }
 
@@ -91,26 +93,31 @@ public class DefaultMemoryManagementService implements ProfiledMemoryManagementS
       throw new IllegalArgumentException(BYTE_BUFFER_PROVIDER_NAME_CANNOT_BE_NULL_MESSAGE);
     }
 
-    ByteBufferProvider<ByteBuffer> byteBufferProvider =
-        byteBufferProviders.computeIfAbsent(name, thisName -> buildByteBufferProviderFrom(byteBufferType)
-            .withName(name)
-            .withPoolConfiguration(poolConfiguration)
-            .withProfilingService(profilingService)
-            .build());
+    synchronized (byteBufferProvidersUsageCount) {
+      ByteBufferProvider<ByteBuffer> byteBufferProvider =
+          byteBufferProviders.computeIfAbsent(name, thisName -> buildByteBufferProviderFrom(byteBufferType)
+              .withName(name)
+              .withPoolConfiguration(poolConfiguration)
+              .withProfilingService(profilingService)
+              .build());
 
-    byteBufferProvidersUsageCount.putIfAbsent(name, 0L);
-    byteBufferProvidersUsageCount.computeIfPresent(name, (key, val) -> val + 1);
+      byteBufferProvidersUsageCount.putIfAbsent(name, 0L);
+      byteBufferProvidersUsageCount.computeIfPresent(name, (key, val) -> val + 1);
 
-    return byteBufferProvider;
+
+      return byteBufferProvider;
+    }
   }
 
   @Override
-  public synchronized void disposeByteBufferProvider(String name) {
-    Long count = byteBufferProvidersUsageCount.get(name);
-    if (count != null) {
-      disposeOrReduceUsageCount(name, count);
-    } else {
-      LOGGER.warn("Unable to dispose not present ByteBufferProvider '{}'", name);
+  public void disposeByteBufferProvider(String name) {
+    synchronized (byteBufferProvidersUsageCount) {
+      Long count = byteBufferProvidersUsageCount.get(name);
+      if (count != null) {
+        disposeOrReduceUsageCount(name, count);
+      } else {
+        LOGGER.warn("Unable to dispose not present ByteBufferProvider '{}'", name);
+      }
     }
   }
 
