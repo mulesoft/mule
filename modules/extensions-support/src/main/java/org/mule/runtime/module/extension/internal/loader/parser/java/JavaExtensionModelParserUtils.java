@@ -148,10 +148,12 @@ public final class JavaExtensionModelParserUtils {
   public static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(
                                                                                       JavaExtensionModelParser extensionModelParser,
                                                                                       ExtensionElement extensionElement,
-                                                                                      List<ConnectionProviderElement> connectionProviderElements) {
+                                                                                      List<ConnectionProviderElement> connectionProviderElements,
+                                                                                      ExtensionLoadingContext loadingContext) {
 
     return connectionProviderElements.stream()
-        .map(cpElement -> new JavaConnectionProviderModelParser(extensionModelParser, extensionElement, cpElement))
+        .map(cpElement -> new JavaConnectionProviderModelParser(extensionModelParser, extensionElement, cpElement,
+                                                                loadingContext))
         .collect(toList());
   }
 
