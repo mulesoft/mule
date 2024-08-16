@@ -11,7 +11,7 @@ import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentE
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 /**
  * Commits any pending transaction.
