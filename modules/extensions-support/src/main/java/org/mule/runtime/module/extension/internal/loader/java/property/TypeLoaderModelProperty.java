@@ -40,6 +40,4 @@ public class TypeLoaderModelProperty implements ModelProperty {
     return false;
   }
 
-
-
 }
