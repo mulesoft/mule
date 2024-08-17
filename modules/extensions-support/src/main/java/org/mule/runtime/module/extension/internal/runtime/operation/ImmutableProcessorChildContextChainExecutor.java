@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.module.extension.api.runtime.privileged.EventedResult.from;
+
+import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -17,11 +20,11 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.EventedResult;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
-import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
 import java.util.List;
@@ -93,7 +96,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
   }
 
   private EventedResult resultWithPreviousCorrelationId(EventedResult result) {
-    return EventedResult.from(withPreviousCorrelationid(result.getEvent()));
+    return from(withPreviousCorrelationid(result.getEvent()));
   }
 
   private EventContext createCorrelationIdContext(String correlationId) {
