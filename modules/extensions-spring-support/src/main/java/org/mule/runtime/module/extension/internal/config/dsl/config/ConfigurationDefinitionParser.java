@@ -11,6 +11,8 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsConnectivity;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,6 +25,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
+
+import java.util.Optional;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link ConfigurationProvider} instances through a
@@ -39,8 +43,9 @@ public final class ConfigurationDefinitionParser extends ExtensionDefinitionPars
   public ConfigurationDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                        ConfigurationModel configurationModel,
                                        DslSyntaxResolver dslResolver,
-                                       ExtensionParsingContext parsingContext) {
-    super(definition, dslResolver, parsingContext);
+                                       ExtensionParsingContext parsingContext,
+                                       Optional<ClassTypeLoader> typeLoader) {
+    super(definition, dslResolver, parsingContext, typeLoader);
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
     this.configDsl = dslResolver.resolve(configurationModel);

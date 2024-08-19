@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.String.format;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory.getDefault;
 
+import static java.lang.String.format;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.NamedObject;
@@ -30,6 +33,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingCon
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -47,8 +51,9 @@ public class TypedInlineParameterGroupParser extends ParameterGroupParser {
                                          ParameterGroupDescriptor groupDescriptor,
                                          ClassLoader classLoader, DslElementSyntax groupDsl,
                                          DslSyntaxResolver dslResolver,
-                                         ExtensionParsingContext context) {
-    super(definition, group, classLoader, groupDsl, dslResolver, context);
+                                         ExtensionParsingContext context,
+                                         Optional<ClassTypeLoader> typeLoader) {
+    super(definition, group, classLoader, groupDsl, dslResolver, context, typeLoader);
     MetadataType type = getDefault().createTypeLoader(classLoader).load(groupDescriptor.getType().getDeclaringClass().get());
 
     checkArgument(isObjectType(type), format("Only an ObjectType can be parsed as a TypedParameterGroup, found [%s] instead",

@@ -6,21 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
-import static java.lang.String.format;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+
+import static java.lang.String.format;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
+
+import java.util.Optional;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing extension objects that can be defined as named top level elements and be placed
@@ -40,8 +45,9 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final String namespace;
 
   public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
-                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context) {
-    super(definition, dslResolver, context);
+                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context,
+                                   Optional<ClassTypeLoader> typeLoader) {
+    super(definition, dslResolver, context, typeLoader);
     this.type = type;
     this.classLoader = classLoader;
     this.typeDsl = dslResolver.resolve(type)
@@ -52,8 +58,9 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
   public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type,
                                    ClassLoader classLoader,
-                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context) {
-    super(definition, dslResolver, context);
+                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context,
+                                   Optional<ClassTypeLoader> typeLoader) {
+    super(definition, dslResolver, context, typeLoader);
     this.name = name;
     this.namespace = namespace;
     this.type = type;

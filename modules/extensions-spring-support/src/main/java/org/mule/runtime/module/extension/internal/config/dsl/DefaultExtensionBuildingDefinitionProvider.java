@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
+import static java.util.Collections.emptySet;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -45,6 +47,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.construct.Construct
 import org.mule.runtime.module.extension.internal.config.dsl.operation.OperationDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
+import org.mule.runtime.module.extension.internal.loader.java.property.TypeLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -95,6 +98,8 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
     final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
     final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
     final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
+    final Optional<ClassTypeLoader> typeLoader =
+        extensionModel.getModelProperty(TypeLoaderModelProperty.class).map(TypeLoaderModelProperty::getTypeLoader);
 
     final ClassLoader extensionClassLoader = getClassLoader(extensionModel);
     withContextClassLoader(extensionClassLoader, () -> {
@@ -104,51 +109,53 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
         @Override
         public void onConfiguration(ConfigurationModel model) {
           parseWith(new ConfigurationDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
-                                                      parsingContext));
+                                                      parsingContext, typeLoader));
         }
 
         @Override
         protected void onConstruct(ConstructModel model) {
           parseWith(new ConstructDefinitionParser(definitionBuilder, extensionModel,
-                                                  model, dslSyntaxResolver, parsingContext));
+                                                  model, dslSyntaxResolver, parsingContext, typeLoader));
         }
 
         @Override
         public void onOperation(OperationModel model) {
           parseWith(new OperationDefinitionParser(definitionBuilder, extensionModel,
-                                                  model, dslSyntaxResolver, parsingContext));
+                                                  model, dslSyntaxResolver, parsingContext, typeLoader));
         }
 
         @Override
         public void onConnectionProvider(ConnectionProviderModel model) {
           parseWith(new ConnectionProviderDefinitionParser(definitionBuilder, model, extensionModel, dslSyntaxResolver,
-                                                           parsingContext));
+                                                           parsingContext, typeLoader));
         }
 
         @Override
         public void onSource(SourceModel model) {
           parseWith(new SourceDefinitionParser(definitionBuilder, extensionModel, model, dslSyntaxResolver,
-                                               parsingContext));
+                                               parsingContext, typeLoader));
         }
 
         @Override
         protected void onParameter(ParameterGroupModel groupModel, ParameterModel model) {
           registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                    parsingContext, reflectionCache);
+                                    parsingContext, reflectionCache, typeLoader);
         }
 
       }.walk(extensionModel);
 
       registerExportedTypesTopLevelParsers(extensionModel, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                           parsingContext, reflectionCache);
+                                           parsingContext, reflectionCache, typeLoader);
 
-      registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache);
+      registerSubTypes(definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache,
+                       typeLoader);
     });
   }
 
   private void registerSubTypes(MetadataType type, Builder definitionBuilder,
                                 ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
+                                ExtensionParsingContext parsingContext, ReflectionCache reflectionCache,
+                                Optional<ClassTypeLoader> typeLoader) {
     type.accept(new MetadataTypeVisitor() {
 
       @Override
@@ -168,7 +175,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
         } else {
           parsingContext.getSubTypes(objectType)
               .forEach(subtype -> registerTopLevelParameter(subtype, definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                                            parsingContext, reflectionCache));
+                                                            parsingContext, reflectionCache, typeLoader));
         }
       }
     });
@@ -184,7 +191,8 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
   private void registerTopLevelParameter(final MetadataType parameterType, Builder definitionBuilder,
                                          ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                         ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
+                                         ExtensionParsingContext parsingContext, ReflectionCache reflectionCache,
+                                         Optional<ClassTypeLoader> typeLoader) {
     Optional<DslElementSyntax> dslElement = dslSyntaxResolver.resolve(parameterType);
     if (!dslElement.isPresent() ||
         parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getPrefix())
@@ -202,16 +210,17 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
             parsingContext.getAllSubTypes().contains(objectType)) {
 
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
-                                                  parsingContext));
+                                                  parsingContext, typeLoader));
         }
 
-        registerSubTypes(objectType, definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache);
+        registerSubTypes(objectType, definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext, reflectionCache,
+                         typeLoader);
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
         registerTopLevelParameter(arrayType.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver,
-                                  parsingContext, reflectionCache);
+                                  parsingContext, reflectionCache, typeLoader);
       }
 
       @Override
@@ -225,18 +234,21 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   private void registerExportedTypesTopLevelParsers(ExtensionModel extensionModel,
                                                     Builder definitionBuilder,
                                                     ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                                    ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
+                                                    ExtensionParsingContext parsingContext, ReflectionCache reflectionCache,
+                                                    Optional<ClassTypeLoader> typeLoader) {
     registerTopLevelParameters(extensionModel.getTypes().stream(),
                                definitionBuilder,
                                extensionClassLoader,
                                dslSyntaxResolver,
                                parsingContext,
-                               reflectionCache);
+                               reflectionCache,
+                               typeLoader);
   }
 
   private void registerSubTypes(Builder definitionBuilder,
                                 ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
+                                ExtensionParsingContext parsingContext, ReflectionCache reflectionCache,
+                                Optional<ClassTypeLoader> typeLoader) {
 
 
     ImmutableList<MetadataType> mappedTypes = new ImmutableList.Builder<MetadataType>()
@@ -246,12 +258,13 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
     registerTopLevelParameters(mappedTypes.stream(), definitionBuilder, extensionClassLoader,
                                dslSyntaxResolver,
-                               parsingContext, reflectionCache);
+                               parsingContext, reflectionCache, typeLoader);
   }
 
   private void registerTopLevelParameters(Stream<? extends MetadataType> parameters, Builder definitionBuilder,
                                           ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
-                                          ExtensionParsingContext parsingContext, ReflectionCache reflectionCache) {
+                                          ExtensionParsingContext parsingContext, ReflectionCache reflectionCache,
+                                          Optional<ClassTypeLoader> typeLoader) {
 
     parameters.filter(p -> IntrospectionUtils.isInstantiable(p, reflectionCache))
         .forEach(subType -> registerTopLevelParameter(subType,
@@ -259,7 +272,8 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
                                                       extensionClassLoader,
                                                       dslSyntaxResolver,
                                                       parsingContext,
-                                                      reflectionCache));
+                                                      reflectionCache,
+                                                      typeLoader));
 
   }
 
