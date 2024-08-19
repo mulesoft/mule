@@ -19257,7 +19257,11 @@
                 "allowedStereotypes": [
                   {
                     "type": "HEALTHY_FOOD",
-                    "namespace": "VEGAN"
+                    "namespace": "VEGAN",
+                    "parent": {
+                      "type": "FARMED_FOOD",
+                      "namespace": "VEGAN"
+                    }
                   }
                 ]
               }
@@ -19452,7 +19456,11 @@
                 "allowedStereotypes": [
                   {
                     "type": "HEALTHY_FOOD",
-                    "namespace": "VEGAN"
+                    "namespace": "VEGAN",
+                    "parent": {
+                      "type": "FARMED_FOOD",
+                      "namespace": "VEGAN"
+                    }
                   }
                 ]
               }
