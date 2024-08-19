@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
@@ -17,6 +14,11 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isF
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.loader.java.validation.JavaModelValidationUtils.isCompiletime;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -38,6 +40,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAn
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.module.extension.internal.loader.java.property.TypeLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
@@ -55,7 +58,8 @@ public final class NullSafeModelValidator implements ExtensionModelValidator {
   @Override
   public void validate(ExtensionModel extensionModel, ProblemsReporter problemsReporter) {
     ReflectionCache reflectionCache = new ReflectionCache();
-    TypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+    TypeLoader typeLoader = extensionModel.getModelProperty(TypeLoaderModelProperty.class)
+        .map(TypeLoaderModelProperty::getTypeLoader).orElseGet(ExtensionsTypeLoaderFactory.getDefault()::createTypeLoader);
     new ExtensionWalker() {
 
       @Override
