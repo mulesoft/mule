@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
-import static java.util.Optional.of;
-
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
+
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -18,6 +18,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 
 import java.util.HashMap;
@@ -77,6 +78,9 @@ final class RouterModelLoaderDelegate extends AbstractComponentModelLoaderDelega
           .withMinOccurs(route.getMinOccurs())
           .withMaxOccurs(route.getMaxOccurs().orElse(null));
 
+      if (route.isSdkApiDefined()) {
+        routeDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);
+      }
       NestedChainDeclarer chain = routeDeclarer.withChain();
       getStereotypeModelLoaderDelegate().addAllowedStereotypes(route, chain);
       route.getAdditionalModelProperties().forEach(routeDeclarer::withModelProperty);
