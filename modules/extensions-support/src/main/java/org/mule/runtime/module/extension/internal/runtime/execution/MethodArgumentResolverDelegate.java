@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.lang.System.arraycopy;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.toMap;
@@ -21,11 +19,11 @@ import static org.mule.runtime.module.extension.internal.runtime.execution.Metho
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isSourceCompletionCallbackType;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isStreamingHelperType;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveCursorAsUnclosable;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
-import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
-import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.isParameterGroupShowInDsl;
 
-import org.mule.metadata.java.api.JavaTypeLoader;
+import static java.lang.System.arraycopy;
+
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -182,11 +180,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
   @Inject
   private ExtensionsClient extensionsClient;
 
-  private final List<ParameterGroupModel> parameterGroupModels;
   private final Method method;
-  private final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
   private ArgumentResolver<Object>[] argumentResolvers;
-  private Map<java.lang.reflect.Parameter, ParameterGroupArgumentResolver<?>> parameterGroupResolvers;
 
   /**
    * Creates a new instance for the given {@code method}
@@ -195,7 +190,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
    * @param method               the {@link Method} to be called
    */
   public MethodArgumentResolverDelegate(List<ParameterGroupModel> parameterGroupModels, Method method) {
-    this.parameterGroupModels = parameterGroupModels;
     this.method = method;
   }
 
@@ -210,7 +204,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
     argumentResolvers = new ArgumentResolver[parameterTypes.length];
     Annotation[][] parameterAnnotations = method.getParameterAnnotations();
     Parameter[] parameters = method.getParameters();
-    parameterGroupResolvers = getParameterGroupResolvers(parameterGroupModels);
     final List<String> paramNames = getParamNames(method);
 
     for (int i = 0; i < parameterTypes.length; i++) {
@@ -232,9 +225,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = LEGACY_SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER;
       } else if (org.mule.sdk.api.runtime.source.SourceCallbackContext.class.equals(parameterType)) {
         argumentResolver = SOURCE_CALLBACK_CONTEXT_ARGUMENT_RESOLVER;
-      } else if (hasParameterGroupAnnotation(annotations.keySet()) && !isParameterGroupShowInDsl(annotations).get()
-          && isParameterContainer(annotations.keySet(), typeLoader.load(parameterType))) {
-        argumentResolver = parameterGroupResolvers.get(parameter);
       } else if (isParameterResolverType(parameterType)) {
         argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
       } else if (TypedValue.class.equals(parameterType)) {
