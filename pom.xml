@@ -250,7 +250,7 @@
         <!-- These are declared here so that version upgrading bots keep the version property up to date -->
         <springVersion>5.3.33</springVersion>
         <commonsCliVersion>1.6.0</commonsCliVersion>
-        <mule.maven.plugin.version>4.1.1</mule.maven.plugin.version>
+        <mule.maven.plugin.version>4.2.0</mule.maven.plugin.version>
     </properties>
 
     <dependencyManagement>

@@ -27,10 +27,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * A cache which relates {@link ClassLoader} instances with {@link LoggerContext}s
@@ -68,15 +70,15 @@ final class LoggerContextCache implements Disposable {
   LoggerContextCache(ArtifactAwareContextSelector artifactAwareContextSelector, ClassLoader reaperContextClassLoader) {
     acquireContextDisposeDelay();
     this.artifactAwareContextSelector = artifactAwareContextSelector;
-    activeContexts = newBuilder().build();
+    activeContexts = newBuilder().<Integer, LoggerContext>build();
 
     disposedContexts = newBuilder().expireAfterWrite(disposeDelayInMillis, MILLISECONDS)
-        .removalListener((key, value, cause) -> {
-          stop((LoggerContext) value);
+        .<Integer, LoggerContext>removalListener((key, value, cause) -> {
+          stop(value);
           activeContexts.invalidate(key);
 
           Int2ObjectMap<LoggerContext> newBuiltContexts = new Int2ObjectOpenHashMap<>(builtContexts);
-          newBuiltContexts.remove(((Integer) key).intValue());
+          newBuiltContexts.remove(key.intValue());
           builtContexts = newBuiltContexts;
         }).build();
 
