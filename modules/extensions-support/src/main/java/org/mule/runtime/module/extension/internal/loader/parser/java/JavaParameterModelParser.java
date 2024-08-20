@@ -510,8 +510,4 @@ public class JavaParameterModelParser implements ParameterModelParser, HasExtens
     return parameter;
   }
 
-  @Override
-  public boolean mustResolveMinMuleVersion() {
-    return context.getLoadingContext().isResolveMinMuleVersion();
-  }
 }

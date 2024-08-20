@@ -72,7 +72,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
-    if (mustResolveMinMuleVersion()) {
+    if (loadingContext.isResolveMinMuleVersion()) {
       this.resolvedMinMuleVersion = resolveConfigurationMinMuleVersion(configElement,
                                                                        getContainerAnnotationMinMuleVersion(extensionElement,
                                                                                                             Configurations.class,

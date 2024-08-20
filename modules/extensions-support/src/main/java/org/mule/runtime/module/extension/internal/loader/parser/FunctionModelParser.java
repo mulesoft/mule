@@ -71,12 +71,4 @@ public interface FunctionModelParser extends SemanticTermsParser, AdditionalProp
    */
   Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 
-  /**
-   * @return whether the {@link #getResolvedMinMuleVersion() minMuleVersion resolution} has to be performed.
-   * @since 4.9
-   */
-  default boolean mustResolveMinMuleVersion() {
-    return true;
-  }
-
 }

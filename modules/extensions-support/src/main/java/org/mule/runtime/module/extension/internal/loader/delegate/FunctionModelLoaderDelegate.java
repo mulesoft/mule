@@ -57,12 +57,10 @@ final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDele
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
       parser.getAdditionalModelProperties().forEach(function::withModelProperty);
-      if (parser.mustResolveMinMuleVersion()) {
-        parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-          function.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-          LOGGER.debug(resolvedMMV.getReason());
-        });
-      }
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+        function.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+        LOGGER.debug(resolvedMMV.getReason());
+      });
       addSemanticTerms(function.getDeclaration(), parser);
 
       functionDeclarers.put(parser, function);

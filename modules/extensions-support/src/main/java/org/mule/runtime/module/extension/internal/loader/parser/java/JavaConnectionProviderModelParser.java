@@ -102,7 +102,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
         .orElse(ExtensionModel.class.getClassLoader());
 
     collectAdditionalModelProperties();
-    if (mustResolveMinMuleVersion()) {
+    if (loadingContext.isResolveMinMuleVersion()) {
       this.resolvedMinMuleVersion = resolveConnectionProviderMinMuleVersion(element);
     } else {
       this.resolvedMinMuleVersion = null;
@@ -334,8 +334,4 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
                                                   .credentialsPlacement())));
   }
 
-  @Override
-  public boolean mustResolveMinMuleVersion() {
-    return loadingContext.isResolveMinMuleVersion();
-  }
 }

@@ -127,12 +127,10 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
 
     parser.getDeprecationModel().ifPresent(operation::withDeprecation);
     parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
-    if (parser.mustResolveMinMuleVersion()) {
-      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-        operation.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-        LOGGER.debug(resolvedMMV.getReason());
-      });
-    }
+    parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+      operation.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+      LOGGER.debug(resolvedMMV.getReason());
+    });
     loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
     addSemanticTerms(operation.getDeclaration(), parser);
     parser.getExecutionType().ifPresent(operation::withExecutionType);

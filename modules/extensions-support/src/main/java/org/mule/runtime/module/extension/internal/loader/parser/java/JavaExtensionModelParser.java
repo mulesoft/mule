@@ -143,7 +143,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseSubtypes();
     parseNotificationModels();
 
-    if (mustResolveMinMuleVersion()) {
+    if (loadingContext.isResolveMinMuleVersion()) {
       this.resolvedMinMuleVersion = resolveExtensionMinMuleVersion(extensionElement);
     } else {
       this.resolvedMinMuleVersion = null;
