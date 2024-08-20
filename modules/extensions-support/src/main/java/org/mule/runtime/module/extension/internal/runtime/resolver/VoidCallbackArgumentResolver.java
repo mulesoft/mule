@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.module.extension.api.runtime.privileged.EventedResult.from;
 import static org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextProperties.COMPLETION_CALLBACK_CONTEXT_PARAM;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
-import org.mule.runtime.core.privileged.event.EventedResult;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
 /**
@@ -36,7 +36,7 @@ public final class VoidCallbackArgumentResolver implements ArgumentResolver<Void
 
       @Override
       public void success() {
-        completionCallback.success(EventedResult.from(event));
+        completionCallback.success(from(event));
       }
 
       @Override
