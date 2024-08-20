@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.String.format;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+
+import static java.lang.String.format;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
@@ -25,6 +29,8 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
+
+import java.util.Optional;
 
 /**
  * A parser which returns the definition parsers for a given {@link NestedRouteModel}
@@ -46,8 +52,9 @@ public class RouteComponentParser extends ExtensionDefinitionParser {
                               ClassLoader classLoader,
                               DslElementSyntax routeDsl,
                               DslSyntaxResolver dslResolver,
-                              ExtensionParsingContext context) {
-    super(definition, dslResolver, context);
+                              ExtensionParsingContext context,
+                              Optional<ClassTypeLoader> typeLoader) {
+    super(definition, dslResolver, context, typeLoader);
 
     checkArgument(isObjectType(metadataType),
                   format("Only an ObjectType can be parsed as a TypedParameterGroup, found [%s] instead",

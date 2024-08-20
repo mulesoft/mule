@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
-import static java.util.Collections.singletonList;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import static java.util.Collections.singletonList;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A {@link ParameterGroupParser} which returns the values of the parameters in the group as a {@link Map}
@@ -41,8 +44,9 @@ public class AnonymousInlineParameterGroupParser extends ParameterGroupParser {
                                              ClassLoader classLoader,
                                              DslElementSyntax groupDsl,
                                              DslSyntaxResolver dslResolver,
-                                             ExtensionParsingContext context) {
-    super(definition, group, classLoader, groupDsl, dslResolver, context);
+                                             ExtensionParsingContext context,
+                                             Optional<ClassTypeLoader> typeLoader) {
+    super(definition, group, classLoader, groupDsl, dslResolver, context, typeLoader);
   }
 
   @Override

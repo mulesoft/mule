@@ -6837,7 +6837,11 @@
                 "allowedStereotypes": [
                   {
                     "type": "SQUARE",
-                    "namespace": "SUBTYPES"
+                    "namespace": "SUBTYPES",
+                    "parent": {
+                      "type": "PARENT_SHAPE",
+                      "namespace": "SUBTYPES"
+                    }
                   }
                 ]
               }
@@ -6973,7 +6977,11 @@
                 "allowedStereotypes": [
                   {
                     "type": "RICIN",
-                    "namespace": "HEISENBERG"
+                    "namespace": "HEISENBERG",
+                    "parent": {
+                      "type": "WEAPON",
+                      "namespace": "HEISENBERG"
+                    }
                   }
                 ]
               }

@@ -39,8 +39,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.oneOf;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
@@ -85,7 +85,6 @@ import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -97,8 +96,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import io.qameta.allure.Issue;
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
 
@@ -257,7 +257,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
 
@@ -267,7 +267,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
     assertExpectedType(getParameter(typedModel, "firstPerson"), personType, true);
     assertExpectedType(getParameter(typedModel, "otherPerson"), personType, true);
   }
@@ -278,7 +278,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     MetadataResult<InputMetadataDescriptor> inputMetadataResult = metadataService.getInputMetadata(location, PERSON_METADATA_KEY);
     assertThat(inputMetadataResult.isSuccess(), is(true));
     InputMetadataDescriptor inputMetadataDescriptor = inputMetadataResult.get();
-    assertExpectedParameterMetadataDescriptor(inputMetadataDescriptor.getParameterMetadata("type"), String.class, false);
+    assertExpectedParameterMetadataDescriptor(inputMetadataDescriptor.getParameterMetadata("type"),
+                                              STRING_TYPE, false);
     assertExpectedParameterMetadataDescriptor(inputMetadataDescriptor.getParameterMetadata("firstPerson"), personType);
     assertExpectedParameterMetadataDescriptor(inputMetadataDescriptor.getParameterMetadata("otherPerson"), personType);
   }
@@ -535,8 +536,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, personType, void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, personType, VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
 
   }
 
@@ -547,8 +548,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, void.class, void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, VOID_TYPE, VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
 
@@ -559,7 +560,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final OperationModel typedModel = metadataDescriptor.getModel();
     MetadataType objectMetadataType = (new ParameterTypeWrapper(Object.class, typeLoader)).asMetadataType();
 
-    assertExpectedOutput(typedModel, personType, void.class);
+    assertExpectedOutput(typedModel, personType, VOID_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), objectMetadataType, false);
 
   }
@@ -570,7 +571,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
         Location.builder().globalName(CONTENT_AND_OUTPUT_METADATA_WITHOUT_KEY_ID).addProcessorsPart().addIndexPart(0).build();
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, personType, void.class);
+    assertExpectedOutput(typedModel, personType, VOID_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
 
@@ -581,8 +582,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, void.class, void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, VOID_TYPE, VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
 
@@ -593,8 +594,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, personType, void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, personType, VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
 
   }
 
@@ -603,9 +604,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     location = Location.builder().globalName(MESSAGE_ATTRIBUTES_ANY_TYPE_METADATA).addProcessorsPart().addIndexPart(0).build();
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, ExtensionsTestUtils.TYPE_BUILDER.anyType().build(),
-                         ExtensionsTestUtils.TYPE_BUILDER.anyType().build());
-    assertExpectedType(getParameter(typedModel, TARGET_PARAMETER_NAME), String.class);
+    assertExpectedOutput(typedModel, ANY_TYPE, ANY_TYPE);
+    assertExpectedType(getParameter(typedModel, TARGET_PARAMETER_NAME), STRING_TYPE);
   }
 
   @Test
@@ -614,8 +614,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, personType, StringAttributes.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, personType, types.get(StringAttributes.class.getName()));
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
 
   }
 
@@ -654,8 +654,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
         .addIndexPart(0).build();
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, Shape.class, AbstractOutputAttributes.class);
-
+    assertExpectedOutput(typedModel,
+                         types.get(Shape.class.getName()), types.get(AbstractOutputAttributes.class.getName()));
   }
 
   @Test
@@ -664,8 +664,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, typeBuilder.anyType().build(), void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, typeBuilder.anyType().build(), VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
 
@@ -675,8 +675,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, typeBuilder.anyType().build(), void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, typeBuilder.anyType().build(), VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
 
@@ -688,8 +688,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final OperationModel typedModel = metadataDescriptor.getModel();
     MetadataType objectMetadataType = (new ParameterTypeWrapper(Object.class, typeLoader)).asMetadataType();
 
-    assertExpectedOutput(typedModel, personType, void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, personType, VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), objectMetadataType, false);
   }
 
@@ -698,7 +698,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     location = Location.builder().globalName(CONTENT_METADATA_WITHOUT_KEY_ID).addProcessorsPart().addIndexPart(0).build();
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, typeBuilder.anyType().build(), void.class);
+    assertExpectedOutput(typedModel, typeBuilder.anyType().build(), VOID_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
 
@@ -709,7 +709,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final OperationModel typedModel = metadataDescriptor.getModel();
     MetadataType objectMetadataType = (new ParameterTypeWrapper(Object.class, typeLoader)).asMetadataType();
 
-    assertExpectedOutput(typedModel, personType, void.class);
+    assertExpectedOutput(typedModel, personType, VOID_TYPE);
     assertExpectedType(getParameter(typedModel, "content"), objectMetadataType, false);
   }
 
@@ -752,8 +752,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadata(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, personType, void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, personType, VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
     // TODO MULE-14190: Revamp MetadataScope annotation
     // assertExpectedType(getParameter(typedModel, "content"), personType, true);
   }
@@ -763,7 +763,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     location = Location.builder().globalName(PAGED_OPERATION_METADATA).addProcessorsPart().addIndexPart(0).build();
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
-    assertExpectedType(getParameter(typedModel, "animal"), Animal.class);
+    assertExpectedType(getParameter(typedModel, "animal"), types.get(Animal.class.getName()));
   }
 
   @Test
@@ -773,7 +773,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     MetadataType param = metadataDescriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
     assertThat(getId(param).get(), is(Iterator.class.getName()));
-    assertMessageType(((ArrayType) param).getType(), personType, TYPE_LOADER.load(Animal.class));
+    assertMessageType(((ArrayType) param).getType(), personType, types.get(Animal.class.getName()));
   }
 
   @Test
@@ -792,9 +792,9 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     location = Location.builder().globalName(TYPE_WITH_DECLARED_SUBTYPES_METADATA).addProcessorsPart().addIndexPart(0).build();
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(NULL_METADATA_KEY);
     final ComponentModel typedModel = metadataDescriptor.getModel();
-    assertExpectedType(getParameter(typedModel, "plainShape"), Shape.class);
-    assertExpectedType(getParameter(typedModel, "animal"), Animal.class);
-    assertExpectedType(getParameter(typedModel, "rectangleSubtype"), Rectangle.class);
+    assertExpectedType(getParameter(typedModel, "plainShape"), types.get(Shape.class.getName()));
+    assertExpectedType(getParameter(typedModel, "animal"), types.get(Animal.class.getName()));
+    assertExpectedType(getParameter(typedModel, "rectangleSubtype"), types.get(Rectangle.class.getName()));
   }
 
   @Test
@@ -814,7 +814,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     MetadataResult<ComponentMetadataDescriptor<OperationModel>> result =
         metadataService.getOperationMetadata(location, newKey("true").build());
     assertSuccessResult(result);
-    assertExpectedType(getParameter(result.get().getModel(), "content"), TYPE_LOADER.load(SwordFish.class), true);
+    assertExpectedType(getParameter(result.get().getModel(), "content"), types.get(SwordFish.class.getName()), true);
   }
 
   @Test
@@ -839,7 +839,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     location = Location.builder().globalName(ENUM_METADATA_KEY).addProcessorsPart().addIndexPart(0).build();
     ComponentMetadataDescriptor metadataDescriptor = getSuccessComponentDynamicMetadata(newKey("MAMMAL").build());
     final ComponentModel typedModel = metadataDescriptor.getModel();
-    assertExpectedType(getParameter(typedModel, "content"), TYPE_LOADER.load(Bear.class), true);
+    assertExpectedType(getParameter(typedModel, "content"), types.get(Bear.class.getName()), true);
   }
 
   @Test
@@ -851,7 +851,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     assertThat(type, is(instanceOf(ObjectType.class)));
     ObjectType objectType = (ObjectType) type;
     assertThat(objectType.getFields(), hasSize(2));
-    objectType.getFields().forEach(f -> assertThat(f.getKey().getName().getLocalPart(), isOneOf(TIRES, BRAND)));
+    objectType.getFields().forEach(f -> assertThat(f.getKey().getName().getLocalPart(), oneOf(TIRES, BRAND)));
     Optional<MetadataKey> metadataKeyOptional = result.get().getMetadataAttributes().getKey();
     assertThat(metadataKeyOptional.isPresent(), is(true));
     assertThat(metadataKeyOptional.get().getId(), is(CAR));
@@ -884,8 +884,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ComponentMetadataDescriptor<OperationModel> descriptor = result.get();
     MetadataType param = descriptor.getModel().getOutput().getType();
     assertThat(param, is(instanceOf(ArrayType.class)));
-    assertMessageType(((ArrayType) param).getType(), TYPE_LOADER.load(String.class),
-                      TYPE_LOADER.load(StringAttributes.class));
+    assertMessageType(((ArrayType) param).getType(),
+                      STRING_TYPE, types.get(StringAttributes.class.getName()));
   }
 
   @Test
@@ -964,8 +964,8 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     final ComponentMetadataDescriptor<OperationModel> metadataDescriptor =
         getSuccessComponentDynamicMetadataWithKey(PERSON_METADATA_KEY);
     final OperationModel typedModel = metadataDescriptor.getModel();
-    assertExpectedOutput(typedModel, personType, void.class);
-    assertExpectedType(getParameter(typedModel, "type"), String.class);
+    assertExpectedOutput(typedModel, personType, VOID_TYPE);
+    assertExpectedType(getParameter(typedModel, "type"), STRING_TYPE);
 
   }
 

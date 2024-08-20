@@ -7,14 +7,15 @@
 package org.mule.test.module.extension.metadata;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultFailureMatcher.isFailure;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
-import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_SERVICE;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_SERVICE;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getCarMetadata;
@@ -26,15 +27,19 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.DSL_RESOLUTION;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
 
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
+
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.Typed;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -50,26 +55,27 @@ import org.mule.runtime.api.metadata.resolving.MetadataComponent;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.api.metadata.MultilevelMetadataKeyBuilder;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.runners.Parameterized;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 //TODO MULE-12809: Make MetadataTestCase use LazyMetadataService
 @RunnerDelegateTo(Parameterized.class)
@@ -154,10 +160,15 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
           .withChild(MultilevelMetadataKeyBuilder.newKey(SAN_FRANCISCO, CITY))).build();
 
   protected static final NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
-  protected static final ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
+  protected static final MetadataType ANY_TYPE = BaseTypeBuilder.create(JAVA).anyType().build();
   protected static final MetadataType VOID_TYPE = BaseTypeBuilder.create(JAVA).voidType().build();
   protected static final MetadataType STRING_TYPE = BaseTypeBuilder.create(JAVA).stringType().build();
+
+  protected Map<String, ObjectType> types;
+
+  @Inject
+  private ExtensionManager extensionManager;
 
   @Inject
   @Named(METADATA_SERVICE_KEY)
@@ -208,6 +219,14 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     personType = getPersonMetadata();
     houseType = getHouseMetadata();
     carType = getCarMetadata();
+  }
+
+  @Before
+  public void loadTypes() {
+    types = extensionManager.getExtension("Metadata").get().getTypes()
+        .stream()
+        .filter(type -> getTypeId(type).isPresent())
+        .collect(toMap(type -> getTypeId(type).get(), identity()));
   }
 
   @Override
@@ -273,15 +292,6 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     }
   }
 
-  void assertExpectedOutput(ConnectableComponentModel model, Type payloadType, Type attributesType) {
-    assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), TYPE_LOADER.load(payloadType),
-                         TYPE_LOADER.load(attributesType));
-  }
-
-  void assertExpectedOutput(ConnectableComponentModel model, MetadataType payloadType, Type attributesType) {
-    assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), payloadType, TYPE_LOADER.load(attributesType));
-  }
-
   void assertExpectedOutput(ConnectableComponentModel model, MetadataType payloadType, MetadataType attributesType) {
     assertExpectedOutput(model.getOutput(), model.getOutputAttributes(), payloadType, attributesType);
   }
@@ -295,7 +305,8 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     assertThat(type, is(expectedType));
   }
 
-  protected void assertExpectedParameterMetadataDescriptor(ParameterMetadataDescriptor parameterMetadataDescriptor, Type type,
+  protected void assertExpectedParameterMetadataDescriptor(ParameterMetadataDescriptor parameterMetadataDescriptor,
+                                                           MetadataType type,
                                                            boolean dynamic) {
     assertThat(parameterMetadataDescriptor.isDynamic(), is(dynamic));
     assertExpectedType(parameterMetadataDescriptor.getType(), type);
@@ -307,12 +318,8 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
     assertExpectedType(parameterMetadataDescriptor.getType(), type);
   }
 
-  protected void assertExpectedType(Typed type, Type expectedType) {
-    assertThat(type.getType(), is(TYPE_LOADER.load(expectedType)));
-  }
-
-  protected void assertExpectedType(MetadataType metadataType, Type expectedType) {
-    assertExpectedType(metadataType, TYPE_LOADER.load(expectedType));
+  protected void assertExpectedType(Typed type, MetadataType expectedType) {
+    assertThat(type.getType(), is(expectedType));
   }
 
   protected void assertExpectedType(Typed typedModel, MetadataType expectedType, boolean isDynamic) {

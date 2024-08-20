@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils
 
 import static java.util.function.Function.identity;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
 import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils.MetadataTypeBasedInfrastructureType;
@@ -27,12 +28,12 @@ import java.util.Optional;
  */
 public class InfrastructureTypeResolver {
 
+  private static final ClassTypeLoader TYPE_LOADER = new DefaultExtensionsTypeLoaderFactory()
+      .createTypeLoader(InfrastructureTypeUtils.class.getClassLoader());
+
   private static final Map<Type, MetadataTypeBasedInfrastructureType> TYPE_MAPPING = getActionableInfrastructureTypes()
       .stream()
-      .collect(toImmutableMap(infrastructureType -> new TypeWrapper(infrastructureType.getClazz(),
-                                                                    new DefaultExtensionsTypeLoaderFactory()
-                                                                        .createTypeLoader(InfrastructureTypeUtils.class
-                                                                            .getClassLoader())),
+      .collect(toImmutableMap(infrastructureType -> new TypeWrapper(infrastructureType.getClazz(), TYPE_LOADER),
                               identity()));
 
 

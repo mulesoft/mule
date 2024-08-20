@@ -21,12 +21,11 @@ import java.util.List;
  */
 public final class ParameterDeclarationContext {
 
-  private static final StackableTypesModelPropertyResolver STACKABLE_TYPES_RESOLVER = newInstance();
-
   private final String componentName;
   private final String componentType;
 
   private final ExtensionLoadingContext loadingContext;
+  private final StackableTypesModelPropertyResolver stackableTypesResolver;
 
   private final boolean keyResolverAvailable;
 
@@ -74,6 +73,7 @@ public final class ParameterDeclarationContext {
     this.componentName = componentName;
     this.componentType = componentType;
     this.loadingContext = loadingContext;
+    this.stackableTypesResolver = newInstance(loadingContext);
     this.keyResolverAvailable = keyResolverAvailable;
   }
 
@@ -103,6 +103,6 @@ public final class ParameterDeclarationContext {
   }
 
   public List<ModelProperty> resolveStackableTypes(ExtensionParameter extensionParameter) {
-    return STACKABLE_TYPES_RESOLVER.resolveStackableProperties(extensionParameter, this);
+    return stackableTypesResolver.resolveStackableProperties(extensionParameter, this);
   }
 }

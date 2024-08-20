@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_P
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -56,8 +57,9 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
   public AbstractComponentDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                            T componentModel,
                                            DslSyntaxResolver dslSyntaxResolver,
-                                           ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
+                                           ExtensionParsingContext parsingContext,
+                                           Optional<ClassTypeLoader> typeLoader) {
+    super(definition, dslSyntaxResolver, parsingContext, typeLoader);
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
     this.operationDsl = dslSyntaxResolver.resolve(componentModel);
