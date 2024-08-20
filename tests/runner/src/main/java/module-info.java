@@ -31,7 +31,6 @@ module org.mule.test.runner {
   requires org.mule.runtime.maven.client.impl;
 
   requires java.management;
-  requires jdk.management;
 
   requires com.google.common;
   requires org.apache.commons.codec;
