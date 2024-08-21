@@ -2,9 +2,11 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
       xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+      xmlns:os="http://www.mulesoft.org/schema/mule/os"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
+               http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
                http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd">
     <configuration-properties file="heisenberg.properties"/>
 
@@ -148,5 +150,19 @@
         <petstore:scope-with-mule-stereotype>
             <heisenberg:validate-money/>
         </petstore:scope-with-mule-stereotype>
+    </flow>
+
+    <os:object-store name="asyncOs" persistent="false" />
+
+    <flow name="asyncChainToObjectStore">
+        <heisenberg:async-chain-to-object-store latch="#[vars.latch]">
+            <os:store key="#[vars.osName]" objectStore="asyncOs" failIfPresent="true">
+                <os:value>#[vars.expectedOutput]</os:value>
+            </os:store>
+        </heisenberg:async-chain-to-object-store>
+
+        <until-successful maxRetries="3" millisBetweenRetries="1000">
+            <os:retrieve key="#[vars.osName]" objectStore="asyncOs" />
+        </until-successful>
     </flow>
 </mule>
