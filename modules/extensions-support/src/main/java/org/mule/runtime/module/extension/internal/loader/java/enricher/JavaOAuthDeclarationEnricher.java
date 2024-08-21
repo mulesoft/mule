@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -16,8 +15,13 @@ import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthCo
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.UNAUTHORIZE_OPERATION_NAME;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
 
-import org.mule.metadata.api.ClassTypeLoader;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.VoidType;
+import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -33,7 +37,6 @@ import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantT
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.WalkingDeclarationEnricher;
@@ -53,6 +56,9 @@ import java.util.Set;
  */
 public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher {
 
+  private static final DefaultStringType stringType = BaseTypeBuilder.create(JAVA).stringType().build();
+  private static final VoidType voidType = BaseTypeBuilder.create(JAVA).voidType().build();
+
   @Override
   public DeclarationEnricherPhase getExecutionPhase() {
     return STRUCTURE;
@@ -62,8 +68,8 @@ public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher 
   public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     return of(new DeclarationEnricherWalkDelegate() {
 
-      private ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
-      private Set<Reference<ConfigurationDeclaration>> oauthConfigs = new HashSet<>();
+      private final ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
+      private final Set<Reference<ConfigurationDeclaration>> oauthConfigs = new HashSet<>();
       private boolean oauthGloballySupported = false;
       private boolean supportsAuthCode = false;
 
@@ -110,10 +116,6 @@ public class JavaOAuthDeclarationEnricher implements WalkingDeclarationEnricher 
       }
 
       private OperationDeclaration buildUnauthorizeOperation(boolean supportsAuthCode) {
-        final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-        final MetadataType stringType = typeLoader.load(String.class);
-        final MetadataType voidType = typeLoader.load(void.class);
-
         OperationDeclaration operation = new OperationDeclaration(UNAUTHORIZE_OPERATION_NAME);
         operation
             .setDescription("Deletes all the access token information of a given resource owner id so that it's impossible to "

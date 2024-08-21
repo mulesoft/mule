@@ -10,6 +10,8 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -26,6 +28,8 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cli
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 
+import java.util.Optional;
+
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link ConnectionProviderResolver} instances through a
  * {@link ConnectionProviderObjectFactory}
@@ -40,8 +44,9 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
 
   public ConnectionProviderDefinitionParser(Builder definition, ConnectionProviderModel providerModel,
                                             ExtensionModel extensionModel, DslSyntaxResolver dslSyntaxResolver,
-                                            ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
+                                            ExtensionParsingContext parsingContext,
+                                            Optional<ClassTypeLoader> typeLoader) {
+    super(definition, dslSyntaxResolver, parsingContext, typeLoader);
     this.providerModel = providerModel;
     this.extensionModel = extensionModel;
     this.connectionDsl = dslSyntaxResolver.resolve(providerModel);

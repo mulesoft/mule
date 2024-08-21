@@ -6,14 +6,6 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
@@ -28,6 +20,16 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.LA_PLATA;
 import static org.mule.test.module.extension.metadata.MetadataExtensionFunctionalTestCase.ResolutionType.EXPLICIT_RESOLUTION;
+
+import static java.lang.String.format;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -160,7 +162,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase<
         metadataService.getOutputMetadata(location, PERSON_METADATA_KEY);
     assertThat(outputMetadataResult.isSuccess(), is(true));
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
-    assertExpectedType(outputMetadataDescriptor.getAttributesMetadata().getType(), StringAttributes.class);
+    assertExpectedType(outputMetadataDescriptor.getAttributesMetadata().getType(), types.get(StringAttributes.class.getName()));
   }
 
   @Test

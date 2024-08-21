@@ -6,22 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
-import static java.util.Optional.of;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.POLLING_SOURCE_LIMIT_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.STRUCTURE;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isPollingSourceLimitEnabled;
 import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
+
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -37,7 +38,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -74,7 +74,7 @@ public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnric
                                                 new DefaultExtensionsTypeLoaderFactory()
                                                     .createTypeLoader(extensionLoadingContext.getExtensionClassLoader())))
                                                         .map(MetadataTypeBasedInfrastructureType::getSequence).orElse(0);
-      ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+      ClassTypeLoader loader = extensionLoadingContext.getTypeLoader();
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
       boolean thereArePollingSources = false;
 
@@ -131,8 +131,8 @@ public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnric
       @Override
       public void onWalkFinished() {
         if (thereArePollingSources && !isSchedulerAlreadyImported(extensionDeclarer.getDeclaration())) {
-          ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
-          extensionDeclarer.withImportedType(new ImportedTypeModel((ObjectType) loadSchedulingStrategyType(typeLoader)));
+          extensionDeclarer.withImportedType(new ImportedTypeModel((ObjectType) loadSchedulingStrategyType(extensionLoadingContext
+              .getTypeLoader())));
         }
       }
     });

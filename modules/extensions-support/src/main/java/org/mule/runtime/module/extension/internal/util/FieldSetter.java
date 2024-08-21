@@ -62,7 +62,7 @@ public final class FieldSetter<Target, Value> {
     } else {
       try {
         field.set(target, value);
-      } catch (IllegalAccessException ex) {
+      } catch (IllegalAccessException | IllegalArgumentException ex) {
         throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
       }
     }

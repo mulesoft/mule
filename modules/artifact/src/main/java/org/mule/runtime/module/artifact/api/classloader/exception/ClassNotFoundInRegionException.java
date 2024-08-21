@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.exception;
 
-import static java.lang.Boolean.getBoolean;
-import static java.lang.String.format;
 import static org.mule.runtime.api.exception.MuleException.MULE_VERBOSE_EXCEPTIONS;
+
+import static java.lang.Boolean.getBoolean;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -33,7 +33,7 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
    * @param regionName the name of the region the class was being loaded from.
    */
   public ClassNotFoundInRegionException(String className, String regionName) {
-    super(format("Class '%s' has no package mapping for region '%s'.", className, regionName));
+    super("Class '" + className + "' has no package mapping for region '" + regionName + "'.");
     this.className = className;
     this.regionName = regionName;
   }
@@ -47,7 +47,8 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
    * @param cause        the actual exception that was thrown when loading the class form the artifact classLoader.
    */
   public ClassNotFoundInRegionException(String className, String regionName, String artifactName, ClassNotFoundException cause) {
-    super(format("Class '%s' not found in classloader for artifact '%s' in region '%s'.", className, artifactName, regionName),
+    super("Class '" + className + "' not found in classloader for artifact '" + artifactName + "' in region '" + regionName
+        + "'.",
           cause);
     this.className = className;
     this.regionName = regionName;
