@@ -10,6 +10,7 @@ import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -19,20 +20,27 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 
+import java.util.concurrent.CountDownLatch;
+
+import javax.inject.Inject;
+
+import io.qameta.allure.Issue;
 import org.hamcrest.core.IsSame;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import io.qameta.allure.Issue;
-
 public class ScopeExecutionTestCase extends AbstractScopeExecutionTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  @Inject
+  private ObjectStoreManager objectStoreManager;
 
   @Test
   public void fieldParameterInjection() throws Exception {
@@ -167,6 +175,32 @@ public class ScopeExecutionTestCase extends AbstractScopeExecutionTestCase {
   public void scopeChainLazilyStarted() throws Exception {
     String result = (String) flowRunner("scopeChainLazilyStarted").run().getMessage().getPayload().getValue();
     assertThat(result, is("newPayload"));
+  }
+
+  @Test
+  public void scopeChainFinishesAsynchronously() throws Exception {
+    final String osName = "asyncOs";
+    final String osKey = "asyncKey";
+    final String expectedOutput = "myOutput";
+    final CountDownLatch latch = new CountDownLatch(1);
+
+    CoreEvent event = flowRunner("asyncChainToObjectStore")
+        .withVariable("osName", osName)
+        .withVariable("osKey", osKey)
+        .withVariable("expectedOutput", expectedOutput)
+        .withVariable("latch", latch)
+        .run();
+
+    latch.await(5, SECONDS);
+
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(expectedOutput));
+
+    // check(5000, 500, () -> {
+    // ObjectStore os = objectStoreManager.getObjectStore(osName);
+    // Object actual = os.retrieve(osKey);
+    // assertThat(actual, equalTo(expectedOutput));
+    // return true;
+    // });
   }
 
 }
