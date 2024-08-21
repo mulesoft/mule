@@ -156,13 +156,11 @@
 
     <flow name="asyncChainToObjectStore">
         <heisenberg:async-chain-to-object-store latch="#[vars.latch]">
-            <os:store key="#[vars.osName]" objectStore="asyncOs" failIfPresent="true">
+            <os:store key="#[vars.osKey]" objectStore="asyncOs" failIfPresent="true">
                 <os:value>#[vars.expectedOutput]</os:value>
             </os:store>
         </heisenberg:async-chain-to-object-store>
 
-        <until-successful maxRetries="3" millisBetweenRetries="1000">
-            <os:retrieve key="#[vars.osName]" objectStore="asyncOs" />
-        </until-successful>
+        <logger message="scope finished" />
     </flow>
 </mule>

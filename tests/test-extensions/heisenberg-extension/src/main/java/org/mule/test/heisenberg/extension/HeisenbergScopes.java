@@ -9,6 +9,8 @@ package org.mule.test.heisenberg.extension;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -17,7 +19,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
-import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
@@ -46,9 +47,6 @@ public class HeisenbergScopes implements Initialisable, Stoppable {
 
   @Inject
   private SchedulerService schedulerService;
-
-  @Inject
-  private ObjectStoreManager objectStoreManager;
 
   private Scheduler scheduler;
 
@@ -123,16 +121,13 @@ public class HeisenbergScopes implements Initialisable, Stoppable {
     final CountDownLatch countDownLatch = (CountDownLatch) latch;
     scheduler.execute(() -> {
       try {
-        // countDownLatch.await(5, SECONDS);
+        countDownLatch.await(5, SECONDS);
 
-        Thread.sleep(1000);
       } catch (Exception e) {
         LOGGER.error(e.getMessage(), e);
       }
 
-      chain.process(r -> {
-      }, (t, r) -> {
-      });
+      chain.process(r -> LOGGER.debug("Chain result: {}", r.getOutput()), (t, r) -> LOGGER.error(t.getMessage()));
     });
 
     callback.success(Result.<Void, Void>builder().build());

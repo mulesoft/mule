@@ -6,6 +6,8 @@
  */
 package org.mule.test.module.extension.scopes;
 
+import static org.mule.tck.probe.PollingProber.check;
+
 import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
@@ -20,6 +22,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
@@ -179,28 +183,23 @@ public class ScopeExecutionTestCase extends AbstractScopeExecutionTestCase {
 
   @Test
   public void scopeChainFinishesAsynchronously() throws Exception {
-    final String osName = "asyncOs";
     final String osKey = "asyncKey";
     final String expectedOutput = "myOutput";
     final CountDownLatch latch = new CountDownLatch(1);
 
-    CoreEvent event = flowRunner("asyncChainToObjectStore")
-        .withVariable("osName", osName)
+    flowRunner("asyncChainToObjectStore")
         .withVariable("osKey", osKey)
         .withVariable("expectedOutput", expectedOutput)
         .withVariable("latch", latch)
         .run();
 
-    latch.await(5, SECONDS);
+    latch.countDown();
 
-    assertThat(event.getMessage().getPayload().getValue(), equalTo(expectedOutput));
-
-    // check(5000, 500, () -> {
-    // ObjectStore os = objectStoreManager.getObjectStore(osName);
-    // Object actual = os.retrieve(osKey);
-    // assertThat(actual, equalTo(expectedOutput));
-    // return true;
-    // });
+    check(5000, 500, () -> {
+      ObjectStore os = objectStoreManager.getObjectStore("asyncOs");
+      TypedValue<String> actual = (TypedValue<String>) os.retrieve(osKey);
+      assertThat(actual.getValue(), equalTo(expectedOutput));
+      return true;
+    });
   }
-
 }
