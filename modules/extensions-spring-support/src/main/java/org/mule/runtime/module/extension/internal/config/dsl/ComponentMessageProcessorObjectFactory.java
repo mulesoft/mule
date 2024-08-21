@@ -27,13 +27,18 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+
+import javax.xml.namespace.QName;
 
 /**
  * A base {@link AbstractExtensionObjectFactory} for producers of {@link ExtensionComponent} instances
@@ -68,23 +73,23 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
 
   @Override
   public P doGetObject() {
-    final MessageProcessorChain nestedChain;
+    final MessageProcessorChain chain;
 
     if (nestedProcessors != null) {
-      nestedChain = newChain(empty(), nestedProcessors,
-                             registry.lookupByType(ComponentTracerFactory.class).get()
-                                 .fromComponent(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
+      chain = newChain(empty(), nestedProcessors,
+                       registry.lookupByType(ComponentTracerFactory.class).get()
+                           .fromComponent(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
-          .ifPresent(chain -> parameters.put(chain.getName(),
-                                             new ProcessorChainValueResolver(registry.lookupByType(StreamingManager.class).get(),
-                                                                             nestedChain)));
+          .ifPresent(chainModel -> parameters.put(chainModel.getName(),
+                                                  new ProcessorChainValueResolver(chainModel, chain, registry
+                                                      .lookupByType(StreamingManager.class).get())));
 
       // For MULE-18771 we need access to the chain's location to create a new event and sdk context
-      nestedChain.setAnnotations(this.getAnnotations());
+      chain.setAnnotations(this.getAnnotations());
     } else {
-      nestedChain = null;
+      chain = null;
     }
 
     return getMessageProcessorBuilder()
@@ -94,7 +99,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
         .setTargetValue(targetValue)
         .setCursorProviderFactory(cursorProviderFactory)
         .setRetryPolicyTemplate(retryPolicyTemplate)
-        .setNestedChain(nestedChain)
+        .setNestedChain(chain)
         .setClassLoader(Thread.currentThread().getContextClassLoader())
         .build();
   }

@@ -7,6 +7,19 @@
           "code": "java.class.added",
           "new": "class org.mule.runtime.core.privileged.exception.MessagingException",
           "justification": "W-15643200: output json --- error fails with NullPointerException after MULE:RETRIES_EXHAUSTED"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.core.privileged.event.EventedResult<T, A>",
+          "justification": "W-16420215: Class is not useful where it sits and it's impossible to consume by any 3pp component",
+          "package": "org.mule.runtime.core.privileged.event",
+          "classQualifiedName": "org.mule.runtime.core.privileged.event.EventedResult",
+          "classSimpleName": "EventedResult",
+          "elementKind": "class",
+          "newArchive": "org.mule.runtime:mule-core:jar:4.6.7-SNAPSHOT",
+          "newArchiveRole": "primary",
+          "breaksSemanticVersioning": "true"
         }
       ]
     }
@@ -14,25 +27,25 @@
   "4.6.5": {
     "revapi": {
       "ignore": [
-	{
-	  "ignore": true,
-	  "code": "java.class.visibilityReduced",
-	  "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
-	  "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
-	  "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"	
-	},
-	{
-	 "ignore": true,	
-	 "code": "java.method.added",
-         "new": "method boolean org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::getEnableNotifications()",	
-	 "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"
-	},
-	{
-	 "ignore": true,
-	 "code": "java.method.added",
-	 "new": "method void org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::setEnableNotifications(boolean)",
-	 "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"	
-	}
+        {
+          "ignore": true,
+          "code": "java.class.visibilityReduced",
+          "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
+          "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
+          "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::getEnableNotifications()",
+          "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::setEnableNotifications(boolean)",
+          "justification": "W-15774242 Update services to 4.6.5-SNAPSHOT after 4.6.4 final release"
+        }
       ]
     }
   },
@@ -70,14 +83,14 @@
   "4.6.0": {
     "revapi": {
       "ignore": [
-		{
-		  "ignore": true,
-		  "code": "java.annotation.added",
-		  "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
-		  "new": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
-		  "annotation": "@org.mule.api.annotation.NoImplement",
-		  "justification": "W-14348898: Deprecate SingleResourceTransactionFactoryManager"
-		},
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+          "new": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "justification": "W-14348898: Deprecate SingleResourceTransactionFactoryManager"
+        },
         {
           "ignore": true,
           "code": "java.annotation.added",
