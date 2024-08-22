@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.tck.api.MetadataTypeMatcher.metadataTypeEqualsTo;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.Category.SELECT;
@@ -53,9 +54,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 
 import org.mule.metadata.api.builder.NumberTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
@@ -145,9 +146,11 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.google.common.reflect.TypeToken;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -757,7 +760,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation, is(notNullValue()));
     assertParameter(operation.getAllParameters(), "grams", "", TYPE_LOADER.load(int[][].class), false, SUPPORTED,
                     "#[payload]");
-    assertThat(operation.getOutput().getType(), is(TYPE_LOADER.load(int[][].class)));
+    assertThat(operation.getOutput().getType(), metadataTypeEqualsTo(TYPE_LOADER.load(int[][].class)));
     assertConnected(operation, false);
     assertTransactional(operation, false);
 
@@ -775,7 +778,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(operation.getModelProperty(PagedOperationModelProperty.class).isPresent(), is(true));
     assertThat(operation.getOutput().getType(), is(instanceOf(ArrayType.class)));
     ArrayType outputType = (ArrayType) operation.getOutput().getType();
-    assertThat(outputType.getType(), is(TYPE_LOADER.load(PersonalInfo.class)));
+    assertThat(outputType.getType(), metadataTypeEqualsTo(TYPE_LOADER.load(PersonalInfo.class)));
     assertConnected(operation, true);
     assertTransactional(operation, false);
 

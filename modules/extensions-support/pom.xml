@@ -175,6 +175,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metadata-model-tck</artifactId>
+            <version>${muleMetadataModelVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-runtime-extension-model</artifactId>
             <version>${project.version}</version>
         </dependency>
