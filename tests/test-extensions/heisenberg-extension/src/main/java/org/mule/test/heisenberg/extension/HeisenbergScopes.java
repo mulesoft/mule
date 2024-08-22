@@ -34,6 +34,7 @@ import org.mule.sdk.api.annotation.dsl.xml.ParameterDsl;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 
@@ -119,16 +120,21 @@ public class HeisenbergScopes implements Initialisable, Stoppable {
                                       Chain chain,
                                       CompletionCallback<Void, Void> callback) {
     final CountDownLatch countDownLatch = (CountDownLatch) latch;
-    scheduler.execute(() -> {
-      try {
-        countDownLatch.await(5, SECONDS);
+    final AtomicInteger counter = new AtomicInteger(0);
+    // scheduler.execute(() -> {
+    try {
+      countDownLatch.await(5, SECONDS);
 
-      } catch (Exception e) {
-        LOGGER.error(e.getMessage(), e);
-      }
+    } catch (Exception e) {
+      LOGGER.error(e.getMessage(), e);
+    }
 
-      chain.process(r -> LOGGER.debug("Chain result: {}", r.getOutput()), (t, r) -> LOGGER.error(t.getMessage()));
-    });
+    for (int i = 0; i < 100; i++) {
+      chain.process(counter.get(), null,
+                    r -> counter.incrementAndGet(),
+                    (t, r) -> counter.incrementAndGet());
+    }
+    // });
 
     callback.success(Result.<Void, Void>builder().build());
   }
