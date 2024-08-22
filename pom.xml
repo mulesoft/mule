@@ -157,7 +157,7 @@
         <productUrl>https://developer.mulesoft.com/</productUrl>
         <dev.list>mule-esb@mulesoft.com</dev.list>
 
-        <muleBomVersion>4.9.0-SNAPSHOT</muleBomVersion>
+        <muleBomVersion>4.9.0-20240821</muleBomVersion>
         <muleMavenClientBomVersion>2.4.0-20240821</muleMavenClientBomVersion>
 
         <weaveVersion>2.9.0-20240821</weaveVersion>
