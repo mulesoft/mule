@@ -20,5 +20,7 @@ module org.mule.runtime.oauth.api {
   exports org.mule.runtime.oauth.api.builder;
   exports org.mule.runtime.oauth.api.listener;
   exports org.mule.runtime.oauth.api.state;
-  
+
+  opens org.mule.runtime.oauth.api.state to
+      kryo.shaded;
 }
