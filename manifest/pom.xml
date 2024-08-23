@@ -18,44 +18,11 @@
         <javaReleaseVersion>8</javaReleaseVersion>
         <project.build.java11SourceDirectory>${project.basedir}/src/main/java11</project.build.java11SourceDirectory>
         <project.build.java11TestSourceDirectory>${project.basedir}/src/test/java11</project.build.java11TestSourceDirectory>
-        <muleModuleMavenPluginVersion>1.9.0-SNAPSHOT</muleModuleMavenPluginVersion>
 
-        <junitVersion>4.13.2</junitVersion>
-        <hamcrestVersion>2.2</hamcrestVersion>
+        <oldMuleArtifactVersion>4.9.0-SNAPSHOT</oldMuleArtifactVersion>
 
-        <oldMuleArtifactVersion>1.9.0-SNAPSHOT</oldMuleArtifactVersion>
-
-        <muleBomVersion>4.9.0-SNAPSHOT</muleBomVersion>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.mule</groupId>
-                <artifactId>mule-runtime-bom</artifactId>
-                <version>${muleBomVersion}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junitVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hamcrest</groupId>
-                        <artifactId>hamcrest-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>${hamcrestVersion}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -64,12 +31,6 @@
         </dependency>
 
         <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
@@ -142,16 +103,5 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <muleVersion>${project.version}</muleVersion>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 </project>

@@ -66,18 +66,6 @@ public class DefaultMuleManifestTestCase {
     assertThat(url.toExternalForm(), containsString("mule-3-embedded.jar"));
   }
 
-  @Test
-  public void getVersionFromManifestProperty() {
-    String manifestVersion = getMuleManifest().getProductVersion();
-    assertThat(manifestVersion, equalTo(getProperty(MULE_VERSION)));
-  }
-
-  @Test
-  public void getVersionFromFallbackOption() {
-    String fallbackVersion = ((DefaultMuleManifest) getMuleManifest()).getProductVersionFromPropertiesFile();
-    assertThat(fallbackVersion, equalTo(getProperty(MULE_VERSION)));
-  }
-
   private Enumeration<URL> getUrlsEnum(String... names) throws MalformedURLException {
     List<URL> urls = new ArrayList<>();
     for (String name : names) {

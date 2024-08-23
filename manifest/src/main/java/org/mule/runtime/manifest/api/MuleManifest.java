@@ -11,7 +11,7 @@ import org.mule.runtime.manifest.internal.DefaultMuleManifest;
 import java.util.jar.Manifest;
 
 /**
- * Provides access to the Mule core manifest file.
+ * Provides access to the Mule JAR manifest file.
  *
  * @since 4.9
  */
