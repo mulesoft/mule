@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.privileged.el;
 
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleManifest;
 
 /**
  * Expose information about the Mule instance:
@@ -26,7 +27,7 @@ public class MuleInstanceContext {
   }
 
   public String getVersion() {
-    return MuleManifest.getProductVersion();
+    return getMuleManifest().getProductVersion();
   }
 
   public String getClusterId() {

@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.java;
 
 import static org.mule.runtime.core.internal.util.java.JdkVersionUtils.isRecommendedJdkVersion;
 import static org.mule.runtime.core.internal.util.java.JdkVersionUtils.isSupportedJdkVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.SUPPORTED_ENVIRONMENTS;
 import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.JdkVersionStory.JDK_VERSION;
 
@@ -25,9 +26,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.internal.util.java.JdkVersionUtils.JdkVersion;
 import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
+import org.mule.runtime.manifest.api.MuleManifest;
+import org.mule.runtime.manifest.internal.DefaultMuleManifest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.Field;
@@ -52,7 +54,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     originalJavaVersion = getProperty("java.version");
-    originalManifest = MuleManifest.getManifest();
+    originalManifest = getMuleManifest().getManifest();
   }
 
   @After
@@ -67,7 +69,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   private void setManifest(Manifest manifest)
       throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-    Field field = MuleManifest.class.getDeclaredField("manifest");
+    Field field = DefaultMuleManifest.class.getDeclaredField("manifest");
     field.setAccessible(true);
     field.set(null, manifest);
   }

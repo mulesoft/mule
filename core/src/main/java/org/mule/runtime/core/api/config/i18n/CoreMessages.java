@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.config.i18n;
 
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
@@ -14,7 +14,6 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
@@ -54,7 +53,7 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage version() {
-    String version = Objects.toString(getProductVersion(), notSet().getMessage());
+    String version = Objects.toString(getMuleManifest().getProductVersion(), notSet().getMessage());
     return factory.createMessage(BUNDLE_PATH, 6, version);
   }
 
@@ -616,10 +615,10 @@ public class CoreMessages extends I18nMessageFactory {
    */
   public static I18nMessage productInformation() {
     String notset = CoreMessages.notSet().getMessage();
-    return factory.createMessage(BUNDLE_PATH, 236, defaultString(MuleManifest.getProductDescription(), notset),
-                                 defaultString(MuleManifest.getProductVersion(), notset),
-                                 defaultString(MuleManifest.getVendorName(), notset) + " "
-                                     + defaultString(MuleManifest.getVendorUrl(), notset));
+    return factory.createMessage(BUNDLE_PATH, 236, defaultString(getMuleManifest().getProductDescription(), notset),
+                                 defaultString(getMuleManifest().getProductVersion(), notset),
+                                 defaultString(getMuleManifest().getVendorName(), notset) + " "
+                                     + defaultString(getMuleManifest().getVendorUrl(), notset));
   }
 
   public static I18nMessage noTransformerFoundForMessage(DataType input, DataType output) {

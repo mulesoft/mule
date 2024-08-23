@@ -8,12 +8,12 @@ package org.mule.tck.util;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
@@ -302,7 +302,7 @@ public class MuleContextUtils {
     when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
 
     final MuleConfiguration configuration = muleContext.getConfiguration();
-    lenient().when(configuration.getMinMuleVersion()).thenReturn(of(new MuleVersion(getProductVersion())));
+    lenient().when(configuration.getMinMuleVersion()).thenReturn(of(new MuleVersion(getMuleManifest().getProductVersion())));
 
     NotificationListenerRegistry notificationListenerRegistry = mock(NotificationListenerRegistry.class);
     ConfigurationProperties configProps = mock(ConfigurationProperties.class, withSettings().lenient());

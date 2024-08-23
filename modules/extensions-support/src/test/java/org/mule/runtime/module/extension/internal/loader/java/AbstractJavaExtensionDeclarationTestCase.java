@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
 import org.mule.metadata.api.model.ObjectType;
@@ -47,7 +47,7 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ExtensionDeclarer declarerFor(final Class<?> type) {
-    return ExtensionDeclarationTestUtils.declarerFor(type, getProductVersion());
+    return ExtensionDeclarationTestUtils.declarerFor(type, getMuleManifest().getProductVersion());
   }
 
   protected ExtensionDeclarer declarerFor(final Class<?> type, String version) {
@@ -55,7 +55,7 @@ public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractM
   }
 
   protected ExtensionDeclarer declarerFor(Class<?> type, ExtensionLoadingContext ctx) {
-    return declarerFor(type, getProductVersion(), ctx);
+    return declarerFor(type, getMuleManifest().getProductVersion(), ctx);
   }
 
   protected ExtensionDeclarer declarerFor(Class<?> type, String version, ExtensionLoadingContext ctx) {

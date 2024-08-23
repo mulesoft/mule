@@ -15,11 +15,11 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isOneOf;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.error.MuleErrors.ANY;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.soap.internal.loader.SoapInvokeOperationDeclarer.ATTACHMENTS_PARAM;
@@ -60,7 +60,7 @@ public class SoapExtensionDeclarationTestCase extends AbstractSoapExtensionDecla
   public void assertSoapExtensionModel() {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, FootballSoapExtension.class.getName());
-    params.put(VERSION, getProductVersion());
+    params.put(VERSION, getMuleManifest().getProductVersion());
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     params.put("COMPILATION_MODE", true);
     ExtensionModel model =

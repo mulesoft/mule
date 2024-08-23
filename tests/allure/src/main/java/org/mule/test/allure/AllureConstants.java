@@ -1304,4 +1304,9 @@ public interface AllureConstants {
 
     String CUSTOMIZATION_SERVICE = "Customization Service";
   }
+
+  interface MuleManifestFeature {
+
+    String MULE_MANIFEST = "Mule Manifest";
+  }
 }

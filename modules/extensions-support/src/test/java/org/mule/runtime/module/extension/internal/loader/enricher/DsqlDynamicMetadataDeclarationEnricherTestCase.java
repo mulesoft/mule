@@ -10,7 +10,7 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.extension.internal.loader.enricher.EnricherTestUtils.getDeclaration;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
@@ -34,7 +34,7 @@ public class DsqlDynamicMetadataDeclarationEnricherTestCase extends AbstractMule
 
   @Before
   public void setUp() {
-    ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getProductVersion());
+    ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getMuleManifest().getProductVersion());
     new DsqlDynamicMetadataDeclarationEnricher()
         .enrich(new DefaultExtensionLoadingContext(declarer, getClass().getClassLoader(), getDefault(emptySet())));
     declaration = declarer.getDeclaration();
