@@ -204,7 +204,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                                                                      loadingContext.getTypeLoader()),
                                                    value -> parseNotifications(value, namespace,
                                                                                loadingContext.getTypeLoader()))
-                                                       .orElse(new LinkedList<>());
+                                                                                   .orElse(new LinkedList<>());
   }
 
   private void parseImportedTypes() {

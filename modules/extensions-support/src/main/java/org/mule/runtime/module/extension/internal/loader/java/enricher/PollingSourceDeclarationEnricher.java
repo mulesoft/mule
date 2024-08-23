@@ -72,7 +72,7 @@ public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnric
 
       final int schedulingStrategyParameterSequence =
           getInfrastructureType(new TypeWrapper(SchedulingStrategy.class, loader))
-                                                        .map(MetadataTypeBasedInfrastructureType::getSequence).orElse(0);
+              .map(MetadataTypeBasedInfrastructureType::getSequence).orElse(0);
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
       boolean thereArePollingSources = false;
 
