@@ -33,9 +33,6 @@ import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
-import org.mule.runtime.config.internal.registry.CompositeOptionalObjectsController;
-import org.mule.runtime.config.internal.registry.DefaultOptionalObjectsController;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
 import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
@@ -110,17 +107,14 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     }
 
     initialiseIfNeeded(this, muleContext);
-    OptionalObjectsController applicationObjectController = createApplicationObjectController();
     Optional<ConfigurationProperties> parentConfigurationProperties = resolveParentConfigurationProperties();
 
-    final BaseMuleArtifactContext baseMuleArtifactContext =
-        createBaseContext(muleContext, applicationObjectController, parentConfigurationProperties);
+    final BaseMuleArtifactContext baseMuleArtifactContext = createBaseContext(muleContext, parentConfigurationProperties);
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
     BaseSpringRegistry baseRegistry = createBaseRegistry(muleContext, baseMuleArtifactContext);
 
     try {
       muleArtifactContext = createApplicationContext(muleContext,
-                                                     applicationObjectController,
                                                      baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
                                                      baseMuleArtifactContext.getBean(ContributedErrorTypeRepository.class),
                                                      baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
@@ -135,10 +129,8 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   }
 
   private BaseMuleArtifactContext createBaseContext(MuleContext muleContext,
-                                                    OptionalObjectsController applicationObjectController,
                                                     Optional<ConfigurationProperties> parentConfigurationProperties) {
     final BaseMuleArtifactContext baseMuleArtifactContext = new BaseMuleArtifactContext(muleContext,
-                                                                                        applicationObjectController,
                                                                                         parentConfigurationProperties,
                                                                                         getArtifactProperties(),
                                                                                         artifactType,
@@ -162,7 +154,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   }
 
   private MuleArtifactContext createApplicationContext(MuleContext muleContext,
-                                                       OptionalObjectsController optionalObjectsController,
                                                        BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                        ContributedErrorTypeRepository errorTypeRepository,
                                                        ContributedErrorTypeLocator errorTypeLocator,
@@ -170,31 +161,12 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                        ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws Exception {
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
-    return doCreateApplicationContext(muleContext, optionalObjectsController,
+    return doCreateApplicationContext(muleContext,
                                       baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
                                       featureFlaggingService, expressionLanguageMetadataService);
   }
 
-  protected OptionalObjectsController createApplicationObjectController() {
-    OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
-
-    // >> TODO W-10736276 Remove this
-    OptionalObjectsController parentObjectController = null;
-
-    if (parentContext instanceof MuleArtifactContext) {
-      parentObjectController = ((MuleArtifactContext) parentContext).getOptionalObjectsController();
-    }
-
-    if (parentObjectController != null) {
-      applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
-    }
-    // << TODO W-10736276 Remove this
-
-    return applicationObjectcontroller;
-  }
-
   private MuleArtifactContext doCreateApplicationContext(MuleContext muleContext,
-                                                         OptionalObjectsController optionalObjectsController,
                                                          BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                                          ContributedErrorTypeRepository errorTypeRepository,
                                                          ContributedErrorTypeLocator errorTypeLocator,
@@ -202,7 +174,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                          ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     if (enableLazyInit) {
       return new LazyMuleArtifactContext(muleContext, artifactAst,
-                                         optionalObjectsController,
                                          resolveParentConfigurationProperties(),
                                          baseConfigurationComponentLocator,
                                          errorTypeRepository, errorTypeLocator,
@@ -215,7 +186,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     } else {
       MuleArtifactContext context;
       context = new MuleArtifactContext(muleContext, artifactAst,
-                                        optionalObjectsController,
                                         resolveParentConfigurationProperties(),
                                         baseConfigurationComponentLocator,
                                         errorTypeRepository, errorTypeLocator,

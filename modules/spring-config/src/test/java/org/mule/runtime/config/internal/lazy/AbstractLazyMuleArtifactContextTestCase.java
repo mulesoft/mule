@@ -51,7 +51,6 @@ import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegist
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
@@ -61,7 +60,6 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 
 import java.util.List;
@@ -100,9 +98,6 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
 
   @Mock
   private InternalCustomizationService customizationService;
-
-  @Mock
-  private OptionalObjectsController optionalObjectsController;
 
   @Mock
   private LockFactory lockFactory;
@@ -184,7 +179,7 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext,
                                     toArtifactast(getArtifactDeclaration(), getExtensions(muleContext.getExtensionManager())),
-                                    optionalObjectsController, empty(),
+                                    empty(),
                                     new BaseConfigurationComponentLocator(),
                                     new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
                                     emptyMap(), false, APP, empty(), lockFactory,
