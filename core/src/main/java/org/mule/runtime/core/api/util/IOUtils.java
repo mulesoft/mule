@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -97,14 +98,7 @@ public class IOUtils {
     if (url == null) {
       return null;
     } else {
-      URLConnection urlConnection = url.openConnection();
-      // It's necessary to disable connection caching when working with jar files
-      // in order to avoid file leaks in windows environments
-      // see for example MULE-18264
-      if (urlConnection instanceof JarURLConnection) {
-        urlConnection.setUseCaches(false);
-      }
-      return urlConnection.getInputStream();
+      return getInputStreamWithCacheControl(url);
     }
   }
 
@@ -168,6 +162,16 @@ public class IOUtils {
       }
     }
     return url;
+  }
+
+  public static InputStream getInputStreamWithCacheControl(URL url) throws IOException {
+    URLConnection urlConnection = url.openConnection();
+    // It's necessary to disable connection caching when working with jar files
+    // in order to avoid file leaks in Windows environments
+    if (IS_OS_WINDOWS && urlConnection instanceof JarURLConnection) {
+      urlConnection.setUseCaches(false);
+    }
+    return urlConnection.getInputStream();
   }
 
   /**

@@ -17,6 +17,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -51,7 +52,6 @@ import static java.util.stream.Collectors.toSet;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Sets.newHashSet;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -117,9 +117,7 @@ import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.JarURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -401,13 +399,7 @@ public final class XmlExtensionLoaderDelegate {
       throws IOException {
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
     final Transformer transformer = FOR_TNS_XSTL_TRANSFORMER_POOL.take();
-    URLConnection urlConnection = resource.openConnection();
-    // It's necessary to disable connection caching when working with jar files
-    // in order to avoid file leaks in Windows environments
-    if (IS_OS_WINDOWS && urlConnection instanceof JarURLConnection) {
-      urlConnection.setUseCaches(false);
-    }
-    try (BufferedInputStream resourceIS = new BufferedInputStream(urlConnection.getInputStream())) {
+    try (BufferedInputStream resourceIS = new BufferedInputStream(getInputStreamWithCacheControl(resource))) {
       transformer.transform(new StreamSource(resourceIS), new StreamResult(resultStream));
     } catch (TransformerException e) {
       throw new MuleRuntimeException(createStaticMessage(format("There was an issue transforming the stream for the resource %s while trying to remove the content of the <body> element to generate an XSD",
