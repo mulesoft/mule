@@ -61,7 +61,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   private final JavaExtensionModelParser extensionModelParser;
   private final ComponentElement configElement;
-  private final ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaConfigurationModelParser(JavaExtensionModelParser extensionModelParser,
                                       ExtensionElement extensionElement,
@@ -72,12 +71,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
-    this.resolvedMinMuleVersion = resolveConfigurationMinMuleVersion(configElement,
-                                                                     getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                          Configurations.class,
-                                                                                                          Configurations::value,
-                                                                                                          configElement),
-                                                                     loadingContext);
   }
 
   private void parseStructure() {
@@ -203,6 +196,10 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return ofNullable(resolveConfigurationMinMuleVersion(configElement,
+                                                         getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                              Configurations.class,
+                                                                                              Configurations::value,
+                                                                                              configElement)));
   }
 }

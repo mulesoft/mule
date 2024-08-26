@@ -119,7 +119,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
-  private ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   private ExtensionParameter nestedChain;
   private boolean blocking = false;
@@ -149,12 +148,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
-      this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
-                                                                   getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                        Operations.class,
-                                                                                                        Operations::value,
-                                                                                                        this.operationContainer),
-                                                                   loadingContext);
     } else {
       this.operationContainer = null;
       enclosingType = null;
@@ -460,7 +453,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return ofNullable(resolveOperationMinMuleVersion(operationElement, this.operationContainer,
+                                                     getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                          Operations.class,
+                                                                                          Operations::value,
+                                                                                          this.operationContainer)));
   }
 
   @Override

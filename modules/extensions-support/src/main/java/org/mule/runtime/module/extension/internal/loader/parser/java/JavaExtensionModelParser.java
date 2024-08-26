@@ -111,7 +111,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<NotificationModel> notificationModels = new LinkedList<>();
   private final Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
   private String namespace;
-  private ResolvedMinMuleVersion resolvedMinMuleVersion;
   private Set<String> supportedJavaVersions;
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
@@ -143,7 +142,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseSubtypes();
     parseNotificationModels();
 
-    this.resolvedMinMuleVersion = resolveExtensionMinMuleVersion(extensionElement, loadingContext);
     supportedJavaVersions = parseSupportedJavaVersions(extensionElement);
   }
 
@@ -409,7 +407,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return ofNullable(resolveExtensionMinMuleVersion(extensionElement));
   }
 
   @Override

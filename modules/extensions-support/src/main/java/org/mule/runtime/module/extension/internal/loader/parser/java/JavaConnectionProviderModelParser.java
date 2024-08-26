@@ -88,7 +88,6 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   private final ExtensionLoadingContext loadingContext;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
-  private final ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaConnectionProviderModelParser(JavaExtensionModelParser extensionModelParser,
                                            ExtensionElement extensionElement,
@@ -102,7 +101,6 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
         .orElse(ExtensionModel.class.getClassLoader());
 
     collectAdditionalModelProperties();
-    this.resolvedMinMuleVersion = resolveConnectionProviderMinMuleVersion(element, loadingContext);
   }
 
   @Override
@@ -236,7 +234,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return ofNullable(resolveConnectionProviderMinMuleVersion(element));
   }
 
   @Override

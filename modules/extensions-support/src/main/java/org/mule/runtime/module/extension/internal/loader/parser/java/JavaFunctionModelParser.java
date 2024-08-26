@@ -50,7 +50,6 @@ import java.util.Set;
 public class JavaFunctionModelParser extends AbstractJavaExecutableComponentModelParser implements FunctionModelParser {
 
   private final FunctionElement functionElement;
-  private ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaFunctionModelParser(ExtensionElement extensionElement,
                                  FunctionElement functionElement,
@@ -62,13 +61,6 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      this.resolvedMinMuleVersion = resolveFunctionMinMuleVersion(functionElement,
-                                                                  getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                       ExpressionFunctions.class,
-                                                                                                       ExpressionFunctions::value,
-                                                                                                       functionElement
-                                                                                                           .getEnclosingType()),
-                                                                  loadingContext);
     }
   }
 
@@ -150,7 +142,12 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return ofNullable(resolveFunctionMinMuleVersion(functionElement,
+                                                    getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                         ExpressionFunctions.class,
+                                                                                         ExpressionFunctions::value,
+                                                                                         functionElement
+                                                                                             .getEnclosingType())));
   }
 
   @Override
