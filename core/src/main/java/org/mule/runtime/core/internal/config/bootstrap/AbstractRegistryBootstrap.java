@@ -46,9 +46,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
-  private static final String TRANSACTION_RESOURCE_SUFFIX = ".transaction.resource";
-  // TODO W-10736276 Remove this
-  private static final String OPTIONAL_ATTRIBUTE = "optional";
   private static final String RETURN_CLASS_PROPERTY = "returnClass";
   private static final String MIME_TYPE_PROPERTY = "mimeType";
 
@@ -145,7 +142,6 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
     String transString;
     String name = null;
     String returnClassName;
-    boolean optional = false;
     transString = propertyValue;
     returnClassName = null;
     int index = transString.indexOf(",");
@@ -153,7 +149,6 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
       Properties p = PropertiesUtils.getPropertiesFromString(transString.substring(index + 1), ',');
       name = p.getProperty("name", null);
       returnClassName = p.getProperty("returnClass", null);
-      optional = p.containsKey(OPTIONAL_ATTRIBUTE);
     }
     String mime = null;
 
@@ -171,7 +166,7 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
     properties.put(MIME_TYPE_PROPERTY, mime);
     properties.put(RETURN_CLASS_PROPERTY, returnClassName);
 
-    return new TransformerBootstrapProperty(bootstrapService, new HashSet<>(asList(APP, POLICY)), optional, name, className,
+    return new TransformerBootstrapProperty(bootstrapService, new HashSet<>(asList(APP, POLICY)), name, className,
                                             returnClassName, mime);
   }
 
@@ -191,13 +186,12 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
             .map(t -> createFromString(t))
             .collect(toSet());
       }
-      optional = p.containsKey(OPTIONAL_ATTRIBUTE);
       className = value.substring(0, index);
     } else {
       className = value;
     }
 
-    return new ObjectBootstrapProperty(bootstrapService, artifactTypesParameterValue, optional, propertyKey, className);
+    return new ObjectBootstrapProperty(bootstrapService, artifactTypesParameterValue, propertyKey, className);
   }
 
   private void registerUnnamedObjects(List<ObjectBootstrapProperty> bootstrapProperties) throws Exception {
@@ -221,10 +215,9 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
       doRegisterObject(bootstrapProperty);
     } catch (InvocationTargetException e) {
       Throwable cause = getCause(e);
-      throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && bootstrapProperty.getOptional(), cause,
-                                  bootstrapProperty);
+      throwException(cause, bootstrapProperty);
     } catch (NoClassDefFoundError | ClassNotFoundException | NoSuchMethodException e) {
-      throwExceptionIfNotOptional(bootstrapProperty.getOptional(), e, bootstrapProperty);
+      throwException(e, bootstrapProperty);
     }
   }
 
@@ -247,10 +240,9 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
         doRegisterTransformer(bootstrapProperty, returnClass, transformerClass);
       } catch (InvocationTargetException e) {
         Throwable cause = getCause(e);
-        throwExceptionIfNotOptional(cause instanceof NoClassDefFoundError && bootstrapProperty.getOptional(), cause,
-                                    bootstrapProperty);
+        throwException(cause, bootstrapProperty);
       } catch (NoClassDefFoundError | ClassNotFoundException e) {
-        throwExceptionIfNotOptional(bootstrapProperty.getOptional(), e, bootstrapProperty);
+        throwException(e, bootstrapProperty);
       }
     }
   }
@@ -261,13 +253,9 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
   protected abstract void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception;
 
-  private void throwExceptionIfNotOptional(boolean optional, Throwable t, AbstractBootstrapProperty bootstrapProperty)
+  private void throwException(Throwable t, AbstractBootstrapProperty bootstrapProperty)
       throws Exception {
-    if (optional) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Ignoring optional " + bootstrapProperty);
-      }
-    } else if (t instanceof Exception) {
+    if (t instanceof Exception) {
       throw (Exception) t;
     } else {
       throw new Exception(t);

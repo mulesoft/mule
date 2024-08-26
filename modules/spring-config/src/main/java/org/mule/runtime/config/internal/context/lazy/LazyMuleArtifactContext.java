@@ -55,7 +55,6 @@ import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -128,8 +127,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *
    * @param muleContext                                the {@link MuleContext} that own this context
    * @param artifactAst                                the definition of the artifact to create a context for
-   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
    * @param baseConfigurationComponentLocator          indirection to the actual ConfigurationComponentLocator in the full
@@ -146,7 +143,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
-                                 OptionalObjectsController optionalObjectsController,
                                  Optional<ConfigurationProperties> parentConfigurationProperties,
                                  BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                  ContributedErrorTypeRepository errorTypeRepository,
@@ -161,7 +157,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  FeatureFlaggingService featureFlaggingService,
                                  ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws BeansException {
-    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
+    super(muleContext, artifactAst, parentConfigurationProperties,
           baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
           artifactProperties, addToolingObjectsToRegistry,
           artifactType, componentBuildingDefinitionRegistryFactory, memoryManagementService,
@@ -198,7 +194,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                         getConfigurationProperties(),
                                                         getArtifactType(),
                                                         getApplicationModel(),
-                                                        getOptionalObjectsController(),
                                                         beanFactory,
                                                         getServiceDiscoverer(),
                                                         getResourceLocator(),

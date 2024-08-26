@@ -27,14 +27,12 @@ public class ObjectBootstrapProperty extends AbstractBootstrapProperty {
    *
    * @param service       service that provides the property. Not null.
    * @param artifactTypes defines what is the artifact this bootstrap object applies to
-   * @param optional      indicates whether or not the bootstrap object is optional. When a bootstrap object is optional, any
-   *                      error creating it will be ignored.
    * @param key           key used to register the object. Not empty.
    * @param className     className of the bootstrapped object. Not empty.
    */
-  public ObjectBootstrapProperty(BootstrapService service, Set<ArtifactType> artifactTypes, Boolean optional, String key,
+  public ObjectBootstrapProperty(BootstrapService service, Set<ArtifactType> artifactTypes, String key,
                                  String className) {
-    super(service, artifactTypes, optional);
+    super(service, artifactTypes);
     checkArgument(!StringUtils.isEmpty(key), "key cannot be empty");
     checkArgument(!StringUtils.isEmpty(className), "className cannot be empty");
 
