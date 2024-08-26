@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_SIZE;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.disablePlugins;
@@ -22,6 +23,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -29,6 +31,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -100,8 +103,9 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-18264")
-  @Description("The URLConnection used to read a resource inside a jar shouldn't have cache enabled")
+  @Description("The URLConnection used to read a resource inside a jar shouldn't have cache enabled in Windows")
   public void cacheOnFalseWhenLoadResourceFromJar() throws Exception {
+    assumeTrue(IS_OS_WINDOWS);
     File jarFile = createDummyJar();
     URLClassLoader classLoader = new URLClassLoader(new URL[] {jarFile.toURI().toURL()});
 
@@ -208,6 +212,8 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       utilities.when(() -> getResourceAsStream(anyString(), any(Class.class)))
           .then(InvocationOnMock::callRealMethod);
       utilities.when(() -> getResourceAsStream(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+          .then(InvocationOnMock::callRealMethod);
+      utilities.when(() -> getInputStreamWithCacheControl(any(URL.class)))
           .then(InvocationOnMock::callRealMethod);
       utilities.when(() -> IOUtils.getResourceAsUrl(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
           .then(invocationOnMock -> mockedURL);
