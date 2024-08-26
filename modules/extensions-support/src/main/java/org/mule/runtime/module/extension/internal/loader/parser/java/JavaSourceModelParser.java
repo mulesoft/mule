@@ -111,11 +111,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      if (loadingContext.isResolveMinMuleVersion()) {
-        this.resolvedMinMuleVersion = resolveSourceMinMuleVersion(sourceElement);
-      } else {
-        this.resolvedMinMuleVersion = null;
-      }
+      this.resolvedMinMuleVersion = resolveSourceMinMuleVersion(sourceElement, loadingContext);
     }
   }
 

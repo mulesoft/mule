@@ -62,16 +62,13 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      if (loadingContext.isResolveMinMuleVersion()) {
-        this.resolvedMinMuleVersion = resolveFunctionMinMuleVersion(functionElement,
-                                                                    getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                         ExpressionFunctions.class,
-                                                                                                         ExpressionFunctions::value,
-                                                                                                         functionElement
-                                                                                                             .getEnclosingType()));
-      } else {
-        this.resolvedMinMuleVersion = null;
-      }
+      this.resolvedMinMuleVersion = resolveFunctionMinMuleVersion(functionElement,
+                                                                  getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                       ExpressionFunctions.class,
+                                                                                                       ExpressionFunctions::value,
+                                                                                                       functionElement
+                                                                                                           .getEnclosingType()),
+                                                                  loadingContext);
     }
   }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 import static org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataModelProperties;
 
@@ -36,17 +37,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Helper class for declaring sources through a {@link DefaultExtensionModelLoaderDelegate}
  *
  * @since 4.0
  */
 final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(SourceModelLoaderDelegate.class);
 
   private final Map<SourceModelParser, SourceDeclarer> sourceDeclarers = new HashMap<>();
 
@@ -98,10 +94,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
 
       parser.getOutputType().applyOn(sourceDeclarer.withOutput());
       parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());
-      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-        sourceDeclarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-        LOGGER.debug(resolvedMMV.getReason());
-      });
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(sourceDeclarer, resolvedMMV));
 
       Optional<OutputResolverModelParser> outputResolverModelParser = parser.getOutputResolverModelParser();
       Optional<AttributesResolverModelParser> attributesResolverModelParser = parser.getAttributesResolverModelParser();

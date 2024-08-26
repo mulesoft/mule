@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -57,10 +58,7 @@ final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDele
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
       parser.getAdditionalModelProperties().forEach(function::withModelProperty);
-      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-        function.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-        LOGGER.debug(resolvedMMV.getReason());
-      });
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(function, resolvedMMV));
       addSemanticTerms(function.getDeclaration(), parser);
 
       functionDeclarers.put(parser, function);

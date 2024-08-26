@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
 
 import static java.util.Optional.of;
 
@@ -51,10 +52,7 @@ final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       configParser.getDisplayModel().ifPresent(d -> configurationDeclarer.getDeclaration().setDisplayModel(d));
       configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
       configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
-      configParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-        configurationDeclarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-        LOGGER.debug(resolvedMMV.getReason());
-      });
+      configParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(configurationDeclarer, resolvedMMV));
       loader.getParameterModelsLoaderDelegate().declare(configurationDeclarer, configParser.getParameterGroupParsers());
 
       getOperationLoaderDelegate().declareOperations(declarer, extensionModelParser.getDevelopmentFramework(),

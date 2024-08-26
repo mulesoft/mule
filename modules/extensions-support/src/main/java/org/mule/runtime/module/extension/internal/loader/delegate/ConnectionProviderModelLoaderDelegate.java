@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarationWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import static java.util.Optional.of;
@@ -20,17 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Helper class for declaring connection providers through a {@link DefaultExtensionModelLoaderDelegate}
  *
  * @since 4.0
  */
 final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionProviderModelLoaderDelegate.class);
 
   private final Map<ConnectionProviderModelParser, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
@@ -55,10 +51,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModel
       ConnectionProviderDeclaration connectionProviderDeclaration = providerDeclarer.getDeclaration();
       parser.getDeprecationModel().ifPresent(connectionProviderDeclaration::withDeprecation);
       parser.getDisplayModel().ifPresent(connectionProviderDeclaration::setDisplayModel);
-      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-        connectionProviderDeclaration.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-        LOGGER.debug(resolvedMMV.getReason());
-      });
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarationWithMmv(connectionProviderDeclaration, resolvedMMV));
 
       parser.getConnectionProviderFactoryModelProperty().ifPresent(providerDeclarer::withModelProperty);
 

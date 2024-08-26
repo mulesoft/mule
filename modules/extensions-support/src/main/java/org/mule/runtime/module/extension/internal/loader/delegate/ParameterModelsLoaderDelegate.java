@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -108,10 +109,7 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
         parameterParser.getOAuthParameterModelProperty().ifPresent(parameter::withModelProperty);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
-        parameterParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-          parameter.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-          LOGGER.debug(resolvedMMV.getReason());
-        });
+        parameterParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(parameter, resolvedMMV));
 
         addSemanticTerms(parameter.getDeclaration(), parameterParser);
         stereotypeModelLoader.get().addStereotypes(parameterParser, parameter);

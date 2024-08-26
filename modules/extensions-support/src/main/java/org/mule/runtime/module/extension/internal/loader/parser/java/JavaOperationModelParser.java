@@ -149,15 +149,12 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
-      if (loadingContext.isResolveMinMuleVersion()) {
-        this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
-                                                                     getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                          Operations.class,
-                                                                                                          Operations::value,
-                                                                                                          this.operationContainer));
-      } else {
-        this.resolvedMinMuleVersion = null;
-      }
+      this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
+                                                                   getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                        Operations.class,
+                                                                                                        Operations::value,
+                                                                                                        this.operationContainer),
+                                                                   loadingContext);
     } else {
       this.operationContainer = null;
       enclosingType = null;

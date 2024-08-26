@@ -14,6 +14,7 @@ import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUti
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataModelProperties;
 
@@ -127,10 +128,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
 
     parser.getDeprecationModel().ifPresent(operation::withDeprecation);
     parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
-    parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-      operation.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-      LOGGER.debug(resolvedMMV.getReason());
-    });
+    parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(operation, resolvedMMV));
     loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
     addSemanticTerms(operation.getDeclaration(), parser);
     parser.getExecutionType().ifPresent(operation::withExecutionType);
