@@ -32,7 +32,6 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -47,7 +46,6 @@ import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.SubTypesMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
-import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
@@ -105,14 +103,13 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<ErrorModelParser> errorModelParsers;
   private final List<MetadataType> exportedTypes = new LinkedList<>();
   private final List<String> exportedResources = new LinkedList<>();
-  private final ClassTypeLoader typeLoader;
   private final StereotypeModelLoaderDelegate stereotypeLoaderDelegate;
 
   private List<MetadataType> importedTypes = new LinkedList<>();
   private List<String> privilegedExportedArtifacts = new LinkedList<>();
   private List<String> privilegedExportedPackages = new LinkedList<>();
   private List<NotificationModel> notificationModels = new LinkedList<>();
-  private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
+  private final Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
   private String namespace;
   private ResolvedMinMuleVersion resolvedMinMuleVersion;
   private Set<String> supportedJavaVersions;
@@ -126,7 +123,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                   ExtensionLoadingContext loadingContext) {
     super(extensionElement, loadingContext);
     this.stereotypeLoaderDelegate = stereotypeLoaderDelegate;
-    typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(loadingContext.getExtensionClassLoader());
     parseStructure(extensionElement);
   }
 
@@ -204,9 +200,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     notificationModels = mapReduceSingleAnnotation(extensionElement,
                                                    NotificationActions.class,
                                                    org.mule.sdk.api.annotation.notification.NotificationActions.class,
-                                                   value -> parseLegacyNotifications(value, namespace, typeLoader),
-                                                   value -> parseNotifications(value, namespace, typeLoader))
-                                                       .orElse(new LinkedList<>());
+                                                   value -> parseLegacyNotifications(value, namespace,
+                                                                                     loadingContext.getTypeLoader()),
+                                                   value -> parseNotifications(value, namespace,
+                                                                               loadingContext.getTypeLoader()))
+                                                                                   .orElse(new LinkedList<>());
   }
 
   private void parseImportedTypes() {

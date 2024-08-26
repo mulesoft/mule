@@ -37,7 +37,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
-import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -69,12 +68,11 @@ public class PollingSourceDeclarationEnricher implements WalkingDeclarationEnric
   public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
     return of(new IdempotentDeclarationEnricherWalkDelegate() {
 
-      final int schedulingStrategyParameterSequence =
-          getInfrastructureType(new TypeWrapper(SchedulingStrategy.class,
-                                                new DefaultExtensionsTypeLoaderFactory()
-                                                    .createTypeLoader(extensionLoadingContext.getExtensionClassLoader())))
-                                                        .map(MetadataTypeBasedInfrastructureType::getSequence).orElse(0);
       ClassTypeLoader loader = extensionLoadingContext.getTypeLoader();
+
+      final int schedulingStrategyParameterSequence =
+          getInfrastructureType(new TypeWrapper(SchedulingStrategy.class, loader))
+              .map(MetadataTypeBasedInfrastructureType::getSequence).orElse(0);
       ExtensionDeclarer extensionDeclarer = extensionLoadingContext.getExtensionDeclarer();
       boolean thereArePollingSources = false;
 
