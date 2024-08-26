@@ -19,9 +19,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static java.util.Optional.of;
 
 import static java.lang.Boolean.getBoolean;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -34,7 +34,6 @@ import org.mule.runtime.config.internal.el.DataWeaveExtendedExpressionLanguageAd
 import org.mule.runtime.config.internal.el.DefaultExpressionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.SchedulerBaseConfigFactory;
 import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -74,7 +73,6 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
   private final MuleContext muleContext;
   private final ArtifactType artifactType;
-  private final OptionalObjectsController optionalObjectsController;
   private final ConfigurationProperties configurationProperties;
   private final boolean enableLazyInit;
   private org.mule.runtime.core.internal.registry.Registry originalRegistry;
@@ -82,7 +80,6 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   public BaseSpringMuleContextServiceConfigurator(MuleContext muleContext,
                                                   ConfigurationProperties configurationProperties,
                                                   ArtifactType artifactType,
-                                                  OptionalObjectsController optionalObjectsController,
                                                   BeanDefinitionRegistry beanDefinitionRegistry,
                                                   Registry serviceLocator,
                                                   org.mule.runtime.core.internal.registry.Registry originalRegistry,
@@ -91,7 +88,6 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
     this.muleContext = muleContext;
     this.configurationProperties = configurationProperties;
     this.artifactType = artifactType;
-    this.optionalObjectsController = optionalObjectsController;
     this.originalRegistry = originalRegistry;
     this.enableLazyInit = enableLazyInit;
   }
@@ -147,7 +143,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   protected void createBootstrapBeanDefinitions() {
     try {
       SpringRegistryBootstrap springRegistryBootstrap =
-          new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, this::registerBeanDefinition,
+          new SpringRegistryBootstrap(artifactType, muleContext, this::registerBeanDefinition,
                                       BINDING_PROVIDER_PREDICATE
                                           .or(TRANSFORMER_PREDICATE)
                                           .or(propertyKey -> propertyKey.endsWith(COMPATIBILITY_PLUGIN_INSTALLED)));
