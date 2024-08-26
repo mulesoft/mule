@@ -134,7 +134,6 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
 
-import org.mule.runtime.privileged.exception.SuppressedMuleException;
 import org.slf4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
