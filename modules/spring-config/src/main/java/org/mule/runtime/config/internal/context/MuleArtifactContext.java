@@ -121,8 +121,6 @@ import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExten
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
