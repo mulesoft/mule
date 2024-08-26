@@ -131,6 +131,7 @@
         <module>runtime-extension-model</module>
         <module>core</module>
         <module>core-tests</module>
+        <module>manifest</module>
         <module>modules</module>
         <module>tests</module>
     </modules>
