@@ -11,14 +11,12 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for declaring functions through a {@link DefaultExtensionModelLoaderDelegate}
@@ -27,15 +25,13 @@ import org.slf4j.LoggerFactory;
  */
 final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FunctionModelLoaderDelegate.class);
-
   private final Map<FunctionModelParser, FunctionDeclarer> functionDeclarers = new HashMap<>();
 
   FunctionModelLoaderDelegate(DefaultExtensionModelLoaderDelegate delegate) {
     super(delegate);
   }
 
-  void declareFunctions(ExtensionDeclarer extensionDeclarer, List<FunctionModelParser> parsers) {
+  void declareFunctions(ExtensionDeclarer extensionDeclarer, List<FunctionModelParser> parsers, ExtensionLoadingContext context) {
 
     for (FunctionModelParser parser : parsers) {
 
@@ -56,9 +52,11 @@ final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDele
       parser.getFunctionExecutorModelProperty().ifPresent(function::withModelProperty);
 
       parser.getOutputType().applyOn(function.withOutput());
-      loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
+      loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers(), context);
       parser.getAdditionalModelProperties().forEach(function::withModelProperty);
-      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(function, resolvedMMV));
+      if (context.isResolveMinMuleVersion()) {
+        parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(function, resolvedMMV));
+      }
       addSemanticTerms(function.getDeclaration(), parser);
 
       functionDeclarers.put(parser, function);

@@ -115,7 +115,9 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
-    parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(declarer, resolvedMMV));
+    if (context.isResolveMinMuleVersion()) {
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(declarer, resolvedMMV));
+    }
 
     declareErrorModels(parser, declarer);
     declareExports(parser, declarer);
@@ -123,13 +125,14 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     declareSubTypes(parser, declarer, context);
     declareNotifications(parser, declarer);
 
-    configLoaderDelegate.declareConfigurations(declarer, parser);
-    connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
+    configLoaderDelegate.declareConfigurations(declarer, parser, context);
+    connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers(),
+                                                                     context);
 
     operationLoaderDelegate.declareOperations(declarer, parser.getDevelopmentFramework(), declarer,
-                                              parser.getOperationModelParsers());
-    functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
-    sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
+                                              parser.getOperationModelParsers(), context);
+    functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers(), context);
+    sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers(), context);
 
     getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
 

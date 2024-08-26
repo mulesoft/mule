@@ -14,6 +14,7 @@ import static java.util.Optional.of;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
 
@@ -34,7 +35,8 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModel
     super(loader);
   }
 
-  void declareConnectionProviders(HasConnectionProviderDeclarer declarer, List<ConnectionProviderModelParser> parsers) {
+  void declareConnectionProviders(HasConnectionProviderDeclarer declarer, List<ConnectionProviderModelParser> parsers,
+                                  ExtensionLoadingContext context) {
     for (ConnectionProviderModelParser parser : parsers) {
 
       ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(parser);
@@ -51,7 +53,10 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModel
       ConnectionProviderDeclaration connectionProviderDeclaration = providerDeclarer.getDeclaration();
       parser.getDeprecationModel().ifPresent(connectionProviderDeclaration::withDeprecation);
       parser.getDisplayModel().ifPresent(connectionProviderDeclaration::setDisplayModel);
-      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarationWithMmv(connectionProviderDeclaration, resolvedMMV));
+      if (context.isResolveMinMuleVersion()) {
+        parser.getResolvedMinMuleVersion()
+            .ifPresent(resolvedMMV -> declarationWithMmv(connectionProviderDeclaration, resolvedMMV));
+      }
 
       parser.getConnectionProviderFactoryModelProperty().ifPresent(providerDeclarer::withModelProperty);
 
@@ -62,7 +67,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModel
       parser.getExternalLibraryModels().forEach(providerDeclarer::withExternalLibrary);
       parser.getOAuthModelProperty().ifPresent(providerDeclarer::withModelProperty);
 
-      loader.getParameterModelsLoaderDelegate().declare(providerDeclarer, parser.getParameterGroupModelParsers());
+      loader.getParameterModelsLoaderDelegate().declare(providerDeclarer, parser.getParameterGroupModelParsers(), context);
       parser.getAdditionalModelProperties().forEach(providerDeclarer::withModelProperty);
       addSemanticTerms(providerDeclarer.getDeclaration(), parser);
       getStereotypeModelLoaderDelegate().addStereotypes(
