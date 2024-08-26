@@ -16,7 +16,9 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -101,12 +103,28 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
     appsFlowStoppedListeners.put(artifact.getArtifactName(), new ArrayList<>());
     if (artifact.getArtifactContext() != null && artifact.getArtifactContext().getRegistry() != null) {
       for (Flow flow : artifact.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
+        String flowName = flow.getName();
+        String artifactName = artifact.getArtifactName();
+        ((DefaultFlowBuilder.DefaultFlow) flow)
+            .setIsStatePersisted(() -> isStatePersisted(flowName, artifactName));
         FlowStoppedPersistenceListener flowStoppedPersistenceListener =
             new FlowStoppedDeploymentPersistenceListener(flow.getName(), artifact.getArtifactName());
         ((DefaultFlowBuilder.DefaultFlow) flow).addFlowStoppedListener(flowStoppedPersistenceListener);
         appsFlowStoppedListeners.get(artifact.getArtifactName()).add(flowStoppedPersistenceListener);
       }
     }
+  }
+
+  public Boolean isStatePersisted(String flowName, String appName) {
+    Properties deploymentProperties = null;
+    try {
+      deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
+    } catch (IOException e) {
+      logger.error("FlowStoppedDeploymentListener failed to process isStatePersisted for flow "
+          + flowName, e);
+    }
+    return deploymentProperties != null
+        && deploymentProperties.getProperty(flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY) != null;
   }
 
   /**
