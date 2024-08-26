@@ -188,9 +188,7 @@ public class DefaultMuleManifest implements MuleManifest {
       SortedMap<String, URL> candidates = new TreeMap<>();
       while (e.hasMoreElements()) {
         URL url = e.nextElement();
-        if ((url.toExternalForm().contains("mule-core")
-            && !url.toExternalForm().contains("tests.jar")
-            && !url.toExternalForm().contains("mule-core-components"))
+        if (url.toExternalForm().contains("mule-manifest")
             || url.toExternalForm().contains("mule-runtime-extension-model")
             || url.toExternalForm().contains("mule-runtime-ee-extension-model")
             || (EMBEDDED_JAR_PATTERN.matcher(url.toExternalForm()).find() && url.toExternalForm().endsWith(".jar"))) {
@@ -198,9 +196,9 @@ public class DefaultMuleManifest implements MuleManifest {
         }
       }
       if (!candidates.isEmpty()) {
-        // if mule-core and mule-core-ee jars are present, then mule-core-ee gets precedence
+        // if mule-manifest and mule-manifest-ee jars are present, then mule-manifest-ee gets precedence
         for (String candidateKey : candidates.keySet()) {
-          if (candidateKey.contains("mule-core-ee")
+          if (candidateKey.contains("mule-manifest-ee")
               || candidateKey.contains("mule-runtime-ee-extension-model")) {
             return candidates.get(candidateKey);
           }

@@ -6,15 +6,12 @@
  */
 package org.mule.runtime.manifest.internal;
 
-import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.allure.AllureConstants.MuleManifestFeature.MULE_MANIFEST;
 
-import static java.lang.System.getProperty;
 import static java.util.Collections.enumeration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,13 +25,11 @@ import org.junit.Test;
 @Feature(MULE_MANIFEST)
 public class DefaultMuleManifestTestCase {
 
-  public static final String MULE_VERSION = "muleVersion";
-
   @Test
   public void getCoreManifest() throws Exception {
     DefaultMuleManifest.UrlPrivilegedAction action = new DefaultMuleManifest.UrlPrivilegedAction();
-    URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-core-3.jar", "mule-foo-3.jar"));
-    assertThat(url.toExternalForm(), containsString("mule-core-3.jar"));
+    URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-manifest-3.jar", "mule-foo-3.jar"));
+    assertThat(url.toExternalForm(), containsString("mule-manifest-3.jar"));
   }
 
   @Test
@@ -47,15 +42,17 @@ public class DefaultMuleManifestTestCase {
   @Test
   public void getCoreEeManifest() throws Exception {
     DefaultMuleManifest.UrlPrivilegedAction action = new DefaultMuleManifest.UrlPrivilegedAction();
-    URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-core-3.jar", "mule-core-ee-3.jar", "mule-foo-3.jar"));
-    assertThat(url.toExternalForm(), containsString("mule-core-ee-3.jar"));
+    URL url = action
+        .getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-manifest-3.jar", "mule-manifest-ee-3.jar", "mule-foo-3.jar"));
+    assertThat(url.toExternalForm(), containsString("mule-manifest-ee-3.jar"));
   }
 
   @Test
   public void getEeExtModelManifest() throws Exception {
     DefaultMuleManifest.UrlPrivilegedAction action = new DefaultMuleManifest.UrlPrivilegedAction();
-    URL url = action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-core-3.jar", "mule-runtime-ee-extension-model-3.jar",
-                                                   "mule-foo-3.jar"));
+    URL url =
+        action.getManifestJarURL(getUrlsEnum("mule-bas-3.jar", "mule-manifest-3.jar", "mule-runtime-ee-extension-model-3.jar",
+                                             "mule-foo-3.jar"));
     assertThat(url.toExternalForm(), containsString("mule-runtime-ee-extension-model-3.jar"));
   }
 
