@@ -23,7 +23,6 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
@@ -31,7 +30,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -103,9 +101,8 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-18264")
-  @Description("The URLConnection used to read a resource inside a jar shouldn't have cache enabled in Windows")
+  @Description("The URLConnection used to read a resource inside a jar shouldn't have cache enabled")
   public void cacheOnFalseWhenLoadResourceFromJar() throws Exception {
-    assumeTrue(IS_OS_WINDOWS);
     File jarFile = createDummyJar();
     URLClassLoader classLoader = new URLClassLoader(new URL[] {jarFile.toURI().toURL()});
 
