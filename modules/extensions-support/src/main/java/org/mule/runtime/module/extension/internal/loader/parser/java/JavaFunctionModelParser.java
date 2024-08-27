@@ -17,7 +17,6 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -142,12 +141,12 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(resolveFunctionMinMuleVersion(functionElement,
-                                                    getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                         ExpressionFunctions.class,
-                                                                                         ExpressionFunctions::value,
-                                                                                         functionElement
-                                                                                             .getEnclosingType())));
+    return of(resolveFunctionMinMuleVersion(functionElement,
+                                            getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                 ExpressionFunctions.class,
+                                                                                 ExpressionFunctions::value,
+                                                                                 functionElement
+                                                                                     .getEnclosingType())));
   }
 
   @Override

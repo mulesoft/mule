@@ -12,14 +12,14 @@
  */
 module org.mule.runtime.artifact.activation {
 
-  requires org.mule.runtime.api;
+  requires transitive org.mule.runtime.api;
   requires org.mule.runtime.artifact;
-  requires org.mule.runtime.artifact.ast;
+  requires transitive org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.xmlParser;
   requires org.mule.runtime.container;
   requires org.mule.runtime.core;
   requires org.mule.runtime.extension.model;
-  requires org.mule.runtime.extensions.api;
+  requires transitive org.mule.runtime.extensions.api;
   requires org.mule.runtime.global.config;
   requires org.mule.runtime.jar.handling.utils;
   requires org.mule.runtime.jpms.utils;

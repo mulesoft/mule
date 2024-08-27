@@ -32,7 +32,6 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -327,7 +326,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(resolveSourceMinMuleVersion(sourceElement));
+    return of(resolveSourceMinMuleVersion(sourceElement));
   }
 
   @Override

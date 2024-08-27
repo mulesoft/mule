@@ -28,7 +28,6 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -234,7 +233,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(resolveConnectionProviderMinMuleVersion(element));
+    return of(resolveConnectionProviderMinMuleVersion(element));
   }
 
   @Override

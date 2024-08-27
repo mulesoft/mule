@@ -18,6 +18,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
+
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
@@ -136,6 +137,7 @@ public final class ExtensionModelTestUtils {
         .addParameter(MULE_SDK_RESOURCE_PROPERTY_NAME, extensionFile)
         .addParameter(MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME, expressionLanguageMetadataService)
         .setArtifactCoordinates(TEST_ARTIFACT_COORDINATES)
+        .setResolveMinMuleVersion(true)
         .build();
     return new MuleSdkPluginExtensionModelLoader().loadExtensionModel(loadingRequest);
   }

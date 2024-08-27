@@ -36,7 +36,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -453,11 +452,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(resolveOperationMinMuleVersion(operationElement, this.operationContainer,
-                                                     getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                          Operations.class,
-                                                                                          Operations::value,
-                                                                                          this.operationContainer)));
+    return of(resolveOperationMinMuleVersion(operationElement, this.operationContainer,
+                                             getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                  Operations.class,
+                                                                                  Operations::value,
+                                                                                  this.operationContainer)));
   }
 
   @Override

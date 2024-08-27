@@ -26,7 +26,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.of;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -407,7 +407,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(resolveExtensionMinMuleVersion(extensionElement));
+    return of(resolveExtensionMinMuleVersion(extensionElement));
   }
 
   @Override
