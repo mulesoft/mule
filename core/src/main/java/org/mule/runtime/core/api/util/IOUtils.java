@@ -97,14 +97,7 @@ public class IOUtils {
     if (url == null) {
       return null;
     } else {
-      URLConnection urlConnection = url.openConnection();
-      // It's necessary to disable connection caching when working with jar files
-      // in order to avoid file leaks in windows environments
-      // see for example MULE-18264
-      if (urlConnection instanceof JarURLConnection) {
-        urlConnection.setUseCaches(false);
-      }
-      return urlConnection.getInputStream();
+      return getInputStreamWithCacheControl(url);
     }
   }
 
@@ -168,6 +161,16 @@ public class IOUtils {
       }
     }
     return url;
+  }
+
+  public static InputStream getInputStreamWithCacheControl(URL url) throws IOException {
+    URLConnection urlConnection = url.openConnection();
+    // It's necessary to disable connection caching when working with jar files
+    // in order to avoid file leaks in Windows environments
+    if (urlConnection instanceof JarURLConnection) {
+      urlConnection.setUseCaches(false);
+    }
+    return urlConnection.getInputStream();
   }
 
   /**
