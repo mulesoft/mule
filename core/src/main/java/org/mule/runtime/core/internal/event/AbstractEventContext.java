@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static com.google.common.base.Functions.identity;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
+
+import static com.google.common.base.Functions.identity;
 import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.mule.runtime.api.functional.Either.left;
-import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.functional.Either;
@@ -25,6 +27,7 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.MessagingException;
+import org.mule.runtime.tracer.api.context.SpanContextAware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +39,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -70,6 +71,9 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   private transient List<BiConsumer<CoreEvent, Throwable>> onTerminatedConsumerList = new ArrayList<>();
 
   private final ReadWriteLock childContextsReadWriteLock = new ReentrantReadWriteLock();
+  private final ReadWriteLock thisContextReadWriteLock = new ReentrantReadWriteLock();
+  private final Lock readLock = thisContextReadWriteLock.readLock();
+  private final Lock writeLock = thisContextReadWriteLock.writeLock();
 
   private final int depthLevel;
 
@@ -196,21 +200,26 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     return empty();
   }
 
-  private synchronized void responseDone(Either<Throwable, CoreEvent> result) {
-    this.result = result;
-    responsePublisher.ifComputed(rp -> rp.result = result);
+  private void responseDone(Either<Throwable, CoreEvent> result) {
+    writeLock.lock();
+    try {
+      this.result = result;
+      responsePublisher.ifComputed(rp -> rp.result = result);
 
-    state = STATE_RESPONSE;
+      state = STATE_RESPONSE;
 
-    for (BiConsumer<CoreEvent, Throwable> onBeforeResponseConsumer : onBeforeResponseConsumerList) {
-      signalConsumerSilently(onBeforeResponseConsumer);
+      for (BiConsumer<CoreEvent, Throwable> onBeforeResponseConsumer : onBeforeResponseConsumerList) {
+        signalConsumerSilently(onBeforeResponseConsumer);
+      }
+      onBeforeResponseConsumerList.clear();
+
+      for (BiConsumer<CoreEvent, Throwable> onResponseConsumer : onResponseConsumerList) {
+        signalConsumerSilently(onResponseConsumer);
+      }
+      onResponseConsumerList.clear();
+    } finally {
+      writeLock.unlock();
     }
-    onBeforeResponseConsumerList.clear();
-
-    for (BiConsumer<CoreEvent, Throwable> onResponseConsumer : onResponseConsumerList) {
-      signalConsumerSilently(onResponseConsumer);
-    }
-    onResponseConsumerList.clear();
     tryComplete();
   }
 
@@ -224,59 +233,98 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
       getChildContextsReadLock().unlock();
     }
 
-    synchronized (this) {
-      if (state == STATE_RESPONSE && allChildrenComplete) {
+    if (!allChildrenComplete) {
+      return;
+    }
+
+    readLock.lock();
+    try {
+      if (state == STATE_RESPONSE) {
         if (debugLogEnabled) {
           LOGGER.debug("{} completed.", this);
         }
-        this.state = STATE_COMPLETE;
 
-        for (BiConsumer<CoreEvent, Throwable> consumer : onCompletionConsumerList) {
-          signalConsumerSilently(consumer);
-        }
-        onCompletionConsumerList.clear();
-        getParentContext().ifPresent(context -> {
-          if (context instanceof AbstractEventContext) {
-            ((AbstractEventContext) context).tryComplete();
+        readLock.unlock();
+        writeLock.lock();
+        try {
+          if (state != STATE_RESPONSE) {
+            return;
           }
-        });
-        tryTerminate();
+          state = STATE_COMPLETE;
+
+          for (BiConsumer<CoreEvent, Throwable> consumer : onCompletionConsumerList) {
+            signalConsumerSilently(consumer);
+          }
+          onCompletionConsumerList.clear();
+
+          Optional<BaseEventContext> parentContext = getParentContext();
+          if (parentContext.isPresent()) {
+            BaseEventContext context = parentContext.get();
+            if (context instanceof AbstractEventContext) {
+              ((AbstractEventContext) context).tryComplete();
+            }
+          }
+          tryTerminate();
+        } finally {
+          readLock.lock();
+          writeLock.unlock();
+        }
       }
+    } finally {
+      readLock.unlock();
     }
   }
 
-  protected synchronized void tryTerminate() {
-    if (this.state == STATE_COMPLETE && (externalCompletion == null || externalCompletion.isDone())) {
-      if (debugLogEnabled) {
-        LOGGER.debug("{} terminated.", this);
-      }
-      this.state = STATE_TERMINATED;
-
-      for (BiConsumer<CoreEvent, Throwable> consumer : onTerminatedConsumerList) {
-        signalConsumerSilently(consumer);
-      }
-      onTerminatedConsumerList.clear();
-
-      getChildContextsWriteLock().lock();
-      try {
-        this.childContexts.clear();
-      } finally {
-        getChildContextsWriteLock().unlock();
-      }
-
-      getParentContext().ifPresent(context -> {
-        AbstractEventContext parent = (AbstractEventContext) context;
-        parent.getChildContextsWriteLock().lock();
+  protected void tryTerminate() {
+    readLock.lock();
+    try {
+      if (canTerminate()) {
+        readLock.unlock();
+        writeLock.lock();
         try {
-          parent.childContexts.remove(this);
-        } finally {
-          parent.getChildContextsWriteLock().unlock();
-        }
-      });
+          if (canTerminate()) {
+            if (debugLogEnabled) {
+              LOGGER.debug("{} terminated.", this);
+            }
+            this.state = STATE_TERMINATED;
 
-      result = null;
-      responsePublisher = null;
+            for (BiConsumer<CoreEvent, Throwable> consumer : onTerminatedConsumerList) {
+              signalConsumerSilently(consumer);
+            }
+            onTerminatedConsumerList.clear();
+
+            getChildContextsWriteLock().lock();
+            try {
+              this.childContexts.clear();
+            } finally {
+              getChildContextsWriteLock().unlock();
+            }
+
+            getParentContext().ifPresent(context -> {
+              AbstractEventContext parent = (AbstractEventContext) context;
+              parent.getChildContextsWriteLock().lock();
+              try {
+                parent.childContexts.remove(this);
+              } finally {
+                parent.getChildContextsWriteLock().unlock();
+              }
+            });
+
+            result = null;
+            responsePublisher = null;
+          }
+        } finally {
+          readLock.lock();
+          writeLock.unlock();
+        }
+      }
+    } finally {
+      readLock.unlock();
     }
+  }
+
+  private boolean canTerminate() {
+    return this.state == STATE_COMPLETE && (externalCompletion == null || externalCompletion.isDone());
   }
 
   private void signalConsumerSilently(BiConsumer<CoreEvent, Throwable> consumer) {
@@ -315,48 +363,72 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   @Override
-  public synchronized void onTerminated(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_TERMINATED) {
-      signalConsumerSilently(consumer);
-    } else {
-      onTerminatedConsumerList.add(requireNonNull(consumer));
+  public void onTerminated(BiConsumer<CoreEvent, Throwable> consumer) {
+    writeLock.lock();
+    try {
+      if (state >= STATE_TERMINATED) {
+        signalConsumerSilently(consumer);
+      } else {
+        onTerminatedConsumerList.add(requireNonNull(consumer));
+      }
+    } finally {
+      writeLock.unlock();
     }
   }
 
   @Override
-  public synchronized void onComplete(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_COMPLETE) {
-      signalConsumerSilently(consumer);
-    } else {
-      onCompletionConsumerList.add(requireNonNull(consumer));
+  public void onComplete(BiConsumer<CoreEvent, Throwable> consumer) {
+    writeLock.lock();
+    try {
+      if (state >= STATE_COMPLETE) {
+        signalConsumerSilently(consumer);
+      } else {
+        onCompletionConsumerList.add(requireNonNull(consumer));
+      }
+    } finally {
+      writeLock.unlock();
     }
   }
 
   @Override
-  public synchronized void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_RESPONSE) {
-      signalConsumerSilently(consumer);
-    } else {
-      onBeforeResponseConsumerList.add(requireNonNull(consumer));
+  public void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer) {
+    writeLock.lock();
+    try {
+      if (state >= STATE_RESPONSE) {
+        signalConsumerSilently(consumer);
+      } else {
+        onBeforeResponseConsumerList.add(requireNonNull(consumer));
+      }
+    }  finally {
+      writeLock.unlock();
     }
   }
 
   @Override
-  public synchronized void onResponse(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_RESPONSE) {
-      signalConsumerSilently(consumer);
-    } else {
-      onResponseConsumerList.add(requireNonNull(consumer));
+  public void onResponse(BiConsumer<CoreEvent, Throwable> consumer) {
+    writeLock.lock();
+    try {
+      if (state >= STATE_RESPONSE) {
+        signalConsumerSilently(consumer);
+      } else {
+        onResponseConsumerList.add(requireNonNull(consumer));
+      }
+    } finally {
+      writeLock.unlock();
     }
   }
 
   @Override
-  public synchronized Publisher<CoreEvent> getResponsePublisher() {
-    if (isTerminated()) {
-      throw new IllegalStateException("getResponsePublisher() cannot be called after eventContext termination.");
+  public Publisher<CoreEvent> getResponsePublisher() {
+    writeLock.lock();
+    try {
+      if (isTerminated()) {
+        throw new IllegalStateException("getResponsePublisher() cannot be called after eventContext termination.");
+      }
+      return Mono.create(responsePublisher.get());
+    } finally {
+      writeLock.unlock();
     }
-
-    return Mono.create(responsePublisher.get());
   }
 
   public void forEachChild(Consumer<BaseEventContext> childConsumer) {
@@ -386,7 +458,8 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
       if (isResponseDone()) {
         signalPublisherSink(sink);
       } else {
-        synchronized (AbstractEventContext.this) {
+        writeLock.lock();
+        try {
           if (isResponseDone()) {
             signalPublisherSink(sink);
           } else {
@@ -398,6 +471,8 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
               }
             });
           }
+        } finally {
+          writeLock.unlock();
         }
       }
     }
