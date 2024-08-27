@@ -123,6 +123,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static File pluginEchoJavaxTestClassFile;
   public static File withLifecycleListenerExtensionJarFile;
   public static File withBrokenLifecycleListenerExtensionJarFile;
+  public static File bridgeMethodExtensionJarFile;
 
   private static TemporaryFolder compilerWorkFolder;
 
@@ -350,6 +351,12 @@ public final class TestArtifactsCatalog extends ExternalResource {
     pluginEchoJavaxTestClassFile = new SingleClassCompiler()
         .dependingOn(barUtilsJavaxJarFile)
         .compile(getResourceFile("/org/foo/echo/PluginJavaxEcho.java"));
+
+    bridgeMethodExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/bridge/JavaBridgeMethodExtension.java"),
+                   getResourceFile("/org/foo/bridge/JavaBridgeMethodOperation.java"),
+                   getResourceFile("/org/foo/bridge/GenericHello.java"))
+        .compile("mule-module-bridge-method-1.0.0.jar", "1.0.0");
   }
 
 
@@ -383,11 +390,13 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static ArtifactPluginFileBuilder echoPluginWithJavaxLib;
   public static ArtifactPluginFileBuilder withLifecycleListenerPlugin;
   public static ArtifactPluginFileBuilder withBrokenLifecycleListenerPlugin;
+  public static ArtifactPluginFileBuilder bridgeMethodExtensionPlugin;
 
   public static void initArtifactPluginFileBuilders() throws URISyntaxException {
     echoPlugin = createEchoPluginBuilder();
     helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
     helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
+    bridgeMethodExtensionPlugin = createBridgeExtensionPluginFileBuilder();
     goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
     oracleExtensionPlugin = createOracleExtensionPluginFileBuilder();
     loadClassExtensionPlugin = createLoadClassExtensionPluginFileBuilder();
@@ -695,5 +704,24 @@ public final class TestArtifactsCatalog extends ExternalResource {
     return new ArtifactPluginFileBuilder(artifactId)
         .dependingOn(new JarFileBuilder(artifactId, jarFile))
         .describedBy(mulePluginModelBuilder.build());
+  }
+
+  private static ArtifactPluginFileBuilder createBridgeExtensionPluginFileBuilder() {
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("bridgeExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("bridgeExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .addProperty(EXPORTED_RESOURCES,
+                     asList("/", "META-INF/mule-bridge.xsd",
+                            "META-INF/spring.handlers",
+                            "META-INF/spring.schemas"))
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.bridge.JavaBridgeMethodExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("bridgeExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("bridgeExtensionPlugin", bridgeMethodExtensionJarFile))
+        .describedBy((mulePluginModelBuilder.build()));
   }
 }
