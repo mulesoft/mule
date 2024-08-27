@@ -399,7 +399,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
       } else {
         onBeforeResponseConsumerList.add(requireNonNull(consumer));
       }
-    }  finally {
+    } finally {
       writeLock.unlock();
     }
   }
