@@ -174,10 +174,6 @@ public class DefaultMuleManifest implements MuleManifest {
       try {
         Enumeration<URL> e = MuleManifest.class.getClassLoader().getResources(MANIFEST_PATH);
         result = getManifestJarURL(e);
-        if (result == null) {
-          // if we haven't found a valid manifest yet, maybe we're running tests
-          result = getManifestTestJarURL();
-        }
       } catch (IOException e1) {
         logger.warn("Failure reading manifest: " + e1.getMessage(), e1);
       }
@@ -204,20 +200,6 @@ public class DefaultMuleManifest implements MuleManifest {
           }
         }
         return candidates.get(candidates.lastKey());
-      }
-      return null;
-    }
-
-    URL getManifestTestJarURL() throws IOException {
-      String testManifestPath = "core-tests/target/test-classes";
-      Enumeration<URL> e = MuleManifest.class.getClassLoader().getResources(MANIFEST_PATH);
-      while (e.hasMoreElements()) {
-        URL url = e.nextElement();
-        if ((url.toExternalForm().contains(testManifestPath)
-            && !url.toExternalForm().contains("tests.jar"))
-            || (EMBEDDED_JAR_PATTERN.matcher(url.toExternalForm()).find() && url.toExternalForm().endsWith(".jar"))) {
-          return url;
-        }
       }
       return null;
     }
