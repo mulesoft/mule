@@ -1002,52 +1002,6 @@
     </reporting>
     <profiles>
         <profile>
-            <id>testJdkWithoutXmlModule</id>
-            <activation>
-                <!-- This profile cannot be activated based on the jdk because the jdk on which this has to be activated or not -->
-                <!-- is the one used to run the tests, not the one used to run Maven. -->
-                <property>
-                    <name>!testJdkWithXmlModule</name>
-                </property>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <additionalClasspathElements>
-                                    <!-- Add this to the classpath so it is available when running tests with jvm8 -->
-                                    <!-- but it does not interfere with the module system --> 
-                                    <!-- (it has colliding packages with java.xml module) when running with java11+ -->
-                                    <additionalClasspathElement>${settings.localRepository}/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</additionalClasspathElement>
-                                </additionalClasspathElements>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>get-xml-apis</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>get</goal>
-                                </goals>
-                                <configuration>
-                                    <artifact>xml-apis:xml-apis:1.4.01</artifact>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>yourkit-agent</id>
             <properties>
                 <!-- When using this profile, the location of the YourKit agent has to be provided with a vm argument -->

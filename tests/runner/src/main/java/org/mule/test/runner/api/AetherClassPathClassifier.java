@@ -131,9 +131,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
   private static final String MULE_ARTIFACT_JSON_PATH = "META-INF/mule-artifact/mule-artifact.json";
 
-  private static final Set<String> JPMS_CONTAINER_ARTIFACT_COORDINATES_DENYLIST =
-      new HashSet<>(asList("xml-apis:xml-apis"));
-
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private final VersionScheme versionScheme = new GenericVersionScheme();
@@ -586,16 +583,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
    * @return {@link Predicate} for selecting direct dependencies for the Container.
    */
   private Predicate<Dependency> getContainerDirectDependenciesFilter(ArtifactClassificationType rootArtifactType) {
-    Predicate<Dependency> xmlApisInContainer = classloaderContainerJpmsModuleLayer()
-        ? directDep -> !JPMS_CONTAINER_ARTIFACT_COORDINATES_DENYLIST
-            .contains(directDep.getArtifact().getGroupId() + ":" + directDep.getArtifact().getArtifactId())
-        : directDep -> true;
-
-    return xmlApisInContainer
-        .and(rootArtifactType.equals(MODULE)
-            ? directDep -> directDep.getScope().equals(PROVIDED) || directDep.getScope().equals(COMPILE)
-            : directDep -> directDep.getScope().equals(PROVIDED)
-                || directDep.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER));
+    return rootArtifactType.equals(MODULE)
+        ? directDep -> directDep.getScope().equals(PROVIDED) || directDep.getScope().equals(COMPILE)
+        : directDep -> directDep.getScope().equals(PROVIDED)
+            || directDep.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER);
   }
 
   /**
