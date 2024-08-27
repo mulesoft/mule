@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
-import static java.util.Set.of;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.bridgeMethodExtensionPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
@@ -14,6 +13,7 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
+import static java.util.Set.of;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 
@@ -23,11 +23,10 @@ import java.util.function.Supplier;
 
 import io.qameta.allure.Issue;
 import io.qameta.allure.Issues;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Contains tests for leak prevention on the deployment process.

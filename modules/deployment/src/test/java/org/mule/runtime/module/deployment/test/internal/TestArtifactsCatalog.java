@@ -712,10 +712,6 @@ public final class TestArtifactsCatalog extends ExternalResource {
         .withBundleDescriptorLoader(createBundleDescriptorLoader("bridgeExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
                                                                  PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
-        .addProperty(EXPORTED_RESOURCES,
-                     asList("/", "META-INF/mule-bridge.xsd",
-                            "META-INF/spring.handlers",
-                            "META-INF/spring.schemas"))
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
         .addProperty("type", "org.foo.bridge.JavaBridgeMethodExtension")
