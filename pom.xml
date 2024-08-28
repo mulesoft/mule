@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.7.3-SNAPSHOT</version>
+    <version>4.7.4-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
@@ -157,17 +157,17 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.7.3-SNAPSHOT</muleBomVersion>
-        <muleMavenClientBomVersion>2.2.3-SNAPSHOT</muleMavenClientBomVersion>
+        <muleBomVersion>4.7.4-SNAPSHOT</muleBomVersion>
+        <muleMavenClientBomVersion>2.2.4-SNAPSHOT</muleMavenClientBomVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.3.3-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.7.3-SNAPSHOT</muleExtensionsApiVersion>
+        <mulePropertiesApiVersion>1.3.4-SNAPSHOT</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.7.4-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
-        <muleHttpPolicyApiVersion>1.7.3-SNAPSHOT</muleHttpPolicyApiVersion>
-        <mulePolicyApiVersion>1.7.3-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.7.3-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.7.3-SNAPSHOT</muleMetadataModelVersion>
+        <muleHttpPolicyApiVersion>1.7.4-SNAPSHOT</muleHttpPolicyApiVersion>
+        <mulePolicyApiVersion>1.7.4-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.7.4-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.7.4-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!--Maven plugins versions-->
@@ -205,12 +205,12 @@
         <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <muleAnnotationsApiVersion>1.6.3-SNAPSHOT</muleAnnotationsApiVersion>
-        <mule.module.maven.plugin.version>1.7.3-SNAPSHOT</mule.module.maven.plugin.version>
+        <muleAnnotationsApiVersion>1.6.4-SNAPSHOT</muleAnnotationsApiVersion>
+        <mule.module.maven.plugin.version>1.7.4-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.15.0</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.7.3-SNAPSHOT</muleRevapiExtensionVersion>
-        <mule.extensions.maven.plugin.version>1.7.3-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.7.3-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleRevapiExtensionVersion>1.7.4-SNAPSHOT</muleRevapiExtensionVersion>
+        <mule.extensions.maven.plugin.version>1.7.4-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.7.4-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
         <exchange-mule-maven-plugin.version>0.0.23</exchange-mule-maven-plugin.version>
@@ -222,7 +222,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.7.2-rc1</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.7.3-rc1</oldMuleArtifactVersion>
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
@@ -279,7 +279,7 @@
         <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
-        <weaveVersion>2.7.3-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.7.4-SNAPSHOT</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
         <commonsNet.version>3.9.0</commonsNet.version>
         <sshdVersion>2.12.1</sshdVersion>
