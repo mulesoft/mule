@@ -10,6 +10,7 @@
           "package": "org.mule.runtime.core.privileged.event",
           "classQualifiedName": "org.mule.runtime.core.privileged.event.EventedResult",
           "classSimpleName": "EventedResult",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.6.7-rc2",
           "elementKind": "class",
           "newArchiveRole": "primary",
           "breaksSemanticVersioning": "true"
