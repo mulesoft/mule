@@ -35,7 +35,6 @@
           "classQualifiedName": "org.mule.runtime.core.privileged.event.EventedResult",
           "classSimpleName": "EventedResult",
           "elementKind": "class",
-          "newArchive": "org.mule.runtime:mule-core:jar:4.6.7-SNAPSHOT",
           "newArchiveRole": "primary",
           "breaksSemanticVersioning": "true"
         }
