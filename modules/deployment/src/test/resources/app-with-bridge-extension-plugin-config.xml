@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:bridge="http://www.mulesoft.org/schema/mule/bridge"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/bridge http://www.mulesoft.org/schema/mule/bridge/current/mule-bridge.xsd">
+
+    <bridge:config name="default" message="Hello from bridge app!!!"/>
+
+    <flow name="main">
+        <set-payload value=""/>
+        <bridge:print-message config-ref="default" />
+    </flow>
+</mule>
