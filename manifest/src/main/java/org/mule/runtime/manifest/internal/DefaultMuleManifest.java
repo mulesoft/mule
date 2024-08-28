@@ -37,6 +37,8 @@ public class DefaultMuleManifest implements MuleManifest {
 
   private static Manifest manifest;
 
+  private String productVersionFromProperties;
+
   private DefaultMuleManifest() {}
 
   public static MuleManifest get() {
@@ -54,23 +56,28 @@ public class DefaultMuleManifest implements MuleManifest {
   }
 
   public String getProductVersionFromPropertiesFile() {
-    final String VERSION_PROPERTIES_PATH = "product-version/version.properties";
-    final String WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED = "Failure reading {} properties file to get productVersion";
-    final String COULDNT_BE_RESOLVED_PLACEHOLDER = "<Mule version could not be resolved>";
+    if (productVersionFromProperties == null) {
+      final String VERSION_PROPERTIES_PATH = "product-version/version.properties";
+      final String WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED = "Failure reading {} properties file to get productVersion";
+      final String COULDNT_BE_RESOLVED_PLACEHOLDER = "<Mule version could not be resolved>";
 
-    Properties versionProps = new Properties();
-    try (InputStream versionPropsInputStream = MuleManifest.class.getClassLoader().getResourceAsStream(VERSION_PROPERTIES_PATH)) {
-      if (versionPropsInputStream == null) {
-        logger.warn(WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED, VERSION_PROPERTIES_PATH);
+      Properties versionProps = new Properties();
+      try (InputStream versionPropsInputStream =
+          MuleManifest.class.getClassLoader().getResourceAsStream(VERSION_PROPERTIES_PATH)) {
+        if (versionPropsInputStream == null) {
+          logger.warn(WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED, VERSION_PROPERTIES_PATH);
+          return COULDNT_BE_RESOLVED_PLACEHOLDER;
+        }
+
+        versionProps.load(versionPropsInputStream);
+        productVersionFromProperties = versionProps.getProperty("mule.version");
+      } catch (IOException e) {
+        logger.warn(WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED, VERSION_PROPERTIES_PATH, e);
         return COULDNT_BE_RESOLVED_PLACEHOLDER;
       }
-
-      versionProps.load(versionPropsInputStream);
-      return versionProps.getProperty("mule.version");
-    } catch (IOException e) {
-      logger.warn(WARNING_MESSAGE_VERSION_COULDNT_BE_RESOLVED, VERSION_PROPERTIES_PATH, e);
-      return COULDNT_BE_RESOLVED_PLACEHOLDER;
     }
+
+    return productVersionFromProperties;
   }
 
   @Override
