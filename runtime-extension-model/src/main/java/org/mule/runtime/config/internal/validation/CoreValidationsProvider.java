@@ -49,13 +49,9 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   @Inject
   private ExpressionLanguage expressionLanguage;
 
-  @Inject
-  @Named("_compatibilityPluginInstalled")
-  private Optional<Object> compatibilityPluginInstalled;
-
   @Override
   public List<Validation> get() {
-    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(isCompatibilityInstalled()),
+    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(),
                                                           new SingletonsAreNotRepeated(),
                                                           new SingletonsPerFileAreNotRepeated(),
                                                           new NamedTopLevelElementsHaveName(),
@@ -127,10 +123,6 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
     return validations;
   }
 
-  private boolean isCompatibilityInstalled() {
-    return compatibilityPluginInstalled != null && compatibilityPluginInstalled.isPresent();
-  }
-
   public static Level getExpressionSyntacticValidationErrorLevel(Optional<FeatureFlaggingService> featureFlaggingService) {
     // Honour the system property consistently with MuleConfiguration#isValidateExpressions
     boolean validateExpressions = true;
@@ -158,7 +150,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                   new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
                                                                       artifactAstDependencyGraphProviderForValidator),
                   new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProviderForValidator),
-                  new MelNotEnabled(isCompatibilityInstalled()));
+                  new MelNotEnabled());
   }
 
   @Override
