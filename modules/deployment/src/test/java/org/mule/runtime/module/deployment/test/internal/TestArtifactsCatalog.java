@@ -31,8 +31,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
-import static org.apache.commons.lang3.JavaVersion.JAVA_11;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import static org.junit.Assert.fail;
 
@@ -180,7 +178,6 @@ public final class TestArtifactsCatalog extends ExternalResource {
             .compile("bar-javax.jar");
 
     barUtilsForbiddenJavaClassFile = new SingleClassCompiler()
-        .targetJavaVersion(8)
         .compile(getResourceFile("/packagetesting/java/lang/BarUtils.java"));
     barUtilsForbiddenJavaJarFile =
         new JarCompiler().compiling(getResourceFile("/packagetesting/java/lang/BarUtils.java"))
@@ -208,22 +205,18 @@ public final class TestArtifactsCatalog extends ExternalResource {
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 
     defaultServiceEchoJarFile = new JarCompiler()
-        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
         .compiling(getResourceFile("/packagetesting/org/mule/echo/DefaultEchoService.java"),
-                   getResourceFile("/packagetesting/org/mule/echo/EchoServiceProvider.java"))
-        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
-                                getResourceFile("/packagetesting/org/mule/echo/module-info.java"))
+                   getResourceFile("/packagetesting/org/mule/echo/EchoServiceProvider.java"),
+                   getResourceFile("/packagetesting/org/mule/echo/module-info.java"))
         .including(getResourceFile("/packagetesting/org/mule/echo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")
         .dependingOn(new File(getProperty("testServicesLib")))
         .compile("mule-module-service-echo-4.0-SNAPSHOT.jar");
 
     defaultFooServiceJarFile = new JarCompiler()
-        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
         .compiling(getResourceFile("/packagetesting/org/mule/service/foo/DefaultFooService.java"),
-                   getResourceFile("/packagetesting/org/mule/service/foo/FooServiceProvider.java"))
-        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
-                                getResourceFile("/packagetesting/org/mule/service/foo/module-info.java"))
+                   getResourceFile("/packagetesting/org/mule/service/foo/FooServiceProvider.java"),
+                   getResourceFile("/packagetesting/org/mule/service/foo/module-info.java"))
         .dependingOn(defaultServiceEchoJarFile.getAbsoluteFile(), new File(getProperty("testServicesLib")))
         .including(getResourceFile("/packagetesting/org/mule/service/foo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")
