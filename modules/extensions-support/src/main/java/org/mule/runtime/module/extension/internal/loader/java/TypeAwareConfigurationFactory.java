@@ -56,7 +56,9 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
             // The annotated class is added to a spring cache that has to be cleared later, and for that we'll need the
             // classloader it was loaded with (or a classloader in the parents' hierarchy).
             // For the cleaning part, see MuleArtifactContext code.
-            ((WithAttachedClassLoaders) extensionClassLoader).attachClassLoader(annotated.getClassLoader().getParent());
+            ((WithAttachedClassLoaders) extensionClassLoader)
+                .attachClassLoader(annotated.getClassLoader().getParent() != null ? annotated.getClassLoader().getParent()
+                    : annotated.getClassLoader());
           }
           return annotated;
         });
