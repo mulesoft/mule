@@ -13,6 +13,8 @@
  */
 module org.mule.runtime.manifest {
 
+  requires org.mule.runtime.api;
+
   requires org.slf4j;
 
   exports org.mule.runtime.manifest.api;
