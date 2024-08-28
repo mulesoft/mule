@@ -222,22 +222,6 @@ public class CompilerUtils {
     }
 
     /**
-     * Indicates which source file must be compiled. <b> does nothing if {@code condition} is {@code false}. This method is useful
-     * to keep the fluent use of the api.
-     *
-     * @param condition whether to compile the given sources or not
-     * @param sources   source files. Non empty.
-     * @return the same compiler instance
-     */
-    public T compilingConditionally(boolean condition, File... sources) {
-      if (condition) {
-        return compiling(sources);
-      }
-
-      return getThis();
-    }
-
-    /**
      * Indicates which source file must be compiled.
      *
      * @param sources     source files. Non empty.
