@@ -8,7 +8,9 @@ package org.mule.runtime.module.artifact.api.descriptor;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
+import static org.mule.runtime.artifact.descriptor.api.BundleScope.COMPILE;
+
+import org.mule.runtime.artifact.descriptor.api.BundleScope;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public final class BundleDependency {
+public final class BundleDependency implements org.mule.runtime.artifact.descriptor.api.BundleDependency {
 
   private BundleDescriptor descriptor;
   private BundleScope scope;
@@ -34,6 +36,7 @@ public final class BundleDependency {
 
   private BundleDependency() {}
 
+  // This change with BundleScope would break backwards.
   public BundleScope getScope() {
     return scope != null ? scope : COMPILE;
   }

@@ -22,7 +22,7 @@ import java.util.Optional;
 /**
  * Describes a bundle by its Maven coordinates.
  */
-public final class BundleDescriptor implements ArtifactCoordinates {
+public final class BundleDescriptor implements org.mule.runtime.artifact.descriptor.api.BundleDescriptor {
 
   public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
 

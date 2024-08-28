@@ -25,7 +25,8 @@ import com.google.common.collect.ImmutableSet;
  * @since 4.5
  */
 @NoExtend
-public class ApplicationDescriptor extends DeployableArtifactDescriptor {
+public class ApplicationDescriptor extends DeployableArtifactDescriptor
+    implements org.mule.runtime.artifact.descriptor.api.ApplicationDescriptor {
 
   public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
   public static final String REPOSITORY_FOLDER = "repository";

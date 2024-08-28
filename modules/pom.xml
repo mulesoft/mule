@@ -20,6 +20,7 @@
         <module>all-modules</module>
         <module>artifact</module>
         <module>artifact-activation</module>
+        <module>artifact-descriptor</module>
         <module>boot-api</module>
         <module>container</module>
         <module>deployment</module>

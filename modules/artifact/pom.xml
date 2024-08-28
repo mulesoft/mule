@@ -58,6 +58,12 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-artifact-descriptor</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-jar-handling-utils</artifactId>
             <version>${project.version}</version>
         </dependency>

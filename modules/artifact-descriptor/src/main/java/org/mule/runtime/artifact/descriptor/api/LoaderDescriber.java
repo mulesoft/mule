@@ -4,18 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.api.plugin;
+package org.mule.runtime.artifact.descriptor.api;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
-import org.mule.api.annotation.NoExtend;
-import org.mule.api.annotation.NoInstantiate;
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,29 +20,13 @@ import java.util.Map;
  *
  * @since 4.5
  */
-@NoInstantiate
-@NoExtend
-public class LoaderDescriber implements org.mule.runtime.artifact.descriptor.api.LoaderDescriber {
-
-  private final String id;
-  private final Map<String, Object> attributes = new HashMap<>();
-
-  /**
-   * Creates an immutable implementation of {@link LoaderDescriber}
-   *
-   * @param id ID of the descriptor. Not blank nor null.
-   */
-  public LoaderDescriber(String id) {
-    checkArgument(!isEmpty(id), "id must not be null");
-    this.id = id;
-  }
+@NoImplement
+public interface LoaderDescriber {
 
   /**
    * @return descriptor's ID that will be used to discover any object that matches with this ID.
    */
-  public String getId() {
-    return id;
-  }
+  String getId();
 
   /**
    * @return attributes that will be feed to the loader found through {@link #getId()}, where it's up to the loader's
@@ -58,27 +35,13 @@ public class LoaderDescriber implements org.mule.runtime.artifact.descriptor.api
    *         <p/>
    *         That implies each loader must evaluate on the attributes' values to be 100% sure it were formed correctly.
    */
-  public Map<String, Object> getAttributes() {
-    return attributes;
-  }
+  Map<String, Object> getAttributes();
 
   /**
    * Stores all the entries of {@code attributes} under in the {@code attributes} internal state.
    *
    * @param attributes mappings to be stored in this map
    */
-  public void addAttributes(Map<String, Object> attributes) {
-    attributes.forEach(this::addAttribute);
-  }
+  void addAttributes(Map<String, Object> attributes);
 
-  /**
-   * Stores the {@code value} under the {@key} in the {@code attributes} internal state.
-   *
-   * @param key   key with which the specified value is to be associated. Non blank nor null.
-   * @param value value to be associated with the specified key
-   */
-  private void addAttribute(String key, Object value) {
-    checkArgument(!isEmpty(key), "key must not be null");
-    attributes.put(key, value);
-  }
 }

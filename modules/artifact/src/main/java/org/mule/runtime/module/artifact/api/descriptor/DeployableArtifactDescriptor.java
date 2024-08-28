@@ -25,7 +25,8 @@ import java.util.Set;
  * 
  * @since 4.5
  */
-public class DeployableArtifactDescriptor extends ArtifactDescriptor {
+public class DeployableArtifactDescriptor extends ArtifactDescriptor
+    implements org.mule.runtime.artifact.descriptor.api.DeployableArtifactDescriptor {
 
   public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
   public static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";

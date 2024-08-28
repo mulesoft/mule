@@ -29,7 +29,7 @@ import java.util.Set;
  * @since 4.5
  */
 @NoExtend
-public class ClassLoaderConfiguration {
+public class ClassLoaderConfiguration implements org.mule.runtime.artifact.descriptor.api.ClassLoaderConfiguration {
 
   /**
    * Defines a {@link ClassLoaderConfiguration} with empty configuration

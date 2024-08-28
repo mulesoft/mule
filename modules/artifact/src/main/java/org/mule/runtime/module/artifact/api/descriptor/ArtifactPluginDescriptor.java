@@ -17,7 +17,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 
 import java.util.Optional;
-import java.util.Properties;
 
 /**
  * Describes an artifact with classifier {@code mule-plugin}, used within an Application or Domain.
@@ -25,7 +24,8 @@ import java.util.Properties;
  * @since 4.5
  */
 @NoExtend
-public class ArtifactPluginDescriptor extends ArtifactDescriptor {
+public class ArtifactPluginDescriptor extends ArtifactDescriptor
+    implements org.mule.runtime.artifact.descriptor.api.ArtifactPluginDescriptor {
 
   private static final String META_INF = "META-INF";
   public static final String MULE_PLUGIN_CLASSIFIER = BundleDescriptor.MULE_PLUGIN_CLASSIFIER;

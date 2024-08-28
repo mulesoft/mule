@@ -18,7 +18,7 @@ import java.io.File;
 import java.nio.file.Paths;
 
 @NoExtend
-public class ArtifactDescriptor {
+public class ArtifactDescriptor implements org.mule.runtime.artifact.descriptor.api.ArtifactDescriptor {
 
   public static final String MULE_ARTIFACT = "mule-artifact";
   public static final String META_INF = "META-INF";
