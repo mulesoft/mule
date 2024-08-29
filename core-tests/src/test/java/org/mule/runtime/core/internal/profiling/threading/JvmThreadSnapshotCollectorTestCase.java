@@ -102,9 +102,18 @@ public class JvmThreadSnapshotCollectorTestCase {
   @Test
   public void cpuTime() {
     Long previousCpuTime = threadSnapshotCollector.getCurrentThreadSnapshot().getCpuTime();
-    for (long l = 0L; l < 10000000L; ++l) {
-      // Just the loop to make the cpu work for some time...
+
+    // The next loop is just to make the cpu work for some time...
+    long total = 0;
+    for (long l = 0L; l < 100000000L; l++) {
+        if (l % 2 == 0) {
+            total += 1;
+        } else {
+            total -= 1;
+        }
     }
+    assertThat(total, is(0L)); // This assert is just to avoid the compiler to optimize the loop away.
+
     assertThat(threadSnapshotCollector.getCurrentThreadSnapshot().getCpuTime(), is(greaterThan(previousCpuTime)));
   }
 }
