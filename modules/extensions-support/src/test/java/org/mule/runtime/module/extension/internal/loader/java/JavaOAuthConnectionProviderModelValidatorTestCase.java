@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 
@@ -54,7 +54,7 @@ public class JavaOAuthConnectionProviderModelValidatorTestCase extends AbstractM
                                                                             extensionClass.getClassLoader(),
                                                                             getDefault(emptySet()));
 
-    declarerFor(OAuthWithParameterSupportingExpressions.class, getProductVersion(), ctx);
+    declarerFor(OAuthWithParameterSupportingExpressions.class, getMuleManifest().getProductVersion(), ctx);
 
     ExtensionModel extensionModel = new ExtensionModelFactory().create(ctx);
 

@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.FieldValueProviderNameUtils.getFieldValueProviderName;
 import static org.mule.runtime.module.extension.internal.loader.utils.ParameterUtils.getConfigFields;
@@ -20,6 +14,13 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractImplementingTypeProperty;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderId;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -40,7 +41,6 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.values.OfValues;
 import org.mule.runtime.extension.api.annotation.values.ValuePart;
-import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
@@ -87,31 +87,30 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
   private static final SinceMuleVersionModelProperty SINCE_MULE_VERSION_MODEL_PROPERTY_SDK_API_VP =
       new SinceMuleVersionModelProperty("4.4.0");
 
-  private final ClassTypeLoader classTypeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
-
   @Override
   public Optional<DeclarationEnricherWalkDelegate> getWalkDelegate(ExtensionLoadingContext extensionLoadingContext) {
+    ClassTypeLoader classTypeLoader = extensionLoadingContext.getTypeLoader();
     return extractImplementingTypeProperty(extensionLoadingContext.getExtensionDeclarer().getDeclaration())
         .map(p -> new IdempotentDeclarationEnricherWalkDelegate() {
 
           @Override
           public void onSource(SourceDeclaration declaration) {
-            enrichContainerModel(declaration, declaration.getName(), "source");
+            enrichContainerModel(declaration, declaration.getName(), "source", classTypeLoader);
           }
 
           @Override
           public void onOperation(OperationDeclaration declaration) {
-            enrichContainerModel(declaration, declaration.getName(), "operation");
+            enrichContainerModel(declaration, declaration.getName(), "operation", classTypeLoader);
           }
 
           @Override
           public void onConfiguration(ConfigurationDeclaration declaration) {
-            enrichContainerModel(declaration, declaration.getName(), "configuration");
+            enrichContainerModel(declaration, declaration.getName(), "configuration", classTypeLoader);
           }
 
           @Override
           protected void onConnectionProvider(ConnectionProviderDeclaration declaration) {
-            enrichContainerModel(declaration, declaration.getName(), "connection provider");
+            enrichContainerModel(declaration, declaration.getName(), "connection provider", classTypeLoader);
           }
         });
   }
@@ -126,7 +125,8 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
    * @param containerDeclaration declaration to introspect their parameters
    */
   private void enrichContainerModel(ParameterizedDeclaration<?> containerDeclaration, String componentName,
-                                    String componentType) {
+                                    String componentType,
+                                    ClassTypeLoader classTypeLoader) {
     List<ParameterDeclaration> allParameters = containerDeclaration.getAllParameters();
 
     Map<String, String> parameterNames = getContainerParameterNames(allParameters);
@@ -144,19 +144,22 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
                                                                                      paramDeclaration::setValueProviderModel,
                                                                                      1,
                                                                                      parameterNames, paramDeclaration.getName(),
-                                                                                     allParameters));
+                                                                                     allParameters,
+                                                                                     classTypeLoader));
 
     dynamicFieldOptions.forEach((paramDeclaration, fieldsValues) -> enrichParameterFields(fieldsValues,
                                                                                           paramDeclaration,
                                                                                           parameterNames,
                                                                                           paramDeclaration.getName(),
-                                                                                          allParameters));
+                                                                                          allParameters,
+                                                                                          classTypeLoader));
 
     dynamicGroupOptions
         .forEach((paramGroupDeclaration, ofValueInformation) -> getParts(paramGroupDeclaration)
             .forEach((paramDeclaration, order) -> enrichParameter(ofValueInformation, paramDeclaration,
                                                                   paramDeclaration::setValueProviderModel, order, parameterNames,
-                                                                  paramGroupDeclaration.getName(), allParameters)));
+                                                                  paramGroupDeclaration.getName(), allParameters,
+                                                                  classTypeLoader)));
   }
 
   /**
@@ -170,7 +173,8 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
                                BaseDeclaration paramDeclaration,
                                Consumer<ValueProviderModel> valueProviderModelConsumer, Integer partOrder,
                                Map<String, String> containerParameterNames, String name,
-                               List<ParameterDeclaration> allParameters) {
+                               List<ParameterDeclaration> allParameters,
+                               ClassTypeLoader classTypeLoader) {
     Map<String, String> bindingMap = getBindingsMap(ofValueInformation.getBindings());
 
     ValueProviderFactoryModelPropertyBuilder propertyBuilder =
@@ -223,7 +227,8 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
   }
 
   private void enrichParameterFields(List<FieldValues> fieldsValues, ParameterDeclaration paramDeclaration,
-                                     Map<String, String> parameterNames, String name, List<ParameterDeclaration> allParameters) {
+                                     Map<String, String> parameterNames, String name, List<ParameterDeclaration> allParameters,
+                                     ClassTypeLoader classTypeLoader) {
 
     List<FieldValueProviderModel> fieldValueProviderModels = new LinkedList<>();
     Map<String, ValueProviderFactoryModelProperty> valueProviderFactoryModelProperties = new HashMap<>();

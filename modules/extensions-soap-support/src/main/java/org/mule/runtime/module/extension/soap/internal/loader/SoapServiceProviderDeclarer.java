@@ -79,7 +79,9 @@ public class SoapServiceProviderDeclarer {
 
     ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerName, loadingContext);
 
-    parametersLoader.declare(providerDeclarer, getParameterGroupParsers(provider.getParameters(), context));
+    parametersLoader.declare(providerDeclarer,
+                             getParameterGroupParsers(provider.getParameters(), context),
+                             loadingContext);
     if (hasCustomTransports) {
       providerDeclarer.onParameterGroup(TRANSPORT_GROUP)
           .withRequiredParameter(TRANSPORT_PARAM)

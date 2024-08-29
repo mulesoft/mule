@@ -6,18 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.enricher;
 
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -25,6 +13,21 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLA
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.STRICT_STUBS;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -68,18 +71,22 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class JavaMimeTypeParametersDeclarationEnricherTestCase extends AbstractMuleTestCase {
 
   private static final BaseTypeBuilder builder = BaseTypeBuilder.create(JAVA);
 
   private static SinceMuleVersionModelProperty SINCE_MULE_VERSION_MODEL_PROPERTY = new SinceMuleVersionModelProperty("4.2.0");
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule().strictness(STRICT_STUBS);
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionLoadingContext extensionLoadingContext;
@@ -96,13 +103,14 @@ public class JavaMimeTypeParametersDeclarationEnricherTestCase extends AbstractM
   @Mock(answer = RETURNS_DEEP_STUBS)
   private SourceDeclaration source;
 
-  private JavaMimeTypeParametersDeclarationEnricher enricher = new JavaMimeTypeParametersDeclarationEnricher();
+  private final JavaMimeTypeParametersDeclarationEnricher enricher = new JavaMimeTypeParametersDeclarationEnricher();
 
-  private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   @Before
   public void before() {
     when(extensionLoadingContext.getExtensionDeclarer()).thenReturn(extensionDeclarer);
+    when(extensionLoadingContext.getTypeLoader()).thenReturn(ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
     when(extensionDeclarer.getDeclaration()).thenReturn(extensionDeclaration);
     when(extensionDeclaration.getOperations()).thenReturn(singletonList(operation));
     when(extensionDeclaration.getMessageSources()).thenReturn(singletonList(source));

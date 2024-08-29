@@ -12,6 +12,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionDeclarationT
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+import static java.util.Optional.of;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -25,6 +26,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.TypeConverter;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
@@ -65,7 +67,8 @@ public class ConfigurationDefinitionParserTestCase extends AbstractMuleTestCase 
 
       ConfigurationDefinitionParser configurationDefinitionParser =
           new ConfigurationDefinitionParser(definitionBuilder, extensionModel, configurationModel, dslSyntaxResolver,
-                                            extensionParsingContext);
+                                            extensionParsingContext,
+                                            of(ExtensionsTypeLoaderFactory.getDefault().createTypeLoader()));
 
       componentBuildingDefinitions = configurationDefinitionParser.parse();
     } finally {

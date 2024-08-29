@@ -40,7 +40,6 @@ import org.mule.runtime.config.internal.bean.lazy.LazySampleDataService;
 import org.mule.runtime.config.internal.bean.lazy.LazyValueProviderService;
 import org.mule.runtime.config.internal.context.SpringMuleContextServiceConfigurator;
 import org.mule.runtime.config.internal.lazy.NoOpConnectivityTesterFactory;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
@@ -84,7 +83,6 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                                   ConfigurationProperties configurationProperties,
                                                   ArtifactType artifactType,
                                                   ArtifactAst artifactAst,
-                                                  OptionalObjectsController optionalObjectsController,
                                                   BeanDefinitionRegistry beanDefinitionRegistry,
                                                   Registry serviceLocator,
                                                   ResourceLocator resourceLocator,
@@ -93,7 +91,6 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
           addToolingObjectsToRegistry,
           artifactType,
           artifactAst,
-          optionalObjectsController,
           beanDefinitionRegistry,
           serviceLocator, resourceLocator, memoryManagementService);
     this.lazyComponentInitializer = lazyComponentInitializer;

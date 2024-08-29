@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.DataType.fromType;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
@@ -15,6 +16,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -45,10 +47,10 @@ import java.util.Optional;
  */
 class StackableTypesModelPropertyResolver {
 
-  public static StackableTypesModelPropertyResolver newInstance() {
+  public static StackableTypesModelPropertyResolver newInstance(ExtensionLoadingContext loadingContext) {
     return StackableTypesModelPropertyResolver.builder()
         .addType(StackableType
-            .builder(ParameterResolver.class)
+            .builder(ParameterResolver.class, loadingContext.getTypeLoader())
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
             .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
             .setExpressionBasedResolverFactory((value,
@@ -57,20 +59,20 @@ class StackableTypesModelPropertyResolver {
                                                                                                                    fromType(expectedType)))
             .build())
         .addType(StackableType
-            .builder(TypedValue.class)
+            .builder(TypedValue.class, loadingContext.getTypeLoader())
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new TypedValue<>(value, DataType.fromObject(value))))
             .setDelegateResolverFactory(valueResolver -> new TypedValueValueResolverWrapper(valueResolver))
             .setExpressionBasedResolverFactory((expression, expectedType) -> new ExpressionTypedValueValueResolver(expression,
                                                                                                                    expectedType))
             .build())
         .addType(StackableType
-            .builder(Literal.class)
+            .builder(Literal.class, loadingContext.getTypeLoader())
             .setExpressionBasedResolverFactory((expression, expectedType) -> new StaticLiteralValueResolver(expression,
                                                                                                             expectedType))
             .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))
             .build())
         .addType(StackableType
-            .builder(org.mule.sdk.api.runtime.parameter.ParameterResolver.class)
+            .builder(org.mule.sdk.api.runtime.parameter.ParameterResolver.class, loadingContext.getTypeLoader())
             .setStaticResolverFactory(value -> new StaticValueResolver<>(new StaticParameterResolver<>(value)))
             .setDelegateResolverFactory(resolver -> new ParameterResolverValueResolverWrapper(resolver))
             .setExpressionBasedResolverFactory((value,
@@ -79,7 +81,7 @@ class StackableTypesModelPropertyResolver {
                                                                                                                    fromType(expectedType)))
             .build())
         .addType(StackableType
-            .builder(org.mule.sdk.api.runtime.parameter.Literal.class)
+            .builder(org.mule.sdk.api.runtime.parameter.Literal.class, loadingContext.getTypeLoader())
             .setExpressionBasedResolverFactory((expression, expectedType) -> new StaticLiteralValueResolver(expression,
                                                                                                             expectedType))
             .setStaticResolverFactory((value) -> new StaticLiteralValueResolver(value.toString(), value.getClass()))

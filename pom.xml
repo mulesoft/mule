@@ -131,12 +131,13 @@
         <module>runtime-extension-model</module>
         <module>core</module>
         <module>core-tests</module>
+        <module>manifest</module>
         <module>modules</module>
         <module>tests</module>
     </modules>
 
     <properties>
-        <javaVersion>11</javaVersion>
+        <javaVersion>17</javaVersion>
         <javaReleaseVersion>${javaVersion}</javaReleaseVersion>
         <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
         <javaTestModuleName>${javaModuleName}.test</javaTestModuleName>
@@ -161,7 +162,6 @@
         <muleMavenClientBomVersion>2.4.0-SNAPSHOT</muleMavenClientBomVersion>
 
         <weaveVersion>2.9.0-SNAPSHOT</weaveVersion>
-        <aspectjVersion>1.9.2</aspectjVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.5.0-SNAPSHOT</mulePropertiesApiVersion>
@@ -176,15 +176,11 @@
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
         <licenseYear>2023</licenseYear>
 
-        <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
-
         <muleAnnotationsApiVersion>1.8.0-SNAPSHOT</muleAnnotationsApiVersion>
         <mule.module.maven.plugin.version>1.9.0-SNAPSHOT</mule.module.maven.plugin.version>
         <mule.extensions.maven.plugin.version>1.9.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.9.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
-
-        <awaitilityVersion>3.0.0</awaitilityVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <oldMuleArtifactVersion>4.8.0-SNAPSHOT</oldMuleArtifactVersion>
@@ -210,46 +206,10 @@
             ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
-        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
+        <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
         <!-- this groovy version is to be used during the build process or for tests, not bundled in the distro -->
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
-
-        <!-- *************************** -->
-        <!-- Test dependencies versions: -->
-        <!-- *************************** -->
-
-        <junitVersion>4.13.2</junitVersion>
-        <hamcrestVersion>2.2</hamcrestVersion>
-        <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <tikaVersion>1.28.3</tikaVersion>
-        <mockitoVersion>4.11.0</mockitoVersion>
-        <xmlUnitVersion>1.6</xmlUnitVersion>
-        <assertJVersion>3.5.2</assertJVersion>
-        <byteBuddyVersion>1.14.0</byteBuddyVersion>
-        <wireMockVersion>2.27.2</wireMockVersion>
-        <jettyVersion>9.4.53.v20231009</jettyVersion>
-        <compileTestingVersion>0.21.0</compileTestingVersion>
-        <activemqVersion>5.15.15</activemqVersion>
-        <hawtbufVersion>1.1</hawtbufVersion>
-        <activemqProtobuf>1.1</activemqProtobuf>
-        <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
-        <derbyVersion>10.14.2.0</derbyVersion>
-        <jsonassert.version>1.5.2</jsonassert.version>
-        <commonsNet.version>3.9.0</commonsNet.version>
-        <sshdVersion>2.12.1</sshdVersion>
-        <ftpServerVersion>1.2.0</ftpServerVersion>
-        <commonsExecVersion>1.3</commonsExecVersion>
-        <testcontainersVersion>1.17.6</testcontainersVersion>
-        <armeriaVersion>1.20.3</armeriaVersion>
-        <protobufVersion>3.21.9</protobufVersion>
-        <openTelemetryProtoVersion>1.7.1-alpha</openTelemetryProtoVersion>
-        <springSecurityVersion>5.7.12</springSecurityVersion>
-        <jmh.version>1.35</jmh.version>
-
-        <!-- These are declared here so that version upgrading bots keep the version property up to date -->
-        <springVersion>5.3.33</springVersion>
-        <commonsCliVersion>1.6.0</commonsCliVersion>
         <mule.maven.plugin.version>4.2.0</mule.maven.plugin.version>
     </properties>
 
@@ -263,274 +223,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainersVersion}</version>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-tests-bom</artifactId>
+                <version>${muleBomVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
-                <groupId>com.googlecode.multithreadedtc</groupId>
-                <artifactId>multithreadedtc</artifactId>
-                <version>${multithreadedtcVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junitVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hamcrest</groupId>
-                        <artifactId>hamcrest-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>${hamcrestVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-core</artifactId>
-                <version>${tikaVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockitoVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-inline</artifactId>
-                <version>${mockitoVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertJVersion}</version>
-            </dependency>
-            <!-- Added to avoid conflicting transitive versions from Mockito and PowerMock -->
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy-agent</artifactId>
-                <version>${byteBuddyVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mule.skyscreamer</groupId>
-                <artifactId>jsonassert</artifactId>
-                <version>${jsonassert.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitilityVersion}</version>
-                <exclusions>
-                   <exclusion>
-                       <groupId>org.hamcrest</groupId>
-                       <artifactId>hamcrest-library</artifactId>
-                   </exclusion>
-                   <exclusion>
-                       <groupId>org.hamcrest</groupId>
-                       <artifactId>hamcrest-core</artifactId>
-                   </exclusion>
-                </exclusions>
-            </dependency>
-            
-            <dependency>
-                <groupId>xmlunit</groupId>
-                <artifactId>xmlunit</artifactId>
-                <version>${xmlUnitVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- Other deps used in testing -->
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derby</artifactId>
-                <version>${derbyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derbynet</artifactId>
-                <version>${derbyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derbytools</artifactId>
-                <version>${derbyVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-net</groupId>
-                <artifactId>commons-net</artifactId>
-                <version>${commonsNet.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.ftpserver</groupId>
-                <artifactId>ftpserver-core</artifactId>
-                <version>${ftpServerVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock</artifactId>
-                <version>${wireMockVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock-standalone</artifactId>
-                <version>${wireMockVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-server</artifactId>
-                <version>${jettyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>javax.servlet</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlet</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-util</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-security</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-http</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-io</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-continuation</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-osgi</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-common</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-core</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-scp</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-sftp</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-exec</artifactId>
-                <version>${commonsExecVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.testing.compile</groupId>
-                <artifactId>compile-testing</artifactId>
-                <version>${compileTestingVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.linecorp.armeria</groupId>
-                <artifactId>armeria-junit4</artifactId>
-                <version>${armeriaVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>jsr305</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.linecorp.armeria</groupId>
-                <artifactId>armeria-grpc</artifactId>
-                <version>${armeriaVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>jsr305</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-proto</artifactId>
-                <version>${openTelemetryProtoVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${protobufVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-config</artifactId>
-                <version>${springSecurityVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-core</artifactId>
-                <version>${springSecurityVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-crypto</artifactId>
-                <version>${springSecurityVersion}</version>
-            </dependency>
-
-            <!-- JMH -->
-            <dependency>
-                <groupId>org.openjdk.jmh</groupId>
-                <artifactId>jmh-core</artifactId>
-                <version>${jmh.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjdk.jmh</groupId>
-                <artifactId>jmh-generator-annprocess</artifactId>
-                <version>${jmh.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <!-- NOT the service (with mule-service classifier) -->
@@ -716,7 +413,7 @@
                                 <Build-Date>${timestamp}</Build-Date>
                                 <Dev-List-Email>${dev.list}</Dev-List-Email>
                                 <Supported-Jdks>[${javaVersion},18)</Supported-Jdks>
-                                <Recommended-Jdks>[${javaVersion},12),[17,18)</Recommended-Jdks>
+                                <Recommended-Jdks>[${javaVersion},18)</Recommended-Jdks>
                                 <More-Info>For more information go to ${productUrl}</More-Info>
                                 <Support>Get commercial support: ${project.organization.url}/support</Support>
                                 <Description>Mule Runtime and Integration Platform</Description>

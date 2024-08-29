@@ -10,6 +10,8 @@ import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
@@ -165,7 +167,8 @@ public final class ArtifactAstUtils {
     String artifactId = muleContext.getConfiguration().getId();
     Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
     return new MuleSdkApplicationExtensionModelLoadingMediator(expressionLanguageMetadataService, artifactId,
-                                                               artifactCoordinates);
+                                                               artifactCoordinates,
+                                                               empty());
   }
 
   private ArtifactAstUtils() {}

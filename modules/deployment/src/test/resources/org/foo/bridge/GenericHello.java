@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.utils;
+package org.foo.bridge;
 
+public interface GenericHello<T> {
 
-public class OptionalRegistryBean {
-
+  T getMessage();
 }

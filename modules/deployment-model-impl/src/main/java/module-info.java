@@ -26,6 +26,7 @@ module org.mule.runtime.deployment.model.impl {
   requires org.mule.runtime.http.policy.api;
   requires org.mule.runtime.jar.handling.utils;
   requires org.mule.runtime.license.api;
+  requires org.mule.runtime.manifest;
   requires org.mule.runtime.maven.client.api;
   requires org.mule.runtime.memory.management;
   requires org.mule.runtime.policy.api;

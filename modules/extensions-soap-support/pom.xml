@@ -17,6 +17,7 @@
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
               --add-reads=org.mule.runtime.extensions.soap.support=org.apache.commons.io
+              --add-reads=org.mule.runtime.extensions.soap.support=org.mule.runtime.manifest
             ${surefire.args.base}
         </surefire.args>
 

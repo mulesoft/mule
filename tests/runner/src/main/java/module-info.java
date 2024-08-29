@@ -25,6 +25,7 @@ module org.mule.test.runner {
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.deployment.model;
   requires org.mule.runtime.extensions.support;
+  requires org.mule.runtime.manifest;
 
   requires org.mule.runtime.maven.client.api;
   requires org.mule.runtime.maven.pom.parser.api;

@@ -122,14 +122,6 @@ public interface ParameterModelParser extends SemanticTermsParser, AllowedStereo
   Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 
   /**
-   * @return whether the {@link #getResolvedMinMuleVersion() minMuleVersion resolution} has to be performed.
-   * @since 4.9
-   */
-  default boolean mustResolveMinMuleVersion() {
-    return true;
-  }
-
-  /**
    * @return the parameter's {@link InputResolverModelParser} if dynamic metadata were defined
    */
   Optional<InputResolverModelParser> getInputResolverModelParser();

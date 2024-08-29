@@ -20,6 +20,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 
@@ -34,11 +35,14 @@ import java.util.Set;
 public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements MuleSdkExtensionModelLoadingMediator {
 
   protected final Optional<ArtifactCoordinates> artifactCoordinates;
+  private final Optional<ExtensionLoadingContext> artifactExtensionLoadingContext;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   protected AbstractMuleSdkExtensionModelLoadingMediator(Optional<ArtifactCoordinates> artifactCoordinates,
+                                                         Optional<ExtensionLoadingContext> artifactExtensionLoadingContext,
                                                          ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactCoordinates = artifactCoordinates;
+    this.artifactExtensionLoadingContext = artifactExtensionLoadingContext;
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
   }
 
@@ -57,6 +61,8 @@ public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements Mu
         .addParameter(MULE_SDK_ARTIFACT_AST_PROPERTY_NAME, ast)
         .addParameter(MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME, expressionLanguageMetadataService);
 
+    artifactExtensionLoadingContext
+        .ifPresent(ctx -> loadingRequestBuilder.setResolveMinMuleVersion(ctx.isResolveMinMuleVersion()));
     artifactCoordinates.ifPresent(loadingRequestBuilder::setArtifactCoordinates);
 
     addCustomLoadingRequestParameters(loadingRequestBuilder);

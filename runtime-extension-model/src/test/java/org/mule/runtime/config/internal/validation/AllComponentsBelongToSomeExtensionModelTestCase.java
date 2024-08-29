@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -18,9 +18,10 @@ import org.mule.runtime.config.internal.validation.test.AbstractCoreValidationTe
 
 import java.util.Optional;
 
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(MULE_DSL)
 @Story(DSL_VALIDATION_STORY)
@@ -28,7 +29,7 @@ public class AllComponentsBelongToSomeExtensionModelTestCase extends AbstractCor
 
   @Override
   protected Validation getValidation() {
-    return new AllComponentsBelongToSomeExtensionModel(false);
+    return new AllComponentsBelongToSomeExtensionModel();
   }
 
   @Test

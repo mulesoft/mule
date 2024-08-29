@@ -14,7 +14,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJEC
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
@@ -359,7 +358,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnforceRequiredExpressionValidation();
       configureEnforceExpressionValidation();
       configureParallelForeachFlattenMessage();
-      configureDisableRegistryBootstrapOptionalEntries();
       configureDisableApplyObjectProcessor();
       configureValidateAppModelWithRegionClassloader();
       configurePrintDetailedCompositeExceptionLog();
@@ -1450,17 +1448,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureParallelForeachFlattenMessage() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(PARALLEL_FOREACH_FLATTEN_MESSAGE,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES} feature flag.
-   *
-   * @since 4.5
-   */
-  private static void configureDisableRegistryBootstrapOptionalEntries() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES,
                                                 minMuleVersion(v4_5_0));
   }
 

@@ -28,7 +28,6 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -88,7 +87,6 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   private final ExtensionLoadingContext loadingContext;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
-  private final ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaConnectionProviderModelParser(JavaExtensionModelParser extensionModelParser,
                                            ExtensionElement extensionElement,
@@ -102,11 +100,6 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
         .orElse(ExtensionModel.class.getClassLoader());
 
     collectAdditionalModelProperties();
-    if (mustResolveMinMuleVersion()) {
-      this.resolvedMinMuleVersion = resolveConnectionProviderMinMuleVersion(element);
-    } else {
-      this.resolvedMinMuleVersion = null;
-    }
   }
 
   @Override
@@ -240,7 +233,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return of(resolveConnectionProviderMinMuleVersion(element));
   }
 
   @Override
@@ -334,8 +327,4 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
                                                   .credentialsPlacement())));
   }
 
-  @Override
-  public boolean mustResolveMinMuleVersion() {
-    return loadingContext.isResolveMinMuleVersion();
-  }
 }

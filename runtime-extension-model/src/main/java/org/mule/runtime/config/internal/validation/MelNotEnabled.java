@@ -31,12 +31,6 @@ import java.util.function.Predicate;
  */
 public class MelNotEnabled implements ArtifactValidation {
 
-  private final boolean compatibilityInstalled;
-
-  public MelNotEnabled(boolean compatibilityInstalled) {
-    this.compatibilityInstalled = compatibilityInstalled;
-  }
-
   @Override
   public String getName() {
     return "MEL not enabled";
@@ -55,9 +49,7 @@ public class MelNotEnabled implements ArtifactValidation {
 
   @Override
   public List<ValidationResultItem> validateMany(ArtifactAst artifact) {
-    if (compatibilityInstalled) {
-      return singletonList(create(emptyList(), this, "Deployed artifact uses the compatibility plugin."));
-    } else if (isMelDefault()) {
+    if (isMelDefault()) {
       return singletonList(create(emptyList(), this,
                                   "Runtime has the '" + MULE_MEL_AS_DEFAULT + "' system property set to true."));
     } else {

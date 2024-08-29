@@ -15,7 +15,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.ANY;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.DIRECTORY;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.LAB_ADDRESS_EXAMPLE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.PARAMETER_OVERRIDED_DISPLAY_NAME;
@@ -70,7 +70,7 @@ public class DisplayModelTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() {
-    String version = getProductVersion();
+    String version = getMuleManifest().getProductVersion();
     heisenbergDeclarer = declarerFor(HeisenbergExtension.class, version);
     marvelDeclarer = declarerFor(MarvelExtension.class, version);
   }

@@ -36,7 +36,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -119,7 +118,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
-  private ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   private ExtensionParameter nestedChain;
   private boolean blocking = false;
@@ -149,15 +147,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
-      if (mustResolveMinMuleVersion()) {
-        this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
-                                                                     getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                          Operations.class,
-                                                                                                          Operations::value,
-                                                                                                          this.operationContainer));
-      } else {
-        this.resolvedMinMuleVersion = null;
-      }
     } else {
       this.operationContainer = null;
       enclosingType = null;
@@ -463,7 +452,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return of(resolveOperationMinMuleVersion(operationElement, this.operationContainer,
+                                             getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                  Operations.class,
+                                                                                  Operations::value,
+                                                                                  this.operationContainer)));
   }
 
   @Override

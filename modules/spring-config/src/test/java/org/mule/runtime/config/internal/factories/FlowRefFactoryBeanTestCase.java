@@ -36,9 +36,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -79,7 +79,6 @@ import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.dsl.model.CoreComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -482,7 +481,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   private MuleArtifactContext createMuleArtifactContextStub(DefaultListableBeanFactory mockedBeanFactory) {
     MuleArtifactContext muleArtifactContext =
-        new MuleArtifactContext(mockMuleContext, emptyArtifact(), mock(OptionalObjectsController.class), empty(),
+        new MuleArtifactContext(mockMuleContext, emptyArtifact(), empty(),
                                 new BaseConfigurationComponentLocator(),
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
                                 emptyMap(), false, APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
