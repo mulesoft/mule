@@ -243,47 +243,37 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   protected void tryTerminate() {
-    boolean terminate;
-    synchronized (this) {
-      terminate = canTerminate() && state.compareAndSet(STATE_COMPLETE, STATE_TERMINATED);
-    }
+    if ((externalCompletion == null || externalCompletion.isDone()) && state.compareAndSet(STATE_COMPLETE, STATE_TERMINATED)) {
 
-    if (!terminate) {
-      return;
-    }
-
-    if (debugLogEnabled) {
-      LOGGER.debug("{} terminated.", this);
-    }
-
-    for (BiConsumer<CoreEvent, Throwable> consumer : onTerminatedConsumerList) {
-      signalConsumerSilently(consumer);
-    }
-
-    onTerminatedConsumerList.clear();
-
-    getChildContextsWriteLock().lock();
-    try {
-      this.childContexts.clear();
-    } finally {
-      getChildContextsWriteLock().unlock();
-    }
-
-    getParentContext().ifPresent(context -> {
-      AbstractEventContext parent = (AbstractEventContext) context;
-      parent.getChildContextsWriteLock().lock();
-      try {
-        parent.childContexts.remove(this);
-      } finally {
-        parent.getChildContextsWriteLock().unlock();
+      if (debugLogEnabled) {
+        LOGGER.debug("{} terminated.", this);
       }
-    });
-    result = null;
-    responsePublisher = null;
-  }
 
-  private boolean canTerminate() {
-    return (externalCompletion == null || externalCompletion.isDone()) && this.state.get() == STATE_COMPLETE;
+      for (BiConsumer<CoreEvent, Throwable> consumer : onTerminatedConsumerList) {
+        signalConsumerSilently(consumer);
+      }
+
+      onTerminatedConsumerList.clear();
+
+      getChildContextsWriteLock().lock();
+      try {
+        this.childContexts.clear();
+      } finally {
+        getChildContextsWriteLock().unlock();
+      }
+
+      getParentContext().ifPresent(context -> {
+        AbstractEventContext parent = (AbstractEventContext) context;
+        parent.getChildContextsWriteLock().lock();
+        try {
+          parent.childContexts.remove(this);
+        } finally {
+          parent.getChildContextsWriteLock().unlock();
+        }
+      });
+      result = null;
+      responsePublisher = null;
+    }
   }
 
   private void signalConsumerSilently(BiConsumer<CoreEvent, Throwable> consumer) {
@@ -392,7 +382,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
       if (isResponseDone()) {
         signalPublisherSink(sink);
       } else {
-        synchronized (this) {
+        synchronized (AbstractEventContext.this) {
           if (isResponseDone()) {
             signalPublisherSink(sink);
           } else {
