@@ -55,9 +55,10 @@ import reactor.core.publisher.MonoSink;
 abstract class AbstractEventContext implements SpanContextAware, BaseEventContext {
 
   private static final int STATE_READY = 0;
-  private static final int STATE_RESPONSE = 1;
-  private static final int STATE_COMPLETE = 2;
-  private static final int STATE_TERMINATED = 3;
+  private static final int STATE_RESPONSE_RECEIVED = 1;
+  private static final int STATE_RESPONSE_PROCESSED = 2;
+  private static final int STATE_COMPLETE = 3;
+  private static final int STATE_TERMINATED = 4;
 
   private static final int TO_STRING_TAB_SIZE = 4;
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
@@ -149,7 +150,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     if (debugLogEnabled) {
       LOGGER.debug("{} response completed with no result.", this);
     }
-    responseDone(right(null));
+    receiveResponse(right(null));
   }
 
   /**
@@ -167,7 +168,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     if (debugLogEnabled) {
       LOGGER.debug("{} response completed with result.", this);
     }
-    responseDone(right(event));
+    receiveResponse(right(event));
   }
 
   /**
@@ -193,20 +194,20 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
       final Consumer<Exception> router = exceptionHandler.router(identity(),
                                                                  handled -> success(handled),
-                                                                 rethrown -> responseDone(left(rethrown)));
+                                                                 rethrown -> receiveResponse(left(rethrown)));
       try {
         router.accept((Exception) throwable);
       } finally {
         disposeIfNeeded(router, LOGGER);
       }
     } else {
-      responseDone(left(throwable));
+      receiveResponse(left(throwable));
     }
     return empty();
   }
 
-  private void responseDone(Either<Throwable, CoreEvent> result) {
-    if (state.compareAndSet(STATE_READY, STATE_RESPONSE)) {
+  private void receiveResponse(Either<Throwable, CoreEvent> result) {
+    if (state.compareAndSet(STATE_READY, STATE_RESPONSE_RECEIVED)) {
       this.result = result;
       resultEverNotNull.set(true);
       responsePublisher.ifComputed(rp -> rp.result = result);
@@ -253,7 +254,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   protected void tryComplete() {
-    if (areAllChildrenComplete() && state.compareAndSet(STATE_RESPONSE, STATE_COMPLETE)) {
+    if (areAllChildrenComplete() && state.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED)) {
       if (debugLogEnabled) {
         LOGGER.debug("{} completed.", this);
       }
@@ -271,6 +272,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
         }
       }
 
+      state.set(STATE_COMPLETE);
       tryTerminate();
     }
 
@@ -432,7 +434,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   private boolean isResponseDone() {
-    return state.get() >= STATE_RESPONSE;
+    return state.get() >= STATE_RESPONSE_RECEIVED;
   }
 
   @Override
@@ -477,7 +479,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   public void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer) {
     writeLock.lock();
     try {
-      if (state.get() >= STATE_RESPONSE) {
+      if (state.get() >= STATE_RESPONSE_RECEIVED) {
         signalConsumerSilently(consumer);
       } else {
         onBeforeResponseConsumerList.add(requireNonNull(consumer));
@@ -491,7 +493,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   public void onResponse(BiConsumer<CoreEvent, Throwable> consumer) {
     writeLock.lock();
     try {
-      if (state.get() >= STATE_RESPONSE) {
+      if (state.get() >= STATE_RESPONSE_RECEIVED) {
         signalConsumerSilently(consumer);
       } else {
         onResponseConsumerList.add(requireNonNull(consumer));
