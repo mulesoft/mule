@@ -26,7 +26,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.of;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -111,7 +111,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private List<NotificationModel> notificationModels = new LinkedList<>();
   private final Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
   private String namespace;
-  private ResolvedMinMuleVersion resolvedMinMuleVersion;
   private Set<String> supportedJavaVersions;
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
@@ -143,11 +142,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseSubtypes();
     parseNotificationModels();
 
-    if (mustResolveMinMuleVersion()) {
-      this.resolvedMinMuleVersion = resolveExtensionMinMuleVersion(extensionElement);
-    } else {
-      this.resolvedMinMuleVersion = null;
-    }
     supportedJavaVersions = parseSupportedJavaVersions(extensionElement);
   }
 
@@ -413,7 +407,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return of(resolveExtensionMinMuleVersion(extensionElement));
   }
 
   @Override

@@ -10,6 +10,7 @@ import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 
@@ -44,17 +45,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Describes an {@link ExtensionModel} by analyzing the annotations in the class provided in the constructor
  *
  * @since 4.0
  */
 public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionModelLoaderDelegate.class);
 
   protected final String version;
 
@@ -119,11 +115,8 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
-    if (parser.mustResolveMinMuleVersion()) {
-      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-        declarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-        LOGGER.debug(resolvedMMV.getReason());
-      });
+    if (context.isResolveMinMuleVersion()) {
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(declarer, resolvedMMV));
     }
 
     declareErrorModels(parser, declarer);
@@ -132,13 +125,14 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     declareSubTypes(parser, declarer, context);
     declareNotifications(parser, declarer);
 
-    configLoaderDelegate.declareConfigurations(declarer, parser);
-    connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers());
+    configLoaderDelegate.declareConfigurations(declarer, parser, context);
+    connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers(),
+                                                                     context);
 
     operationLoaderDelegate.declareOperations(declarer, parser.getDevelopmentFramework(), declarer,
-                                              parser.getOperationModelParsers());
-    functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers());
-    sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers());
+                                              parser.getOperationModelParsers(), context);
+    functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers(), context);
+    sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers(), context);
 
     getStereotypeModelLoaderDelegate().resolveDeclaredTypesStereotypes(declarer.getDeclaration());
 

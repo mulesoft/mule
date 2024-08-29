@@ -17,7 +17,6 @@ import static java.lang.String.format;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -50,7 +49,6 @@ import java.util.Set;
 public class JavaFunctionModelParser extends AbstractJavaExecutableComponentModelParser implements FunctionModelParser {
 
   private final FunctionElement functionElement;
-  private ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaFunctionModelParser(ExtensionElement extensionElement,
                                  FunctionElement functionElement,
@@ -62,16 +60,6 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      if (mustResolveMinMuleVersion()) {
-        this.resolvedMinMuleVersion = resolveFunctionMinMuleVersion(functionElement,
-                                                                    getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                         ExpressionFunctions.class,
-                                                                                                         ExpressionFunctions::value,
-                                                                                                         functionElement
-                                                                                                             .getEnclosingType()));
-      } else {
-        this.resolvedMinMuleVersion = null;
-      }
     }
   }
 
@@ -153,7 +141,12 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return ofNullable(this.resolvedMinMuleVersion);
+    return of(resolveFunctionMinMuleVersion(functionElement,
+                                            getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                 ExpressionFunctions.class,
+                                                                                 ExpressionFunctions::value,
+                                                                                 functionElement
+                                                                                     .getEnclosingType())));
   }
 
   @Override

@@ -6,8 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.utils;
 
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasMinMuleVersionDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.WithMinMuleVersionDeclaration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -32,7 +43,6 @@ import org.mule.sdk.api.annotation.DoNotEnforceMinMuleVersion;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 
-import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,13 +51,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
-
-import static org.slf4j.LoggerFactory.getLogger;
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -560,6 +564,16 @@ public final class MinMuleVersionUtils {
     annotationMMV.ifPresent(resolvedMMV -> parameterMMV
         .updateIfHigherMMV(resolvedMMV, getReasonAnnotated("Type", parameterType.getName(), resolvedMMV)));
     return parameterMMV;
+  }
+
+  public static void declarerWithMmv(HasMinMuleVersionDeclarer declarer, ResolvedMinMuleVersion resolvedMMV) {
+    declarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+    LOGGER.debug(resolvedMMV.getReason());
+  }
+
+  public static void declarationWithMmv(WithMinMuleVersionDeclaration declaration, ResolvedMinMuleVersion resolvedMMV) {
+    declaration.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+    LOGGER.debug(resolvedMMV.getReason());
   }
 
   private static boolean isLinkageError(Throwable t) {

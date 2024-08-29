@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 import static org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataModelProperties;
 
@@ -23,6 +24,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
@@ -36,17 +38,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Helper class for declaring sources through a {@link DefaultExtensionModelLoaderDelegate}
  *
  * @since 4.0
  */
 final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(SourceModelLoaderDelegate.class);
 
   private final Map<SourceModelParser, SourceDeclarer> sourceDeclarers = new HashMap<>();
 
@@ -57,7 +54,8 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
   // TODO: MULE-9220: Add a Syntax validator which checks that a Source class doesn't try to declare operations, configs, etc
   void declareMessageSources(ExtensionDeclarer extensionDeclarer,
                              HasSourceDeclarer ownerDeclarer,
-                             List<SourceModelParser> parsers) {
+                             List<SourceModelParser> parsers,
+                             ExtensionLoadingContext context) {
 
     for (SourceModelParser parser : parsers) {
 
@@ -98,18 +96,15 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
 
       parser.getOutputType().applyOn(sourceDeclarer.withOutput());
       parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());
-      if (parser.mustResolveMinMuleVersion()) {
-        parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-          sourceDeclarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-          LOGGER.debug(resolvedMMV.getReason());
-        });
+      if (context.isResolveMinMuleVersion()) {
+        parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(sourceDeclarer, resolvedMMV));
       }
 
       Optional<OutputResolverModelParser> outputResolverModelParser = parser.getOutputResolverModelParser();
       Optional<AttributesResolverModelParser> attributesResolverModelParser = parser.getAttributesResolverModelParser();
       Optional<MetadataKeyModelParser> keyIdResolverModelParser = parser.getMetadataKeyModelParser();
 
-      loader.getParameterModelsLoaderDelegate().declare(sourceDeclarer, parser.getParameterGroupModelParsers());
+      loader.getParameterModelsLoaderDelegate().declare(sourceDeclarer, parser.getParameterGroupModelParsers(), context);
 
       parser.getMediaTypeModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
@@ -140,7 +135,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
         declareMetadataModelProperties(onSuccessSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
                                        sourceCallbackInputResolverModelParsers, empty(), parser.isConnected());
 
-        declareSourceCallbackParameters(successCallbackSourceCallbackModelParser, () -> onSuccessSourceCallbackDeclarer);
+        declareSourceCallbackParameters(successCallbackSourceCallbackModelParser, () -> onSuccessSourceCallbackDeclarer, context);
       }
 
       Optional<SourceCallbackModelParser> errorCallbackSourceCallbackModelParser = parser.getOnErrorCallbackParser();
@@ -153,12 +148,12 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
         declareMetadataModelProperties(onErrorSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
                                        sourceCallbackInputResolverModelParsers, empty(), parser.isConnected());
 
-        declareSourceCallbackParameters(parser.getOnErrorCallbackParser(), () -> onErrorSourceCallbackDeclarer);
+        declareSourceCallbackParameters(parser.getOnErrorCallbackParser(), () -> onErrorSourceCallbackDeclarer, context);
       }
 
       // TODO: MULE-9220 add syntax validator to check that none of these use @UseConfig or @Connection
-      declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate);
-      declareSourceCallbackParameters(parser.getOnBackPressureCallbackParser(), sourceDeclarer::onBackPressure);
+      declareSourceCallbackParameters(parser.getOnTerminateCallbackParser(), sourceDeclarer::onTerminate, context);
+      declareSourceCallbackParameters(parser.getOnBackPressureCallbackParser(), sourceDeclarer::onBackPressure, context);
 
       sourceDeclarer.withModelProperty(parser.getSourceClusterSupportModelProperty());
 
@@ -169,9 +164,11 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
   }
 
   private void declareSourceCallbackParameters(Optional<SourceCallbackModelParser> parser,
-                                               Supplier<ParameterizedDeclarer> declarer) {
+                                               Supplier<ParameterizedDeclarer> declarer,
+                                               ExtensionLoadingContext context) {
     parser.ifPresent(callback -> loader.getParameterModelsLoaderDelegate().declare(declarer.get(),
-                                                                                   callback.getParameterGroupModelParsers()));
+                                                                                   callback.getParameterGroupModelParsers(),
+                                                                                   context));
   }
 
 }
