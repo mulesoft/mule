@@ -4,17 +4,17 @@
       "ignore": [
         {
           "ignore": true,
-          "code": "java.class.added",
-          "new": "class org.mule.runtime.core.privileged.event.EventedResult<T, A>",
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult<T, A>",
           "justification": "W-16420215: Class is not useful where it sits and it's impossible to consume by any 3pp component",
-          "package": "org.mule.runtime.core.privileged.event",
-          "classQualifiedName": "org.mule.runtime.core.privileged.event.EventedResult",
-          "classSimpleName": "EventedResult",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.6.7-rc2",
+          "package": "org.mule.runtime.module.extension.api.runtime.privileged",
+          "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult",
+          "classSimpleName": "EventedSdkResult",
           "elementKind": "class",
-          "newArchiveRole": "primary",
+          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.6.7-rc2",
+          "oldArchiveRole": "primary",
           "breaksSemanticVersioning": "true"
-        }
+        },
       ]
     }
   },
