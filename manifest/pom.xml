@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule</artifactId>
+        <version>4.9.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>mule-manifest</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule Manifest</name>
+    <description>Mule Runtime Manifest</description>
+
+    <properties>
+        <javaModuleName>org.mule.runtime.manifest</javaModuleName>
+        <!-- The `javaVersion` property is not overridden because we want to take the one in parent POM for the Manifest -->
+        <javaReleaseVersion>8</javaReleaseVersion>
+        <project.build.java11SourceDirectory>${project.basedir}/src/main/java11</project.build.java11SourceDirectory>
+        <project.build.java11TestSourceDirectory>${project.basedir}/src/test/java11</project.build.java11TestSourceDirectory>
+
+        <oldMuleArtifactVersion>4.9.0-SNAPSHOT</oldMuleArtifactVersion>
+
+        <formatterConfigPath>../formatter.xml</formatterConfigPath>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-allure</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                            <release>11</release>
+                            <!-- no excludes: compile everything to ensure module-info contains right entries -->
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>base-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>${javaReleaseVersion}</release>
+                            <!-- recompile everything for target VM except the module-info.java -->
+                            <excludes>
+                                <exclude>module-info.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <testRelease>11</testRelease>
+                            <!-- no excludes: compile everything to ensure module-info contains right entries -->
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>base-testCompile</id>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <testRelease>${javaReleaseVersion}</testRelease>
+                            <!-- recompile everything for target VM except the module-info.java -->
+                            <testExcludes>
+                                <testExclude>module-info.java</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <proc>none</proc>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-manifest</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.outputDirectory}/META-INF</directory>
+                                    <includes>
+                                        <include>MANIFEST.MF</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

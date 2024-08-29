@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.version;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_JDK_VENDOR_VALIDATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
@@ -17,7 +18,6 @@ import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VENDOR;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
 
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.util.SystemUtils;
 
 import java.util.ArrayList;
@@ -236,7 +236,7 @@ public class JdkVersionUtils {
   }
 
   public static String getSupportedJdks() {
-    return MuleManifest.getSupportedJdks();
+    return getMuleManifest().getSupportedJdks();
   }
 
   public static boolean isSupportedJdkVendor() {
@@ -251,7 +251,7 @@ public class JdkVersionUtils {
   }
 
   public static String getRecommendedJdks() {
-    return MuleManifest.getRecommndedJdks();
+    return getMuleManifest().getRecommendedJdks();
   }
 
   public static boolean isSupportedJdkVersion() {

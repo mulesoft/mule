@@ -31,6 +31,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_CO
 import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -91,7 +92,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
@@ -471,7 +471,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     CoreEvent event = testEvent();
     when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
     TypedValue<?> evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
-    assertThat(evaluate.getValue(), is(MuleManifest.getProductVersion()));
+    assertThat(evaluate.getValue(), is(getMuleManifest().getProductVersion()));
   }
 
   @Test

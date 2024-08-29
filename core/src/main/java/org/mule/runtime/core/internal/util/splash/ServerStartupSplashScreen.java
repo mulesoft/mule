@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.util.splash;
 
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
+
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.NetworkUtils;
 
@@ -25,15 +26,15 @@ public class ServerStartupSplashScreen extends SplashScreen {
     String notset = CoreMessages.notSet().getMessage();
 
     // Mule Version, Timestamp, and Server ID
-    Manifest mf = MuleManifest.getManifest();
+    Manifest mf = getMuleManifest().getManifest();
     Attributes att = mf.getMainAttributes();
     if (att.values().size() > 0) {
-      header.add(defaultString(MuleManifest.getProductDescription(), notset));
+      header.add(defaultString(getMuleManifest().getProductDescription(), notset));
       header.add(CoreMessages.version().getMessage() + " Build: "
-          + defaultString(MuleManifest.getBuildNumber(), notset));
+          + defaultString(getMuleManifest().getBuildNumber(), notset));
 
-      header.add(defaultString(MuleManifest.getVendorName(), notset));
-      header.add(defaultString(MuleManifest.getProductMoreInfo(), notset));
+      header.add(defaultString(getMuleManifest().getVendorName(), notset));
+      header.add(defaultString(getMuleManifest().getProductMoreInfo(), notset));
     } else {
       header.add(CoreMessages.versionNotSet().getMessage());
     }

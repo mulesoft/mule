@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getNamedObject;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
@@ -42,7 +42,7 @@ public class SampleDataDeclarationEnricherTestCase {
 
   @Before
   public void setUp() {
-    ExtensionDeclarer declarer = declarerFor(SampleDataExtension.class, getProductVersion());
+    ExtensionDeclarer declarer = declarerFor(SampleDataExtension.class, getMuleManifest().getProductVersion());
     new SampleDataDeclarationEnricher()
         .enrich(new DefaultExtensionLoadingContext(declarer, getClass().getClassLoader(), getDefault(emptySet())));
     this.declaration = declarer.getDeclaration();

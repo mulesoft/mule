@@ -8,9 +8,9 @@ package org.mule.test.module.extension.internal;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
@@ -77,7 +77,7 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
 
   protected static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader, ArtifactCoordinates coordinates) {
     Map<String, Object> params = of(TYPE_PROPERTY_NAME, clazz.getName(),
-                                    VERSION, getProductVersion(),
+                                    VERSION, getMuleManifest().getProductVersion(),
                                     // TODO MULE-14517: This workaround should be replaced for a better and more complete
                                     // mechanism
                                     COMPILATION_MODE, true);

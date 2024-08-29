@@ -23,6 +23,7 @@ module org.mule.runtime.launcher {
   requires org.mule.runtime.deployment;
   requires org.mule.runtime.deployment.model.impl;
   requires org.mule.runtime.log4j;
+  requires org.mule.runtime.manifest;
   requires org.mule.runtime.repository;
   requires org.mule.runtime.service;
   requires org.mule.runtime.tooling.support;

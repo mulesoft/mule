@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.api.util;
 
 import static java.util.Collections.singleton;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
@@ -63,7 +63,7 @@ public class MuleExtensionUtils {
    */
   public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
     params.put(TYPE_PROPERTY_NAME, clazz.getName());
-    params.put(VERSION, getProductVersion());
+    params.put(VERSION, getMuleManifest().getProductVersion());
     // TODO MULE-11797: as this utils is consumed from
     // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
     // this util should get dropped once the ticket gets implemented.

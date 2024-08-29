@@ -6,7 +6,7 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
@@ -169,7 +169,7 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
                                                    ExtensionModelLoader extensionModelLoader) {
     Map<String, Object> ctx = new HashMap<>();
     ctx.put(TYPE_PROPERTY_NAME, extension.getName());
-    ctx.put(VERSION, getProductVersion());
+    ctx.put(VERSION, getMuleManifest().getProductVersion());
     ctx.putAll(getExtensionLoaderContextAdditionalParameters());
     return extensionModelLoader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps),
                                                    ctx);

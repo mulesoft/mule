@@ -20,8 +20,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
@@ -70,15 +70,15 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
     String notset = CoreMessages.notSet().getMessage();
 
     // Mule Version, Timestamp, and Server ID
-    Manifest mf = MuleManifest.getManifest();
+    Manifest mf = getMuleManifest().getManifest();
     Attributes att = mf.getMainAttributes();
     if (att.values().size() > 0) {
-      doBody(defaultString(MuleManifest.getProductDescription(), notset));
+      doBody(defaultString(getMuleManifest().getProductDescription(), notset));
       doBody(format("%s Build: %s", CoreMessages.version().getMessage(),
-                    defaultString(MuleManifest.getBuildNumber(), notset)));
+                    defaultString(getMuleManifest().getBuildNumber(), notset)));
 
-      doBody(defaultString(MuleManifest.getVendorName(), notset));
-      doBody(defaultString(MuleManifest.getProductMoreInfo(), notset));
+      doBody(defaultString(getMuleManifest().getVendorName(), notset));
+      doBody(defaultString(getMuleManifest().getProductMoreInfo(), notset));
     } else {
       doBody(CoreMessages.versionNotSet().getMessage());
     }
