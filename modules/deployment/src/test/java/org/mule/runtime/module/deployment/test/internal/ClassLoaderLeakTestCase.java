@@ -11,7 +11,6 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
-import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.runtime.module.deployment.test.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
@@ -53,7 +52,9 @@ import org.mule.tck.util.CompilerUtils;
 import java.io.File;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -80,7 +81,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private final String xmlFile;
 
-  private final boolean useEchoPluginInApp;
+  private final Supplier<Set<ArtifactPluginFileBuilder>> applicationPlugins;
 
   @BeforeClass
   public static void compileTestClasses() throws Exception {
@@ -106,10 +107,11 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private TestDeploymentListener deploymentListener;
 
-  public ClassLoaderLeakTestCase(boolean parallellDeployment, String appName, String xmlFile, boolean useEchoPluginInApp) {
+  public ClassLoaderLeakTestCase(boolean parallellDeployment, String appName, String xmlFile,
+                                 Supplier<Set<ArtifactPluginFileBuilder>> applicationPlugins) {
     super(parallellDeployment);
     this.appName = appName;
-    this.useEchoPluginInApp = useEchoPluginInApp;
+    this.applicationPlugins = applicationPlugins;
     this.xmlFile = xmlFile;
   }
 
@@ -261,8 +263,9 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   }
 
   private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
-    if (useEchoPluginInApp) {
-      return createExtensionApplicationWithServices(xmlFile + ".xml", helloExtensionV1Plugin);
+    if (applicationPlugins.get().size() > 0) {
+      return createExtensionApplicationWithServices(xmlFile + ".xml",
+                                                    applicationPlugins.get().toArray(new ArtifactPluginFileBuilder[0]));
     } else {
       return new ApplicationFileBuilder(xmlFile)
           .definedBy(xmlFile + ".xml");
