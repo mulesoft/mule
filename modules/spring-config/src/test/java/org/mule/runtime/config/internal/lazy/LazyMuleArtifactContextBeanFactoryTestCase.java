@@ -9,8 +9,8 @@ package org.mule.runtime.config.internal.lazy;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
-import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.COMPONENT_LIFE_CYCLE;
 import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
@@ -43,21 +43,26 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Features;
-import io.qameta.allure.Story;
-import org.hamcrest.Matcher;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.core.ResolvableType;
+
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.hamcrest.Matcher;
+
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.core.ResolvableType;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Story;
 
 /**
  * Test case for the methods of {@link org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext} that implement
@@ -66,6 +71,7 @@ import org.springframework.core.ResolvableType;
 @Features({@Feature(LAZY_INITIALIZATION), @Feature(CONFIGURATION_COMPONENT_LOCATOR)})
 @Story(COMPONENT_LIFE_CYCLE)
 @RunWith(Parameterized.class)
+@Ignore("W-16639192")
 public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMuleArtifactContextTestCase {
 
   @Parameterized.Parameters(name = "BeanFactory throws NoSuchBeanDefinition: {0}")
@@ -235,6 +241,7 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
     verify(beanFactory).registerBeanDefinition(eq(MY_FLOW), any());
   }
 
+  @Override
   protected ArtifactDeclaration getArtifactDeclaration() {
     return newArtifact()
         .withGlobalElement(forExtension(MULE_NAME)

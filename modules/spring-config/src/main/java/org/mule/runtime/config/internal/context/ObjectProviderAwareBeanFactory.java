@@ -26,6 +26,7 @@ import java.util.function.Function;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -81,6 +82,8 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
         throw new NoSuchBeanDefinitionException(name);
       }
       return bean;
+    } catch (BeanCreationException e) {
+      throw unwrapBeanCreationException(e);
     } catch (NoSuchBeanDefinitionException e) {
       Optional<Object> objectFound =
           objectProviders.stream().map(objectProvider -> objectProvider.getObject(name))
@@ -89,6 +92,32 @@ public class ObjectProviderAwareBeanFactory extends DefaultListableBeanFactory {
               .findFirst();
       return doNotFail ? null : objectFound.orElseThrow(() -> e);
     }
+  }
+
+  /**
+   * Make sure the root cause message is easily available on the message shown to the user.
+   */
+  private BeanCreationException unwrapBeanCreationException(BeanCreationException beanCreationException) {
+    StringBuilder messageBuilder = new StringBuilder();
+
+    Throwable currentCause = beanCreationException;
+    while (currentCause != null && currentCause instanceof BeanCreationException) {
+      if (messageBuilder.length() > 0) {
+        messageBuilder.append("; nested exception is ");
+      }
+      messageBuilder.append(currentCause.getMessage());
+
+      currentCause = currentCause.getCause();
+    }
+
+    if (currentCause != null) {
+      if (messageBuilder.length() > 0) {
+        messageBuilder.append("; nested exception is ");
+      }
+      messageBuilder.append(currentCause.getMessage());
+    }
+
+    return new BeanCreationException(messageBuilder.toString(), beanCreationException);
   }
 
   @Override
