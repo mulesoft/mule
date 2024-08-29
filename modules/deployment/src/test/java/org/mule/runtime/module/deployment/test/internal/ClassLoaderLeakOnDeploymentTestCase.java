@@ -13,10 +13,11 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static java.util.Set.of;
+import static java.util.Collections.singletonList;
 
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -34,11 +35,13 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @Feature(LEAK_PREVENTION)
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
-@Issues({@Issue("W-13160893"), @Issue("MULE-17311")})
+@Issues({@Issue("W-13160893"), @Issue("MULE-17311"), @Issue("W-16226692")})
 public class ClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLeakTestCase {
 
-  public static final Supplier<Set<ArtifactPluginFileBuilder>> BRIDGE_METHOD_PLUGIN = () -> of(bridgeMethodExtensionPlugin);
-  public static final Supplier<Set<ArtifactPluginFileBuilder>> HELLO_V1_PLUGIN = () -> of(helloExtensionV1Plugin);
+  public static final Supplier<Set<ArtifactPluginFileBuilder>> BRIDGE_METHOD_PLUGIN =
+      () -> new HashSet<>(singletonList(bridgeMethodExtensionPlugin));
+  public static final Supplier<Set<ArtifactPluginFileBuilder>> HELLO_V1_PLUGIN =
+      () -> new HashSet<>(singletonList(helloExtensionV1Plugin));
   public static final Supplier<Set<ArtifactPluginFileBuilder>> NO_PLUGINS = () -> emptySet();
 
   @Parameterized.Parameters(name = "Parallel: {0}, AppName: {1}, Use Plugin: {2}")
