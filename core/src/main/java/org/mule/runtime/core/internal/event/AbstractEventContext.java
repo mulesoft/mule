@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -79,6 +80,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   private volatile byte state = STATE_READY;
   private volatile Either<Throwable, CoreEvent> result;
+  private AtomicBoolean resultEverNotNull = new AtomicBoolean(false);
 
   private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(ResponsePublisher::new);
 
@@ -98,7 +100,9 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
                               Optional<CompletableFuture<Void>> externalCompletion) {
     this.depthLevel = depthLevel;
     this.externalCompletion = externalCompletion.orElse(null);
-    externalCompletion.ifPresent(completableFuture -> completableFuture.thenAccept((aVoid) -> tryTerminate()));
+    if (this.externalCompletion != null) {
+      this.externalCompletion.thenAccept((aVoid) -> tryTerminate());
+    }
     this.exceptionHandler = exceptionHandler;
   }
 
@@ -208,9 +212,8 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
       }
 
       this.result = result;
+      resultEverNotNull.set(true);
       responsePublisher.ifComputed(rp -> rp.result = result);
-
-      state = STATE_RESPONSE;
     } finally {
       writeLock.unlock();
     }
@@ -224,23 +227,12 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
       signalConsumerSilently(onResponseConsumer);
     }
     onResponseConsumerList.clear();
+
+    tryUpdateState(STATE_RESPONSE);
     tryComplete();
   }
 
   protected void tryComplete() {
-    boolean allChildrenComplete;
-
-    getChildContextsReadLock().lock();
-    try {
-      allChildrenComplete = childContexts.stream().allMatch(BaseEventContext::isComplete);
-    } finally {
-      getChildContextsReadLock().unlock();
-    }
-
-    if (!allChildrenComplete) {
-      return;
-    }
-
     readLock.lock();
     try {
       if (state != STATE_RESPONSE) {
@@ -252,15 +244,13 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
     writeLock.lock();
     try {
-      if (state != STATE_RESPONSE) {
+      if (state != STATE_RESPONSE || !areAllChildrenComplete()) {
         return;
       }
 
       if (debugLogEnabled) {
         LOGGER.debug("{} completed.", this);
       }
-
-      state = STATE_COMPLETE;
     } finally {
       writeLock.unlock();
     }
@@ -277,7 +267,31 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
         ((AbstractEventContext) context).tryComplete();
       }
     }
+
+    tryUpdateState(STATE_COMPLETE);
     tryTerminate();
+  }
+
+  private void tryUpdateState(byte value) {
+    writeLock.lock();
+    try {
+      if (state < value) {
+        state = value;
+      }
+    } finally {
+      writeLock.unlock();
+    }
+  }
+
+  private boolean areAllChildrenComplete() {
+    boolean allChildrenComplete;
+    getChildContextsReadLock().lock();
+    try {
+      allChildrenComplete = childContexts.stream().allMatch(BaseEventContext::isComplete);
+    } finally {
+      getChildContextsReadLock().unlock();
+    }
+    return allChildrenComplete;
   }
 
   protected void tryTerminate() {
