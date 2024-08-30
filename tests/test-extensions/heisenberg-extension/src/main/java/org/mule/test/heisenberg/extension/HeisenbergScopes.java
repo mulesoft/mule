@@ -6,21 +6,10 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import static org.slf4j.LoggerFactory.getLogger;
-
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -33,23 +22,10 @@ import org.mule.runtime.extension.api.stereotype.ValidatorStereotype;
 import org.mule.sdk.api.annotation.dsl.xml.ParameterDsl;
 
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-
-public class HeisenbergScopes implements Initialisable, Stoppable {
-
-  private static final Logger LOGGER = getLogger(HeisenbergScopes.class);
+public class HeisenbergScopes implements Initialisable {
 
   private int initialiasedCounter = 0;
-
-  @Inject
-  private SchedulerService schedulerService;
-
-  private Scheduler scheduler;
 
   @Parameter
   @Optional(defaultValue = "0")
@@ -58,14 +34,6 @@ public class HeisenbergScopes implements Initialisable, Stoppable {
   @Override
   public void initialise() throws InitialisationException {
     initialiasedCounter++;
-    scheduler = schedulerService.ioScheduler();
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    if (scheduler != null) {
-      scheduler.shutdown();
-    }
   }
 
   public int getCounter() {
@@ -114,29 +82,6 @@ public class HeisenbergScopes implements Initialisable, Stoppable {
                                  (error, previous) -> callback
                                      .success(previous.copy().output("ERROR").attributes(error).build()));
     }
-  }
-
-  public void asyncChainToObjectStore(@Expression(REQUIRED) Object latch,
-                                      Chain chain,
-                                      CompletionCallback<Void, Void> callback) {
-    final CountDownLatch countDownLatch = (CountDownLatch) latch;
-    final AtomicInteger counter = new AtomicInteger(0);
-    // scheduler.execute(() -> {
-    try {
-      countDownLatch.await(5, SECONDS);
-
-    } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
-    }
-
-    for (int i = 0; i < 100; i++) {
-      chain.process(counter.get(), null,
-                    r -> counter.incrementAndGet(),
-                    (t, r) -> counter.incrementAndGet());
-    }
-    // });
-
-    callback.success(Result.<Void, Void>builder().build());
   }
 
   public int scopeField(int expected, int newValue) {
