@@ -77,6 +77,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   private final int depthLevel;
 
   private AtomicInteger state = new AtomicInteger(STATE_READY);
+  private volatile boolean childrenComplete = false;
   private volatile Either<Throwable, CoreEvent> result;
 
   private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(ResponsePublisher::new);
@@ -208,7 +209,16 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   protected void tryComplete() {
-    if (areAllChildrenComplete() && state.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED)) {
+    boolean completable =
+        state.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED) || state.get() == STATE_RESPONSE_PROCESSED;
+
+    if (completable && areAllChildrenComplete()) {
+      synchronized (this) {
+        if (!state.compareAndSet(STATE_RESPONSE_PROCESSED, STATE_COMPLETE)) {
+          return;
+        }
+      }
+
       if (debugLogEnabled) {
         LOGGER.debug("{} completed.", this);
       }
@@ -226,17 +236,21 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
         }
       }
 
-      state.set(STATE_COMPLETE);
       tryTerminate();
     }
   }
 
   private boolean areAllChildrenComplete() {
-    getChildContextsReadLock().lock();
-    try {
-      return childContexts.stream().allMatch(BaseEventContext::isComplete);
-    } finally {
-      getChildContextsReadLock().unlock();
+    if (childrenComplete) {
+      return true;
+    } else {
+      getChildContextsReadLock().lock();
+      try {
+        childrenComplete = childrenComplete || childContexts.stream().allMatch(BaseEventContext::isComplete);
+      } finally {
+        getChildContextsReadLock().unlock();
+      }
+      return childrenComplete;
     }
   }
 
