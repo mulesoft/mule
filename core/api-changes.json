@@ -358,6 +358,15 @@
           "fieldName": "rollbackAfterTimeout",
           "elementKind": "field",
           "justification": "W-14608096: timeout is not being considered for local transactions and rollbacks are being silently executed"
+        },
+        {
+          "code": "java.method.added",
+          "new": "method java.io.InputStream org.mule.runtime.core.api.util.IOUtils::getInputStreamWithCacheControl(java.net.URL) throws java.io.IOException",
+          "package": "org.mule.runtime.core.api.util",
+          "classSimpleName": "IOUtils",
+          "methodName": "getInputStreamWithCacheControl",
+          "elementKind": "method",
+          "justification": "W-16584232: [Windows] Fix test org.mule.runtime.module.embedded.DomainTestCase.deployUndeployDomain"
         }
       ]
     }
