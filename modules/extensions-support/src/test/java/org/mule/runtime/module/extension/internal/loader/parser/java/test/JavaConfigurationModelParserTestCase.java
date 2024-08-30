@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.test;
 
+import static org.mule.runtime.module.extension.internal.loader.parser.java.test.MinMuleVersionTestUtils.ctxResolvingMinMuleVersion;
+
 import static java.lang.String.format;
-import static java.util.Collections.emptySet;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
@@ -30,10 +30,6 @@ import org.mule.sdk.api.annotation.Configuration;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.NoImplicit;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.sdk.api.annotation.Operations;
 import org.mule.sdk.api.annotation.Sources;
 import org.mule.sdk.api.annotation.connectivity.ConnectionProviders;
@@ -41,6 +37,10 @@ import org.mule.sdk.api.connectivity.ConnectionProvider;
 import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class JavaConfigurationModelParserTestCase {
 
@@ -159,16 +159,16 @@ public class JavaConfigurationModelParserTestCase {
   }
 
   protected JavaConfigurationModelParser getParser(Class<?> extension, Class<?> configuration) {
-    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
-    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ClassTypeLoader typeLoader =
+        ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
     ExtensionElement extensionElement = new ExtensionTypeWrapper<>(extension, typeLoader);
     ConfigurationElement configurationElement = extensionElement.getConfigurations().stream()
         .filter(conf -> conf.getTypeName().equals(configuration.getName())).findFirst()
         .orElseThrow(() -> new IllegalStateException(format("Configuration %s was not found among the declared configuration in the extension",
                                                             configuration.getName(), extension.getName())));
-    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionElement, ctx);
 
+    ExtensionLoadingContext ctx = ctxResolvingMinMuleVersion();
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionElement, ctx);
     return new JavaConfigurationModelParser(javaExtensionModelParser, extensionElement, configurationElement, ctx);
   }
 

@@ -48,10 +48,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.stereotype.Stereotype;
-import org.mule.runtime.extension.api.client.DefaultOperationParameters;
-import org.mule.runtime.extension.api.client.DefaultOperationParametersBuilder;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
-import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -69,6 +66,7 @@ import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
+import org.mule.test.heisenberg.extension.internal.SecretParameterGroup;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
@@ -329,12 +327,18 @@ public class HeisenbergOperations implements Disposable {
 
   @MediaType(TEXT_PLAIN)
   public String executeForeingOrders(String extensionName, String operationName, @Optional String configName,
-                                     ExtensionsClient extensionsClient, Map<String, Object> operationParameters)
-      throws MuleException {
-    Object output =
-        extensionsClient.execute(extensionName, operationName, createOperationParameters(configName, operationParameters))
-            .getOutput();
-    return output instanceof TypedValue ? (String) ((TypedValue) output).getValue() : (String) output;
+                                     ExtensionsClient extensionsClient, Map<String, Object> operationParameters) {
+    try {
+      Object output = extensionsClient.execute(extensionName, operationName, parameterizer -> {
+        if (configName != null) {
+          parameterizer.withConfigRef(configName);
+        }
+        operationParameters.forEach(parameterizer::withParameter);
+      }).get().getOutput();
+      return output instanceof TypedValue ? (String) ((TypedValue) output).getValue() : (String) output;
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @MediaType(TEXT_PLAIN)
@@ -368,15 +372,6 @@ public class HeisenbergOperations implements Disposable {
             callback.success(result);
           }
         });
-  }
-
-  private OperationParameters createOperationParameters(String configName, Map<String, Object> operationParameters) {
-    DefaultOperationParametersBuilder builder = DefaultOperationParameters.builder();
-    if (configName != null) {
-      builder.configName(configName);
-    }
-    operationParameters.forEach((key, value) -> builder.addParameter(key, value));
-    return builder.build();
   }
 
   private Consumer<OperationParameterizer> getClientParameterizer(String configName,
@@ -723,6 +718,11 @@ public class HeisenbergOperations implements Disposable {
         return -1;
       }
     };
+  }
+
+  @MediaType(TEXT_PLAIN)
+  public String whisperSecret(@ParameterGroup(name = "internalGroup", showInDsl = true) SecretParameterGroup secret) {
+    return secret.getSecret();
   }
 
   public void futureSdkImplicitHandling(SecretSdkFutureFeature secretSdkFutureFeature) {

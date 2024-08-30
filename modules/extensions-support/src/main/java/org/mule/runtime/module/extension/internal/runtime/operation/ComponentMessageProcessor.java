@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
+import static org.mule.runtime.api.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -20,7 +21,6 @@ import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
@@ -94,7 +94,6 @@ import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.event.NullEventFactory;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -110,6 +109,7 @@ import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -117,7 +117,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
@@ -351,7 +350,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
         pub -> from(pub)
-            .map(event -> {
+            .mapNotNull(event -> {
               try {
                 return addContextToEvent(event, ctx);
               } catch (Exception t) {
@@ -370,8 +369,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                   // That's why an `Either` is used here,
                   // so the error can be propagated afterwards in a way consistent with our expected error handling.
                   errorSwitchSinkSinkRef.next(left(mapped, CoreEvent.class));
+                  return null;
                 }
-
                 throw propagateWrappingFatal(mapped);
               }
             })

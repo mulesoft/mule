@@ -10,7 +10,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.SERVER_NOTIFICATION_MANAGER;
@@ -18,6 +17,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository.getExtensionModelLoaderManager;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.CONTAINER_CLASS_LOADER;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.MODULE_REPOSITORY;
@@ -222,8 +222,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       ArtifactClassLoader containerClassLoader;
       if (moduleRepository == null) {
         moduleRepository = MODULE_REPOSITORY;
-        containerClassLoader = CONTAINER_CLASS_LOADER;
-      } else if (bootPackages.isEmpty() && additionalResourceDirectories.isEmpty()) {
+      }
+      if (bootPackages.isEmpty() && additionalResourceDirectories.isEmpty()) {
         containerClassLoader = createContainerClassLoader(moduleRepository);
       } else {
         containerClassLoader = createContainerClassLoader(moduleRepository, bootPackages, additionalResourceDirectories);
@@ -362,7 +362,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     configureEnableProfilingService();
 
     return new FeatureFlaggingServiceBuilder()
-        .withContext(new FeatureContext(new MuleVersion(getProductVersion()), CONTAINER_FEATURE_CONTEXT_NAME))
+        .withContext(new FeatureContext(new MuleVersion(getMuleManifest().getProductVersion()), CONTAINER_FEATURE_CONTEXT_NAME))
         .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
         .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
         .build();

@@ -20,6 +20,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.module.extension.internal.loader.delegate.ParameterModelsLoaderDelegate;
@@ -44,12 +45,15 @@ public class SoapServiceProviderDeclarer {
   private final ParameterModelsLoaderDelegate parametersLoader;
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final StereotypeModelLoaderDelegate stereotypeDelegate;
+  private final ExtensionLoadingContext loadingContext;
 
   SoapServiceProviderDeclarer(ExtensionDeclarer extensionDeclarer,
                               Supplier<StereotypeModelLoaderDelegate> stereotypeModelLoader,
-                              StereotypeModelLoaderDelegate stereotypeDelegate) {
+                              StereotypeModelLoaderDelegate stereotypeDelegate,
+                              ExtensionLoadingContext loadingContext) {
     parametersLoader = new ParameterModelsLoaderDelegate(stereotypeModelLoader, type -> registerType(extensionDeclarer, type));
     this.stereotypeDelegate = stereotypeDelegate;
+    this.loadingContext = loadingContext;
   }
 
   /**
@@ -73,9 +77,11 @@ public class SoapServiceProviderDeclarer {
         .supportsConnectivityTesting(provider.supportsConnectivityTesting())
         .withStereotype(stereotypeDelegate.getDefaultConnectionProviderStereotype(providerName));
 
-    ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerName);
+    ParameterDeclarationContext context = new ParameterDeclarationContext("Service Provider", providerName, loadingContext);
 
-    parametersLoader.declare(providerDeclarer, getParameterGroupParsers(provider.getParameters(), context));
+    parametersLoader.declare(providerDeclarer,
+                             getParameterGroupParsers(provider.getParameters(), context),
+                             loadingContext);
     if (hasCustomTransports) {
       providerDeclarer.onParameterGroup(TRANSPORT_GROUP)
           .withRequiredParameter(TRANSPORT_PARAM)

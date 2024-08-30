@@ -58,6 +58,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.BASE_TYPE_BUILDER;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.BOOLEAN_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.INTEGER_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.LONG_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
@@ -123,13 +124,17 @@ import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.AllowsExpressionWithoutMarkersModelProperty;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.core.internal.extension.ForEachChainInputTypeResolver;
+import org.mule.runtime.core.internal.extension.ForEachCollectionTypeResolver;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
+import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.NoRedeliveryPolicyModelProperty;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
@@ -191,6 +196,10 @@ public class MuleExtensionModelDeclarer {
 
     declareExportedTypes(extensionDeclarer);
 
+    final MetadataType collectionType = TYPE_LOADER.load(new TypeToken<Iterable<Object>>() {
+
+    }.getType());
+
     // constructs
     declareObject(extensionDeclarer);
     declareFlow(extensionDeclarer);
@@ -198,14 +207,14 @@ public class MuleExtensionModelDeclarer {
     declareChoice(extensionDeclarer);
     declareGlobalErrorHandler(extensionDeclarer);
     declareTry(extensionDeclarer);
-    declareScatterGather(extensionDeclarer, TYPE_LOADER);
-    declareParallelForEach(extensionDeclarer, TYPE_LOADER);
+    declareScatterGather(extensionDeclarer);
+    declareParallelForEach(extensionDeclarer, collectionType);
     declareFirstSuccessful(extensionDeclarer);
     declareRoundRobin(extensionDeclarer);
     declareConfiguration(extensionDeclarer);
     declareConfigurationProperties(extensionDeclarer);
     declareAsync(extensionDeclarer);
-    declareForEach(extensionDeclarer, TYPE_LOADER);
+    declareForEach(extensionDeclarer, collectionType);
     declareUntilSuccessful(extensionDeclarer);
     declareSecurityFilter(extensionDeclarer);
 
@@ -231,7 +240,7 @@ public class MuleExtensionModelDeclarer {
     // misc
     declareNotifications(extensionDeclarer);
     declareGlobalProperties(extensionDeclarer);
-    declareSecurityManager(extensionDeclarer, TYPE_LOADER);
+    declareSecurityManager(extensionDeclarer);
 
     return extensionDeclarer;
   }
@@ -399,6 +408,10 @@ public class MuleExtensionModelDeclarer {
         .describedAs("Processes the nested list of message processors asynchronously.").blocking(false);
 
     async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
+    configurerFactory.create()
+        .withPassThroughChainInputTypeResolver()
+        .configure(async);
+
     async.onDefaultParameterGroup()
         .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
@@ -603,7 +616,7 @@ public class MuleExtensionModelDeclarer {
         .describedAs("The description of this error.");
   }
 
-  private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareForEach(ExtensionDeclarer extensionDeclarer, MetadataType collectionType) {
     OperationDeclarer forEach = extensionDeclarer.withOperation("foreach")
         .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
             + " generating a message for each element.")
@@ -614,13 +627,13 @@ public class MuleExtensionModelDeclarer {
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
-        .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
-
-        }.getType()))
+        .ofDynamicType(collectionType)
         .defaultingTo("#[payload]")
         .withExpressionSupport(REQUIRED)
         .describedAs("Expression that defines the collection to iterate over.")
-        .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty());
+        .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
+        // TODO: add support for doing this on the MetadataConfigurer
+        .withModelProperty(new MetadataKeyPartModelProperty(1, false, REQUIRED));
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
@@ -645,6 +658,15 @@ public class MuleExtensionModelDeclarer {
     forEach.withOutput().ofType(VOID_TYPE);
     forEach.withOutputAttributes().ofType(VOID_TYPE);
 
+    configurerFactory.create()
+        // The metadata key type is String even though the parameter is Array because the key object will be the unresolved
+        // expression (we can't evaluate expressions during metadata resolution)
+        // The InputTypeResolver will then take the expression and resolve its actual output type, providing more precise
+        // metadata information than just "Array of Any"
+        .setKeysResolver(new NullMetadataResolver(), "collection", STRING_TYPE, false)
+        .addInputResolver("collection", new ForEachCollectionTypeResolver())
+        .setChainInputTypeResolver(new ForEachChainInputTypeResolver())
+        .configure(forEach);
   }
 
   private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer) {
@@ -697,7 +719,11 @@ public class MuleExtensionModelDeclarer {
         .setExecutionOccurrence(ONCE_OR_NONE);
     choice.withOutput().ofDynamicType(ANY_TYPE);
     choice.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asOneOfRouter().configure(choice);
+    configurerFactory.create()
+        .addRoutePassThroughChainInputResolver("when")
+        .addRoutePassThroughChainInputResolver("otherwise")
+        .asOneOfRouter()
+        .configure(choice);
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer) {
@@ -760,7 +786,10 @@ public class MuleExtensionModelDeclarer {
 
     firstSuccessful.withOutput().ofDynamicType(ANY_TYPE);
     firstSuccessful.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asOneOfRouter().configure(firstSuccessful);
+    configurerFactory.create()
+        .addRoutePassThroughChainInputResolver("route")
+        .asOneOfRouter()
+        .configure(firstSuccessful);
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
@@ -779,10 +808,13 @@ public class MuleExtensionModelDeclarer {
 
     roundRobin.withOutput().ofDynamicType(ANY_TYPE);
     roundRobin.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asOneOfRouter().configure(roundRobin);
+    configurerFactory.create()
+        .addRoutePassThroughChainInputResolver("route")
+        .asOneOfRouter()
+        .configure(roundRobin);
   }
 
-  private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareScatterGather(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer scatterGather = extensionDeclarer.withOperation("scatterGather")
         .describedAs("Sends the same message to multiple message processors in parallel.")
         .withErrorModel(compositeRoutingError).blocking(false);
@@ -795,7 +827,7 @@ public class MuleExtensionModelDeclarer {
 
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
-        .ofType(typeLoader.load(Long.class))
+        .ofType(LONG_TYPE)
         .defaultingTo(Long.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
@@ -823,13 +855,16 @@ public class MuleExtensionModelDeclarer {
 
     scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asAllOfRouter().configure(scatterGather);
+    configurerFactory.create()
+        .addRoutePassThroughChainInputResolver("route")
+        .asAllOfRouter()
+        .configure(scatterGather);
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)
   }
 
-  private void declareParallelForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareParallelForEach(ExtensionDeclarer extensionDeclarer, MetadataType collectionType) {
     OperationDeclarer parallelForeach = extensionDeclarer.withOperation("parallelForeach")
         .describedAs("Splits the same message and processes each part in parallel.")
         .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0")).blocking(false);
@@ -838,18 +873,18 @@ public class MuleExtensionModelDeclarer {
 
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
-        .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
-
-        }.getType()))
+        .ofDynamicType(collectionType)
         .withRole(BEHAVIOUR)
         .withExpressionSupport(REQUIRED)
         .defaultingTo("#[payload]")
         .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
+        // TODO: add support for doing this on the MetadataConfigurer
+        .withModelProperty(new MetadataKeyPartModelProperty(1, false, REQUIRED))
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
 
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
-        .ofType(typeLoader.load(Long.class))
+        .ofType(LONG_TYPE)
         .defaultingTo(Long.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
@@ -862,7 +897,16 @@ public class MuleExtensionModelDeclarer {
 
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
-    configurerFactory.create().asPassthroughScope().configure(parallelForeach);
+    configurerFactory.create()
+        // The metadata key type is String even though the parameter is Array because the key object will be the unresolved
+        // expression (we can't evaluate expressions during metadata resolution)
+        // The InputTypeResolver will then take the expression and resolve its actual output type, providing more precise
+        // metadata information than just "Array of Any"
+        .setKeysResolver(new NullMetadataResolver(), "collection", STRING_TYPE, false)
+        .addInputResolver("collection", new ForEachCollectionTypeResolver())
+        .setChainInputTypeResolver(new ForEachChainInputTypeResolver())
+        .asPassthroughScope()
+        .configure(parallelForeach);
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer) {
@@ -1391,7 +1435,7 @@ public class MuleExtensionModelDeclarer {
         .describedAs("The value of the property. This replaces each occurence of a property placeholder.");
   }
 
-  private void declareSecurityManager(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
+  private void declareSecurityManager(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer securityManagerDeclarer = extensionDeclarer.withConstruct("securityManager")
         .allowingTopLevelDefinition()
         .describedAs("The default security manager provides basic support for security functions. Other modules (PGP, "

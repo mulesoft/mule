@@ -438,7 +438,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -1093,7 +1094,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -1813,7 +1815,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -3216,7 +3219,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -4595,7 +4599,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -5160,7 +5165,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -5856,7 +5862,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -6448,7 +6455,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -7123,7 +7131,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -7848,7 +7857,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -10107,7 +10117,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -10825,7 +10836,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -11542,7 +11554,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -12212,7 +12225,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -12988,7 +13002,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -13705,7 +13720,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -15092,7 +15108,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -15757,7 +15774,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -17227,7 +17245,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -18071,7 +18090,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -18942,7 +18962,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -18976,7 +18997,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 2,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -19013,7 +19035,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 3,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 }
@@ -19656,7 +19679,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -19690,7 +19714,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 2,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -19727,7 +19752,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 3,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 }
@@ -20277,7 +20303,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -21002,7 +21029,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -21812,7 +21840,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": false
+                      "providedByKeyResolver": false,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -21846,7 +21875,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 2,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -21883,7 +21913,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 3,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 }
@@ -22775,7 +22806,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -23713,7 +23745,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -27829,7 +27862,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }
@@ -28211,7 +28245,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -28646,7 +28681,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -34858,7 +34894,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }
@@ -35225,7 +35262,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -35909,7 +35947,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }
@@ -36832,7 +36871,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }
@@ -37110,7 +37150,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -37513,7 +37554,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }
@@ -38255,6 +38297,453 @@
           "partialTypeKeyResolver": false
         }
       },
+      "kind": "operation"
+    },
+    {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": {
+            "id": "*/*",
+            "label": "*/*",
+            "validMimeTypes": [
+              "*/*"
+            ]
+          },
+          "type": "Any",
+          "annotations": {
+            "typeId": "java.lang.Object",
+            "classInformation": {
+              "classname": "java.lang.Object",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            },
+            "typeAlias": {
+              "value": "Object"
+            }
+          }
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [
+        {
+          "minOccurs": 1,
+          "errors": [],
+          "semanticTerms": [],
+          "visibility": "PUBLIC",
+          "parameterGroupModels": [],
+          "name": "aliasedRoute",
+          "description": "",
+          "modelProperties": {},
+          "childComponents": [
+            {
+              "executionOccurrence": "UNKNOWN",
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "minOccurs": 1,
+              "maxOccurs": 1,
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "visibility": "PUBLIC",
+              "parameterGroupModels": [],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "kind": "route"
+        }
+      ],
+      "errors": [],
+      "semanticTerms": [],
+      "visibility": "PUBLIC",
+      "stereotype": {
+        "type": "ROUTER_WITH_CHAIN_INPUT_RESOLVER_ON_ALIASED_ROUTE",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "minMuleVersion": "4.5.0",
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "json",
+                "type": "Any",
+                "annotations": {
+                  "classInformation": {
+                    "classname": "java.lang.String",
+                    "hasDefaultConstructor": true,
+                    "isInterface": false,
+                    "isInstantiable": true,
+                    "isAbstract": false,
+                    "isFinal": true,
+                    "implementedInterfaces": [],
+                    "parent": "",
+                    "genericTypes": [],
+                    "isMap": false
+                  }
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "jsonValue",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "outputMimeType",
+              "description": "The mime type of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "outputEncoding",
+              "description": "The encoding of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "infrastructureType": {},
+                  "description": {
+                    "value": "Determines that an error thrown by this operation should be mapped to another"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
+                  }
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "source"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "target",
+                        "required": "true"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeDefinition"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6,
+                "tabName": "Error Mapping"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "errorMappings",
+              "description": "Set of error mappings",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "error-mappings",
+                    "prefix": "mule"
+                  }
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 12
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
+          "showInDsl": false,
+          "name": "Error Mappings",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "routerWithChainInputResolverOnAliasedRoute",
+      "description": "",
+      "modelProperties": {},
       "kind": "operation"
     },
     {
@@ -39261,6 +39750,439 @@
             }
           }
         },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [
+        {
+          "minOccurs": 1,
+          "errors": [],
+          "semanticTerms": [],
+          "visibility": "PUBLIC",
+          "parameterGroupModels": [],
+          "name": "metaroute",
+          "description": "",
+          "modelProperties": {},
+          "childComponents": [
+            {
+              "executionOccurrence": "UNKNOWN",
+              "isRequired": true,
+              "allowedStereotypes": [
+                {
+                  "type": "PROCESSOR",
+                  "namespace": "MULE"
+                }
+              ],
+              "minOccurs": 1,
+              "maxOccurs": 1,
+              "nestedComponents": [],
+              "errors": [],
+              "semanticTerms": [],
+              "visibility": "PUBLIC",
+              "parameterGroupModels": [],
+              "name": "processors",
+              "description": "",
+              "modelProperties": {},
+              "kind": "chain"
+            }
+          ],
+          "kind": "route"
+        }
+      ],
+      "errors": [],
+      "semanticTerms": [],
+      "visibility": "PUBLIC",
+      "stereotype": {
+        "type": "ROUTER_WITH_ONLY_CHAIN_INPUT_METADATA_RESOLVER",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "minMuleVersion": "4.1.1",
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "jsonValue",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "outputMimeType",
+              "description": "The mime type of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "outputEncoding",
+              "description": "The encoding of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "infrastructureType": {},
+                  "description": {
+                    "value": "Determines that an error thrown by this operation should be mapped to another"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
+                  }
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "source"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "target",
+                        "required": "true"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeDefinition"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6,
+                "tabName": "Error Mapping"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "errorMappings",
+              "description": "Set of error mappings",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "error-mappings",
+                    "prefix": "mule"
+                  }
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 12
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
+          "showInDsl": false,
+          "name": "Error Mappings",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "routerWithOnlyChainInputMetadataResolver",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": {
+            "id": "*/*",
+            "label": "*/*",
+            "validMimeTypes": [
+              "*/*"
+            ]
+          },
+          "type": "Any",
+          "annotations": {
+            "typeId": "java.lang.Object",
+            "classInformation": {
+              "classname": "java.lang.Object",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            },
+            "typeAlias": {
+              "value": "Object"
+            }
+          }
+        },
         "hasDynamicType": true,
         "description": "",
         "modelProperties": {}
@@ -40106,6 +41028,426 @@
             }
           }
         },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "outputAttributes": {
+        "type": {
+          "format": "java",
+          "type": "Void"
+        },
+        "hasDynamicType": false,
+        "description": "",
+        "modelProperties": {}
+      },
+      "transactional": false,
+      "requiresConnection": false,
+      "supportsStreaming": false,
+      "notifications": [],
+      "nestedComponents": [
+        {
+          "executionOccurrence": "UNKNOWN",
+          "isRequired": true,
+          "allowedStereotypes": [
+            {
+              "type": "PROCESSOR",
+              "namespace": "MULE"
+            }
+          ],
+          "minOccurs": 1,
+          "maxOccurs": 1,
+          "nestedComponents": [],
+          "errors": [],
+          "semanticTerms": [],
+          "visibility": "PUBLIC",
+          "parameterGroupModels": [],
+          "name": "chain",
+          "description": "",
+          "modelProperties": {},
+          "kind": "chain"
+        }
+      ],
+      "errors": [],
+      "semanticTerms": [],
+      "visibility": "PUBLIC",
+      "stereotype": {
+        "type": "SCOPE_WITH_ONLY_CHAIN_INPUT_METADATA_RESOLVER",
+        "namespace": "METADATA",
+        "parent": {
+          "type": "PROCESSOR",
+          "namespace": "METADATA",
+          "parent": {
+            "type": "PROCESSOR",
+            "namespace": "MULE"
+          }
+        }
+      },
+      "minMuleVersion": "4.1.1",
+      "parameterGroupModels": [
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 1
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "jsonValue",
+              "description": "",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 2,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "outputMimeType",
+              "description": "The mime type of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 3,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "outputEncoding",
+              "description": "The encoding of the payload that this operation outputs.",
+              "modelProperties": {
+                "sinceMuleVersion": {
+                  "version": "4.2.0"
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 1
+          },
+          "showInDsl": false,
+          "name": "General",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 4,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "target",
+              "displayModel": {
+                "displayName": "Target Variable"
+              },
+              "description": "The name of a variable on which the operation\u0027s output will be placed",
+              "modelProperties": {}
+            },
+            {
+              "type": {
+                "format": "java",
+                "type": "String"
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "REQUIRED",
+              "defaultValue": "#[payload]",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": false,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 5,
+                "tabName": "Advanced"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "targetValue",
+              "displayModel": {
+                "displayName": "Target Value"
+              },
+              "description": "An expression that will be evaluated against the operation\u0027s output and the outcome of that expression will be stored in the target variable",
+              "modelProperties": {}
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 2
+          },
+          "showInDsl": false,
+          "name": "Output",
+          "description": "",
+          "modelProperties": {}
+        },
+        {
+          "parameters": [
+            {
+              "type": {
+                "format": "java",
+                "type": "Array",
+                "annotations": {
+                  "infrastructureType": {},
+                  "description": {
+                    "value": "Determines that an error thrown by this operation should be mapped to another"
+                  },
+                  "typeDsl": {
+                    "allowInlineDefinition": true,
+                    "allowTopLevelDefinition": false
+                  }
+                },
+                "item": {
+                  "type": "Object",
+                  "annotations": {
+                    "typeId": "errorMapping",
+                    "infrastructureType": {}
+                  },
+                  "fields": [
+                    {
+                      "key": {
+                        "name": "source"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeMatcher",
+                          "enum": {
+                            "type": "[Ljava.lang.String;",
+                            "values": [
+                              "ANY",
+                              "REDELIVERY_EXHAUSTED",
+                              "TRANSFORMATION",
+                              "EXPRESSION",
+                              "SECURITY",
+                              "CLIENT_SECURITY",
+                              "SERVER_SECURITY",
+                              "ROUTING",
+                              "CONNECTIVITY",
+                              "RETRY_EXHAUSTED",
+                              "TIMEOUT"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "name": "target",
+                        "required": "true"
+                      },
+                      "model": {
+                        "format": {
+                          "id": "text",
+                          "label": "Text",
+                          "validMimeTypes": [
+                            "text/plain"
+                          ]
+                        },
+                        "type": "String",
+                        "annotations": {
+                          "typeId": "errorTypeDefinition"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "hasDynamicType": false,
+              "required": false,
+              "isConfigOverride": false,
+              "isComponentId": false,
+              "fieldValueProviderModels": [],
+              "expressionSupport": "NOT_SUPPORTED",
+              "role": "BEHAVIOUR",
+              "dslConfiguration": {
+                "allowsInlineDefinition": true,
+                "allowsReferences": false,
+                "allowTopLevelDefinition": false
+              },
+              "layoutModel": {
+                "password": false,
+                "text": false,
+                "query": false,
+                "order": 6,
+                "tabName": "Error Mapping"
+              },
+              "allowedStereotypeModels": [],
+              "semanticTerms": [],
+              "name": "errorMappings",
+              "description": "Set of error mappings",
+              "modelProperties": {
+                "org.mule.runtime.extension.api.property.QNameModelProperty": {
+                  "value": {
+                    "namespaceURI": "http://www.mulesoft.org/schema/mule/core",
+                    "localPart": "error-mappings",
+                    "prefix": "mule"
+                  }
+                },
+                "sinceMuleVersion": {
+                  "version": "4.4.0"
+                },
+                "org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty": {
+                  "sequence": 12
+                }
+              }
+            }
+          ],
+          "exclusiveParametersModels": [],
+          "layoutModel": {
+            "password": false,
+            "text": false,
+            "query": false,
+            "order": 3
+          },
+          "showInDsl": false,
+          "name": "Error Mappings",
+          "description": "",
+          "modelProperties": {}
+        }
+      ],
+      "name": "scopeWithOnlyChainInputMetadataResolver",
+      "description": "",
+      "modelProperties": {},
+      "kind": "operation"
+    },
+    {
+      "blocking": false,
+      "executionType": "CPU_LITE",
+      "output": {
+        "type": {
+          "format": {
+            "id": "*/*",
+            "label": "*/*",
+            "validMimeTypes": [
+              "*/*"
+            ]
+          },
+          "type": "Any",
+          "annotations": {
+            "typeId": "java.lang.Object",
+            "classInformation": {
+              "classname": "java.lang.Object",
+              "hasDefaultConstructor": true,
+              "isInterface": false,
+              "isInstantiable": true,
+              "isAbstract": false,
+              "isFinal": false,
+              "implementedInterfaces": [],
+              "parent": "",
+              "genericTypes": [],
+              "isMap": false
+            },
+            "typeAlias": {
+              "value": "Object"
+            }
+          }
+        },
         "hasDynamicType": true,
         "description": "",
         "modelProperties": {}
@@ -40593,7 +41935,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }
@@ -44299,7 +45642,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -44333,7 +45677,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 2,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -44370,7 +45715,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 3,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }
@@ -44730,7 +46076,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -44764,7 +46111,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 2,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -44801,7 +46149,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 3,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }
@@ -45161,7 +46510,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 1,
-                  "providedByKeyResolver": false
+                  "providedByKeyResolver": false,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -45195,7 +46545,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 2,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             },
@@ -45232,7 +46583,8 @@
               "modelProperties": {
                 "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                   "order": 3,
-                  "providedByKeyResolver": true
+                  "providedByKeyResolver": true,
+                  "expressionSupport": "NOT_SUPPORTED"
                 }
               }
             }

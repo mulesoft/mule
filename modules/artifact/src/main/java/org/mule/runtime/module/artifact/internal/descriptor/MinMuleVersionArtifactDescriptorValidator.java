@@ -8,7 +8,8 @@ package org.mule.runtime.module.artifact.internal.descriptor;
 
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -25,7 +26,7 @@ import java.util.function.Supplier;
 public class MinMuleVersionArtifactDescriptorValidator implements ArtifactDescriptorValidator {
 
   private boolean validateMinMuleVersionWithSemanticVersion;
-  private Supplier<String> muleRuntimeVersionSupplier = () -> getProductVersion();
+  private Supplier<String> muleRuntimeVersionSupplier = () -> getMuleManifest().getProductVersion();
 
   /**
    * Creates an instance of this validator.

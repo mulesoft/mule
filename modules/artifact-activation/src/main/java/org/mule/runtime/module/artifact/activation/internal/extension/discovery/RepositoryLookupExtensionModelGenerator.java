@@ -60,7 +60,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                 additionalAttributes,
                                                                 artifactPluginDescriptor,
                                                                 discoveryRequest.isOCSEnabled(),
-                                                                discoveryRequest.isForceExtensionValidation()))
+                                                                discoveryRequest.isForceExtensionValidation(),
+                                                                discoveryRequest.isResolveMinMuleVersion()))
         .orElse(null);
   }
 
@@ -88,7 +89,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                Map<String, Object> additionalAttributes,
                                                                ArtifactPluginDescriptor artifactPluginDescriptor,
                                                                boolean ocsEnabled,
-                                                               boolean forceExtensionValidation) {
+                                                               boolean forceExtensionValidation,
+                                                               boolean resolveMinMuleVersion) {
     ExtensionModelLoader loader = extensionModelLoaderRepository.getExtensionModelLoader(loaderDescriber)
         .orElseThrow(() -> new IllegalArgumentException(format("The identifier '%s' does not match with the describers available "
             + "to generate an ExtensionModel (working with the plugin '%s')", loaderDescriber.getId(), artifactName)));
@@ -99,6 +101,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
         .addParameters(attributes)
         .setOCSEnabled(ocsEnabled)
         .setForceExtensionValidation(forceExtensionValidation)
+        .setResolveMinMuleVersion(resolveMinMuleVersion)
         .setArtifactCoordinates(artifactPluginDescriptor.getBundleDescriptor())
         .build());
   }

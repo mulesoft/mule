@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputWithAttributesResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputResolver.INPUT_RESOLVER_NAME;
@@ -59,7 +59,7 @@ public class SourceModelLoaderDelegateTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() {
-    ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getProductVersion());
+    ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getMuleManifest().getProductVersion());
     declaration = declarer.getDeclaration();
   }
 

@@ -38,12 +38,14 @@ public class EventedExtensionsClientDecorator implements ExtensionsClient {
   }
 
   @Override
+  @Deprecated
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extension, String operation,
                                                              OperationParameters parameters) {
     return extensionsClient.executeAsync(extension, operation, new EventedOperationsParameterDecorator(parameters, event));
   }
 
   @Override
+  @Deprecated
   public <T, A> Result<T, A> execute(String extension, String operation, OperationParameters parameters) throws MuleException {
     return extensionsClient.execute(extension, operation, new EventedOperationsParameterDecorator(parameters, event));
   }

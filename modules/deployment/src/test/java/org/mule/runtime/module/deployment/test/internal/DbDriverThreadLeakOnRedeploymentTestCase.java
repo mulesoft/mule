@@ -8,19 +8,20 @@ package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
-import static org.hamcrest.core.Is.is;
+
+import static java.util.Arrays.asList;
+
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assume.assumeThat;
-import static java.util.Arrays.asList;
 
 import java.util.List;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Contains tests for leak prevention on the deployment process.
@@ -44,7 +45,8 @@ public class DbDriverThreadLeakOnRedeploymentTestCase extends DbDriverThreadLeak
 
   @Override
   public void oracleDriverTimerThreadsReleasedOnUndeploy() throws Exception {
-    // TODO (W-14331417) Remove this assume (entire override)
+    // Here we're testing a test extension (OracleExtension) instead of the actual DB Connector. In JDK17+, the DB Connector is
+    // responsible or releasing these resources, then this test doesn't apply there.
     assumeThat(isJavaVersionAtLeast(JAVA_17), is(false));
     super.oracleDriverTimerThreadsReleasedOnUndeploy();
   }

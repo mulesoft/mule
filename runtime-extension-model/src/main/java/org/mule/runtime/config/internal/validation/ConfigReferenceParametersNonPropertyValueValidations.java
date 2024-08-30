@@ -18,12 +18,8 @@ import java.util.function.Predicate;
 
 public class ConfigReferenceParametersNonPropertyValueValidations extends AbstractReferenceParametersStereotypesValidations {
 
-  private final boolean enabled;
-
-  public ConfigReferenceParametersNonPropertyValueValidations(boolean enabled,
-                                                              ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+  public ConfigReferenceParametersNonPropertyValueValidations(ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
     super(artifactAstDependencyGraphProvider);
-    this.enabled = enabled;
   }
 
   @Override
@@ -44,7 +40,6 @@ public class ConfigReferenceParametersNonPropertyValueValidations extends Abstra
   @Override
   protected boolean filterComponent(ComponentAstDependency missingDependency) {
     return super.filterComponent(missingDependency)
-        && enabled
         && missingDependency.getName().contains("${");
   }
 

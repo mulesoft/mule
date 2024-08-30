@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.tooling.api;
 
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
@@ -110,7 +111,8 @@ public interface ToolingService extends Initialisable, Stoppable {
    * @throws IOException
    */
   default Application createApplication(byte[] appContent) throws IOException {
-    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: "
+        + getMuleManifest().getProductVersion());
   }
 
   /**
@@ -122,7 +124,8 @@ public interface ToolingService extends Initialisable, Stoppable {
    * @throws IOException
    */
   default Application createApplication(byte[] appContent, Optional<Properties> deploymentProperties) throws IOException {
-    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: "
+        + getMuleManifest().getProductVersion());
   }
 
   /**
@@ -148,7 +151,8 @@ public interface ToolingService extends Initialisable, Stoppable {
    * @throws IOException
    */
   default Domain createDomain(File domainLocation, Optional<Properties> deploymentProperties) throws IOException {
-    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: "
+        + getMuleManifest().getProductVersion());
   }
 
   /**
@@ -173,7 +177,8 @@ public interface ToolingService extends Initialisable, Stoppable {
    * @throws IOException
    */
   default Domain createDomain(File domainLocation) throws IOException {
-    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: "
+        + getMuleManifest().getProductVersion());
   }
 
   /**
@@ -184,7 +189,8 @@ public interface ToolingService extends Initialisable, Stoppable {
    * @throws IOException
    */
   default Domain createDomain(byte[] domainContent) throws IOException {
-    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: "
+        + getMuleManifest().getProductVersion());
   }
 
   /**
@@ -196,7 +202,8 @@ public interface ToolingService extends Initialisable, Stoppable {
    * @throws IOException
    */
   default Domain createDomain(byte[] domainContent, Optional<Properties> deploymentProperties) throws IOException {
-    throw new UnsupportedOperationException("Method not support for Mule Runtime version: " + getProductVersion());
+    throw new UnsupportedOperationException("Method not support for Mule Runtime version: "
+        + getMuleManifest().getProductVersion());
   }
 
   default void initialise() throws InitialisationException {}

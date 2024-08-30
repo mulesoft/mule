@@ -33,6 +33,7 @@ public class DefaultMuleClassPathConfig {
 
   protected List<URL> muleUrls = new ArrayList<>();
   protected List<URL> optUrls = new ArrayList<>();
+  protected List<URL> resourceUrls = new ArrayList<>();
 
   public DefaultMuleClassPathConfig(File muleHome, File muleBase) {
     init(muleHome, muleBase);
@@ -45,9 +46,12 @@ public class DefaultMuleClassPathConfig {
      */
     addMuleBaseUserLibs(muleHome, muleBase);
 
-    addLibraryDirectory(muleUrls, muleHome, USER_DIR);
     addLibraryDirectory(muleUrls, muleHome, MULE_DIR);
+    addLibraryDirectory(optUrls, muleHome, USER_DIR);
     addLibraryDirectory(optUrls, muleHome, OPT_DIR);
+
+    // Add resources paths. This is needed when using jdk 17 which uses module layers instead of classpath with urls.
+    addFile(resourceUrls, new File(muleHome, USER_DIR));
 
     // Do not use commons-lang3 to avoid having to add that jar to lib/boot
     if (getProperty(JAVA_RUNNING_VERSION).startsWith(JAVA_8_VERSION)) {
@@ -79,6 +83,10 @@ public class DefaultMuleClassPathConfig {
 
   public List<URL> getOptURLs() {
     return new ArrayList<>(this.optUrls);
+  }
+
+  public List<URL> getResourceURLs() {
+    return new ArrayList<>(this.resourceUrls);
   }
 
   /**

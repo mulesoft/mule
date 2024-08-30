@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
-import static java.util.Objects.hash;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forFunction;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.semantics.SemanticTermsParserUtils.addCustomTerms;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveFunctionMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveFunctionMinMuleVersion;
+
+import static java.lang.String.format;
+import static java.util.Objects.hash;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -48,7 +49,6 @@ import java.util.Set;
 public class JavaFunctionModelParser extends AbstractJavaExecutableComponentModelParser implements FunctionModelParser {
 
   private final FunctionElement functionElement;
-  private ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaFunctionModelParser(ExtensionElement extensionElement,
                                  FunctionElement functionElement,
@@ -60,12 +60,6 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      this.resolvedMinMuleVersion = resolveFunctionMinMuleVersion(functionElement,
-                                                                  getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                       ExpressionFunctions.class,
-                                                                                                       ExpressionFunctions::value,
-                                                                                                       functionElement
-                                                                                                           .getEnclosingType()));
     }
   }
 
@@ -81,7 +75,7 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    return getParameterGroupParsers(functionElement.getParameters(), forFunction(getName()));
+    return getParameterGroupParsers(functionElement.getParameters(), forFunction(getName(), loadingContext));
   }
 
   @Override
@@ -147,7 +141,12 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return of(resolveFunctionMinMuleVersion(functionElement,
+                                            getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                 ExpressionFunctions.class,
+                                                                                 ExpressionFunctions::value,
+                                                                                 functionElement
+                                                                                     .getEnclosingType())));
   }
 
   @Override

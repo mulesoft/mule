@@ -27,8 +27,11 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ComposableModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -46,12 +49,13 @@ import org.mule.runtime.module.extension.internal.metadata.chain.DefaultChainInp
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Metadata service delegate implementations that handles the resolution of a {@link ComponentModel}
@@ -117,7 +121,8 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     } catch (ConnectionException e) {
       return connectivityFailure(e);
     } catch (Exception e) {
-      return failure(newFailure(e).withMessage("Failed to resolve input types for scope inner chain").onComponent());
+      return failure(newFailure(e).withMessage("Failed to resolve input types for scope inner chain: " + e.getMessage())
+          .onComponent());
     }
   }
 
@@ -137,15 +142,19 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
       return resolveWithOAuthRefresh(context, () -> {
         ChainInputMetadataContext chainCtx =
             new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor, context);
-        Map<String, MessageMetadataType> result = new HashMap<>();
-        for (Map.Entry<String, ChainInputTypeResolver> entry : resolverFactory.getRouterChainInputResolvers().entrySet()) {
+        Map<String, ChainInputTypeResolver> routerChainInputResolvers = resolverFactory.getRouterChainInputResolvers();
+        Map<String, MessageMetadataType> result = new LinkedHashMap<>();
+        Iterable<String> routeNames = getRouteNames()::iterator;
+        for (String routeName : routeNames) {
           try {
-            result.put(entry.getKey(), entry.getValue().getChainInputMetadataType(chainCtx));
+            // If there is no resolver for the route, resolves to ANY
+            ChainInputTypeResolver resolverForRoute = routerChainInputResolvers.getOrDefault(routeName, NULL_INSTANCE);
+            result.put(routeName, resolverForRoute.getChainInputMetadataType(chainCtx));
           } catch (ConnectionException e) {
             return connectivityFailure(e);
           } catch (Exception e) {
             return failure(newFailure(e).withMessage("Failed to resolve input types for route inner chain")
-                .onParameter(entry.getKey()));
+                .onParameter(routeName));
           }
         }
         return success(unmodifiableMap(result));
@@ -155,6 +164,11 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     }
   }
 
+  private Stream<String> getRouteNames() {
+    return ((ComposableModel) model).getNestedComponents().stream()
+        .filter(nested -> nested instanceof NestedRouteModel)
+        .map(NamedObject::getName);
+  }
 
   private static <T> MetadataResult<T> connectivityFailure(ConnectionException e) {
     return failure(newFailure(e).withMessage("Failed to establish connection: " + getMessage(e))

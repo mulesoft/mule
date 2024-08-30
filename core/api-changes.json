@@ -1,4 +1,18 @@
 {
+  "4.8.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.registry.JSR250ValidatorProcessor",
+            "justification": "W-10781591: TechDebt: Remove org.mule.runtime.core.privileged.registry.ObjectProcessor"
+          }
+        ]
+      }
+    }
+  },
   "4.7.0": {
     "revapi": {
       "differences": {

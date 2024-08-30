@@ -9,12 +9,12 @@ package org.mule.runtime.core.internal.el.dataweave;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
 import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
+import static org.mule.runtime.api.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 
 import static java.lang.System.getProperty;
 
@@ -69,6 +69,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private final FeatureFlaggingService featureFlaggingService;
   private List<BindingContext> globalBindings = new LinkedList<>();
   private volatile boolean initialised = false;
+
+  private boolean disposed = false;
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
@@ -289,9 +291,10 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public void dispose() {
-    if (expressionExecutor != null) {
+  public synchronized void dispose() {
+    if (expressionExecutor != null && !disposed) {
       expressionExecutor.dispose();
+      disposed = true;
     }
   }
 

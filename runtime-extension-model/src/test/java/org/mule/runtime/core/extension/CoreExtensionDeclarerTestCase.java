@@ -100,12 +100,22 @@ public class CoreExtensionDeclarerTestCase {
     }
 
     @Override
+    public ComponentMetadataConfigurer withPassThroughChainInputTypeResolver() {
+      return this;
+    }
+
+    @Override
     public ComponentMetadataConfigurer addInputResolver(String parameterName, InputTypeResolver resolver) {
       return this;
     }
 
     @Override
     public ComponentMetadataConfigurer addInputResolvers(Map<String, InputTypeResolver> resolvers) {
+      return this;
+    }
+
+    @Override
+    public ComponentMetadataConfigurer addRoutePassThroughChainInputResolver(String routeName) {
       return this;
     }
 
@@ -144,7 +154,9 @@ public class CoreExtensionDeclarerTestCase {
 
     @Override
     public <T extends ParameterizedDeclarer, D extends ParameterizedDeclaration> void configure(ParameterizedDeclarer<T, D> declarer) {
-      selected.add(declarer);
+      if (selected != null) {
+        selected.add(declarer);
+      }
     }
 
     @Override

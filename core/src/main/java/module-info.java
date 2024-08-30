@@ -37,8 +37,10 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "com.mulesoft.munit:mtf-tools",
         "org.mule.modules:mule-aggregators-module",
         "org.mule.modules:mule-apikit-module",
+        "org.mule.modules:mule-soapkit-module",
         "org.mule.modules:mule-tracing-module",
         "org.mule.modules:mule-validation-module",
+        "org.mule.modules:mule-scripting-module",
         "org.mule.tests.plugin:mule-tests-component-plugin",
         "org.mule.tests:test-processor-chains",
         "org.mule.tests:test-components"
@@ -56,6 +58,7 @@ module org.mule.runtime.core {
   requires org.mule.runtime.profiling.api;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
+  requires org.mule.runtime.manifest;
 
   requires org.mule.runtime.metrics.api;
   requires org.mule.runtime.tracer.api;
@@ -176,7 +179,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.el;
   // for MuleFwk, MUnit, MTF, ApiGateway, Tracing and Validation
   exports org.mule.runtime.core.privileged.event;
-  // for MuleFwk, MUnit, ApiKit and Validation
+  // for MuleFwk, MUnit, ApiKit, DataWeave and Validation
   exports org.mule.runtime.core.privileged.exception;
   // for MUnit
   exports org.mule.runtime.core.privileged.interception;
@@ -392,6 +395,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.security to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
@@ -563,6 +567,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.connection to
       spring.core;
   opens org.mule.runtime.core.internal.connectivity to
+      spring.core;
+  opens org.mule.runtime.core.internal.construct to
       spring.core;
   opens org.mule.runtime.core.internal.context.notification to
       kryo.shaded,

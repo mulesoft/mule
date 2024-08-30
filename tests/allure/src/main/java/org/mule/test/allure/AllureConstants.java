@@ -76,6 +76,7 @@ public interface AllureConstants {
     String DOMAIN_DEPLOYMENT = "Domain Deployment";
     String POLICY_DEPLOYMENT = "Policy Deployment";
     String POLICY_REORDER = "Policy Reorder";
+    String POLICY_SILENT_DEPLOY = "Policy Silent Deploy";
 
     interface DeploymentSuccessfulStory {
 
@@ -1302,5 +1303,10 @@ public interface AllureConstants {
   interface CustomizationServiceFeature {
 
     String CUSTOMIZATION_SERVICE = "Customization Service";
+  }
+
+  interface MuleManifestFeature {
+
+    String MULE_MANIFEST = "Mule Manifest";
   }
 }

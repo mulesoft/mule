@@ -190,4 +190,5 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @see {@link JavaConstants}
    */
   Set<String> getSupportedJavaVersions();
+
 }

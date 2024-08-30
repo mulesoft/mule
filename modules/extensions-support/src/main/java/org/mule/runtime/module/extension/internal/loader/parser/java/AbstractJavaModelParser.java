@@ -46,4 +46,5 @@ abstract class AbstractJavaModelParser implements AdditionalPropertiesModelParse
   public final List<ModelProperty> getAdditionalModelProperties() {
     return additionalModelProperties;
   }
+
 }

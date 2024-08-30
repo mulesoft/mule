@@ -12,7 +12,7 @@
  */
 module org.mule.runtime.deployment {
 
-  requires org.mule.runtime.api;
+  requires transitive org.mule.runtime.api;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.artifact.ast;

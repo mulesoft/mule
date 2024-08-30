@@ -61,7 +61,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   private final JavaExtensionModelParser extensionModelParser;
   private final ComponentElement configElement;
-  private final ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaConfigurationModelParser(JavaExtensionModelParser extensionModelParser,
                                       ExtensionElement extensionElement,
@@ -72,11 +71,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
-    this.resolvedMinMuleVersion = resolveConfigurationMinMuleVersion(configElement,
-                                                                     getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                          Configurations.class,
-                                                                                                          Configurations::value,
-                                                                                                          configElement));
   }
 
   private void parseStructure() {
@@ -105,9 +99,9 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupParsers() {
-    return JavaExtensionModelParserUtils.getParameterGroupParsers(
-                                                                  configElement.getParameters(),
-                                                                  forConfig(configElement.getName()));
+    return JavaExtensionModelParserUtils.getParameterGroupParsers(configElement.getParameters(),
+                                                                  forConfig(configElement.getName(),
+                                                                            loadingContext));
   }
 
   @Override
@@ -133,7 +127,8 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
                                                                            extensionModelParser,
                                                                            extensionElement,
-                                                                           configElement.getConnectionProviders());
+                                                                           configElement.getConnectionProviders(),
+                                                                           loadingContext);
   }
 
   @Override
@@ -201,6 +196,10 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return of(resolveConfigurationMinMuleVersion(configElement,
+                                                 getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                      Configurations.class,
+                                                                                      Configurations::value,
+                                                                                      configElement)));
   }
 }

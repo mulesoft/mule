@@ -11,8 +11,6 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.pom.parser.api.model.BundleScope.SYSTEM;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
@@ -48,6 +46,7 @@ import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.PomParentCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
@@ -78,6 +77,9 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMavenDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
 
+  protected static final Supplier<MavenConfiguration> DEFAULT_MAVEN_CONFIGURATION =
+      new LazyValue<>(() -> getDefaultMavenConfiguration());
+
   protected final MavenConfiguration mavenConfiguration;
   protected final File projectFolder;
   protected List<BundleDependency> deployableMavenBundleDependencies;
@@ -92,7 +94,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   private final static Pattern PLACEHOLDER_PATTERN = compile("\\$\\{\\s*([^}]*)\\s*\\}");
 
 
-  protected static MavenConfiguration getDefaultMavenConfiguration() {
+  private static MavenConfiguration getDefaultMavenConfiguration() {
     final MavenClientProvider mavenClientProvider =
         discoverProvider(MavenDeployableProjectModelBuilder.class.getClassLoader());
 
@@ -128,7 +130,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     Properties pomProperties;
     Optional<String> version = empty();
 
-    if (projectFolder.equals(APP) || projectFolder.equals(DOMAIN) || projectFolder.isDirectory()) {
+    if (projectFolder.isDirectory()) {
       try {
         // 1) look for pom.properties, get the version info from there
         pomProperties = getPomPropertiesFolder(projectFolder);

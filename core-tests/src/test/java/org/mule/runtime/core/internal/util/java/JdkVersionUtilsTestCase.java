@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.java;
 
 import static org.mule.runtime.core.internal.util.java.JdkVersionUtils.isRecommendedJdkVersion;
 import static org.mule.runtime.core.internal.util.java.JdkVersionUtils.isSupportedJdkVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.SUPPORTED_ENVIRONMENTS;
 import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.JdkVersionStory.JDK_VERSION;
 
@@ -25,9 +26,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.config.MuleManifest;
-import org.mule.runtime.core.internal.util.java.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.java.JdkVersionUtils.JdkVersion;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
+import org.mule.runtime.manifest.api.MuleManifest;
+import org.mule.runtime.manifest.internal.DefaultMuleManifest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.Field;
@@ -52,7 +54,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     originalJavaVersion = getProperty("java.version");
-    originalManifest = MuleManifest.getManifest();
+    originalManifest = getMuleManifest().getManifest();
   }
 
   @After
@@ -67,7 +69,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
   private void setManifest(Manifest manifest)
       throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-    Field field = MuleManifest.class.getDeclaredField("manifest");
+    Field field = DefaultMuleManifest.class.getDeclaredField("manifest");
     field.setAccessible(true);
     field.set(null, manifest);
   }
@@ -78,20 +80,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     assertThat("Java version `" + getProperty("java.version") + "` not supported",
                isSupportedJdkVersion(), is(true));
 
-    List<String> supported = asList(
-                                    "1.8.0",
-                                    "1.8.20",
-                                    "1.8.0_129",
-                                    "9.0.0",
-                                    "10.0.0",
-                                    "11.0.0",
-                                    "12.0.0",
-                                    "13.0.0",
-                                    "14.0.0",
-                                    "15.0.0",
-                                    "16.0.0",
-                                    "17.0.0",
-                                    "17.0.6");
+    List<String> supported = asList("17.0.0",
+                                    "17.0.11");
 
     for (String version : supported) {
       setJdkVersion(version);
@@ -100,8 +90,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     }
 
     // not supported
-    List<String> notSupported = asList(
-                                       "1.7.2",
+    List<String> notSupported = asList("1.7.2",
                                        "1.7.2_12",
                                        "18.0.0");
 
@@ -160,12 +149,8 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testRecommendedJdkVersion() {
     // recommended
-    List<String> recommended = asList(
-                                      "1.8.0_181",
-                                      "1.8.20",
-                                      "11.0.0",
-                                      "17.0.0",
-                                      "17.0.6");
+    List<String> recommended = asList("17.0.0",
+                                      "17.0.11");
 
     for (String version : recommended) {
       setJdkVersion(version);
@@ -174,8 +159,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     }
 
     // not recommended
-    List<String> notRecommended = asList(
-                                         "1.4.2",
+    List<String> notRecommended = asList("1.4.2",
                                          "1.6",
                                          "1.6.0_5",
                                          "1.7.0",
@@ -250,19 +234,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testValidateJdk() {
     JdkVersionUtils.validateJdk();
-    setJdkVersion("1.8.0");
-    JdkVersionUtils.validateJdk();
-    setJdkVersion("1.8.0_129");
-    JdkVersionUtils.validateJdk();
-    setJdkVersion("1.8.20");
-    JdkVersionUtils.validateJdk();
-    setJdkVersion("1.9.0");
-    JdkVersionUtils.validateJdk();
-    setJdkVersion("1.9.0_03");
-    JdkVersionUtils.validateJdk();
-    setJdkVersion("1.9.0_51");
-    JdkVersionUtils.validateJdk();
-
+    setJdkVersion("11.0.0");
   }
 
   @Test(expected = java.lang.RuntimeException.class)
@@ -271,7 +243,7 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     JdkVersionUtils.validateJdk();
   }
 
-  @Test
+  @Test(expected = java.lang.RuntimeException.class)
   public void testValidateJdk8() {
     setJdkVersion("1.8.0");
     JdkVersionUtils.validateJdk();

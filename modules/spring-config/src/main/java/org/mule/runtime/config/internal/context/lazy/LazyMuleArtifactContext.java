@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.context.lazy;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SUB_FLOW;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.filteredArtifactAst;
@@ -54,7 +55,6 @@ import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -127,8 +127,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *
    * @param muleContext                                the {@link MuleContext} that own this context
    * @param artifactAst                                the definition of the artifact to create a context for
-   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
    * @param baseConfigurationComponentLocator          indirection to the actual ConfigurationComponentLocator in the full
@@ -145,7 +143,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
-                                 OptionalObjectsController optionalObjectsController,
                                  Optional<ConfigurationProperties> parentConfigurationProperties,
                                  BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                  ContributedErrorTypeRepository errorTypeRepository,
@@ -160,7 +157,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  FeatureFlaggingService featureFlaggingService,
                                  ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws BeansException {
-    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
+    super(muleContext, artifactAst, parentConfigurationProperties,
           baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
           artifactProperties, addToolingObjectsToRegistry,
           artifactType, componentBuildingDefinitionRegistryFactory, memoryManagementService,
@@ -197,7 +194,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                         getConfigurationProperties(),
                                                         getArtifactType(),
                                                         getApplicationModel(),
-                                                        getOptionalObjectsController(),
                                                         beanFactory,
                                                         getServiceDiscoverer(),
                                                         getResourceLocator(),
@@ -567,7 +563,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Handle orphan named components...
     orphanComponents.stream()
-        .filter(cm -> asList(SOURCE, OPERATION, SCOPE).contains(cm.getComponentType()))
+        .filter(cm -> asList(SOURCE, OPERATION, SCOPE, SUB_FLOW).contains(cm.getComponentType()))
         .filter(cm -> cm.getComponentId().isPresent())
         .forEach(cm -> {
           final String nameAttribute = cm.getComponentId().get();

@@ -6,12 +6,16 @@
  */
 package org.mule.runtime.module.extension.api.tooling.metadata;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -19,6 +23,8 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+
+import java.util.function.Supplier;
 
 /**
  * Resolves a Component's Metadata by coordinating the several moving parts that are affected by the Metadata fetching process, so
@@ -31,6 +37,40 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueReso
  * @since 4.8
  */
 public interface MetadataMediator {
+
+  /**
+   * Resolves the {@link ScopeInputMetadataDescriptor}. Only to be used for scope components
+   * <p>
+   * <b>NOTE:</b> Experimental feature. Backwards compatibility not guaranteed.
+   *
+   * @param context               current {@link MetadataContext} that will be used by the metadata resolvers.
+   * @param key                   {@link MetadataKey} of the type which structure has to be resolved, used both for input and
+   *                              output types
+   * @param scopeInputMessageType a {@link MessageMetadataType} for the message that originally entered the scope
+   * @return a {@link MetadataResult} of {@link ScopeInputMetadataDescriptor}
+   * @since 4.8.0
+   */
+  @Experimental
+  MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataContext context,
+                                                                     MetadataKey key,
+                                                                     Supplier<MessageMetadataType> scopeInputMessageType);
+
+  /**
+   * Resolves the {@link RouterInputMetadataDescriptor}. Only to be used for router components
+   * <p>
+   * <b>NOTE:</b> Experimental feature. Backwards compatibility not guaranteed.
+   *
+   * @param context                current {@link MetadataContext} that will be used by the metadata resolvers.
+   * @param key                    {@link MetadataKey} of the type which structure has to be resolved, used both for input and
+   *                               output types
+   * @param routerInputMessageType a {@link MessageMetadataType} for the message that originally entered the router
+   * @return a {@link MetadataResult} of {@link RouterInputMetadataDescriptor}
+   * @since 4.8.0
+   */
+  @Experimental
+  MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataContext context,
+                                                                       MetadataKey key,
+                                                                       Supplier<MessageMetadataType> routerInputMessageType);
 
   MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataContext context, MetadataKey key);
 

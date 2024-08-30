@@ -63,7 +63,6 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.lifecycle.PrimaryNodeLifecycleNotificationListener;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -254,7 +253,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       CompletableFuture<Void> future = new CompletableFuture<>();
       retryScheduler.execute(() -> {
         if (retryPolicyTemplate.isAsync()) {
-          // in theory we only have to lock on started, but for avoiding deadlocks we need to lock on lifecycleManager first.
+          // in theory, we only have to lock on started, but for avoiding deadlocks we need to lock on lifecycleManager first.
           // Otherwise, doWork may internally call `stop`, which would attempt to take both these locks in this order.
           synchronized (lifecycleManager) {
             synchronized (started) {

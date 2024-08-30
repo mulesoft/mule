@@ -31,6 +31,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_CO
 import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -67,6 +68,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import org.mule.runtime.api.component.Component;
@@ -90,7 +92,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
@@ -470,7 +471,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     CoreEvent event = testEvent();
     when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
     TypedValue<?> evaluate = expressionLanguage.evaluate("mule.version", event, BindingContext.builder().build());
-    assertThat(evaluate.getValue(), is(MuleManifest.getProductVersion()));
+    assertThat(evaluate.getValue(), is(getMuleManifest().getProductVersion()));
   }
 
   @Test
@@ -482,6 +483,20 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
         expressionLanguage.evaluate("flow.name", event, from(flowName), BindingContext.builder().build());
     assertThat(result.getDataType(), is(assignableTo(STRING)));
     assertThat(result.getValue(), is(flowName));
+  }
+
+  @Test
+  public void expressionExecutorIsNotDisposedWhenAlreadyDisposed() throws MuleException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+    ExpressionLanguage mockedExpressionLanguage = mock(ExpressionLanguage.class);
+    when(genericExpressionLanguageService.create(any())).thenReturn(mockedExpressionLanguage);
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.dispose();
+    verify(mockedExpressionLanguage, times(1)).dispose();
+    expressionLanguageAdaptor.dispose();
+    verify(mockedExpressionLanguage, times(1)).dispose();
   }
 
   @Test

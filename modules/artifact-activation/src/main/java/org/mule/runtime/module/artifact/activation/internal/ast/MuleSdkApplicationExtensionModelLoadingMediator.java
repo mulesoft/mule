@@ -20,6 +20,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 
@@ -39,8 +40,10 @@ public class MuleSdkApplicationExtensionModelLoadingMediator extends AbstractMul
   private final String artifactId;
 
   public MuleSdkApplicationExtensionModelLoadingMediator(ExpressionLanguageMetadataService expressionLanguageMetadataService,
-                                                         String artifactId, Optional<ArtifactCoordinates> artifactCoordinates) {
-    super(artifactCoordinates, expressionLanguageMetadataService);
+                                                         String artifactId,
+                                                         Optional<ArtifactCoordinates> artifactCoordinates,
+                                                         Optional<ExtensionLoadingContext> artifactExtensionLoadingContext) {
+    super(artifactCoordinates, artifactExtensionLoadingContext, expressionLanguageMetadataService);
     this.artifactId = artifactId;
   }
 

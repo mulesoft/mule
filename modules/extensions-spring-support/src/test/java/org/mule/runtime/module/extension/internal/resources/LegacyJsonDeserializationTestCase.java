@@ -10,6 +10,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 
 import java.io.IOException;
@@ -44,6 +46,7 @@ import org.mule.runtime.api.meta.model.source.SourceCallbackModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
+import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
@@ -158,6 +161,8 @@ public class LegacyJsonDeserializationTestCase {
         assertNotNull(model.getSemanticTerms());
         assertFieldValueProviderModels(model);
         model.getValueProviderModel().ifPresent(valueProviderModel -> valueProviderModel.getParameters());
+        model.getModelProperty(MetadataKeyPartModelProperty.class)
+            .ifPresent(LegacyJsonDeserializationTestCase.this::assertMetadataKeyPartModelPropertyHasCorrectDefault);
       }
 
       @Override
@@ -204,6 +209,10 @@ public class LegacyJsonDeserializationTestCase {
   private void assertValueProviderModel(ValueProviderModel model) {
     assertEnrichableModel(model);
     assertNotNull(model.getParameters());
+  }
+
+  private void assertMetadataKeyPartModelPropertyHasCorrectDefault(MetadataKeyPartModelProperty metadataKeyPartModelProperty) {
+    assertThat(metadataKeyPartModelProperty.getExpressionSupport(), is(NOT_SUPPORTED));
   }
 
   public void assertNotNull(Object value) {

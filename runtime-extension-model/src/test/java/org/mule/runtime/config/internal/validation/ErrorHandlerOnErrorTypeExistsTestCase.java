@@ -7,8 +7,10 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
-import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+
+import static java.util.Optional.ofNullable;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -21,12 +23,13 @@ import org.mule.runtime.config.internal.validation.test.AbstractCoreValidationTe
 
 import java.util.Optional;
 
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Features({@Feature(ERROR_HANDLING), @Feature(MULE_DSL)})
 @Story(DSL_VALIDATION_STORY)
@@ -37,7 +40,7 @@ public class ErrorHandlerOnErrorTypeExistsTestCase extends AbstractCoreValidatio
 
   @Override
   protected Validation getValidation() {
-    return new ErrorHandlerOnErrorTypeExists(Optional.ofNullable(featureFlaggingService), ignoreParams);
+    return new ErrorHandlerOnErrorTypeExists(ofNullable(featureFlaggingService), ignoreParams);
   }
 
   @Test
@@ -58,7 +61,6 @@ public class ErrorHandlerOnErrorTypeExistsTestCase extends AbstractCoreValidatio
         "            <on-error-propagate>\n" +
         "            <logger level=\"ERROR\" message=\"Check Failed.\" />\n" +
         "            </on-error-propagate>\n" +
-
         "        </error-handler>\n" +
         "    </flow>\n" +
         "\n" +

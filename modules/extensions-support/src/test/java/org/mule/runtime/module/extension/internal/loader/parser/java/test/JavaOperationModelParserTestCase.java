@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.test;
 
+import static org.mule.runtime.module.extension.internal.loader.parser.java.test.MinMuleVersionTestUtils.ctxResolvingMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 
@@ -18,7 +19,6 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.values.ValuePart;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
@@ -232,7 +232,7 @@ public class JavaOperationModelParserTestCase {
         .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     parser = new JavaOperationModelParser(mock(JavaExtensionModelParser.class), extensionElement,
                                           mock(OperationContainerElement.class), operationElement,
-                                          mock(ExtensionLoadingContext.class));
+                                          ctxResolvingMinMuleVersion());
   }
 
   protected ExtensionElement getExtensionElement(Class<?> extensionClass) {
@@ -299,7 +299,7 @@ public class JavaOperationModelParserTestCase {
         name = "pg") ParameterGroupWithLiteralField parameterGroup) {}
 
     public org.mule.sdk.api.runtime.streaming.PagingProvider<String, String> withSdkPagingProvider() {
-      return new org.mule.sdk.api.runtime.streaming.PagingProvider<String, String>() {
+      return new org.mule.sdk.api.runtime.streaming.PagingProvider<>() {
 
         @Override
         public List<String> getPage(String connection) {
@@ -319,7 +319,7 @@ public class JavaOperationModelParserTestCase {
     }
 
     public PagingProvider<String, Result<String, Void>> withPagingProviderSdkGeneric() {
-      return new PagingProvider<String, Result<String, Void>>() {
+      return new PagingProvider<>() {
 
         @Override
         public List<Result<String, Void>> getPage(String connection) {

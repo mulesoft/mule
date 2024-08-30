@@ -6,17 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
@@ -35,12 +31,18 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isF
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isReferableType;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.acceptsReferences;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.getChildKey;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.locateParsingDelegate;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.AnyType;
@@ -143,7 +145,7 @@ public abstract class ExtensionDefinitionParser {
   protected final DslSyntaxResolver dslResolver;
   private final Map<String, AttributeDefinition.Builder> parameters = new HashMap<>();
   private final List<ComponentBuildingDefinition> parsedDefinitions = new ArrayList<>();
-  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
+  private final ClassTypeLoader typeLoader;
 
   protected final Builder definitionBuilder;
   protected final ExtensionParsingContext parsingContext;
@@ -156,10 +158,12 @@ public abstract class ExtensionDefinitionParser {
    * @param dslResolver       a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
    * @param ctx               the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
-  protected ExtensionDefinitionParser(Builder definitionBuilder, DslSyntaxResolver dslResolver, ExtensionParsingContext ctx) {
+  protected ExtensionDefinitionParser(Builder definitionBuilder, DslSyntaxResolver dslResolver, ExtensionParsingContext ctx,
+                                      Optional<ClassTypeLoader> typeLoader) {
     this.definitionBuilder = definitionBuilder;
     this.dslResolver = dslResolver;
     this.parsingContext = ctx;
+    this.typeLoader = typeLoader.orElseGet(ExtensionsTypeLoaderFactory.getDefault()::createTypeLoader);
     this.valueResolverFactory = new ValueResolverFactory();
   }
 
@@ -412,7 +416,8 @@ public abstract class ExtensionDefinitionParser {
           try {
             parsingContext.registerObjectType(valueChild.getElementName(), valueChild.getPrefix(), objectType);
             new ObjectTypeParameterParser(definitionBuilder, objectType, getContextClassLoader(), dslResolver,
-                                          parsingContext).parse().forEach(definition -> addDefinition(definition));
+                                          parsingContext, of(typeLoader)).parse()
+                                              .forEach(definition -> addDefinition(definition));
           } catch (ConfigurationException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not create parser for map complex type"), e);
           }
@@ -650,7 +655,8 @@ public abstract class ExtensionDefinitionParser {
             try {
               parsingContext.registerObjectType(itemDsl.getElementName(), itemDsl.getPrefix(), objectType);
               new ObjectTypeParameterParser(definitionBuilder, objectType, getContextClassLoader(), dslResolver,
-                                            parsingContext).parse().forEach(definition -> addDefinition(definition));
+                                            parsingContext, of(typeLoader)).parse()
+                                                .forEach(definition -> addDefinition(definition));
             } catch (ConfigurationException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not create parser for collection complex type"), e);
             }
@@ -808,7 +814,7 @@ public abstract class ExtensionDefinitionParser {
         modelProperties.stream().noneMatch(m -> m.getName().equals(InfrastructureParameterModelProperty.NAME))) {
       try {
         new ObjectTypeParameterParser(definitionBuilder, elementName, elementNamespace, type, getContextClassLoader(),
-                                      dslResolver, parsingContext).parse()
+                                      dslResolver, parsingContext, of(typeLoader)).parse()
                                           .forEach(this::addDefinition);
       } catch (Exception e) {
         throw new MuleRuntimeException(new ConfigurationException(e));
@@ -873,7 +879,7 @@ public abstract class ExtensionDefinitionParser {
 
     try {
       new RouteComponentParser(definitionBuilder, routeModel, metadataType, getContextClassLoader(), routeDsl,
-                               dslResolver, parsingContext).parse()
+                               dslResolver, parsingContext, of(typeLoader)).parse()
                                    .forEach(this::addDefinition);
     } catch (Exception e) {
       throw new MuleRuntimeException(new ConfigurationException(e));
@@ -903,7 +909,8 @@ public abstract class ExtensionDefinitionParser {
                    new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax));
       new TypedInlineParameterGroupParser(definitionBuilder, group, descriptor, getContextClassLoader(),
                                           dslElementSyntax,
-                                          dslResolver, parsingContext).parse().forEach(this::addDefinition);
+                                          dslResolver, parsingContext, of(typeLoader)).parse()
+                                              .forEach(this::addDefinition);
     } else {
       AttributeDefinition.Builder builder = fromChildConfiguration(Map.class);
       if (dslElementSyntax.isWrapped()) {
@@ -913,7 +920,8 @@ public abstract class ExtensionDefinitionParser {
       }
       addParameter(getChildKey(group.getName()), builder);
       new AnonymousInlineParameterGroupParser(definitionBuilder, group, getContextClassLoader(), dslElementSyntax,
-                                              dslResolver, parsingContext).parse().forEach(this::addDefinition);
+                                              dslResolver, parsingContext, of(typeLoader)).parse()
+                                                  .forEach(this::addDefinition);
     }
   }
 

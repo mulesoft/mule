@@ -6,27 +6,26 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
+
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
-import static java.lang.Thread.yield;
-
-import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
-import static org.mule.runtime.api.util.MuleSystemProperties.USE_TRANSACTION_SINK_INDEX_PROPERTY;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -86,7 +85,7 @@ public class DefaultCachedThreadReactorSinkProvider extends AbstractCachedThread
     while (disposableSinks.get() != 0
         && currentTimeMillis() <= shutdownTimeout + startMillis
         && !currentThread().isInterrupted()) {
-      yield();
+      Thread.yield();
     }
 
     if (currentThread().isInterrupted()) {

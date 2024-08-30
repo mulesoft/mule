@@ -28,6 +28,7 @@ import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A {@link ReconnectableConnectionProviderWrapper} which makes sure that by the time the {@link ConnectionProvider#connect()}
@@ -43,6 +44,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   private final AuthorizationCodeOAuthHandler oauthHandler;
   private final FieldSetter<Object, Object> authCodeStateSetter;
   private final RunOnce dance;
+  private Supplier<Boolean> forceInvalidateStatusRetrievalSupplier;
 
   private AuthorizationCodeOAuthDancer dancer;
 
@@ -50,13 +52,15 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                     AuthorizationCodeConfig oauthConfig,
                                                     Map<Field, String> callbackValues,
                                                     AuthorizationCodeOAuthHandler oauthHandler,
-                                                    ReconnectionConfig reconnectionConfig) {
+                                                    ReconnectionConfig reconnectionConfig,
+                                                    Supplier<Boolean> forceInvalidateStatusRetrievalSupplier) {
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
     authCodeStateSetter =
         getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
+    this.forceInvalidateStatusRetrievalSupplier = forceInvalidateStatusRetrievalSupplier;
   }
 
   @Override
@@ -74,7 +78,8 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                           context,
                                                           updatedContext -> updateOAuthParameters(delegate,
                                                                                                   callbackValues,
-                                                                                                  updatedContext)));
+                                                                                                  updatedContext),
+                                                          forceInvalidateStatusRetrievalSupplier.get()));
     updateOAuthParameters(delegate, callbackValues, context);
   }
 
@@ -85,6 +90,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
 
   @Override
   public void invalidate(String resourceOwnerId) {
+    oauthHandler.setForceInvalidateStatusRetrieval(forceInvalidateStatusRetrievalSupplier.get());
     oauthHandler.invalidate(oauthConfig.getOwnerConfigName(), resourceOwnerId);
   }
 

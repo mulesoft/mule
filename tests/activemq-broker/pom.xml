@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.mule.tests</groupId>
 		<artifactId>mule-tests</artifactId>
-		<version>4.8.0-SNAPSHOT</version>
+		<version>4.9.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>mule-activemq-broker</artifactId>
 	<name>ActiveMQ :: Broker</name>
@@ -48,12 +48,10 @@
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
-            <version>${activemqVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-client</artifactId>
-            <version>${activemqVersion}</version>
             <exclusions>
 				<!-- excluded to prevent conflict with jakarta.jms.api -->
                 <exclusion>
@@ -66,29 +64,24 @@
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-kahadb-store</artifactId>
-            <version>${activemqVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-jaas</artifactId>
-            <version>${activemqVersion}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.activemq.protobuf</groupId>
             <artifactId>activemq-protobuf</artifactId>
-            <version>${activemqProtobuf}</version>
         </dependency>
         <dependency>
             <groupId>org.fusesource.hawtbuf</groupId>
             <artifactId>hawtbuf</artifactId>
-            <version>${hawtbufVersion}</version>
         </dependency>
 
         <dependency>
             <groupId>jakarta.management.j2ee</groupId>
             <artifactId>jakarta.management.j2ee-api</artifactId>
-            <version>${managementJ2eeVersion}</version>
         </dependency>
     </dependencies>
 </project>

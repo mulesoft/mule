@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.api.artifact.ArtifactType.APP;
+import static org.mule.runtime.api.artifact.ArtifactType.DOMAIN;
+import static org.mule.runtime.api.artifact.ArtifactType.POLICY;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer.deserialize;
 
 import org.mule.maven.client.api.MavenClient;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;

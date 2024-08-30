@@ -27,6 +27,7 @@ module org.mule.runtime.container {
 
   exports org.mule.runtime.container.internal to
       com.mulesoft.mule.runtime.plugin,
+      org.mule.framework.classpath,
       org.mule.runtime.artifact.activation,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model,

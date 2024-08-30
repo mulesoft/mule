@@ -57,6 +57,7 @@ public final class MuleExtensionModelProvider {
   public static final BaseTypeBuilder BASE_TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
   public static final MetadataType STRING_TYPE = loadPrimitive(STRING);
   public static final MetadataType INTEGER_TYPE = TYPE_LOADER.load(Integer.class);
+  public static final MetadataType LONG_TYPE = TYPE_LOADER.load(Long.class);
   public static final MetadataType NUMBER_TYPE = loadPrimitive(NUMBER);
   public static final MetadataType BOOLEAN_TYPE = loadPrimitive(BOOLEAN);
   public static final MetadataType NULL_TYPE = BASE_TYPE_BUILDER.nullType().build();

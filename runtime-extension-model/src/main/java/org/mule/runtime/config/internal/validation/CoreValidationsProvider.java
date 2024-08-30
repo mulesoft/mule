@@ -49,20 +49,16 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   @Inject
   private ExpressionLanguage expressionLanguage;
 
-  @Inject
-  @Named("_compatibilityPluginInstalled")
-  private Optional<Object> compatibilityPluginInstalled;
-
   @Override
   public List<Validation> get() {
-    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(isCompatibilityInstalled()),
+    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(),
                                                           new SingletonsAreNotRepeated(),
                                                           new SingletonsPerFileAreNotRepeated(),
                                                           new NamedTopLevelElementsHaveName(),
                                                           new NameHasValidCharacters(),
                                                           new NameIsNotRepeated(),
                                                           // make these general for all references via stereotypes
-                                                          new FlowRefPointsToNonPropertyValue(ignoreParamsWithProperties),
+                                                          new FlowRefPointsToNonPropertyValue(),
                                                           new FlowRefPointsToExistingFlow(ignoreParamsWithProperties),
                                                           // --
 
@@ -73,18 +69,18 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
-                                                          new RaiseErrorTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new RaiseErrorTypeReferencesNonPropertyValue(),
                                                           new RaiseErrorTypeReferencesExist(featureFlaggingService,
                                                                                             ignoreParamsWithProperties),
-                                                          new ErrorMappingTargetTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorMappingTargetTypeReferencesNonPropertyValue(),
                                                           new ErrorMappingTargetTypeReferencesExist(featureFlaggingService,
                                                                                                     ignoreParamsWithProperties),
                                                           new ErrorMappingTargetTypeReferencesDoNotUseExtensionNamespace(featureFlaggingService,
                                                                                                                          ignoreParamsWithProperties),
-                                                          new ErrorMappingSourceTypeReferencesNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorMappingSourceTypeReferencesNonPropertyValue(),
                                                           new ErrorMappingSourceTypeReferencesExist(featureFlaggingService,
                                                                                                     ignoreParamsWithProperties),
-                                                          new ErrorHandlerOnErrorTypeNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ErrorHandlerOnErrorTypeNonPropertyValue(),
                                                           new ErrorHandlerOnErrorTypeExists(featureFlaggingService,
                                                                                             ignoreParamsWithProperties),
                                                           // --
@@ -93,7 +89,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new ParameterGroupExclusiveness(),
                                                           new NumberParameterWithinRange(),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
-                                                          new ExpressionsInRequiredExpressionsParamsNonPropertyValue(ignoreParamsWithProperties),
+                                                          new ExpressionsInRequiredExpressionsParamsNonPropertyValue(),
                                                           new ExpressionsInRequiredExpressionsParams(featureFlaggingService,
                                                                                                      ignoreParamsWithProperties),
                                                           new OperationParameterDefaultValueDoesntSupportExpressions(),
@@ -127,10 +123,6 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
     return validations;
   }
 
-  private boolean isCompatibilityInstalled() {
-    return compatibilityPluginInstalled != null && compatibilityPluginInstalled.isPresent();
-  }
-
   public static Level getExpressionSyntacticValidationErrorLevel(Optional<FeatureFlaggingService> featureFlaggingService) {
     // Honour the system property consistently with MuleConfiguration#isValidateExpressions
     boolean validateExpressions = true;
@@ -153,12 +145,12 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
         artifactAstDependencyGraphProvider.orElse(new DefaultArtifactAstDependencyGraphProvider());
 
     return asList(new ImportValidTarget(),
-                  new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties,
-                                                                           artifactAstDependencyGraphProviderForValidator),
+                  new ImportTargetElement(featureFlaggingService),
+                  new ConfigReferenceParametersNonPropertyValueValidations(artifactAstDependencyGraphProviderForValidator),
                   new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
                                                                       artifactAstDependencyGraphProviderForValidator),
                   new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProviderForValidator),
-                  new MelNotEnabled(isCompatibilityInstalled()));
+                  new MelNotEnabled());
   }
 
   @Override

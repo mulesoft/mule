@@ -42,10 +42,10 @@ public class ParseTemplateResourceNotPropertyValue implements Validation {
       .name(PARSE_TEMPLATE_ELEMENT_NAME)
       .build();
 
-  private final boolean enabled;
+  private final boolean disabled;
 
-  public ParseTemplateResourceNotPropertyValue(boolean enabled) {
-    this.enabled = enabled;
+  public ParseTemplateResourceNotPropertyValue(boolean disabled) {
+    this.disabled = disabled;
   }
 
   @Override
@@ -70,7 +70,7 @@ public class ParseTemplateResourceNotPropertyValue implements Validation {
           try {
             return component.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM).getValue().getRight() != null;
           } catch (PropertyNotFoundException pnfe) {
-            if (enabled) {
+            if (disabled) {
               return false;
             } else {
               throw pnfe;

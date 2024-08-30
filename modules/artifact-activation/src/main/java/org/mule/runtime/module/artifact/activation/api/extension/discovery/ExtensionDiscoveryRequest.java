@@ -14,6 +14,7 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
+import org.mule.runtime.api.meta.model.version.HasMinMuleVersion;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -93,6 +94,12 @@ public interface ExtensionDiscoveryRequest {
    */
   boolean isForceExtensionValidation();
 
+  /**
+   * @return whether the {@link HasMinMuleVersion#getMinMuleVersion() minMuleVersion} of each component must be calculated.
+   * @since 1.9
+   */
+  boolean isResolveMinMuleVersion();
+
   @NoInstantiate
   final class ExtensionDiscoveryRequestBuilder {
 
@@ -102,6 +109,7 @@ public interface ExtensionDiscoveryRequest {
     private boolean enrichDescriptions = true;
     private boolean ocsEnabled = false;
     private boolean forceExtensionValidation = false;
+    private boolean resolveMinMuleVersion = false;
     private final Map<String, Object> customParameters = new HashMap<>();
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
@@ -131,6 +139,12 @@ public interface ExtensionDiscoveryRequest {
 
     public ExtensionDiscoveryRequestBuilder setForceExtensionValidation(boolean forceExtensionValidation) {
       this.forceExtensionValidation = forceExtensionValidation;
+      return this;
+    }
+
+
+    public ExtensionDiscoveryRequestBuilder setResolveMinMuleVersion(boolean resolveMinMuleVersion) {
+      this.resolveMinMuleVersion = resolveMinMuleVersion;
       return this;
     }
 
@@ -168,6 +182,7 @@ public interface ExtensionDiscoveryRequest {
                                                   enrichDescriptions,
                                                   ocsEnabled,
                                                   forceExtensionValidation,
+                                                  resolveMinMuleVersion,
                                                   customParameters);
     }
   }

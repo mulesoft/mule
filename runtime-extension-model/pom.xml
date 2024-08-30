@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-runtime-extension-model</artifactId>
     <packaging>jar</packaging>
@@ -19,7 +19,6 @@
             --add-exports=org.mule.runtime.api/org.mule.runtime.internal.dsl=ALL-UNNAMED
             --add-exports=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation.test=ALL-UNNAMED
             --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader=org.mule.runtime.extension.model
-            --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.spi=ALL-UNNAMED
             --add-exports=org.mule.runtime.dsl.api/org.mule.runtime.dsl.internal.xml.parser=ALL-UNNAMED
             --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.dsl=ALL-UNNAMED
             ${surefire.args.base}

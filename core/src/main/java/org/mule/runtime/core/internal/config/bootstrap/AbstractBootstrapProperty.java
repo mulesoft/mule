@@ -19,7 +19,6 @@ import java.util.Set;
 public class AbstractBootstrapProperty {
 
   protected final BootstrapService service;
-  protected final Boolean optional;
   protected final Set<ArtifactType> artifactTypes;
 
   /**
@@ -27,26 +26,18 @@ public class AbstractBootstrapProperty {
    *
    * @param service       service that provides the property. Not null.
    * @param artifactTypes defines what is the artifact this bootstrap object applies to
-   * @param optional      indicates whether or not the bootstrapped transformer is optional. When a bootstrap object is optional,
-   *                      any error creating it will be ignored.
    */
-  public AbstractBootstrapProperty(BootstrapService service, Set<ArtifactType> artifactTypes, Boolean optional) {
+  public AbstractBootstrapProperty(BootstrapService service, Set<ArtifactType> artifactTypes) {
     checkArgument(service != null, "service cannot be null");
     checkArgument(artifactTypes != null, "artifactTypes cannot be null");
     checkArgument(!artifactTypes.isEmpty(), "artifactTypes cannot be empty");
 
-    this.optional = optional;
     this.artifactTypes = artifactTypes;
     this.service = service;
   }
 
   public BootstrapService getService() {
     return service;
-  }
-
-  // TODO W-10736276 Remove this
-  public Boolean getOptional() {
-    return optional;
   }
 
   public Set<ArtifactType> getArtifactTypes() {

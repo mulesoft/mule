@@ -25,6 +25,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaInputR
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.getKeyIdResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.getRoutes;
+import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils.isRoute;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseAttributesResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseOutputResolverModelParser;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
@@ -117,7 +118,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private final Optional<ExtensionParameter> configParameter;
   private final Optional<ExtensionParameter> connectionParameter;
-  private ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   private ExtensionParameter nestedChain;
   private boolean blocking = false;
@@ -147,11 +147,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
-      this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
-                                                                   getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                        Operations.class,
-                                                                                                        Operations::value,
-                                                                                                        this.operationContainer));
     } else {
       this.operationContainer = null;
       enclosingType = null;
@@ -259,15 +254,13 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                 getName()));
     }
 
-    List<ExtensionParameter> routes = operationElement.getParameters().stream().filter(this::isRoute).collect(toList());
-
     if (routes.isEmpty()) {
       throw new IllegalOperationModelDefinitionException(format(
                                                                 "Router '%s' does not declare a '%s' parameter. One is required.",
                                                                 getName(), Route.class.getSimpleName()));
     }
 
-    if (!IntrospectionUtils.isVoid(operationElement)) {
+    if (!isVoid(operationElement)) {
       throw new IllegalOperationModelDefinitionException(format(
                                                                 "Router '%s' is not declared in a void method.", getName()));
     }
@@ -277,10 +270,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   private boolean isRouterCallback(ExtensionParameter p) {
     return ROUTER_CALLBACK_PARAMETER_TYPES.stream().anyMatch(type -> p.getType().isSameType(type));
-  }
-
-  private boolean isRoute(ExtensionParameter parameter) {
-    return parameter.getType().isAssignableTo(Route.class);
   }
 
   private void parseBlockingOperation() {
@@ -361,7 +350,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
       methodParameters = operationElement.getParameters();
     }
 
-    ParameterDeclarationContext context = forOperation(getName(), hasKeyResolverAvailable());
+    ParameterDeclarationContext context = forOperation(getName(), loadingContext, hasKeyResolverAvailable());
 
     List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, context);
     parameterGroupModelParsers.addAll(
@@ -390,7 +379,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public List<NestedRouteModelParser> getNestedRouteParsers() {
-    return routes.stream().map(JavaNestedRouteModelParser::new).collect(toList());
+    return routes.stream().map(route -> new JavaNestedRouteModelParser(route, loadingContext)).collect(toList());
   }
 
   @Override
@@ -463,7 +452,11 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return of(resolveOperationMinMuleVersion(operationElement, this.operationContainer,
+                                             getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                  Operations.class,
+                                                                                  Operations::value,
+                                                                                  this.operationContainer)));
   }
 
   @Override
