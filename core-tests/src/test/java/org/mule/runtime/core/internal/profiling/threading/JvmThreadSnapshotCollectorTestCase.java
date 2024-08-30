@@ -106,11 +106,11 @@ public class JvmThreadSnapshotCollectorTestCase {
     // The next loop is just to make the cpu work for some time...
     long total = 0;
     for (long l = 0L; l < 100000000L; l++) {
-        if (l % 2 == 0) {
-            total += 1;
-        } else {
-            total -= 1;
-        }
+      if (l % 2 == 0) {
+        total += 1;
+      } else {
+        total -= 1;
+      }
     }
     assertThat(total, is(0L)); // This assert is just to avoid the compiler to optimize the loop away.
 
