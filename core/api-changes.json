@@ -20,6 +20,20 @@
           "newArchive": "org.mule.runtime:mule-core:jar:4.6.7-SNAPSHOT",
           "newArchiveRole": "primary",
           "breaksSemanticVersioning": "true"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method java.io.InputStream org.mule.runtime.core.api.util.IOUtils::getInputStreamWithCacheControl(java.net.URL) throws java.io.IOException",
+          "justification": "W-16584232: [Windows] Fix test org.mule.runtime.module.embedded.DomainTestCase.deployUndeployDomain",
+          "package": "org.mule.runtime.core.api.util",
+          "classQualifiedName": "org.mule.runtime.core.api.util.IOUtils",
+          "classSimpleName": "IOUtils",
+          "methodName": "getInputStreamWithCacheControl",
+          "elementKind": "method",
+          "newArchive": "org.mule.runtime:mule-core:jar:4.6.7-SNAPSHOT",
+          "newArchiveRole": "primary",
+          "breaksSemanticVersioning": "true"
         }
       ]
     }
