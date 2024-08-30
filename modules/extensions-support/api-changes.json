@@ -1,4 +1,16 @@
 {
+  "4.6.8": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult<T, A>",
+          "justification": "W-16420215: Class is not useful where it sits and it's impossible to consume by any 3pp component"
+        }
+      ]
+    }
+  },
   "4.6.7": {
     "revapi": {
       "ignore": [
