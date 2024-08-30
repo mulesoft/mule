@@ -90,6 +90,12 @@ public class CompilerUtils {
      */
     protected abstract T getThis();
 
+    public T targetJavaVersion(int targetJavaVersion) {
+      this.targetJavaVersion = targetJavaVersion;
+
+      return getThis();
+    }
+
     /**
      * Adds jar files to the classpath used during the compilation.
      *
@@ -128,6 +134,7 @@ public class CompilerUtils {
           .map(javaPackage -> targetFolder.toPath().resolve(javaPackage).toFile()).orElse(targetFolder);
       targetPackage.mkdirs();
       CompilerTask compilerTask = new CompilerTaskBuilder()
+          .targetJavaVersion(targetJavaVersion)
           .compiling(sources)
           .dependingOn(requiredJars).toTarget(targetPackage)
           .build();
@@ -380,6 +387,12 @@ public class CompilerUtils {
     private String annotationProcessorClassName;
     private String processorPath;
     private final List<String> processProperties = new ArrayList<>();
+
+    public CompilerTaskBuilder targetJavaVersion(int targetJavaVersion) {
+      this.targetJavaVersion = targetJavaVersion;
+
+      return this;
+    }
 
     public CompilerTaskBuilder toTarget(File target) {
       this.target = target;
