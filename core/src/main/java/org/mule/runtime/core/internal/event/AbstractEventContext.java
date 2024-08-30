@@ -232,14 +232,12 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   private boolean areAllChildrenComplete() {
-    boolean allChildrenComplete;
     getChildContextsReadLock().lock();
     try {
-      allChildrenComplete = childContexts.stream().allMatch(BaseEventContext::isComplete);
+      return childContexts.stream().allMatch(BaseEventContext::isComplete);
     } finally {
       getChildContextsReadLock().unlock();
     }
-    return allChildrenComplete;
   }
 
   protected void tryTerminate() {
