@@ -80,6 +80,7 @@ public class CompilerUtils {
    */
   private static abstract class AbstractCompiler<T extends AbstractCompiler> {
 
+    private int targetJavaVersion = 17;
     protected File[] requiredJars = {};
     protected File[] sources = {};
     protected Path javaPackage;
@@ -88,6 +89,12 @@ public class CompilerUtils {
      * @return current instance. Used just to avoid compilation warnings.
      */
     protected abstract T getThis();
+
+    public T targetJavaVersion(int targetJavaVersion) {
+      this.targetJavaVersion = targetJavaVersion;
+
+      return getThis();
+    }
 
     /**
      * Adds jar files to the classpath used during the compilation.
@@ -127,6 +134,7 @@ public class CompilerUtils {
           .map(javaPackage -> targetFolder.toPath().resolve(javaPackage).toFile()).orElse(targetFolder);
       targetPackage.mkdirs();
       CompilerTask compilerTask = new CompilerTaskBuilder()
+          .targetJavaVersion(targetJavaVersion)
           .compiling(sources)
           .dependingOn(requiredJars).toTarget(targetPackage)
           .build();
@@ -372,12 +380,19 @@ public class CompilerUtils {
 
   private static class CompilerTaskBuilder {
 
+    private int targetJavaVersion = 17;
     private File target;
     private File[] sources = {};
     private File[] jarFiles = {};
     private String annotationProcessorClassName;
     private String processorPath;
     private final List<String> processProperties = new ArrayList<>();
+
+    public CompilerTaskBuilder targetJavaVersion(int targetJavaVersion) {
+      this.targetJavaVersion = targetJavaVersion;
+
+      return this;
+    }
 
     public CompilerTaskBuilder toTarget(File target) {
       this.target = target;
@@ -470,7 +485,14 @@ public class CompilerUtils {
             .collect(joining(PATH_SEPARATOR));
       }
 
-      options.addAll(asList("--module-path", fullClassPath));
+      if (targetJavaVersion <= 8) {
+        options.addAll(asList("-classpath", fullClassPath));
+        // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing
+        // what happens when deploying.
+        options.addAll(asList("--release", "8"));
+      } else {
+        options.addAll(asList("--module-path", fullClassPath));
+      }
 
       options.addAll(processProperties);
 
