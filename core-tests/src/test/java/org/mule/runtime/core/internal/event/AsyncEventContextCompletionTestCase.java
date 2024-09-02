@@ -54,7 +54,6 @@ public class AsyncEventContextCompletionTestCase extends AbstractMuleTestCase {
     final CompletableFuture<Void> parentTermination = new CompletableFuture<>();
     final Latch testLatch = new Latch();
     final Latch parentCompletedLatch = new Latch();
-    final Latch childCompletedLatch = new Latch();
     final Latch childTerminatedLatch = new Latch();
 
     BaseEventContext parentContext =
@@ -64,7 +63,6 @@ public class AsyncEventContextCompletionTestCase extends AbstractMuleTestCase {
 
     parentContext.onComplete((e, t) -> {
       parentCompletedLatch.countDown();
-      await(childCompletedLatch);
       await(childTerminatedLatch);
       executorService.submit(() -> parentTermination.complete(null));
     });
@@ -78,7 +76,6 @@ public class AsyncEventContextCompletionTestCase extends AbstractMuleTestCase {
         parentContext.success();
       });
       await(parentCompletedLatch);
-      childCompletedLatch.release();
     });
 
     childContext.onTerminated((e, t) -> childTerminatedLatch.countDown());
