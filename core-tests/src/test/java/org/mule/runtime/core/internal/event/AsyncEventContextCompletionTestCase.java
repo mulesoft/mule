@@ -86,8 +86,8 @@ public class AsyncEventContextCompletionTestCase extends AbstractMuleTestCase {
     await(testLatch);
 
     check(RECEIVE_TIMEOUT, 500, () -> {
-      assertThat(parentContext.isTerminated(), is(true));
-      assertThat(childContext.isTerminated(), is(true));
+      assertThat("parent did not terminate", parentContext.isTerminated(), is(true));
+      assertThat("child did not terminate", childContext.isTerminated(), is(true));
       return true;
     });
   }
