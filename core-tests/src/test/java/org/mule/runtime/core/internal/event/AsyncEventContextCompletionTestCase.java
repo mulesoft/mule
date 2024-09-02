@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -61,16 +61,13 @@ public class AsyncEventContextCompletionTestCase extends AbstractMuleTestCase {
         (BaseEventContext) create("id", "server", mock(ComponentLocation.class), "correlation", of(parentTermination));
     BaseEventContext childContext = DefaultEventContext.child(parentContext, empty());
 
-
     parentContext.onComplete((e, t) -> {
       parentCompletedLatch.countDown();
       await(childTerminatedLatch);
       executorService.submit(() -> parentTermination.complete(null));
     });
 
-    parentContext.onTerminated((e, t) -> executorService.submit(() -> {
-      testLatch.release();
-    }));
+    parentContext.onTerminated((e, t) -> executorService.submit(() -> testLatch.release()));
 
     childContext.onComplete((e, t) -> {
       executorService.submit(() -> {
