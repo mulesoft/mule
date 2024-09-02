@@ -17,6 +17,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
@@ -386,7 +387,7 @@ public final class XmlExtensionLoaderDelegate {
       throws IOException {
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
     final Transformer transformer = FOR_TNS_XSTL_TRANSFORMER_POOL.take();
-    try (BufferedInputStream resourceIS = new BufferedInputStream(resource.openStream())) {
+    try (BufferedInputStream resourceIS = new BufferedInputStream(getInputStreamWithCacheControl(resource))) {
       transformer.transform(new StreamSource(resourceIS), new StreamResult(resultStream));
     } catch (TransformerException e) {
       throw new MuleRuntimeException(createStaticMessage(format("There was an issue transforming the stream for the resource %s while trying to remove the content of the <body> element to generate an XSD",
