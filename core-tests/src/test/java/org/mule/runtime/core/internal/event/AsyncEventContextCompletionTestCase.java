@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.event;
 
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static org.mule.tck.probe.PollingProber.check;
 
 import static java.util.Optional.empty;
@@ -84,7 +85,7 @@ public class AsyncEventContextCompletionTestCase extends AbstractMuleTestCase {
 
     await(testLatch);
 
-    check(5000, 500, () -> {
+    check(RECEIVE_TIMEOUT, 500, () -> {
       assertThat(parentContext.isTerminated(), is(true));
       assertThat(childContext.isTerminated(), is(true));
       return true;
@@ -93,7 +94,7 @@ public class AsyncEventContextCompletionTestCase extends AbstractMuleTestCase {
 
   private void await(CountDownLatch latch) {
     try {
-      if (!latch.await(1000000000, SECONDS)) {
+      if (!latch.await(RECEIVE_TIMEOUT, SECONDS)) {
         throw new AssertionError("Latch timed out");
       }
     } catch (InterruptedException ex) {
