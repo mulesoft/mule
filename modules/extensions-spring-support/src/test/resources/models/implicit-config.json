@@ -3,7 +3,6 @@
   "description": "",
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
-  "minMuleVersion": "4.1.1",
   "supportedJavaVersions": [
     "1.8",
     "11",
@@ -371,7 +370,6 @@
         }
       ],
       "externalLibraryModels": [],
-      "minMuleVersion": "4.5.0",
       "operations": [
         {
           "blocking": true,
@@ -414,7 +412,6 @@
               }
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -748,7 +745,6 @@
               }
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1272,7 +1268,6 @@
               }
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1606,7 +1601,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1980,7 +1974,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
