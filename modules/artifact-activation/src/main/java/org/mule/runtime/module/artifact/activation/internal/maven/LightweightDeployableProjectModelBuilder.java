@@ -68,7 +68,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
     return new DeployableProjectModel(exportedPackages, exportedResources, emptyList(),
                                       buildBundleDescriptor(deployableArtifactCoordinates, isDomain),
                                       deployableModelResolver,
-                                      projectFolder, deployableBundleDependencies,
+                                      empty(), projectFolder, deployableBundleDependencies,
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
