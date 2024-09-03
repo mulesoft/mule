@@ -51,10 +51,12 @@ final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       configParser.getDisplayModel().ifPresent(d -> configurationDeclarer.getDeclaration().setDisplayModel(d));
       configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
       configParser.getAdditionalModelProperties().forEach(configurationDeclarer::withModelProperty);
-      configParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-        configurationDeclarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-        LOGGER.debug(resolvedMMV.getReason());
-      });
+      if (configParser.mustResolveMinMuleVersion()) {
+        configParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+          configurationDeclarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+          LOGGER.debug(resolvedMMV.getReason());
+        });
+      }
       loader.getParameterModelsLoaderDelegate().declare(configurationDeclarer, configParser.getParameterGroupParsers());
 
       getOperationLoaderDelegate().declareOperations(declarer, extensionModelParser.getDevelopmentFramework(),

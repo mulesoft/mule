@@ -3,7 +3,6 @@
   "description": "",
   "version": "1.0.0",
   "vendor": "Mulesoft",
-  "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
     "1.8",
     "11",
@@ -68,7 +67,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -97,7 +95,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -131,7 +128,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -165,7 +161,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -198,7 +193,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -487,7 +481,6 @@
         "message": "Some deprecation message",
         "deprecatedSince": "1.1.0"
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -754,7 +747,6 @@
         "deprecatedSince": "1.1.0",
         "toRemoveIn": "2.0.0"
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1019,7 +1011,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1284,7 +1275,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1313,7 +1303,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -1346,7 +1335,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "myName",
               "displayModel": {
                 "summary": "The gentleman\u0027s name"
@@ -1379,7 +1367,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "myNationalID",
               "displayModel": {
                 "summary": "The gentleman\u0027s identification"
@@ -1413,7 +1400,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -1447,7 +1433,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -1480,7 +1465,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -1768,7 +1752,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1797,7 +1780,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -1830,7 +1812,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "city",
               "displayModel": {
                 "summary": "The name of a city to say hello to"
@@ -1863,7 +1844,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "country",
               "displayModel": {
                 "summary": "The name of a country to say hello to"
@@ -2159,7 +2139,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2188,7 +2167,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -2222,7 +2200,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -2256,7 +2233,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -2289,7 +2265,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -2577,7 +2552,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2606,7 +2580,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "name",
               "displayModel": {
                 "summary": "The gentleman\u0027s name"
@@ -2639,7 +2612,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "nationalID",
               "displayModel": {
                 "summary": "The gentleman\u0027s identification"
@@ -2925,7 +2897,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -2954,7 +2925,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -2988,7 +2958,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -3022,7 +2991,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -3055,7 +3023,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -3340,7 +3307,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -3374,7 +3340,6 @@
                 "toRemoveIn": "2.0.0"
               },
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "deprecatedParameter",
               "displayModel": {
                 "summary": "Some deprecated param"
@@ -3576,7 +3541,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -3605,7 +3569,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "receiver",
               "displayModel": {
                 "summary": "The name of the person being greeted"
@@ -3638,7 +3601,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "count",
               "displayModel": {
                 "summary": "The number of times to repeat the greeting message"
@@ -3672,7 +3634,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "greeting",
               "displayModel": {
                 "summary": "The greeting message"
@@ -3706,7 +3667,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "prefix",
               "displayModel": {
                 "summary": "The receiver\u0027s prefix"
@@ -3739,7 +3699,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "suffix",
               "displayModel": {
                 "summary": "The receiver\u0027s suffix"
@@ -4027,7 +3986,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -4081,7 +4039,6 @@
                 }
               ],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "missileLauncherConfig",
               "description": "",
               "modelProperties": {}
