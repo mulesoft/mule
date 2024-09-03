@@ -3,7 +3,6 @@
   "description": "",
   "version": "1.2.3",
   "vendor": "Extension Producers Inc.",
-  "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
     "1.8",
     "11",
@@ -66,7 +65,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -95,7 +93,6 @@
               },
               "allowedStereotypeModels": [],
               "semanticTerms": [],
-              "minMuleVersion": "4.5.0",
               "name": "input",
               "description": "",
               "modelProperties": {}

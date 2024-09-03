@@ -36,6 +36,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.hash;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -148,11 +149,15 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
       parseStructure();
       collectAdditionalModelProperties();
-      this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
-                                                                   getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                        Operations.class,
-                                                                                                        Operations::value,
-                                                                                                        this.operationContainer));
+      if (mustResolveMinMuleVersion()) {
+        this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
+                                                                     getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                          Operations.class,
+                                                                                                          Operations::value,
+                                                                                                          this.operationContainer));
+      } else {
+        this.resolvedMinMuleVersion = null;
+      }
     } else {
       this.operationContainer = null;
       enclosingType = null;
@@ -356,7 +361,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
       methodParameters = operationElement.getParameters();
     }
 
-    ParameterDeclarationContext context = forOperation(getName(), hasKeyResolverAvailable());
+    ParameterDeclarationContext context = forOperation(getName(), loadingContext, hasKeyResolverAvailable());
 
     List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, context);
     parameterGroupModelParsers.addAll(
@@ -385,7 +390,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public List<NestedRouteModelParser> getNestedRouteParsers() {
-    return routes.stream().map(JavaNestedRouteModelParser::new).collect(toList());
+    return routes.stream().map(route -> new JavaNestedRouteModelParser(route, loadingContext)).collect(toList());
   }
 
   @Override
@@ -458,7 +463,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return ofNullable(this.resolvedMinMuleVersion);
   }
 
   @Override

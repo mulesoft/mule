@@ -170,6 +170,14 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 
   /**
+   * @return whether the {@link #getResolvedMinMuleVersion() minMuleVersion resolution} has to be performed.
+   * @since 4.9
+   */
+  default boolean mustResolveMinMuleVersion() {
+    return false;
+  }
+
+  /**
    * @return the {@link ExtensionDevelopmentFramework} used to develop the extension being parsed.
    *
    * @since 4.5.0
@@ -190,4 +198,5 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @see {@link JavaConstants}
    */
   Set<String> getSupportedJavaVersions();
+
 }

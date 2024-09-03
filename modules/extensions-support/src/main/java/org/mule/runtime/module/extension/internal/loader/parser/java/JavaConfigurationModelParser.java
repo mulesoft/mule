@@ -18,7 +18,7 @@ import static java.lang.String.format;
 import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparing;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -72,11 +72,15 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
-    this.resolvedMinMuleVersion = resolveConfigurationMinMuleVersion(configElement,
-                                                                     getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                          Configurations.class,
-                                                                                                          Configurations::value,
-                                                                                                          configElement));
+    if (mustResolveMinMuleVersion()) {
+      this.resolvedMinMuleVersion = resolveConfigurationMinMuleVersion(configElement,
+                                                                       getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                            Configurations.class,
+                                                                                                            Configurations::value,
+                                                                                                            configElement));
+    } else {
+      this.resolvedMinMuleVersion = null;
+    }
   }
 
   private void parseStructure() {
@@ -105,9 +109,9 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupParsers() {
-    return JavaExtensionModelParserUtils.getParameterGroupParsers(
-                                                                  configElement.getParameters(),
-                                                                  forConfig(configElement.getName()));
+    return JavaExtensionModelParserUtils.getParameterGroupParsers(configElement.getParameters(),
+                                                                  forConfig(configElement.getName(),
+                                                                            loadingContext));
   }
 
   @Override
@@ -133,7 +137,8 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
                                                                            extensionModelParser,
                                                                            extensionElement,
-                                                                           configElement.getConnectionProviders());
+                                                                           configElement.getConnectionProviders(),
+                                                                           loadingContext);
   }
 
   @Override
@@ -201,6 +206,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return ofNullable(this.resolvedMinMuleVersion);
   }
 }

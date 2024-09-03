@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.JAVA_SDK;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
@@ -21,12 +20,13 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.parseLegacyNotifications;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.parseNotifications;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveExtensionMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
@@ -74,9 +74,9 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.info.Export
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.sdk.api.annotation.OnArtifactLifecycle;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
-import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.sdk.api.meta.JavaVersion;
 
 import java.util.ArrayList;
@@ -147,7 +147,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseSubtypes();
     parseNotificationModels();
 
-    this.resolvedMinMuleVersion = resolveExtensionMinMuleVersion(extensionElement);
+    if (mustResolveMinMuleVersion()) {
+      this.resolvedMinMuleVersion = resolveExtensionMinMuleVersion(extensionElement);
+    } else {
+      this.resolvedMinMuleVersion = null;
+    }
     supportedJavaVersions = parseSupportedJavaVersions(extensionElement);
   }
 
@@ -316,7 +320,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
     return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(this, extensionElement,
-                                                                           extensionElement.getConnectionProviders());
+                                                                           extensionElement.getConnectionProviders(),
+                                                                           loadingContext);
   }
 
   @Override
@@ -410,7 +415,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return ofNullable(this.resolvedMinMuleVersion);
   }
 
   @Override
