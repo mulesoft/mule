@@ -175,6 +175,14 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
   Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
 
   /**
+   * @return whether the {@link #getResolvedMinMuleVersion() minMuleVersion resolution} has to be performed.
+   * @since 4.9
+   */
+  default boolean mustResolveMinMuleVersion() {
+    return false;
+  }
+
+  /**
    * @return an {@link Optional} {@link OutputResolverModelParser} that encapsulates the operation's output resolver if dynamic
    *         metadata were defined
    */

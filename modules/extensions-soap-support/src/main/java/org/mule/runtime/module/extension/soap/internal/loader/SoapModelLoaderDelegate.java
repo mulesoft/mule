@@ -78,7 +78,7 @@ public final class SoapModelLoaderDelegate implements ModelLoaderDelegate {
     stereotypeDelegate.setNamespace(getExtensionsNamespace(xmlDslModel));
     operationDeclarer = new SoapInvokeOperationDeclarer(stereotypeDelegate);
     serviceProviderDeclarer =
-        new SoapServiceProviderDeclarer(extensionDeclarer, parser::getStereotypeLoaderDelegate, stereotypeDelegate);
+        new SoapServiceProviderDeclarer(extensionDeclarer, parser::getStereotypeLoaderDelegate, stereotypeDelegate, context);
 
     final SoapExtensionTypeWrapper<?> extension = getSoapExtensionType(this.extensionType, typeLoader);
     List<MessageDispatcherProviderTypeWrapper> customTransportProviders = extension.getDispatcherProviders();

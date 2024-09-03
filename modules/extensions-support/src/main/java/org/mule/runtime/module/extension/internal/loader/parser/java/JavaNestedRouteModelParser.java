@@ -15,6 +15,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -39,11 +40,13 @@ import java.util.Set;
 public class JavaNestedRouteModelParser implements NestedRouteModelParser {
 
   private final ExtensionParameter route;
+  private final ExtensionLoadingContext loadingContext;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final boolean sdkApiDefined;
 
-  public JavaNestedRouteModelParser(ExtensionParameter route) {
+  public JavaNestedRouteModelParser(ExtensionParameter route, ExtensionLoadingContext loadingContext) {
     this.route = route;
+    this.loadingContext = loadingContext;
 
     Class clazz = route.getType().getDeclaringClass().orElse(null);
     if (clazz != null) {
@@ -80,7 +83,7 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
                                                                              Parameter.class,
                                                                              org.mule.sdk.api.annotation.param.Parameter.class);
 
-    return getParameterGroupParsers(parameters, forRoute(getName()));
+    return getParameterGroupParsers(parameters, forRoute(getName(), loadingContext));
   }
 
   @Override
