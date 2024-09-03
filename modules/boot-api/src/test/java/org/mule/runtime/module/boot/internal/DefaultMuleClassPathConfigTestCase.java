@@ -64,12 +64,14 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
   public static void setUpClass() throws Exception {
     File fromThirdPartyLibJarFile = new JarFileBuilder("third-party-lib",
                                                        new JarCompiler()
+                                                           .targetJavaVersion(8)
                                                            .compiling(getResourceFile("/org/test/opt/FromThirdPartyLib.java"))
                                                            .compile("third-party-lib.jar"))
                                                                .getArtifactFile();
 
     File fromMuleModuleJarFile = new JarFileBuilder("mule-module",
                                                     new JarCompiler()
+                                                        .targetJavaVersion(8)
                                                         .compiling(getResourceFile("/org/test/mule/FromMuleModule.java"))
                                                         .dependingOn(fromThirdPartyLibJarFile)
                                                         .compile("mule-module.jar"))
@@ -77,6 +79,7 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
 
     File fromUserLibJarFile = new JarFileBuilder("user-lib",
                                                  new JarCompiler()
+                                                     .targetJavaVersion(8)
                                                      .compiling(getResourceFile("/org/test/user/FromUserLib.java"))
                                                      .compile("user-lib.jar"))
                                                          .getArtifactFile();
