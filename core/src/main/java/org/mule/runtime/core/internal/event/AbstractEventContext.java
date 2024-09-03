@@ -213,10 +213,8 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
         state.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED) || state.get() == STATE_RESPONSE_PROCESSED;
 
     if (completable && areAllChildrenComplete()) {
-      synchronized (this) {
-        if (!state.compareAndSet(STATE_RESPONSE_PROCESSED, STATE_COMPLETE)) {
-          return;
-        }
+      if (!state.compareAndSet(STATE_RESPONSE_PROCESSED, STATE_COMPLETE)) {
+        return;
       }
 
       if (debugLogEnabled) {
