@@ -6,7 +6,7 @@
  */
 package org.mule.functional.services;
 
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
+import static org.mule.runtime.api.artifact.ArtifactType.SERVICE;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
 
