@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.registry;
 
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.ObjectRegistrationStory.OBJECT_REGISTRATION;
 
@@ -86,8 +87,8 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     when(appContext.getBean("key")).thenThrow(BeanCreationException.class);
 
     assertThat(registry.unregisterObject("key"), is(nullValue()));
-    assertThrows("No bean named 'key' available", NoSuchBeanDefinitionException.class,
-                 () -> beanFactory.getBeanDefinition("key"));
+    assertThat(assertThrows(NoSuchBeanDefinitionException.class, () -> beanFactory.getBeanDefinition("key")),
+               hasMessage("No bean named 'key' available"));
     assertThat(beanFactory.getSingleton("key"), nullValue());
   }
 
