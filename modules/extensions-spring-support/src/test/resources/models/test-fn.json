@@ -3,7 +3,6 @@
   "description": "",
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
-  "minMuleVersion": "4.1.1",
   "supportedJavaVersions": [
     "1.8",
     "11",
@@ -156,7 +155,6 @@
         }
       ],
       "externalLibraryModels": [],
-      "minMuleVersion": "4.5.0",
       "operations": [],
       "connectionProviders": [],
       "messageSources": [],
@@ -237,7 +235,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -611,7 +608,6 @@
         "description": "",
         "modelProperties": {}
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -661,7 +657,6 @@
         "description": "",
         "modelProperties": {}
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -920,7 +915,6 @@
         "description": "",
         "modelProperties": {}
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1070,7 +1064,6 @@
         "description": "",
         "modelProperties": {}
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1217,7 +1210,6 @@
         "description": "",
         "modelProperties": {}
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1281,7 +1273,6 @@
         "description": "",
         "modelProperties": {}
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1383,7 +1374,6 @@
         "description": "",
         "modelProperties": {}
       },
-      "minMuleVersion": "4.4.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -1558,7 +1548,6 @@
         "deprecatedSince": "2.2.0",
         "toRemoveIn": "3.0.0"
       },
-      "minMuleVersion": "4.2.0",
       "parameterGroupModels": [
         {
           "parameters": [

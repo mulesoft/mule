@@ -19,7 +19,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveConfigurationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -70,11 +70,15 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     this.configElement = configElement;
 
     parseStructure();
-    this.resolvedMinMuleVersion = resolveConfigurationMinMuleVersion(configElement,
-                                                                     getContainerAnnotationMinMuleVersion(extensionElement,
-                                                                                                          Configurations.class,
-                                                                                                          Configurations::value,
-                                                                                                          configElement));
+    if (mustResolveMinMuleVersion()) {
+      this.resolvedMinMuleVersion = resolveConfigurationMinMuleVersion(configElement,
+                                                                       getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                            Configurations.class,
+                                                                                                            Configurations::value,
+                                                                                                            configElement));
+    } else {
+      this.resolvedMinMuleVersion = null;
+    }
   }
 
   private void parseStructure() {
@@ -103,9 +107,9 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupParsers() {
-    return JavaExtensionModelParserUtils.getParameterGroupParsers(
-                                                                  configElement.getParameters(),
-                                                                  forConfig(configElement.getName()));
+    return JavaExtensionModelParserUtils.getParameterGroupParsers(configElement.getParameters(),
+                                                                  forConfig(configElement.getName(),
+                                                                            loadingContext));
   }
 
   @Override
@@ -131,7 +135,8 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
     return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
                                                                            extensionModelParser,
                                                                            extensionElement,
-                                                                           configElement.getConnectionProviders());
+                                                                           configElement.getConnectionProviders(),
+                                                                           loadingContext);
   }
 
   @Override
@@ -199,6 +204,6 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return ofNullable(this.resolvedMinMuleVersion);
   }
 }

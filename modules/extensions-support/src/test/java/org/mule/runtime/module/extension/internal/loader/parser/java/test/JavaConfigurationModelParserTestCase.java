@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.test;
 
+import static org.mule.runtime.module.extension.internal.loader.parser.java.test.MinMuleVersionTestUtils.ctxResolvingMinMuleVersion;
+
 import static java.lang.String.format;
-import static java.util.Collections.emptySet;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -20,7 +21,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
@@ -30,10 +30,6 @@ import org.mule.sdk.api.annotation.Configuration;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.NoImplicit;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mule.sdk.api.annotation.Operations;
 import org.mule.sdk.api.annotation.Sources;
 import org.mule.sdk.api.annotation.connectivity.ConnectionProviders;
@@ -41,6 +37,10 @@ import org.mule.sdk.api.connectivity.ConnectionProvider;
 import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class JavaConfigurationModelParserTestCase {
 
@@ -86,89 +86,17 @@ public class JavaConfigurationModelParserTestCase {
     assertThat(javaConfigurationModelParser.isForceNoImplicit(), is(true));
   }
 
-  @Test
-  public void getMMVForLegacyImplicitConfiguration() {
-    JavaConfigurationModelParser javaConfigurationModelParser =
-        getParser(LegacyAnnotationsExtension.class, NoImplicitLegacyConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.3"));
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration NoImplicitLegacyConfiguration has min mule version 4.3 because it is annotated with NoImplicit. NoImplicit was introduced in Mule 4.3."));
-  }
-
-  @Test
-  public void getMMVForSdkImplicitConfiguration() {
-    JavaConfigurationModelParser javaConfigurationModelParser =
-        getParser(LegacyAnnotationsExtension.class, NoImplicitSdkConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration NoImplicitSdkConfiguration has min mule version 4.5.0 because it is annotated with NoImplicit. NoImplicit was introduced in Mule 4.5.0."));
-  }
-
-  @Test
-  public void getMMVForLegacyAnnotationConfiguration() {
-    JavaConfigurationModelParser javaConfigurationModelParser =
-        getParser(LegacyAnnotationsExtension.class, LegacyAnnotationConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.1.1"));
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration LegacyAnnotationConfiguration has min mule version 4.1.1 because it is the default value."));
-  }
-
-  @Test
-  public void getMMVForSdkAnnotationConfiguration() {
-    JavaConfigurationModelParser javaConfigurationModelParser =
-        getParser(LegacyAnnotationsExtension.class, SdkAnnotationConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration SdkAnnotationConfiguration has min mule version 4.5.0 because it is annotated with Configuration. Configuration was introduced in Mule 4.5.0."));
-  }
-
-  @Test
-  public void getMMVForParameterizedConfiguration() {
-    JavaConfigurationModelParser javaConfigurationModelParser =
-        getParser(LegacyAnnotationsExtension.class, ParameterizedConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.4"));
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
-  }
-
-  @Test
-  public void getMMVForExtendsParameterizedConfiguration() {
-    JavaConfigurationModelParser javaConfigurationModelParser =
-        getParser(LegacyAnnotationsExtension.class, ExtendsParameterizedConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.4"));
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration ExtendsParameterizedConfiguration has min mule version 4.4 because of its super class ParameterizedConfiguration. Configuration ParameterizedConfiguration has min mule version 4.4 because of its field configField. Field configField has min mule version 4.4 because it is annotated with Parameter. Parameter was introduced in Mule 4.4."));
-  }
-
-  @Test
-  public void getMMVForAnnotatedConfiguration() {
-    JavaConfigurationModelParser javaConfigurationModelParser =
-        getParser(LegacyAnnotationsExtension.class, AnnotatedConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.1.1"));
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration AnnotatedConfiguration has min mule version 4.1.1 because it is the default value."));
-  }
-
-  @Test
-  public void getMMVForConfigurationFromExtensionWithSdkConfigurationsAnnotation() {
-    JavaConfigurationModelParser javaConfigurationModelParser =
-        getParser(SimpleLegacyExtension.class, SimpleLegacyConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration SimpleLegacyConfiguration has min mule version 4.5.0 because it was propagated from the annotation (either @Configurations or @Config) used to reference this configuration."));
-  }
-
   protected JavaConfigurationModelParser getParser(Class<?> extension, Class<?> configuration) {
-    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
-    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ClassTypeLoader typeLoader =
+        ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
     ExtensionElement extensionElement = new ExtensionTypeWrapper<>(extension, typeLoader);
     ConfigurationElement configurationElement = extensionElement.getConfigurations().stream()
         .filter(conf -> conf.getTypeName().equals(configuration.getName())).findFirst()
         .orElseThrow(() -> new IllegalStateException(format("Configuration %s was not found among the declared configuration in the extension",
                                                             configuration.getName(), extension.getName())));
-    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionElement, ctx);
 
+    ExtensionLoadingContext ctx = ctxResolvingMinMuleVersion();
+    JavaExtensionModelParser javaExtensionModelParser = new JavaExtensionModelParser(extensionElement, ctx);
     return new JavaConfigurationModelParser(javaExtensionModelParser, extensionElement, configurationElement, ctx);
   }
 
