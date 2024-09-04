@@ -20,7 +20,6 @@ import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaMode
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
 
 import java.util.LinkedList;
 import java.util.List;

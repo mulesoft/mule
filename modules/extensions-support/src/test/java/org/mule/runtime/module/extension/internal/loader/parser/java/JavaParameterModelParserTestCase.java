@@ -6,26 +6,31 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
+
+import static java.util.Collections.emptySet;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConnectionProvider;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement;
+import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.FieldWrapper;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.Optional;
 
 import org.junit.Test;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 public class JavaParameterModelParserTestCase {
 
@@ -78,10 +83,13 @@ public class JavaParameterModelParserTestCase {
   }
 
   protected JavaParameterModelParser getParser(String parameterName) throws NoSuchFieldException {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     ExtensionParameter extensionParameter =
         new FieldWrapper(TestConnectionProvider.class.getField(parameterName), new DefaultExtensionsTypeLoaderFactory()
-            .createTypeLoader(Thread.currentThread().getContextClassLoader()));
-    return new JavaParameterModelParser(extensionParameter, Optional.empty(), forConnectionProvider("TestConnectionProvider"));
+            .createTypeLoader(contextClassLoader));
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
+    return new JavaParameterModelParser(extensionParameter, Optional.empty(),
+                                        forConnectionProvider("TestConnectionProvider", ctx));
   }
 
   protected static class TestConnectionProvider implements ConnectionProvider<Object> {

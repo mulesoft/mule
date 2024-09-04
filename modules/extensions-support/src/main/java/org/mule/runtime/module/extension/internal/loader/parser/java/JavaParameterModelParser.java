@@ -57,7 +57,6 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.annotation.ConfigReferences;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -90,8 +89,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkParameterPlacementUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaInputResolverModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;

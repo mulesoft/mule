@@ -75,9 +75,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaE
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaSourceModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;

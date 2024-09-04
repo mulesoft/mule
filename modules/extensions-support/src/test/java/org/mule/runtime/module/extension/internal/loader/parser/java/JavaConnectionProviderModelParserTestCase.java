@@ -10,6 +10,7 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.test.MinMuleVersionTestUtils.ctxResolvingMinMuleVersion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -331,7 +332,7 @@ public class JavaConnectionProviderModelParserTestCase {
         new ConnectionProviderTypeWrapper(connectionProviderClass, new DefaultExtensionsTypeLoaderFactory()
             .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     parser = new JavaConnectionProviderModelParser(mock(JavaExtensionModelParser.class), mock(ExtensionElement.class),
-                                                   connectionProviderElement);
+                                                   connectionProviderElement, ctxResolvingMinMuleVersion());
   }
 
   private static class BaseTestConnectionProvider implements ConnectionProvider<String> {
