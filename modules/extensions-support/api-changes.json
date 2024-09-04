@@ -6,7 +6,7 @@
           "ignore": true,
           "code": "java.class.removed",
           "old": "class org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult<T, A>",
-          "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          "justification": "W-16420215: Class is not useful where it sits and it's impossible to consume by any 3pp component"
         }
       ]
     }
