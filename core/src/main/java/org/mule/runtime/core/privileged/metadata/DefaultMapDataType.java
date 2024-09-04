@@ -34,6 +34,9 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
 
   @Override
   public boolean isCompatibleWith(DataType dataType) {
+    if (dataType instanceof DynamicDelegateDataType) {
+      dataType = ((DynamicDelegateDataType) dataType).getDelegate();
+    }
     if (!(dataType instanceof DefaultMapDataType)) {
       return false;
     }

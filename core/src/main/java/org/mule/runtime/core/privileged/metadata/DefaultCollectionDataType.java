@@ -39,6 +39,9 @@ public class DefaultCollectionDataType extends SimpleDataType implements Collect
 
   @Override
   public boolean isCompatibleWith(DataType dataType) {
+    if (dataType instanceof DynamicDelegateDataType) {
+      dataType = ((DynamicDelegateDataType) dataType).getDelegate();
+    }
     if (!(dataType instanceof DefaultCollectionDataType)) {
       return false;
     }

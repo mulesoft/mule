@@ -96,6 +96,9 @@ public class SimpleDataType implements DataType {
 
   @Override
   public boolean isCompatibleWith(DataType dataType) {
+    if (dataType instanceof DynamicDelegateDataType) {
+      dataType = ((DynamicDelegateDataType) dataType).getDelegate();
+    }
     if (this == dataType) {
       return true;
     }
