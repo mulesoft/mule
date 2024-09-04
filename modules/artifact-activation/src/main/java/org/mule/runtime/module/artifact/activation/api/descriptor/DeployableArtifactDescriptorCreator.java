@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.descriptor;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
@@ -19,6 +20,7 @@ import java.util.Properties;
  * @param <D> the concrete type of deployable artifact descriptor (application or domain) to resolve.
  * @since 4.5
  */
+@NoImplement
 public interface DeployableArtifactDescriptorCreator<D extends DeployableArtifactDescriptor> {
 
   /**

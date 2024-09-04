@@ -1,0 +1,18 @@
+{
+  "4.8.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "interface org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>",
+            "new": "interface org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator<D extends org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor>",
+            "annotation": "@org.mule.api.annotation.NoImplement",
+            "justification": "W-16658814: Provide a way to reload a DeployableProjectModel without reparsing the pom"
+          }
+        ]
+      }
+    }
+  }
+}
