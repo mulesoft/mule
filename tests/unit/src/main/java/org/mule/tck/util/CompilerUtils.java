@@ -80,7 +80,7 @@ public class CompilerUtils {
    */
   private static abstract class AbstractCompiler<T extends AbstractCompiler> {
 
-    private int targetJavaVersion = 17;
+    private int targetJavaVersion = 8;
     protected File[] requiredJars = {};
     protected File[] sources = {};
     protected Path javaPackage;
@@ -380,7 +380,7 @@ public class CompilerUtils {
 
   private static class CompilerTaskBuilder {
 
-    private int targetJavaVersion = 17;
+    private int targetJavaVersion = 8;
     private File target;
     private File[] sources = {};
     private File[] jarFiles = {};

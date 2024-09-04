@@ -50,6 +50,7 @@ public class TestServicesUtils {
    */
   public static File buildSchedulerServiceFile(File tempFolder) {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+        .targetJavaVersion(17)
         .compiling(getResourceFile("/org/mule/service/scheduler/MockScheduler.java", tempFolder),
                    getResourceFile("/org/mule/service/scheduler/MockSchedulerService.java", tempFolder),
                    getResourceFile("/org/mule/service/scheduler/MockSchedulerServiceProvider.java", tempFolder),
@@ -76,6 +77,7 @@ public class TestServicesUtils {
    */
   public static File buildExpressionLanguageServiceFile(File tempFolder) {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+        .targetJavaVersion(17)
         .compiling(getResourceFile("/org/mule/service/el/MockExpressionLanguage.java", tempFolder),
                    getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryService.java", tempFolder),
                    getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryServiceProvider.java", tempFolder),
@@ -102,6 +104,7 @@ public class TestServicesUtils {
    */
   public static File buildExpressionLanguageMetadataServiceFile(File tempFolder) {
     final File defaultServiceJarFile = new CompilerUtils.JarCompiler()
+        .targetJavaVersion(17)
         .compiling(getResourceFile("/org/mule/service/el/metadata/MockExpressionLanguageMetadataService.java", tempFolder),
                    getResourceFile("/org/mule/service/el/metadata/MockExpressionLanguageMetadataServiceProvider.java",
                                    tempFolder),
@@ -127,6 +130,7 @@ public class TestServicesUtils {
    */
   public static File buildHttpServiceFile(File tempFolder) {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+        .targetJavaVersion(17)
         .compiling(getResourceFile("/org/mule/service/http/mock/MockHttpService.java", tempFolder),
                    getResourceFile("/org/mule/service/http/mock/MockHttpServiceProvider.java", tempFolder),
                    getResourceFile("/org/mule/service/http/mock/module-info.java", tempFolder, "module-info.java"))
