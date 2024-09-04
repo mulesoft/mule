@@ -21,6 +21,7 @@ import static java.nio.file.Files.walk;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
@@ -33,10 +34,10 @@ import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.meta.MuleDomainModel;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.activation.api.deployable.MuleProjectStructure;
 import org.mule.runtime.module.artifact.activation.api.descriptor.MuleConfigurationsFilter;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
@@ -45,6 +46,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,11 +67,6 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   private static final String JAVA_EXTENSION = "java";
   private static final String PACKAGE_SEPARATOR = ".";
   private static final String CLASS_PATH_SEPARATOR = "/";
-  private static final String DEFAULT_SOURCES_DIRECTORY = "src/main";
-  private static final String DEFAULT_SOURCES_JAVA_DIRECTORY = "/java";
-  private static final String DEFAULT_RESOURCES_DIRECTORY = "/resources";
-  private static final String DEFAULT_MULE_DIRECTORY = "/mule";
-  private static final String DEFAULT_TEST_RESOURCES_DIRECTORY = "/test/resources";
 
   private static final MuleConfigurationsFilter MULE_CONFIGURATIONS_FILTER =
       MuleConfigurationsFilter.defaultMuleConfigurationsFilter();
@@ -102,20 +99,35 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
 
   @Override
   protected DeployableProjectModel doBuild(MavenPomParser parser, ArtifactCoordinates deployableArtifactCoordinates) {
+    final MuleProjectStructure projectStructure =
+        new DefaultMuleProjectStructure(projectFolder.toPath(), parser, isIncludeTestDependencies());
+
+    return doBuild(projectStructure, deployableArtifactCoordinates);
+  }
+
+  protected DeployableProjectModel doBuild(final MuleProjectStructure projectStructure,
+                                           ArtifactCoordinates deployableArtifactCoordinates) {
     // Get exported resources and packages
     try {
-      List<String> packages = getAvailablePackages(parser);
-      List<String> muleResources = getAvailableMuleResources(parser);
-      List<String> nonMuleResources = getAvailableNonMuleResources(parser);
+      List<String> packages = getAvailablePackages(projectStructure);
+      List<String> muleResources = getAvailableMuleResources(projectStructure);
+      List<String> nonMuleResources = getAvailableNonMuleResources(projectStructure);
       List<String> allResources = concat(muleResources.stream(), nonMuleResources.stream()).collect(toList());
-      Set<String> muleConfigs = getConfigs(getMuleResourcesDirectory(parser), muleResources);
+      Set<String> muleConfigs = getConfigs(projectStructure.getMuleResourcesDirectory(), muleResources);
 
-      return new DeployableProjectModel(packages, allResources, resourcesPath,
+      return new DeployableProjectModel(packages,
+                                        allResources,
+                                        resourcesPath,
                                         buildBundleDescriptor(deployableArtifactCoordinates),
-                                        getDeployableModelResolver(deployableArtifactCoordinates, allResources, muleConfigs,
+                                        getDeployableModelResolver(deployableArtifactCoordinates,
+                                                                   allResources,
+                                                                   muleConfigs,
                                                                    packages),
-                                        projectFolder, deployableBundleDependencies,
-                                        sharedDeployableBundleDescriptors, additionalPluginDependencies);
+                                        of(projectStructure),
+                                        projectFolder,
+                                        deployableBundleDependencies,
+                                        sharedDeployableBundleDescriptors,
+                                        additionalPluginDependencies);
     } catch (IOException e) {
       throw new ArtifactActivationException(createStaticMessage("Couldn't search exported packages and resources"), e);
     }
@@ -124,7 +136,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   private Supplier<MuleDeployableModel> getDeployableModelResolver(ArtifactCoordinates deployableArtifactCoordinates,
                                                                    List<String> allResources, Set<String> muleConfigs,
                                                                    List<String> packages) {
-    if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
+    if (MULE_APPLICATION_CLASSIFIER.equals(deployableArtifactCoordinates.getClassifier())) {
       return () -> {
         MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
         if (shouldEditDeployableModel(applicationModel)) {
@@ -132,7 +144,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
         }
         return applicationModel;
       };
-    } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
+    } else if (MULE_DOMAIN_CLASSIFIER.equals(deployableArtifactCoordinates.getClassifier())) {
       return () -> {
         MuleDomainModel domainModel = domainModelResolver().resolve(projectFolder);
         if (shouldEditDeployableModel(domainModel)) {
@@ -197,12 +209,12 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     return builder.build();
   }
 
-  private Set<String> getConfigs(String muleResourcesDirectory, List<String> muleResources) {
+  private Set<String> getConfigs(Path muleResourcesDirectory, List<String> muleResources) {
     return muleResources.stream().filter(muleResource -> MULE_CONFIGURATIONS_FILTER
         .filter(resolveCandidateConfigsPath(muleResourcesDirectory, muleResource))).collect(toSet());
   }
 
-  private File resolveCandidateConfigsPath(String muleResourcesDirectory, String candidateConfigFileName) {
+  private File resolveCandidateConfigsPath(Path muleResourcesDirectory, String candidateConfigFileName) {
     return get(projectFolder.getAbsolutePath()).resolve(muleResourcesDirectory).resolve(candidateConfigFileName).toFile();
   }
 
@@ -225,9 +237,9 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     return new MuleArtifactLoaderDescriptor(id, attributes);
   }
 
-  private List<String> getAvailablePackages(MavenPomParser parser) throws IOException {
-    String sourceDirectory = parser.getSourceDirectory();
-    Path javaDirectory = get(projectFolder.getAbsolutePath(), sourceDirectory.concat(DEFAULT_SOURCES_JAVA_DIRECTORY));
+  private List<String> getAvailablePackages(MuleProjectStructure projectStructure) throws IOException {
+    Path javaDirectory = projectStructure.getJavaDirectory();
+
     // look for all the sources under the java directory
     if (!javaDirectory.toFile().exists()) {
       return emptyList();
@@ -249,48 +261,31 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
         .collect(toList());
   }
 
-  private String getMuleResourcesDirectory(MavenPomParser parser) {
-    return parser.getSourceDirectory().concat(DEFAULT_MULE_DIRECTORY);
-  }
-
-  private List<String> getAvailableMuleResources(MavenPomParser parser) throws IOException {
-    String muleResourcesDirectory = getMuleResourcesDirectory(parser);
-    List<String> resources = getResourcesInFolder(muleResourcesDirectory);
+  private List<String> getAvailableMuleResources(MuleProjectStructure projectStructure) throws IOException {
+    List<String> resources = getResourcesInFolder(projectStructure.getMuleResourcesDirectory());
     if (resources.isEmpty()) {
-      throw new MuleRuntimeException(createStaticMessage(muleResourcesDirectory + " cannot be empty"));
+      throw new IOException(projectStructure.getMuleResourcesDirectory().toAbsolutePath().toString()
+          + " cannot be empty");
     }
 
     return resources;
   }
 
-  private List<String> getAvailableNonMuleResources(MavenPomParser parser) throws IOException {
-    String sourceDirectory = parser.getSourceDirectory();
+  private List<String> getAvailableNonMuleResources(MuleProjectStructure projectStructure) throws IOException {
     List<String> resources = new ArrayList<>();
-    List<String> resourcesDirectories = parser.getResourceDirectories();
-
-    // include test resources if test dependencies have to be considered
-    if (isIncludeTestDependencies()) {
-      resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_TEST_RESOURCES_DIRECTORY)));
-    }
-
-    if (resourcesDirectories.isEmpty()) {
-      resources.addAll(getResourcesInFolder(sourceDirectory.concat(DEFAULT_RESOURCES_DIRECTORY)));
-    } else {
-      resourcesDirectories.forEach(r -> {
-        try {
-          resources.addAll(getResourcesInFolder(r));
-        } catch (IOException e) {
-          throw new IllegalStateException("Cannot load files from" + r);
-        }
-      });
+    final Collection<Path> resourcesDirectories = projectStructure.getResourcesDirectories();
+    for (Path r : resourcesDirectories) {
+      try {
+        resources.addAll(getResourcesInFolder(r));
+      } catch (IOException e) {
+        throw new IOException("Cannot load files from" + r + ": " + e.getMessage());
+      }
     }
 
     return resources;
   }
 
-  private List<String> getResourcesInFolder(String resourcesDirectoryName) throws IOException {
-    Path resourcesDirectory = get(projectFolder.getAbsolutePath(), resourcesDirectoryName);
-
+  private List<String> getResourcesInFolder(Path resourcesDirectory) throws IOException {
     if (!resourcesDirectory.toFile().exists()) {
       return emptyList();
     }

@@ -6,12 +6,19 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.activation.internal.maven.MavenRefreshDeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Generic builder to create a {@link DeployableProjectModel} representing the structure of a project.
@@ -37,6 +44,20 @@ public interface DeployableProjectModelBuilder {
                                                               boolean includeTestDependencies) {
     return new MavenDeployableProjectModelBuilder(projectFolder, exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
                                                   includeTestDependencies);
+  }
+
+  public static DeployableProjectModelBuilder forMavenRefreshProject(MuleProjectStructure projectStructure,
+                                                                     ArtifactCoordinates deployableArtifactCoordinates,
+                                                                     boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                                     List<BundleDependency> deployableBundleDependencies,
+                                                                     Set<BundleDescriptor> sharedDeployableBundleDescriptors,
+                                                                     Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
+    return new MavenRefreshDeployableProjectModelBuilder(projectStructure,
+                                                         deployableArtifactCoordinates,
+                                                         exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                         deployableBundleDependencies,
+                                                         sharedDeployableBundleDescriptors,
+                                                         additionalPluginDependencies);
   }
 
   /**

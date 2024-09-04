@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.descriptor;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
@@ -19,13 +20,14 @@ import java.util.Properties;
  * @param <D> the concrete type of deployable artifact descriptor (application or domain) to resolve.
  * @since 4.5
  */
+@NoImplement
 public interface DeployableArtifactDescriptorCreator<D extends DeployableArtifactDescriptor> {
 
   /**
    * @return a default creator for {@link ApplicationDescriptor}s.
    */
   static DeployableArtifactDescriptorCreator<ApplicationDescriptor> applicationDescriptorCreator() {
-    return new DeployableArtifactDescriptorCreator<ApplicationDescriptor>() {
+    return new DeployableArtifactDescriptorCreator<>() {
 
       @Override
       public ApplicationDescriptor create(String name) {
@@ -44,7 +46,7 @@ public interface DeployableArtifactDescriptorCreator<D extends DeployableArtifac
    * @return a default creator for {@link DomainDescriptor}s.
    */
   static DeployableArtifactDescriptorCreator<DomainDescriptor> domainDescriptorCreator() {
-    return new DeployableArtifactDescriptorCreator<DomainDescriptor>() {
+    return new DeployableArtifactDescriptorCreator<>() {
 
       @Override
       public DomainDescriptor create(String name) {
