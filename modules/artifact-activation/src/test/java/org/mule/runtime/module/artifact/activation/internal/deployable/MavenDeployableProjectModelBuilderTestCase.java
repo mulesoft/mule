@@ -194,7 +194,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   public void createDeployableProjectModelWithTransitiveSharedLibrary() throws URISyntaxException {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel(deploymentTypePrefix + "/shared-lib-transitive");
 
-    assertThat(deployableProjectModel.getSharedLibraries(), hasSize(6));
+    assertThat(deployableProjectModel.getSharedLibraries(), hasSize(8));
     assertThat(deployableProjectModel.getSharedLibraries(), hasItem(hasProperty("artifactId", equalTo("spring-context"))));
   }
 
@@ -240,7 +240,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
 
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(1));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
-               hasEntry(hasProperty("artifactId", equalTo("mule-spring-module")), hasSize(6)));
+               hasEntry(hasProperty("artifactId", equalTo("mule-spring-module")), hasSize(8)));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
                hasEntry(hasProperty("artifactId", equalTo("mule-spring-module")),
                         hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("spring-context"))))));

@@ -16,7 +16,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -110,10 +109,11 @@ public class ConfigurationProviderObjectFactory extends AbstractExtensionObjectF
         }
 
       } catch (Exception e) {
-        throw new MuleRuntimeException(
-                                       createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s'",
-                                                                  configurationModel.getName(), extensionModel.getName())),
-                                       e);
+        throw new ConfigurationException(createStaticMessage(format("Could not create an implicit configuration '%s' for the extension '%s': %s",
+                                                                    configurationModel.getName(),
+                                                                    extensionModel.getName(),
+                                                                    e.getMessage())),
+                                         e);
       }
       return configurationProvider;
     });

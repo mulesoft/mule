@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.registry;
 
+import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.ObjectRegistrationStory.OBJECT_REGISTRATION;
 
@@ -15,9 +16,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -28,8 +29,8 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;
@@ -38,12 +39,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.context.ConfigurableApplicationContext;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.ConfigurableApplicationContext;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -61,7 +66,7 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() {
     appContext = mock(ConfigurableApplicationContext.class);
-    beanFactory = mock(DefaultListableBeanFactory.class);
+    beanFactory = new DefaultListableBeanFactory();
     when(appContext.getBeanFactory()).thenReturn(beanFactory);
     executor = Executors.newFixedThreadPool(1);
   }
@@ -78,12 +83,13 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
                                                  mock(MuleContext.class), mock(ConfigurationDependencyResolver.class),
                                                  mock(LifecycleInterceptor.class));
 
-    when(beanFactory.containsBeanDefinition("key")).thenReturn(true);
+    beanFactory.registerBeanDefinition("key", new GenericBeanDefinition());
     when(appContext.getBean("key")).thenThrow(BeanCreationException.class);
 
     assertThat(registry.unregisterObject("key"), is(nullValue()));
-    verify(beanFactory).removeBeanDefinition("key");
-    verify(beanFactory).destroySingleton("key");
+    assertThat(assertThrows(NoSuchBeanDefinitionException.class, () -> beanFactory.getBeanDefinition("key")),
+               hasMessage("No bean named 'key' available"));
+    assertThat(beanFactory.getSingleton("key"), nullValue());
   }
 
   @Test
@@ -139,8 +145,9 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     singletonBeansToRegister.forEach((key, value) -> {
       when(appContext.getBean(key)).thenReturn(value);
       when(appContext.isSingleton(key)).thenReturn(true);
+
       // No dependencies for any of the registered beans.
-      when(beanFactory.getDependenciesForBean(key)).thenReturn(new String[0]);
+      beanFactory.registerBeanDefinition(key, new GenericBeanDefinition());
     });
     return new SpringRegistry(appContext, appContext,
                               null, mock(ConfigurationDependencyResolver.class),

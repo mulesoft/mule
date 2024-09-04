@@ -151,7 +151,7 @@ public class DomainDescriptorFactoryTestCase extends AbstractDeployableArtifactD
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-spring-module")).findAny()
             .get().getAdditionalDependenciesList();
 
-    assertThat(additionalDependencies, hasSize(6));
+    assertThat(additionalDependencies, hasSize(8));
     assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("spring-context"));
 
     ArtifactPluginDescriptor springPlugin = domainDescriptor.getPlugins()
