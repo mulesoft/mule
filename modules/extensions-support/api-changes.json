@@ -11,8 +11,6 @@
           "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedResult",
           "classSimpleName": "EventedResult",
           "elementKind": "class",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -24,8 +22,6 @@
           "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedSdkResult",
           "classSimpleName": "EventedSdkResult",
           "elementKind": "class",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -38,8 +34,6 @@
           "classSimpleName": "EventedResult",
           "methodName": "getAttributes",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -52,8 +46,6 @@
           "classSimpleName": "EventedResult",
           "methodName": "getAttributesMediaType",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -66,8 +58,6 @@
           "classSimpleName": "EventedResult",
           "methodName": "getByteLength",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -80,8 +70,6 @@
           "classSimpleName": "EventedResult",
           "methodName": "getEvent",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -94,8 +82,6 @@
           "classSimpleName": "EventedResult",
           "methodName": "getLength",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -108,8 +94,6 @@
           "classSimpleName": "EventedResult",
           "methodName": "getMediaType",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -122,8 +106,6 @@
           "classSimpleName": "EventedResult",
           "methodName": "getOutput",
           "elementKind": "method",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -137,10 +119,6 @@
           "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedResult",
           "classSimpleName": "EventedResult",
           "elementKind": "class",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
-          "newArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.3-SNAPSHOT",
-          "newArchiveRole": "primary",
           "breaksVersioningRules": "true"
         },
         {
@@ -154,10 +132,6 @@
           "classQualifiedName": "org.mule.runtime.module.extension.api.runtime.privileged.EventedResult",
           "classSimpleName": "EventedResult",
           "elementKind": "class",
-          "oldArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.2-rc1",
-          "oldArchiveRole": "primary",
-          "newArchive": "org.mule.runtime:mule-module-extensions-support:jar:4.7.3-SNAPSHOT",
-          "newArchiveRole": "primary",
           "breaksVersioningRules": "true"
         }
       ]
