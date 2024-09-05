@@ -77,6 +77,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMavenDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
 
+  private static final MavenPomParserProvider POM_PARSER_PROVIDER = MavenPomParserProvider.discoverProvider();
+
   protected static final Supplier<MavenConfiguration> DEFAULT_MAVEN_CONFIGURATION =
       new LazyValue<>(() -> getDefaultMavenConfiguration());
 
@@ -124,7 +126,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   }
 
   @Override
-  public final DeployableProjectModel build() {
+  public DeployableProjectModel build() {
     File pom = getPomFromFolder(projectFolder);
 
     Properties pomProperties;
@@ -141,7 +143,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     }
 
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
-    MavenPomParser parser = MavenPomParserProvider.discoverProvider().createMavenPomParserClient(pom.toPath(), activeProfiles);
+    MavenPomParser parser = POM_PARSER_PROVIDER.createMavenPomParserClient(pom.toPath(), activeProfiles);
 
     // 2) if a version is passed using system properties, use the version instead
     String originalPomVersion = getVersion(parser);

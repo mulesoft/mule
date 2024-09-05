@@ -24,9 +24,11 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -80,8 +82,8 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
 
   @Test
   public void createDeployableProjectModelForAnEmptyDeploymentMustFail() throws Exception {
-    expected.expect(MuleRuntimeException.class);
-    expected.expectMessage("src/main/mule cannot be empty");
+    expected.expect(ArtifactActivationException.class);
+    expected.expectCause(hasMessage(containsString("src/main/mule cannot be empty")));
     getDeployableProjectModel(deploymentTypePrefix + "/empty-app");
   }
 

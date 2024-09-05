@@ -12,6 +12,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -49,6 +51,7 @@ public final class DeployableProjectModel {
   private final List<String> resources;
   private final BundleDescriptor descriptor;
   private final Supplier<MuleDeployableModel> deployableModelSupplier;
+  private final Optional<MuleProjectStructure> projectStructure;
   private final File projectFolder;
   private final List<BundleDependency> dependencies;
   private final Set<BundleDescriptor> sharedLibraries;
@@ -79,12 +82,50 @@ public final class DeployableProjectModel {
                                 List<BundleDependency> dependencies,
                                 Set<BundleDescriptor> sharedLibraries,
                                 Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
+    this(packages,
+         resources,
+         resourcesPath,
+         descriptor,
+         deployableModelSupplier,
+         empty(),
+         projectFolder,
+         dependencies,
+         sharedLibraries,
+         additionalPluginDependencies);
+  }
+
+  /**
+   * Creates a new instance with the provided parameters.
+   *
+   * @param packages                     See {@link #getPackages()}
+   * @param resources                    See {@link #getResources()}
+   * @param resourcesPath                See {@link #getResourcesPath()}
+   * @param descriptor                   See {@link #getDescriptor()}
+   * @param deployableModelSupplier      See {@link #getDeployableModel()}
+   * @param projectStructure             See {@link #getProjectStructure()}
+   * @param projectFolder                See {@link #getProjectFolder()}
+   * @param dependencies                 See {@link #getDependencies()}
+   * @param sharedLibraries              See {@link #getSharedLibraries()}
+   * @param additionalPluginDependencies See {@link #additionalPluginDependencies}
+   */
+
+  public DeployableProjectModel(List<String> packages,
+                                List<String> resources,
+                                List<Path> resourcesPath,
+                                BundleDescriptor descriptor,
+                                Supplier<MuleDeployableModel> deployableModelSupplier,
+                                Optional<MuleProjectStructure> projectStructure,
+                                File projectFolder,
+                                List<BundleDependency> dependencies,
+                                Set<BundleDescriptor> sharedLibraries,
+                                Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
 
     this.packages = ImmutableList.copyOf(packages);
     this.resources = ImmutableList.copyOf(resources);
     this.resourcesPath = ImmutableList.copyOf(resourcesPath);
     this.descriptor = requireNonNull(descriptor);
     this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
+    this.projectStructure = requireNonNull(projectStructure);
     this.projectFolder = requireNonNull(projectFolder);
     this.dependencies = ImmutableList.copyOf(dependencies);
     this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
@@ -196,6 +237,19 @@ public final class DeployableProjectModel {
   }
 
   /**
+   * This structure will be used to obtain the sources/resources and create the classloader for the deployable project.
+   * <p>
+   * Temporary files related to this project will also be created within the {@link MuleProjectStructure#getProjectFolder()}.
+   * 
+   * @return the folder structure for this deployable project.
+   * 
+   * @since 4.8
+   */
+  public Optional<MuleProjectStructure> getProjectStructure() {
+    return projectStructure;
+  }
+
+  /**
    * This folder will be used to create the classloader for the deployable project.
    * <p>
    * Temporary files related to this project will also be created within this directory.
@@ -203,7 +257,9 @@ public final class DeployableProjectModel {
    * @return the folder where this deployable project is located.
    */
   public File getProjectFolder() {
-    return projectFolder;
+    return projectStructure
+        .map(s -> s.getProjectFolder().toFile())
+        .orElse(projectFolder);
   }
 
   /**

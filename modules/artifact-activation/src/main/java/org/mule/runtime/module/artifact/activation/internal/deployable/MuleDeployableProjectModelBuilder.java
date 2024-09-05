@@ -115,7 +115,7 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
                                       emptyList(),
                                       buildBundleDescriptor(packagerClassLoaderModel.getArtifactCoordinates()),
                                       getModelResolver(packagerClassLoaderModel.getArtifactCoordinates()),
-                                      projectFolder, dependencies, sharedLibraries,
+                                      empty(), projectFolder, dependencies, sharedLibraries,
                                       additionalPluginDependencies);
   }
 
