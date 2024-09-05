@@ -62,6 +62,9 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
 
   @Override
   public boolean equals(Object o) {
+    if (o instanceof DynamicDelegateDataType) {
+      o = ((DynamicDelegateDataType) o).getDelegate();
+    }
     if (this == o) {
       return true;
     }
