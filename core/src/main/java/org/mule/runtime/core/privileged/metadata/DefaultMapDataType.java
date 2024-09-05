@@ -88,6 +88,7 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
 
   @Override
   public int hashCode() {
+    // No need to consider `DynamicDelegateDataType` for hashcode calculation as we're only interested in its delegate
     return Objects.hash(getType(), getKeyDataType(), getValueDataType(), getMediaType());
   }
 

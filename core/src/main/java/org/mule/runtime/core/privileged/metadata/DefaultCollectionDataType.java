@@ -76,6 +76,7 @@ public class DefaultCollectionDataType extends SimpleDataType implements Collect
 
   @Override
   public int hashCode() {
+    // No need to consider `DynamicDelegateDataType` for hashcode calculation as we're only interested in its delegate
     return Objects.hash(getType(), getItemDataType(), getMediaType());
   }
 

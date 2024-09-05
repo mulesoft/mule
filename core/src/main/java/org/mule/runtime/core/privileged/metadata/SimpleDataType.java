@@ -138,6 +138,7 @@ public class SimpleDataType implements DataType {
 
   @Override
   public int hashCode() {
+    // No need to consider `DynamicDelegateDataType` for hashcode calculation as we're only interested in its delegate
     return Objects.hash(getType(), getMediaType());
   }
 
