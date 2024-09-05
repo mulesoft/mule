@@ -7,7 +7,9 @@
 package org.mule.runtime.tracer.common.watcher;
 
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY;
+
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
@@ -18,6 +20,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 
 /**
@@ -26,9 +29,8 @@ import org.slf4j.Logger;
 public class TracingConfigurationFileWatcher extends Thread {
 
   private static final Logger LOGGER = getLogger(TracingConfigurationFileWatcher.class);
-  public final long DEFAULT_DELAY = Long
-      .getLong(MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY,
-          60000l);
+  public final long DEFAULT_DELAY =
+      Long.getLong(MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY, 60000l);
   private final Runnable doOnChange;
   private final File file;
   private final WatchService watchService;
