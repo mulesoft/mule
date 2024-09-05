@@ -20,14 +20,15 @@ import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaMode
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ParameterModelsLoaderDelegate {
 
@@ -107,10 +108,12 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getDisplayModel().ifPresent(parameter::withDisplayModel);
         parameterParser.getOAuthParameterModelProperty().ifPresent(parameter::withModelProperty);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
-        parameterParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-          parameter.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-          LOGGER.debug(resolvedMMV.getReason());
-        });
+        if (parameterParser.mustResolveMinMuleVersion()) {
+          parameterParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
+            parameter.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
+            LOGGER.debug(resolvedMMV.getReason());
+          });
+        }
 
         addSemanticTerms(parameter.getDeclaration(), parameterParser);
         stereotypeModelLoader.get().addStereotypes(parameterParser, parameter);

@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -38,6 +32,13 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.type
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -56,7 +57,6 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.annotation.ConfigReferences;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.ConfigOverride;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
@@ -512,4 +512,5 @@ public class JavaParameterModelParser implements ParameterModelParser, HasExtens
   public ExtensionParameter getExtensionParameter() {
     return parameter;
   }
+
 }

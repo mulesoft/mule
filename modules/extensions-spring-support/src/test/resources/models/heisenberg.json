@@ -3,7 +3,6 @@
   "description": "",
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
-  "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
     "1.8",
     "11",
@@ -1980,7 +1979,6 @@
           "optional": false
         }
       ],
-      "minMuleVersion": "4.5.0",
       "operations": [
         {
           "blocking": true,
@@ -2028,7 +2026,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2542,7 +2539,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -2812,7 +2808,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -3576,7 +3571,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -4350,7 +4344,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5109,7 +5102,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5887,7 +5879,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -6248,7 +6239,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -6662,7 +6652,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -7060,7 +7049,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -7634,7 +7622,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -8330,7 +8317,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -8708,7 +8694,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -9173,7 +9158,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -10028,7 +10012,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -10811,7 +10794,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -11510,7 +11492,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -12024,7 +12005,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -12424,7 +12404,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -12800,7 +12779,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -13191,7 +13169,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -13802,7 +13779,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -14646,7 +14622,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -15410,7 +15385,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -16106,7 +16080,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -16704,7 +16677,6 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -17386,7 +17358,6 @@
             "deprecatedSince": "1.3.0",
             "toRemoveIn": "2.0.0"
           },
-          "minMuleVersion": "4.2.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -17800,7 +17771,6 @@
             "deprecatedSince": "1.3.0",
             "toRemoveIn": "2.0.0"
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -20108,7 +20078,6 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -22408,7 +22377,6 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -24220,7 +24188,6 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -26262,7 +26229,6 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -28595,7 +28561,6 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -30928,7 +30893,6 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -31982,7 +31946,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -32666,7 +32629,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -32902,7 +32864,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -33306,7 +33267,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -33503,7 +33463,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -33863,7 +33822,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -34172,7 +34130,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -34430,7 +34387,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -34620,7 +34576,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -34932,7 +34887,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -35190,7 +35144,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -35591,7 +35544,6 @@
         "type": "DRUG_KILLING",
         "namespace": "HEISENBERG"
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -35928,7 +35880,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -36239,7 +36190,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -36547,7 +36497,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -36874,7 +36823,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -37140,7 +37088,6 @@
         "deprecatedSince": "1.3.0",
         "toRemoveIn": "2.0.0"
       },
-      "minMuleVersion": "4.2.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -37382,7 +37329,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -37817,7 +37763,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -38125,7 +38070,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -38542,7 +38486,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -38884,7 +38827,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -39060,7 +39002,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -39284,7 +39225,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -39621,7 +39561,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -39988,7 +39927,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -40359,7 +40297,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -40667,7 +40604,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -41044,7 +40980,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -41407,7 +41342,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -42066,7 +42000,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -42427,7 +42360,6 @@
         "deprecatedSince": "1.5.0",
         "toRemoveIn": "2.0.0"
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -42774,7 +42706,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -43127,7 +43058,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -43467,7 +43397,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -43845,7 +43774,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -44229,7 +44157,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -44570,7 +44497,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -44966,7 +44892,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -45292,7 +45217,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -45659,7 +45583,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -45885,7 +45808,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -46237,7 +46159,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -46598,7 +46519,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -46994,7 +46914,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -47379,7 +47298,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -47881,7 +47799,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -48257,7 +48174,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -48580,7 +48496,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -48911,7 +48826,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -49261,7 +49175,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -49593,7 +49506,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -49912,7 +49824,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -50236,7 +50147,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -50661,7 +50571,6 @@
           }
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -51073,7 +50982,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -51502,7 +51410,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -51771,7 +51678,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -52035,7 +51941,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -52363,7 +52268,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -52621,7 +52525,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -52803,7 +52706,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -53111,7 +53013,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -53425,7 +53326,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -53739,7 +53639,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.1.1",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -54053,7 +53952,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -54235,7 +54133,6 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.4.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -55906,7 +55803,6 @@
         "deprecatedSince": "1.3.0",
         "toRemoveIn": "2.0.0"
       },
-      "minMuleVersion": "4.2.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -56320,7 +56216,6 @@
         "deprecatedSince": "1.3.0",
         "toRemoveIn": "2.0.0"
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -57408,7 +57303,6 @@
           }
         }
       },
-      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [

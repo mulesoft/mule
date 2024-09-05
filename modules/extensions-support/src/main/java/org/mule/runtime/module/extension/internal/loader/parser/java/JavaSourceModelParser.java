@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
-import static java.util.Objects.hash;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
@@ -33,6 +28,13 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutput
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 
+import static java.lang.String.format;
+import static java.util.Objects.hash;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -49,7 +51,6 @@ import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionExce
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
-import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
@@ -110,7 +111,11 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     if (!isIgnored()) {
       parseStructure();
       collectAdditionalModelProperties();
-      this.resolvedMinMuleVersion = resolveSourceMinMuleVersion(sourceElement);
+      if (mustResolveMinMuleVersion()) {
+        this.resolvedMinMuleVersion = resolveSourceMinMuleVersion(sourceElement);
+      } else {
+        this.resolvedMinMuleVersion = null;
+      }
     }
   }
 
@@ -140,7 +145,8 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    return getSourceParameterGroupParsers(sourceElement.getParameters(), forSource(getName(), hasKeyResolverAvailable()));
+    return getSourceParameterGroupParsers(sourceElement.getParameters(),
+                                          forSource(getName(), loadingContext, hasKeyResolverAvailable()));
   }
 
   @Override
@@ -266,7 +272,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     return methodElement
         .map(method -> new JavaSourceCallbackModelParser(method, getParameterGroupParsers(
                                                                                           method.getParameters(),
-                                                                                          forSource(getName()))));
+                                                                                          forSource(getName(), loadingContext))));
   }
 
   @Override
@@ -284,14 +290,15 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
     return resolveStereotype(sourceElement, "Source", getName(), factory);
   }
 
+  @Override
   public Optional<BackPressureStrategyModelProperty> getBackPressureStrategyModelProperty() {
     return mapReduceSingleAnnotation(sourceElement, "source", sourceElement.getName(), BackPressure.class,
                                      org.mule.sdk.api.annotation.source.BackPressure.class,
                                      (legacyAnnotation) -> new BackPressureStrategyModelProperty(legacyAnnotation
-                                         .getEnumValue(BackPressure::defaultMode), new LinkedHashSet<BackPressureMode>(legacyAnnotation.getEnumArrayValue(BackPressure::supportedModes))),
+                                         .getEnumValue(BackPressure::defaultMode), new LinkedHashSet<>(legacyAnnotation.getEnumArrayValue(BackPressure::supportedModes))),
                                      (sdkAnnotation) -> new BackPressureStrategyModelProperty(fromSdkBackPressureMode(sdkAnnotation
                                          .getEnumValue(org.mule.sdk.api.annotation.source.BackPressure::defaultMode)),
-                                                                                              new LinkedHashSet<BackPressureMode>(sdkAnnotation
+                                                                                              new LinkedHashSet<>(sdkAnnotation
                                                                                                   .getEnumArrayValue(org.mule.sdk.api.annotation.source.BackPressure::supportedModes)
                                                                                                   .stream()
                                                                                                   .map(JavaSourceModelParserUtils::fromSdkBackPressureMode)
@@ -326,7 +333,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return ofNullable(this.resolvedMinMuleVersion);
   }
 
   @Override

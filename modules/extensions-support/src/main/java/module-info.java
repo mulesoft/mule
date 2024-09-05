@@ -38,7 +38,7 @@ module org.mule.runtime.extensions.support {
   requires org.mule.runtime.core;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.extension.model;
-  requires org.mule.runtime.extensions.api;
+  requires transitive org.mule.runtime.extensions.api;
   requires org.mule.runtime.extensions.api.persistence;
   requires org.mule.runtime.featureManagement;
   requires org.mule.runtime.http.api;
