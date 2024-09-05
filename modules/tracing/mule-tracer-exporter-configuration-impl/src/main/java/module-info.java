@@ -23,8 +23,9 @@ module org.mule.runtime.tracer.exporter.config.impl {
   requires org.mule.runtime.tracer.exporter.configuration.api;
 
   requires com.fasterxml.jackson.databind;
+    requires org.mule.runtime.api;
 
-  exports org.mule.runtime.tracer.exporter.config.impl to
+    exports org.mule.runtime.tracer.exporter.config.impl to
       org.mule.runtime.tracer.exporter.impl;
 
 }
