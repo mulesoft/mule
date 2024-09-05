@@ -183,7 +183,7 @@ public class FileSpanExporterConfigurationTestCase {
     assertThat(keyFileLocationPath.isAbsolute(), is(TRUE));
   }
 
-  @Test @Ignore("To be fixed in W-16676258")
+  @Test
   public void configurationFileChanged() throws Exception {
     File file = createTempFile("tracing", "test");
     Path testFile = get(file.getPath());
