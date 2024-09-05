@@ -50,8 +50,7 @@ module org.mule.runtime.core {
   requires org.mule.runtime.metadata.model.api;
   requires org.mule.runtime.metadata.model.java;
   requires org.mule.runtime.metadata.model.message;
-  requires transitive org.mule.runtime.api;
-  requires org.mule.sdk.api;
+    requires org.mule.sdk.api;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.policy.api;
   requires org.mule.runtime.http.policy.api;
@@ -60,8 +59,7 @@ module org.mule.runtime.core {
   requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.manifest;
 
-  requires org.mule.runtime.metrics.api;
-  requires org.mule.runtime.tracer.api;
+    requires org.mule.runtime.tracer.api;
   requires org.mule.runtime.tracer.customization.api;
   requires org.mule.runtime.tracer.exporter.api;
   requires org.mule.runtime.tracer.exporter.configuration.api;
@@ -93,15 +91,16 @@ module org.mule.runtime.core {
   requires jakarta.activation;
   requires transitive jakarta.jms.api;
   requires java.annotation;
-  requires java.inject;
-  requires java.management;
+    requires java.management;
   // InvalidTransactionException extends java.rmi.RemoteException
   requires java.rmi;
   requires java.transaction;
   // used by DateTime
   requires java.xml.bind;
+    requires org.mule.runtime.metrics.exporter.api;
+    requires org.mule.runtime.metrics.api;
 
-  exports org.mule.runtime.core.api;
+    exports org.mule.runtime.core.api;
   exports org.mule.runtime.core.api.artifact;
   exports org.mule.runtime.core.api.component;
   exports org.mule.runtime.core.api.connection.util;
