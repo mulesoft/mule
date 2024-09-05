@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracer.common.watcher;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY;
 
@@ -38,7 +39,7 @@ public class TracingConfigurationFileWatcher extends Thread {
   protected long delay = DEFAULT_DELAY;
 
   public TracingConfigurationFileWatcher(String filename, Runnable doOnChange) {
-    super("FileSpanExporterConfigurationWatcher");
+    super("TracingConfigurationFileWatcher");
     this.file = new File(filename);
     this.doOnChange = doOnChange;
 
@@ -66,6 +67,7 @@ public class TracingConfigurationFileWatcher extends Thread {
         }
       }
     }
+
     key.reset();
   }
 
