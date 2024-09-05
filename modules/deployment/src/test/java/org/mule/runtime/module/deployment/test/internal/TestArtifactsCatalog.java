@@ -206,6 +206,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 
     defaultServiceEchoJarFile = new JarCompiler()
+        .targetJavaVersion(17)
         .compiling(getResourceFile("/packagetesting/org/mule/echo/DefaultEchoService.java"),
                    getResourceFile("/packagetesting/org/mule/echo/EchoServiceProvider.java"),
                    getResourceFile("/packagetesting/org/mule/echo/module-info.java"))
@@ -215,6 +216,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
         .compile("mule-module-service-echo-4.0-SNAPSHOT.jar");
 
     defaultFooServiceJarFile = new JarCompiler()
+        .targetJavaVersion(17)
         .compiling(getResourceFile("/packagetesting/org/mule/service/foo/DefaultFooService.java"),
                    getResourceFile("/packagetesting/org/mule/service/foo/FooServiceProvider.java"),
                    getResourceFile("/packagetesting/org/mule/service/foo/module-info.java"))
