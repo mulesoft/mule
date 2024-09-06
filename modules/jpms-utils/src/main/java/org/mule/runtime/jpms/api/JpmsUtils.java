@@ -77,6 +77,8 @@ public final class JpmsUtils {
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
       "--add-opens=java.base/java.lang.reflect=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_JAVA_LANG_INVOKE =
+      "--add-opens=java.base/java.lang.invoke=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JDK_INTERNAL_REF =
       "--add-opens=java.base/jdk.internal.ref=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_NIO =
@@ -92,6 +94,7 @@ public final class JpmsUtils {
 
   private static final List<String> REQUIRED_ADD_OPENS = asList(REQUIRED_ADD_OPENS_JAVA_LANG,
                                                                 REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT,
+                                                                REQUIRED_ADD_OPENS_JAVA_LANG_INVOKE,
                                                                 REQUIRED_ADD_OPENS_JDK_INTERNAL_REF,
                                                                 REQUIRED_ADD_OPENS_JAVA_NIO,
                                                                 REQUIRED_ADD_OPENS_SUN_NIO_CH,
@@ -261,9 +264,9 @@ public final class JpmsUtils {
     openToModule(layer, "org.mule.runtime.launcher", "org.mule.boot.api",
                  singletonList("org.mule.runtime.module.boot.internal"));
     openToModule(layer, "kryo.shaded", "java.base",
-                 asList("java.lang", "java.lang.reflect"));
+                 asList("java.lang", "java.lang.reflect", "java.lang.invoke"));
     openToModule(layer, "org.mule.runtime.jpms.utils", "java.base",
-                 asList("java.lang", "java.lang.reflect"));
+                 asList("java.lang", "java.lang.reflect", "java.lang.invoke"));
 
     // To avoid a performance-related warning from Hazelcast according to
     // https://docs.hazelcast.com/hazelcast/5.2/getting-started/install-hazelcast#using-modular-java

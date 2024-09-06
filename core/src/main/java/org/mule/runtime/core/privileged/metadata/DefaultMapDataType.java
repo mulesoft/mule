@@ -34,6 +34,9 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
 
   @Override
   public boolean isCompatibleWith(DataType dataType) {
+    if (dataType instanceof DynamicDelegateDataType) {
+      dataType = ((DynamicDelegateDataType) dataType).getDelegate();
+    }
     if (!(dataType instanceof DefaultMapDataType)) {
       return false;
     }
@@ -59,6 +62,9 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
 
   @Override
   public boolean equals(Object o) {
+    if (o instanceof DynamicDelegateDataType) {
+      o = ((DynamicDelegateDataType) o).getDelegate();
+    }
     if (this == o) {
       return true;
     }
@@ -82,6 +88,7 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
 
   @Override
   public int hashCode() {
+    // No need to consider `DynamicDelegateDataType` for hashcode calculation as we're only interested in its delegate
     return Objects.hash(getType(), getKeyDataType(), getValueDataType(), getMediaType());
   }
 
