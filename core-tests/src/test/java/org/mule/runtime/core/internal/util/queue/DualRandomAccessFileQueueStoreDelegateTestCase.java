@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.util.queue.DualRandomAccessFileQueueStoreDelegate;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -22,12 +23,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import org.hamcrest.core.Is;
 
 @SmallTest
 public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMuleTestCase {
@@ -149,7 +151,9 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
 
   private void createAndDisposeQueue(String queueName) throws IOException {
     DualRandomAccessFileQueueStoreDelegate queue =
-        new DualRandomAccessFileQueueStoreDelegate(queueName, workingDirectory.getRoot().getAbsolutePath(), mockMuleContext, 1);
+        new DualRandomAccessFileQueueStoreDelegate(queueName, workingDirectory.getRoot().getAbsolutePath(),
+                                                   mockMuleContext.getObjectSerializer().getInternalProtocol(),
+                                                   1);
     queue.dispose();
   }
 
@@ -159,7 +163,8 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
 
   private DualRandomAccessFileQueueStoreDelegate createTestQueueStore() {
     return new DualRandomAccessFileQueueStoreDelegate(TEST_QUEUE_NAME, workingDirectory.getRoot().getAbsolutePath(),
-                                                      mockMuleContext, 0);
+                                                      mockMuleContext.getObjectSerializer().getInternalProtocol(),
+                                                      0);
   }
 
 }

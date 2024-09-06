@@ -13,7 +13,6 @@
 
     <properties>
         <surefire.args>
-            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.test.core
             ${surefire.test.unit.open.args}
         </surefire.args>
 		

@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
-import org.mule.runtime.core.internal.util.queue.DefaultQueueStore;
-import org.mule.runtime.core.internal.util.queue.QueueStore;
 
 public class DefaultQueueStoreTestCase extends QueueStoreTestCase {
 
   @Override
-  protected QueueStore createQueueInfoDelegate(int capacity, MuleContext mockMuleContext) {
-    return new DefaultQueueStore("testQueue", mockMuleContext, new DefaultQueueConfiguration(capacity, false));
+  protected QueueStore createQueueInfoDelegate(int capacity, String workingDirectory, SerializationProtocol serializer) {
+    return new DefaultQueueStore("testQueue", workingDirectory, serializer, new DefaultQueueConfiguration(capacity, false));
   }
 
 }

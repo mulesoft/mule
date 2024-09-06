@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.journal.queue;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.util.journal.JournalEntry;
 
@@ -65,7 +65,7 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T> 
     this.operation = operation;
   }
 
-  public AbstractQueueTxJournalEntry(DataInputStream inputStream, MuleContext muleContext) throws IOException {
+  public AbstractQueueTxJournalEntry(DataInputStream inputStream, SerializationProtocol serializer) throws IOException {
     txId = deserializeTxId(inputStream);
     operation = inputStream.readByte();
     if (isCheckpointOperation(operation)) {
@@ -79,10 +79,10 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T> 
     byte[] valueAsBytes = new byte[valueSize];
     inputStream.read(valueAsBytes, 0, valueSize);
     queueName = new String(queueNameAsBytes);
-    value = muleContext.getObjectSerializer().getInternalProtocol().deserialize(valueAsBytes);
+    value = serializer.deserialize(valueAsBytes);
   }
 
-  public void write(DataOutputStream outputStream, MuleContext muleContext) {
+  public void write(DataOutputStream outputStream, SerializationProtocol serializer) {
     try {
       serializeTxId(outputStream);
       outputStream.write(operation);
@@ -92,7 +92,7 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T> 
       }
       outputStream.write(queueName.length());
       outputStream.write(queueName.getBytes());
-      byte[] serializedValue = muleContext.getObjectSerializer().getInternalProtocol().serialize(value);
+      byte[] serializedValue = serializer.serialize(value);
       outputStream.writeInt(serializedValue.length);
       outputStream.write(serializedValue);
       outputStream.flush();
@@ -114,6 +114,7 @@ public abstract class AbstractQueueTxJournalEntry<T> implements JournalEntry<T> 
     return queueName;
   }
 
+  @Override
   public T getTxId() {
     return txId;
   }

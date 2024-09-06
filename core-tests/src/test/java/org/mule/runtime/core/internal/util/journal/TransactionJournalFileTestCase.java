@@ -9,7 +9,8 @@ package org.mule.runtime.core.internal.util.journal;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.runtime.core.internal.util.journal.queue.LocalQueueTxJournalEntry;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -19,6 +20,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.apache.commons.lang3.RandomStringUtils;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -32,7 +34,7 @@ public class TransactionJournalFileTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void largeQueueName() throws Exception {
-    final String queueName = RandomStringUtils.randomAlphanumeric(129);
+    final String queueName = RandomStringUtils.insecure().nextAlphanumeric(129);
     final Serializable payload = "Hello World!";
     final int txId = 1;
 
@@ -53,9 +55,10 @@ public class TransactionJournalFileTestCase extends AbstractMuleContextTestCase 
 
   private TransactionJournalFile<Integer, LocalQueueTxJournalEntry> openJournal() {
     File journalFile = new File(temporaryFolder.getRoot(), "journal");
-    JournalEntrySerializer serializer = LocalTxQueueTransactionJournal.createLocalTxQueueJournalEntrySerializer(muleContext);
+    JournalEntrySerializer<Integer, LocalQueueTxJournalEntry> serializer = LocalTxQueueTransactionJournal
+        .createLocalTxQueueJournalEntrySerializer(muleContext.getObjectSerializer().getInternalProtocol());
 
-    return new TransactionJournalFile(journalFile, serializer, journalEntry -> false, KB_500);
+    return new TransactionJournalFile<>(journalFile, serializer, journalEntry -> false, KB_500);
   }
 
 }

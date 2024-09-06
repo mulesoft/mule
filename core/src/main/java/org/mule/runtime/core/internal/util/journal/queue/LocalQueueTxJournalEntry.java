@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.journal.queue;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.internal.util.journal.JournalEntry;
 
 import java.io.DataInputStream;
@@ -27,8 +27,8 @@ public class LocalQueueTxJournalEntry extends AbstractQueueTxJournalEntry<Intege
     super(txId, operation);
   }
 
-  public LocalQueueTxJournalEntry(DataInputStream inputStream, MuleContext muleContext) throws IOException {
-    super(inputStream, muleContext);
+  public LocalQueueTxJournalEntry(DataInputStream inputStream, SerializationProtocol serializer) throws IOException {
+    super(inputStream, serializer);
   }
 
   @Override

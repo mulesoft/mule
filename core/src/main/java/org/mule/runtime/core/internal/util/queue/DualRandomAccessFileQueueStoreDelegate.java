@@ -6,12 +6,8 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.core.api.MuleContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
@@ -22,6 +18,9 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link TransactionalQueueStoreDelegate} implementation using two files for storing the queue data.
@@ -43,18 +42,18 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   private static final Object QUEUE_DATA_CONTROL_SUFFIX = "-crl";
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-  private final ObjectSerializer serializer;
+  private final SerializationProtocol serializer;
   private final ReadWriteLock filesLock;
   private final QueueControlDataFile queueControlDataFile;
   private RandomAccessFileQueueStore writeFile;
   private RandomAccessFileQueueStore readFile;
-  private RandomAccessFileQueueStore randomAccessFileQueueStore1;
-  private RandomAccessFileQueueStore randomAccessFileQueueStore2;
+  private final RandomAccessFileQueueStore randomAccessFileQueueStore1;
+  private final RandomAccessFileQueueStore randomAccessFileQueueStore2;
 
-  public DualRandomAccessFileQueueStoreDelegate(String queueName, String workingDirectory, MuleContext muleContext,
+  public DualRandomAccessFileQueueStoreDelegate(String queueName, String workingDirectory, SerializationProtocol serializer,
                                                 int capacity) {
     super(capacity);
-    serializer = muleContext.getObjectSerializer();
+    this.serializer = serializer;
     File queuesDirectory = getQueuesDirectory(workingDirectory);
     if (!queuesDirectory.exists()) {
       Preconditions.checkState(queuesDirectory.mkdirs(),
@@ -96,14 +95,14 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   @Override
   protected void addFirst(Serializable item) throws InterruptedException {
     switchWriteFileIfFull();
-    byte[] serialiazedObject = serializer.getInternalProtocol().serialize(item);
+    byte[] serialiazedObject = serializer.serialize(item);
     readFile.addFirst(serialiazedObject);
   }
 
   @Override
   protected void add(Serializable item) {
     switchWriteFileIfFull();
-    byte[] serialiazedObject = serializer.getInternalProtocol().serialize(item);
+    byte[] serialiazedObject = serializer.serialize(item);
     writeFile.addLast(serialiazedObject);
   }
 
@@ -207,7 +206,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   }
 
   private Serializable deserialize(byte[] valuesAsBytes) {
-    return serializer.getInternalProtocol().deserialize(valuesAsBytes);
+    return serializer.deserialize(valuesAsBytes);
   }
 
   @Override
