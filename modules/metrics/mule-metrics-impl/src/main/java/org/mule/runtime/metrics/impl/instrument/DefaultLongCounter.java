@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.metrics.impl.instrument;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.metrics.api.instrument.LongCounter;
@@ -73,7 +74,7 @@ public class DefaultLongCounter implements LongCounter {
     if (value < 0) {
       throw new IllegalArgumentException("The value to add must be positive");
     }
-    addOperation.accept(value, null);
+    addOperation.accept(value, emptyMap());
   }
 
   @Override
