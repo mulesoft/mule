@@ -77,6 +77,12 @@ public class TracingConfigurationFileWatcher extends Thread {
         checkAndConfigure();
       } catch (InterruptedException ignored) {
         return;
+      } finally {
+        try {
+          watchService.close();
+        } catch (IOException e) {
+          LOGGER.error("Error while closing watch service", e);
+        }
       }
     }
   }
