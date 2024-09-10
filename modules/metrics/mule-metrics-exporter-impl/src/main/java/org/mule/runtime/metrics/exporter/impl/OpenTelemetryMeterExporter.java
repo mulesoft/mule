@@ -85,7 +85,9 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
   private BiConsumer<Long, Map<String, String>> bindCounters(LongCounter longCounter,
                                                              io.opentelemetry.api.metrics.LongCounter otelLongCounter) {
     BiConsumer<Long, Map<String, String>> muleCounterObserver =
-        (value, context) -> otelLongCounter.add(value, getOtelAttributes(context));
+        (value, context) -> {
+          otelLongCounter.add(value, getOtelAttributes(context));
+        };
     longCounter.onAddition(muleCounterObserver);
     return muleCounterObserver;
   }
