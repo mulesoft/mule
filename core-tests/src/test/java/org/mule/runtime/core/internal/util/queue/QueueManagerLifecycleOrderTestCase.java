@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.util.queue;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.CORE_ERROR_TYPE_REPO;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_FACTORY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
@@ -48,6 +50,8 @@ import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatis
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
+import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -86,6 +90,8 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestC
     objects.put(INTERCEPTOR_MANAGER_REGISTRY_KEY, mock(InterceptorManager.class));
     InternalProfilingService coreProfilingService = mock(InternalProfilingService.class);
     objects.put(MULE_PROFILING_SERVICE_KEY, coreProfilingService);
+    objects.put(MULE_ERROR_METRICS_FACTORY_KEY, ErrorMetricsFactory.NO_OP);
+    objects.put(MULE_METER_PROVIDER_KEY, MeterProvider.NO_OP);
 
     mockProcessingStrategyProfilingChainWithoutTriggeringEvent(coreProfilingService);
 
