@@ -80,13 +80,15 @@ import org.mule.tck.junit4.matcher.EventMatcher;
 import java.util.Calendar;
 import java.util.Set;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(CONFIGURATION_PROPERTIES)
 @Story(COMPONENT_CONFIGURATION_PROPERTIES_STORY)
@@ -325,13 +327,15 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
       if (configFiles.length == 0) {
         artifactAst = emptyArtifact();
       } else {
-        artifactAst = parseAndBuildAppExtensionModel(configFiles, this, muleContext.getExtensionManager().getExtensions(), false,
+        artifactAst = parseAndBuildAppExtensionModel(muleContext.getConfiguration().getId(),
+                                                     configFiles, this, muleContext.getExtensionManager().getExtensions(), false,
                                                      muleContext, null);
       }
       new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false, false)
           .configure(muleContext);
     }
 
+    @Override
     public AstXmlParser getParser(Set<ExtensionModel> extensions, boolean disableValidations) {
       return AstXmlParser.builder()
           .withArtifactType(APPLICATION)

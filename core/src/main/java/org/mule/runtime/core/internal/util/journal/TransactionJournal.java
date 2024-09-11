@@ -8,12 +8,12 @@ package org.mule.runtime.core.internal.util.journal;
 
 import org.mule.runtime.api.util.Preconditions;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
 
   private transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  private final TransactionCompletePredicate transactionCompletePredicate;
+  private final TransactionCompletePredicate<T> transactionCompletePredicate;
 
   /**
    * Log file in which we are currently writing new entries.
@@ -60,8 +60,8 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
   /**
    * @param logFilesDirectory directory used to store the journal files.
    */
-  public TransactionJournal(String logFilesDirectory, TransactionCompletePredicate transactionCompletePredicate,
-                            JournalEntrySerializer journalEntrySerializer, Integer maximumFileSizeInMegabytes) {
+  public TransactionJournal(String logFilesDirectory, TransactionCompletePredicate<T> transactionCompletePredicate,
+                            JournalEntrySerializer<T, K> journalEntrySerializer, Integer maximumFileSizeInMegabytes) {
     File logFileDirectory = new File(logFilesDirectory);
     if (!logFileDirectory.exists()) {
       Preconditions.checkState(logFileDirectory.mkdirs(),
@@ -73,9 +73,9 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
     logger.info(String.format("Using files for tx logs %s and %s", logFile1.getAbsolutePath(), logFile2.getAbsolutePath()));
 
     this.currentLogFile =
-        new TransactionJournalFile(logFile1, journalEntrySerializer, transactionCompletePredicate, clearFileMinimumSizeInBytes);
+        new TransactionJournalFile<>(logFile1, journalEntrySerializer, transactionCompletePredicate, clearFileMinimumSizeInBytes);
     this.notCurrentLogFile =
-        new TransactionJournalFile(logFile2, journalEntrySerializer, transactionCompletePredicate, clearFileMinimumSizeInBytes);
+        new TransactionJournalFile<>(logFile2, journalEntrySerializer, transactionCompletePredicate, clearFileMinimumSizeInBytes);
     this.transactionCompletePredicate = transactionCompletePredicate;
 
   }
@@ -92,8 +92,8 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
    *
    * @param journalEntry journal entry with the update operation details
    */
-  public synchronized void logUpdateOperation(JournalEntry<T> journalEntry) {
-    TransactionJournalFile logFile = determineLogFile(journalEntry.getTxId());
+  public synchronized void logUpdateOperation(K journalEntry) {
+    TransactionJournalFile<T, K> logFile = determineLogFile(journalEntry.getTxId());
     logFile.logOperation(journalEntry);
   }
 
@@ -104,8 +104,8 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
    *
    * @param journalEntry journal entry with the checkpoint operation details
    */
-  public synchronized void logCheckpointOperation(JournalEntry<T> journalEntry) {
-    TransactionJournalFile logFile = determineLogFile(journalEntry.getTxId());
+  public synchronized void logCheckpointOperation(K journalEntry) {
+    TransactionJournalFile<T, K> logFile = determineLogFile(journalEntry.getTxId());
     logFile.logOperation(journalEntry);
     if (transactionCompletePredicate.isTransactionComplete(journalEntry)) {
       logFile.clearEntriesForTransaction(journalEntry.getTxId());
@@ -117,7 +117,7 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
    * @return all the transaction entries for a certain transaction identifier
    */
   public Collection<K> getLogEntriesForTx(T txId) {
-    TransactionJournalFile logFile = determineLogFileWithoutModifyingCurrent(txId);
+    TransactionJournalFile<T, K> logFile = determineLogFileWithoutModifyingCurrent(txId);
     if (logFile == null || !logFile.containsTx(txId)) {
       return Collections.emptyList();
     }
@@ -150,8 +150,8 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
     notCurrentLogFile.clear();
   }
 
-  private TransactionJournalFile determineLogFile(T txId) {
-    final TransactionJournalFile logFile = determineLogFileWithoutModifyingCurrent(txId);
+  private TransactionJournalFile<T, K> determineLogFile(T txId) {
+    final TransactionJournalFile<T, K> logFile = determineLogFileWithoutModifyingCurrent(txId);
     if (logFile != null) {
       return logFile;
     }
@@ -178,12 +178,12 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
   }
 
   private void changeCurrentLogFile() {
-    TransactionJournalFile aux = currentLogFile;
+    TransactionJournalFile<T, K> aux = currentLogFile;
     currentLogFile = notCurrentLogFile;
     notCurrentLogFile = aux;
   }
 
-  private TransactionJournalFile determineLogFileWithoutModifyingCurrent(T txId) {
+  private TransactionJournalFile<T, K> determineLogFileWithoutModifyingCurrent(T txId) {
     if (currentLogFile.containsTx(txId)) {
       return currentLogFile;
     }

@@ -9,12 +9,12 @@ package org.mule.runtime.core.internal.util.journal;
 /**
  * Determines if the operation denotes a transaction complete log entry.
  */
-public interface TransactionCompletePredicate {
+public interface TransactionCompletePredicate<T> {
 
   /**
    * @param journalEntry journal entry
    * @return true if the journal entry completes a transaction, false otherwise.
    */
-  boolean isTransactionComplete(JournalEntry journalEntry);
+  boolean isTransactionComplete(JournalEntry<T> journalEntry);
 
 }
