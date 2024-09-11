@@ -21,6 +21,7 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.util
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
@@ -124,12 +125,14 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     try {
       // Parses the full AST of the artifact by providing a helper for loading the ExtensionModel that represents the artifact
       // itself, this is so that schema validations can be performed properly.
-      ArtifactAst artifactAst = parseArtifact(left(resources),
-                                              this::createAstParser,
-                                              dependencies,
-                                              false,
-                                              context.getExtensionClassLoader(),
-                                              loadingHelper);
+      ArtifactAst artifactAst =
+          parseArtifact(context.getArtifactCoordinates().map(ArtifactCoordinates::getArtifactId).orElse(null),
+                        left(resources),
+                        this::createAstParser,
+                        dependencies,
+                        false,
+                        context.getExtensionClassLoader(),
+                        loadingHelper);
 
       // Applies the AST validators and throws if there was any error
       logWarningsAndThrowIfContainsErrors(validatorBuilder().build().validate(artifactAst), LOGGER);

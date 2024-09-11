@@ -63,7 +63,8 @@ public final class ArtifactAstUtils {
                                                            MuleContext muleContext,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
-    return parseArtifact(left(configResources),
+    return parseArtifact(null,
+                         left(configResources),
                          parserSupplier,
                          extensions,
                          disableValidations,
@@ -78,6 +79,7 @@ public final class ArtifactAstUtils {
    * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
    * {@code muleContext.getConfiguration.getId()} return value
    *
+   * @param artifactName                      the name of the artifact whose configs will be parsed
    * @param configResources                   the paths to the application's config files
    * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
    *                                          the parsing
@@ -91,14 +93,16 @@ public final class ArtifactAstUtils {
    * 
    * @since 4.8
    */
-  public static ArtifactAst parseAndBuildAppExtensionModel(String[] configResources,
+  public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
+                                                           String[] configResources,
                                                            AstXmlParserSupplier parserSupplier,
                                                            Set<ExtensionModel> extensions,
                                                            boolean disableValidations,
                                                            MuleContext muleContext,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
-    return parseArtifact(left(configResources),
+    return parseArtifact(artifactName,
+                         left(configResources),
                          parserSupplier,
                          extensions,
                          disableValidations,
@@ -113,6 +117,7 @@ public final class ArtifactAstUtils {
    * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
    * {@code muleContext.getConfiguration.getId()} return value
    *
+   * @param artifactName                      the name of the artifact whose configs will be parsed
    * @param appXmlConfigDocuments             the parsed XML DOMs for the config files
    * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
    *                                          the parsing
@@ -126,14 +131,16 @@ public final class ArtifactAstUtils {
    * 
    * @since 4.8
    */
-  public static ArtifactAst parseAndBuildAppExtensionModel(Map<String, Document> appXmlConfigDocuments,
+  public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
+                                                           Map<String, Document> appXmlConfigDocuments,
                                                            AstXmlParserSupplier parserSupplier,
                                                            Set<ExtensionModel> extensions,
                                                            boolean disableValidations,
                                                            MuleContext muleContext,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
-    return parseArtifact(right(appXmlConfigDocuments),
+    return parseArtifact(artifactName,
+                         right(appXmlConfigDocuments),
                          parserSupplier,
                          extensions,
                          disableValidations,
