@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.context;
 
+import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.CORE_ERROR_TYPE_REPO;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
@@ -33,6 +34,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
@@ -87,6 +89,8 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
                                                                  CORE_ERROR_TYPE_REPO.get());
     ((MuleContextWithRegistry) ctx).getRegistry().registerObject(InternalProfilingService.class.getName(),
                                                                  new DefaultProfilingService());
+    ((MuleContextWithRegistry) ctx).getRegistry().registerObject(DEFAULT_OBJECT_SERIALIZER_NAME,
+                                                                 mock(ObjectSerializer.class));
 
     testServicesConfigurationBuilder.configure(ctx);
   }

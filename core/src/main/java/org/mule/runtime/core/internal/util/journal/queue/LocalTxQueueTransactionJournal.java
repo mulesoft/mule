@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.journal.queue;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.internal.util.journal.JournalEntrySerializer;
 
 import java.io.DataInputStream;
@@ -19,25 +19,26 @@ import java.io.Serializable;
  */
 public class LocalTxQueueTransactionJournal extends AbstractQueueTransactionJournal<Integer, LocalQueueTxJournalEntry> {
 
-  public LocalTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext, int maximumFileSizeInMegabytes) {
-    super(logFilesDirectory, createLocalTxQueueJournalEntrySerializer(muleContext), maximumFileSizeInMegabytes);
+  public LocalTxQueueTransactionJournal(String logFilesDirectory, final SerializationProtocol serializer,
+                                        int maximumFileSizeInMegabytes) {
+    super(logFilesDirectory, createLocalTxQueueJournalEntrySerializer(serializer), maximumFileSizeInMegabytes);
   }
 
-  public LocalTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext) {
-    super(logFilesDirectory, createLocalTxQueueJournalEntrySerializer(muleContext), null);
+  public LocalTxQueueTransactionJournal(String logFilesDirectory, final SerializationProtocol serializer) {
+    super(logFilesDirectory, createLocalTxQueueJournalEntrySerializer(serializer), null);
   }
 
-  public static JournalEntrySerializer<Integer, LocalQueueTxJournalEntry> createLocalTxQueueJournalEntrySerializer(final MuleContext muleContext) {
-    return new JournalEntrySerializer<Integer, LocalQueueTxJournalEntry>() {
+  public static JournalEntrySerializer<Integer, LocalQueueTxJournalEntry> createLocalTxQueueJournalEntrySerializer(final SerializationProtocol serializer) {
+    return new JournalEntrySerializer<>() {
 
       @Override
       public LocalQueueTxJournalEntry deserialize(DataInputStream inputStream) throws IOException {
-        return new LocalQueueTxJournalEntry(inputStream, muleContext);
+        return new LocalQueueTxJournalEntry(inputStream, serializer);
       }
 
       @Override
       public void serialize(LocalQueueTxJournalEntry journalEntry, DataOutputStream dataOutputStream) {
-        journalEntry.write(dataOutputStream, muleContext);
+        journalEntry.write(dataOutputStream, serializer);
       }
     };
   }

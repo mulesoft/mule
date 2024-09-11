@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 
 public class TestTransactionLogger extends LocalTxQueueTransactionJournal {
 
   private boolean failDuringLogCommit;
 
-  public TestTransactionLogger(String logFilesDirectory, MuleContext muleContext) {
-    super(logFilesDirectory, muleContext);
+  public TestTransactionLogger(String logFilesDirectory, final SerializationProtocol serializer) {
+    super(logFilesDirectory, serializer);
   }
 
   public TestTransactionLogger failDuringLogCommit() {
