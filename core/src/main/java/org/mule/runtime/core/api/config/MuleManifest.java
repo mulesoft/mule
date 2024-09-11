@@ -22,6 +22,10 @@ public class MuleManifest {
     return getMuleManifest().getProductVersion();
   }
 
+  public static String getProductVersionFromPropertiesFile() {
+    return getMuleManifest().getProductVersion();
+  }
+
   public static String getVendorName() {
     return getMuleManifest().getVendorName();
   }
