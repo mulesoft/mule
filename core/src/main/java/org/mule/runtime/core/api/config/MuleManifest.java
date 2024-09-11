@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.config;
 
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 
+import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
 
 /**
@@ -83,6 +84,10 @@ public class MuleManifest {
    */
   public static String getRecommendedJdks() {
     return getMuleManifest().getRecommendedJdks();
+  }
+
+  protected static String getManifestProperty(String name) {
+    return getManifest().getMainAttributes().getValue(new Name(name));
   }
 
   // synchronize this method as manifest initialized here.
