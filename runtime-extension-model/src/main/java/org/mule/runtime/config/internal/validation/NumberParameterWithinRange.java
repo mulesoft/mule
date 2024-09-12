@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
@@ -37,6 +38,12 @@ import java.util.stream.Stream;
 
 public class NumberParameterWithinRange implements Validation {
 
+  private final boolean ignoreParamsWithProperties;
+
+  public NumberParameterWithinRange(boolean ignoreParamsWithProperties) {
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
+  }
+
   @Override
   public String getName() {
     return "Number parameter within range.";
@@ -55,9 +62,10 @@ public class NumberParameterWithinRange implements Validation {
   @Override
   public Predicate<List<ComponentAst>> applicable() {
     return currentElemement(comp -> comp.getModel(ParameterizedModel.class)
-        .map(pmzd -> pmzd.getParameterGroupModels().stream()
-            .flatMap(pmg -> pmg.getParameterModels().stream())
-            .anyMatch(this::isDoValidation))
+        .map(pmzd -> getGroupAndParametersPairs(pmzd)
+            .anyMatch(groupAndParameter -> isDoValidation(groupAndParameter.getSecond(),
+                                                          comp.getParameter(groupAndParameter.getFirst().getName(),
+                                                                            groupAndParameter.getSecond().getName()))))
         .orElse(false));
   }
 
@@ -65,10 +73,10 @@ public class NumberParameterWithinRange implements Validation {
   public List<ValidationResultItem> validateMany(ComponentAst component, ArtifactAst artifact) {
     return (component.getModel(ParameterizedModel.class)
         .map(pmzd -> getGroupAndParametersPairs(pmzd)
-            .filter(groupAndParameter -> isDoValidation(groupAndParameter.getSecond()))
             .map(groupAndParameter -> new Pair<>(groupAndParameter.getSecond(),
                                                  component.getParameter(groupAndParameter.getFirst().getName(),
-                                                                        groupAndParameter.getSecond().getName()))))
+                                                                        groupAndParameter.getSecond().getName())))
+            .filter(modelAndParam -> isDoValidation(modelAndParam.getFirst(), modelAndParam.getSecond())))
         .orElse(Stream.empty())
         .map(param -> {
           if (numberOffRange(param.getFirst(), param.getSecond())) {
@@ -104,7 +112,11 @@ public class NumberParameterWithinRange implements Validation {
     return visitor.isValueOffRange();
   }
 
-  protected boolean isDoValidation(ParameterModel pm) {
+  protected boolean isDoValidation(ParameterModel pm, ComponentParameterAst componentParameterAst) {
+    if (ignoreParamsWithProperties && hasPropertyPlaceholder(componentParameterAst.getRawValue())) {
+      return false;
+    }
+
     final NumberHasRangeVisitor visitor = new NumberHasRangeVisitor();
     pm.getType().accept(visitor);
     return visitor.hasRangeAnnotation();
