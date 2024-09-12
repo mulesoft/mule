@@ -1247,8 +1247,9 @@ public class MuleExtensionModelDeclarer {
             + "${key_name}. This allows to externalize configuration and change it based\n"
             + "on the environment the application is being deployed to.");
 
-    configuration.onDefaultParameterGroup()
-        .withRequiredParameter("file")
+    ParameterGroupDeclarer defaultParameterGroup = configuration.onDefaultParameterGroup();
+
+    defaultParameterGroup.withRequiredParameter("file")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, EMBEDDED, new String[] {"yaml", "properties"}))
@@ -1257,6 +1258,11 @@ public class MuleExtensionModelDeclarer {
             + "It may be a location in the classpath or an absolute location. \nThe file location"
             + " value may also contains references to properties that will only be resolved based on "
             + "system properties or properties set at deployment time.");
+
+    defaultParameterGroup.withOptionalParameter("encoding")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The encoding of the file with the configuration properties to use.");
   }
 
   private void declareNotifications(ExtensionDeclarer extensionDeclarer) {
