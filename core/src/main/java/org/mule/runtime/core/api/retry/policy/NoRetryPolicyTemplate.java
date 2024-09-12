@@ -7,8 +7,13 @@
 package org.mule.runtime.core.api.retry.policy;
 
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -19,6 +24,9 @@ import java.util.function.Supplier;
  */
 public final class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(NoRetryPolicyTemplate.class);
+
+  @Override
   public RetryPolicy createRetryInstance() {
     return new NoRetryPolicy();
   }
@@ -30,7 +38,8 @@ public final class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
 
   protected static class NoRetryPolicy implements RetryPolicy {
 
-    public PolicyStatus applyPolicy(Throwable cause) {
+    @Override
+	public PolicyStatus applyPolicy(Throwable cause) {
       return PolicyStatus.policyExhausted(cause);
     }
 
@@ -43,7 +52,44 @@ public final class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
     }
   }
 
+  @Override
   public String toString() {
     return "NoRetryPolicy{}";
   }
+  
+  private static class DoNothingRetryCallback implements RetryCallback {
+
+	  
+	private static final Logger INNER_LOGGER = LoggerFactory.getLogger(NoRetryPolicyTemplate.DoNothingRetryCallback.class);
+	private NoRetryPolicyTemplate noRetryPolicyTemplate;
+	
+	public DoNothingRetryCallback(NoRetryPolicyTemplate aNoRetryPolicyTemplate) {
+		noRetryPolicyTemplate = aNoRetryPolicyTemplate;
+	}
+
+	@Override
+	public void doWork(RetryContext aContext) {
+		INNER_LOGGER.info("No nothing with " + aContext);
+	}
+
+	@Override
+	public String getWorkDescription() {
+		return "Do Nothing";
+	}
+
+	@Override
+	public Object getWorkOwner() {
+		return noRetryPolicyTemplate;
+	}
+	  
+  }
+  
+  /**
+	 * 
+	 */
+	@Override
+	public RetryContext execute(RetryCallback aCallback, Executor aWorkManager) throws Exception {
+		LOGGER.debug("Skip aCallback={}",aCallback);
+		return super.execute(new DoNothingRetryCallback(this), aWorkManager);
+	}
 }
