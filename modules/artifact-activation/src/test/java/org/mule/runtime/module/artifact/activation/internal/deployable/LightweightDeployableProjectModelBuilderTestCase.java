@@ -23,7 +23,9 @@ import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
+import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
@@ -47,7 +49,6 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -73,9 +74,6 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
                              .getClassLoader()).getSettingsSupplierFactory()
                                  .environmentUserSettingsSupplier().get()
                                  .getAbsolutePath());
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Before
   public void before() {
@@ -113,15 +111,20 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
     DeployableProjectModel deployableProjectModel =
         getDeployableProjectModel("apps/lightweight/db-plugin-with-additional-dep", pluginFileMavenReactor);
 
-    assertThat(deployableProjectModel.getAdditionalPluginDependencies().size(), is(1));
+    assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(1));
     List<BundleDependency> additionalBundleDependencies =
         deployableProjectModel.getAdditionalPluginDependencies().values().stream().findFirst().get();
-    assertThat(additionalBundleDependencies.size(), is(1));
+    assertThat(additionalBundleDependencies, iterableWithSize(2));
 
     org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor descriptor =
         additionalBundleDependencies.get(0).getDescriptor();
     assertThat(descriptor.getGroupId(), is("org.apache.derby"));
     assertThat(descriptor.getArtifactId(), is("derby"));
+
+    org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor derbySharedDescriptor =
+        additionalBundleDependencies.get(1).getDescriptor();
+    assertThat(derbySharedDescriptor.getGroupId(), is("org.apache.derby"));
+    assertThat(derbySharedDescriptor.getArtifactId(), is("derbyshared"));
   }
 
 
@@ -129,10 +132,10 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
   @Issue("W-14998254")
   @Description("When pom has invalid GAV and no parent pom, then MuleRuntimeException will be the thrown.")
   public void createDeployableProjectModelWithInvalidGAVAndMissingParentPom() throws Exception {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException
-        .expectMessage("Failed to retrieve version from the artifact, trying to retrieve from parent POM but parent POM is not present");
-    getDeployableProjectModel("apps/lightweight/test-app-missing-gav", null);
+    final var thrownExcpetion =
+        assertThrows(MuleRuntimeException.class, () -> getDeployableProjectModel("apps/lightweight/test-app-missing-gav", null));
+    assertThat(thrownExcpetion.getMessage(),
+               is("Failed to retrieve version from the artifact, trying to retrieve from parent POM but parent POM is not present"));
   }
 
 
