@@ -14,7 +14,6 @@ import static java.lang.Long.parseLong;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
@@ -25,12 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.Objects;
 
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounterBuilder;
 import io.opentelemetry.api.metrics.LongUpDownCounterBuilder;
+import io.opentelemetry.api.metrics.ObservableLongCounter;
 import io.opentelemetry.api.metrics.ObservableLongUpDownCounter;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.api.metrics.Meter;
@@ -46,14 +45,14 @@ import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
  */
 public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
-  private final List<Pair<LongCounter, BiConsumer<Long, Map<String, String>>>> longCounters = new ArrayList<>();
-  private final List<ObservableLongUpDownCounter> longUpDownCounters = new ArrayList<>();
+  private final List<ObservableLongCounter> counters = new ArrayList<>();
+  private final List<ObservableLongUpDownCounter> upDownCounters = new ArrayList<>();
   private final Map<String, Meter> openTelemetryMeters = new HashMap<>();
   private final MeterProvider meterProvider;
   private final PeriodicMetricReader periodicMetricReader;
 
   public OpenTelemetryMeterExporter(MeterExporterConfiguration configuration, Resource resource) {
-    // TODO W-13218993: Finish ADR adoption and implementation.
+    // TODO W-13218993: In this task all the configuration possibilities will be applied.
     MetricExporter metricExporter;
     String meterExporterType = configuration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE);
 
@@ -79,33 +78,17 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
   @Override
   public synchronized void enableExport(LongCounter longCounter) {
-    longCounters.add(new Pair<>(longCounter, bindCounters(longCounter, getOtelLongCounter(longCounter))));
-  }
-
-  private BiConsumer<Long, Map<String, String>> bindCounters(LongCounter longCounter,
-                                                             io.opentelemetry.api.metrics.LongCounter otelLongCounter) {
-    BiConsumer<Long, Map<String, String>> muleCounterObserver =
-        (value, context) -> {
-          otelLongCounter.add(value, getOtelAttributes(context));
-        };
-    longCounter.onAddition(muleCounterObserver);
-    return muleCounterObserver;
-  }
-
-  private io.opentelemetry.api.metrics.LongCounter getOtelLongCounter(LongCounter muleLongCounter) {
-    Meter openTelemetryMeter = openTelemetryMeters.get(muleLongCounter.getMeter().getName());
+    Meter openTelemetryMeter = openTelemetryMeters.get(longCounter.getMeter().getName());
+    Attributes attributes = new OpentelemetryExporterAttributes(longCounter.getMeter());
     LongCounterBuilder longCounterBuilder =
-        openTelemetryMeter.counterBuilder(muleLongCounter.getName()).setDescription(muleLongCounter.getDescription());
-    if (muleLongCounter.getUnit() != null) {
-      longCounterBuilder = longCounterBuilder.setUnit(muleLongCounter.getUnit());
-    }
-    return longCounterBuilder.build();
-  }
+        openTelemetryMeter.counterBuilder(longCounter.getName()).setDescription(longCounter.getDescription());
 
-  private Attributes getOtelAttributes(Map<String, String> stringStringMap) {
-    AttributesBuilder attributesBuilder = Attributes.builder();
-    stringStringMap.forEach(attributesBuilder::put);
-    return attributesBuilder.build();
+    if (longCounter.getUnit() != null) {
+      longCounterBuilder = longCounterBuilder.setUnit(longCounter.getUnit());
+    }
+
+    counters
+        .add(longCounterBuilder.buildWithCallback(measurement -> measurement.record(longCounter.getValueAsLong(), attributes)));
   }
 
   @Override
@@ -116,10 +99,10 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
         .setDescription(upDownCounter.getDescription());
 
     if (upDownCounter.getUnit() != null) {
-      longUpDownCounter = longUpDownCounter.setUnit(upDownCounter.getUnit());
+      longUpDownCounter = longUpDownCounter.setUnit(Objects.toString(upDownCounter.getUnit(), ""));
     }
 
-    longUpDownCounters
+    upDownCounters
         .add(longUpDownCounter.buildWithCallback(measurement -> measurement.record(upDownCounter.getValueAsLong(), attributes)));
   }
 
@@ -130,9 +113,9 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
   @Override
   public void dispose() {
-    longCounters
-        .forEach(longCounterBiConsumerPair -> longCounterBiConsumerPair.getFirst().remove(longCounterBiConsumerPair.getSecond()));
-    longUpDownCounters.forEach(ObservableLongUpDownCounter::close);
+    counters.forEach(ObservableLongCounter::close);
+    upDownCounters.forEach(ObservableLongUpDownCounter::close);
+
     if (periodicMetricReader != null) {
       periodicMetricReader.shutdown();
     }

@@ -14,13 +14,11 @@ import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.api.MeterExporterFactory;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.capturer.CapturingMeterExporterWrapper;
-import org.mule.runtime.metrics.exporter.impl.optel.resources.logging.LoggingMeterExporter;
 
 import javax.inject.Inject;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.sdk.metrics.export.MetricExporter;
 import io.opentelemetry.sdk.resources.Resource;
 
 /**
@@ -32,7 +30,6 @@ import io.opentelemetry.sdk.resources.Resource;
 public class OpenTelemetryMeterExporterFactory implements MeterExporterFactory {
 
   public static final CapturingMeterExporterWrapper METER_SNIFFER_EXPORTER = new CapturingMeterExporterWrapper();
-  public static final MetricExporter METER_LOGGING_EXPORTER = new LoggingMeterExporter();
 
   public static final AttributeKey<String> SERVICE_NAME_KEY = stringKey("service.name");
 

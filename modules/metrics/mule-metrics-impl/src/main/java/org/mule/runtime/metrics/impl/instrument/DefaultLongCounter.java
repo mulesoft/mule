@@ -15,9 +15,7 @@ import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -43,9 +41,6 @@ public class DefaultLongCounter implements LongCounter {
   private BiConsumer<Long, Map<String, String>> addOperation = getDefaultAddOperation();
 
   private Function<Map<String, String>, Long> incrementAndGetOperation = getDefaultIncrementAndGetOperation();
-
-  // This list MUST be thread safe (observers can call #remove at any time).
-  private final List<BiConsumer<Long, Map<String, String>>> onAdditionObservers = new CopyOnWriteArrayList<>();
 
   private DefaultLongCounter(String name, String description, String unit, Meter meter) {
     this.name = name;
@@ -82,10 +77,6 @@ public class DefaultLongCounter implements LongCounter {
     addOperation.accept(value, attributes);
   }
 
-  private void notifyOnAdditionObservers(Long value, Map<String, String> context) {
-    onAdditionObservers.forEach(longMapBiConsumer -> longMapBiConsumer.accept(value, context));
-  }
-
   @Override
   public long getValueAsLong() {
     return valueSupplier.get();
@@ -99,16 +90,6 @@ public class DefaultLongCounter implements LongCounter {
   @Override
   public int getValueAsInt() {
     return valueSupplier.get().intValue();
-  }
-
-  @Override
-  public void onAddition(BiConsumer<Long, Map<String, String>> onAdditionObserver) {
-    onAdditionObservers.add(onAdditionObserver);
-  }
-
-  @Override
-  public void remove(BiConsumer<Long, Map<String, String>> onAdditionObserver) {
-    onAdditionObservers.remove(onAdditionObserver);
   }
 
   @Override
@@ -129,15 +110,11 @@ public class DefaultLongCounter implements LongCounter {
   private BiConsumer<Long, Map<String, String>> getDefaultAddOperation() {
     return (delta, context) -> {
       value.addAndGet(delta);
-      this.notifyOnAdditionObservers(delta, context);
     };
   }
 
   private Function<Map<String, String>, Long> getDefaultIncrementAndGetOperation() {
-    return contextAttributes -> {
-      this.notifyOnAdditionObservers(1L, contextAttributes);
-      return value.incrementAndGet();
-    };
+    return contextAttributes -> value.incrementAndGet();
   }
 
   public static class DefaultLongCounterBuilder implements LongCounterBuilder {
@@ -185,7 +162,7 @@ public class DefaultLongCounter implements LongCounter {
     public LongCounter build() {
       LongCounter longCounter = ofNullable(instrumentRepository)
           .map(repository -> (LongCounter) repository.create(name, name -> doBuild()))
-          .orElse(doBuild());
+          .orElseGet(this::doBuild);
 
       return longCounter;
     }

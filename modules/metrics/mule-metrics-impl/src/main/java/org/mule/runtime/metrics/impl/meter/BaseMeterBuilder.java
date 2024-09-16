@@ -48,7 +48,7 @@ public abstract class BaseMeterBuilder implements MeterBuilderWithRepository {
     requireNonNull(meterExporter);
     return ofNullable(meterRepository)
         .map(repository -> repository.getOrCreate(meterName, name -> doBuild(name, description, meterExporter, meterAttributes)))
-        .orElse(doBuild(meterName, description, meterExporter, meterAttributes));
+        .orElseGet(() -> doBuild(meterName, description, meterExporter, meterAttributes));
   }
 
   protected abstract Meter doBuild(String meterName, String description, MeterExporter meterExporter,
