@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.metrics.api.instrument;
 
-import org.mule.runtime.metrics.api.meter.Meter;
-
 /**
  * A counter for registering long measurements, only incremental.
  *

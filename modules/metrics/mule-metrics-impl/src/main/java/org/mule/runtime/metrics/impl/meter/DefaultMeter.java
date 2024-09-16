@@ -9,11 +9,13 @@ package org.mule.runtime.metrics.impl.meter;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.metrics.api.instrument.builder.ErrorCountersBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
+import org.mule.runtime.metrics.impl.instrument.DefaultErrorCounters;
 import org.mule.runtime.metrics.impl.instrument.DefaultLongCounter;
 import org.mule.runtime.metrics.impl.instrument.DefaultLongUpDownCounter;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
@@ -72,6 +74,13 @@ public class DefaultMeter implements Meter {
   @Override
   public LongCounterBuilder counterBuilder(String counterName) {
     return DefaultLongCounter.builder(counterName, this)
+        .withInstrumentRepository(instrumentRepository)
+        .withMeterExporter(meterExporter);
+  }
+
+  @Override
+  public ErrorCountersBuilder errorCountersBuilder(String name) {
+    return DefaultErrorCounters.builder(name, "", this)
         .withInstrumentRepository(instrumentRepository)
         .withMeterExporter(meterExporter);
   }
