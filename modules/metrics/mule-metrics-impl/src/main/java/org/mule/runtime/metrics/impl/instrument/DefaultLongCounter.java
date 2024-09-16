@@ -94,12 +94,12 @@ public class DefaultLongCounter implements LongCounter {
 
   @Override
   public int incrementAndGetAsInt() {
-    return incrementAndGetOperation.apply(null).intValue();
+    return incrementAndGetOperation.apply(emptyMap()).intValue();
   }
 
   @Override
   public long incrementAndGetAsLong() {
-    return incrementAndGetOperation.apply(null);
+    return incrementAndGetOperation.apply(emptyMap());
   }
 
   @Override
