@@ -41,7 +41,7 @@ public class DefaultMeter implements Meter {
   private final String description;
   private final InstrumentRepository instrumentRepository = new InstrumentRepository();
 
-  protected DefaultMeter(String meterName, String description, MeterExporter meterExporter, Map<String, String> meterAttributes) {
+  private DefaultMeter(String meterName, String description, MeterExporter meterExporter, Map<String, String> meterAttributes) {
     this.meterName = meterName;
     this.description = description;
     this.meterExporter = meterExporter;
