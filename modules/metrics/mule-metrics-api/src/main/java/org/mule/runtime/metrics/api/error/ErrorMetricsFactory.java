@@ -19,7 +19,9 @@ public interface ErrorMetricsFactory {
    * No operation {@link ErrorMetricsFactory} implementation. It will always return a no operation {@link ErrorMetrics}
    * implementation.
    */
-  ErrorMetricsFactory NO_OP = new ErrorMetricsFactory() {
+  ErrorMetricsFactory NO_OP = new NoOpErrorMetricsFactory();
+
+  class NoOpErrorMetricsFactory implements ErrorMetricsFactory {
 
     @Override
     public ErrorMetrics create(Meter errorMetricsMeter) {
@@ -30,7 +32,7 @@ public interface ErrorMetricsFactory {
     public ErrorMetrics create(Meter errorMetricsMeter, ErrorIdProvider errorIdProvider) {
       return ErrorMetrics.NO_OP;
     }
-  };
+  }
 
   /**
    * Returns an {@link ErrorMetrics} implementation.
