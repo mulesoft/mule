@@ -32,7 +32,7 @@ import org.hamcrest.TypeSafeMatcher;
 public class StacktraceLogChecker extends AbstractLogChecker {
 
   private static final String MODULE_OR_PACKAGE_NAME_REGEX = "[a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+[0-9a-z_]";
-  private static final String VERSION_REGEX = "[0-9_]*(?:\\.[0-9_]+)+\\.[0-9]";
+  private static final String VERSION_REGEX = "[0-9_]*(?:\\.[0-9_]+)+\\.[0-9]+";
 
   private static final Pattern PACKAGE_WITH_MODULE_PATTERN =
       compile("^(?:" + MODULE_OR_PACKAGE_NAME_REGEX + "@" + VERSION_REGEX + "\\/)?(" + MODULE_OR_PACKAGE_NAME_REGEX + ")$");
@@ -150,7 +150,7 @@ public class StacktraceLogChecker extends AbstractLogChecker {
      * @return a {@link org.hamcrest.Matcher} for checking compatible method calls.
      */
     public static org.hamcrest.Matcher<MethodCall> compatibleWith(MethodCall thisCall) {
-      return new TypeSafeMatcher<MethodCall>() {
+      return new TypeSafeMatcher<>() {
 
         @Override
         protected boolean matchesSafely(MethodCall otherCall) {
