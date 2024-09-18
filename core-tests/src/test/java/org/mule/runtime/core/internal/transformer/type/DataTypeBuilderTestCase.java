@@ -30,7 +30,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import net.bytebuddy.implementation.bind.annotation.*;
 import org.mule.runtime.api.el.BindingContext;
@@ -412,7 +412,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
   }
 
-  protected static class TestInterceptor {
+  public static class TestInterceptor {
 
     @RuntimeType
     public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args,
