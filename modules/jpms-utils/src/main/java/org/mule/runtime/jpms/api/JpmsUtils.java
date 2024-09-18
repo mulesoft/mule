@@ -173,14 +173,7 @@ public final class JpmsUtils {
         .filter(module -> {
           final String moduleName = module.getName();
 
-          // Original intention is to only expose standard java modules...
-          return moduleName.startsWith("java.")
-              // TODO W-16374984:
-              // ... but because we need to keep compatibility with Java 8, older versions of some libraries use internal JDK
-              // modules packages:
-              // * caffeine 2.x still uses sun.misc.Unsafe. Ref: https://github.com/ben-manes/caffeine/issues/273
-              // * obgenesis SunReflectionFactoryHelper, used by Mockito
-              || moduleName.startsWith("jdk.");
+          return moduleName.startsWith("java.");
         })
         .forEach(module -> packages.addAll(module.getPackages()));
   }
