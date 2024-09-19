@@ -7,9 +7,9 @@
 package org.mule.runtime.module.deployment.internal;
 
 /**
- * A Logger for the {@link RetryScheduledFolderDeletionTask} This is only used for 4.4.x.
+ * A Logger for the {@link NativeLibrariesFolderDeletionRetryScheduledTask} This is only used for 4.4.x.
  */
-public interface RetryScheduledFolderDeletionTaskLogger {
+public interface NativeLibrariesFolderDeletionRetryScheduledTaskLogger {
 
   /**
    * Logs a message with DEBUG level.

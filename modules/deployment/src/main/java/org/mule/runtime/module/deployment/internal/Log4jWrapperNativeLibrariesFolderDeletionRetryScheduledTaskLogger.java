@@ -9,13 +9,15 @@ package org.mule.runtime.module.deployment.internal;
 import org.slf4j.Logger;
 
 /**
- * A Logger for the {@link RetryScheduledFolderDeletionTask} that wraps a log4j logger. This is only used for 4.4.x.
+ * A Logger for the {@link NativeLibrariesFolderDeletionRetryScheduledTask} that wraps a log4j logger. This is only used for
+ * 4.4.x.
  */
-public class Log4jWrapperRetryScheduledFolderDeletionTaskLogger implements RetryScheduledFolderDeletionTaskLogger {
+public class Log4jWrapperNativeLibrariesFolderDeletionRetryScheduledTaskLogger
+    implements NativeLibrariesFolderDeletionRetryScheduledTaskLogger {
 
   private final Logger logger;
 
-  public Log4jWrapperRetryScheduledFolderDeletionTaskLogger(Logger logger) {
+  public Log4jWrapperNativeLibrariesFolderDeletionRetryScheduledTaskLogger(Logger logger) {
     this.logger = logger;
   }
 

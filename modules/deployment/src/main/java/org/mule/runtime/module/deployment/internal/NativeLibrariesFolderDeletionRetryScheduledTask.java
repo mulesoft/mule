@@ -24,7 +24,7 @@ public class NativeLibrariesFolderDeletionRetryScheduledTask implements Runnable
   private final int maxAttempts;
   private final AtomicInteger attempts;
   private final ActionTask actionTask;
-  private final RetryScheduledFolderDeletionTaskLogger logger;
+  private final NativeLibrariesFolderDeletionRetryScheduledTaskLogger logger;
 
   private static final Logger LOGGER = getLogger(NativeLibrariesFolderDeletionRetryScheduledTask.class);
   private static final boolean DISABLE_NATIVE_LIBRARIES_FOLDER_DELETION_GC_CALL =
@@ -32,7 +32,7 @@ public class NativeLibrariesFolderDeletionRetryScheduledTask implements Runnable
 
   public NativeLibrariesFolderDeletionRetryScheduledTask(ScheduledExecutorService scheduler, int maxAttempts,
                                                          ActionTask actionTask,
-                                                         RetryScheduledFolderDeletionTaskLogger logger) {
+                                                         NativeLibrariesFolderDeletionRetryScheduledTaskLogger logger) {
     this.scheduler = scheduler;
     this.maxAttempts = maxAttempts;
     this.attempts = new AtomicInteger(0);
@@ -42,7 +42,7 @@ public class NativeLibrariesFolderDeletionRetryScheduledTask implements Runnable
 
   public NativeLibrariesFolderDeletionRetryScheduledTask(ScheduledExecutorService scheduler, int maxAttempts,
                                                          ActionTask actionTask) {
-    this(scheduler, maxAttempts, actionTask, new Log4jWrapperRetryScheduledFolderDeletionTaskLogger(LOGGER));
+    this(scheduler, maxAttempts, actionTask, new Log4jWrapperNativeLibrariesFolderDeletionRetryScheduledTaskLogger(LOGGER));
   }
 
   @Override

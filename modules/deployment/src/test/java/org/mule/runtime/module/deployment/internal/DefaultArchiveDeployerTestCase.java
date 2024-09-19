@@ -43,7 +43,7 @@ public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
     ArtifactDeployer artifactDeployer = mock(ArtifactDeployer.class);
 
     DefaultArchiveDeployer<Application> deployer =
-        new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null);
+        new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null, null);
     deployer.setDeploymentListener(mock(DeploymentListener.class));
 
     deployer.deployArtifact(createMockApplication(), empty());
@@ -93,12 +93,12 @@ public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
 
   private static DefaultArchiveDeployer createDeployer(ArtifactDeployer artifactDeployer,
                                                        AbstractDeployableArtifactFactory artifactFactory) {
-    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null);
+    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null, null);
   }
 
   private static DefaultArchiveDeployer createDeployerWithRemoveDataInFalse(ArtifactDeployer artifactDeployer,
                                                                             AbstractDeployableArtifactFactory artifactFactory) {
-    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null) {
+    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null, null) {
 
       @Override
       public void undeployArtifact(String artifactId) {
