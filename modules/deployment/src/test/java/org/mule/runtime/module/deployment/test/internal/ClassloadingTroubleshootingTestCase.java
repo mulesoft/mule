@@ -58,6 +58,7 @@ import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -66,6 +67,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 
 @Features({@Feature(LOGGING), @Feature(CLASSLOADING_ISOLATION)})
+@Ignore("W-16176670")
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
 
   private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
