@@ -103,8 +103,6 @@ module org.mule.runtime.spring.config {
       spring.beans;
   exports org.mule.runtime.config.internal.context.lazy to
       org.mule.runtime.tooling.support;
-  exports org.mule.runtime.config.internal.context.metrics to
-      spring.beans;
   exports org.mule.runtime.config.internal.dsl.processor to
       org.mule.runtime.core,
       spring.beans;

@@ -7,7 +7,6 @@
 package org.mule.runtime.metrics.api.instrument.builder;
 
 import org.mule.runtime.metrics.api.instrument.Instrument;
-import org.mule.runtime.metrics.api.meter.Meter;
 
 /**
  * A builder for {@link Instrument}'s component.

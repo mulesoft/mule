@@ -112,6 +112,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metrics-exporter-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-manifest</artifactId>
             <version>${project.version}</version>
         </dependency>
