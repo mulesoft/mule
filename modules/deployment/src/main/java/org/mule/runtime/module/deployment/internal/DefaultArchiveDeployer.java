@@ -15,7 +15,6 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
-import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -26,6 +25,9 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
@@ -47,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
@@ -77,12 +79,14 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   private AbstractDeployableArtifactFactory<D, T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
   private final MuleContextListenerFactory muleContextListenerFactory;
+  private final Supplier<SchedulerService> artifactStartExecutorSupplier;
 
   public DefaultArchiveDeployer(final ArtifactDeployer<T> deployer,
                                 final AbstractDeployableArtifactFactory<D, T> artifactFactory,
                                 final ObservableList<T> artifacts,
                                 ArtifactDeploymentTemplate deploymentTemplate,
-                                MuleContextListenerFactory muleContextListenerFactory) {
+                                MuleContextListenerFactory muleContextListenerFactory,
+                                Supplier<SchedulerService> artifactStartExecutorSupplier) {
     this.deployer = deployer;
     this.artifactFactory = artifactFactory;
     this.artifacts = artifacts;
@@ -90,6 +94,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     this.artifactDir = artifactFactory.getArtifactDir();
     this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
     this.muleContextListenerFactory = muleContextListenerFactory;
+    this.artifactStartExecutorSupplier = artifactStartExecutorSupplier;
   }
 
   @Override
@@ -359,7 +364,9 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
     final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appDataFolderName, loadedNativeLibrariesFolderName);
 
-    ScheduledExecutorService scheduler = newScheduledThreadPool(CORE_POOL_SIZE);
+    Scheduler scheduler = artifactStartExecutorSupplier.get().customScheduler(SchedulerConfig.config()
+        .withMaxConcurrentTasks(CORE_POOL_SIZE)
+        .withName("RetryScheduledFolderDeletionTask-StaleCleaner"));
     NativeLibrariesFolderDeletionRetryScheduledTask retryTask =
         new NativeLibrariesFolderDeletionRetryScheduledTask(scheduler, MAX_ATTEMPTS,
                                                             new NativeLibrariesFolderDeletionActionTask(appDataFolderName,
