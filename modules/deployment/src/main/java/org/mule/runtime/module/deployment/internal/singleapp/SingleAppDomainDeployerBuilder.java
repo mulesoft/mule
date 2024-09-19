@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal.singleapp;
 
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
@@ -21,6 +22,7 @@ import org.mule.runtime.module.deployment.internal.DomainDeploymentTemplate;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 
@@ -29,6 +31,7 @@ import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemp
  */
 public class SingleAppDomainDeployerBuilder {
 
+  private final Supplier<SchedulerService> artifactStartExecutorSupplier;
   private ObservableList<Domain> domains;
   private ArtifactDeployer<Domain> domainArtifactDeployer;
   private DefaultDomainFactory domainFactory;
@@ -40,11 +43,13 @@ public class SingleAppDomainDeployerBuilder {
   private DefaultApplicationFactory applicationFactory;
   private ArtifactDeployer<Application> applicationArtifactDeployer;
 
-  public static SingleAppDomainDeployerBuilder getSingleAppDomainDeployerBuilder() {
-    return new SingleAppDomainDeployerBuilder();
+  private SingleAppDomainDeployerBuilder(Supplier<SchedulerService> artifactStartExecutorSupplier) {
+    this.artifactStartExecutorSupplier = artifactStartExecutorSupplier;
   }
 
-  private SingleAppDomainDeployerBuilder() {}
+  public static SingleAppDomainDeployerBuilder getSingleAppDomainDeployerBuilder(Supplier<SchedulerService> artifactStartExecutorSupplier) {
+    return new SingleAppDomainDeployerBuilder(artifactStartExecutorSupplier);
+  }
 
   public DomainArchiveDeployer build() {
     return new DomainArchiveDeployer(new DefaultArchiveDeployer<>(domainArtifactDeployer, domainFactory, domains,
@@ -52,11 +57,12 @@ public class SingleAppDomainDeployerBuilder {
                                                                                                                             applicationFactory,
                                                                                                                             applications,
                                                                                                                             NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
-                                                                                                                            new DeploymentMuleContextListenerFactory(applicationDeploymentListener)),
+                                                                                                                            new DeploymentMuleContextListenerFactory(applicationDeploymentListener),
+                                                                                                                            artifactStartExecutorSupplier),
                                                                                                deploymentService,
                                                                                                applicationDeploymentListener),
-                                                                  new DeploymentMuleContextListenerFactory(
-                                                                                                           domainDeploymentListener)),
+                                                                  new DeploymentMuleContextListenerFactory(domainDeploymentListener),
+                                                                  artifactStartExecutorSupplier),
                                      applicationDeployer, deploymentService);
 
   }
