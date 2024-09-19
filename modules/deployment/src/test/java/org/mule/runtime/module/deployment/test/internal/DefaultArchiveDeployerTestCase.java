@@ -124,13 +124,13 @@ public class DefaultArchiveDeployerTestCase extends AbstractMuleTestCase {
   @NotNull
   private static DefaultArchiveDeployer createDeployer(ArtifactDeployer artifactDeployer,
                                                        AbstractDeployableArtifactFactory artifactFactory) {
-    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null);
+    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null, null);
   }
 
   @NotNull
   private static DefaultArchiveDeployer createDeployerWithRemoveDataInFalse(ArtifactDeployer artifactDeployer,
                                                                             AbstractDeployableArtifactFactory artifactFactory) {
-    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null) {
+    return new DefaultArchiveDeployer(artifactDeployer, artifactFactory, new ObservableList(), null, null, null) {
 
       @Override
       public void undeployArtifact(String artifactId) {
