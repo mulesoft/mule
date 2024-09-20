@@ -10,8 +10,8 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -38,24 +38,27 @@ public class ErrorHandlerOnErrorTypeNonPropertyValueTestCase extends AbstractCor
   @Test
   @Issue("W-16083021")
   public void onErrorRefDoesntCauseNpe() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns:http=\"http://www.mulesoft.org/schema/mule/http\"\n" +
-        "      xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xsi:schemaLocation=\"\n" +
-        "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
-        "\n" +
-        "    <on-error-continue name=\"sharedErrorHandler\">\n" +
-        "        <logger/>\n" +
-        "    </on-error-continue>\n" +
-        "\n" +
-        "    <flow name=\"withSharedHandler\">\n" +
-        "        <error-handler >\n" +
-        "            <on-error ref=\"sharedErrorHandler\"/>\n" +
-        "        </error-handler>\n" +
-        "    </flow>\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("ErrorHandlerOnErrorTypeNonPropertyValueTestCase#onErrorRefDoesntCauseNpe",
+                      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                          "<mule xmlns:http=\"http://www.mulesoft.org/schema/mule/http\"\n" +
+                          "      xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                          "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                          "      xsi:schemaLocation=\"\n" +
+                          "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                          +
+                          "\n" +
+                          "    <on-error-continue name=\"sharedErrorHandler\">\n" +
+                          "        <logger/>\n" +
+                          "    </on-error-continue>\n" +
+                          "\n" +
+                          "    <flow name=\"withSharedHandler\">\n" +
+                          "        <error-handler >\n" +
+                          "            <on-error ref=\"sharedErrorHandler\"/>\n" +
+                          "        </error-handler>\n" +
+                          "    </flow>\n" +
+                          "</mule>")
+                              .stream().findFirst();
 
     assertThat(msg.isPresent(), equalTo(false));
   }

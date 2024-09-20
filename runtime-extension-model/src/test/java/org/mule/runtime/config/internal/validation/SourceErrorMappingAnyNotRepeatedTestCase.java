@@ -10,8 +10,8 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HA
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -36,32 +36,36 @@ public class SourceErrorMappingAnyNotRepeatedTestCase extends AbstractCoreValida
 
   @Test
   public void severalAnyMappingsNotAllowed() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xmlns:test=\"http://www.mulesoft.org/schema/mule/test\"\n" +
-        "      xsi:schemaLocation=\"\n" +
-        "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\n" +
-        "       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd\">\n" +
-        "\n" +
-        "    <flow name=\"onErrorPropagateTypeMatch\">\n" +
-        "        <test:operation>\n" +
-        "            <error-mapping targetType=\"TRANSFORMATION\"/>\n" +
-        "            <error-mapping sourceType=\"ANY\" targetType=\"CONNECTIVITY\"/>\n" +
-        "            <error-mapping targetType=\"EXPRESSION\"/>\n" +
-        "        </test:operation>\n" +
-        "        <error-handler>\n" +
-        "            <on-error-propagate type=\"EXPRESSION\">\n" +
-        "                <set-payload value=\"#[payload ++ ' nope']\"/>\n" +
-        "            </on-error-propagate>\n" +
-        "            <on-error-propagate type=\"ANY\">\n" +
-        "                <logger level=\"ERROR\"/>\n" +
-        "            </on-error-propagate>\n" +
-        "        </error-handler>\n" +
-        "    </flow>\n" +
-        "\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("SourceErrorMappingAnyNotRepeatedTestCase#severalAnyMappingsNotAllowed",
+                      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                          "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                          "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                          "      xmlns:test=\"http://www.mulesoft.org/schema/mule/test\"\n" +
+                          "      xsi:schemaLocation=\"\n" +
+                          "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\n"
+                          +
+                          "       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd\">\n"
+                          +
+                          "\n" +
+                          "    <flow name=\"onErrorPropagateTypeMatch\">\n" +
+                          "        <test:operation>\n" +
+                          "            <error-mapping targetType=\"TRANSFORMATION\"/>\n" +
+                          "            <error-mapping sourceType=\"ANY\" targetType=\"CONNECTIVITY\"/>\n" +
+                          "            <error-mapping targetType=\"EXPRESSION\"/>\n" +
+                          "        </test:operation>\n" +
+                          "        <error-handler>\n" +
+                          "            <on-error-propagate type=\"EXPRESSION\">\n" +
+                          "                <set-payload value=\"#[payload ++ ' nope']\"/>\n" +
+                          "            </on-error-propagate>\n" +
+                          "            <on-error-propagate type=\"ANY\">\n" +
+                          "                <logger level=\"ERROR\"/>\n" +
+                          "            </on-error-propagate>\n" +
+                          "        </error-handler>\n" +
+                          "    </flow>\n" +
+                          "\n" +
+                          "</mule>")
+                              .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Only one mapping for 'ANY' or an empty source type is allowed."));
