@@ -28,9 +28,9 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Sc
 
 import java.io.StringWriter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.io.OutputFormat;
