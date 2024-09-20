@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import javax.inject.Inject;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
@@ -79,16 +79,14 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   private AbstractDeployableArtifactFactory<D, T> artifactFactory;
   private DeploymentListener deploymentListener = new NullDeploymentListener();
   private final MuleContextListenerFactory muleContextListenerFactory;
-  private Scheduler scheduler;
-
-  @Inject
-  private SchedulerService schedulerService;
+  private final Supplier<SchedulerService> artifactStartExecutorSupplier;
 
   public DefaultArchiveDeployer(final ArtifactDeployer<T> deployer,
                                 final AbstractDeployableArtifactFactory<D, T> artifactFactory,
                                 final ObservableList<T> artifacts,
                                 ArtifactDeploymentTemplate deploymentTemplate,
-                                MuleContextListenerFactory muleContextListenerFactory) {
+                                MuleContextListenerFactory muleContextListenerFactory,
+                                Supplier<SchedulerService> artifactStartExecutorSupplier) {
     this.deployer = deployer;
     this.artifactFactory = artifactFactory;
     this.artifacts = artifacts;
@@ -96,6 +94,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     this.artifactDir = artifactFactory.getArtifactDir();
     this.artifactArchiveInstaller = new ArtifactArchiveInstaller(artifactDir);
     this.muleContextListenerFactory = muleContextListenerFactory;
+    this.artifactStartExecutorSupplier = artifactStartExecutorSupplier;
   }
 
   @Override
@@ -365,7 +364,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     final String loadedNativeLibrariesFolderName = artifact.getDescriptor().getLoadedNativeLibrariesFolderName();
     final File appNativeLibrariesFolder = getAppNativeLibrariesTempFolder(appDataFolderName, loadedNativeLibrariesFolderName);
 
-    scheduler = schedulerService.customScheduler(SchedulerConfig.config()
+    Scheduler scheduler = artifactStartExecutorSupplier.get().customScheduler(SchedulerConfig.config()
         .withMaxConcurrentTasks(CORE_POOL_SIZE)
         .withName("RetryScheduledFolderDeletionTask-StaleCleaner"));
     NativeLibrariesFolderDeletionRetryScheduledTask retryTask =

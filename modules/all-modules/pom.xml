@@ -116,12 +116,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-javaee</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-jpms-utils</artifactId>
             <version>${project.version}</version>

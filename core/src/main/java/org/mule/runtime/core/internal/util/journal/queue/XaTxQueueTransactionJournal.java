@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.journal.queue;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.internal.util.journal.JournalEntrySerializer;
 
 import java.io.DataInputStream;
@@ -19,24 +19,24 @@ import javax.transaction.xa.Xid;
 
 public class XaTxQueueTransactionJournal extends AbstractQueueTransactionJournal<Xid, XaQueueTxJournalEntry> {
 
-  public XaTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext,
+  public XaTxQueueTransactionJournal(String logFilesDirectory, final SerializationProtocol serializer,
                                      Integer maximumFileSizeInMegabytes) {
     super(logFilesDirectory, new JournalEntrySerializer<Xid, XaQueueTxJournalEntry>() {
 
       @Override
       public XaQueueTxJournalEntry deserialize(DataInputStream inputStream) throws IOException {
-        return new XaQueueTxJournalEntry(inputStream, muleContext);
+        return new XaQueueTxJournalEntry(inputStream, serializer);
       }
 
       @Override
       public void serialize(XaQueueTxJournalEntry journalEntry, DataOutputStream dataOutputStream) {
-        journalEntry.write(dataOutputStream, muleContext);
+        journalEntry.write(dataOutputStream, serializer);
       }
     }, maximumFileSizeInMegabytes);
   }
 
-  public XaTxQueueTransactionJournal(String logFilesDirectory, final MuleContext muleContext) {
-    this(logFilesDirectory, muleContext, null);
+  public XaTxQueueTransactionJournal(String logFilesDirectory, final SerializationProtocol serializer) {
+    this(logFilesDirectory, serializer, null);
   }
 
   @Override

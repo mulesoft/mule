@@ -16,6 +16,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -145,9 +146,10 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
     when(mockMuleContext.getConfiguration().getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
     when(mockMuleContext.getExecutionClassLoader()).thenReturn(muleContext.getExecutionClassLoader());
     when(mockMuleContext.getObjectSerializer()).thenReturn(muleContext.getObjectSerializer());
-    QueueStore queue = createQueueInfoDelegate(capacity, mockMuleContext);
+    QueueStore queue = createQueueInfoDelegate(capacity, mockMuleContext.getConfiguration().getWorkingDirectory(),
+                                               mockMuleContext.getObjectSerializer().getInternalProtocol());
     return queue;
   }
 
-  protected abstract QueueStore createQueueInfoDelegate(int capacity, MuleContext mockMuleContext);
+  protected abstract QueueStore createQueueInfoDelegate(int capacity, String workingDirectory, SerializationProtocol serializer);
 }

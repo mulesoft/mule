@@ -16,6 +16,69 @@ import org.mule.runtime.metrics.api.meter.Meter;
 public interface LongUpDownCounter extends Instrument {
 
   /**
+   * No operation {@link LongUpDownCounter} implementation.
+   */
+  LongUpDownCounter NO_OP = new LongUpDownCounter() {
+
+    public static final String NOOP = "NOOP";
+
+    @Override
+    public String getName() {
+      return NOOP;
+    }
+
+    @Override
+    public String getDescription() {
+      return NOOP;
+    }
+
+    @Override
+    public Meter getMeter() {
+      return Meter.NO_OP;
+    }
+
+    @Override
+    public void add(long value) {
+      // Nothing to do.
+    }
+
+    @Override
+    public long getValueAsLong() {
+      return 0;
+    }
+
+    @Override
+    public int getValueAsInt() {
+      return 0;
+    }
+
+    @Override
+    public String getUnit() {
+      return NOOP;
+    }
+
+    @Override
+    public int incrementAndGetAsInt() {
+      return 0;
+    }
+
+    @Override
+    public long incrementAndGetAsLong() {
+      return 0;
+    }
+
+    @Override
+    public int decrementAndGetAsInt() {
+      return 0;
+    }
+
+    @Override
+    public long decrementAndGetAsLong() {
+      return 0;
+    }
+  };
+
+  /**
    * Adds a value to the counter.
    *
    * @param value The increment amount. May be positive, negative or zero.

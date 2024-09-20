@@ -7,10 +7,8 @@
 package org.mule.runtime.core.internal.util.journal;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -24,6 +22,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -48,8 +49,9 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
   private final JournalEntrySerializer<T, K> journalEntrySerializer;
   private final Long clearFileMinimumSizeInBytes;
 
-  private Multimap<T, K> entries = LinkedHashMultimap.create();
+  private final Multimap<T, K> entries = LinkedHashMultimap.create();
 
+  private boolean doClear;
   private DataOutputStream logFileOutputStream;
   private int journalOperations = 0;
 
@@ -59,14 +61,19 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
    * @param journalEntrySerializer       serializer for {@link JournalEntry}
    * @param transactionCompletePredicate a callback to determine if a transaction is complete.
    */
-  public TransactionJournalFile(File journalFile, JournalEntrySerializer journalEntrySerializer,
-                                TransactionCompletePredicate transactionCompletePredicate, Long clearFileMinimumSizeInBytes) {
+  public TransactionJournalFile(File journalFile, JournalEntrySerializer<T, K> journalEntrySerializer,
+                                TransactionCompletePredicate<T> transactionCompletePredicate, Long clearFileMinimumSizeInBytes) {
     this.journalFile = journalFile;
     this.journalEntrySerializer = journalEntrySerializer;
     this.clearFileMinimumSizeInBytes = clearFileMinimumSizeInBytes;
     if (journalFile.exists()) {
+      doClear = true;
       loadAllEntries(transactionCompletePredicate);
+    } else {
+      // skip the clear call done for the recovery, since there's nothing to recover
+      doClear = false;
     }
+
     createLogOutputStream();
   }
 
@@ -153,13 +160,20 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
   }
 
   /**
-   * Remove all the entries from the transaction journal and cleans the transaction journal fle.
+   * Remove all the entries from the transaction journal and cleans the transaction journal file.
    */
   public synchronized void clear() {
-    close();
-    entries.clear();
-    FileUtils.deleteQuietly(journalFile);
-    createLogOutputStream();
+    if (doClear) {
+      if (journalFile.exists()) {
+        close();
+        entries.clear();
+        FileUtils.deleteQuietly(journalFile);
+      }
+      createLogOutputStream();
+    } else {
+      // after skipping the recovery, do clear normally
+      doClear = true;
+    }
   }
 
   private void createLogOutputStream() {
@@ -182,10 +196,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
    * 
    * @param transactionCompletePredicate a callback to determine if a transaction is complete.
    */
-  private void loadAllEntries(TransactionCompletePredicate transactionCompletePredicate) {
-    if (!journalFile.exists()) {
-      return;
-    }
+  private void loadAllEntries(TransactionCompletePredicate<T> transactionCompletePredicate) {
     DataInputStream dataInputStream = null;
     try {
       dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(journalFile)));

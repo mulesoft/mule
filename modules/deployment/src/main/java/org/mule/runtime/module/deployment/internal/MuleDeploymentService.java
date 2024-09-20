@@ -105,6 +105,7 @@ public class MuleDeploymentService implements DeploymentService {
   private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
   private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final DomainBundleArchiveDeployer domainBundleDeployer;
+  private final Supplier<SchedulerService> artifactStartExecutorSupplier;
 
   static {
     setWeakHashCaches();
@@ -134,6 +135,7 @@ public class MuleDeploymentService implements DeploymentService {
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                Supplier<SchedulerService> artifactStartExecutorSupplier) {
+    this.artifactStartExecutorSupplier = artifactStartExecutorSupplier;
     artifactStartExecutor = new LazyValue<>(() -> artifactStartExecutorSupplier.get()
         .customScheduler(config()
             .withName("ArtifactDeployer.start")
@@ -146,7 +148,8 @@ public class MuleDeploymentService implements DeploymentService {
 
     this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
                                                             NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
-                                                            new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
+                                                            new DeploymentMuleContextListenerFactory(applicationDeploymentListener),
+                                                            artifactStartExecutorSupplier);
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
     this.domainDeployer = createDomainArchiveDeployer(domainFactory, domainMuleDeployer, domains, applicationDeployer,
                                                       applicationDeploymentListener, domainDeploymentListener);
@@ -511,8 +514,8 @@ public class MuleDeploymentService implements DeploymentService {
                                                                   new DomainDeploymentTemplate(applicationDeployer,
                                                                                                this,
                                                                                                applicationDeploymentListener),
-                                                                  new DeploymentMuleContextListenerFactory(
-                                                                                                           domainDeploymentListener)),
+                                                                  new DeploymentMuleContextListenerFactory(domainDeploymentListener),
+                                                                  artifactStartExecutorSupplier),
                                      applicationDeployer, this);
 
   }
