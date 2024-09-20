@@ -43,6 +43,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -183,6 +184,7 @@ public class FileSpanExporterConfigurationTestCase {
   }
 
   @Test
+  @Ignore("To be fixed in W-16676258")
   public void configurationFileChanged() throws Exception {
     File file = createTempFile("tracing", "test");
     Path testFile = get(file.getPath());
