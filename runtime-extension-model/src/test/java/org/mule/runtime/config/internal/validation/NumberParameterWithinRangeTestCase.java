@@ -59,16 +59,20 @@ public class NumberParameterWithinRangeTestCase extends AbstractCoreValidationTe
   public void propertyValue() {
     assumeTrue(ignoreParamsWithProperties);
 
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "    xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core" +
-        "                         http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
-        "    <flow name=\"w-15959903Flow\" maxConcurrency=\"${maxConcurrency}\">\n" +
-        "        <logger level=\"INFO\" />\n" +
-        "    </flow>\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("NumberParameterWithinRangeTestCase#propertyValue",
+                                                             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                                                 "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                                                                 "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                                                                 "    xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core"
+                                                                 +
+                                                                 "                         http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                                                                 +
+                                                                 "    <flow name=\"w-15959903Flow\" maxConcurrency=\"${maxConcurrency}\">\n"
+                                                                 +
+                                                                 "        <logger level=\"INFO\" />\n" +
+                                                                 "    </flow>\n" +
+                                                                 "</mule>")
+                                                                     .stream().findFirst();
 
     // No errors
     assertThat(msg.isPresent(), is(false));
@@ -76,16 +80,19 @@ public class NumberParameterWithinRangeTestCase extends AbstractCoreValidationTe
 
   @Test
   public void valueOffRange() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "    xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core" +
-        "                         http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
-        "    <flow name=\"w-15959903Flow\" maxConcurrency=\"-1\">\n" +
-        "        <logger level=\"INFO\" />\n" +
-        "    </flow>\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("NumberParameterWithinRangeTestCase#valueOffRange",
+                                                             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                                                 "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                                                                 "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                                                                 "    xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core"
+                                                                 +
+                                                                 "                         http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                                                                 +
+                                                                 "    <flow name=\"w-15959903Flow\" maxConcurrency=\"-1\">\n" +
+                                                                 "        <logger level=\"INFO\" />\n" +
+                                                                 "    </flow>\n" +
+                                                                 "</mule>")
+                                                                     .stream().findFirst();
 
     assertThat(msg.get().getValidation().getLevel(), is(ERROR));
     assertThat(msg.get().getMessage(),

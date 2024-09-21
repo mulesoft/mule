@@ -11,10 +11,10 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DS
 
 import static java.lang.String.format;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -40,18 +40,20 @@ public class RequiredParametersPresentTestCase extends AbstractCoreValidationTes
 
   @Test
   public void flowRefWithNoName() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
-        +
-        "\n" +
-        "    <flow name=\"flow\">\n" +
-        "        <flow-ref/>\n" +
-        "    </flow>\n" +
-        "    \n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("RequiredParametersPresentTestCase#flowRefWithNoName",
+                                                             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                                                 "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                                                                 "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                                                                 +
+                                                                 "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                                                                 +
+                                                                 "\n" +
+                                                                 "    <flow name=\"flow\">\n" +
+                                                                 "        <flow-ref/>\n" +
+                                                                 "    </flow>\n" +
+                                                                 "    \n" +
+                                                                 "</mule>")
+                                                                     .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString(format("Element <flow-ref> is missing required parameter 'name'.")));
@@ -60,19 +62,21 @@ public class RequiredParametersPresentTestCase extends AbstractCoreValidationTes
   @Test
   @Issue("MULE-19899")
   public void numberParamWithUnresolvedProperty() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xmlns:test=\"http://www.mulesoft.org/schema/mule/test\"\n" +
-        "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\n"
-        +
-        "               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd\">\n"
-        +
-        "\n" +
-        "    <test:other-config name=\"cfg\" count=\"${other.count}\"/>\n" +
-        "\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("RequiredParametersPresentTestCase#numberParamWithUnresolvedProperty",
+                      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                          "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                          "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                          "      xmlns:test=\"http://www.mulesoft.org/schema/mule/test\"\n" +
+                          "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\n"
+                          +
+                          "               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd\">\n"
+                          +
+                          "\n" +
+                          "    <test:other-config name=\"cfg\" count=\"${other.count}\"/>\n" +
+                          "\n" +
+                          "</mule>")
+                              .stream().findFirst();
 
     assertThat(msg.map(r -> r.getMessage()).orElse(null), msg.isPresent(), is(false));
   }
@@ -80,15 +84,16 @@ public class RequiredParametersPresentTestCase extends AbstractCoreValidationTes
   @Test
   @Issue("MULE-19963")
   public void manyRequiredMissingAllReported() {
-    final List<ValidationResultItem> msgs = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
-        +
-        "\n" +
-        "    <global-property/>\n" +
-        "\n" +
-        "</mule>");
+    final List<ValidationResultItem> msgs = runValidation("RequiredParametersPresentTestCase#manyRequiredMissingAllReported",
+                                                          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                                              "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                                                              "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                                                              "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                                                              +
+                                                              "\n" +
+                                                              "    <global-property/>\n" +
+                                                              "\n" +
+                                                              "</mule>");
 
     assertThat(msgs, hasSize(2));
   }

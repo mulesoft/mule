@@ -26,38 +26,44 @@ public class MelExpressionsTestCase extends AbstractCoreValidationTestCase {
 
   @Test
   public void dataWeaveExpression() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xsi:schemaLocation=\"\n" +
-        "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
-        "    <flow name=\"flow\">\n" +
-        "        <foreach collection=\"#[1, 2, 3]\">\n" +
-        "            <logger message=\"hello\"/>\n" +
-        "        </foreach>\n" +
-        "    </flow>\n" +
-        "\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("MelExpressionsTestCase#dataWeaveExpression",
+                                                             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                                                 "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                                                                 "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                                                                 +
+                                                                 "      xsi:schemaLocation=\"\n" +
+                                                                 "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                                                                 +
+                                                                 "    <flow name=\"flow\">\n" +
+                                                                 "        <foreach collection=\"#[1, 2, 3]\">\n" +
+                                                                 "            <logger message=\"hello\"/>\n" +
+                                                                 "        </foreach>\n" +
+                                                                 "    </flow>\n" +
+                                                                 "\n" +
+                                                                 "</mule>")
+                                                                     .stream().findFirst();
 
     assertThat(msg.isPresent(), is(false));
   }
 
   @Test
   public void melExpression() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xsi:schemaLocation=\"\n" +
-        "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
-        "    <flow name=\"flow\">\n" +
-        "        <foreach collection=\"#[mel:[1, 2, 3]]\">\n" +
-        "            <logger message=\"hello\"/>\n" +
-        "        </foreach>\n" +
-        "    </flow>\n" +
-        "\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("MelExpressionsTestCase#melExpression",
+                                                             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                                                 "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                                                                 "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                                                                 +
+                                                                 "      xsi:schemaLocation=\"\n" +
+                                                                 "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                                                                 +
+                                                                 "    <flow name=\"flow\">\n" +
+                                                                 "        <foreach collection=\"#[mel:[1, 2, 3]]\">\n" +
+                                                                 "            <logger message=\"hello\"/>\n" +
+                                                                 "        </foreach>\n" +
+                                                                 "    </flow>\n" +
+                                                                 "\n" +
+                                                                 "</mule>")
+                                                                     .stream().findFirst();
 
     assertThat(msg.isPresent(), is(true));
     assertThat(msg.get().getMessage(), is("MEL expressions are no longer supported."));
