@@ -11,6 +11,7 @@ import static org.mule.sdk.api.meta.Category.SELECT;
 import static org.mule.sdk.api.meta.ExternalLibraryType.NATIVE;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 
 import static com.google.common.collect.ImmutableList.copyOf;
@@ -66,7 +67,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT)
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17, JAVA_21})
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
     KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class, HeisenbergOperationLifecycleValidator.class})
 @OnException(SdkHeisenbergConnectionExceptionEnricher.class)

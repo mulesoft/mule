@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.internal.util.java.JdkVersionUtils.JdkVersion;
 import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
-import org.mule.runtime.manifest.api.MuleManifest;
 import org.mule.runtime.manifest.internal.DefaultMuleManifest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -81,22 +80,24 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
                isSupportedJdkVersion(), is(true));
 
     List<String> supported = asList("17.0.0",
-                                    "17.0.11");
+                                    "17.0.11",
+                                    "21.0.1",
+                                    "21.0.3");
 
     for (String version : supported) {
       setJdkVersion(version);
-      assertThat("Java version `" + originalJavaVersion + "` not supported",
+      assertThat("Java version `" + version + "` not supported",
                  isSupportedJdkVersion(), is(true));
     }
 
     // not supported
     List<String> notSupported = asList("1.7.2",
                                        "1.7.2_12",
-                                       "18.0.0");
+                                       "22.0.0");
 
     for (String version : notSupported) {
       setJdkVersion(version);
-      assertThat("Java version `" + originalJavaVersion + "` supported",
+      assertThat("Java version `" + version + "` supported",
                  isSupportedJdkVersion(), is(false));
     }
   }
@@ -150,11 +151,13 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   public void testRecommendedJdkVersion() {
     // recommended
     List<String> recommended = asList("17.0.0",
-                                      "17.0.11");
+                                      "17.0.11",
+                                      "21.0.1",
+                                      "21.0.3");
 
     for (String version : recommended) {
       setJdkVersion(version);
-      assertThat("Java version `" + originalJavaVersion + "` not recommended",
+      assertThat("Java version `" + version + "` not recommended",
                  isRecommendedJdkVersion(), is(true));
     }
 
@@ -170,11 +173,12 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
                                          "14.0.0",
                                          "15.0.0",
                                          "16.0.0",
-                                         "18.0.0");
+                                         "18.0.0",
+                                         "22.0.0");
 
     for (String version : notRecommended) {
       setJdkVersion(version);
-      assertThat("Java version `" + originalJavaVersion + "` recommended",
+      assertThat("Java version `" + version + "` recommended",
                  isRecommendedJdkVersion(), is(false));
     }
   }
