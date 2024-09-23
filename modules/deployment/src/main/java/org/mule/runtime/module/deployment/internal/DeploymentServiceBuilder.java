@@ -92,12 +92,14 @@ public class DeploymentServiceBuilder {
     requireNonNull(artifactStartExecutorSupplier, ARTIFACT_START_EXECUTOR_SUPPLIER_IS_NULL_ERROR_MESSAGE);
 
     if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
-      SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder = getSingleAppDomainDeployerBuilder();
+      SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder =
+          getSingleAppDomainDeployerBuilder(artifactStartExecutorSupplier);
       singleAppDomainDeployerBuilder
           .withDomainFactory(domainFactory)
           .withApplicationFactory(applicationFactory);
 
-      SingleAppApplicationDeployerBuilder singleAppApplicationDeployerBuilder = getSingleAppApplicationDeployerBuilder();
+      SingleAppApplicationDeployerBuilder singleAppApplicationDeployerBuilder =
+          getSingleAppApplicationDeployerBuilder(artifactStartExecutorSupplier);
       singleAppApplicationDeployerBuilder.withApplicationFactory(applicationFactory);
 
 
