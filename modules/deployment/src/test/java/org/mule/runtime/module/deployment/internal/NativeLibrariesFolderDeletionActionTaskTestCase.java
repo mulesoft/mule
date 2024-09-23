@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 @Issue("W-15894519")
-public class NativeLibrariesFolderDeletionTestCase extends AbstractMuleTestCase {
+public class NativeLibrariesFolderDeletionActionTaskTestCase extends AbstractMuleTestCase {
 
   private static final String ARTIFACT_ID = "application-test";
 
@@ -27,7 +27,7 @@ public class NativeLibrariesFolderDeletionTestCase extends AbstractMuleTestCase 
   public TemporaryFolder nativeLibrariesFolder = new TemporaryFolder();
 
   @Test
-  public void nativeLibrariesFolderDeletionDeletesTheAppNativeLibrariesFolderWhenExistsAndReturnsTrue() {
+  public void nativeLibrariesFolderDeletionActionTaskDeletesTheAppNativeLibrariesFolderWhenExistsAndReturnsTrue() {
     ActionTask nativeLibrariesFolderDeletionActionTask =
         new NativeLibrariesFolderDeletionActionTask(ARTIFACT_ID, nativeLibrariesFolder.getRoot());
 
