@@ -1352,9 +1352,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static class TestMuleDeploymentService extends MuleDeploymentService {
 
+    private final Supplier<SchedulerService> schedulerServiceSupplier;
+
     public TestMuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                      Supplier<SchedulerService> schedulerServiceSupplier) {
       super(domainFactory, applicationFactory, schedulerServiceSupplier);
+      this.schedulerServiceSupplier = schedulerServiceSupplier;
     }
 
     @Override
@@ -1368,8 +1371,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                         new DomainDeploymentTemplate(applicationDeployer,
                                                                                                      this,
                                                                                                      applicationDeploymentListener),
-                                                                        new DeploymentMuleContextListenerFactory(
-                                                                                                                 domainDeploymentListener)),
+                                                                        new DeploymentMuleContextListenerFactory(domainDeploymentListener),
+                                                                        schedulerServiceSupplier),
                                            applicationDeployer, this);
 
     }
