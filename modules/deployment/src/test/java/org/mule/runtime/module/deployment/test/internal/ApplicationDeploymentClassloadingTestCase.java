@@ -60,7 +60,6 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.times;
 
-import org.apache.commons.io.FileUtils;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleFatalException;
@@ -80,6 +79,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -135,6 +135,58 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
         .definedBy("dummy-app-with-stopped-flow-config.xml")
         .dependingOn(callbackExtensionPlugin)
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+  }
+
+  @Test
+  @Ignore("W-16508382: Java 9+ restricts extending standard Java packages like javax.annotation, causing ResolutionException. "
+      + "Replaced by canExtendCustomPackages.")
+  public void canExtendJavaPackages() throws Exception {
+    File customJavaxClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/javax/annotation/CustomAnnotation.java"));
+
+    // Create an application that includes a custom class in the javax.annotation package
+    final ApplicationFileBuilder extendJavaPackagesAppFileBuilder = appFileBuilder("appExtendingJavaPackages")
+        .definedBy("app-extending-java-packages-config.xml")
+        .containingClass(customJavaxClassFile, "javax/annotation/CustomAnnotation.class");
+
+    addPackedAppFromBuilder(extendJavaPackagesAppFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, extendJavaPackagesAppFileBuilder.getId());
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase by adding tests for external library dependencies and custom package extensions.")
+  public void canExtendCustomPackages() throws Exception {
+    File customExtensionJarFile = new SingleClassCompiler()
+        .compile(getResourceFile("/com/example/extension/CustomExtension.java"));
+
+    // Create an application that includes a custom class in the com.example.extension package
+    final ApplicationFileBuilder extendPackagesAppFileBuilder = appFileBuilder("appExtendingCustomPackages")
+        .definedBy("app-extending-custom-packages-config.xml")
+        .containingClass(customExtensionJarFile, "com/example/extension/CustomExtension.class");
+
+    addPackedAppFromBuilder(extendPackagesAppFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, extendPackagesAppFileBuilder.getId());
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase by adding tests for external library dependencies and custom package extensions.")
+  public void canDependOnExternalLibrary() throws Exception {
+    File externalJarFile = new JarCompiler().compiling(getResourceFile("/com/example/external/ExternalClass.java"))
+        .compile("extension.jar");
+
+    // Create an application that depends on the external library
+    ApplicationFileBuilder externalLibAppFileBuilder = appFileBuilder("appWithExternalLib")
+        .definedBy("app-with-external-lib-config.xml")
+        .dependingOn(new JarFileBuilder("external-lib", externalJarFile));
+
+    addPackedAppFromBuilder(externalLibAppFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, externalLibAppFileBuilder.getId());
+    executeApplicationFlow("main");
   }
 
   @Test
