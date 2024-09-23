@@ -8,6 +8,9 @@ package org.mule.runtime.module.deployment.internal.singleapp;
 
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
@@ -18,25 +21,32 @@ import org.mule.runtime.module.deployment.internal.DeploymentMuleContextListener
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * A builder for an application {@link DefaultArchiveDeployer} to be used in single app mode.
  */
 public class SingleAppApplicationDeployerBuilder {
 
+  private final Supplier<SchedulerService> artifactStartExecutorSupplier;
   private ObservableList<Application> applications;
   private DefaultApplicationFactory applicationFactory;
   private DefaultArtifactDeployer applicationDeployer;
   private CompositeDeploymentListener applicationDeploymentListener;
 
-  public static SingleAppApplicationDeployerBuilder getSingleAppApplicationDeployerBuilder() {
-    return new SingleAppApplicationDeployerBuilder();
+  private SingleAppApplicationDeployerBuilder(Supplier<SchedulerService> artifactStartExecutorSupplier) {
+    this.artifactStartExecutorSupplier = artifactStartExecutorSupplier;
+  }
+
+  public static SingleAppApplicationDeployerBuilder getSingleAppApplicationDeployerBuilder(Supplier<SchedulerService> artifactStartExecutorSupplier) {
+    return new SingleAppApplicationDeployerBuilder(artifactStartExecutorSupplier);
   }
 
   public DefaultArchiveDeployer<ApplicationDescriptor, Application> build() {
     return new DefaultArchiveDeployer<>(applicationDeployer, applicationFactory, applications,
                                         NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
-                                        new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
+                                        new DeploymentMuleContextListenerFactory(applicationDeploymentListener),
+                                        artifactStartExecutorSupplier);
   }
 
   public SingleAppApplicationDeployerBuilder withApplications(List<Application> applications) {
