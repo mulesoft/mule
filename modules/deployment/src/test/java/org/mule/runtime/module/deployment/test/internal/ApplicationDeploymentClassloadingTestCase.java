@@ -156,7 +156,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   }
 
   @Test
-  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase by adding tests for external library dependencies and custom package extensions.")
+  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase")
   public void canExtendCustomPackages() throws Exception {
     File customExtensionJarFile = new SingleClassCompiler()
         .compile(getResourceFile("/com/example/extension/CustomExtension.java"));
@@ -186,6 +186,50 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     addPackedAppFromBuilder(externalLibAppFileBuilder);
     startDeployment();
     assertDeploymentSuccess(applicationDeploymentListener, externalLibAppFileBuilder.getId());
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase")
+  public void applicationClassPrecedenceOverLibraryClass() throws Exception {
+    // Compile the class to be embedded directly into the application
+    File applicationClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/com/example/OverridingClass.java"));
+
+    // Create a library JAR containing the library version of the class
+    File libraryJarFile = new JarCompiler().compiling(getResourceFile("/library/com/example/OverridingClass.java"))
+        .compile("overriding-class-library.jar");
+
+    // Create an application that includes the application version of the class and depends on the library
+    final ApplicationFileBuilder appBuilder = appFileBuilder("appWithClassPrecedence")
+        .definedBy("app-with-class-precedence-config.xml")
+        .containingClass(applicationClassFile, "com/example/OverridingClass.class")
+        .dependingOn(new JarFileBuilder("overriding-class-library", libraryJarFile));
+
+    addPackedAppFromBuilder(appBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, appBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  public void deploysAppWithEmbeddedLibraryClass() throws Exception {
+
+    File libraryJarFile = new JarCompiler().compiling(getResourceFile("/com/example/library/LibraryClass.java"))
+        .compile("library-class.jar");
+
+
+    // Create an application that depends on the library
+    final ApplicationFileBuilder appWithLibraryBuilder = appFileBuilder("appWithLibrary")
+        .definedBy("app-with-library-config.xml")
+        .dependingOn(new JarFileBuilder("library-class", libraryJarFile));
+
+    addPackedAppFromBuilder(appWithLibraryBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, appWithLibraryBuilder.getId());
+
+    // Execute the application flow that uses the library class
     executeApplicationFlow("main");
   }
 
