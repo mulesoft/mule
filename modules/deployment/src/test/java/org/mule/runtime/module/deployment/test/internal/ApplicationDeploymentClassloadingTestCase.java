@@ -173,15 +173,13 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   }
 
   @Test
-  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase by adding tests for external library dependencies and custom package extensions.")
-  public void canDependOnExternalLibrary() throws Exception {
-    File externalJarFile = new JarCompiler().compiling(getResourceFile("/com/example/external/ExternalClass.java"))
-        .compile("extension.jar");
+  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase")
+  public void canDependOnXerces() throws Exception {
+    File xercesJarFile = getResourceFile("/sources/jar/xercesImpl-2.11.0.jar");
 
-    // Create an application that depends on the external library
-    ApplicationFileBuilder externalLibAppFileBuilder = appFileBuilder("appWithExternalLib")
-        .definedBy("app-with-external-lib-config.xml")
-        .dependingOn(new JarFileBuilder("external-lib", externalJarFile));
+    ApplicationFileBuilder externalLibAppFileBuilder = appFileBuilder("appWithXerces")
+        .definedBy("app-with-xerces-config.xml")
+        .dependingOn(new JarFileBuilder("xerces", xercesJarFile));
 
     addPackedAppFromBuilder(externalLibAppFileBuilder);
     startDeployment();
