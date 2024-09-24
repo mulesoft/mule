@@ -125,7 +125,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.lifecycle;
   exports org.mule.runtime.core.api.management.stats;
   exports org.mule.runtime.core.api.message;
-  exports org.mule.runtime.core.api.message.ds;
   exports org.mule.runtime.core.api.metadata;
   exports org.mule.runtime.core.api.object;
   exports org.mule.runtime.core.api.policy;
