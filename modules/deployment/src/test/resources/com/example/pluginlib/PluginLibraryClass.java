@@ -7,7 +7,9 @@
 package com.example.pluginlib;
 
 public class PluginLibraryClass {
+
   public String getMessage() {
     return "Message from Plugin Library Class";
   }
+
 }

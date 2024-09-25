@@ -176,10 +176,15 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase")
   public void canDependOnXerces() throws Exception {
     File xercesJarFile = getResourceFile("/sources/jar/xercesImpl-2.11.0.jar");
+    File overriderClass = new SingleClassCompiler()
+        .compile(getResourceFile("/sources/OverrideMe.java"));
 
     ApplicationFileBuilder externalLibAppFileBuilder = appFileBuilder("appWithXerces")
         .definedBy("app-with-xerces-config.xml")
-        .dependingOn(new JarFileBuilder("xerces", xercesJarFile));
+        // todo: clean up config
+        .containingClass(overriderClass, "overriderClass")
+        .usingResource(xercesJarFile.getAbsolutePath(), "lib/xercesImpl-2.11.0.jar");
+    // .dependingOn(new JarFileBuilder("xerces", xercesJarFile));
 
     addPackedAppFromBuilder(externalLibAppFileBuilder);
     startDeployment();
@@ -229,6 +234,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
 
     // Execute the application flow that uses the library class
     executeApplicationFlow("main");
+    // todo: result should be checked
   }
 
   @Test

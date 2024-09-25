@@ -9,7 +9,9 @@ package com.example;
 // the version of OverridingClass that will be included in the library dependency,
 // it has the same name (com.example.OverridingClass) but returns a different message.
 public class OverridingClass {
+
   public String getMessage() {
     return "Message from Library Class";
   }
+
 }
