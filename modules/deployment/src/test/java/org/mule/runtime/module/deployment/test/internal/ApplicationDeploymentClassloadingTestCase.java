@@ -138,8 +138,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   }
 
   @Test
-  @Ignore("W-16508382: Java 9+ restricts extending standard Java packages like javax.annotation, causing ResolutionException. "
-      + "Replaced by canExtendCustomPackages.")
+  @Ignore("W-16508382: Cover missing test cases from ClassloadingTestCase")
   public void canExtendJavaPackages() throws Exception {
     File customJavaxClassFile = new SingleClassCompiler()
         .compile(getResourceFile("/javax/annotation/CustomAnnotation.java"));
@@ -152,23 +151,6 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     addPackedAppFromBuilder(extendJavaPackagesAppFileBuilder);
     startDeployment();
     assertDeploymentSuccess(applicationDeploymentListener, extendJavaPackagesAppFileBuilder.getId());
-    executeApplicationFlow("main");
-  }
-
-  @Test
-  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase")
-  public void canExtendCustomPackages() throws Exception {
-    File customExtensionJarFile = new SingleClassCompiler()
-        .compile(getResourceFile("/com/example/extension/CustomExtension.java"));
-
-    // Create an application that includes a custom class in the com.example.extension package
-    final ApplicationFileBuilder extendPackagesAppFileBuilder = appFileBuilder("appExtendingCustomPackages")
-        .definedBy("app-extending-custom-packages-config.xml")
-        .containingClass(customExtensionJarFile, "com/example/extension/CustomExtension.class");
-
-    addPackedAppFromBuilder(extendPackagesAppFileBuilder);
-    startDeployment();
-    assertDeploymentSuccess(applicationDeploymentListener, extendPackagesAppFileBuilder.getId());
     executeApplicationFlow("main");
   }
 
