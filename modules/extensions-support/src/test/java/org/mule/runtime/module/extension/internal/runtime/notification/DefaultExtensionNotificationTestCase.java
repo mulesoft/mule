@@ -10,7 +10,8 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotificationTestCase.TestNotificationActionDefinition.REQUEST_START;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,16 +19,18 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import org.junit.Test;
 
-public class DefaultExtensionNotificationTestCase {
+public class DefaultExtensionNotificationTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-16288302")
-  @Description("When DefaultExtensionNotification has a NullComponent and getAction() is called, a NullPointerException is not thrown and the action is initialised.")
+  @Description("When DefaultExtensionNotification calls getAction() with a NullComponent, " +
+      "component.getLocation().getComponentIdentifier() does not throw a NullPointerException and the action is created.")
   public void getActionWhenTheComponentIsANullComponent() {
     TypedValue<?> mockData = mock(TypedValue.class);
     when(mockData.getDataType()).thenReturn(REQUEST_START.getDataType());
@@ -35,8 +38,8 @@ public class DefaultExtensionNotificationTestCase {
 
     Notification.Action action = notification.getAction();
 
-    assertEquals("NULL", action.getNamespace());
-    assertEquals("REQUEST_START", action.getIdentifier());
+    assertThat(action.getNamespace(), is("NULL"));
+    assertThat(action.getIdentifier(), is("REQUEST_START"));
   }
 
   public enum TestNotificationActionDefinition implements NotificationActionDefinition {
