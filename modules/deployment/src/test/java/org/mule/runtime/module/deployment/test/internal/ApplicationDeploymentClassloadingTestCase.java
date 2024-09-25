@@ -173,7 +173,8 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   }
 
   @Test
-  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase")
+  @Issue("W-16508382: Cover missing test cases from ClassloadingTestCase: "
+      + "(MULE-15215: Classloading error when having xerces as mule app dependency)")
   public void canDependOnXerces() throws Exception {
     File xercesJarFile = getResourceFile("/sources/jar/xercesImpl-2.11.0.jar");
     File overriderClass = new SingleClassCompiler()
