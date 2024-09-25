@@ -104,8 +104,9 @@ public class DefaultExtensionNotification implements ExtensionNotification {
   @Override
   public Action getAction() {
     if (action == null) {
-      action = new ExtensionAction(component.getLocation().getComponentIdentifier().getIdentifier().getNamespace().toUpperCase(),
-                                   ((Enum) actionDefinition).name());
+      String namespace = (component.getLocation() == null) ? "NULL"
+          : component.getLocation().getComponentIdentifier().getIdentifier().getNamespace().toUpperCase();
+      action = new ExtensionAction(namespace, ((Enum) actionDefinition).name());
     }
     return action;
   }
