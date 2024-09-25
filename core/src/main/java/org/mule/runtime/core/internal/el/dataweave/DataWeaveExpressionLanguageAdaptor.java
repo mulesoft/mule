@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSaniti
 
 import static java.lang.System.getProperty;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -32,7 +33,9 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ConstraintViolation;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
+import org.mule.runtime.api.el.validation.ValidationPhase;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -52,6 +55,7 @@ import org.mule.runtime.core.privileged.el.ServerContext;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -235,6 +239,12 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   @Override
   public ValidationResult validate(String expression) {
     return expressionExecutor.validate(sanitize(expression));
+  }
+
+  @Override
+  public List<ConstraintViolation> validate(String script, String nameIdentifier, ValidationPhase validationScopePhase,
+                                            TypeBindings typeBindings, Optional<MetadataType> outputType) {
+    return expressionExecutor.validate(script, nameIdentifier, validationScopePhase, typeBindings, outputType);
   }
 
   @Override
