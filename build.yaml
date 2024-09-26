@@ -15,3 +15,6 @@ mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Da
 projectType: runtime
 mavenTool: "3.9.9"
 jdkTool: OPEN-JDK17
+additionalTestConfigs:
+  jdk21:
+    testJdkTool: TEMURIN-JDK21
