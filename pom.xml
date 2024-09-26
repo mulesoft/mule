@@ -158,7 +158,7 @@
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
         <muleBomVersion>4.7.4-rc1</muleBomVersion>
-        <muleMavenClientBomVersion>2.2.4-rc1</muleMavenClientBomVersion>
+        <muleMavenClientBomVersion>2.2.4-rc2</muleMavenClientBomVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.3.4-rc2</mulePropertiesApiVersion>
