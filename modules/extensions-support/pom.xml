@@ -360,10 +360,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
             </plugin>
             <!-- Required by mule-extension-ast-loader -->
             <!-- Force creation of the test-jar before the shade-plugin runs -->
