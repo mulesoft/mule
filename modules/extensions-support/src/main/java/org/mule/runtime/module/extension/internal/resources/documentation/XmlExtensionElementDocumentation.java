@@ -8,27 +8,28 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentationApi;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentationApi;
 
 import java.util.List;
 
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  * a POJO that represents an extension element with parameters and a description.
  *
  * @since 4.0
  */
-public class DefaultXmlExtensionElementDocumentation implements NamedObject, DescribedObject, XmlExtensionElementDocumentation {
+public class XmlExtensionElementDocumentation implements NamedObject, DescribedObject,
+    XmlExtensionElementDocumentationApi {
 
   private String name;
 
   private String description;
 
-  private List<XmlExtensionParameterDocumentation> parameters;
+  private List<XmlExtensionParameterDocumentationApi> parameters;
 
   @XmlAttribute
   public String getName() {
@@ -50,11 +51,11 @@ public class DefaultXmlExtensionElementDocumentation implements NamedObject, Des
 
   @XmlElementWrapper(name = "parameters")
   @XmlElement(name = "parameter")
-  public List<XmlExtensionParameterDocumentation> getParameters() {
+  public List<XmlExtensionParameterDocumentationApi> getParameters() {
     return parameters;
   }
 
-  public void setParameters(List<XmlExtensionParameterDocumentation> parameters) {
+  public void setParameters(List<XmlExtensionParameterDocumentationApi> parameters) {
     this.parameters = parameters;
   }
 }

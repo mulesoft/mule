@@ -13,37 +13,37 @@ import static java.lang.Thread.currentThread;
 
 import org.mule.apache.xml.serialize.OutputFormat;
 import org.mule.apache.xml.serialize.XMLSerializer;
-import org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializerApi;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentationApi;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 /**
- * A simple XML JAXB serializer class for {@link XmlExtensionDocumentation}s files.
+ * A simple XML JAXB serializer class for {@link XmlExtensionDocumentationApi}s files.
  *
  * @since 4.0
  */
-public class DefaultExtensionDescriptionsSerializer
-    implements ExtensionDescriptionsSerializer {
+public class ExtensionDescriptionsSerializer
+    implements ExtensionDescriptionsSerializerApi {
 
-  public static final DefaultExtensionDescriptionsSerializer SERIALIZER = new DefaultExtensionDescriptionsSerializer();
+  public static final ExtensionDescriptionsSerializer SERIALIZER = new ExtensionDescriptionsSerializer();
 
   private JAXBContext jaxbContext;
   private Marshaller marshaller;
   private Unmarshaller unmarshaller;
 
-  private DefaultExtensionDescriptionsSerializer() {
+  private ExtensionDescriptionsSerializer() {
     final ClassLoader tccl = currentThread().getContextClassLoader();
-    currentThread().setContextClassLoader(DefaultExtensionDescriptionsSerializer.class.getClassLoader());
+    currentThread().setContextClassLoader(ExtensionDescriptionsSerializer.class.getClassLoader());
     try {
-      jaxbContext = JAXBContext.newInstance(XmlExtensionDocumentation.class);
+      jaxbContext = JAXBContext.newInstance(XmlExtensionDocumentationApi.class);
       marshaller = jaxbContext.createMarshaller();
       unmarshaller = jaxbContext.createUnmarshaller();
     } catch (Exception e) {
@@ -53,7 +53,7 @@ public class DefaultExtensionDescriptionsSerializer
     }
   }
 
-  public synchronized String serialize(XmlExtensionDocumentation dto) {
+  public synchronized String serialize(XmlExtensionDocumentationApi dto) {
     try {
       ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
       marshaller.marshal(dto, getXmlSerializer(out).asContentHandler());
@@ -64,17 +64,17 @@ public class DefaultExtensionDescriptionsSerializer
     }
   }
 
-  public synchronized XmlExtensionDocumentation deserialize(String xml) {
+  public synchronized XmlExtensionDocumentationApi deserialize(String xml) {
     try {
-      return (XmlExtensionDocumentation) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()));
+      return (XmlExtensionDocumentationApi) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  public synchronized XmlExtensionDocumentation deserialize(InputStream xml) {
+  public synchronized XmlExtensionDocumentationApi deserialize(InputStream xml) {
     try {
-      return (XmlExtensionDocumentation) unmarshaller.unmarshal(xml);
+      return (XmlExtensionDocumentationApi) unmarshaller.unmarshal(xml);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -97,7 +97,7 @@ public class DefaultExtensionDescriptionsSerializer
     return format(EXTENSION_DESCRIPTIONS_FILE_NAME_MASK, key);
   }
 
-  static public ExtensionDescriptionsSerializer getExtensionDescriptionsSerializer() {
+  static public ExtensionDescriptionsSerializerApi getExtensionDescriptionsSerializer() {
     return SERIALIZER;
   }
 }

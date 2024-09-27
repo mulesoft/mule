@@ -8,25 +8,25 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentationApi;
 
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * a POJO that represents an extension parameter with a name and a description.
  *
  * @since 4.0
  */
-public class DefaultXmlExtensionParameterDocumentation implements NamedObject, DescribedObject,
-    XmlExtensionParameterDocumentation {
+public class XmlExtensionParameterDocumentation implements NamedObject, DescribedObject,
+    XmlExtensionParameterDocumentationApi {
 
   private String name;
   private String description;
 
-  public DefaultXmlExtensionParameterDocumentation() {}
+  public XmlExtensionParameterDocumentation() {}
 
-  public DefaultXmlExtensionParameterDocumentation(String name, String description) {
+  public XmlExtensionParameterDocumentation(String name, String description) {
     this.name = name;
     this.description = description;
   }

@@ -60,7 +60,7 @@ module org.mule.runtime.extensions.support {
   // Usage of TypeElement, VariableElement and other
   requires java.compiler;
   // XML documentation classes
-  requires jakarta.xml.bind;
+  requires java.xml.bind;
   requires org.mule.apache.xerces;
 
   requires com.github.benmanes.caffeine;
