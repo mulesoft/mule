@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
-import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
+import static org.mule.runtime.module.extension.internal.resources.documentation.DefaultExtensionDescriptionsSerializer.SERIALIZER;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -26,8 +26,8 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentationApi;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentationApi;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +59,10 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
 
   private class ExtensionDocumenterWalker extends ExtensionWalker {
 
-    List<XmlExtensionElementDocumentationApi> configs = new ArrayList<>();
-    List<XmlExtensionElementDocumentationApi> connections = new ArrayList<>();
-    List<XmlExtensionElementDocumentationApi> operations = new ArrayList<>();
-    List<XmlExtensionElementDocumentationApi> sources = new ArrayList<>();
+    List<XmlExtensionElementDocumentation> configs = new ArrayList<>();
+    List<XmlExtensionElementDocumentation> connections = new ArrayList<>();
+    List<XmlExtensionElementDocumentation> operations = new ArrayList<>();
+    List<XmlExtensionElementDocumentation> sources = new ArrayList<>();
 
     @Override
     protected void onConfiguration(ConfigurationModel model) {
@@ -84,48 +84,48 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
       sources.addAll(createParameterizedElement(model));
     }
 
-    private List<XmlExtensionElementDocumentationApi> createParameterizedElement(ParameterizedModel model) {
-      ImmutableList.Builder<XmlExtensionElementDocumentationApi> builder = ImmutableList.builder();
-      XmlExtensionElementDocumentationApi element = new XmlExtensionElementDocumentation();
+    private List<XmlExtensionElementDocumentation> createParameterizedElement(ParameterizedModel model) {
+      ImmutableList.Builder<XmlExtensionElementDocumentation> builder = ImmutableList.builder();
+      XmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
       element.setName(model.getName());
       element.setDescription(model.getDescription());
       element.setParameters(model.getAllParameterModels().stream()
-          .map(p -> new XmlExtensionParameterDocumentation(p.getName(), p.getDescription()))
+          .map(p -> new DefaultXmlExtensionParameterDocumentation(p.getName(), p.getDescription()))
           .collect(toList()));
       builder.add(element);
       return builder.build();
     }
 
-    public List<XmlExtensionElementDocumentationApi> getConfigs() {
+    public List<XmlExtensionElementDocumentation> getConfigs() {
       return configs;
     }
 
-    public List<XmlExtensionElementDocumentationApi> getConnections() {
+    public List<XmlExtensionElementDocumentation> getConnections() {
       return connections;
     }
 
-    public List<XmlExtensionElementDocumentationApi> getOperations() {
+    public List<XmlExtensionElementDocumentation> getOperations() {
       return operations;
     }
 
-    public List<XmlExtensionElementDocumentationApi> getSources() {
+    public List<XmlExtensionElementDocumentation> getSources() {
       return sources;
     }
   }
 
-  private List<XmlExtensionElementDocumentationApi> getTypesDocumentation(ExtensionModel extensionModel) {
-    List<XmlExtensionElementDocumentationApi> types = new ArrayList<>();
+  private List<XmlExtensionElementDocumentation> getTypesDocumentation(ExtensionModel extensionModel) {
+    List<XmlExtensionElementDocumentation> types = new ArrayList<>();
 
     extensionModel.getTypes().forEach(type -> ExtensionMetadataTypeUtils.getId(type)
         .ifPresent(id -> {
-          XmlExtensionElementDocumentationApi element = new XmlExtensionElementDocumentation();
+          XmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
           element.setName(id);
           element.setDescription(type.getAnnotation(DescriptionAnnotation.class)
               .map(DescriptionAnnotation::getValue).orElse(""));
           element.setParameters(type.getFields().stream()
-              .map(f -> new XmlExtensionParameterDocumentation(getAlias(f),
-                                                               f.getAnnotation(DescriptionAnnotation.class)
-                                                                   .map(DescriptionAnnotation::getValue).orElse("")))
+              .map(f -> new DefaultXmlExtensionParameterDocumentation(getAlias(f),
+                                                                      f.getAnnotation(DescriptionAnnotation.class)
+                                                                          .map(DescriptionAnnotation::getValue).orElse("")))
               .collect(toList()));
 
           types.add(element);
@@ -134,14 +134,14 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
   }
 
 
-  private XmlExtensionDocumentationApi getDocumenter(ExtensionModel model,
-                                                     List<XmlExtensionElementDocumentationApi> configs,
-                                                     List<XmlExtensionElementDocumentationApi> connections,
-                                                     List<XmlExtensionElementDocumentationApi> operations,
-                                                     List<XmlExtensionElementDocumentationApi> sources,
-                                                     List<XmlExtensionElementDocumentationApi> types) {
-    final XmlExtensionDocumentationApi documenter = new XmlExtensionDocumentation();
-    XmlExtensionElementDocumentationApi element = new XmlExtensionElementDocumentation();
+  private XmlExtensionDocumentation getDocumenter(ExtensionModel model,
+                                                  List<XmlExtensionElementDocumentation> configs,
+                                                  List<XmlExtensionElementDocumentation> connections,
+                                                  List<XmlExtensionElementDocumentation> operations,
+                                                  List<XmlExtensionElementDocumentation> sources,
+                                                  List<XmlExtensionElementDocumentation> types) {
+    final XmlExtensionDocumentation documenter = new DefaultXmlExtensionDocumentation();
+    XmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
     element.setName(model.getName());
     element.setDescription(model.getDescription());
     element.setParameters(emptyList());

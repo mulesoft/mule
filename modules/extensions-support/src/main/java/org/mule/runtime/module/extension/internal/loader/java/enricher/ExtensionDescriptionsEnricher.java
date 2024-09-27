@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_DESCRIPTIONS_ENRICHMENT;
-import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
+import static org.mule.runtime.module.extension.internal.resources.documentation.DefaultExtensionDescriptionsSerializer.SERIALIZER;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -22,8 +22,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentationApi;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentationApi;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,11 +55,11 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
     ClassLoader classLoader = loadingContext.getExtensionClassLoader();
     try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + SERIALIZER.getFileName(name))) {
       if (resource != null) {
-        XmlExtensionDocumentationApi documenter = withContextClassLoader(
-                                                                         ExtensionDescriptionsEnricher.class
-                                                                             .getClassLoader(),
-                                                                         () -> SERIALIZER
-                                                                             .deserialize(resource));
+        XmlExtensionDocumentation documenter = withContextClassLoader(
+                                                                      ExtensionDescriptionsEnricher.class
+                                                                          .getClassLoader(),
+                                                                      () -> SERIALIZER
+                                                                          .deserialize(resource));
         document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter);
       }
     } catch (IOException e) {
@@ -80,7 +80,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    * @param declaration   the declaration to describe.
    * @param documentation the extension documentation with its corresponding description.
    */
-  private void document(ExtensionDeclaration declaration, XmlExtensionDocumentationApi documentation) {
+  private void document(ExtensionDeclaration declaration, XmlExtensionDocumentation documentation) {
     declaration.setDescription(documentation.getExtension().getDescription());
     new DeclarationWalker() {
 
@@ -104,7 +104,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
         document(declaration, documentation.getSources());
       }
 
-      private void document(ParameterizedDeclaration<?> declaration, List<XmlExtensionElementDocumentationApi> elements) {
+      private void document(ParameterizedDeclaration<?> declaration, List<XmlExtensionElementDocumentation> elements) {
         elements.stream().filter(e -> e.getName().equals(declaration.getName())).findAny()
             .ifPresent(e -> {
               declaration.setDescription(e.getDescription());

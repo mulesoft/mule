@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.privileged.resources.documentation;
 
 import java.util.List;
 
-public interface XmlExtensionElementDocumentationApi {
+public interface XmlExtensionElementDocumentation {
 
   String getName();
 
@@ -18,7 +18,7 @@ public interface XmlExtensionElementDocumentationApi {
 
   void setDescription(String description);
 
-  List<XmlExtensionParameterDocumentationApi> getParameters();
+  List<XmlExtensionParameterDocumentation> getParameters();
 
-  void setParameters(List<XmlExtensionParameterDocumentationApi> parameters);
+  void setParameters(List<XmlExtensionParameterDocumentation> parameters);
 }

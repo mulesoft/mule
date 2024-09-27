@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentationApi;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentationApi;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation;
 
 import java.util.List;
 
@@ -22,14 +22,14 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  *
  * @since 4.0
  */
-public class XmlExtensionElementDocumentation implements NamedObject, DescribedObject,
-    XmlExtensionElementDocumentationApi {
+public class DefaultXmlExtensionElementDocumentation implements NamedObject, DescribedObject,
+    XmlExtensionElementDocumentation {
 
   private String name;
 
   private String description;
 
-  private List<XmlExtensionParameterDocumentationApi> parameters;
+  private List<XmlExtensionParameterDocumentation> parameters;
 
   @XmlAttribute
   public String getName() {
@@ -51,11 +51,11 @@ public class XmlExtensionElementDocumentation implements NamedObject, DescribedO
 
   @XmlElementWrapper(name = "parameters")
   @XmlElement(name = "parameter")
-  public List<XmlExtensionParameterDocumentationApi> getParameters() {
+  public List<XmlExtensionParameterDocumentation> getParameters() {
     return parameters;
   }
 
-  public void setParameters(List<XmlExtensionParameterDocumentationApi> parameters) {
+  public void setParameters(List<XmlExtensionParameterDocumentation> parameters) {
     this.parameters = parameters;
   }
 }

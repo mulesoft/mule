@@ -11,7 +11,7 @@ package org.mule.runtime.module.extension.privileged.resources.documentation;
  *
  * @since 4.0
  */
-public interface XmlExtensionParameterDocumentationApi {
+public interface XmlExtensionParameterDocumentation {
 
   String getName();
 
