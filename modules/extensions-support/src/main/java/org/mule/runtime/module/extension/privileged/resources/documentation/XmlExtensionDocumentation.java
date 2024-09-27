@@ -6,12 +6,7 @@
  */
 package org.mule.runtime.module.extension.privileged.resources.documentation;
 
-import java.util.LinkedList;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * a POJO that represents the extension-descriptions.xml file which contains the necessary annotations and setters necessary to
@@ -19,72 +14,29 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @since 4.0
  */
-@XmlRootElement(name = "extension-documentation")
-public class XmlExtensionDocumentation {
+public interface XmlExtensionDocumentation {
 
-  private XmlExtensionElementDocumentation extension;
-  private List<XmlExtensionElementDocumentation> connections = new LinkedList<>();
-  private List<XmlExtensionElementDocumentation> configs = new LinkedList<>();
-  private List<XmlExtensionElementDocumentation> sources = new LinkedList<>();
-  private List<XmlExtensionElementDocumentation> operation = new LinkedList<>();
-  private List<XmlExtensionElementDocumentation> types = new LinkedList<>();
+  List<XmlExtensionElementDocumentation> getConnections();
 
-  @XmlElementWrapper(name = "connections")
-  @XmlElement(name = "connection")
-  public List<XmlExtensionElementDocumentation> getConnections() {
-    return connections;
-  }
+  void setConnections(List<XmlExtensionElementDocumentation> connections);
 
-  public void setConnections(List<XmlExtensionElementDocumentation> connections) {
-    this.connections = connections;
-  }
+  List<XmlExtensionElementDocumentation> getConfigs();
 
-  @XmlElementWrapper(name = "configs")
-  @XmlElement(name = "config")
-  public List<XmlExtensionElementDocumentation> getConfigs() {
-    return configs;
-  }
+  void setConfigs(List<XmlExtensionElementDocumentation> configs);
 
-  public void setConfigs(List<XmlExtensionElementDocumentation> configs) {
-    this.configs = configs;
-  }
+  List<XmlExtensionElementDocumentation> getSources();
 
-  @XmlElementWrapper(name = "sources")
-  @XmlElement(name = "source")
-  public List<XmlExtensionElementDocumentation> getSources() {
-    return sources;
-  }
+  void setSources(List<XmlExtensionElementDocumentation> sources);
 
-  public void setSources(List<XmlExtensionElementDocumentation> sources) {
-    this.sources = sources;
-  }
+  List<XmlExtensionElementDocumentation> getOperations();
 
-  @XmlElementWrapper(name = "operations")
-  @XmlElement(name = "operation")
-  public List<XmlExtensionElementDocumentation> getOperations() {
-    return operation;
-  }
+  void setOperation(List<XmlExtensionElementDocumentation> operations);
 
-  public void setOperation(List<XmlExtensionElementDocumentation> operation) {
-    this.operation = operation;
-  }
+  List<XmlExtensionElementDocumentation> getTypes();
 
-  @XmlElementWrapper(name = "types")
-  @XmlElement(name = "type")
-  public List<XmlExtensionElementDocumentation> getTypes() {
-    return types;
-  }
+  void setTypes(List<XmlExtensionElementDocumentation> types);
 
-  public void setTypes(List<XmlExtensionElementDocumentation> types) {
-    this.types = types;
-  }
+  XmlExtensionElementDocumentation getExtension();
 
-  @XmlElement
-  public XmlExtensionElementDocumentation getExtension() {
-    return extension;
-  }
-
-  public void setExtension(XmlExtensionElementDocumentation extension) {
-    this.extension = extension;
-  }
+  void setExtension(XmlExtensionElementDocumentation extension);
 }
