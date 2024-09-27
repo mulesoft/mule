@@ -1,4 +1,36 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          }
+        ]
+      }
+    }
+  },
   "4.8.0": {
     "revapi": {
       "ignore": [
