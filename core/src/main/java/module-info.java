@@ -99,7 +99,7 @@ module org.mule.runtime.core {
   requires java.rmi;
   requires java.transaction;
   // used by DateTime
-  requires java.xml.bind;
+  requires jakarta.xml.bind;
 
   exports org.mule.runtime.core.api;
   exports org.mule.runtime.core.api.artifact;
