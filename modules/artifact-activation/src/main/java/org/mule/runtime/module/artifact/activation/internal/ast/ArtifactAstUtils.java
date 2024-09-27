@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_MULE_SDK_PROPERTY;
-import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
@@ -56,7 +55,7 @@ public class ArtifactAstUtils {
    * @throws ConfigurationException it the artifact couldn't be parsed
    */
   public static ArtifactAst parseArtifact(String artifactName,
-                                          Either<String[], Map<String, Document>> configs,
+                                          Either<ConfigResource[], Map<String, Document>> configs,
                                           AstXmlParserSupplier parserSupplier,
                                           Set<ExtensionModel> extensions,
                                           boolean disableValidations,
@@ -85,7 +84,7 @@ public class ArtifactAstUtils {
   }
 
   private static ArtifactAst doParseArtifactIntoAst(String artifactName,
-                                                    Either<String[], Map<String, Document>> configs,
+                                                    Either<ConfigResource[], Map<String, Document>> configs,
                                                     AstXmlParserSupplier parserSupplier,
                                                     Set<ExtensionModel> extensions,
                                                     boolean disableValidations,
@@ -93,7 +92,7 @@ public class ArtifactAstUtils {
       throws ConfigurationException {
     if (configs.isLeft()) {
       return parserSupplier.getParser(extensions, disableValidations)
-          .parse(artifactName, loadConfigResources(configs.getLeft(), artifactClassLoader));
+          .parse(artifactName, configs.getLeft());
     } else {
       return configs.mapRight(appXmlConfigDocuments -> {
         final AstXmlParser parser = parserSupplier.getParser(extensions, true);
@@ -113,7 +112,7 @@ public class ArtifactAstUtils {
     }
   }
 
-  private static ConfigResource[] loadConfigResources(String[] configs, ClassLoader artifactClassLoader)
+  public static ConfigResource[] loadConfigResources(String[] configs, ClassLoader artifactClassLoader)
       throws ConfigurationException {
     ClassLoader currentClassLoader = currentThread().getContextClassLoader();
     setContextClassLoader(currentThread(), currentClassLoader, artifactClassLoader);
@@ -127,6 +126,12 @@ public class ArtifactAstUtils {
       throw new ConfigurationException(e);
     } finally {
       setContextClassLoader(currentThread(), artifactClassLoader, currentClassLoader);
+    }
+  }
+
+  private static void setContextClassLoader(Thread thread, ClassLoader currentClassLoader, ClassLoader newClassLoader) {
+    if (currentClassLoader != newClassLoader) {
+      thread.setContextClassLoader(newClassLoader);
     }
   }
 
