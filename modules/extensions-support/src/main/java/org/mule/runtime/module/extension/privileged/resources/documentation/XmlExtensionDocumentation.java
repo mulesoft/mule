@@ -14,29 +14,29 @@ import java.util.List;
  *
  * @since 4.0
  */
-public interface XmlExtensionDocumentation {
+public abstract class XmlExtensionDocumentation {
 
-  List<XmlExtensionElementDocumentation> getConnections();
+  abstract public List<XmlExtensionElementDocumentation> getConnections();
 
-  void setConnections(List<XmlExtensionElementDocumentation> connections);
+  abstract public void setConnections(List<XmlExtensionElementDocumentation> connections);
 
-  List<XmlExtensionElementDocumentation> getConfigs();
+  abstract public List<XmlExtensionElementDocumentation> getConfigs();
 
-  void setConfigs(List<XmlExtensionElementDocumentation> configs);
+  abstract public void setConfigs(List<XmlExtensionElementDocumentation> configs);
 
-  List<XmlExtensionElementDocumentation> getSources();
+  abstract public List<XmlExtensionElementDocumentation> getSources();
 
-  void setSources(List<XmlExtensionElementDocumentation> sources);
+  abstract public void setSources(List<XmlExtensionElementDocumentation> sources);
 
-  List<XmlExtensionElementDocumentation> getOperations();
+  abstract public List<XmlExtensionElementDocumentation> getOperations();
 
-  void setOperation(List<XmlExtensionElementDocumentation> operations);
+  abstract public void setOperation(List<XmlExtensionElementDocumentation> operations);
 
-  List<XmlExtensionElementDocumentation> getTypes();
+  abstract public List<XmlExtensionElementDocumentation> getTypes();
 
-  void setTypes(List<XmlExtensionElementDocumentation> types);
+  abstract public void setTypes(List<XmlExtensionElementDocumentation> types);
 
-  XmlExtensionElementDocumentation getExtension();
+  abstract public XmlExtensionElementDocumentation getExtension();
 
-  void setExtension(XmlExtensionElementDocumentation extension);
+  abstract public void setExtension(XmlExtensionElementDocumentation extension);
 }

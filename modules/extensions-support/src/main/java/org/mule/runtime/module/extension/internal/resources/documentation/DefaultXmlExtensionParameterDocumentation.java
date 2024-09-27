@@ -18,8 +18,8 @@ import javax.xml.bind.annotation.XmlElement;
  *
  * @since 4.0
  */
-public class DefaultXmlExtensionParameterDocumentation implements NamedObject, DescribedObject,
-    XmlExtensionParameterDocumentation {
+public class DefaultXmlExtensionParameterDocumentation extends XmlExtensionParameterDocumentation
+    implements NamedObject, DescribedObject {
 
   private String name;
   private String description;

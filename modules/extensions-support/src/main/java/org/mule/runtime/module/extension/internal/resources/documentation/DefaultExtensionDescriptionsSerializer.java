@@ -31,7 +31,7 @@ import javax.xml.bind.Unmarshaller;
  * @since 4.0
  */
 public class DefaultExtensionDescriptionsSerializer
-    implements ExtensionDescriptionsSerializer {
+    extends ExtensionDescriptionsSerializer {
 
   public static final DefaultExtensionDescriptionsSerializer SERIALIZER = new DefaultExtensionDescriptionsSerializer();
 
@@ -43,7 +43,7 @@ public class DefaultExtensionDescriptionsSerializer
     final ClassLoader tccl = currentThread().getContextClassLoader();
     currentThread().setContextClassLoader(DefaultExtensionDescriptionsSerializer.class.getClassLoader());
     try {
-      jaxbContext = JAXBContext.newInstance(XmlExtensionDocumentation.class);
+      jaxbContext = JAXBContext.newInstance(DefaultXmlExtensionDocumentation.class);
       marshaller = jaxbContext.createMarshaller();
       unmarshaller = jaxbContext.createUnmarshaller();
     } catch (Exception e) {

@@ -84,9 +84,9 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
       sources.addAll(createParameterizedElement(model));
     }
 
-    private List<XmlExtensionElementDocumentation> createParameterizedElement(ParameterizedModel model) {
-      ImmutableList.Builder<XmlExtensionElementDocumentation> builder = ImmutableList.builder();
-      XmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
+    private List<DefaultXmlExtensionElementDocumentation> createParameterizedElement(ParameterizedModel model) {
+      ImmutableList.Builder<DefaultXmlExtensionElementDocumentation> builder = ImmutableList.builder();
+      DefaultXmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
       element.setName(model.getName());
       element.setDescription(model.getDescription());
       element.setParameters(model.getAllParameterModels().stream()
@@ -118,7 +118,7 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
 
     extensionModel.getTypes().forEach(type -> ExtensionMetadataTypeUtils.getId(type)
         .ifPresent(id -> {
-          XmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
+          DefaultXmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
           element.setName(id);
           element.setDescription(type.getAnnotation(DescriptionAnnotation.class)
               .map(DescriptionAnnotation::getValue).orElse(""));

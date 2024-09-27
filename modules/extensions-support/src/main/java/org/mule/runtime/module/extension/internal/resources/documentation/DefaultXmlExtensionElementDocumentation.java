@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  *
  * @since 4.0
  */
-public class DefaultXmlExtensionElementDocumentation implements NamedObject, DescribedObject,
-    XmlExtensionElementDocumentation {
+public class DefaultXmlExtensionElementDocumentation extends XmlExtensionElementDocumentation
+    implements NamedObject, DescribedObject {
 
   private String name;
 

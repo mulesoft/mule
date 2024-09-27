@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @since 4.0
  */
 @XmlRootElement(name = "extension-documentation")
-public class DefaultXmlExtensionDocumentation implements XmlExtensionDocumentation {
+public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation {
 
   private XmlExtensionElementDocumentation extension;
   private List<XmlExtensionElementDocumentation> connections = new LinkedList<>();

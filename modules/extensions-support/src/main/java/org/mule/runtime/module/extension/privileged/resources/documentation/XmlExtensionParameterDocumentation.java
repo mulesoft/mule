@@ -11,13 +11,13 @@ package org.mule.runtime.module.extension.privileged.resources.documentation;
  *
  * @since 4.0
  */
-public interface XmlExtensionParameterDocumentation {
+public abstract class XmlExtensionParameterDocumentation {
 
-  String getName();
+  abstract public String getName();
 
-  void setName(String name);
+  abstract public void setName(String name);
 
-  String getDescription();
+  abstract public String getDescription();
 
-  void setDescription(String description);
+  abstract public void setDescription(String description);
 }

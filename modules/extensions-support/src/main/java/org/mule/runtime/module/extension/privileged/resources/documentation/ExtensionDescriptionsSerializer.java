@@ -10,17 +10,17 @@ import org.mule.runtime.module.extension.internal.resources.documentation.Defaul
 
 import java.io.InputStream;
 
-public interface ExtensionDescriptionsSerializer {
+public abstract class ExtensionDescriptionsSerializer {
 
-  String serialize(XmlExtensionDocumentation dto);
+  abstract public String serialize(XmlExtensionDocumentation dto);
 
-  XmlExtensionDocumentation deserialize(String xml);
+  abstract public XmlExtensionDocumentation deserialize(String xml);
 
-  XmlExtensionDocumentation deserialize(InputStream xml);
+  abstract public XmlExtensionDocumentation deserialize(InputStream xml);
 
-  String getFileName(String extensionName);
+  abstract public String getFileName(String extensionName);
 
-  static ExtensionDescriptionsSerializer getSerializer() {
+  static public ExtensionDescriptionsSerializer getSerializer() {
     return DefaultExtensionDescriptionsSerializer.getExtensionDescriptionsSerializer();
   }
 
