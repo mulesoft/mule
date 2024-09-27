@@ -100,6 +100,7 @@ module org.mule.runtime.core {
   requires java.transaction;
   // used by DateTime
   requires java.xml.bind;
+  requires org.slf4j;
 
   exports org.mule.runtime.core.api;
   exports org.mule.runtime.core.api.artifact;
