@@ -122,6 +122,12 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static File withLifecycleListenerExtensionJarFile;
   public static File withBrokenLifecycleListenerExtensionJarFile;
   public static File bridgeMethodExtensionJarFile;
+  public static File overriderClassFile;
+  public static File xercesJarFile;
+  public static File pluginClassFile;
+  public static JarFileBuilder testOverriderLibrary;
+  public static JarFileBuilder jreExtensionLibrary;
+  public static ArtifactPluginFileBuilder testPlugin;
 
   private static TemporaryFolder compilerWorkFolder;
 
@@ -177,6 +183,26 @@ public final class TestArtifactsCatalog extends ExternalResource {
     barUtilsJavaxJarFile =
         new JarCompiler().compiling(getResourceFile("/packagetesting/javax/annotation/BarUtils.java"))
             .compile("bar-javax.jar");
+
+    xercesJarFile = getResourceFile("/sources/jar/xercesImpl-2.11.0.jar");
+    overriderClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/OverrideMe.java"));
+    testOverriderLibrary = new JarFileBuilder("test-overrider-library", new JarCompiler()
+        .compiling(getResourceFile("/override-library/org/foo/OverrideMe.java"))
+        .compile("test-overrider-library.jar"));
+    pluginClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/pluginlib/org/foo/OverrideMe.java"));
+    testPlugin = new ArtifactPluginFileBuilder("plugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .containingClass(pluginClassFile, "org/foo/OverrideMe.class");
+    jreExtensionLibrary = new JarFileBuilder("jre-extension-library", new JarCompiler()
+        .targetJavaVersion(8)
+        .compiling(getResourceFile("/jre-extension-library/src/main/java/OverrideMe.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/javax/annotation/JavaxExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/ietf/jgss/IetfExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/omg/test/OmgExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/w3c/dom/DomExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/xml/sax/SaxExtender.java"))
+        .compile("jre-extension-library.jar"));
 
     barUtilsForbiddenJavaClassFile = new SingleClassCompiler()
         .compile(getResourceFile("/packagetesting/java/lang/BarUtils.java"));
