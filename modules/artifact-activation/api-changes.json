@@ -1,5 +1,5 @@
 {
-  "4.8.0": {
+  "4.8.1": {
     "revapi": {
       "differences": {
         "differences": [
@@ -26,7 +26,15 @@
             "code": "java.method.added",
             "new": "method java.util.Optional<org.mule.runtime.api.meta.model.ExtensionModel> org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils::parseArtifactExtensionModel(org.mule.runtime.ast.api.ArtifactAst, java.lang.ClassLoader, org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.core.api.extension.ExtensionManager, org.mule.runtime.api.metadata.ExpressionLanguageMetadataService) throws org.mule.runtime.core.api.config.ConfigurationException",
             "justification": "W-16825599: Allow to create a muleFwk by passing the ConfigResources"
-          },
+          }
+        ]
+      }
+    }
+  },
+  "4.8.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
           {
             "ignore": true,
             "code": "java.annotation.added",
