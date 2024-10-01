@@ -1,4 +1,36 @@
 {
+  "4.8.1": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method org.mule.runtime.ast.api.ArtifactAst org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils::parseAndBuildAppExtensionModel(java.lang.String, java.util.Map<java.lang.String, org.w3c.dom.Document>, org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier, java.util.Set<org.mule.runtime.api.meta.model.ExtensionModel>, boolean, java.lang.ClassLoader, org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.metadata.ExpressionLanguageMetadataService) throws org.mule.runtime.core.api.config.ConfigurationException",
+            "justification": "W-16825599: Allow to create a muleFwk by passing the ConfigResources"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method org.mule.runtime.ast.api.ArtifactAst org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils::parseAndBuildAppExtensionModel(java.lang.String, org.mule.runtime.dsl.api.ConfigResource[], org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier, java.util.Set<org.mule.runtime.api.meta.model.ExtensionModel>, boolean, java.lang.ClassLoader, org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.metadata.ExpressionLanguageMetadataService) throws org.mule.runtime.core.api.config.ConfigurationException",
+            "justification": "W-16825599: Allow to create a muleFwk by passing the ConfigResources"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method org.mule.runtime.ast.api.ArtifactAst org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils::parseAndBuildAppExtensionModel(java.lang.String, java.lang.String[], org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier, java.util.Set<org.mule.runtime.api.meta.model.ExtensionModel>, boolean, java.lang.ClassLoader, org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.metadata.ExpressionLanguageMetadataService) throws org.mule.runtime.core.api.config.ConfigurationException",
+            "justification": "W-16825599: Allow to create a muleFwk by passing the ConfigResources"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method java.util.Optional<org.mule.runtime.api.meta.model.ExtensionModel> org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils::parseArtifactExtensionModel(org.mule.runtime.ast.api.ArtifactAst, java.lang.ClassLoader, org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.core.api.extension.ExtensionManager, org.mule.runtime.api.metadata.ExpressionLanguageMetadataService) throws org.mule.runtime.core.api.config.ConfigurationException",
+            "justification": "W-16825599: Allow to create a muleFwk by passing the ConfigResources"
+          }
+        ]
+      }
+    }
+  },
   "4.8.0": {
     "revapi": {
       "differences": {

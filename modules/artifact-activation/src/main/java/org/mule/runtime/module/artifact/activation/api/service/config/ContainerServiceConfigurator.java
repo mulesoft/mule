@@ -12,13 +12,12 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.core.api.MuleContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configures available {@link Service} instances in an artifact's {@link MuleContext} in order to resolve injectable
+ * Configures available {@link Service} instances in an artifact's {@link CustomizationService} in order to resolve injectable
  * dependencies.
  */
 public class ContainerServiceConfigurator implements ServiceConfigurator {

@@ -86,14 +86,18 @@ public final class AstXmlParserArtifactConfigurationProcessor extends AbstractAs
         if (artifactConfigResources.length == 0) {
           artifactAst = emptyArtifact();
         } else {
-          artifactAst = parseAndBuildAppExtensionModel(artifactConfigResources,
+          artifactAst = parseAndBuildAppExtensionModel(muleContext.getConfiguration().getId(),
+                                                       artifactConfigResources,
                                                        (exts, disableValidations) -> createMuleXmlParser(muleContext, exts,
                                                                                                          artifactProperties,
                                                                                                          artifactType,
                                                                                                          parentArtifactAst,
                                                                                                          disableValidations),
-                                                       extensions, toAstArtifactType(artifactType), disableXmlValidations,
-                                                       muleContext, expressionLanguageMetadataService);
+                                                       extensions,
+                                                       disableXmlValidations,
+                                                       muleContext.getExecutionClassLoader(),
+                                                       muleContext.getConfiguration(),
+                                                       expressionLanguageMetadataService);
         }
       } else {
         artifactAst = toArtifactast(artifactDeclaration, extensions);

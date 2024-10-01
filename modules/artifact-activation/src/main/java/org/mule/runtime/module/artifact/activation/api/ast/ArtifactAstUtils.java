@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.api.ast;
 
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.loadConfigResources;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
@@ -17,6 +18,9 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkApplicationExtensionModelLoadingMediator;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
 
@@ -51,7 +55,7 @@ public final class ArtifactAstUtils {
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
    * @deprecated Use
-   *             {@link #parseAndBuildAppExtensionModel(String[], AstXmlParserSupplier, Set, boolean, MuleContext, ExpressionLanguageMetadataService)}
+   *             {@link #parseAndBuildAppExtensionModel(String[], AstXmlParserSupplier, Set, boolean, ClassLoader, MuleConfiguration, ExpressionLanguageMetadataService)}
    *             instead;
    */
   @Deprecated
@@ -64,12 +68,13 @@ public final class ArtifactAstUtils {
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
     return parseArtifact(null,
-                         left(configResources),
+                         left(loadConfigResources(configResources, muleContext.getExecutionClassLoader())),
                          parserSupplier,
                          extensions,
                          disableValidations,
                          muleContext.getExecutionClassLoader(),
-                         getExtensionModelLoadingMediator(muleContext, expressionLanguageMetadataService));
+                         getExtensionModelLoadingMediator(muleContext.getConfiguration(),
+                                                          expressionLanguageMetadataService));
   }
 
   /**
@@ -92,7 +97,11 @@ public final class ArtifactAstUtils {
    * @throws ConfigurationException it the app couldn't be parsed
    * 
    * @since 4.8
+   * @deprecated Use
+   *             {@link #parseAndBuildAppExtensionModel(String, String[], AstXmlParserSupplier, Set, boolean, ClassLoader, MuleConfiguration, ExpressionLanguageMetadataService)}
+   *             instead.
    */
+  @Deprecated
   public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
                                                            String[] configResources,
                                                            AstXmlParserSupplier parserSupplier,
@@ -101,13 +110,92 @@ public final class ArtifactAstUtils {
                                                            MuleContext muleContext,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
+    return parseAndBuildAppExtensionModel(artifactName, configResources,
+                                          parserSupplier, extensions, disableValidations,
+                                          muleContext.getExecutionClassLoader(), muleContext.getConfiguration(),
+                                          expressionLanguageMetadataService);
+  }
+
+  /**
+   * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
+   * {@link ExtensionModel} which models the app itself, with all its defined operations, sources, functions, etc.
+   * <p>
+   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
+   * {@code muleContext.getConfiguration.getId()} return value
+   *
+   * @param artifactName                      the name of the artifact whose configs will be parsed
+   * @param configResources                   the paths to the application's config files
+   * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
+   *                                          the parsing
+   * @param extensions                        the initial set of extensions the app depends on.
+   * @param artifactType                      the artifact type
+   * @param disableValidations                whether to disable DSL validation
+   * @param artifactClassLoader               the artifact's classloader
+   * @param muleConfiguration                 the application's muleConfiguration
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
+   * @return an {@link ArtifactAst}
+   * @throws ConfigurationException it the app couldn't be parsed
+   * 
+   * @since 4.9
+   */
+  public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
+                                                           String[] configResources,
+                                                           AstXmlParserSupplier parserSupplier,
+                                                           Set<ExtensionModel> extensions,
+                                                           boolean disableValidations,
+                                                           ClassLoader artifactClassLoader,
+                                                           MuleConfiguration muleConfiguration,
+                                                           ExpressionLanguageMetadataService expressionLanguageMetadataService)
+      throws ConfigurationException {
+    return parseArtifact(artifactName,
+                         left(loadConfigResources(configResources, artifactClassLoader)),
+                         parserSupplier,
+                         extensions,
+                         disableValidations,
+                         artifactClassLoader,
+                         getExtensionModelLoadingMediator(muleConfiguration,
+                                                          expressionLanguageMetadataService));
+  }
+
+  /**
+   * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
+   * {@link ExtensionModel} which models the app itself, with all its defined operations, sources, functions, etc.
+   * <p>
+   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
+   * {@code muleContext.getConfiguration.getId()} return value
+   *
+   * @param artifactName                      the name of the artifact whose configs will be parsed
+   * @param configResources                   pointers to the application's config files
+   * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
+   *                                          the parsing
+   * @param extensions                        the initial set of extensions the app depends on.
+   * @param artifactType                      the artifact type
+   * @param disableValidations                whether to disable DSL validation
+   * @param artifactClassLoader               the artifact's classloader
+   * @param muleConfiguration                 the application's muleConfiguration
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
+   * @return an {@link ArtifactAst}
+   * @throws ConfigurationException it the app couldn't be parsed
+   * 
+   * @since 4.9
+   */
+  public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
+                                                           ConfigResource[] configResources,
+                                                           AstXmlParserSupplier parserSupplier,
+                                                           Set<ExtensionModel> extensions,
+                                                           boolean disableValidations,
+                                                           ClassLoader artifactClassLoader,
+                                                           MuleConfiguration muleConfiguration,
+                                                           ExpressionLanguageMetadataService expressionLanguageMetadataService)
+      throws ConfigurationException {
     return parseArtifact(artifactName,
                          left(configResources),
                          parserSupplier,
                          extensions,
                          disableValidations,
-                         muleContext.getExecutionClassLoader(),
-                         getExtensionModelLoadingMediator(muleContext, expressionLanguageMetadataService));
+                         artifactClassLoader,
+                         getExtensionModelLoadingMediator(muleConfiguration,
+                                                          expressionLanguageMetadataService));
   }
 
   /**
@@ -130,7 +218,11 @@ public final class ArtifactAstUtils {
    * @throws ConfigurationException it the app couldn't be parsed
    * 
    * @since 4.8
+   * @deprecated Use
+   *             {@link #parseAndBuildAppExtensionModel(String, Map, AstXmlParserSupplier, Set, boolean, ClassLoader, MuleConfiguration, ExpressionLanguageMetadataService)}
+   *             instead.
    */
+  @Deprecated
   public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
                                                            Map<String, Document> appXmlConfigDocuments,
                                                            AstXmlParserSupplier parserSupplier,
@@ -139,13 +231,51 @@ public final class ArtifactAstUtils {
                                                            MuleContext muleContext,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
+    return parseAndBuildAppExtensionModel(artifactName, appXmlConfigDocuments,
+                                          parserSupplier, extensions, disableValidations,
+                                          muleContext.getExecutionClassLoader(), muleContext.getConfiguration(),
+                                          expressionLanguageMetadataService);
+  }
+
+  /**
+   * Processes {@code appXmlConfigDocuments} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
+   * {@link ExtensionModel} which models the app itself, with all its defined operations, sources, functions, etc.
+   * <p>
+   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
+   * {@code muleContext.getConfiguration.getId()} return value
+   *
+   * @param artifactName                      the name of the artifact whose configs will be parsed
+   * @param appXmlConfigDocuments             the parsed XML DOMs for the config files
+   * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
+   *                                          the parsing
+   * @param extensions                        the initial set of extensions the app depends on.
+   * @param artifactType                      the artifact type
+   * @param disableValidations                whether to disable DSL validation
+   * @param artifactClassLoader               the artifact's classloader
+   * @param muleConfiguration                 the application's muleConfiguration
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
+   * @return an {@link ArtifactAst}
+   * @throws ConfigurationException it the app couldn't be parsed
+   * 
+   * @since 4.9
+   */
+  public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
+                                                           Map<String, Document> appXmlConfigDocuments,
+                                                           AstXmlParserSupplier parserSupplier,
+                                                           Set<ExtensionModel> extensions,
+                                                           boolean disableValidations,
+                                                           ClassLoader artifactClassLoader,
+                                                           MuleConfiguration muleConfiguration,
+                                                           ExpressionLanguageMetadataService expressionLanguageMetadataService)
+      throws ConfigurationException {
     return parseArtifact(artifactName,
                          right(appXmlConfigDocuments),
                          parserSupplier,
                          extensions,
                          disableValidations,
-                         muleContext.getExecutionClassLoader(),
-                         getExtensionModelLoadingMediator(muleContext, expressionLanguageMetadataService));
+                         artifactClassLoader,
+                         getExtensionModelLoadingMediator(muleConfiguration,
+                                                          expressionLanguageMetadataService));
   }
 
   /**
@@ -157,20 +287,48 @@ public final class ArtifactAstUtils {
    * @param muleContext                       the application's context
    * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an optional {@link ExtensionModel}
+   * @deprecated Use
+   *             {@link #parseArtifactExtensionModel(ArtifactAst, ClassLoader, MuleConfiguration, ExtensionManager, ExpressionLanguageMetadataService)}
+   *             instead.
    */
+  @Deprecated
   public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
                                                                      ClassLoader artifactClassLoader,
                                                                      MuleContext muleContext,
                                                                      ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
-    return getExtensionModelLoadingMediator(muleContext, expressionLanguageMetadataService)
-        .loadExtensionModel(ast, artifactClassLoader, muleContext.getExtensionManager().getExtensions());
+    return parseArtifactExtensionModel(ast, artifactClassLoader,
+                                       muleContext.getConfiguration(),
+                                       muleContext.getExtensionManager(),
+                                       expressionLanguageMetadataService);
   }
 
-  private static MuleSdkExtensionModelLoadingMediator getExtensionModelLoadingMediator(MuleContext muleContext,
+  /**
+   * If the {@code ast} represents an application which defines reusable components (operations, sources, etc), it returns an
+   * {@link ExtensionModel} which represents it.
+   *
+   * @param ast                               the application's AST
+   * @param artifactClassLoader               the application's classloader
+   * @param muleConfiguration                 the application's muleConfiguration
+   * @param extensionManager                  the application's extensionManager
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
+   * @return an optional {@link ExtensionModel}
+   * @since 4.9
+   */
+  public static Optional<ExtensionModel> parseArtifactExtensionModel(ArtifactAst ast,
+                                                                     ClassLoader artifactClassLoader,
+                                                                     MuleConfiguration muleConfiguration,
+                                                                     ExtensionManager extensionManager,
+                                                                     ExpressionLanguageMetadataService expressionLanguageMetadataService)
+      throws ConfigurationException {
+    return getExtensionModelLoadingMediator(muleConfiguration, expressionLanguageMetadataService)
+        .loadExtensionModel(ast, artifactClassLoader, extensionManager.getExtensions());
+  }
+
+  private static MuleSdkExtensionModelLoadingMediator getExtensionModelLoadingMediator(MuleConfiguration muleConfiguration,
                                                                                        ExpressionLanguageMetadataService expressionLanguageMetadataService) {
-    String artifactId = muleContext.getConfiguration().getId();
-    Optional<ArtifactCoordinates> artifactCoordinates = muleContext.getConfiguration().getArtifactCoordinates();
+    String artifactId = muleConfiguration.getId();
+    Optional<ArtifactCoordinates> artifactCoordinates = muleConfiguration.getArtifactCoordinates();
     return new MuleSdkApplicationExtensionModelLoadingMediator(expressionLanguageMetadataService, artifactId,
                                                                artifactCoordinates);
   }
