@@ -1,4 +1,24 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoaderProvider",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider",
+            "justification": "W-"
+          }
+        ]
+      }
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [

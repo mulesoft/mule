@@ -34,8 +34,6 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cli
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
-import org.mule.runtime.module.extension.soap.internal.runtime.connection.SoapConnectionProviderObjectBuilder;
 
 import java.util.concurrent.Callable;
 
@@ -80,17 +78,11 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   @Override
   public ConnectionProviderResolver doGetObject() {
     // TODO: W-11365218
-    Callable<ResolverSet> callable = () -> getParametersResolver().getParametersAsResolverSet(providerModel, muleContext);
-    ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
+    final Callable<ResolverSet> callable = () -> getParametersResolver().getParametersAsResolverSet(providerModel, muleContext);
+    final ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
 
     BaseConnectionProviderObjectBuilder builder;
-    if (extensionModel.getModelProperty(SoapExtensionModelProperty.class).isPresent()) {
-      builder = new SoapConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
-                                                        reconnectionConfig,
-                                                        extensionModel,
-                                                        expressionManager,
-                                                        muleContext);
-    } else if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
+    if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
       builder = resolveOAuthBuilder(resolverSet);
     } else {
       builder = new DefaultConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
@@ -104,11 +96,11 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   }
 
   private BaseConnectionProviderObjectBuilder resolveOAuthBuilder(ResolverSet resolverSet) {
-    OAuthGrantType grantType = providerModel.getModelProperty(OAuthModelProperty.class)
+    final OAuthGrantType grantType = providerModel.getModelProperty(OAuthModelProperty.class)
         .map(OAuthModelProperty::getGrantTypes)
         .get().get(0);
 
-    Reference<BaseConnectionProviderObjectBuilder> builder = new Reference<>();
+    final Reference<BaseConnectionProviderObjectBuilder> builder = new Reference<>();
 
     grantType.accept(new OAuthGrantTypeVisitor() {
 
