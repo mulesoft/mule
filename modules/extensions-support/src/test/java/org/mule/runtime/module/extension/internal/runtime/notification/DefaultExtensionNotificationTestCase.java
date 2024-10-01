@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.notification;
 
 import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotificationTestCase.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotificationTestCase.TestNotificationActionDefinition.REQUEST_START;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,8 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.Notification;
@@ -35,9 +32,10 @@ public class DefaultExtensionNotificationTestCase extends AbstractMuleTestCase {
   @Description("When DefaultExtensionNotification calls getAction() with a NullComponent, " +
       "component.getLocation().getComponentIdentifier() does not throw a NullPointerException and the action is created.")
   public void getActionWhenTheComponentIsANullComponent() {
-    TypedValue<?> mockData = mock(TypedValue.class);
-    when(mockData.getDataType()).thenReturn(REQUEST_START.getDataType());
-    Notification notification = new DefaultExtensionNotification(null, NULL_COMPONENT, REQUEST_START, mockData);
+    AbstractComponent nullComponent = mock(AbstractComponent.class);
+    when(nullComponent.getLocation()).thenReturn(null);
+    TypedValue<?> typedValue = new TypedValue<>("", REQUEST_START.getDataType());
+    Notification notification = new DefaultExtensionNotification(null, nullComponent, REQUEST_START, typedValue);
 
     Notification.Action action = notification.getAction();
 
@@ -58,16 +56,6 @@ public class DefaultExtensionNotificationTestCase extends AbstractMuleTestCase {
     @Override
     public DataType getDataType() {
       return dataType;
-    }
-  }
-
-  public static class NullComponent extends AbstractComponent implements Initialisable {
-
-    public static final NullComponent NULL_COMPONENT = new NullComponent();
-
-    @Override
-    public void initialise() throws InitialisationException {
-
     }
   }
 }
