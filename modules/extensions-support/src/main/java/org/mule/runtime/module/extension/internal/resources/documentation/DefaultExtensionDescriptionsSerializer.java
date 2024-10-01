@@ -56,7 +56,7 @@ public class DefaultExtensionDescriptionsSerializer
   public synchronized String serialize(XmlExtensionDocumentation dto) {
     try {
       ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
-      marshaller.marshal(dto, getXmlSerializer(out).asContentHandler());
+      marshaller.marshal((DefaultXmlExtensionDocumentation) dto, getXmlSerializer(out).asContentHandler());
 
       return out.toString();
     } catch (Exception e) {
@@ -66,7 +66,7 @@ public class DefaultExtensionDescriptionsSerializer
 
   public synchronized XmlExtensionDocumentation deserialize(String xml) {
     try {
-      return (XmlExtensionDocumentation) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()));
+      return (DefaultXmlExtensionDocumentation) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes()));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -74,7 +74,7 @@ public class DefaultExtensionDescriptionsSerializer
 
   public synchronized XmlExtensionDocumentation deserialize(InputStream xml) {
     try {
-      return (XmlExtensionDocumentation) unmarshaller.unmarshal(xml);
+      return (DefaultXmlExtensionDocumentation) unmarshaller.unmarshal(xml);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -97,7 +97,7 @@ public class DefaultExtensionDescriptionsSerializer
     return format(EXTENSION_DESCRIPTIONS_FILE_NAME_MASK, key);
   }
 
-  static public ExtensionDescriptionsSerializer getExtensionDescriptionsSerializer() {
+  static public DefaultExtensionDescriptionsSerializer getExtensionDescriptionsSerializer() {
     return SERIALIZER;
   }
 }

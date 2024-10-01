@@ -134,13 +134,13 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
   }
 
 
-  private XmlExtensionDocumentation getDocumenter(ExtensionModel model,
-                                                  List<XmlExtensionElementDocumentation> configs,
-                                                  List<XmlExtensionElementDocumentation> connections,
-                                                  List<XmlExtensionElementDocumentation> operations,
-                                                  List<XmlExtensionElementDocumentation> sources,
-                                                  List<XmlExtensionElementDocumentation> types) {
-    final XmlExtensionDocumentation documenter = new DefaultXmlExtensionDocumentation();
+  private DefaultXmlExtensionDocumentation getDocumenter(ExtensionModel model,
+                                                         List<XmlExtensionElementDocumentation> configs,
+                                                         List<XmlExtensionElementDocumentation> connections,
+                                                         List<XmlExtensionElementDocumentation> operations,
+                                                         List<XmlExtensionElementDocumentation> sources,
+                                                         List<XmlExtensionElementDocumentation> types) {
+    final DefaultXmlExtensionDocumentation documenter = new DefaultXmlExtensionDocumentation();
     XmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
     element.setName(model.getName());
     element.setDescription(model.getDescription());

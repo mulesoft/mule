@@ -22,6 +22,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.module.extension.internal.resources.documentation.DefaultXmlExtensionDocumentation;
 import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
 import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
 
@@ -55,11 +56,11 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
     ClassLoader classLoader = loadingContext.getExtensionClassLoader();
     try (InputStream resource = classLoader.getResourceAsStream("META-INF/" + SERIALIZER.getFileName(name))) {
       if (resource != null) {
-        XmlExtensionDocumentation documenter = withContextClassLoader(
-                                                                      ExtensionDescriptionsEnricher.class
-                                                                          .getClassLoader(),
-                                                                      () -> SERIALIZER
-                                                                          .deserialize(resource));
+        DefaultXmlExtensionDocumentation documenter = (DefaultXmlExtensionDocumentation) withContextClassLoader(
+                                                                                                                ExtensionDescriptionsEnricher.class
+                                                                                                                    .getClassLoader(),
+                                                                                                                () -> SERIALIZER
+                                                                                                                    .deserialize(resource));
         document(loadingContext.getExtensionDeclarer().getDeclaration(), documenter);
       }
     } catch (IOException e) {

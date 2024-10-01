@@ -50,7 +50,7 @@ public class DefaultXmlExtensionElementDocumentation extends XmlExtensionElement
   }
 
   @XmlElementWrapper(name = "parameters")
-  @XmlElement(name = "parameter")
+  @XmlElement(name = "parameter", type = DefaultXmlExtensionParameterDocumentation.class)
   public List<XmlExtensionParameterDocumentation> getParameters() {
     return parameters;
   }

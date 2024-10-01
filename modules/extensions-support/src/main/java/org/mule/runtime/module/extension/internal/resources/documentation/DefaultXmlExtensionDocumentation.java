@@ -33,7 +33,7 @@ public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation 
   private List<XmlExtensionElementDocumentation> types = new LinkedList<>();
 
   @XmlElementWrapper(name = "connections")
-  @XmlElement(name = "connection")
+  @XmlElement(name = "connection", type = DefaultXmlExtensionElementDocumentation.class)
   public List<XmlExtensionElementDocumentation> getConnections() {
     return connections;
   }
@@ -43,7 +43,7 @@ public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation 
   }
 
   @XmlElementWrapper(name = "configs")
-  @XmlElement(name = "config")
+  @XmlElement(name = "config", type = DefaultXmlExtensionElementDocumentation.class)
   public List<XmlExtensionElementDocumentation> getConfigs() {
     return configs;
   }
@@ -53,7 +53,7 @@ public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation 
   }
 
   @XmlElementWrapper(name = "sources")
-  @XmlElement(name = "source")
+  @XmlElement(name = "source", type = DefaultXmlExtensionElementDocumentation.class)
   public List<XmlExtensionElementDocumentation> getSources() {
     return sources;
   }
@@ -63,7 +63,7 @@ public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation 
   }
 
   @XmlElementWrapper(name = "operations")
-  @XmlElement(name = "operation")
+  @XmlElement(name = "operation", type = DefaultXmlExtensionElementDocumentation.class)
   public List<XmlExtensionElementDocumentation> getOperations() {
     return operation;
   }
@@ -73,7 +73,7 @@ public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation 
   }
 
   @XmlElementWrapper(name = "types")
-  @XmlElement(name = "type")
+  @XmlElement(name = "type", type = DefaultXmlExtensionElementDocumentation.class)
   public List<XmlExtensionElementDocumentation> getTypes() {
     return types;
   }
@@ -82,7 +82,7 @@ public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation 
     this.types = types;
   }
 
-  @XmlElement
+  @XmlElement(type = DefaultXmlExtensionElementDocumentation.class)
   public XmlExtensionElementDocumentation getExtension() {
     return extension;
   }
