@@ -37,6 +37,7 @@ import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCata
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestJarFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.jreExtensionLibrary;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.moduleOverriderClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.overriderClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho1ClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho2ClassFile;
@@ -847,7 +848,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
   public void canDependOnXerces() throws Exception {
     ApplicationFileBuilder externalLibAppFileBuilder = appFileBuilder("appWithXerces")
-        .definedBy("app-with-xerces-config.xml")
+        .definedBy("app-config.xml")
         .containingClass(overriderClassFile, "org/foo/OverrideMe.class")
         .dependingOn(new JarFileBuilder("xerces", xercesJarFile));
 
@@ -864,7 +865,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
   public void testEmbeddedClassVisibleFromApp() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClass")
-        .definedBy("app-with-embedded-class-config.xml")
+        .definedBy("app-config.xml")
         .containingClass(overriderClassFile, "org/foo/OverrideMe.class");
 
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -880,7 +881,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
   public void testEmbeddedClassPrecedenceOverLibraryClass() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClassOverLib")
-        .definedBy("app-with-embedded-class-over-lib-config.xml")
+        .definedBy("app-config.xml")
         .containingClass(overriderClassFile, "org/foo/OverrideMe.class")
         .dependingOn(testOverriderLibrary);
 
@@ -897,7 +898,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
   public void testEmbeddedLibraryClassIsVisibleFromApp() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClassOverLib")
-        .definedBy("app-with-embedded-lib-config.xml")
+        .definedBy("app-config.xml")
         .dependingOn(testOverriderLibrary);
 
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -913,7 +914,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
   public void testEmbeddedPluginLibraryClassIsVisibleFromApp() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClassOverLib")
-        .definedBy("app-with-embedded-plugin-config.xml")
+        .definedBy("app-config.xml")
         .dependingOn(testPlugin);
 
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -929,7 +930,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
   public void testEmbeddedSharedLibraryClassPrecedenceOverEmbeddedPluginLibraryClass() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClassOverLib")
-        .definedBy("app-with-embedded-plugin-lib-config.xml")
+        .definedBy("app-config.xml")
         .dependingOn(testPlugin)
         .dependingOnSharedLibrary(testOverriderLibrary);
 
@@ -946,7 +947,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
   public void canExtendJavaPackages() throws Exception {
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtendedJava")
-        .definedBy("app-with-extended-java-config.xml")
+        .definedBy("app-config.xml")
         .dependingOn(jreExtensionLibrary);
 
     addPackedAppFromBuilder(applicationFileBuilder);
@@ -973,11 +974,9 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     JarFileBuilder module1JarBuilder = new JarFileBuilder("module1", module1ClassFile)
         .dependingOn(module2JarBuilder);
 
-    File moduleOverriderClassFile = new SingleClassCompiler().compile(getResourceFile("/modules/OverrideMe.java"));
-
     ApplicationFileBuilder applicationFileBuilder = appFileBuilder("shared-libraries-transitive")
-        .definedBy("shared-libraries-transitive-config.xml")
-        .containingClass(moduleOverriderClassFile, "modules/OverrideMe.class")
+        .definedBy("app-config.xml")
+        .containingClass(moduleOverriderClassFile, "org/foo/OverrideMe.class")
         .dependingOnSharedLibrary(module1JarBuilder);
 
     addPackedAppFromBuilder(applicationFileBuilder);

@@ -123,6 +123,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static File withBrokenLifecycleListenerExtensionJarFile;
   public static File bridgeMethodExtensionJarFile;
   public static File overriderClassFile;
+  public static File moduleOverriderClassFile;
   public static File xercesJarFile;
   public static File pluginClassFile;
   public static JarFileBuilder testOverriderLibrary;
@@ -186,6 +187,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
 
     xercesJarFile = getResourceFile("/sources/jar/xercesImpl-2.11.0.jar");
     overriderClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/OverrideMe.java"));
+    moduleOverriderClassFile = new SingleClassCompiler().compile(getResourceFile("/modules/org/foo/OverrideMe.java"));
     testOverriderLibrary = new JarFileBuilder("test-overrider-library", new JarCompiler()
         .compiling(getResourceFile("/override-library/org/foo/OverrideMe.java"))
         .compile("test-overrider-library.jar"));
@@ -196,7 +198,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
         .containingClass(pluginClassFile, "org/foo/OverrideMe.class");
     jreExtensionLibrary = new JarFileBuilder("jre-extension-library", new JarCompiler()
         .targetJavaVersion(8)
-        .compiling(getResourceFile("/jre-extension-library/src/main/java/OverrideMe.java"),
+        .compiling(getResourceFile("/jre-extension-library/src/main/java/org/foo/OverrideMe.java"),
                    getResourceFile("/jre-extension-library/src/main/java/javax/annotation/JavaxExtender.java"),
                    getResourceFile("/jre-extension-library/src/main/java/org/ietf/jgss/IetfExtender.java"),
                    getResourceFile("/jre-extension-library/src/main/java/org/omg/test/OmgExtender.java"),
