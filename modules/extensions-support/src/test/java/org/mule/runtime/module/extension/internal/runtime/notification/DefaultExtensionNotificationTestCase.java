@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.notification;
 
-import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.module.extension.internal.runtime.notification.DefaultExtensionNotificationTestCase.TestNotificationActionDefinition.REQUEST_START;
+import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.NEW_BATCH;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -15,10 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Description;
@@ -34,28 +31,12 @@ public class DefaultExtensionNotificationTestCase extends AbstractMuleTestCase {
   public void getActionWhenTheComponentIsANullComponent() {
     AbstractComponent nullComponent = mock(AbstractComponent.class);
     when(nullComponent.getLocation()).thenReturn(null);
-    TypedValue<?> typedValue = new TypedValue<>("", REQUEST_START.getDataType());
-    Notification notification = new DefaultExtensionNotification(null, nullComponent, REQUEST_START, typedValue);
+    TypedValue<?> typedValue = new TypedValue<>("", NEW_BATCH.getDataType());
+    Notification notification = new DefaultExtensionNotification(null, nullComponent, NEW_BATCH, typedValue);
 
     Notification.Action action = notification.getAction();
 
     assertThat(action.getNamespace(), is("NULL"));
-    assertThat(action.getIdentifier(), is("REQUEST_START"));
-  }
-
-  public enum TestNotificationActionDefinition implements NotificationActionDefinition {
-
-    REQUEST_START(fromType(TypedValue.class));
-
-    private final DataType dataType;
-
-    TestNotificationActionDefinition(DataType dataType) {
-      this.dataType = dataType;
-    }
-
-    @Override
-    public DataType getDataType() {
-      return dataType;
-    }
+    assertThat(action.getIdentifier(), is("NEW_BATCH"));
   }
 }
