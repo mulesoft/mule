@@ -171,12 +171,13 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   protected ArtifactAst parseArtifactIntoAst(Set<ExtensionModel> extensions, MuleContext muleContext,
                                              ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     try {
-      ArtifactAst ast = parseAndBuildAppExtensionModel(configResources,
+      ArtifactAst ast = parseAndBuildAppExtensionModel(muleContext.getConfiguration().getId(),
+                                                       configResources,
                                                        this::getParser,
                                                        extensions,
-                                                       artifactType,
                                                        disableXmlValidations,
-                                                       muleContext,
+                                                       muleContext.getExecutionClassLoader(),
+                                                       muleContext.getConfiguration(),
                                                        expressionLanguageMetadataService);
 
       if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {

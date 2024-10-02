@@ -205,14 +205,12 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     }
     onResponseConsumerList.clear();
 
+    state.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED);
     tryComplete();
   }
 
   protected void tryComplete() {
-    boolean completable =
-        state.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED) || state.get() == STATE_RESPONSE_PROCESSED;
-
-    if (completable && areAllChildrenComplete()) {
+    if (state.get() == STATE_RESPONSE_PROCESSED && areAllChildrenComplete()) {
       if (!state.compareAndSet(STATE_RESPONSE_PROCESSED, STATE_COMPLETE)) {
         return;
       }

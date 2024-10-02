@@ -36,6 +36,9 @@ import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCata
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoPluginWithLib1;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.jreExtensionLibrary;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.moduleOverriderClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.overriderClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho1ClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho2ClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho3ClassFile;
@@ -43,7 +46,10 @@ import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCata
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginForbiddenJavaEchoTestClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginForbiddenMuleContainerEchoTestClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginForbiddenMuleThirdPartyEchoTestClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.testPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.privilegedExtensionV1JarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.testOverriderLibrary;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.xercesJarFile;
 import static org.mule.runtime.module.deployment.test.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
@@ -60,17 +66,17 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.times;
 
-import org.apache.commons.io.FileUtils;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.exception.MuleFatalException;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
+import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,14 +85,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 
 /**
  * Contains test for application classloading isolation scenarios
@@ -96,6 +101,9 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
 
   private static final String OVERWRITTEN_PROPERTY = "configFile";
   private static final String OVERWRITTEN_PROPERTY_SYSTEM_VALUE = "nonExistent.yaml";
+  private static final String APP_CLASS_RESPONSE = "This is an app class";
+  private static final String APP_LIBRARY_RESPONSE = "This is an embedded library class";
+  private static final String PLUGIN_LIBRARY_RESPONSE = "This is a plugin library class";
 
   protected static ApplicationFileBuilder dummyAppDescriptorWithPropsDependencyFileBuilder;
 
@@ -833,6 +841,151 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
       assertThat(e.getCause().getCause().getCause(), instanceOf(NoClassDefFoundError.class));
       assertThat(e.getCause().getCause().getCause().getMessage(), containsString("org/slf4j/BarUtils"));
     }
+  }
+
+  @Test
+  @Issue("W-16508382")
+  @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
+  public void canDependOnXerces() throws Exception {
+    ApplicationFileBuilder externalLibAppFileBuilder = appFileBuilder("appWithXerces")
+        .definedBy("app-config.xml")
+        .containingClass(overriderClassFile, "org/foo/OverrideMe.class")
+        .dependingOn(new JarFileBuilder("xerces", xercesJarFile));
+
+    addPackedAppFromBuilder(externalLibAppFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, externalLibAppFileBuilder.getId());
+    CoreEvent event = executeApplicationFlow("main", null);
+    String payload = event.getMessage().getPayload().toString();
+    assertThat(payload, containsString(APP_CLASS_RESPONSE));
+  }
+
+  @Test
+  @Issue("W-16508382")
+  @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
+  public void testEmbeddedClassVisibleFromApp() throws Exception {
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClass")
+        .definedBy("app-config.xml")
+        .containingClass(overriderClassFile, "org/foo/OverrideMe.class");
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    CoreEvent event = executeApplicationFlow("main", null);
+    String payload = event.getMessage().getPayload().toString();
+    assertThat(payload, containsString(APP_CLASS_RESPONSE));
+  }
+
+  @Test
+  @Issue("W-16508382")
+  @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
+  public void testEmbeddedClassPrecedenceOverLibraryClass() throws Exception {
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClassOverLib")
+        .definedBy("app-config.xml")
+        .containingClass(overriderClassFile, "org/foo/OverrideMe.class")
+        .dependingOn(testOverriderLibrary);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    CoreEvent event = executeApplicationFlow("main", null);
+    String payload = event.getMessage().getPayload().toString();
+    assertThat(payload, containsString(APP_CLASS_RESPONSE));
+  }
+
+  @Test
+  @Issue("W-16508382")
+  @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
+  public void testEmbeddedLibraryClassIsVisibleFromApp() throws Exception {
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClassOverLib")
+        .definedBy("app-config.xml")
+        .dependingOn(testOverriderLibrary);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    CoreEvent event = executeApplicationFlow("main", null);
+    String payload = event.getMessage().getPayload().toString();
+    assertThat(payload, containsString(APP_LIBRARY_RESPONSE));
+  }
+
+  @Test
+  @Issue("W-16508382")
+  @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
+  public void testEmbeddedPluginLibraryClassIsVisibleFromApp() throws Exception {
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClassOverLib")
+        .definedBy("app-config.xml")
+        .dependingOn(testPlugin);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    CoreEvent event = executeApplicationFlow("main", null);
+    String payload = event.getMessage().getPayload().toString();
+    assertThat(payload, containsString(PLUGIN_LIBRARY_RESPONSE));
+  }
+
+  @Test
+  @Issue("W-16508382")
+  @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
+  public void testEmbeddedSharedLibraryClassPrecedenceOverEmbeddedPluginLibraryClass() throws Exception {
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithEmbeddedClassOverLib")
+        .definedBy("app-config.xml")
+        .dependingOn(testPlugin)
+        .dependingOnSharedLibrary(testOverriderLibrary);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    CoreEvent event = executeApplicationFlow("main", null);
+    String payload = event.getMessage().getPayload().toString();
+    assertThat(payload, containsString(APP_LIBRARY_RESPONSE));
+  }
+
+  @Test
+  @Issue("W-16508382")
+  @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
+  public void canExtendJavaPackages() throws Exception {
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("appWithExtendedJava")
+        .definedBy("app-config.xml")
+        .dependingOn(jreExtensionLibrary);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+    CoreEvent event = executeApplicationFlow("main", null);
+    String payload = event.getMessage().getPayload().toString();
+    assertThat(payload, containsString("javaxorg.ietg.jgssorg.omgorg.w3c.domorg.xml.sax"));
+  }
+
+  @Test
+  @Issue("W-16508382")
+  @Description("Migrate tests from ClassLoadingTestCase to ApplicationDeploymentClassLoadingTestCase")
+  public void sharedLibrariesTransitiveDependencies() throws Exception {
+    File module2ClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/modules/module2/Module2.java"));
+    JarFileBuilder module2JarBuilder = new JarFileBuilder("module2", module2ClassFile);
+
+    // module1 depending on module2
+    File module1ClassFile = new JarCompiler()
+        .compiling(getResourceFile("/modules/module1/Module1.java"))
+        .dependingOn(module2JarBuilder.getArtifactFile())
+        .compile("module1.jar");
+    JarFileBuilder module1JarBuilder = new JarFileBuilder("module1", module1ClassFile)
+        .dependingOn(module2JarBuilder);
+
+    ApplicationFileBuilder applicationFileBuilder = appFileBuilder("shared-libraries-transitive")
+        .definedBy("app-config.xml")
+        .containingClass(moduleOverriderClassFile, "org/foo/OverrideMe.class")
+        .dependingOnSharedLibrary(module1JarBuilder);
+
+    addPackedAppFromBuilder(applicationFileBuilder);
+    startDeployment();
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    CoreEvent event = executeApplicationFlow("main", null);
+    String payload = event.getMessage().getPayload().toString();
+    assertThat(payload, containsString("Hi, I'm Module1 depending on Module2"));
   }
 
   @Override
