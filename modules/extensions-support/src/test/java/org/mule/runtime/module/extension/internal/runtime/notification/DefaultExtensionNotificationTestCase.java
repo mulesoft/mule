@@ -18,7 +18,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.Notification;
-import org.mule.sdk.api.notification.NotificationActionDefinition;
+import org.mule.runtime.extension.api.notification.NotificationActionDefinition;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import io.qameta.allure.Description;
