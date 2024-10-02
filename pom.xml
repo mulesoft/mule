@@ -163,7 +163,7 @@
         <sshdVersion>2.12.1</sshdVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.4.0-20240923</muleDslApiVersion>
+        <muleDslApiVersion>1.4.0-20241002</muleDslApiVersion>
         <muleAstVersion>1.0.0-20241002</muleAstVersion>
         <mulePropertiesApiVersion>1.0.0-20241002</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.4.0-20241002</muleExtensionsApiVersion>
