@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,69 +24,68 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "extension-documentation")
 public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation {
 
-  private XmlExtensionElementDocumentation extension;
-  private List<XmlExtensionElementDocumentation> connections = new LinkedList<>();
-  private List<XmlExtensionElementDocumentation> configs = new LinkedList<>();
-  private List<XmlExtensionElementDocumentation> sources = new LinkedList<>();
-  private List<XmlExtensionElementDocumentation> operation = new LinkedList<>();
-  private List<XmlExtensionElementDocumentation> types = new LinkedList<>();
+  private DefaultXmlExtensionElementDocumentation extension;
+  private List<DefaultXmlExtensionElementDocumentation> connections = new LinkedList<>();
+  private List<DefaultXmlExtensionElementDocumentation> configs = new LinkedList<>();
+  private List<DefaultXmlExtensionElementDocumentation> sources = new LinkedList<>();
+  private List<DefaultXmlExtensionElementDocumentation> operation = new LinkedList<>();
+  private List<DefaultXmlExtensionElementDocumentation> types = new LinkedList<>();
 
   @XmlElementWrapper(name = "connections")
-  @XmlElement(name = "connection", type = DefaultXmlExtensionElementDocumentation.class)
-  public List<XmlExtensionElementDocumentation> getConnections() {
+  @XmlElement(name = "connection")
+  public List<DefaultXmlExtensionElementDocumentation> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<XmlExtensionElementDocumentation> connections) {
+  public void setConnections(List<DefaultXmlExtensionElementDocumentation> connections) {
     this.connections = connections;
   }
 
   @XmlElementWrapper(name = "configs")
-  @XmlElement(name = "config", type = DefaultXmlExtensionElementDocumentation.class)
-  public List<XmlExtensionElementDocumentation> getConfigs() {
+  @XmlElement(name = "config")
+  public List<DefaultXmlExtensionElementDocumentation> getConfigs() {
     return configs;
   }
 
-  public void setConfigs(List<XmlExtensionElementDocumentation> configs) {
+  public void setConfigs(List<DefaultXmlExtensionElementDocumentation> configs) {
     this.configs = configs;
   }
 
   @XmlElementWrapper(name = "sources")
-  @XmlElement(name = "source", type = DefaultXmlExtensionElementDocumentation.class)
-  public List<XmlExtensionElementDocumentation> getSources() {
+  @XmlElement(name = "source")
+  public List<DefaultXmlExtensionElementDocumentation> getSources() {
     return sources;
   }
 
-  public void setSources(List<XmlExtensionElementDocumentation> sources) {
+  public void setSources(List<DefaultXmlExtensionElementDocumentation> sources) {
     this.sources = sources;
   }
 
   @XmlElementWrapper(name = "operations")
-  @XmlElement(name = "operation", type = DefaultXmlExtensionElementDocumentation.class)
-  public List<XmlExtensionElementDocumentation> getOperations() {
+  @XmlElement(name = "operation")
+  public List<DefaultXmlExtensionElementDocumentation> getOperations() {
     return operation;
   }
 
-  public void setOperation(List<XmlExtensionElementDocumentation> operation) {
+  public void setOperation(List<DefaultXmlExtensionElementDocumentation> operation) {
     this.operation = operation;
   }
 
   @XmlElementWrapper(name = "types")
-  @XmlElement(name = "type", type = DefaultXmlExtensionElementDocumentation.class)
-  public List<XmlExtensionElementDocumentation> getTypes() {
+  @XmlElement(name = "type")
+  public List<DefaultXmlExtensionElementDocumentation> getTypes() {
     return types;
   }
 
-  public void setTypes(List<XmlExtensionElementDocumentation> types) {
+  public void setTypes(List<DefaultXmlExtensionElementDocumentation> types) {
     this.types = types;
   }
 
-  @XmlElement(type = DefaultXmlExtensionElementDocumentation.class)
-  public XmlExtensionElementDocumentation getExtension() {
+  public DefaultXmlExtensionElementDocumentation getExtension() {
     return extension;
   }
 
-  public void setExtension(XmlExtensionElementDocumentation extension) {
+  public void setExtension(DefaultXmlExtensionElementDocumentation extension) {
     this.extension = extension;
   }
 }

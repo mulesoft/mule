@@ -18,7 +18,5 @@ public abstract class XmlExtensionElementDocumentation {
 
   abstract public void setDescription(String description);
 
-  abstract public List<XmlExtensionParameterDocumentation> getParameters();
-
-  abstract public void setParameters(List<XmlExtensionParameterDocumentation> parameters);
+  abstract public List<? extends XmlExtensionParameterDocumentation> getParameters();
 }

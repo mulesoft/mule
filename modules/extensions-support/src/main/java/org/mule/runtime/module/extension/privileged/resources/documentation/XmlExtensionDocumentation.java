@@ -16,27 +16,15 @@ import java.util.List;
  */
 public abstract class XmlExtensionDocumentation {
 
-  abstract public List<XmlExtensionElementDocumentation> getConnections();
+  abstract public List<? extends XmlExtensionElementDocumentation> getConnections();
 
-  abstract public void setConnections(List<XmlExtensionElementDocumentation> connections);
+  abstract public List<? extends XmlExtensionElementDocumentation> getConfigs();
 
-  abstract public List<XmlExtensionElementDocumentation> getConfigs();
+  abstract public List<? extends XmlExtensionElementDocumentation> getSources();
 
-  abstract public void setConfigs(List<XmlExtensionElementDocumentation> configs);
+  abstract public List<? extends XmlExtensionElementDocumentation> getOperations();
 
-  abstract public List<XmlExtensionElementDocumentation> getSources();
-
-  abstract public void setSources(List<XmlExtensionElementDocumentation> sources);
-
-  abstract public List<XmlExtensionElementDocumentation> getOperations();
-
-  abstract public void setOperation(List<XmlExtensionElementDocumentation> operations);
-
-  abstract public List<XmlExtensionElementDocumentation> getTypes();
-
-  abstract public void setTypes(List<XmlExtensionElementDocumentation> types);
+  abstract public List<? extends XmlExtensionElementDocumentation> getTypes();
 
   abstract public XmlExtensionElementDocumentation getExtension();
-
-  abstract public void setExtension(XmlExtensionElementDocumentation extension);
 }

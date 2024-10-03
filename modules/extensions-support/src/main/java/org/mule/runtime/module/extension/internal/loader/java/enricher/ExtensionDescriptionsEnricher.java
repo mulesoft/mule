@@ -105,7 +105,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
         document(declaration, documentation.getSources());
       }
 
-      private void document(ParameterizedDeclaration<?> declaration, List<XmlExtensionElementDocumentation> elements) {
+      private void document(ParameterizedDeclaration<?> declaration, List<? extends XmlExtensionElementDocumentation> elements) {
         elements.stream().filter(e -> e.getName().equals(declaration.getName())).findAny()
             .ifPresent(e -> {
               declaration.setDescription(e.getDescription());

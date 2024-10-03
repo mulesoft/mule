@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class DefaultXmlExtensionElementDocumentation extends XmlExtensionElement
 
   private String description;
 
-  private List<XmlExtensionParameterDocumentation> parameters;
+  private List<DefaultXmlExtensionParameterDocumentation> parameters;
 
   @XmlAttribute
   public String getName() {
@@ -50,12 +49,12 @@ public class DefaultXmlExtensionElementDocumentation extends XmlExtensionElement
   }
 
   @XmlElementWrapper(name = "parameters")
-  @XmlElement(name = "parameter", type = DefaultXmlExtensionParameterDocumentation.class)
-  public List<XmlExtensionParameterDocumentation> getParameters() {
+  @XmlElement(name = "parameter")
+  public List<DefaultXmlExtensionParameterDocumentation> getParameters() {
     return parameters;
   }
 
-  public void setParameters(List<XmlExtensionParameterDocumentation> parameters) {
+  public void setParameters(List<DefaultXmlExtensionParameterDocumentation> parameters) {
     this.parameters = parameters;
   }
 }

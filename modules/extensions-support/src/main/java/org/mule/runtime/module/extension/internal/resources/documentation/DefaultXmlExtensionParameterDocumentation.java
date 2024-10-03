@@ -24,8 +24,6 @@ public class DefaultXmlExtensionParameterDocumentation extends XmlExtensionParam
   private String name;
   private String description;
 
-  public DefaultXmlExtensionParameterDocumentation() {}
-
   public DefaultXmlExtensionParameterDocumentation(String name, String description) {
     this.name = name;
     this.description = description;
