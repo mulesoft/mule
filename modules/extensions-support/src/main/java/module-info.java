@@ -233,7 +233,7 @@ module org.mule.runtime.extensions.support {
   provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider with
       org.mule.runtime.module.extension.api.loader.DefaultExtensionModelLoaderProvider;
   provides org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory with
-    org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
+      org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
   provides org.mule.runtime.core.api.transaction.TransactionFactory with
       org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
   provides org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactoryDelegate with
