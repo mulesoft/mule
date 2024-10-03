@@ -23,8 +23,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.resources.documentation.DefaultXmlExtensionDocumentation;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
+import org.mule.runtime.module.extension.internal.resources.documentation.DefaultXmlExtensionElementDocumentation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,7 +80,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    * @param declaration   the declaration to describe.
    * @param documentation the extension documentation with its corresponding description.
    */
-  private void document(ExtensionDeclaration declaration, XmlExtensionDocumentation documentation) {
+  private void document(ExtensionDeclaration declaration, DefaultXmlExtensionDocumentation documentation) {
     declaration.setDescription(documentation.getExtension().getDescription());
     new DeclarationWalker() {
 
@@ -105,7 +104,8 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
         document(declaration, documentation.getSources());
       }
 
-      private void document(ParameterizedDeclaration<?> declaration, List<? extends XmlExtensionElementDocumentation> elements) {
+      private void document(ParameterizedDeclaration<?> declaration,
+                            List<? extends DefaultXmlExtensionElementDocumentation> elements) {
         elements.stream().filter(e -> e.getName().equals(declaration.getName())).findAny()
             .ifPresent(e -> {
               declaration.setDescription(e.getDescription());

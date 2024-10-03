@@ -56,7 +56,7 @@ public class DefaultExtensionDescriptionsSerializer
   public synchronized String serialize(XmlExtensionDocumentation dto) {
     try {
       ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
-      marshaller.marshal((DefaultXmlExtensionDocumentation) dto, getXmlSerializer(out).asContentHandler());
+      marshaller.marshal(dto, getXmlSerializer(out).asContentHandler());
 
       return out.toString();
     } catch (Exception e) {

@@ -81,6 +81,7 @@ public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation 
     this.types = types;
   }
 
+  @XmlElement
   public DefaultXmlExtensionElementDocumentation getExtension() {
     return extension;
   }
