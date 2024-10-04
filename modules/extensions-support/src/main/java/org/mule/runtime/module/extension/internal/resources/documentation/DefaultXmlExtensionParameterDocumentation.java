@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.privileged.resources.documentation;
+package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionParameterDocumentation;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,14 +18,15 @@ import javax.xml.bind.annotation.XmlElement;
  *
  * @since 4.0
  */
-public class XmlExtensionParameterDocumentation implements NamedObject, DescribedObject {
+public class DefaultXmlExtensionParameterDocumentation
+    implements NamedObject, DescribedObject, XmlExtensionParameterDocumentation {
 
   private String name;
   private String description;
 
-  public XmlExtensionParameterDocumentation() {}
+  public DefaultXmlExtensionParameterDocumentation() {}
 
-  public XmlExtensionParameterDocumentation(String name, String description) {
+  public DefaultXmlExtensionParameterDocumentation(String name, String description) {
     this.name = name;
     this.description = description;
   }

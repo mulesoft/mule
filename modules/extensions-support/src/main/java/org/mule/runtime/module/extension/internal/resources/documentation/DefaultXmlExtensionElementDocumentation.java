@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.privileged.resources.documentation;
+package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.util.List;
 
@@ -15,18 +16,14 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
-/**
- * a POJO that represents an extension element with parameters and a description.
- *
- * @since 4.0
- */
-public class XmlExtensionElementDocumentation implements NamedObject, DescribedObject {
+public class DefaultXmlExtensionElementDocumentation
+    implements NamedObject, DescribedObject, XmlExtensionElementDocumentation {
 
   private String name;
 
   private String description;
 
-  private List<XmlExtensionParameterDocumentation> parameters;
+  private List<DefaultXmlExtensionParameterDocumentation> parameters;
 
   @XmlAttribute
   public String getName() {
@@ -48,11 +45,11 @@ public class XmlExtensionElementDocumentation implements NamedObject, DescribedO
 
   @XmlElementWrapper(name = "parameters")
   @XmlElement(name = "parameter")
-  public List<XmlExtensionParameterDocumentation> getParameters() {
+  public List<DefaultXmlExtensionParameterDocumentation> getParameters() {
     return parameters;
   }
 
-  public void setParameters(List<XmlExtensionParameterDocumentation> parameters) {
+  public void setParameters(List<DefaultXmlExtensionParameterDocumentation> parameters) {
     this.parameters = parameters;
   }
 }

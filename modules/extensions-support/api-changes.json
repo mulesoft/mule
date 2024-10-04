@@ -1,4 +1,471 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.io.InputStream)",
+          "new": "method org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.io.InputStream)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.lang.String)",
+          "new": "method org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.lang.String)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer::getFileName(java.lang.String)",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer::getFileName(java.lang.String)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer::serialize(org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation)",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer::serialize(org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.kindChanged",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.nowAbstract",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::<init>()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConfigs()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConfigs()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConfigs()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConfigs()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConfigs()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConfigs()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement(name = \"config\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConfigs()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConfigs()",
+          "annotation": "@javax.xml.bind.annotation.XmlElementWrapper(name = \"configs\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConnections()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConnections()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConnections()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConnections()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConnections()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConnections()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement(name = \"connection\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConnections()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getConnections()",
+          "annotation": "@javax.xml.bind.annotation.XmlElementWrapper(name = \"connections\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getExtension()",
+          "new": "method org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getExtension()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getExtension()",
+          "new": "method org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getExtension()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getOperations()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getOperations()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getOperations()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getOperations()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getOperations()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getOperations()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement(name = \"operation\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getOperations()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getOperations()",
+          "annotation": "@javax.xml.bind.annotation.XmlElementWrapper(name = \"operations\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getSources()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getSources()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getSources()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getSources()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getSources()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getSources()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement(name = \"source\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getSources()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getSources()",
+          "annotation": "@javax.xml.bind.annotation.XmlElementWrapper(name = \"sources\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getTypes()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getTypes()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getTypes()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getTypes()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getTypes()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getTypes()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement(name = \"type\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getTypes()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::getTypes()",
+          "annotation": "@javax.xml.bind.annotation.XmlElementWrapper(name = \"types\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::setConfigs(java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation>)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::setConnections(java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation>)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::setExtension(org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::setOperation(java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation>)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::setSources(java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation>)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation::setTypes(java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation>)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.kindChanged",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.nowAbstract",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation",
+          "annotation": "@javax.xml.bind.annotation.XmlRootElement(name = \"extension-documentation\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::<init>()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getDescription()",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getDescription()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getDescription()",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getDescription()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getName()",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getName()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getName()",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getName()",
+          "annotation": "@javax.xml.bind.annotation.XmlAttribute",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getParameters()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getParameters()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getParameters()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getParameters()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getParameters()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getParameters()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement(name = \"parameter\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getParameters()",
+          "new": "method java.util.List<? extends org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation> org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::getParameters()",
+          "annotation": "@javax.xml.bind.annotation.XmlElementWrapper(name = \"parameters\")",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::setDescription(java.lang.String)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::setName(java.lang.String)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation::setParameters(java.util.List<org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation>)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.kindChanged",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.nowAbstract",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::<init>()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::<init>(java.lang.String, java.lang.String)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::getDescription()",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::getDescription()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::getDescription()",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::getDescription()",
+          "annotation": "@javax.xml.bind.annotation.XmlElement",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.nowAbstract",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::getName()",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::getName()",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.removed",
+          "old": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::getName()",
+          "new": "method java.lang.String org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::getName()",
+          "annotation": "@javax.xml.bind.annotation.XmlAttribute",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::setDescription(java.lang.String)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation::setName(java.lang.String)",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.kindChanged",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.nowAbstract",
+          "old": "class org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation",
+          "new": "interface org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        }
+      ]
+    }
+  },
   "4.8.0": {
     "revapi": {
       "ignore": [
