@@ -33,13 +33,11 @@ import javax.xml.bind.Unmarshaller;
 public class DefaultExtensionDescriptionsSerializer
     extends ExtensionDescriptionsSerializer {
 
-  public static final DefaultExtensionDescriptionsSerializer SERIALIZER = new DefaultExtensionDescriptionsSerializer();
-
   private JAXBContext jaxbContext;
   private Marshaller marshaller;
   private Unmarshaller unmarshaller;
 
-  private DefaultExtensionDescriptionsSerializer() {
+  public DefaultExtensionDescriptionsSerializer() {
     final ClassLoader tccl = currentThread().getContextClassLoader();
     currentThread().setContextClassLoader(DefaultExtensionDescriptionsSerializer.class.getClassLoader());
     try {
@@ -95,9 +93,5 @@ public class DefaultExtensionDescriptionsSerializer
   public String getFileName(String extensionName) {
     String key = extensionName.replace(" ", "-").toLowerCase();
     return format(EXTENSION_DESCRIPTIONS_FILE_NAME_MASK, key);
-  }
-
-  static public DefaultExtensionDescriptionsSerializer getExtensionDescriptionsSerializer() {
-    return SERIALIZER;
   }
 }

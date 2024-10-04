@@ -15,9 +15,5 @@ public abstract class XmlExtensionParameterDocumentation {
 
   abstract public String getName();
 
-  abstract public void setName(String name);
-
   abstract public String getDescription();
-
-  abstract public void setDescription(String description);
 }

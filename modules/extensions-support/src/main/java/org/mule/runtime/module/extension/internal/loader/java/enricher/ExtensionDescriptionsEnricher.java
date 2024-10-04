@@ -23,7 +23,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.resources.documentation.DefaultXmlExtensionDocumentation;
-import org.mule.runtime.module.extension.internal.resources.documentation.DefaultXmlExtensionElementDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,7 +105,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
       }
 
       private void document(ParameterizedDeclaration<?> declaration,
-                            List<? extends DefaultXmlExtensionElementDocumentation> elements) {
+                            List<? extends XmlExtensionElementDocumentation> elements) {
         elements.stream().filter(e -> e.getName().equals(declaration.getName())).findAny()
             .ifPresent(e -> {
               declaration.setDescription(e.getDescription());

@@ -221,8 +221,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.loader.parser.java.utils to
       org.mule.runtime.extensions.mule.support;
 
-  opens org.mule.runtime.module.extension.privileged.resources.documentation to
-      java.xml.bind;
+  opens org.mule.runtime.module.extension.internal.resources.documentation to java.xml.bind;
   exports org.mule.runtime.module.extension.internal.loader.parser.metadata to org.mule.runtime.extensions.mule.support, org.mule.runtime.extensions.soap.support, org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.metadata.chain to org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.loader.parser.java.metadata to org.mule.runtime.extensions.mule.support, org.mule.runtime.extensions.soap.support, org.mule.runtime.extensions.spring.support;

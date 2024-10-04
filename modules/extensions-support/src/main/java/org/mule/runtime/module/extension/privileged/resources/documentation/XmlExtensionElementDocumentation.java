@@ -12,11 +12,7 @@ public abstract class XmlExtensionElementDocumentation {
 
   abstract public String getName();
 
-  abstract public void setName(String name);
-
   abstract public String getDescription();
-
-  abstract public void setDescription(String description);
 
   abstract public List<? extends XmlExtensionParameterDocumentation> getParameters();
 }

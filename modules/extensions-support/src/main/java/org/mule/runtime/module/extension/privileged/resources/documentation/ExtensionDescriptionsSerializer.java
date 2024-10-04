@@ -12,6 +12,8 @@ import java.io.InputStream;
 
 public abstract class ExtensionDescriptionsSerializer {
 
+  public static final ExtensionDescriptionsSerializer SERIALIZER = new DefaultExtensionDescriptionsSerializer();
+
   abstract public String serialize(XmlExtensionDocumentation dto);
 
   abstract public XmlExtensionDocumentation deserialize(String xml);
@@ -19,9 +21,5 @@ public abstract class ExtensionDescriptionsSerializer {
   abstract public XmlExtensionDocumentation deserialize(InputStream xml);
 
   abstract public String getFileName(String extensionName);
-
-  static public ExtensionDescriptionsSerializer getSerializer() {
-    return DefaultExtensionDescriptionsSerializer.getExtensionDescriptionsSerializer();
-  }
 
 }
