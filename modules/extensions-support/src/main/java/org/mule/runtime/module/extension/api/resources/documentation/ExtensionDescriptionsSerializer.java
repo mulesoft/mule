@@ -10,6 +10,11 @@ import org.mule.runtime.module.extension.internal.resources.documentation.Defaul
 
 import java.io.InputStream;
 
+/**
+ * A simple XML JAXB serializer class for {@link XmlExtensionDocumentation}s files.
+ *
+ * @since 4.0
+ */
 public interface ExtensionDescriptionsSerializer {
 
   ExtensionDescriptionsSerializer SERIALIZER = new DefaultExtensionDescriptionsSerializer();

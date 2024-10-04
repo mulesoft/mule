@@ -91,6 +91,8 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.tooling.sampledata;
   exports org.mule.runtime.module.extension.api.tooling.valueprovider;
   exports org.mule.runtime.module.extension.api.util;
+  // Used by the extensions-maven-plugin
+  exports org.mule.runtime.module.extension.api.resources.documentation;
 
   exports org.mule.runtime.module.extension.api.runtime.privileged to
       org.mule.runtime.extensions.spring.support,

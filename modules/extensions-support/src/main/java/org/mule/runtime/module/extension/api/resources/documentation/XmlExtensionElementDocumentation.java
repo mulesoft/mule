@@ -8,6 +8,11 @@ package org.mule.runtime.module.extension.api.resources.documentation;
 
 import java.util.List;
 
+/**
+ * a POJO that represents an extension element with parameters and a description.
+ *
+ * @since 4.0
+ */
 public interface XmlExtensionElementDocumentation {
 
   String getName();

@@ -25,11 +25,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-/**
- * A simple XML JAXB serializer class for {@link XmlExtensionDocumentation}s files.
- *
- * @since 4.0
- */
 public class DefaultExtensionDescriptionsSerializer
     implements ExtensionDescriptionsSerializer {
 
