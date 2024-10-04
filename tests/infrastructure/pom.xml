@@ -131,7 +131,6 @@
         <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>${groovyVersionBuild}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
