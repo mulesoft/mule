@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
+import org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @since 4.0
  */
 @XmlRootElement(name = "extension-documentation")
-public class DefaultXmlExtensionDocumentation extends XmlExtensionDocumentation {
+public class DefaultXmlExtensionDocumentation implements XmlExtensionDocumentation {
 
   private DefaultXmlExtensionElementDocumentation extension;
   private List<DefaultXmlExtensionElementDocumentation> connections = new LinkedList<>();

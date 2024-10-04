@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.NamedObject;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
+import org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.util.List;
 
@@ -21,8 +21,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  *
  * @since 4.0
  */
-public class DefaultXmlExtensionElementDocumentation extends XmlExtensionElementDocumentation
-    implements NamedObject, DescribedObject {
+public class DefaultXmlExtensionElementDocumentation
+    implements NamedObject, DescribedObject, XmlExtensionElementDocumentation {
 
   private String name;
 

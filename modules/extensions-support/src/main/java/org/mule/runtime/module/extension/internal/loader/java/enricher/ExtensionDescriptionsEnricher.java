@@ -23,7 +23,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.resources.documentation.DefaultXmlExtensionDocumentation;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
+import org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.io.IOException;
 import java.io.InputStream;

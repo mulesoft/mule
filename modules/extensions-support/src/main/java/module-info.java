@@ -14,9 +14,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
  */
 @PrivilegedApi(
   privilegedPackages = {
-        "org.mule.runtime.module.extension.api.runtime.privileged",
-        // Used by the extensions-maven-plugin
-        "org.mule.runtime.module.extension.privileged.resources.documentation"
+        "org.mule.runtime.module.extension.api.runtime.privileged"
   },
   privilegedArtifactIds = {
       "com.mulesoft.munit:munit-tools",

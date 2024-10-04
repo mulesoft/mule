@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.privileged.resources.documentation;
+package org.mule.runtime.module.extension.api.resources.documentation;
 
 /**
  * a POJO that represents an extension parameter with a name and a description.
  *
  * @since 4.0
  */
-public abstract class XmlExtensionParameterDocumentation {
+public interface XmlExtensionParameterDocumentation {
 
-  abstract public String getName();
+  String getName();
 
-  abstract public String getDescription();
+  String getDescription();
 }

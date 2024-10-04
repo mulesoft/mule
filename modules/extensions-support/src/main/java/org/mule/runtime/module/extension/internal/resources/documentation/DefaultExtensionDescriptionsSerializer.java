@@ -13,8 +13,8 @@ import static java.lang.Thread.currentThread;
 
 import org.mule.apache.xml.serialize.OutputFormat;
 import org.mule.apache.xml.serialize.XMLSerializer;
-import org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer;
-import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
+import org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer;
+import org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,7 +31,7 @@ import javax.xml.bind.Unmarshaller;
  * @since 4.0
  */
 public class DefaultExtensionDescriptionsSerializer
-    extends ExtensionDescriptionsSerializer {
+    implements ExtensionDescriptionsSerializer {
 
   private JAXBContext jaxbContext;
   private Marshaller marshaller;
