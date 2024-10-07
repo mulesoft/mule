@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -19,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 
 /**
@@ -57,7 +59,7 @@ abstract class AbstractSinkRouter {
       routePublishers.add(nextRoute.getPublisher());
     }
 
-    routePublishers.add(subscribeFluxOnPublisherSubscription(phantomRoute.getPublisher(), router));
+    routePublishers.add(from(subscribeFluxOnPublisherSubscription(identity(), router).apply(phantomRoute.getPublisher())));
 
     return routePublishers;
   }
