@@ -40,7 +40,10 @@
         </surefire.args>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+
         <maven.compat.version>3.3.9</maven.compat.version>
+        <commonsIoVersion>2.17.0</commonsIoVersion>
+        <commonsCollectionsVersion>4.4</commonsCollectionsVersion>
     </properties>
 
     <dependencies>
