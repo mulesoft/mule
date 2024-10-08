@@ -36,6 +36,7 @@ import static java.util.stream.Collectors.toSet;
 
 import static javax.lang.model.element.ElementKind.METHOD;
 import static javax.lang.model.element.Modifier.PUBLIC;
+
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
@@ -162,8 +163,14 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import com.google.common.collect.ImmutableList;
-
-import org.apache.commons.lang3.reflect.FieldUtils;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.dynamic.ClassFileLocator;
+import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.MethodCall;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.pool.TypePool;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
@@ -182,31 +189,29 @@ public final class IntrospectionUtils {
   private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
   private static final Logger LOGGER = getLogger(IntrospectionUtils.class);
 
-  static {
-    setWeakHashCaches();
-  }
-
   private IntrospectionUtils() {}
 
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
    * <p>
-   * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
+   * For example, {@link ResolvableType} may retain classloaders when introspection is used.
    * <p>
-   * This hack is also present in the {@code deployment} module. It's because this module shades the spring dependencies and
-   * changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
+   * This hack is also present in the {@code extensions-support} module. It's because that module shades the spring dependencies
+   * and changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
    */
   private static void setWeakHashCaches() {
-    try {
-      Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
-      Field modifiersField = Field.class.getDeclaredField("modifiers");
-      modifiersField.setAccessible(true);
-      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-      field.set(null, WEAK);
-    } catch (Exception e) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes.", e);
-      }
+    TypePool typePool = TypePool.Default.of(IntrospectionUtils.class.getClassLoader());
+    try (DynamicType.Unloaded<?> unloaded = new ByteBuddy()
+        .redefine(typePool.describe("org.springframework.util.ConcurrentReferenceHashMap").resolve(),
+                  ClassFileLocator.ForClassLoader.of(IntrospectionUtils.class.getClassLoader()))
+        // We redirect any other constructor to the fully parameterized one.
+        .constructor(target -> target.isConstructor() && target.getParameters().size() < 4)
+        .intercept(MethodCall
+            .invoke((ElementMatcher<MethodDescription>) target -> target.isConstructor() && target.getParameters().size() == 4)
+            // We use default arguments plus WEAK reference type, discarding the intercepted ones.
+            .with(16, 0.75F, 16, WEAK))
+        .make()) {
+      unloaded.load(IntrospectionUtils.class.getClassLoader(), ClassLoadingStrategy.Default.INJECTION);
     }
   }
 

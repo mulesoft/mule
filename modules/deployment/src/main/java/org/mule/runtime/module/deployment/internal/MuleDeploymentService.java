@@ -54,8 +54,6 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
@@ -68,13 +66,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.dynamic.ClassFileLocator;
+import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.MethodCall;
+import net.bytebuddy.matcher.ElementMatcher;
+import net.bytebuddy.pool.TypePool;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
@@ -107,29 +113,27 @@ public class MuleDeploymentService implements DeploymentService {
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final Supplier<SchedulerService> artifactStartExecutorSupplier;
 
-  static {
-    setWeakHashCaches();
-  }
-
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
    * <p>
-   * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
+   * For example, {@link ResolvableType} may retain classloaders when introspection is used.
    * <p>
    * This hack is also present in the {@code extensions-support} module. It's because that module shades the spring dependencies
    * and changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
    */
   private static void setWeakHashCaches() {
-    try {
-      Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
-      Field modifiersField = Field.class.getDeclaredField("modifiers");
-      modifiersField.setAccessible(true);
-      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-      field.set(null, WEAK);
-    } catch (Exception e) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes.", e);
-      }
+    TypePool typePool = TypePool.Default.of(MuleDeploymentService.class.getClassLoader());
+    try (DynamicType.Unloaded<?> unloaded = new ByteBuddy()
+        .redefine(typePool.describe("org.springframework.util.ConcurrentReferenceHashMap").resolve(),
+                  ClassFileLocator.ForClassLoader.of(MuleDeploymentService.class.getClassLoader()))
+        // We redirect any other constructor to the fully parameterized one.
+        .constructor(target -> target.isConstructor() && target.getParameters().size() < 4)
+        .intercept(MethodCall
+            .invoke((ElementMatcher<MethodDescription>) target -> target.isConstructor() && target.getParameters().size() == 4)
+            // We use default arguments plus WEAK reference type, discarding the intercepted ones.
+            .with(16, 0.75F, 16, WEAK))
+        .make()) {
+      unloaded.load(ApplicationContext.class.getClassLoader(), ClassLoadingStrategy.Default.INJECTION);
     }
   }
 

@@ -101,6 +101,8 @@ module org.mule.runtime.spring.config {
   exports org.mule.runtime.config.internal.context to
       org.mule.runtime.deployment,
       spring.beans;
+  exports org.mule.runtime.config.internal.util to
+        spring.core;
   exports org.mule.runtime.config.internal.context.lazy to
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.config.internal.dsl.processor to

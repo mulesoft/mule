@@ -95,6 +95,7 @@ import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
+import org.mule.runtime.config.internal.util.ByteBuddySpringCachesManager;
 import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -133,7 +134,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
-
 import org.slf4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -463,7 +463,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       IntrospectionUtils.resetCommonCaches();
       // Additional Spring cache cleanup
       clearSpringSoftReferencesCachesForDynamicClassLoaders();
-      clearSpringBridgeMethodsCache();
+      // clearSpringBridgeMethodsCache();
+      try {
+        ByteBuddySpringCachesManager.clearCaches();
+      } catch (Exception e) {
+        LOGGER.warn("Spring caches cleanup failed", e);
+      }
     }
   }
 
