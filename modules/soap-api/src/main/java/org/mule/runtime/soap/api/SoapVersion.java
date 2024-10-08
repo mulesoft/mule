@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.soap.api;
 
-import static javax.xml.soap.SOAPConstants.SOAP_1_1_PROTOCOL;
-import static javax.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
+import static jakarta.xml.soap.SOAPConstants.SOAP_1_1_PROTOCOL;
+import static jakarta.xml.soap.SOAPConstants.SOAP_1_2_PROTOCOL;
 
 /**
  * All the available SOAP versions with it's version code and protocol name.
