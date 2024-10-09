@@ -95,7 +95,7 @@ import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
-import org.mule.runtime.config.internal.util.ByteBuddySpringCachesManager;
+import org.mule.runtime.config.privileged.spring.ByteBuddySpringCachesManager;
 import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -459,13 +459,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         throw new MuleRuntimeException(e);
       }
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
-      // Needed due to a shade of spring-core in the extensions-support module.
-      IntrospectionUtils.resetCommonCaches();
       // Additional Spring cache cleanup
       clearSpringSoftReferencesCachesForDynamicClassLoaders();
-      // clearSpringBridgeMethodsCache();
       try {
         ByteBuddySpringCachesManager.clearCaches();
+        // Needed due to a shade of spring-core in the extensions-support module.
+        IntrospectionUtils.resetCommonCaches();
       } catch (Exception e) {
         LOGGER.warn("Spring caches cleanup failed", e);
       }

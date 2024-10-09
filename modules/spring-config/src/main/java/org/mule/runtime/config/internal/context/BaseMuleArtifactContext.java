@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.config.internal.util.ByteBuddySpringCacheInstrumentator;
+import org.mule.runtime.config.privileged.spring.ByteBuddySpringCacheInstrumentator;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
@@ -31,6 +31,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
+import org.springframework.core.SpringVersion;
 
 /**
  * Spring context specialization that contains just some standard constant beans for every Mule deployable artifact.
@@ -47,7 +48,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   private final boolean enableLazyInit;
 
   static {
-    ByteBuddySpringCacheInstrumentator.instrument();
+    ByteBuddySpringCacheInstrumentator.instrumentForCleanup(SpringVersion.class.getClassLoader());
   }
 
   /**

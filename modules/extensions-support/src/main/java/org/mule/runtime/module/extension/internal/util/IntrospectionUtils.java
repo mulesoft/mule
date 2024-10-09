@@ -19,6 +19,7 @@ import static org.mule.runtime.module.extension.api.loader.java.type.PropertyEle
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.spring.ByteBuddySpringCacheInstrumentator.instrumentForCleanup;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 
@@ -42,7 +43,6 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.ResolvableType.NONE;
-import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -122,6 +122,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.RequireNa
 import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.spring.ByteBuddySpringCachesManager;
 import org.mule.sdk.api.annotation.param.NullSafe;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.sdk.api.runtime.parameter.Literal;
@@ -163,19 +164,10 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import com.google.common.collect.ImmutableList;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.dynamic.ClassFileLocator;
-import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.implementation.MethodCall;
-import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.pool.TypePool;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.ConcurrentReferenceHashMap;
+import org.springframework.core.SpringVersion;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -189,31 +181,13 @@ public final class IntrospectionUtils {
   private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
   private static final Logger LOGGER = getLogger(IntrospectionUtils.class);
 
-  private IntrospectionUtils() {}
-
-  /**
-   * Set caches in spring so that they are weakly (and not softly) referenced by default.
-   * <p>
-   * For example, {@link ResolvableType} may retain classloaders when introspection is used.
-   * <p>
-   * This hack is also present in the {@code extensions-support} module. It's because that module shades the spring dependencies
-   * and changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
-   */
-  private static void setWeakHashCaches() {
-    TypePool typePool = TypePool.Default.of(IntrospectionUtils.class.getClassLoader());
-    try (DynamicType.Unloaded<?> unloaded = new ByteBuddy()
-        .redefine(typePool.describe("org.springframework.util.ConcurrentReferenceHashMap").resolve(),
-                  ClassFileLocator.ForClassLoader.of(IntrospectionUtils.class.getClassLoader()))
-        // We redirect any other constructor to the fully parameterized one.
-        .constructor(target -> target.isConstructor() && target.getParameters().size() < 4)
-        .intercept(MethodCall
-            .invoke((ElementMatcher<MethodDescription>) target -> target.isConstructor() && target.getParameters().size() == 4)
-            // We use default arguments plus WEAK reference type, discarding the intercepted ones.
-            .with(16, 0.75F, 16, WEAK))
-        .make()) {
-      unloaded.load(IntrospectionUtils.class.getClassLoader(), ClassLoadingStrategy.Default.INJECTION);
-    }
+  static {
+    // A shade of the spring-core library is the cause for this additional cleanup.
+    // If that shade is no longer present, this cleanup can be safely removed.
+    instrumentForCleanup(SpringVersion.class.getClassLoader());
   }
+
+  private IntrospectionUtils() {}
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
@@ -1867,12 +1841,11 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * We already do it in {@code spring-config} module, but we need to do this here too because we're shading springcore and then
+   * We already do it in {@code spring-config} module, but we need to do this here too because we're shading spring-core and then
    * the classes (and their caches) are created twice.
    */
-  public static void resetCommonCaches() {
-    org.springframework.util.ReflectionUtils.clearCache();
-    AnnotationUtils.clearCache();
-    ResolvableType.clearCache();
+  public static void resetCommonCaches()
+      throws Exception {
+    ByteBuddySpringCachesManager.clearCaches();
   }
 }
