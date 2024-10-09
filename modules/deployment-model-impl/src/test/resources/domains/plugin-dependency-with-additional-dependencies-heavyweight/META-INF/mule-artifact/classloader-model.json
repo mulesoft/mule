@@ -8,19 +8,19 @@
           "artifactCoordinates": {
             "groupId": "org.apache.commons",
             "artifactId": "commons-collections4",
-            "version": "4.4",
+            "version": "${commonsCollectionsVersion}",
             "type": "jar"
           },
-          "uri": "repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar"
+          "uri": "repository/org/apache/commons/commons-collections4/${commonsCollectionsVersion}/commons-collections4-${commonsCollectionsVersion}.jar"
         },
         {
           "artifactCoordinates": {
             "groupId": "commons-io",
             "artifactId": "commons-io",
-            "version": "2.13.0",
+            "version": "${commonsIoVersion}",
             "type": "jar"
           },
-          "uri": "repository/commons-io/commons-io/2.13.0/commons-io-2.13.0.jar"
+          "uri": "repository/commons-io/commons-io/${commonsIoVersion}/commons-io-${commonsIoVersion}.jar"
         }
       ]
     }

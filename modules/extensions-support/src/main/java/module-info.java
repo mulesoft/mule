@@ -63,6 +63,7 @@ module org.mule.runtime.extensions.support {
   requires java.xml.bind;
   requires com.github.benmanes.caffeine;
   requires com.google.common;
+  requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   // Date Times and formats
   requires org.joda.time;

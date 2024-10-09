@@ -261,7 +261,6 @@
             ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
-        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <!-- this groovy version is to be used during the build process or for tests, not bundled in the distro -->
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
