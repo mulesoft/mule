@@ -1841,8 +1841,7 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * We already do it in {@code spring-config} module, but we need to do this here too because we're shading spring-core and then
-   * the classes (and their caches) are created twice.
+   * Allows the cleanup of the shaded Spring {@link org.springframework.util.ConcurrentReferenceHashMap} caches.
    */
   public static void resetCommonCaches()
       throws Exception {

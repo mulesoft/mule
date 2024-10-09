@@ -27,7 +27,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -66,23 +65,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.dynamic.ClassFileLocator;
-import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.implementation.MethodCall;
-import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.pool.TypePool;
 import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.ResolvableType;
-import org.springframework.util.ConcurrentReferenceHashMap;
 
 public class MuleDeploymentService implements DeploymentService {
 
@@ -112,30 +100,6 @@ public class MuleDeploymentService implements DeploymentService {
   private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final Supplier<SchedulerService> artifactStartExecutorSupplier;
-
-  /**
-   * Set caches in spring so that they are weakly (and not softly) referenced by default.
-   * <p>
-   * For example, {@link ResolvableType} may retain classloaders when introspection is used.
-   * <p>
-   * This hack is also present in the {@code extensions-support} module. It's because that module shades the spring dependencies
-   * and changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
-   */
-  private static void setWeakHashCaches() {
-    TypePool typePool = TypePool.Default.of(MuleDeploymentService.class.getClassLoader());
-    try (DynamicType.Unloaded<?> unloaded = new ByteBuddy()
-        .redefine(typePool.describe("org.springframework.util.ConcurrentReferenceHashMap").resolve(),
-                  ClassFileLocator.ForClassLoader.of(MuleDeploymentService.class.getClassLoader()))
-        // We redirect any other constructor to the fully parameterized one.
-        .constructor(target -> target.isConstructor() && target.getParameters().size() < 4)
-        .intercept(MethodCall
-            .invoke((ElementMatcher<MethodDescription>) target -> target.isConstructor() && target.getParameters().size() == 4)
-            // We use default arguments plus WEAK reference type, discarding the intercepted ones.
-            .with(16, 0.75F, 16, WEAK))
-        .make()) {
-      unloaded.load(ApplicationContext.class.getClassLoader(), ClassLoadingStrategy.Default.INJECTION);
-    }
-  }
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                Supplier<SchedulerService> artifactStartExecutorSupplier) {
