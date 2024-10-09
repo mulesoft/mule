@@ -41,7 +41,7 @@
             "version": "${commonsCollectionsVersion}",
             "type": "jar"
           },
-          "uri": "${outputDirectory}/domains/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/apache/commons/commons-collections4/${commonsCollectionsVersion}/commons-collections4-${commonsCollectionsVersion}.jar",
+          "uri": "file://${project.build.testOutputDirectory}/domains/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/apache/commons/commons-collections4/${commonsCollectionsVersion}/commons-collections4-${commonsCollectionsVersion}.jar",
           "packages": [
             "org.apache.commons.collections4",
             "org.apache.commons.collections4.bag",
@@ -78,7 +78,7 @@
             "version": "${commonsIoVersion}",
             "type": "jar"
           },
-          "uri": "${outputDirectory}/domains/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-io/commons-io/${commonsIoVersion}/commons-io-${commonsIoVersion}.jar",
+          "uri": "file://${project.build.testOutputDirectory}/domains/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-io/commons-io/${commonsIoVersion}/commons-io-${commonsIoVersion}.jar",
           "packages": [
             "",
             "org.apache.commons.io",
