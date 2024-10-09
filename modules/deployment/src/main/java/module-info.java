@@ -40,8 +40,6 @@ module org.mule.runtime.deployment {
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires spring.core;
-  requires net.bytebuddy;
-  requires spring.context;
 
   exports org.mule.runtime.module.deployment.api;
   exports org.mule.runtime.module.deployment.internal.processor to
