@@ -10,6 +10,8 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.tck.junit4.matcher.connection.ConnectionValidationResultFailureMatcher.isFailure;
+import static org.mule.tck.junit4.matcher.connection.ConnectionValidationResultSuccessMatcher.isSuccess;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.LazyConnectionsStory.LAZY_CONNECTIONS;
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
 import static org.mule.test.allure.AllureConstants.JavaSdk.ConnectivityTestingStory.CONNECTIVITY_TEST;
@@ -19,7 +21,8 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -33,6 +36,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -88,7 +92,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   private <T extends ConnectionProvider> T mockConnectionProvider(Class<T> type) throws Exception {
-    T connectionProvider = mock(type);
+    final T connectionProvider = mock(type);
     when(connectionProvider.connect()).thenReturn(connection);
     when(connectionProvider.validate(connection)).thenReturn(success());
 
@@ -98,7 +102,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   @Test
   public void getConnection() throws Exception {
     connectionManager.bind(config, connectionProvider);
-    ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
+    final ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
     assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
   }
 
@@ -156,14 +160,15 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
     when(muleContext.isStopped()).thenReturn(true);
     when(muleContext.isStarting()).thenReturn(true);
     connectionManager.bind(config, connectionProvider);
-    ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
+    final ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
     assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
   }
 
   @Test
   public void successfulConnectionProviderConnectivity() throws Exception {
-    ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
-    assertThat(result.isValid(), is(true));
+    final ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
+
+    assertThat(result, isSuccess());
     verify(testeableConnectionProvider).connect();
     verify(testeableConnectionProvider).validate(connection);
     verify(testeableConnectionProvider).disconnect(connection);
@@ -171,9 +176,9 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void failingConnectionProviderConnectivity() throws Exception {
-    ConnectionValidationResult validationResult = failure("oops", new Exception());
+    final ConnectionValidationResult validationResult = failure("oops", new Exception());
     when(testeableConnectionProvider.validate(connection)).thenReturn(validationResult);
-    ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
+    final ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
     assertThat(result, is(sameInstance(validationResult)));
 
     verify(testeableConnectionProvider).connect();
@@ -185,8 +190,8 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   public void poolingConnectionProviderConnectivity() throws Exception {
     testeableConnectionProvider = mockConnectionProvider(PoolingConnectionProvider.class);
 
-    ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
-    assertThat(result.isValid(), is(true));
+    final ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
+    assertThat(result, isSuccess());
     verify(testeableConnectionProvider).connect();
     verify(testeableConnectionProvider, atLeastOnce()).validate(connection);
     verify(testeableConnectionProvider, never()).disconnect(connection);
@@ -194,8 +199,8 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void cachedConnectionProviderConnectivity() throws Exception {
-    ConnectionValidationResult result = connectionManager.testConnectivity(connectionProvider);
-    assertThat(result.isValid(), is(true));
+    final ConnectionValidationResult result = connectionManager.testConnectivity(connectionProvider);
+    assertThat(result, isSuccess());
     verify(connectionProvider).connect();
     verify(connectionProvider, atLeastOnce()).validate(connection);
     verify(connectionProvider, never()).disconnect(connection);
@@ -205,10 +210,9 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   public void connectionProviderFailsToCreateConnectionOnConnectivityTest() throws Exception {
     when(testeableConnectionProvider.connect())
         .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
-    ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
+    final ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
 
-    assertThat(result.isValid(), is(false));
-    assertThat(result.getMessage(), is(CONNECTION_CREATION_FAILURE_MESSAGE));
+    assertThat(result, isFailure(nullValue(ErrorType.class), is(CONNECTION_CREATION_FAILURE_MESSAGE)));
     assertThat(result.getException(), instanceOf(ConnectionException.class));
 
     verify(testeableConnectionProvider).connect();
@@ -229,10 +233,9 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
     when(testeableConnectionProvider.connect())
         .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
     when(configurationInstance.getConnectionProvider()).thenReturn(of(testeableConnectionProvider));
-    ConnectionValidationResult result = lazyConnectionManagerAdapter.testConnectivity(configurationInstance, true);
+    final ConnectionValidationResult result = lazyConnectionManagerAdapter.testConnectivity(configurationInstance, true);
 
-    assertThat(result.isValid(), is(false));
-    assertThat(result.getMessage(), is(CONNECTION_CREATION_FAILURE_MESSAGE));
+    assertThat(result, isFailure(nullValue(ErrorType.class), is(CONNECTION_CREATION_FAILURE_MESSAGE)));
     assertThat(result.getException(), instanceOf(ConnectionException.class));
   }
 
@@ -245,10 +248,9 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
     when(testeableConnectionProvider.connect())
         .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
     when(configurationInstance.getConnectionProvider()).thenReturn(of(testeableConnectionProvider));
-    ConnectionValidationResult result = lazyConnectionManagerAdapter.testConnectivity(configurationInstance);
+    final ConnectionValidationResult result = lazyConnectionManagerAdapter.testConnectivity(configurationInstance);
 
-    assertThat(result.isValid(), is(false));
-    assertThat(result.getMessage(), is(CONNECTION_CREATION_FAILURE_MESSAGE));
+    assertThat(result, isFailure(nullValue(ErrorType.class), is(CONNECTION_CREATION_FAILURE_MESSAGE)));
     assertThat(result.getException(), instanceOf(ConnectionException.class));
   }
 
