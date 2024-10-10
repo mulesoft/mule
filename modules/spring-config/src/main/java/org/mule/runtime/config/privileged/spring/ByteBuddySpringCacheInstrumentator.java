@@ -89,9 +89,9 @@ public class ByteBuddySpringCacheInstrumentator {
             .with(16, 0.75F, 16, WEAK))
         .make()) {
       unloaded.load(targetClassloader, INJECTION);
-      LOGGER.debug("Spring caches are now instrumented for weakness.");
+      LOGGER.debug("Spring caches are now instrumented for using weak keys.");
     } catch (Exception e) {
-      LOGGER.error("Could not instrument Spring caches for weakness.", e);
+      LOGGER.error("Could not instrument Spring caches for using weak keys.", e);
     }
   }
 

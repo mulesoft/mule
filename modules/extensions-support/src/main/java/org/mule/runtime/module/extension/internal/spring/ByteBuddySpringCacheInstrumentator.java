@@ -25,6 +25,8 @@ import net.bytebuddy.pool.TypePool;
 import org.slf4j.Logger;
 
 /**
+ * <b>NOTE: Included because of a shading of the spring-core module.</b>
+ * <p>
  * This class offers instrumentation alternatives for Spring {@link org.springframework.util.ConcurrentReferenceHashMap} caches
  * cleanup. Spring caches of the type {@link org.springframework.util.ConcurrentReferenceHashMap} are scattered all over the
  * Spring framework code. Those caches are never explicitly cleaned up (the cleanup relies on the values being soft referenced)
@@ -33,6 +35,7 @@ import org.slf4j.Logger;
 public class ByteBuddySpringCacheInstrumentator {
 
   private static final Logger LOGGER = getLogger(ByteBuddySpringCacheInstrumentator.class);
+  // The "org.mule.springframework" package is because of the shading, that renames the original "org.springframework" one.
   private static final String CONCURRENT_REFERENCE_HASH_MAP_CLASS = "org.mule.springframework.util.ConcurrentReferenceHashMap";
   private static final ByteBuddy BYTE_BUDDY = new ByteBuddy();
   public static final ClassFileLocator BOOT_LOADER = ForClassLoader.ofBootLoader();
@@ -89,9 +92,9 @@ public class ByteBuddySpringCacheInstrumentator {
             .with(16, 0.75F, 16, WEAK))
         .make()) {
       unloaded.load(targetClassloader, INJECTION);
-      LOGGER.debug("Spring caches are now instrumented for weakness.");
+      LOGGER.debug("Spring caches are now instrumented for using weak keys.");
     } catch (Exception e) {
-      LOGGER.error("Could not instrument Spring caches for weakness.", e);
+      LOGGER.error("Could not instrument Spring caches for using weak keys.", e);
     }
   }
 

@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.springframework.core.SpringVersion;
 
 /**
- * ByteBuddy aspect implementation that stores Soring {@link org.springframework.util.ConcurrentReferenceHashMap} caches, offering
+ * ByteBuddy aspect implementation that stores Spring {@link org.springframework.util.ConcurrentReferenceHashMap} caches, offering
  * a cleanup method. The use the cleanup feature, this aspect must be instrumented through
  * {@link ByteBuddySpringCacheInstrumentator#instrumentForCleanup(ClassLoader)} call.
  *
