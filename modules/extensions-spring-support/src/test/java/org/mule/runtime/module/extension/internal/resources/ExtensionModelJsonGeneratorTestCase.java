@@ -31,7 +31,6 @@ import org.mule.test.module.extension.internal.FileGenerationParameterizedExtens
 import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfigExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
-import org.mule.test.ram.RickAndMortyExtension;
 import org.mule.test.semantic.extension.SemanticTermsExtension;
 import org.mule.test.substitutiongroup.extension.SubstitutionGroupExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
@@ -78,8 +77,6 @@ public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameter
                                     createArtifactCoordinate("mule-subtypes-extension")),
                         newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.json",
                                     createArtifactCoordinate("mule-marvel-extension")),
-                        newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.json",
-                                    createArtifactCoordinate("mule-rick-and-morty-extension")),
                         newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.json",
                                     createArtifactCoordinate("mule-typed-value-extension")),
                         newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.json",
@@ -130,7 +127,7 @@ public class ExtensionModelJsonGeneratorTestCase extends FileGenerationParameter
 
   @Test
   public void load() {
-    ExtensionModel result = generator.deserialize(expectedContent);
+    final ExtensionModel result = generator.deserialize(expectedContent);
     assertThat(result, is(extensionUnderTest));
   }
 }
