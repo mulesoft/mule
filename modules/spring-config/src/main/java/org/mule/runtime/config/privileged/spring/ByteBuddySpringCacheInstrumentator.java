@@ -6,29 +6,36 @@
  */
 package org.mule.runtime.config.privileged.spring;
 
+import static net.bytebuddy.asm.Advice.to;
+import static net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION;
+import static net.bytebuddy.matcher.ElementMatchers.isConstructor;
+import static net.bytebuddy.pool.TypePool.Default.of;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
-
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.dynamic.ClassFileLocator;
-import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.dynamic.ClassFileLocator.Compound;
+import net.bytebuddy.dynamic.ClassFileLocator.ForClassLoader;
+import net.bytebuddy.dynamic.DynamicType.Unloaded;
 import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.matcher.ElementMatcher;
-import net.bytebuddy.matcher.ElementMatchers;
 import net.bytebuddy.pool.TypePool;
 import org.slf4j.Logger;
 
+/**
+ * This class offers instrumentation alternatives for Spring {@link org.springframework.util.ConcurrentReferenceHashMap} caches
+ * cleanup. Spring caches of the type {@link org.springframework.util.ConcurrentReferenceHashMap} are scattered all over the
+ * Spring framework code. Those caches are never explicitly cleaned up (the cleanup relies on the values being soft referenced)
+ * and can cause mule artifact classloaders retention.
+ */
 public class ByteBuddySpringCacheInstrumentator {
 
-  private static final String CONCURRENT_REFERENCE_HASH_MAP_CLASS = "org.springframework.util.ConcurrentReferenceHashMap";
-  private static final String BYTE_BUDDY_SPRING_CACHES_MANAGER_CLASS =
-      "org.mule.runtime.config.privileged.spring.ByteBuddySpringCachesManager";
   private static final Logger LOGGER = getLogger(ByteBuddySpringCacheInstrumentator.class);
+  private static final String CONCURRENT_REFERENCE_HASH_MAP_CLASS = "org.springframework.util.ConcurrentReferenceHashMap";
+  private static final ByteBuddy BYTE_BUDDY = new ByteBuddy();
+  public static final ClassFileLocator BOOT_LOADER = ForClassLoader.ofBootLoader();
 
   /**
    * Instrument Spring ConcurrentReferenceHashMap cache instances in order to register them into a
@@ -39,28 +46,28 @@ public class ByteBuddySpringCacheInstrumentator {
    */
   public static void instrumentForCleanup(ClassLoader targetClassloader) {
     try {
-      TypePool targetTypePool = TypePool.Default.of(targetClassloader);
-      TypePool muleTypePool = TypePool.Default.of(ByteBuddySpringCacheInstrumentator.class.getClassLoader());
-      ByteBuddy byteBuddy = new ByteBuddy();
-      DynamicType byteBuddySpringCachesManager;
-      try (DynamicType.Unloaded<?> unloaded = byteBuddy
-          .redefine(muleTypePool.describe(BYTE_BUDDY_SPRING_CACHES_MANAGER_CLASS)
-              .resolve(),
-                    ClassFileLocator.ForClassLoader.of(ByteBuddySpringCacheInstrumentator.class.getClassLoader()))
-          .make()) {
-        byteBuddySpringCachesManager =
-            unloaded.load(targetClassloader, ClassLoadingStrategy.Default.INJECTION);
+      ClassFileLocator classFileLocator = new Compound(ForClassLoader.of(targetClassloader),
+                                                       BOOT_LOADER);
+      TypePool targetTypePool = of(classFileLocator);
+      try {
+        targetClassloader.loadClass(ByteBuddySpringCachesManager.class.getName());
+      } catch (ClassNotFoundException e) {
+        try (Unloaded<?> unloaded = BYTE_BUDDY
+            .decorate(ByteBuddySpringCachesManager.class)
+            .make()) {
+          unloaded.load(targetClassloader, INJECTION);
+        }
       }
-      try (DynamicType.Unloaded<?> unloaded = byteBuddy
+      try (Unloaded<?> unloaded = BYTE_BUDDY
           .rebase(targetTypePool.describe(CONCURRENT_REFERENCE_HASH_MAP_CLASS).resolve(),
-                  ClassFileLocator.ForClassLoader.of(targetClassloader))
-          .visit(Advice.to(byteBuddySpringCachesManager.getTypeDescription()).on(ElementMatchers.isConstructor()))
+                  classFileLocator)
+          .visit(to(ByteBuddySpringCachesManager.class).on(isConstructor()))
           .make()) {
-        unloaded.load(targetClassloader, ClassLoadingStrategy.Default.INJECTION);
+        unloaded.load(targetClassloader, INJECTION);
       }
       LOGGER.debug("Spring caches are now instrumented for cleanup.");
     } catch (Exception e) {
-      LOGGER.error("Could not instrument Spring caches cleanup.", e);
+      LOGGER.error("Could not instrument Spring caches for cleanup.", e);
     }
   }
 
@@ -70,10 +77,10 @@ public class ByteBuddySpringCacheInstrumentator {
    * @param targetClassloader Classloader where the Spring cache instrumentation will be injected.
    */
   public static void instrumentForWeakness(ClassLoader targetClassloader) {
-    TypePool typePool = TypePool.Default.of(targetClassloader);
-    try (DynamicType.Unloaded<?> unloaded = new ByteBuddy()
+    TypePool typePool = of(targetClassloader);
+    try (Unloaded<?> unloaded = BYTE_BUDDY
         .redefine(typePool.describe(CONCURRENT_REFERENCE_HASH_MAP_CLASS).resolve(),
-                  ClassFileLocator.ForClassLoader.of(IntrospectionUtils.class.getClassLoader()))
+                  ForClassLoader.of(targetClassloader))
         // We redirect any other constructor to the fully parameterized one.
         .constructor(target -> target.isConstructor() && target.getParameters().size() < 4)
         .intercept(MethodCall
@@ -81,10 +88,10 @@ public class ByteBuddySpringCacheInstrumentator {
             // We use default arguments plus WEAK reference type, discarding the intercepted ones.
             .with(16, 0.75F, 16, WEAK))
         .make()) {
-      unloaded.load(IntrospectionUtils.class.getClassLoader(), ClassLoadingStrategy.Default.INJECTION);
+      unloaded.load(targetClassloader, INJECTION);
       LOGGER.debug("Spring caches are now instrumented for weakness.");
     } catch (Exception e) {
-      LOGGER.error("Could not instrument Spring caches weakness.", e);
+      LOGGER.error("Could not instrument Spring caches for weakness.", e);
     }
   }
 

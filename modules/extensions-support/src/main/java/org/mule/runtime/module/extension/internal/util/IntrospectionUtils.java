@@ -41,7 +41,6 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
-import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.ResolvableType.NONE;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -165,7 +164,6 @@ import javax.lang.model.type.TypeMirror;
 
 import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.SpringVersion;
 
@@ -179,7 +177,6 @@ public final class IntrospectionUtils {
   private static final AnyType ANY_TYPE = typeBuilder().anyType().build();
   private static final ArrayType ANY_ARRAY_TYPE = typeBuilder().arrayType().of(ANY_TYPE).build();
   private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
-  private static final Logger LOGGER = getLogger(IntrospectionUtils.class);
 
   static {
     // A shade of the spring-core library is the cause for this additional cleanup.
