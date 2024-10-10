@@ -91,7 +91,7 @@ module org.mule.runtime.core {
   requires vibur.object.pool;
 
   requires jakarta.activation;
-  requires transitive jakarta.jms.api;
+  requires jakarta.jms.api;
   requires java.annotation;
   requires java.inject;
   requires java.management;
