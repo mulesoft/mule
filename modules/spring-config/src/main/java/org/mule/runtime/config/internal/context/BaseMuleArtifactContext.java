@@ -47,7 +47,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   private final boolean enableLazyInit;
 
   static {
-    ByteBuddySpringCacheInstrumentator.instrumentForCleanup();
+    ByteBuddySpringCacheInstrumentator.instrumentSpringCachesForCleanup();
   }
 
   /**

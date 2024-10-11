@@ -47,7 +47,7 @@ public class ByteBuddySpringCacheInstrumentator {
    * 
    * @see ByteBuddySpringCachesManager#clearCaches()
    */
-  public static void instrumentForCleanup() {
+  public static void instrumentSpringCachesForCleanup() {
     try {
       ClassLoader targetClassloader = SpringVersion.class.getClassLoader();
       ClassFileLocator classFileLocator = new Compound(ForClassLoader.of(targetClassloader),
@@ -78,7 +78,7 @@ public class ByteBuddySpringCacheInstrumentator {
   /**
    * Instrument Spring ConcurrentReferenceHashMap cache instances so that they are weakly (and not softly) referenced by default.
    */
-  public static void instrumentForWeakness() {
+  public static void instrumentSpringCachesForWeakReferences() {
     ClassLoader targetClassloader = SpringVersion.class.getClassLoader();
     TypePool typePool = of(targetClassloader);
     try (Unloaded<?> unloaded = BYTE_BUDDY
@@ -88,7 +88,8 @@ public class ByteBuddySpringCacheInstrumentator {
         .constructor(target -> target.isConstructor() && target.getParameters().size() < 4)
         .intercept(MethodCall
             .invoke((ElementMatcher<MethodDescription>) target -> target.isConstructor() && target.getParameters().size() == 4)
-            // We use default arguments plus WEAK reference type, discarding the intercepted ones.
+            // We use default arguments plus WEAK reference type, discarding the intercepted ones (an improvement would be to use
+            // the original ones).
             .with(16, 0.75F, 16, WEAK))
         .make()) {
       unloaded.load(targetClassloader, INJECTION);

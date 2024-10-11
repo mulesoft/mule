@@ -19,7 +19,7 @@ import static org.mule.runtime.module.extension.api.loader.java.type.PropertyEle
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
-import static org.mule.runtime.module.extension.internal.spring.ByteBuddySpringCacheInstrumentator.instrumentForCleanup;
+import static org.mule.runtime.module.extension.internal.spring.ByteBuddySpringCacheInstrumentator.instrumentSpringCachesForCleanup;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 
@@ -180,7 +180,7 @@ public final class IntrospectionUtils {
   static {
     // A shade of the spring-core library is the cause for this additional cleanup.
     // If that shade is no longer present, this cleanup can be safely removed.
-    instrumentForCleanup();
+    instrumentSpringCachesForCleanup();
   }
 
   private IntrospectionUtils() {}
