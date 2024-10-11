@@ -31,7 +31,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
-import org.springframework.core.SpringVersion;
 
 /**
  * Spring context specialization that contains just some standard constant beans for every Mule deployable artifact.
@@ -48,7 +47,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   private final boolean enableLazyInit;
 
   static {
-    ByteBuddySpringCacheInstrumentator.instrumentForCleanup(SpringVersion.class.getClassLoader());
+    ByteBuddySpringCacheInstrumentator.instrumentForCleanup();
   }
 
   /**

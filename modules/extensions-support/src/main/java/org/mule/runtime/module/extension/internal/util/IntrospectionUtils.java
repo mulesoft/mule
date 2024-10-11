@@ -165,7 +165,6 @@ import javax.lang.model.type.TypeMirror;
 import com.google.common.collect.ImmutableList;
 import org.reflections.ReflectionUtils;
 import org.springframework.core.ResolvableType;
-import org.springframework.core.SpringVersion;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -181,7 +180,7 @@ public final class IntrospectionUtils {
   static {
     // A shade of the spring-core library is the cause for this additional cleanup.
     // If that shade is no longer present, this cleanup can be safely removed.
-    instrumentForCleanup(SpringVersion.class.getClassLoader());
+    instrumentForCleanup();
   }
 
   private IntrospectionUtils() {}

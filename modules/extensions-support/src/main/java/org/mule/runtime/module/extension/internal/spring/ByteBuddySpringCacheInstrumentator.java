@@ -23,6 +23,7 @@ import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.pool.TypePool;
 import org.slf4j.Logger;
+import org.springframework.core.SpringVersion;
 
 /**
  * <b>NOTE: Included because of a shading of the spring-core module.</b>
@@ -44,11 +45,11 @@ public class ByteBuddySpringCacheInstrumentator {
    * Instrument Spring ConcurrentReferenceHashMap cache instances in order to register them into a
    * {@link ByteBuddySpringCachesManager} that offers a cache cleanup feature.
    * 
-   * @param targetClassloader Classloader where the Spring cache instrumentation will be injected.
    * @see ByteBuddySpringCachesManager#clearCaches()
    */
-  public static void instrumentForCleanup(ClassLoader targetClassloader) {
+  public static void instrumentForCleanup() {
     try {
+      ClassLoader targetClassloader = SpringVersion.class.getClassLoader();
       ClassFileLocator classFileLocator = new Compound(ForClassLoader.of(targetClassloader),
                                                        BOOT_LOADER);
       TypePool targetTypePool = of(classFileLocator);
@@ -76,10 +77,9 @@ public class ByteBuddySpringCacheInstrumentator {
 
   /**
    * Instrument Spring ConcurrentReferenceHashMap cache instances so that they are weakly (and not softly) referenced by default.
-   * 
-   * @param targetClassloader Classloader where the Spring cache instrumentation will be injected.
    */
-  public static void instrumentForWeakness(ClassLoader targetClassloader) {
+  public static void instrumentForWeakness() {
+    ClassLoader targetClassloader = SpringVersion.class.getClassLoader();
     TypePool typePool = of(targetClassloader);
     try (Unloaded<?> unloaded = BYTE_BUDDY
         .redefine(typePool.describe(CONCURRENT_REFERENCE_HASH_MAP_CLASS).resolve(),
