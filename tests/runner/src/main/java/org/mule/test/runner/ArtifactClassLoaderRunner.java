@@ -26,6 +26,13 @@ import static java.util.Optional.of;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import org.bouncycastle.crypto.util.BasicEntropySourceProvider;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+import org.bouncycastle.util.Strings;
+import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.test.FixedEntropySourceProvider;
+import org.bouncycastle.util.test.FixedSecureRandom;
+import org.bouncycastle.util.test.TestRandomEntropySourceProvider;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -46,6 +53,10 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +68,9 @@ import java.util.function.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
+import org.bouncycastle.crypto.CryptoServicesRegistrar;
+import org.bouncycastle.crypto.EntropySourceProvider;
+import org.bouncycastle.crypto.fips.FipsDRBG;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +128,13 @@ import org.junit.runners.model.TestClass;
  */
 public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
+  private static final String FIPS_TESTING_PROPERTY = "mule.fips.testing";
+
+  static {
+    if (Boolean.getBoolean(FIPS_TESTING_PROPERTY)) {
+      CryptoServicesRegistrar.setSecureRandom(getSecureRandom());
+    }
+  }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArtifactClassLoaderRunner.class);
 
@@ -296,6 +317,10 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error while building the 'ArtifactClassLoaderHolder'"), e);
     }
+  }
+
+  private static SecureRandom getSecureRandom() {
+    return new BouncyCastleFipsProvider().getDefaultSecureRandom();
   }
 
   /**

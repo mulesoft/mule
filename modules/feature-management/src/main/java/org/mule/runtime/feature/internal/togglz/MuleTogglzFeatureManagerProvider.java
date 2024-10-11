@@ -14,6 +14,8 @@ import org.togglz.core.manager.FeatureManagerBuilder;
 import org.togglz.core.spi.FeatureManagerProvider;
 import org.togglz.core.user.thread.ThreadLocalUserProvider;
 
+import java.util.UUID;
+
 import static org.mule.runtime.feature.internal.togglz.activation.MuleTogglzActivationStrategyProvider.getDefaultActivationStrategyProvider;
 
 /**
@@ -28,6 +30,8 @@ public class MuleTogglzFeatureManagerProvider implements FeatureManagerProvider 
       new DefaultMuleTogglzFeatureProvider(MuleHotSwitchProfilingFeatures.class);
 
   private static FeatureManager FEATURE_MANAGER = new FeatureManagerBuilder()
+      // done to avoid the use of a random UUID for fips testing.
+      .name("MuleTogglzFeatureManagerProvider")
       .featureProvider(FEATURE_PROVIDER)
       .stateRepository(new MuleTogglzFeatureStateRepository(FEATURE_PROVIDER))
       .userProvider(new ThreadLocalUserProvider())

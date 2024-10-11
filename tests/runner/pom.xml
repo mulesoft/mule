@@ -25,7 +25,16 @@
         <javaModuleName>org.mule.test.runner</javaModuleName>
         
         <javassist.version>3.28.0-GA</javassist.version>
-         
+
+        <bcprov-jdk15on.version>1.58</bcprov-jdk15on.version>
+        <bctls-fips.version>1.0.17</bctls-fips.version>
+        <bcpqc-addon-fips.version>1.0.1</bcpqc-addon-fips.version>
+        <bcpkix-fips.version>1.0.7</bcpkix-fips.version>
+        <bcpg-fips.version>1.0.7.1</bcpg-fips.version>
+        <bcmail-jdk15on.version>1.58</bcmail-jdk15on.version>
+        <bcmail-fips.version>1.0.4</bcmail-fips.version>
+        <bc-fips.version>1.0.2.5</bc-fips.version>
+
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -168,6 +177,55 @@
             <artifactId>mule-petstore-extension</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- fips testing -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bc-fips</artifactId>
+            <version>${bc-fips.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-fips</artifactId>
+            <version>${bcmail-fips.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk15on</artifactId>
+            <version>${bcmail-jdk15on.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpg-fips</artifactId>
+            <version>${bcpg-fips.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-fips</artifactId>
+            <version>${bcpkix-fips.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpqc-addon-fips</artifactId>
+            <version>${bcpqc-addon-fips.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-fips</artifactId>
+            <version>${bctls-fips.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>${bcprov-jdk15on.version}</version>
         </dependency>
     </dependencies>
 </project>
