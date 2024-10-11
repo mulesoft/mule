@@ -130,7 +130,7 @@ public class ObjectFactoryClassRepository {
   }
 
 
-  protected static class IsEagerInitGetterInterceptor implements InvocationHandler {
+  public static class IsEagerInitGetterInterceptor implements InvocationHandler {
 
     @Override
     @RuntimeType

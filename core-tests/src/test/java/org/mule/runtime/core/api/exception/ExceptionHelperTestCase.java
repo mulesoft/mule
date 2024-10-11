@@ -24,14 +24,15 @@ import static java.util.Collections.singleton;
 import static java.util.Collections.sort;
 
 import static org.apache.commons.collections4.comparators.ComparableComparator.comparableComparator;
+import static org.apache.commons.lang3.SystemUtils.IS_JAVA_17;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -145,7 +146,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  \\(" + (calls + 16) + " more...\\)")); // recursive
+                                                       "  \\(" + (calls + (IS_JAVA_17 ? 16 : 14)) + " more...\\)")); // recursive
     }
   }
 
@@ -176,7 +177,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  \\(" + (calls + 16) + " more...\\)")); // recursive
+                                                       "  \\(" + (calls + (IS_JAVA_17 ? 16 : 14)) + " more...\\)")); // recursive
     }
   }
 
@@ -197,7 +198,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                                                            + ".generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".generateStackEntries\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  \\(" + (calls + 15) + " more...\\)")); // recursive
+                                                       "  \\(" + (calls + (IS_JAVA_17 ? 15 : 13)) + " more...\\)")); // recursive
     }
   }
 

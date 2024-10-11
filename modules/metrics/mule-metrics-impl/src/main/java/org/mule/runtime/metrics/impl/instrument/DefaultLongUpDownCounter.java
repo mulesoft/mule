@@ -208,7 +208,7 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
           .map(repository -> (LongUpDownCounter) repository.create(name,
                                                                    name -> doBuild(name, description, unit, initialValue,
                                                                                    meter)))
-          .orElse(doBuild(name, description, unit, initialValue, meter));
+          .orElseGet(() -> doBuild(name, description, unit, initialValue, meter));
 
       if (meterExporter != null) {
         meterExporter.enableExport(longUpDownCounter);

@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.el;
 
 import static java.util.Collections.emptyList;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -16,8 +17,10 @@ import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ConstraintViolation;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationItem;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
+import org.mule.runtime.api.el.validation.ValidationPhase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -26,6 +29,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Binds Mule Core concepts {@link CoreEvent} or {@link FlowConstruct} and executes the underlying {@link ExpressionLanguage}.
@@ -119,6 +123,21 @@ public interface ExpressionLanguageAdaptor {
    * @return a {@link ValidationResult} indicating whether the validation was successful or not
    */
   ValidationResult validate(String expression);
+
+  /**
+   * Validates whether the script is valid according to the validations defined for the specified phase.
+   *
+   * @param script               to be validated.
+   * @param nameIdentifier       an identifier for the script.
+   * @param validationScopePhase {@link ValidationPhase} to be applied.
+   * @param typeBindings         input {@link TypeBindings} required for phases >= {@link ValidationPhase#SCOPE}.
+   * @param outputType           input {@link TypeBindings} required for phases >= {@link ValidationPhase#SCOPE}.
+   * @return if script is valid an empty or a list with the {@link ConstraintViolation}s.
+   *
+   * @since 4.9
+   */
+  List<ConstraintViolation> validate(String script, String nameIdentifier, ValidationPhase validationScopePhase,
+                                     TypeBindings typeBindings, Optional<MetadataType> outputType);
 
   /**
    * Splits using the specified expression and group it with the batch size. If batch size is less or equals to zero then no

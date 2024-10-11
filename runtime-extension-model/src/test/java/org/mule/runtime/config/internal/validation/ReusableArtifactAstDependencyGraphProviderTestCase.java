@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 
 import static java.util.stream.Stream.empty;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,12 +20,13 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import io.qameta.allure.Issue;
-import org.junit.Test;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(MULE_DSL)
 @Story(DSL_VALIDATION_STORY)

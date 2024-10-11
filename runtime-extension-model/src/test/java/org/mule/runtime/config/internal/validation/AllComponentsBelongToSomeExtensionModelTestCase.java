@@ -34,18 +34,22 @@ public class AllComponentsBelongToSomeExtensionModelTestCase extends AbstractCor
 
   @Test
   public void topLevelComponentThatDoesNotBelongToAnyExtensionModel() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xmlns:some=\"http://www.mulesoft.org/schema/mule/some\"\n" +
-        "      xsi:schemaLocation=\"\n" +
-        "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
-        "       http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd\">\n" +
-        "\n" +
-        "    <some:thing name=\"theSomething\" />\n" +
-        "\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("AllComponentsBelongToSomeExtensionModelTestCase#topLevelComponentThatDoesNotBelongToAnyExtensionModel",
+                      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                          "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                          "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                          "      xmlns:some=\"http://www.mulesoft.org/schema/mule/some\"\n" +
+                          "      xsi:schemaLocation=\"\n" +
+                          "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                          +
+                          "       http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd\">\n"
+                          +
+                          "\n" +
+                          "    <some:thing name=\"theSomething\" />\n" +
+                          "\n" +
+                          "</mule>")
+                              .stream().findFirst();
     assertThat(msg.get().getMessage(), containsString("The component 'some:thing' doesn't belong to any extension model"));
   }
 }

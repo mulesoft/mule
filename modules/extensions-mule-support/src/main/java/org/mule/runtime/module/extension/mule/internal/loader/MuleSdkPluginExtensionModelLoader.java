@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESS
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
+import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.loadConfigResources;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.logWarningsAndThrowIfContainsErrors;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkExtensionLoadingUtils.getRequiredLoadingParameter;
@@ -127,7 +128,7 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
       // itself, this is so that schema validations can be performed properly.
       ArtifactAst artifactAst =
           parseArtifact(context.getArtifactCoordinates().map(ArtifactCoordinates::getArtifactId).orElse(null),
-                        left(resources),
+                        left(loadConfigResources(resources, context.getExtensionClassLoader())),
                         this::createAstParser,
                         dependencies,
                         false,

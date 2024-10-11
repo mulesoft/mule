@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.management.stats.ResetOnQueryCounter;
+import org.mule.runtime.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.meter.Meter;
 
 import java.util.List;
@@ -47,7 +48,6 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   // Transient to avoid de-serialization backward compatibility problems (MULE-19020)
   private transient final AtomicLong connectionErrors = new AtomicLong(0);
-
   private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> messagesDispatchedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> executionErrorsCounters = new CopyOnWriteArrayList<>();
@@ -249,36 +249,43 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {
     String artifactId = getName() + "-" + meterProvider.getArtifactId();
-    Meter meter = meterProvider.getMeterBuilder(FLOW_CONSTRUCT_STATISTICS_NAME)
-        .withDescription(FLOW_CONSTRUCT_STATISTICS_DESCRIPTION)
-        .withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId).build();
+
+    Meter meter = getMeter(meterProvider, artifactId);
 
     // Register the declared private flows.
     meter.counterBuilder(RECEIVED_EVENTS_NAME)
         .withValueSupplier(receivedEvents::get)
-        .withConsumerForAddOperation(receivedEvents::addAndGet)
-        .withSupplierForIncrementAndGetOperation(receivedEvents::incrementAndGet)
+        .withAddOperation((delta, context) -> receivedEvents.addAndGet(delta))
+        .withIncrementAndGetOperation(context -> receivedEvents.incrementAndGet())
         .withDescription(RECEIVED_EVENTS_DESCRIPTION).build();
 
     // Register the dispatched messages counter
     meter.counterBuilder(DISPATCHED_MESSAGES_NAME)
         .withValueSupplier(dispatchedMessages::get)
-        .withConsumerForAddOperation(dispatchedMessages::addAndGet)
-        .withSupplierForIncrementAndGetOperation(dispatchedMessages::incrementAndGet)
+        .withAddOperation((delta, context) -> dispatchedMessages.addAndGet(delta))
+        .withIncrementAndGetOperation(context -> dispatchedMessages.incrementAndGet())
         .withDescription(DISPATCHED_MESSAGES_DESCRIPTION).build();
 
     // Register the execution errors counter
     meter.counterBuilder(EXECUTION_ERRORS_NAME)
         .withValueSupplier(executionError::get)
-        .withConsumerForAddOperation(executionError::addAndGet)
-        .withSupplierForIncrementAndGetOperation(executionError::incrementAndGet)
+        .withAddOperation((delta, context) -> executionError.addAndGet(delta))
+        .withIncrementAndGetOperation(context -> executionError.incrementAndGet())
         .withDescription(EXECUTION_ERRORS_DESCRIPTION).build();
 
     // Register the fatal errors counter
     meter.counterBuilder(FATAL_ERRORS_NAME)
         .withValueSupplier(fatalError::get)
-        .withConsumerForAddOperation(fatalError::addAndGet)
-        .withSupplierForIncrementAndGetOperation(fatalError::incrementAndGet)
+        .withAddOperation((delta, context) -> fatalError.addAndGet(delta))
+        .withIncrementAndGetOperation(context -> fatalError.incrementAndGet())
         .withDescription(FATAL_ERRORS_DESCRIPTION).build();
+
   }
+
+  private static Meter getMeter(MeterProvider meterProvider, String artifactId) {
+    return meterProvider.getMeterBuilder(FLOW_CONSTRUCT_STATISTICS_NAME)
+        .withDescription(FLOW_CONSTRUCT_STATISTICS_DESCRIPTION)
+        .withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId).build();
+  }
+
 }

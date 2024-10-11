@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -23,12 +24,13 @@ import org.mule.runtime.config.internal.validation.test.AbstractCoreValidationTe
 
 import java.util.Optional;
 
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Features({@Feature(MULE_DSL), @Feature(REUSE)})
 @Stories({@Story(DSL_VALIDATION_STORY), @Story(OPERATIONS)})
@@ -51,27 +53,32 @@ public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreVali
   @Test
   @Description("Checks that no validation message is returned if there is no operation")
   public void withoutOperation() {
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF + XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("OperationDoesNotHaveCoreRaiseErrorTestCase#withoutOperation",
+                                                             XML_NAMESPACE_DEF + XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
   @Test
   @Description("Checks that no validation message is returned if there is no core raise-error inside operation")
   public void withoutCoreRaiseError() {
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/></operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("OperationDoesNotHaveCoreRaiseErrorTestCase#withoutCoreRaiseError",
+                                                             XML_NAMESPACE_DEF +
+                                                                 "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/></operation:body></operation:def>"
+                                                                 +
+                                                                 XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
   @Test
   @Description("Checks that a corresponding validation message is returned if there is a core raise-error inside an operation")
   public void withCoreRaiseError() {
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/>" +
-        "    <raise-error type=\"APP:SOME\"/>" +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("OperationDoesNotHaveCoreRaiseErrorTestCase#withCoreRaiseError",
+                                                             XML_NAMESPACE_DEF +
+                                                                 "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/>"
+                                                                 +
+                                                                 "    <raise-error type=\"APP:SOME\"/>" +
+                                                                 "</operation:body></operation:def>" +
+                                                                 XML_CLOSE).stream().findFirst();
     assertThat(msg, is(not(empty())));
     assertThat(msg.get().getMessage(),
                containsString("Usages of the component 'raise-error' are not allowed inside a Mule SDK Operation Definition"));

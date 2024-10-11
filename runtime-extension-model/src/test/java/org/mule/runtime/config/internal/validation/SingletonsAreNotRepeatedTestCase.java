@@ -11,8 +11,8 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DS
 
 import static java.lang.String.format;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -38,19 +38,22 @@ public class SingletonsAreNotRepeatedTestCase extends AbstractCoreValidationTest
 
   @Test
   public void conflictingNames() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
-        "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
-        +
-        "\n" +
-        "    <" + REPEATED_ELEMENT_NAME + " defaultResponseTimeout=\"10000\"/>\n" +
-        "\n" +
-        "    <flow name=\"firstFlow\">\n" +
-        "        <logger/>\n" +
-        "    </flow>\n" +
-        "    \n" +
-        "</mule>",
+    final Optional<ValidationResultItem> msg = runValidation("SingletonsAreNotRepeatedTestCase#conflictingNames",
+                                                             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                                                 "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
+                                                                 "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                                                                 +
+                                                                 "      xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                                                                 +
+                                                                 "\n" +
+                                                                 "    <" + REPEATED_ELEMENT_NAME
+                                                                 + " defaultResponseTimeout=\"10000\"/>\n" +
+                                                                 "\n" +
+                                                                 "    <flow name=\"firstFlow\">\n" +
+                                                                 "        <logger/>\n" +
+                                                                 "    </flow>\n" +
+                                                                 "    \n" +
+                                                                 "</mule>",
                                                              "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                                                                  "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
                                                                  "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"

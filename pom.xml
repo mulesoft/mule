@@ -183,7 +183,7 @@
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
-        <oldMuleArtifactVersion>4.8.0-SNAPSHOT</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.8.0</oldMuleArtifactVersion>
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
@@ -207,9 +207,6 @@
             ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
-        <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
-        <!-- this groovy version is to be used during the build process or for tests, not bundled in the distro -->
-        <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
         <mule.maven.plugin.version>4.2.0</mule.maven.plugin.version>
     </properties>
@@ -413,8 +410,8 @@
                                 <Build-Revision>${buildNumber}</Build-Revision>
                                 <Build-Date>${timestamp}</Build-Date>
                                 <Dev-List-Email>${dev.list}</Dev-List-Email>
-                                <Supported-Jdks>[${javaVersion},18)</Supported-Jdks>
-                                <Recommended-Jdks>[${javaVersion},18)</Recommended-Jdks>
+                                <Supported-Jdks>[${javaVersion},22)</Supported-Jdks>
+                                <Recommended-Jdks>[${javaVersion},18),[21,22)</Recommended-Jdks>
                                 <More-Info>For more information go to ${productUrl}</More-Info>
                                 <Support>Get commercial support: ${project.organization.url}/support</Support>
                                 <Description>Mule Runtime and Integration Platform</Description>

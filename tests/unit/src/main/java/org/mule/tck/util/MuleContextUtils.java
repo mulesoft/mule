@@ -89,6 +89,8 @@ import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -337,6 +339,8 @@ public class MuleContextUtils {
       injectableObjects.put(InternalProfilingService.class, coreProfilingService);
       injectableObjects.put(ProfilingService.class, coreProfilingService);
       injectableObjects.put(ComponentTracerFactory.class, new DummyComponentTracerFactory());
+      injectableObjects.put(ErrorMetricsFactory.class, ErrorMetricsFactory.NO_OP);
+      injectableObjects.put(MeterProvider.class, MeterProvider.NO_OP);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));

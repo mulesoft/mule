@@ -8,14 +8,16 @@ package org.mule.runtime.core.internal.connectivity;
 
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.tck.junit4.matcher.connection.ConnectionValidationResultFailureMatcher.isFailure;
+import static org.mule.tck.junit4.matcher.connection.ConnectionValidationResultSuccessMatcher.isSuccess;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -66,21 +68,21 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
 
   @Test
   public void testConnectionThrowsException() throws Exception {
-    RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException();
     when(mockConnectivityTestingStrategy.testConnectivity(fakeConnectivityTestingObject)).thenThrow(exception);
-    ConnectionValidationResult validationResult =
+    final ConnectionValidationResult validationResult =
         connectivityTestingService.testConnection(builder().globalName(TEST_IDENTIFIER).build());
 
-    assertThat(validationResult.isValid(), is(false));
+    assertThat(validationResult, isFailure());
     assertThat(validationResult.getException(), is(exception));
   }
 
   @Test
   public void testConnection() {
     when(mockConnectivityTestingStrategy.testConnectivity(fakeConnectivityTestingObject)).thenReturn(success());
-    ConnectionValidationResult validationResult =
+    final ConnectionValidationResult validationResult =
         connectivityTestingService.testConnection(builder().globalName(TEST_IDENTIFIER).build());
-    assertThat(validationResult.isValid(), is(true));
+    assertThat(validationResult, isSuccess());
   }
 
   @Test
