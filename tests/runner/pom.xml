@@ -198,6 +198,7 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk15on</artifactId>
             <version>${bcmail-jdk15on.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
