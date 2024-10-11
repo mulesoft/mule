@@ -6,7 +6,6 @@
  */
 package org.mule.test.runner;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -18,6 +17,7 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_F
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
 
+import static java.util.Collections.emptyMap;
 import static java.lang.System.clearProperty;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -26,13 +26,6 @@ import static java.util.Optional.of;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import org.bouncycastle.crypto.util.BasicEntropySourceProvider;
-import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
-import org.bouncycastle.util.Strings;
-import org.bouncycastle.util.encoders.Hex;
-import org.bouncycastle.util.test.FixedEntropySourceProvider;
-import org.bouncycastle.util.test.FixedSecureRandom;
-import org.bouncycastle.util.test.TestRandomEntropySourceProvider;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -53,9 +46,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,8 +59,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
-import org.bouncycastle.crypto.EntropySourceProvider;
-import org.bouncycastle.crypto.fips.FipsDRBG;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
