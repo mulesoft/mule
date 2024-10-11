@@ -7,6 +7,7 @@
 package org.mule.test.runner.classification;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
+import static org.mule.runtime.core.api.util.UUID.getUUID;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -15,7 +16,6 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.test.runner.api.WorkspaceLocationResolver;
-import static org.mule.runtime.core.api.util.UUID.getUUID;
 
 import java.io.File;
 import java.net.URL;
@@ -63,7 +63,6 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
     this.classPath = classPath;
     this.workspaceLocationResolver = workspaceLocationResolver;
   }
-
 
   /**
    * Looks for a matching {@link URL} for a workspace {@link Artifact}. It also supports to look for jars or classes depending if
