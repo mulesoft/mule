@@ -6,16 +6,15 @@
  */
 package org.mule.runtime.feature.internal.togglz;
 
-import static org.mule.runtime.feature.internal.togglz.activation.MuleTogglzActivationStrategyProvider.getDefaultActivationStrategyProvider;
-
 import org.mule.runtime.feature.internal.togglz.config.MuleHotSwitchProfilingFeatures;
 import org.mule.runtime.feature.internal.togglz.provider.DefaultMuleTogglzFeatureProvider;
 import org.mule.runtime.feature.internal.togglz.state.MuleTogglzFeatureStateRepository;
-
 import org.togglz.core.manager.FeatureManager;
 import org.togglz.core.manager.FeatureManagerBuilder;
 import org.togglz.core.spi.FeatureManagerProvider;
 import org.togglz.core.user.thread.ThreadLocalUserProvider;
+
+import static org.mule.runtime.feature.internal.togglz.activation.MuleTogglzActivationStrategyProvider.getDefaultActivationStrategyProvider;
 
 /**
  * a {@link FeatureManagerProvider} for the Mule Runtime. This is retrieved through SPI.
@@ -29,8 +28,6 @@ public class MuleTogglzFeatureManagerProvider implements FeatureManagerProvider 
       new DefaultMuleTogglzFeatureProvider(MuleHotSwitchProfilingFeatures.class);
 
   private static FeatureManager FEATURE_MANAGER = new FeatureManagerBuilder()
-      // done to avoid the use of a random UUID for fips testing.
-      .name("MuleTogglzFeatureManagerProvider")
       .featureProvider(FEATURE_PROVIDER)
       .stateRepository(new MuleTogglzFeatureStateRepository(FEATURE_PROVIDER))
       .userProvider(new ThreadLocalUserProvider())

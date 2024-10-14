@@ -7,7 +7,6 @@
 package org.mule.test.runner.classification;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
-import static org.mule.runtime.core.api.util.UUID.getUUID;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -45,7 +44,7 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private final WorkspaceRepository workspaceRepository = new WorkspaceRepository(WORKSPACE, getUUID());
+  private final WorkspaceRepository workspaceRepository = new WorkspaceRepository(WORKSPACE);
   private final WorkspaceLocationResolver workspaceLocationResolver;
   private final List<URL> classPath;
 

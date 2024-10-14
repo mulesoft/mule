@@ -17,14 +17,16 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_F
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
 
-import static java.util.Collections.emptyMap;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.System.clearProperty;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.bouncycastle.crypto.CryptoServicesRegistrar.setSecureRandom;
 
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
@@ -120,8 +122,11 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
   private static final String FIPS_TESTING_PROPERTY = "mule.fips.testing";
 
   static {
-    if (Boolean.getBoolean(FIPS_TESTING_PROPERTY)) {
-      CryptoServicesRegistrar.setSecureRandom(getSecureRandom());
+    // This is done for certain fips tests that need
+    // an available secure ramdom provider that need
+    // to be other than default.
+    if (getBoolean(FIPS_TESTING_PROPERTY)) {
+      setSecureRandom(getSecureRandom());
     }
   }
 
