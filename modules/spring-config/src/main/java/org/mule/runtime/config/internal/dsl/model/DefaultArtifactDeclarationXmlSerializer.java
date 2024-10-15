@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.StringUtils.join;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -16,14 +13,19 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
+
+import static org.apache.commons.lang3.StringUtils.join;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter;
-import org.mule.runtime.core.api.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -95,9 +97,9 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
       List<String> cDataElements = getCDataElements(doc.getDocumentElement());
 
       // write the content into xml file
-      TransformerFactory transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
+      final TransformerFactory transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
 
-      Transformer transformer = transformerFactory.newTransformer();
+      final Transformer transformer = transformerFactory.newTransformer();
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, join(cDataElements, " "));
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -114,9 +116,9 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
   }
 
   private Document createAppDocument(ArtifactDeclaration artifact) throws ParserConfigurationException {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    final DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
     factory.setNamespaceAware(true);
-    DocumentBuilder docBuilder = factory.newDocumentBuilder();
+    final DocumentBuilder docBuilder = factory.newDocumentBuilder();
 
     Document doc = docBuilder.newDocument();
     Element mule = doc.createElement(CORE_PREFIX);
