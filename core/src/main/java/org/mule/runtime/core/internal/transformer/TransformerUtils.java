@@ -32,8 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
