@@ -27,7 +27,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -54,8 +53,6 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
@@ -72,11 +69,8 @@ import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ResolvableType;
-import org.springframework.util.ConcurrentReferenceHashMap;
 
 public class MuleDeploymentService implements DeploymentService {
 
@@ -106,32 +100,6 @@ public class MuleDeploymentService implements DeploymentService {
   private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final Supplier<SchedulerService> artifactStartExecutorSupplier;
-
-  static {
-    setWeakHashCaches();
-  }
-
-  /**
-   * Set caches in spring so that they are weakly (and not softly) referenced by default.
-   * <p>
-   * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
-   * <p>
-   * This hack is also present in the {@code extensions-support} module. It's because that module shades the spring dependencies
-   * and changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
-   */
-  private static void setWeakHashCaches() {
-    try {
-      Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
-      Field modifiersField = Field.class.getDeclaredField("modifiers");
-      modifiersField.setAccessible(true);
-      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-      field.set(null, WEAK);
-    } catch (Exception e) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes.", e);
-      }
-    }
-  }
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                Supplier<SchedulerService> artifactStartExecutorSupplier) {
