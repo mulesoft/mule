@@ -6,7 +6,7 @@
  */
 package org.mule.test.module.extension.connector;
 
-import static javax.xml.bind.DatatypeConverter.parseDateTime;
+import static jakarta.xml.bind.DatatypeConverter.parseDateTime;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
