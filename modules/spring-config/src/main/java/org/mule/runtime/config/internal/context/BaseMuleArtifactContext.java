@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.config.privileged.spring.ByteBuddySpringCacheInstrumentator;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
@@ -44,6 +45,10 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   private final ArtifactType artifactType;
   private final PropertiesResolverConfigurationProperties configurationProperties;
   private final boolean enableLazyInit;
+
+  static {
+    ByteBuddySpringCacheInstrumentator.instrumentSpringCachesForCleanup();
+  }
 
   /**
    * Configures the context.
