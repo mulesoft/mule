@@ -85,16 +85,16 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
     checkArgument(artifact != null, "The artifact to serialize cannot be null");
 
     try {
-      final Document doc = createAppDocument(artifact);
+      Document doc = createAppDocument(artifact);
 
-      final XmlDslElementModelConverter toXmlConverter = XmlDslElementModelConverter.getDefault(doc);
-      final DslElementModelFactory modelResolver = DslElementModelFactory.getDefault(context);
+      XmlDslElementModelConverter toXmlConverter = XmlDslElementModelConverter.getDefault(doc);
+      DslElementModelFactory modelResolver = DslElementModelFactory.getDefault(context);
 
       artifact.getGlobalElements()
           .forEach(declaration -> appendChildElement(toXmlConverter, doc.getDocumentElement(),
                                                      modelResolver, (ElementDeclaration) declaration));
 
-      final List<String> cDataElements = getCDataElements(doc.getDocumentElement());
+      List<String> cDataElements = getCDataElements(doc.getDocumentElement());
 
       // write the content into xml file
       final TransformerFactory transformerFactory = XMLSecureFactories.createDefault().getTransformerFactory();
@@ -104,24 +104,24 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
       transformer.setOutputProperty(OutputKeys.CDATA_SECTION_ELEMENTS, join(cDataElements, " "));
       transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-      final DOMSource source = new DOMSource(doc);
-      final StringWriter writer = new StringWriter();
+      DOMSource source = new DOMSource(doc);
+      StringWriter writer = new StringWriter();
       transformer.transform(source, new StreamResult(writer));
       return writer.getBuffer().toString();
 
-    } catch (final Exception e) {
+    } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Failed to serialize the declaration for the artifact ["
           + artifact.getName() + "]: " + e.getMessage()), e);
     }
   }
 
   private Document createAppDocument(ArtifactDeclaration artifact) throws ParserConfigurationException {
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    final DocumentBuilderFactory factory = XMLSecureFactories.createDefault().getDocumentBuilderFactory();
     factory.setNamespaceAware(true);
     final DocumentBuilder docBuilder = factory.newDocumentBuilder();
 
-    final Document doc = docBuilder.newDocument();
-    final Element mule = doc.createElement(CORE_PREFIX);
+    Document doc = docBuilder.newDocument();
+    Element mule = doc.createElement(CORE_PREFIX);
     doc.appendChild(mule);
 
     artifact.getCustomConfigurationParameters().forEach(p -> mule.setAttribute(p.getName(), p.getValue().toString()));
@@ -143,8 +143,8 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
     if (element.getChildNodes().getLength() == 1 && element.getFirstChild().getNodeType() == Node.CDATA_SECTION_NODE) {
       return singletonList(format("{%s}%s", element.getNamespaceURI(), element.getLocalName()));
     } else {
-      final List<String> identifiers = new LinkedList<>();
-      final NodeList childs = element.getChildNodes();
+      List<String> identifiers = new LinkedList<>();
+      NodeList childs = element.getChildNodes();
       IntStream.range(0, childs.getLength()).mapToObj(childs::item)
           .forEach(c -> identifiers.addAll(getCDataElements(c)));
       return identifiers;
