@@ -35,6 +35,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -62,6 +63,11 @@ public final class JpmsUtils {
 
   public static final String MULE_SKIP_MODULE_TWEAKING_VALIDATION = "mule.module.tweaking.validation.skip";
 
+  private static final String MULE_JPMS_UTILS_MODULE_NAME = "org.mule.runtime.jpms.utils";
+  private static final String MULE_LAUNCHER_MODULE_NAME = "org.mule.runtime.launcher";
+  private static final String HAZELCAST_CORE_MODULE_NAME = "com.hazelcast.core";
+  private static final String KRYO_MODULE_NAME = "kryo.shaded";
+
   private static final Set<String> SERVICE_MODULE_NAME_PREFIXES =
       new HashSet<>(asList("org.mule.service.",
                            "com.mulesoft.mule.service.",
@@ -70,7 +76,7 @@ public final class JpmsUtils {
   private static final Set<String> REQUIRED_ADD_MODULES =
       new HashSet<>(asList("java.se",
                            "org.mule.boot.tanuki",
-                           "org.mule.runtime.jpms.utils",
+                           MULE_JPMS_UTILS_MODULE_NAME,
                            "com.fasterxml.jackson.core",
                            "org.apache.commons.codec"));
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG =
@@ -85,6 +91,8 @@ public final class JpmsUtils {
       "--add-opens=java.base/java.nio=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_SUN_NIO_CH =
       "--add-opens=java.base/sun.nio.ch=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_JAVA_SQL =
+      "--add-opens=java.sql/java.sql=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_SUN_MANAGEMENT =
       "--add-opens=java.management/sun.management=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_COM_IBM_LANG_MANAGEMENT_INTERNAL =
@@ -98,6 +106,7 @@ public final class JpmsUtils {
                                                                 REQUIRED_ADD_OPENS_JDK_INTERNAL_REF,
                                                                 REQUIRED_ADD_OPENS_JAVA_NIO,
                                                                 REQUIRED_ADD_OPENS_SUN_NIO_CH,
+                                                                REQUIRED_ADD_OPENS_JAVA_SQL,
                                                                 REQUIRED_ADD_OPENS_SUN_MANAGEMENT,
                                                                 REQUIRED_ADD_OPENS_COM_IBM_LANG_MANAGEMENT_INTERNAL,
                                                                 REQUIRED_ADD_OPENS_COM_SUN_MANAGEMENT_INTERNAL);
@@ -261,21 +270,23 @@ public final class JpmsUtils {
   }
 
   private static void openPackages(ModuleLayer layer) {
-    openToModule(layer, "org.mule.runtime.launcher", "org.mule.boot.api",
+    openToModule(layer, MULE_LAUNCHER_MODULE_NAME, "org.mule.boot.api",
                  singletonList("org.mule.runtime.module.boot.internal"));
-    openToModule(layer, "kryo.shaded", "java.base",
+    openToModule(layer, KRYO_MODULE_NAME, "java.base",
                  asList("java.lang", "java.lang.reflect", "java.lang.invoke"));
-    openToModule(layer, "org.mule.runtime.jpms.utils", "java.base",
+    openToModule(layer, MULE_JPMS_UTILS_MODULE_NAME, "java.base",
                  asList("java.lang", "java.lang.reflect", "java.lang.invoke"));
+    openToModule(layer, KRYO_MODULE_NAME, "java.sql",
+                 asList("java.sql"));
 
     // To avoid a performance-related warning from Hazelcast according to
     // https://docs.hazelcast.com/hazelcast/5.2/getting-started/install-hazelcast#using-modular-java
     try {
-      openToModule(layer, "com.hazelcast.core", "java.base",
+      openToModule(layer, HAZELCAST_CORE_MODULE_NAME, "java.base",
                    asList("java.lang", "jdk.internal.ref", "java.nio", "sun.nio.ch"));
-      openToModule(layer, "com.hazelcast.core", "jdk.management",
+      openToModule(layer, HAZELCAST_CORE_MODULE_NAME, "jdk.management",
                    asList("com.sun.management.internal", "com.ibm.lang.management.internal"));
-      openToModule(layer, "com.hazelcast.core", "java.management",
+      openToModule(layer, HAZELCAST_CORE_MODULE_NAME, "java.management",
                    singletonList("sun.management"));
     } catch (IllegalCallerException e) {
       // It is fine to continue because the feature may not even be used
@@ -340,7 +351,7 @@ public final class JpmsUtils {
       List<ModuleLayer> layers = isolateDependenciesInTheirOwnLayer ? singletonList(boot()) : resolvedParentLayers;
       Set<Module> parentLayersModules = getParentLayersModules(layers);
       modulesToFilter = parentLayersModules.stream()
-          .map(m -> m.getName())
+          .map(Module::getName)
           .collect(toSet());
     } else {
       modulesToFilter = emptySet();
@@ -374,7 +385,7 @@ public final class JpmsUtils {
           .map(ModuleReference::location)
           .filter(Optional::isPresent)
           .map(Optional::get)
-          .map(uri -> get(uri))
+          .map(Paths::get)
           .toArray(size -> new Path[size]);
       ModuleFinder isolatedModulesFinder = ModuleFinder.of(isolatedModulesPaths);
 
@@ -394,7 +405,7 @@ public final class JpmsUtils {
           .map(ModuleReference::location)
           .filter(Optional::isPresent)
           .map(Optional::get)
-          .map(uri -> get(uri))
+          .map(Paths::get)
           .toArray(size -> new Path[size]);
       ModuleFinder notIsolatedModulesFinder = ModuleFinder.of(notIsolatedModulesPaths);
 
@@ -421,7 +432,7 @@ public final class JpmsUtils {
           .map(ModuleReference::location)
           .filter(Optional::isPresent)
           .map(Optional::get)
-          .map(uri -> get(uri))
+          .map(Paths::get)
           .toArray(size -> new Path[size]);
       ModuleFinder filteredModulesFinder = ModuleFinder.of(filteredModulesPaths);
 
