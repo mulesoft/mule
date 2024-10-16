@@ -6,23 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.description;
 
-import static com.google.common.truth.Truth.assert_;
-import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.NAME_PARAM_DESCRIPTION;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
-import static javax.lang.model.SourceVersion.RELEASE_8;
+
+import static com.google.common.truth.Truth.assert_;
+import static com.google.testing.compile.JavaSourcesSubjectFactory.javaSources;
+import static javax.lang.model.SourceVersion.RELEASE_17;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_DESCRIPTION;
-import static org.mule.runtime.extension.api.ExtensionConstants.NAME_PARAM_DESCRIPTION;
-import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
-import static org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
-import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -64,6 +66,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 
 import com.google.testing.compile.JavaFileObjects;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -217,7 +220,7 @@ public class ExtensionDescriptionDocumenterTestCase extends AbstractAnnotationPr
   }
 
   @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
-  @SupportedSourceVersion(RELEASE_8)
+  @SupportedSourceVersion(RELEASE_17)
   @SupportedOptions(EXTENSION_VERSION)
   private class TestProcessor extends AbstractProcessor {
 

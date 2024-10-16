@@ -25,7 +25,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
-import static javax.lang.model.SourceVersion.RELEASE_8;
+import static javax.lang.model.SourceVersion.RELEASE_17;
 import static javax.tools.Diagnostic.Kind.ERROR;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
@@ -78,7 +78,7 @@ import com.google.common.base.Joiner;
  * @since 3.7.0
  */
 @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
-@SupportedSourceVersion(RELEASE_8)
+@SupportedSourceVersion(RELEASE_17)
 @SupportedOptions({
     BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION,
     BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES,
