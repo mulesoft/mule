@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.extension.internal.loader.xml;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -24,7 +26,7 @@ import org.vibur.objectpool.PoolObjectFactory;
 
 public class ForTnsTransformerFactory implements PoolObjectFactory<Transformer> {
 
-  private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
+  private static final TransformerFactory TRANSFORMER_FACTORY = XMLSecureFactories.createDefault().getTransformerFactory();
   private static final String TRANSFORMATION_FOR_TNS_RESOURCE = "META-INF/transform_for_tns.xsl";
 
   @Override
