@@ -53,7 +53,7 @@ class TlsExtensionModelDeclarer {
             .setPrefix(TLS_PREFIX)
             .setNamespace(MULE_TLS_NAMESPACE)
             .setSchemaVersion(MULE_VERSION)
-            .setXsdFileName(TLS_PREFIX + ".xsd")
+            .setXsdFileName("mule-tls.xsd")
             .setSchemaLocation(MULE_TLS_SCHEMA_LOCATION)
             .build());
 
