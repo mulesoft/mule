@@ -6,21 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 
-import java.io.IOException;
-import java.util.Collection;
+import static java.util.Arrays.asList;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComposableModel;
@@ -49,6 +42,14 @@ import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.tck.size.SmallTest;
 
+import java.io.IOException;
+import java.util.Collection;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 @SmallTest
 @RunWith(Parameterized.class)
 public class LegacyJsonDeserializationTestCase {
@@ -69,7 +70,6 @@ public class LegacyJsonDeserializationTestCase {
         {"tx-ext.json"},
         {"subtypes.json"},
         {"marvel.json"},
-        {"ram.json"},
         {"typed-value.json"},
         {"test-oauth.json"},
         {"test-oauth-ocs.json"},
@@ -94,7 +94,7 @@ public class LegacyJsonDeserializationTestCase {
 
   @Test
   public void load() {
-    ExtensionModel result = generator.deserialize(fileContent);
+    final ExtensionModel result = generator.deserialize(fileContent);
     assertLegacyExtensionModelCollections(result);
   }
 
@@ -160,7 +160,7 @@ public class LegacyJsonDeserializationTestCase {
         assertNotNull(model.getAllowedStereotypes());
         assertNotNull(model.getSemanticTerms());
         assertFieldValueProviderModels(model);
-        model.getValueProviderModel().ifPresent(valueProviderModel -> valueProviderModel.getParameters());
+        model.getValueProviderModel().ifPresent(ValueProviderModel::getParameters);
         model.getModelProperty(MetadataKeyPartModelProperty.class)
             .ifPresent(LegacyJsonDeserializationTestCase.this::assertMetadataKeyPartModelPropertyHasCorrectDefault);
       }
@@ -203,7 +203,7 @@ public class LegacyJsonDeserializationTestCase {
 
   private void assertFieldValueProviderModels(ParameterModel model) {
     assertNotNull(model.getFieldValueProviderModels());
-    model.getFieldValueProviderModels().forEach(fieldValueProviderModel -> assertValueProviderModel(fieldValueProviderModel));
+    model.getFieldValueProviderModels().forEach(this::assertValueProviderModel);
   }
 
   private void assertValueProviderModel(ValueProviderModel model) {

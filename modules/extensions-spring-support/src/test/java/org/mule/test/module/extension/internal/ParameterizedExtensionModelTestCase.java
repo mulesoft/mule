@@ -24,7 +24,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -47,7 +46,6 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
   protected static Map<String, ExtensionModel> EXTENSION_MODELS = new HashMap<>();
 
   protected static final ExtensionModelLoader JAVA_LOADER = new DefaultJavaExtensionModelLoader();
-  protected static final ExtensionModelLoader SOAP_LOADER = new SoapExtensionModelLoader();
 
   @Parameterized.Parameter
   public ExtensionModel extensionUnderTest;
@@ -58,9 +56,9 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
   }
 
   protected static Collection<Object[]> createExtensionModels(List<? extends ExtensionUnitTest> extensions) {
-    TriFunction<Class<?>, ExtensionModelLoader, ArtifactCoordinates, ExtensionModel> createExtensionModel =
+    final TriFunction<Class<?>, ExtensionModelLoader, ArtifactCoordinates, ExtensionModel> createExtensionModel =
         (extension, loader, artifactCoordinates) -> {
-          ExtensionModel model = loadExtension(extension, loader, artifactCoordinates);
+          final ExtensionModel model = loadExtension(extension, loader, artifactCoordinates);
 
           if (EXTENSION_MODELS.put(model.getName(), model) != null) {
             throw new IllegalArgumentException(format("Extension names must be unique. Name [%s] for extension [%s] was already used",
@@ -76,11 +74,11 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
   }
 
   protected static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader, ArtifactCoordinates coordinates) {
-    Map<String, Object> params = of(TYPE_PROPERTY_NAME, clazz.getName(),
-                                    VERSION, getMuleManifest().getProductVersion(),
-                                    // TODO MULE-14517: This workaround should be replaced for a better and more complete
-                                    // mechanism
-                                    COMPILATION_MODE, true);
+    final Map<String, Object> params = of(TYPE_PROPERTY_NAME, clazz.getName(),
+                                          VERSION, getMuleManifest().getProductVersion(),
+                                          // TODO MULE-14517: This workaround should be replaced for a better and more complete
+                                          // mechanism
+                                          COMPILATION_MODE, true);
 
     // TODO MULE-11797: as this utils is consumed from
     // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
@@ -98,7 +96,7 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
             classBytes =
                 toByteArray(this.getClass().getResourceAsStream("/" + name.replaceAll("\\.", "/") + ".class"));
             return this.defineClass(null, classBytes, 0, classBytes.length);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             return super.loadClass(name);
           }
         } else {
@@ -107,7 +105,7 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
       }
     };
 
-    ExtensionModelLoadingRequest.Builder builder = builder(pluginClassLoader, dslResolvingContext)
+    final ExtensionModelLoadingRequest.Builder builder = builder(pluginClassLoader, dslResolvingContext)
         .setResolveMinMuleVersion(true)
         .addParameters(params);
     if (coordinates != null) {

@@ -1,4 +1,192 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.SoapService",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "enum org.mule.runtime.soap.api.SoapVersion",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.client.SoapClient",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.client.SoapClientConfiguration",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.client.SoapClientConfigurationBuilder",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.client.SoapClientFactory",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.client.metadata.SoapMetadataKeyResolver",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.client.metadata.SoapMetadataResolver",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.client.metadata.SoapOperationMetadata",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.exception.BadRequestException",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.exception.BadResponseException",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.exception.DispatchingException",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.exception.EncodingException",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.exception.InvalidWsdlException",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.exception.SoapFaultException",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.exception.SoapServiceException",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "enum org.mule.runtime.soap.api.exception.error.SoapErrors",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.exception.error.SoapExceptionEnricher",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.message.ImmutableSoapRequest",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.message.SoapMessage",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.message.SoapRequest",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.message.SoapRequestBuilder",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.message.SoapResponse",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.message.WithContentType",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.message.dispatcher.DefaultHttpMessageDispatcher",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.message.dispatcher.HttpConfigBasedMessageDispatcher",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.transport.HttpResourceLocator",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.transport.NullTransportResourceLocator",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.soap.api.transport.ReflectiveHttpConfigBasedRequester",
+            "justification": "W-"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.soap.api.transport.TransportResourceLocator",
+            "justification": "W-"
+          }
+        ]
+      }
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
