@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;

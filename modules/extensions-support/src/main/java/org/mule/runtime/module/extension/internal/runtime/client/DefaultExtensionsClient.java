@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.runtime.operation.Result;

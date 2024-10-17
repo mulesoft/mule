@@ -72,7 +72,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.ObjectUtils;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
@@ -80,6 +79,7 @@ import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterPr
 import org.mule.runtime.core.internal.processor.strategy.StreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ScatterGatherRouter;
 import org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor;

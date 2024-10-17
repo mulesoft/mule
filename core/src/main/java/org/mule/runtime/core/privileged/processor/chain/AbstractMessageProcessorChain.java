@@ -70,7 +70,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
@@ -84,6 +83,7 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.ArrayList;
 import java.util.Collection;

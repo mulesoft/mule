@@ -32,7 +32,7 @@ import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionTemplateTestUtils;
-import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;

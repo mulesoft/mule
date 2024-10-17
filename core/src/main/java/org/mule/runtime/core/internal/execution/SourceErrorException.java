@@ -15,8 +15,8 @@ import org.mule.runtime.api.notification.EnrichedNotificationInfo;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.Collection;
 import java.util.Optional;

@@ -4,6 +4,14 @@
       "ignore": [
         {
           "code": "java.class.added",
+          "new": "class org.mule.runtime.core.privileged.exception.MessagingException",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classSimpleName": "MessagingException",
+          "elementKind": "class",
+          "justification": "W-15643200"
+        },
+        {
+          "code": "java.class.added",
           "new": "interface org.mule.runtime.core.api.management.stats.ResetOnQueryCounter",
           "package": "org.mule.runtime.core.api.management.stats",
           "classSimpleName": "ResetOnQueryCounter",
