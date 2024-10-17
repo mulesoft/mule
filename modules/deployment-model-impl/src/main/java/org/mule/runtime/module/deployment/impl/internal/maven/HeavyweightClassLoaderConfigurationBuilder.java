@@ -14,7 +14,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.semver4j.Semver.SemverType.LOOSE;
 
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
@@ -33,7 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import com.vdurmont.semver4j.Semver;
+import org.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
 
 /**
