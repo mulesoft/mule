@@ -12,9 +12,6 @@
  */
 module org.mule.runtime.logging {
 
-  // Allows usage of Unsafe for caffeine and disruptor libraries, used by the logging framework
-  requires jdk.unsupported;
-
   // Logging framework
   requires org.slf4j;
   requires org.apache.logging.log4j;
