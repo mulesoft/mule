@@ -157,5 +157,6 @@ module org.mule.runtime.spring.config {
       spring.core;
   opens org.mule.runtime.config.internal.factories.streaming to
       net.bytebuddy;
+  exports org.mule.runtime.config.privileged.spring to spring.core;
 
 }
