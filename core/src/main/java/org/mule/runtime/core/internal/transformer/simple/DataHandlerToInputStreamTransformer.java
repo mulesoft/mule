@@ -13,7 +13,7 @@ import org.mule.runtime.core.internal.transformer.AbstractDiscoverableTransforme
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 
 public class DataHandlerToInputStreamTransformer extends AbstractDiscoverableTransformer {
 
