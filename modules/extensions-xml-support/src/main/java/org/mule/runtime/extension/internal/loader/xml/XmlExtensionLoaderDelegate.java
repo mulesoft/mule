@@ -17,6 +17,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -250,12 +251,17 @@ public final class XmlExtensionLoaderDelegate {
 
   // Set a conservative value for how big the pool can get
   private static final int FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE = max(1, getRuntime().availableProcessors() / 2);
-  private static final PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL =
-      new ConcurrentPool<>(new ConcurrentLinkedQueueCollection<>(), new ForTnsTransformerFactory(), 1,
-                           FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE, false);
+  private static final PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL;
 
   private static final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
       newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
+
+  static {
+    FOR_TNS_XSTL_TRANSFORMER_POOL =
+        withContextClassLoader(XmlExtensionLoaderDelegate.class.getClassLoader(),
+                               () -> new ConcurrentPool<>(new ConcurrentLinkedQueueCollection<>(), new ForTnsTransformerFactory(),
+                                                          1, FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE, false));
+  }
 
   private static final ExtensionModelLoader TEMP_EXTENSION_MODEL_LOADER = new ExtensionModelLoader() {
 
