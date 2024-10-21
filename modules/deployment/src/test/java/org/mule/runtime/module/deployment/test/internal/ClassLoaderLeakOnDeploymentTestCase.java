@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.bridgeMethodExtensionPlugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.byeXmlExtensionPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
@@ -42,6 +43,8 @@ public class ClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLeakTestCase
       () -> new HashSet<>(singletonList(bridgeMethodExtensionPlugin));
   public static final Supplier<Set<ArtifactPluginFileBuilder>> HELLO_V1_PLUGIN =
       () -> new HashSet<>(singletonList(helloExtensionV1Plugin));
+  public static final Supplier<Set<ArtifactPluginFileBuilder>> XML_SDK_PLUGIN =
+      () -> new HashSet<>(singletonList(byeXmlExtensionPlugin));
   public static final Supplier<Set<ArtifactPluginFileBuilder>> NO_PLUGINS = () -> emptySet();
 
   @Parameterized.Parameters(name = "Parallel: {0}, AppName: {1}, Use Plugin: {2}")
@@ -60,7 +63,13 @@ public class ClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLeakTestCase
             BRIDGE_METHOD_PLUGIN},
         {true, "appWithExtensionPlugin-1.0.0-mule-application",
             "app-with-bridge-extension-plugin-config",
-            BRIDGE_METHOD_PLUGIN}
+            BRIDGE_METHOD_PLUGIN},
+        {false, "appWithExtensionPlugin-1.0.0-mule-application",
+            "app-with-extension-xml-plugin-module-bye",
+            XML_SDK_PLUGIN},
+        {true, "appWithExtensionPlugin-1.0.0-mule-application",
+            "app-with-extension-xml-plugin-module-bye",
+            XML_SDK_PLUGIN}
     });
   }
 
