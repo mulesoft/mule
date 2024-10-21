@@ -100,6 +100,7 @@ import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProc
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
+import org.mule.runtime.config.privileged.spring.ByteBuddySpringCachesManager;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
 import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
@@ -128,8 +129,6 @@ import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExten
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -140,7 +139,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
-
 import org.slf4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -153,7 +151,6 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
-import org.springframework.core.BridgeMethodResolver;
 
 /**
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
@@ -473,34 +470,16 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         throw new MuleRuntimeException(e);
       }
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
-      // Needed due to a shade of spring-core in the extensions-support module.
-      IntrospectionUtils.resetCommonCaches();
       // Additional Spring cache cleanup
       clearSpringSoftReferencesCachesForDynamicClassLoaders();
-      clearSpringBridgeMethodsCache();
+      try {
+        ByteBuddySpringCachesManager.clearCaches();
+        // Needed due to a shade of spring-core in the extensions-support module.
+        IntrospectionUtils.resetCommonCaches();
+      } catch (Exception e) {
+        LOGGER.warn("Spring caches cleanup failed", e);
+      }
     }
-  }
-
-  /**
-   * {@link BridgeMethodResolver} cache hold soft references to mule artifact classloaders. This method tries to clean the cache
-   * in order to make such classloaders garbage-collectable. Will not fail if the cache cannot be cleaned (it will log a warning
-   * message instead).
-   */
-  private void clearSpringBridgeMethodsCache() {
-    try {
-      getSpringBridgeMethodsCache().clear();
-    } catch (Exception e) {
-      LOGGER.warn("Spring bridge methods cache could not be clear.", e);
-    }
-  }
-
-  /**
-   * Reflective access to {@link BridgeMethodResolver} cache.
-   */
-  private Map<Method, Method> getSpringBridgeMethodsCache() throws IllegalAccessException, NoSuchFieldException {
-    Field f = BridgeMethodResolver.class.getDeclaredField("cache");
-    f.setAccessible(true);
-    return (Map<Method, Method>) f.get(null);
   }
 
   /**
