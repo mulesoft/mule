@@ -367,6 +367,7 @@
                                 <includes>
                                     <!-- From Spring we just require ResolvableType and DefaultConversionService for use in this module. -->
                                     <!-- Shading and minimizing it we avoid including the whole spring-core jar as a dependency. -->
+                                    <!-- If this shading is removed, all the ByteBuddySpringCacheInstrumentator related logic should be removed from the extensions-support module too -->
                                     <includes>org.springframework:spring-core</includes>
                                 </includes>
                             </artifactSet>
