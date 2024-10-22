@@ -274,7 +274,7 @@ public final class XmlExtensionLoaderDelegate {
 
   private static final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
       newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
-  
+
   private static PoolService<Transformer> getTransformerPool() {
     if (forceTransformerPoolRecreation) {
       FOR_TNS_XSTL_TRANSFORMER_POOL = calculateTransformerPool();
