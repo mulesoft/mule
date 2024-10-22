@@ -100,6 +100,9 @@ public final class JpmsUtils {
   private static final String REQUIRED_ADD_OPENS_COM_SUN_MANAGEMENT_INTERNAL =
       "--add-opens=jdk.management/com.sun.management.internal=org.mule.runtime.jpms.utils";
 
+  private static final String REQUIRED_ADD_OPENS_BOUNCY_CASTLE_SECURE_RANDOM =
+      "--add-opens=java.base/sun.security.provider=org.bouncycastle.fips.core";
+
   private static final List<String> REQUIRED_ADD_OPENS = asList(REQUIRED_ADD_OPENS_JAVA_LANG,
                                                                 REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT,
                                                                 REQUIRED_ADD_OPENS_JAVA_LANG_INVOKE,
@@ -109,7 +112,8 @@ public final class JpmsUtils {
                                                                 REQUIRED_ADD_OPENS_JAVA_SQL,
                                                                 REQUIRED_ADD_OPENS_SUN_MANAGEMENT,
                                                                 REQUIRED_ADD_OPENS_COM_IBM_LANG_MANAGEMENT_INTERNAL,
-                                                                REQUIRED_ADD_OPENS_COM_SUN_MANAGEMENT_INTERNAL);
+                                                                REQUIRED_ADD_OPENS_COM_SUN_MANAGEMENT_INTERNAL,
+                                                                REQUIRED_ADD_OPENS_BOUNCY_CASTLE_SECURE_RANDOM);
 
   /**
    * Validates that no module tweaking jvm options (i.e: {@code --add-opens}, {@code --add-exports}, ...) have been provided in
