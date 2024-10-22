@@ -13,8 +13,8 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
+import org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +24,8 @@ import java.util.function.Supplier;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.ClassRule;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 
 @Feature(LEAK_PREVENTION)
@@ -32,8 +33,15 @@ import org.junit.runners.Parameterized.Parameters;
 @Issue("W-16814280")
 public class XmlPluginClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLeakOnDeploymentTestCase {
 
-  @ClassRule
-  public static SystemProperty xmlLeak = new SystemProperty("mule.test.transformer.pool.leak", "true");
+  @BeforeClass
+  public static void before() {
+    XmlExtensionLoaderDelegate.forceTransformerPoolRecreation(true);
+  }
+
+  @AfterClass
+  public static void after() {
+    XmlExtensionLoaderDelegate.forceTransformerPoolRecreation(false);
+  }
 
   public static final Supplier<Set<ArtifactPluginFileBuilder>> XML_SDK_PLUGIN =
       () -> new HashSet<>(singletonList(byeXmlExtensionPlugin));

@@ -254,11 +254,26 @@ public final class XmlExtensionLoaderDelegate {
   private static final int FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE = max(1, getRuntime().availableProcessors() / 2);
   private static PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL = calculateTransformerPool();
 
+  /**
+   * Only for testing purposes. Determines whether to force the recreation of the transformer pool
+   * {@code FOR_TNS_XSTL_TRANSFORMER_POOL}.
+   */
+  private static boolean forceTransformerPoolRecreation;
+
+  /**
+   * Only for testing purposes.
+   *
+   * @param force whether to force the recreation of the transformer pool {@code FOR_TNS_XSTL_TRANSFORMER_POOL}.
+   */
+  public static void forceTransformerPoolRecreation(boolean force) {
+    forceTransformerPoolRecreation = force;
+  }
+
   private static final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
       newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
 
   private static PoolService<Transformer> getTransformerPool() {
-    if (getBoolean("mule.test.transformer.pool.leak")) {
+    if (forceTransformerPoolRecreation) {
       FOR_TNS_XSTL_TRANSFORMER_POOL = calculateTransformerPool();
     }
 
