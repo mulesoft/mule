@@ -15,6 +15,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFA
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -31,6 +32,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
@@ -252,12 +254,55 @@ public final class XmlExtensionLoaderDelegate {
 
   // Set a conservative value for how big the pool can get
   private static final int FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE = max(1, getRuntime().availableProcessors() / 2);
-  private static final PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL =
-      new ConcurrentPool<>(new ConcurrentLinkedQueueCollection<>(), new ForTnsTransformerFactory(), 1,
-                           FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE, false);
+  private static PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL = calculateTransformerPool();
+
+  /**
+   * Only for testing purposes. Determines whether to force the recreation of the transformer pool
+   * {@code FOR_TNS_XSTL_TRANSFORMER_POOL}.
+   */
+  @Deprecated
+  private static boolean forceTransformerPoolRecreation;
+
+  /**
+   * Only for testing purposes.
+   *
+   * @param force whether to force the recreation of the transformer pool {@code FOR_TNS_XSTL_TRANSFORMER_POOL}.
+   */
+  @Deprecated
+  public static void forceTransformerPoolRecreation(boolean force) {
+    forceTransformerPoolRecreation = force;
+  }
 
   private static final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
       newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
+  
+  private static PoolService<Transformer> getTransformerPool() {
+    if (forceTransformerPoolRecreation) {
+      FOR_TNS_XSTL_TRANSFORMER_POOL = calculateTransformerPool();
+    }
+
+    return FOR_TNS_XSTL_TRANSFORMER_POOL;
+  }
+
+  private static PoolService<Transformer> calculateTransformerPool() {
+    return withContextClassLoader(XmlExtensionLoaderDelegate.class.getClassLoader(),
+                                  () -> new ConcurrentPool<>(new ConcurrentLinkedQueueCollection<>(),
+                                                             new ForTnsTransformerFactory(),
+                                                             1, FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE, false));
+  }
+
+  private static final ExtensionModelLoader TEMP_EXTENSION_MODEL_LOADER = new ExtensionModelLoader() {
+
+    @Override
+    public String getId() {
+      return "xmlSdkTemp";
+    }
+
+    @Override
+    protected void declareExtension(ExtensionLoadingContext context) {
+      // nothing to do
+    }
+  };
 
   private final String modulePath;
   private final boolean validateXml;
@@ -387,7 +432,7 @@ public final class XmlExtensionLoaderDelegate {
   private Optional<ExtensionModel> createTnsExtensionModel(URL resource, Set<ExtensionModel> extensionModels)
       throws IOException {
     final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-    final Transformer transformer = FOR_TNS_XSTL_TRANSFORMER_POOL.take();
+    final Transformer transformer = getTransformerPool().take();
     try (BufferedInputStream resourceIS = new BufferedInputStream(getInputStreamWithCacheControl(resource))) {
       transformer.transform(new StreamSource(resourceIS), new StreamResult(resultStream));
     } catch (TransformerException e) {
@@ -395,7 +440,7 @@ public final class XmlExtensionLoaderDelegate {
                                                                 resource.getFile())),
                                      e);
     } finally {
-      FOR_TNS_XSTL_TRANSFORMER_POOL.restore(transformer);
+      getTransformerPool().restore(transformer);
     }
 
     final ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer();
