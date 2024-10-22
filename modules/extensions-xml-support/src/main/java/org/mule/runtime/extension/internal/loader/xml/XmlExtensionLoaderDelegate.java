@@ -34,7 +34,6 @@ import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelop
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
