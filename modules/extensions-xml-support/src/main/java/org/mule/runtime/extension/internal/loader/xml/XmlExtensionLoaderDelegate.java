@@ -32,7 +32,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
@@ -290,19 +289,6 @@ public final class XmlExtensionLoaderDelegate {
                                                              new ForTnsTransformerFactory(),
                                                              1, FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE, false));
   }
-
-  private static final ExtensionModelLoader TEMP_EXTENSION_MODEL_LOADER = new ExtensionModelLoader() {
-
-    @Override
-    public String getId() {
-      return "xmlSdkTemp";
-    }
-
-    @Override
-    protected void declareExtension(ExtensionLoadingContext context) {
-      // nothing to do
-    }
-  };
 
   private final String modulePath;
   private final boolean validateXml;
