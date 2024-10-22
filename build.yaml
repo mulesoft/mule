@@ -6,7 +6,7 @@ upstreamProjects:
   Mule-runtime/mule-artifact-ast/master-TESTCYCLE-2020-DRY-RUN,
   Mule-runtime/mule-properties-api/master-TESTCYCLE-2020-DRY-RUN,
   DataWeave/data-weave/master,
-  Mule-runtime/mule-maven-client/master
+  Mule-runtime/mule-maven-client/master-TESTCYCLE-2020-DRY-RUN
 # Comment public setting to get oldMuleArtifact 4.2.1 from private repo till we move them to the public Repo
 # Uncomment it after they are copied
 # "mavenSettingsXmlId" : "mule-runtime-maven-settings-MuleSettings",
