@@ -33,6 +33,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
@@ -486,6 +487,20 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
         expressionLanguage.evaluate("flow.name", event, from(flowName), BindingContext.builder().build());
     assertThat(result.getDataType(), is(assignableTo(STRING)));
     assertThat(result.getValue(), is(flowName));
+  }
+
+  @Test
+  public void expressionExecutorIsNotDisposedWhenAlreadyDisposed() throws MuleException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+    ExpressionLanguage mockedExpressionLanguage = mock(ExpressionLanguage.class);
+    when(genericExpressionLanguageService.create(any())).thenReturn(mockedExpressionLanguage);
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.dispose();
+    verify(mockedExpressionLanguage, times(1)).dispose();
+    expressionLanguageAdaptor.dispose();
+    verify(mockedExpressionLanguage, times(1)).dispose();
   }
 
   @Test
