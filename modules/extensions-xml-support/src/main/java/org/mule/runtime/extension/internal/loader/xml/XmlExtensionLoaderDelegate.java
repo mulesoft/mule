@@ -258,6 +258,7 @@ public final class XmlExtensionLoaderDelegate {
    * Only for testing purposes. Determines whether to force the recreation of the transformer pool
    * {@code FOR_TNS_XSTL_TRANSFORMER_POOL}.
    */
+  @Deprecated
   private static boolean forceTransformerPoolRecreation;
 
   /**
@@ -265,6 +266,7 @@ public final class XmlExtensionLoaderDelegate {
    *
    * @param force whether to force the recreation of the transformer pool {@code FOR_TNS_XSTL_TRANSFORMER_POOL}.
    */
+  @Deprecated
   public static void forceTransformerPoolRecreation(boolean force) {
     forceTransformerPoolRecreation = force;
   }

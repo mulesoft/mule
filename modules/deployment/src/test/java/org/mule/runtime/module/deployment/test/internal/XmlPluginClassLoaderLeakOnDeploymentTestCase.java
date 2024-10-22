@@ -11,7 +11,7 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTIO
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.singleton;
 
 import org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
@@ -44,7 +44,7 @@ public class XmlPluginClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLea
   }
 
   public static final Supplier<Set<ArtifactPluginFileBuilder>> XML_SDK_PLUGIN =
-      () -> new HashSet<>(singletonList(byeXmlExtensionPlugin));
+      () -> new HashSet<>(singleton(byeXmlExtensionPlugin));
 
   @Parameters(name = "Parallel: {0}, AppName: {1}, Use Plugin: {2}")
   public static List<Object[]> parameters() {
