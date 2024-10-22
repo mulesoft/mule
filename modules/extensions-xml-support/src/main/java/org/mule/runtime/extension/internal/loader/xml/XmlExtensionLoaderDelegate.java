@@ -252,7 +252,7 @@ public final class XmlExtensionLoaderDelegate {
 
   // Set a conservative value for how big the pool can get
   private static final int FOR_TNS_XSTL_TRANSFORMER_POOL_MAX_SIZE = max(1, getRuntime().availableProcessors() / 2);
-  private static PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL = getTransformerPool();
+  private static PoolService<Transformer> FOR_TNS_XSTL_TRANSFORMER_POOL = calculateTransformerPool();
 
   private static final Set<ComponentIdentifier> NOT_GLOBAL_ELEMENT_IDENTIFIERS =
       newHashSet(OPERATION_PROPERTY_IDENTIFIER, CONNECTION_PROPERTIES_IDENTIFIER, OPERATION_IDENTIFIER);
