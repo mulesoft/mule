@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
 
-import javax.activation.DataHandler;
+import jakarta.activation.DataHandler;
 
 import org.junit.Test;
 
