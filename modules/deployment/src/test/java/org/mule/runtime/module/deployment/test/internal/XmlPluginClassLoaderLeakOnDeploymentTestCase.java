@@ -43,8 +43,7 @@ public class XmlPluginClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLea
     XmlExtensionLoaderDelegate.forceTransformerPoolRecreation(false);
   }
 
-  public static final Supplier<Set<ArtifactPluginFileBuilder>> XML_SDK_PLUGIN =
-      () -> new HashSet<>(singleton(byeXmlExtensionPlugin));
+  public static final Supplier<Set<ArtifactPluginFileBuilder>> XML_SDK_PLUGIN = () -> singleton(byeXmlExtensionPlugin);
 
   @Parameters(name = "Parallel: {0}, AppName: {1}, Use Plugin: {2}")
   public static List<Object[]> parameters() {
