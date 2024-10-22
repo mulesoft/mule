@@ -16,7 +16,6 @@ import static java.util.Collections.singleton;
 import org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
