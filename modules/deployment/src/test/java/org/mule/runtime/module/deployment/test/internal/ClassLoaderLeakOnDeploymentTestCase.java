@@ -22,12 +22,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Issues;
-import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Contains tests for leak prevention on the deployment process.
@@ -44,7 +45,7 @@ public class ClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLeakTestCase
       () -> new HashSet<>(singletonList(helloExtensionV1Plugin));
   public static final Supplier<Set<ArtifactPluginFileBuilder>> NO_PLUGINS = () -> emptySet();
 
-  @Parameterized.Parameters(name = "Parallel: {0}, AppName: {1}, Use Plugin: {2}")
+  @Parameters(name = "Parallel: {0}, AppName: {1}, Use Plugin: {2}")
   public static List<Object[]> parameters() {
     return asList(new Object[][] {
         {false, "empty-config-1.0.0-mule-application",
@@ -64,8 +65,8 @@ public class ClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLeakTestCase
     });
   }
 
-  public ClassLoaderLeakOnDeploymentTestCase(boolean parallellDeployment, String appName, String xmlFile,
+  public ClassLoaderLeakOnDeploymentTestCase(boolean parallelDeployment, String appName, String xmlFile,
                                              Supplier<Set<ArtifactPluginFileBuilder>> applicationPlugins) {
-    super(parallellDeployment, appName, xmlFile, applicationPlugins);
+    super(parallelDeployment, appName, xmlFile, applicationPlugins);
   }
 }

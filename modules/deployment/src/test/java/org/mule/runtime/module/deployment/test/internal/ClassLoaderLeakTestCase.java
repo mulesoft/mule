@@ -56,12 +56,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 
 public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase {
 
@@ -107,9 +106,9 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private TestDeploymentListener deploymentListener;
 
-  public ClassLoaderLeakTestCase(boolean parallellDeployment, String appName, String xmlFile,
+  public ClassLoaderLeakTestCase(boolean parallelDeployment, String appName, String xmlFile,
                                  Supplier<Set<ArtifactPluginFileBuilder>> applicationPlugins) {
-    super(parallellDeployment);
+    super(parallelDeployment);
     this.appName = appName;
     this.applicationPlugins = applicationPlugins;
     this.xmlFile = xmlFile;
