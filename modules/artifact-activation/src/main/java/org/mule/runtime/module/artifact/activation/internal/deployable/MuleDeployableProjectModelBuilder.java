@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.semver4j.Semver.SemverType.LOOSE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
@@ -59,7 +59,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.vdurmont.semver4j.Semver;
+import org.semver4j.Semver;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
