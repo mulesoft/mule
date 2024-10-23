@@ -12,24 +12,4 @@
  */
 module org.mule.runtime.soap.api {
 
-  requires transitive org.mule.runtime.api;
-  requires org.mule.runtime.metadata.model.api;
-  requires org.mule.runtime.extensions.api;
-  requires org.mule.runtime.extensions.soap.api;
-  requires org.mule.runtime.http.api;
-
-  requires java.xml.soap;
-
-  requires com.google.common;
-  requires org.apache.commons.io;
-
-  exports org.mule.runtime.soap.api;
-  exports org.mule.runtime.soap.api.client;
-  exports org.mule.runtime.soap.api.client.metadata;
-  exports org.mule.runtime.soap.api.exception;
-  exports org.mule.runtime.soap.api.exception.error;
-  exports org.mule.runtime.soap.api.message;
-  exports org.mule.runtime.soap.api.message.dispatcher;
-  exports org.mule.runtime.soap.api.transport;
-  
 }
