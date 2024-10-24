@@ -195,7 +195,7 @@
         <awaitilityVersion>3.0.0</awaitilityVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
-        <oldMuleArtifactVersion>4.8.0-rc3</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.8.1-rc1</oldMuleArtifactVersion>
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
