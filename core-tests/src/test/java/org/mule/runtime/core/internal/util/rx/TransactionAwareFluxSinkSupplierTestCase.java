@@ -24,8 +24,8 @@ import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pus
 import static reactor.util.context.Context.empty;
 
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.TransactionCoordination;
 
 import io.qameta.allure.Issue;
 import org.junit.Before;

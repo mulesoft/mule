@@ -7,9 +7,9 @@
 package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.core.api.execution.ExecutionCallback;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.transaction.TransactionCoordination;
 
 public class IsolateCurrentTransactionInterceptor<T> implements ExecutionInterceptor<T> {
 

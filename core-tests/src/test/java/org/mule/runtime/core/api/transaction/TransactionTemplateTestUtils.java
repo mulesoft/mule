@@ -11,6 +11,8 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.internal.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 
 public class TransactionTemplateTestUtils {

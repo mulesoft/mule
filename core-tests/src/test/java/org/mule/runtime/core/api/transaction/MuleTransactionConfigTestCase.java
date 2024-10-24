@@ -10,6 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.internal.transaction.TransactionConfig;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 

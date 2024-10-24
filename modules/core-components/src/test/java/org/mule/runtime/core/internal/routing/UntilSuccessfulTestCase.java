@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.runtime.core.internal.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RETRY_CTX_INTERNAL_PARAM_KEY;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createAndRegisterFlow;
@@ -45,7 +45,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.Transaction;
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.exception.MessagingException;

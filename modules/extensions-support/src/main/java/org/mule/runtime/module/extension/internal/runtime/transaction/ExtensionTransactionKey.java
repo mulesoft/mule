@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.Transaction;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionContextConfigurationDecorator;
 

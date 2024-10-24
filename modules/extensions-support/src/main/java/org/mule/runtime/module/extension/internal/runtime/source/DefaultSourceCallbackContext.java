@@ -12,7 +12,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
+import static org.mule.runtime.core.internal.transaction.TransactionUtils.profileTransactionAction;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.connection.ConnectionException;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.isTxActiveByContext;
 
 import static java.lang.Thread.currentThread;

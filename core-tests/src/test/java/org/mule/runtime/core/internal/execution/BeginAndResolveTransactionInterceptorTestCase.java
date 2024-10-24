@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import static org.mule.runtime.core.internal.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
@@ -15,10 +15,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.execution.ExecutionCallback;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.internal.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.TransactionFactory;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

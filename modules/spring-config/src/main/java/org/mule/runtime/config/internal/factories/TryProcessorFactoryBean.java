@@ -12,8 +12,9 @@ import static java.util.Collections.emptyList;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.internal.processor.TryScope;
+import org.mule.runtime.core.internal.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 
 import java.util.List;
@@ -24,8 +25,8 @@ import org.springframework.beans.factory.FactoryBean;
 
 /**
  * Generates an object that wraps the invocation of the next {@link org.mule.runtime.core.api.processor.Processor} with a
- * transaction. If the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the
- * next {@code org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
+ * transaction. If the {@link TransactionConfig} is null then no transaction is used and the next
+ * {@code org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
  *
  * @since 4.0
  *

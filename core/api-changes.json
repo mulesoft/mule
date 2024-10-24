@@ -5,6 +5,156 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::commitTxButNoResource(===org.mule.runtime.core.api.transaction.Transaction===)",
+            "new": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::commitTxButNoResource(===org.mule.runtime.core.internal.transaction.Transaction===)",
+            "parameterIndex": "0",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::errorInvokingMessageProcessorWithinTransaction(org.mule.runtime.core.api.processor.Processor, ===org.mule.runtime.core.api.transaction.TransactionConfig===)",
+            "new": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::errorInvokingMessageProcessorWithinTransaction(org.mule.runtime.core.api.processor.Processor, ===org.mule.runtime.core.internal.transaction.TransactionConfig===)",
+            "parameterIndex": "1",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::rollbackTxButNoResource(===org.mule.runtime.core.api.transaction.Transaction===)",
+            "new": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::rollbackTxButNoResource(===org.mule.runtime.core.internal.transaction.Transaction===)",
+            "parameterIndex": "0",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, ===org.mule.runtime.core.api.transaction.TransactionConfig===)",
+            "new": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, ===org.mule.runtime.core.internal.transaction.TransactionConfig===)",
+            "parameterIndex": "1",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, ===org.mule.runtime.core.api.transaction.TransactionConfig===)",
+            "new": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, ===org.mule.runtime.core.internal.transaction.TransactionConfig===)",
+            "parameterIndex": "3",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, ===org.mule.runtime.core.api.transaction.TransactionConfig===, boolean)",
+            "new": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, ===org.mule.runtime.core.internal.transaction.TransactionConfig===, boolean)",
+            "parameterIndex": "3",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, ===org.mule.runtime.core.api.transaction.TransactionConfig===)",
+            "new": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, ===org.mule.runtime.core.internal.transaction.TransactionConfig===)",
+            "parameterIndex": "1",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, ===org.mule.runtime.core.api.transaction.TransactionConfig===)",
+            "new": "parameter <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, ===org.mule.runtime.core.internal.transaction.TransactionConfig===)",
+            "parameterIndex": "3",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.DelegateTransactionFactory",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.MuleTransactionConfig",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.Transaction",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionCallback<T>",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionConfig",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.TransactionCoordination",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionManagerFactory",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.TransactionRollbackException",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.TransactionStatusException",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.TransactionUtils",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transaction.TypedTransactionFactory",
+            "new": "interface org.mule.runtime.core.api.transaction.TypedTransactionFactory",
+            "interface": "org.mule.runtime.core.api.transaction.TransactionFactory",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.UnboundTransactionFactory",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.UniversalTransactionFactory",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
             "code": "java.field.removed",
             "old": "field org.mule.runtime.core.api.config.MuleManifest.logger",
             "justification": "W-16519697: add new `mule-manifest` module compatible with Java 8"

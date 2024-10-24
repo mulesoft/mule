@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.processor.strategy;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.transaction.TransactionCoordination.isTransactionActive;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.construct.BackPressureReason;

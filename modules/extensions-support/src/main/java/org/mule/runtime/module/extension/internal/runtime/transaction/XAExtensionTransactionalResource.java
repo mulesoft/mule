@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import static javax.transaction.xa.XAResource.TMSUCCESS;
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.api.tx.MuleXaObject;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.transaction.XaTransaction;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 import org.mule.sdk.api.connectivity.XATransactionalConnection;

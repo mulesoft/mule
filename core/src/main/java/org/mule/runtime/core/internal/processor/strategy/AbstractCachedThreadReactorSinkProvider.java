@@ -10,8 +10,8 @@ import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.TransactionCoordination;
 
 import java.util.ArrayList;
 import java.util.List;

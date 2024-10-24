@@ -16,7 +16,6 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 
 import java.lang.reflect.Field;

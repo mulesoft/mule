@@ -18,11 +18,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_INDIFFERENT;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
-import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
+import static org.mule.runtime.core.internal.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import static org.mule.runtime.core.internal.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
+import static org.mule.runtime.core.internal.transaction.TransactionConfig.ACTION_INDIFFERENT;
+import static org.mule.runtime.core.internal.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.transaction.TransactionUtils.profileTransactionAction;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
@@ -56,10 +56,10 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.internal.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.transaction.TransactionAdapter;
@@ -80,7 +80,7 @@ import reactor.util.context.ContextView;
 
 /**
  * Wraps the invocation of a list of nested processors {@link org.mule.runtime.core.api.processor.Processor} with a transaction.
- * If the {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
+ * If the {@link TransactionConfig} is null then no transaction is used and the next
  * {@link org.mule.runtime.core.api.processor.Processor} is invoked directly.
  */
 public class TryScope extends AbstractMessageProcessorOwner implements Scope {

@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction;
+package org.mule.runtime.core.internal.transaction;
 
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.tx.TransactionType.XA;
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+import static org.mule.runtime.core.internal.transaction.TransactionCoordination.isTransactionActive;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.empty;
@@ -21,7 +21,6 @@ import org.mule.runtime.api.profiling.type.TransactionProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.internal.profiling.context.DefaultTransactionProfilingEventContext;
-import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 
 public final class TransactionUtils {
 

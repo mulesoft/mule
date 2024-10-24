@@ -5,6 +5,7 @@
  * LICENSE.txt file.
  */
 import org.mule.api.annotation.jpms.PrivilegedApi;
+import org.mule.runtime.core.internal.transaction.TransactionFactory;
 
 /**
  * Default implementation of the Mule Extension API.
@@ -233,7 +234,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.module.extension.api.loader.DefaultExtensionModelLoaderProvider;
   provides org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory with
       org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
-  provides org.mule.runtime.core.api.transaction.TransactionFactory with
+  provides TransactionFactory with
       org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
   provides org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactoryDelegate with
       org.mule.runtime.module.extension.internal.metadata.DefaultComponentMetadataConfigurerFactoryDelegate;

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.transaction.xa;
 
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.mule.runtime.core.api.transaction.TransactionStatusException;
+import org.mule.runtime.core.internal.transaction.TransactionStatusException;
 
 /**
  * <code>IllegalTransactionStateException</code> TODO (document class)

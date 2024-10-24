@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.tx.TransactionHandle;
 
 /**

@@ -23,7 +23,7 @@ import static org.junit.rules.ExpectedException.none;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.transaction.TransactionStatusException;
+import org.mule.runtime.core.internal.transaction.TransactionStatusException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.transactional.connection.TestLocalTransactionalConnection;
 import org.mule.test.transactional.connection.TestTransactionalConnection;

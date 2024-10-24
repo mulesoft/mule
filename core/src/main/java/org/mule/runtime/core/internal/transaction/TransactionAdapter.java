@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.transaction;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.transaction.Transaction;
 
 import java.util.Optional;
 

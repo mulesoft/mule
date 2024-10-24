@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
+import static org.mule.runtime.core.internal.transaction.TransactionCoordination.getInstance;
 import static org.mule.tck.junit4.matcher.Eventually.eventually;
 import static org.mule.tck.util.CollectableReference.collectedByGc;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
