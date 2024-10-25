@@ -300,6 +300,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.properties.config,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.bti,
       spring.beans;
   exports org.mule.runtime.core.internal.interception to
       org.mule.runtime.core.components,
@@ -435,6 +436,10 @@ module org.mule.runtime.core {
     org.mule.runtime.extensions.mule.support,
     org.mule.runtime.spring.config,
     com.mulesoft.mule.runtime.bti,
+    com.mulesoft.mule.runtime.cache,
+    com.mulesoft.mule.runtime.cluster,
+    com.mulesoft.mule.runtime.http.policy,
+    com.mulesoft.mule.runtime.xa,
     spring.beans;
   exports org.mule.runtime.core.internal.transaction.xa to
       org.mule.runtime.extensions.support,
