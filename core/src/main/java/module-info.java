@@ -431,6 +431,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.transaction to
     org.mule.runtime.core.components,
     org.mule.runtime.extensions.support,
+    org.mule.runtime.extensions.spring.support,
     org.mule.runtime.extensions.mule.support,
     org.mule.runtime.spring.config,
     com.mulesoft.mule.runtime.bti,
