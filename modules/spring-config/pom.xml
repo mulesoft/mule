@@ -64,6 +64,7 @@
                             <compilerArgs>
                                 <arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal=org.mule.runtime.spring.config</arg>
                                 <arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.validation=org.mule.runtime.spring.config</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.transaction=ALL-UNNAMED</arg>
                             </compilerArgs>
                         </configuration>
                     </execution>

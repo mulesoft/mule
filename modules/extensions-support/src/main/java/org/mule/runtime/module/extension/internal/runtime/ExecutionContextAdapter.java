@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.api.runtime.privileged;
+package org.mule.runtime.module.extension.internal.runtime;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
@@ -21,6 +21,7 @@ import org.mule.runtime.core.internal.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
+import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 
 import java.util.Optional;
 

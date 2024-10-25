@@ -12,7 +12,7 @@ import static org.mule.oauth.client.api.state.ResourceOwnerOAuthContext.DEFAULT_
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
  * Synthetic {@link CompletableComponentExecutor} which invalidates a given user's OAuth context.

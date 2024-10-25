@@ -4,6 +4,12 @@
       "ignore": [
         {
           "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>",
+          "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+        },
+        {
+          "ignore": true,
           "code": "java.method.returnTypeTypeParametersChanged",
           "old": "method java.util.Optional<org.mule.runtime.core.api.transaction.TransactionConfig> org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getTransactionConfig()",
           "new": "method java.util.Optional<org.mule.runtime.core.internal.transaction.TransactionConfig> org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getTransactionConfig()",

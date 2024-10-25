@@ -40,7 +40,7 @@ import org.mule.runtime.core.internal.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.transaction.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionContextConfigurationDecorator;
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
 import org.mule.runtime.tracer.api.component.ComponentTracer;

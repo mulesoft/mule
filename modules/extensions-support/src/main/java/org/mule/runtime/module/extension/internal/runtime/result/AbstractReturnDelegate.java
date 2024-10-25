@@ -45,7 +45,7 @@ import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.core.internal.util.message.MessageUtils;
 import org.mule.runtime.core.internal.util.message.SdkResultAdapter;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.CollectionReturnHandler;
 import org.mule.runtime.module.extension.internal.runtime.operation.resulthandler.MapReturnHandler;

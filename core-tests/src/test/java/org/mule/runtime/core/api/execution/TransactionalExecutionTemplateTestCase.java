@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.execution;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
+import static org.mule.runtime.core.internal.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.internal.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.internal.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.internal.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;

@@ -5,7 +5,6 @@
  * LICENSE.txt file.
  */
 import org.mule.api.annotation.jpms.PrivilegedApi;
-import org.mule.runtime.core.internal.transaction.TransactionFactory;
 
 /**
  * Default implementation of the Mule Extension API.
@@ -152,8 +151,6 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.deployment.model.impl;
   exports org.mule.runtime.module.extension.internal.resources.manifest to
       org.mule.runtime.extensions.spring.support;
-  exports org.mule.runtime.module.extension.internal.runtime to
-      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.client to
       org.mule.runtime.core,
       org.mule.runtime.extensions.soap.support;
@@ -226,6 +223,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.loader.parser.metadata to org.mule.runtime.extensions.mule.support, org.mule.runtime.extensions.soap.support, org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.metadata.chain to org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.loader.parser.java.metadata to org.mule.runtime.extensions.mule.support, org.mule.runtime.extensions.soap.support, org.mule.runtime.extensions.spring.support;
+  exports org.mule.runtime.module.extension.internal.runtime to org.mule.runtime.extensions.soap.support, org.mule.runtime.extensions.spring.support;
 
 
   provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
@@ -234,7 +232,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.module.extension.api.loader.DefaultExtensionModelLoaderProvider;
   provides org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory with
       org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
-  provides TransactionFactory with
+  provides org.mule.runtime.core.internal.transaction.TransactionFactory with
       org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
   provides org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactoryDelegate with
       org.mule.runtime.module.extension.internal.metadata.DefaultComponentMetadataConfigurerFactoryDelegate;

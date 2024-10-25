@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.core.api.util.func.CheckedBiFunction;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.internal.runtime.ExecutionContextAdapter;
 
 /**
  * Transforms a component's output considering the state of an {@link ExecutionContextAdapter}

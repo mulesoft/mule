@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.notification.DefaultNotificationEmitter;
 import org.mule.runtime.module.extension.internal.runtime.notification.legacy.LegacyNotificationEmitterAdapter;
 
 /**

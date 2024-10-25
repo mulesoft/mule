@@ -5,7 +5,6 @@
  * LICENSE.txt file.
  */
 import org.mule.api.annotation.jpms.PrivilegedApi;
-import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
 
 /**
  * Mule server and core classes.
@@ -143,7 +142,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.streaming.bytes.factory;
   exports org.mule.runtime.core.api.streaming.iterator;
   exports org.mule.runtime.core.api.streaming.object;
-  exports org.mule.runtime.core.api.transaction;
   exports org.mule.runtime.core.api.transaction.xa;
   exports org.mule.runtime.core.api.transformer;
   exports org.mule.runtime.core.api.util;
@@ -153,8 +151,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.util.proxy;
   exports org.mule.runtime.core.api.util.queue;
   exports org.mule.runtime.core.api.util.xmlsecurity;
-
-  uses TypedTransactionFactory;
 
   provides org.mule.runtime.api.el.AbstractBindingContextBuilderFactory with
       org.mule.runtime.core.api.el.DefaultBindingContextBuilderFactory;
@@ -168,7 +164,7 @@ module org.mule.runtime.core {
   provides org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory with
       org.mule.runtime.core.api.metadata.DefaultDataTypeBuilderFactory;
 
-  provides TypedTransactionFactory with
+  provides org.mule.runtime.core.internal.transaction.TypedTransactionFactory with
     org.mule.runtime.core.internal.transaction.DelegateTransactionFactory;
 
   // for MUnit, MTF
@@ -432,6 +428,13 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.transaction to
+    org.mule.runtime.core.components,
+    org.mule.runtime.extensions.support,
+    org.mule.runtime.extensions.mule.support,
+    org.mule.runtime.spring.config,
+    com.mulesoft.mule.runtime.bti,
+    spring.beans;
   exports org.mule.runtime.core.internal.transaction.xa to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
@@ -604,9 +607,9 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.value to
       spring.core;
-  exports org.mule.runtime.core.internal.transaction;
 
   uses org.mule.runtime.core.internal.transaction.TransactionFactory;
+  uses org.mule.runtime.core.internal.transaction.TypedTransactionFactory;
   uses org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
 
 }

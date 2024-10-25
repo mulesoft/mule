@@ -4,22 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.execution;
+package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.internal.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.execution.BeginAndResolveTransactionInterceptor;
-import org.mule.runtime.core.internal.execution.ExecuteCallbackInterceptor;
-import org.mule.runtime.core.internal.execution.ExecutionContext;
-import org.mule.runtime.core.internal.execution.ExecutionInterceptor;
-import org.mule.runtime.core.internal.execution.IsolateCurrentTransactionInterceptor;
-import org.mule.runtime.core.internal.execution.SuspendXaTransactionInterceptor;
-import org.mule.runtime.core.internal.execution.ValidateTransactionalStateInterceptor;
 import org.mule.runtime.core.internal.execution.compatibility.ResolvePreviousTransactionInterceptor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
