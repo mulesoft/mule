@@ -14,82 +14,10 @@
     <packaging>jar</packaging>
 
     <properties>
-        <surefire.args>
-            -XX:+IgnoreUnrecognizedVMOptions
-              --add-reads=org.mule.runtime.extensions.soap.support=org.apache.commons.io
-              --add-reads=org.mule.runtime.extensions.soap.support=org.mule.runtime.manifest
-            ${surefire.args.base}
-        </surefire.args>
-
-        <javaModuleName>org.mule.runtime.extensions.soap.support</javaModuleName>
+        <javaModuleName>org.mule.runtime.extensions.soap.support.old</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        
+        <skipRevapiCheck>true</skipRevapiCheck>
     </properties>
 
-    <dependencies>
-
-        <!-- SOAP Extensions API -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-extensions-soap-api</artifactId>
-        </dependency>
-
-        <!-- SOAP Service API -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-soap-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- Extensions Support -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.sdk</groupId>
-            <artifactId>mule-sdk-api</artifactId>
-        </dependency>
-
-        <!--Other Dependencies-->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Test Dependencies -->
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-allure</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-football-soap-extension</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-rick-and-morty-extension</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>
