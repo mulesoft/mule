@@ -10,7 +10,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.ASYNC_IDENTIFIER;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER;
-import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_ALWAYS_BEGIN_STRING;
+import static org.mule.runtime.core.internal.transaction.MuleTransactionConfig.ACTION_ALWAYS_BEGIN_STRING;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;

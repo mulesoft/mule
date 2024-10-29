@@ -11,8 +11,8 @@ import static java.util.ServiceLoader.load;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.collection.SmallMap;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
+import org.mule.runtime.core.privileged.transaction.TransactionFactory;
+import org.mule.runtime.core.privileged.transaction.TypedTransactionFactory;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -4,12 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction;
+package org.mule.runtime.core.internal.transaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 

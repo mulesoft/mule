@@ -40,7 +40,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.model.MissileProofVillain;
 import org.mule.test.marvel.model.Villain;
@@ -127,7 +126,9 @@ public class NonBlockingOperationsTestCase extends AbstractExtensionFunctionalTe
 
     try {
       flowRunner("nonBlockingOperationFailureInsideTransaction")
-          .transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory(transaction)).withPayload(villain).run();
+          .transactionally(ACTION_ALWAYS_BEGIN, transaction)
+          .withPayload(villain)
+          .run();
     } catch (Exception e) {
       assertThat(ThreadCaptor.capturedThreads, hasSize(1));
       assertCapturedThreadsNameMatch(not(startsWith("SimpleUnitTestSupportScheduler.")));
