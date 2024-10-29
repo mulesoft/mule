@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
+import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
@@ -333,7 +334,7 @@ class UntilSuccessfulRouter {
     if (suppressErrors) {
       return suppressIfPresent(throwable, MuleException.class);
     } else {
-      return throwable;
+      return ExceptionUtils.getMessagingExceptionCause(throwable);
     }
   }
 
