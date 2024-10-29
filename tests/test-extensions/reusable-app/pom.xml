@@ -30,6 +30,7 @@
                 <groupId>org.mule.tools.maven</groupId>
                 <artifactId>mule-maven-plugin</artifactId>
                 <extensions>true</extensions>
+                <version>${mule.maven.plugin.version}</version>
                 <configuration>
                     <classifier>mule-plugin</classifier>
                 </configuration>
