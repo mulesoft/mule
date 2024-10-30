@@ -11,7 +11,7 @@ import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NA
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
+import static org.mule.runtime.core.internal.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import static java.util.Arrays.asList;
@@ -26,13 +26,13 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
+import org.mule.runtime.core.internal.transaction.DelegateTransactionFactory;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleTestCase;

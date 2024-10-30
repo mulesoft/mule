@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.transaction;
+package org.mule.runtime.core.privileged.transaction;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 
 import javax.transaction.TransactionManager;
