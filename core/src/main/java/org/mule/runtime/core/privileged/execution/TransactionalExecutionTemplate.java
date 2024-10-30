@@ -4,14 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.execution;
+package org.mule.runtime.core.privileged.execution;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.execution.BeginAndResolveTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.ExecuteCallbackInterceptor;
@@ -21,7 +22,10 @@ import org.mule.runtime.core.internal.execution.IsolateCurrentTransactionInterce
 import org.mule.runtime.core.internal.execution.SuspendXaTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.ValidateTransactionalStateInterceptor;
 import org.mule.runtime.core.internal.execution.compatibility.ResolvePreviousTransactionInterceptor;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.core.privileged.transaction.TransactionConfig;
+import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
 import javax.transaction.TransactionManager;
 
@@ -92,6 +96,20 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                 getNotificationDispatcher((MuleContextWithRegistry) muleContext),
                                                 muleContext.getTransactionManager(),
                                                 transactionConfig);
+  }
+
+  /**
+   * Creates a ExecutionTemplate that will manage transactional context according to the given txAction
+   */
+  public static <T> TransactionalExecutionTemplate<T> createTransactionalExecutionTemplate(Registry registry,
+                                                                                           byte txAction,
+                                                                                           TransactionFactory factory) {
+    final var muleContext = registry.lookupByType(MuleContext.class).get();
+
+    MuleTransactionConfig transactionConfig = new MuleTransactionConfig(txAction);
+    transactionConfig.setFactory(factory);
+
+    return createTransactionalExecutionTemplate(muleContext, transactionConfig);
   }
 
   /**

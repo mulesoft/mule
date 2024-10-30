@@ -5,6 +5,62 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::errorInvokingMessageProcessorWithinTransaction(org.mule.runtime.core.api.processor.Processor, ===org.mule.runtime.core.api.transaction.TransactionConfig===)",
+            "new": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::errorInvokingMessageProcessorWithinTransaction(org.mule.runtime.core.api.processor.Processor, ===java.lang.Object===)",
+            "parameterIndex": "1",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.DelegateTransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.MuleTransactionConfig",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionConfig",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TypedTransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.UnboundTransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.UniversalTransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
             "code": "java.field.removed",
             "old": "field org.mule.runtime.core.api.config.MuleManifest.logger",
             "justification": "W-16519697: add new `mule-manifest` module compatible with Java 8"

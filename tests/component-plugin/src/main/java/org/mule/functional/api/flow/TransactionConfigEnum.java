@@ -6,7 +6,7 @@
  */
 package org.mule.functional.api.flow;
 
-import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 
 /**
  * Helper to access constants from {@link TransactionConfig}.
