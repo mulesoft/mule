@@ -7,6 +7,7 @@
         <groupId>org.mule</groupId>
         <artifactId>mule-plugin-mgmt-parent-pom</artifactId>
         <version>4.9.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
 
     <groupId>org.mule.runtime</groupId>
@@ -469,16 +470,6 @@
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>${assembly.verifier.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <configuration>
-                        <header>${licensePath}</header>
-                        <properties>
-                            <year>${licenseYear}</year>
-                        </properties>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.mule.runtime.plugins</groupId>
