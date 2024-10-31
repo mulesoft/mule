@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.VersionUtils.getMajor;
@@ -15,10 +14,10 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 
 import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +49,7 @@ public class DeployablePluginsDependenciesResolver {
     for (Map.Entry<BundleDependency, List<BundleDependency>> dependencyListEntry : dependenciesMap.entrySet()) {
       List<BundleDependency> dependencyDependencies =
           resolveConflicts(dependencyListEntry.getValue(), dependencies);
-      pluginsDependencies.put(toArtifactCoordinates(dependencyListEntry.getKey().getDescriptor()),
+      pluginsDependencies.put(dependencyListEntry.getKey().getDescriptor(),
                               updatePackagesResources(toArtifacts(dependencyDependencies)));
     }
 

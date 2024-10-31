@@ -45,6 +45,7 @@ import org.mule.maven.pom.parser.api.MavenPomParserProvider;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.PomParentCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
@@ -53,7 +54,6 @@ import org.mule.runtime.module.artifact.activation.internal.deployable.Deployabl
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.net.URI;
@@ -76,6 +76,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMavenDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
 
+  protected static final String PACKAGE_TYPE = "jar";
   private static final MavenPomParserProvider POM_PARSER_PROVIDER = MavenPomParserProvider.discoverProvider();
 
   protected static final Supplier<MavenConfiguration> DEFAULT_MAVEN_CONFIGURATION =
@@ -155,7 +156,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     }
     deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
 
-    ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(parser);
+    ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(parser, version);
 
     try (MavenClient mavenClient = createMavenClient(mavenConfiguration)) {
       resolveDeployableDependencies(mavenClient, pom, parser, activeProfiles);
@@ -165,10 +166,6 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
       resolveAdditionalPluginDependencies(mavenClient, parser, pluginsArtifactDependencies);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error while resolving dependencies"), e);
-    }
-
-    if (version.isPresent()) {
-      deployableArtifactCoordinates.setVersion(version.get());
     }
 
     return doBuild(parser, deployableArtifactCoordinates);
@@ -216,8 +213,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         .setGroupId(artifactCoordinates.getGroupId())
         .setVersion(artifactCoordinates.getVersion())
         .setBaseVersion(artifactCoordinates.getVersion())
-        .setType(artifactCoordinates.getType())
-        .setClassifier(artifactCoordinates.getClassifier())
+        .setType(PACKAGE_TYPE)
+        .setClassifier(artifactCoordinates.getClassifier().orElse(null))
         .build();
   }
 
@@ -283,10 +280,10 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
    *
    * @return the {@link ArtifactCoordinates} of the deployable project.
    */
-  private ArtifactCoordinates getDeployableProjectArtifactCoordinates(MavenPomParser parser) {
+  private ArtifactCoordinates getDeployableProjectArtifactCoordinates(MavenPomParser parser, Optional<String> version) {
     return getDeployableArtifactCoordinates(getGroupId(parser),
                                             getArtifactId(parser),
-                                            getVersion(parser),
+                                            version.orElse(getVersion(parser)),
                                             parser.getModel().getPackaging());
   }
 

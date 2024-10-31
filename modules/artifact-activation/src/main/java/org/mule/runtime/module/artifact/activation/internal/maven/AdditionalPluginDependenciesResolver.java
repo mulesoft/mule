@@ -22,11 +22,11 @@ import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.maven.pom.parser.api.model.MavenPomModel;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.util.Collection;
@@ -273,8 +273,7 @@ public class AdditionalPluginDependenciesResolver {
   }
 
   private ArtifactCoordinates getArtifactCoordinates(BundleDependency mulePlugin) {
-    BundleDescriptor descriptor = mulePlugin.getDescriptor();
-    return new ArtifactCoordinates(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+    return mulePlugin.getDescriptor();
   }
 
   private Predicate<AdditionalPluginDependencies> isNotRedefinedAtApplicationLevel() {

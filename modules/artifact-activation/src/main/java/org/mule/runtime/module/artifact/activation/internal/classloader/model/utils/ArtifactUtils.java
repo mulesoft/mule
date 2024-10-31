@@ -14,8 +14,8 @@ import static java.util.stream.Stream.concat;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import org.mule.maven.pom.parser.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.model.Artifact;
@@ -32,10 +32,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ArtifactUtils {
 
-  private static final String PACKAGE_TYPE = "jar";
   private static final String PROVIDED = "provided";
   private static final URI EMPTY_RESOURCE = URI.create("");
-  private static final String POM_TYPE = "pom";
 
   /**
    * Convert a {@link BundleDescriptor} instance to {@link ArtifactCoordinates}.
@@ -43,29 +41,12 @@ public class ArtifactUtils {
    * @param bundleDescriptor the bundle descriptor to be converted.
    * @return the corresponding artifact coordinates with normalized version.
    */
-  public static ArtifactCoordinates toArtifactCoordinates(BundleDescriptor bundleDescriptor) {
-    return new ArtifactCoordinates(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(),
-                                   bundleDescriptor.getBaseVersion(),
-                                   bundleDescriptor.getType(), bundleDescriptor.getClassifier().orElse(null));
-  }
-
   public static ArtifactCoordinates toArtifactCoordinates(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor bundleDescriptor) {
     return new ArtifactCoordinates(bundleDescriptor.getGroupId(),
                                    bundleDescriptor.getArtifactId(),
                                    bundleDescriptor.getBaseVersion(),
                                    bundleDescriptor.getType(),
                                    bundleDescriptor.getClassifier().orElse(null));
-  }
-
-  /**
-   * Convert a {@link org.mule.maven.pom.parser.api.model.BundleDependency} instance to {@link Artifact}.
-   *
-   * @param bundleDependency the bundle dependency to be converted.
-   * @return the corresponding artifact with normalized version.
-   */
-  public static Artifact toArtifact(org.mule.maven.pom.parser.api.model.BundleDependency bundleDependency) {
-    ArtifactCoordinates artifactCoordinates = toArtifactCoordinates(bundleDependency.getDescriptor());
-    return new Artifact(artifactCoordinates, bundleDependency.getBundleUri());
   }
 
   /**
@@ -160,27 +141,16 @@ public class ArtifactUtils {
     }
   }
 
-  public static ArtifactCoordinates getDeployableArtifactCoordinates(String groupId, String artifactId, String version,
-                                                                     String packaging) {
-    ArtifactCoordinates deployableCoordinates =
-        toArtifactCoordinates(getPomProjectBundleDescriptor(groupId, artifactId, version));
-    deployableCoordinates.setType(PACKAGE_TYPE);
-    deployableCoordinates.setClassifier(packaging);
-    return deployableCoordinates;
-  }
-
-  private static BundleDescriptor getPomProjectBundleDescriptor(String groupId, String artifactId, String version) {
-    return getBundleDescriptor(groupId, artifactId, version);
-  }
-
-
-  private static BundleDescriptor getBundleDescriptor(String groupId, String artifactId, String version) {
+  public static org.mule.runtime.api.artifact.ArtifactCoordinates getDeployableArtifactCoordinates(String groupId,
+                                                                                                   String artifactId,
+                                                                                                   String version,
+                                                                                                   String packaging) {
     return new BundleDescriptor.Builder()
         .setGroupId(groupId)
         .setArtifactId(artifactId)
         .setVersion(version)
         .setBaseVersion(version)
-        .setType(POM_TYPE)
+        .setClassifier(packaging)
         .build();
   }
 
