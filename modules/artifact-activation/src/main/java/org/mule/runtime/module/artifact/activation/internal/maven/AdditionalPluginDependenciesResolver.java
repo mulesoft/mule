@@ -26,7 +26,6 @@ import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.util.Collection;
@@ -88,14 +87,14 @@ public class AdditionalPluginDependenciesResolver {
   }
 
   public Map<BundleDependency, List<BundleDependency>> resolveDependencies(List<BundleDependency> applicationDependencies,
-                                                                           Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
+                                                                           Map<ArtifactCoordinates, List<BundleDependency>> pluginsDependencies) {
     addPluginDependenciesAdditionalLibraries(applicationDependencies);
     Map<BundleDependency, List<BundleDependency>> pluginsWithAdditionalDeps = new LinkedHashMap<>();
 
     pluginsWithAdditionalDependencies
         .forEach((k, v) -> {
           BundleDependency pluginBundleDependency = getPluginBundleDependency(k, applicationDependencies);
-          List<Artifact> pluginDependencies = getPluginDependencies(k, pluginsDependencies);
+          List<BundleDependency> pluginDependencies = getPluginDependencies(k, pluginsDependencies);
           List<org.mule.maven.pom.parser.api.model.BundleDependency> additionalDependencies =
               resolveDependencies(v.stream()
                   .filter(additionalDep -> pluginDependencies.stream()
@@ -152,8 +151,8 @@ public class AdditionalPluginDependenciesResolver {
             + pluginCoordinates)));
   }
 
-  private List<Artifact> getPluginDependencies(String pluginCoordinates,
-                                               Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
+  private List<BundleDependency> getPluginDependencies(String pluginCoordinates,
+                                                       Map<ArtifactCoordinates, List<BundleDependency>> pluginsDependencies) {
     return pluginsDependencies.entrySet().stream()
         .filter(pluginDependenciesEntry -> StringUtils
             .equals(pluginDependenciesEntry.getKey().getGroupId() + ":" + pluginDependenciesEntry.getKey().getArtifactId(),
@@ -164,10 +163,10 @@ public class AdditionalPluginDependenciesResolver {
             + pluginCoordinates)));
   }
 
-  private boolean areSameArtifact(BundleDescriptor dependency, Artifact artifact) {
-    return StringUtils.equals(dependency.getArtifactId(), artifact.getArtifactCoordinates().getArtifactId())
-        && StringUtils.equals(dependency.getGroupId(), artifact.getArtifactCoordinates().getGroupId())
-        && StringUtils.equals(dependency.getVersion(), artifact.getArtifactCoordinates().getVersion());
+  private boolean areSameArtifact(BundleDescriptor dependency, BundleDependency artifact) {
+    return StringUtils.equals(dependency.getArtifactId(), artifact.getDescriptor().getArtifactId())
+        && StringUtils.equals(dependency.getGroupId(), artifact.getDescriptor().getGroupId())
+        && StringUtils.equals(dependency.getVersion(), artifact.getDescriptor().getVersion());
   }
 
   private void addPluginDependenciesAdditionalLibraries(List<BundleDependency> applicationDependencies) {

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.VersionUtils.getMajor;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -17,7 +16,6 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,14 +28,14 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Resolves the dependencies of a deployable as {@link Artifact artifacts}.
+ * Resolves the dependencies of a deployable as {@link BundleDependency artifacts}.
  *
  * @since 4.5
  */
 public class DeployablePluginsDependenciesResolver {
 
-  public final Map<ArtifactCoordinates, List<Artifact>> resolve(List<BundleDependency> deployableDependencies) {
-    Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies = new HashMap<>();
+  public final Map<ArtifactCoordinates, List<BundleDependency>> resolve(List<BundleDependency> deployableDependencies) {
+    Map<ArtifactCoordinates, List<BundleDependency>> pluginsDependencies = new HashMap<>();
 
     List<BundleDependency> dependencies = deployableDependencies.stream()
         .filter(dep -> dep.getDescriptor().getClassifier().isPresent())
@@ -50,7 +48,7 @@ public class DeployablePluginsDependenciesResolver {
       List<BundleDependency> dependencyDependencies =
           resolveConflicts(dependencyListEntry.getValue(), dependencies);
       pluginsDependencies.put(dependencyListEntry.getKey().getDescriptor(),
-                              updatePackagesResources(toArtifacts(dependencyDependencies)));
+                              updatePackagesResources(dependencyDependencies));
     }
 
     return pluginsDependencies;

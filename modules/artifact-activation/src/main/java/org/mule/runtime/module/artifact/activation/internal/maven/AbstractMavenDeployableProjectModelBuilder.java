@@ -53,7 +53,6 @@ import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractD
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.net.URI;
@@ -86,7 +85,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   protected final File projectFolder;
   protected List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableMavenBundleDependencies;
   protected List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
-  protected Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
+  protected Map<ArtifactCoordinates, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsArtifactDependencies;
   protected Set<BundleDescriptor> sharedDeployableBundleDescriptors;
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
@@ -307,11 +306,10 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     deployableMavenBundleDependencies = resolveSystemScopeDependencies(mavenClient, deployableMavenBundleDependencies);
 
     // Get the dependencies as Artifacts, accounting for the shared libraries configuration
-    List<Artifact> deployableArtifactDependencies =
+    List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableArtifactDependencies =
         updatePackagesResources(toApplicationModelArtifacts(deployableMavenBundleDependencies));
-    List<Artifact> deployableArtifactSharedDependencies =
-        findArtifactsSharedDependencies(deployableMavenBundleDependencies,
-                                        deployableArtifactDependencies,
+    List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableArtifactSharedDependencies =
+        findArtifactsSharedDependencies(deployableArtifactDependencies,
                                         parser.getSharedLibraries()
                                             .stream()
                                             .map(sharedLibrary -> sharedLibrary.getGroupId() + ":"
@@ -329,8 +327,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     sharedDeployableBundleDescriptors =
         deployableBundleDependencies.stream()
             .filter(bd -> deployableArtifactSharedDependencies.stream()
-                .anyMatch(artifact -> bd.getDescriptor().getGroupId().equals(artifact.getArtifactCoordinates().getGroupId())
-                    && bd.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId())))
+                .anyMatch(artifact -> bd.getDescriptor().getGroupId().equals(artifact.getDescriptor().getGroupId())
+                    && bd.getDescriptor().getArtifactId().equals(artifact.getDescriptor().getArtifactId())))
             .map(org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getDescriptor)
             .collect(toSet());
   }
@@ -437,7 +435,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   }
 
   private void resolveAdditionalPluginDependencies(MavenClient mavenClient, MavenPomParser parser,
-                                                   Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
+                                                   Map<ArtifactCoordinates, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsDependencies) {
     // Parse additional plugin dependencies
     Map<org.mule.maven.pom.parser.api.model.ArtifactCoordinates, AdditionalPluginDependencies> initialAdditionalPluginDependencies =
         parser.getPomAdditionalPluginDependenciesForArtifacts();
@@ -492,7 +490,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
             .get(),
                        entry -> {
                          // Get the dependencies as Artifacts, accounting for the shared libraries configuration
-                         List<Artifact> deployableArtifactDependencies =
+                         List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableArtifactDependencies =
                              updatePackagesResources(toApplicationModelArtifacts(entry.getValue()));
 
                          // Prepare bundle dependencies as expected by the project model
@@ -503,22 +501,22 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
                        }));
   }
 
-  private Function<Artifact, org.mule.runtime.module.artifact.api.descriptor.BundleDependency> createBundleDependencyFromPackagerDependency(Function<URI, URI> uriResolver) {
+  private Function<org.mule.runtime.module.artifact.api.descriptor.BundleDependency, org.mule.runtime.module.artifact.api.descriptor.BundleDependency> createBundleDependencyFromPackagerDependency(Function<URI, URI> uriResolver) {
     return d -> {
-      URI bundle = d.getUri();
-      if (!d.getUri().isAbsolute()) {
-        bundle = uriResolver.apply(d.getUri());
+      URI bundle = d.getBundleUri();
+      if (!d.getBundleUri().isAbsolute()) {
+        bundle = uriResolver.apply(d.getBundleUri());
       }
 
       return new org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder()
           .setDescriptor(
                          new BundleDescriptor.Builder()
-                             .setGroupId(d.getArtifactCoordinates().getGroupId())
-                             .setArtifactId(d.getArtifactCoordinates().getArtifactId())
-                             .setClassifier(d.getArtifactCoordinates().getClassifier())
-                             .setType(d.getArtifactCoordinates().getType())
-                             .setVersion(d.getArtifactCoordinates().getVersion())
-                             .setBaseVersion(d.getArtifactCoordinates().getVersion())
+                             .setGroupId(d.getDescriptor().getGroupId())
+                             .setArtifactId(d.getDescriptor().getArtifactId())
+                             .setClassifier(d.getDescriptor().getClassifier().orElse(null))
+                             .setType(d.getDescriptor().getType())
+                             .setVersion(d.getDescriptor().getVersion())
+                             .setBaseVersion(d.getDescriptor().getVersion())
                              .build())
           .setBundleUri(bundle)
           .setPackages(d.getPackages() == null ? emptySet() : newHashSet(d.getPackages()))
