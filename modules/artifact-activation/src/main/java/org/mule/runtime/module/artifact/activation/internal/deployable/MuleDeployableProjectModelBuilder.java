@@ -257,6 +257,7 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
 
   private Set<BundleDescriptor> getSharedLibraries(AppClassLoaderModel packagerClassLoaderModel,
                                                    Map<ArtifactCoordinates, BundleDescriptor> bundleDescriptors) {
+    // TODO check if this is needed
     if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_110)) {
       return discoverProvider().createMavenPomParserClient(projectFolder.toPath(), getActiveProfiles())
           .getSharedLibraries().stream().map(shareLibrary -> {

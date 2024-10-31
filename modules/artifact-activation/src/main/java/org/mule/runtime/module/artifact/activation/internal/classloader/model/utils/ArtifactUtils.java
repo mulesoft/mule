@@ -14,7 +14,6 @@ import static java.util.stream.Stream.concat;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
@@ -114,24 +113,24 @@ public class ArtifactUtils {
     return artifact;
   }
 
-  public static List<Artifact> findArtifactsSharedDependencies(List<BundleDependency> appDependencies, List<Artifact> artifacts,
-                                                               MavenPomParser parser, List<String> activeProfiles) {
-    return parser.getSharedLibraries()
+  public static List<Artifact> findArtifactsSharedDependencies(List<BundleDependency> appDependencies,
+                                                               List<Artifact> artifacts,
+                                                               List<String> sharedLibrariesCoordinates,
+                                                               List<String> activeProfiles) {
+    return sharedLibrariesCoordinates
         .stream()
-        .flatMap(shareLibrary -> findAndExportSharedLibraries(shareLibrary.getGroupId(),
-                                                              shareLibrary.getArtifactId(),
+        .flatMap(shareLibrary -> findAndExportSharedLibraries(shareLibrary,
                                                               artifacts,
                                                               appDependencies))
         .collect(toList());
   }
 
-  private static Stream<Artifact> findAndExportSharedLibraries(String sharedLibraryGroupId,
-                                                               String sharedLibraryArtifactId,
+  private static Stream<Artifact> findAndExportSharedLibraries(String sharedLibraryCoordinates,
                                                                List<Artifact> artifacts,
                                                                List<BundleDependency> deployableDependencies) {
     return deployableDependencies.stream()
-        .filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId().equals(sharedLibraryGroupId) &&
-            bundleDependency.getDescriptor().getArtifactId().equals(sharedLibraryArtifactId))
+        .filter(bundleDependency -> sharedLibraryCoordinates
+            .equals(bundleDependency.getDescriptor().getGroupId() + ":" + bundleDependency.getDescriptor().getArtifactId()))
         .flatMap(sharedBundleDependency -> filterTransitiveSharedDependencies(artifacts, sharedBundleDependency));
   }
 
@@ -162,10 +161,10 @@ public class ArtifactUtils {
     }
   }
 
-  public static ArtifactCoordinates getDeployableArtifactCoordinates(MavenPomParser parser, ApplicationGAVModel appGAVModel) {
+  public static ArtifactCoordinates getDeployableArtifactCoordinates(String packaging, ApplicationGAVModel appGAVModel) {
     ArtifactCoordinates deployableCoordinates = toArtifactCoordinates(getPomProjectBundleDescriptor(appGAVModel));
     deployableCoordinates.setType(PACKAGE_TYPE);
-    deployableCoordinates.setClassifier(parser.getModel().getPackaging());
+    deployableCoordinates.setClassifier(packaging);
     return deployableCoordinates;
   }
 

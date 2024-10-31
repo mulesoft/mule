@@ -288,7 +288,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     ApplicationGAVModel deployableGAVModel =
         new ApplicationGAVModel(getGroupId(parser), getArtifactId(parser),
                                 getVersion(parser));
-    return getDeployableArtifactCoordinates(parser, deployableGAVModel);
+    return getDeployableArtifactCoordinates(parser.getModel().getPackaging(), deployableGAVModel);
   }
 
   /**
@@ -316,7 +316,12 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     List<Artifact> deployableArtifactSharedDependencies =
         findArtifactsSharedDependencies(deployableMavenBundleDependencies,
                                         deployableArtifactDependencies,
-                                        parser, activeProfiles);
+                                        parser.getSharedLibraries()
+                                            .stream()
+                                            .map(sharedLibrary -> sharedLibrary.getGroupId() + ":"
+                                                + sharedLibrary.getArtifactId())
+                                            .collect(toList()),
+                                        activeProfiles);
 
     // Prepare bundle dependencies as expected by the project model
     deployableBundleDependencies =
