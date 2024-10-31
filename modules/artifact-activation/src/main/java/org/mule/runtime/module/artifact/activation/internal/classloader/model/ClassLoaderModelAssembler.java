@@ -31,12 +31,12 @@ public class ClassLoaderModelAssembler {
   private final List<String> availablePackages;
   private final List<String> availableResources;
 
-  public ClassLoaderModelAssembler(ArtifactCoordinates artifactCoordinates,
+  public ClassLoaderModelAssembler(BundleDescriptor artifactDescriptor,
                                    List<BundleDependency> projectDependencies,
                                    Set<BundleDescriptor> sharedProjectDependencies,
                                    List<String> availablePackages,
                                    List<String> availableResources) {
-    this.artifactCoordinates = requireNonNull(artifactCoordinates);
+    this.artifactCoordinates = toArtifactCoordinates(requireNonNull(artifactDescriptor));
     this.projectDependencies = requireNonNull(projectDependencies);
     this.sharedProjectDependencies = requireNonNull(sharedProjectDependencies);
     this.availablePackages = requireNonNull(availablePackages);
@@ -55,6 +55,16 @@ public class ClassLoaderModelAssembler {
     classLoaderModel.setDependencies(toArtifacts(projectDependencies));
     classLoaderModel.setPackages(availablePackages.toArray(new String[0]));
     classLoaderModel.setResources(availableResources.toArray(new String[0]));
+  }
+
+  /**
+   * Converts a {@link List<BundleDependency>} to a {@link List<Artifact>}.
+   *
+   * @param dependencies the bundle dependency list to be converted.
+   * @return the corresponding artifact list.
+   */
+  protected List<Artifact> toArtifacts(List<BundleDependency> dependencies) {
+    return dependencies.stream().map(this::toArtifact).collect(toList());
   }
 
   /**
@@ -78,25 +88,17 @@ public class ClassLoaderModelAssembler {
   }
 
   /**
-   * Converts a {@link List<BundleDependency>} to a {@link List<Artifact>}.
-   *
-   * @param dependencies the bundle dependency list to be converted.
-   * @return the corresponding artifact list.
-   */
-  protected List<Artifact> toArtifacts(List<BundleDependency> dependencies) {
-    return dependencies.stream().map(this::toArtifact).collect(toList());
-  }
-
-  /**
    * Convert a {@link BundleDescriptor} instance to {@link ArtifactCoordinates}.
    *
    * @param bundleDescriptor the bundle descriptor to be converted.
    * @return the corresponding artifact coordinates.
    */
   private ArtifactCoordinates toArtifactCoordinates(BundleDescriptor bundleDescriptor) {
-    return new ArtifactCoordinates(bundleDescriptor.getGroupId(), bundleDescriptor.getArtifactId(),
+    return new ArtifactCoordinates(bundleDescriptor.getGroupId(),
+                                   bundleDescriptor.getArtifactId(),
                                    bundleDescriptor.getBaseVersion(),
-                                   bundleDescriptor.getType(), bundleDescriptor.getClassifier().orElse(null));
+                                   bundleDescriptor.getType(),
+                                   bundleDescriptor.getClassifier().orElse(null));
   }
 
   protected ArtifactCoordinates getArtifactCoordinates() {

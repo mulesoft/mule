@@ -23,7 +23,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -52,11 +51,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
                                                  MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
                                                  List<BundleDependency> bundleDependencies,
                                                  DeployableArtifactDescriptor ownerDescriptor) {
-    super(new ClassLoaderModelAssembler(new ArtifactCoordinates(bundleDependency.getDescriptor().getGroupId(),
-                                                                bundleDependency.getDescriptor().getArtifactId(),
-                                                                bundleDependency.getDescriptor().getVersion(),
-                                                                bundleDependency.getDescriptor().getType(),
-                                                                bundleDependency.getDescriptor().getClassifier().orElse(null)),
+    super(new ClassLoaderModelAssembler(bundleDependency.getDescriptor(),
                                         bundleDependencies,
                                         sharedProjectDependencies, attributeToList(bundleDependency.getPackages()),
                                         attributeToList(bundleDependency.getResources()))
@@ -92,7 +87,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     // in the Runtime (AbstractMavenClassLoaderConfigurationLoader in versions <= 4.4), it's done for deployables (applications
     // and
     // domains) as well
-    pluginPatchesResolver.resolve(getPackagerClassLoaderModel().getArtifactCoordinates())
+    pluginPatchesResolver.resolve(bundleDependency.getDescriptor())
         .forEach(classLoaderConfigurationBuilder::containing);
 
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
