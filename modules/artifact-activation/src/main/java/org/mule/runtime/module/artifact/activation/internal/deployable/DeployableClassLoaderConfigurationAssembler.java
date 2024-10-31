@@ -30,8 +30,8 @@ public class DeployableClassLoaderConfigurationAssembler extends AbstractArtifac
 
   public DeployableClassLoaderConfigurationAssembler(DeployableProjectModel deployableProjectModel,
                                                      MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    super(new DeployableClassLoaderModelAssembler(deployableProjectModel)
-        .createClassLoaderModel(), muleArtifactLoaderDescriptor);
+    super(deployableProjectModel.getDescriptor(),
+          muleArtifactLoaderDescriptor);
     this.deployableProjectModel = deployableProjectModel;
   }
 

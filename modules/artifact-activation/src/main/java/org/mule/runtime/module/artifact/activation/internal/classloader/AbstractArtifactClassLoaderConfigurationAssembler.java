@@ -27,6 +27,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployableClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 
@@ -51,12 +52,12 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
   private static final String MULE_RUNTIME_GROUP_ID = "org.mule.runtime";
   private static final String MULE_RUNTIME_MODULES_GROUP_ID = "com.mulesoft.mule.runtime.modules";
 
-  private final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
+  private final BundleDescriptor artifactDescriptor;
   private final MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor;
 
-  public AbstractArtifactClassLoaderConfigurationAssembler(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
+  public AbstractArtifactClassLoaderConfigurationAssembler(BundleDescriptor artifactDescriptor,
                                                            MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
-    this.packagerClassLoaderModel = packagerClassLoaderModel;
+    this.artifactDescriptor = artifactDescriptor;
     this.muleArtifactLoaderDescriptor = muleArtifactLoaderDescriptor;
   }
 
@@ -152,8 +153,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
         .filter(dependency -> dependency.getBundleUri() != null)
         .filter(dependency -> !validateMuleRuntimeSharedLibrary(dependency.getDescriptor().getGroupId(),
                                                                 dependency.getDescriptor().getArtifactId(),
-                                                                packagerClassLoaderModel.getArtifactCoordinates()
-                                                                    .getArtifactId()))
+                                                                artifactDescriptor.getArtifactId()))
         .forEach(dependency -> {
           final URL dependencyArtifactUrl;
           try {
@@ -191,10 +191,6 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
   }
 
   protected abstract void populateLocalPackages(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder);
-
-  protected org.mule.tools.api.classloader.model.ClassLoaderModel getPackagerClassLoaderModel() {
-    return packagerClassLoaderModel;
-  }
 
   protected abstract List<BundleDependency> getBundleDependencies();
 

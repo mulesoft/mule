@@ -17,16 +17,12 @@ import static com.google.common.collect.Sets.newHashSet;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
-import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map.Entry;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * {@link ClassLoaderConfigurationBuilder ClassLoaderConfigurationBuilder} that adds the concept of Shared Library for the
@@ -35,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfigurationBuilder {
 
   private final DeployableProjectModel deployableProjectModel;
+  // TODO remove this?
   private final File artifactFolder;
 
   public DeployableClassLoaderConfigurationBuilder(DeployableProjectModel deployableProjectModel,
@@ -58,8 +55,7 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfig
   }
 
   /**
-   * Exports shared libraries resources and packages getting the information from the packager
-   * {@link org.mule.tools.api.classloader.model.ClassLoaderModel}.
+   * Exports shared libraries resources and packages getting the information from the {@link DeployableProjectModel}.
    */
   private void exportSharedLibrariesResourcesAndPackages() {
     deployableProjectModel.getDependencies()
@@ -97,36 +93,6 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfig
   private void replaceBundleDependency(BundleDependency original, BundleDependency modified) {
     this.dependencies.remove(original);
     this.dependencies.add(modified);
-  }
-
-  private boolean areSameDependency(org.mule.tools.api.classloader.model.Plugin plugin, BundleDependency dependency) {
-    return StringUtils.equals(dependency.getDescriptor().getGroupId(), plugin.getGroupId())
-        && StringUtils.equals(dependency.getDescriptor().getArtifactId(), plugin.getArtifactId());
-  }
-
-  private BundleDependency toBundleDependency(Artifact artifact) {
-    BundleDependency.Builder builder = new BundleDependency.Builder();
-    if (artifact.getArtifactCoordinates().getScope() != null) {
-      builder.setScope(BundleScope.valueOf(artifact.getArtifactCoordinates().getScope().toUpperCase()));
-    }
-
-    BundleDependency.Builder bundleDependencyBuilder = builder
-        .setBundleUri(artifact.getUri().isAbsolute()
-            ? artifact.getUri()
-            : new File(artifactFolder, artifact.getUri().toString()).toURI())
-        .setDescriptor(new BundleDescriptor.Builder()
-            .setArtifactId(artifact.getArtifactCoordinates().getArtifactId())
-            .setGroupId(artifact.getArtifactCoordinates().getGroupId())
-            .setVersion(artifact.getArtifactCoordinates().getVersion())
-            .setClassifier(artifact.getArtifactCoordinates().getClassifier())
-            .setType(artifact.getArtifactCoordinates().getType())
-            .build());
-
-    bundleDependencyBuilder
-        .setPackages(artifact.getPackages() == null ? emptySet() : newHashSet(artifact.getPackages()));
-    bundleDependencyBuilder
-        .setResources(artifact.getResources() == null ? emptySet() : newHashSet(artifact.getResources()));
-    return bundleDependencyBuilder.build();
   }
 
 }

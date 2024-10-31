@@ -12,7 +12,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
@@ -20,7 +19,6 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
-import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
@@ -55,13 +53,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
                                                  MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
                                                  List<BundleDependency> bundleDependencies,
                                                  DeployableArtifactDescriptor ownerDescriptor) {
-    super(new ClassLoaderModelAssembler(bundleDependency.getDescriptor(),
-                                        bundleDependencies,
-                                        sharedProjectDependencies,
-                                        attributeToList(bundleDependency.getPackages()),
-                                        attributeToList(bundleDependency.getResources()))
-                                            .createClassLoaderModel(),
-          muleArtifactLoaderDescriptor);
+    super(bundleDependency.getDescriptor(), muleArtifactLoaderDescriptor);
     this.artifactLocation = artifactLocation;
     this.bundleDependencies = bundleDependencies;
     this.bundleDependency = bundleDependency;
@@ -80,10 +72,6 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     } else {
       pluginPatchesResolver = resolverRegistered.iterator().next();
     }
-  }
-
-  private static List<String> attributeToList(Set<String> attribute) {
-    return attribute != null ? new ArrayList<>(attribute) : emptyList();
   }
 
   @Override
