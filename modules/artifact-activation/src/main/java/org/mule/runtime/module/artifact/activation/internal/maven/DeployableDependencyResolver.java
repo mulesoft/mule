@@ -11,8 +11,9 @@ import static java.util.stream.Collectors.toList;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
-import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.BundleScope;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
 import java.util.List;
@@ -43,7 +44,27 @@ public class DeployableDependencyResolver {
         .stream()
         .filter(d -> !(d.getScope() == BundleScope.PROVIDED)
             || d.getDescriptor().getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false))
+        .map(this::from)
         .collect(toList());
+  }
+
+  private BundleDependency from(org.mule.maven.pom.parser.api.model.BundleDependency d) {
+    return BundleDependency.builder()
+        .setDescriptor(BundleDescriptor.builder()
+            .setArtifactId(d.getDescriptor().getArtifactId())
+            .setGroupId(d.getDescriptor().getGroupId())
+            .setClassifier(d.getDescriptor().getClassifier().orElse(null))
+            .setType(d.getDescriptor().getType())
+            .setVersion(d.getDescriptor().getVersion())
+            .setBaseVersion(d.getDescriptor().getVersion())
+            .build())
+        .setBundleUri(d.getBundleUri())
+        .setTransitiveDependencies(d.getTransitiveDependencies()
+            .stream()
+            .map(this::from)
+            .collect(toList()))
+        .setScope(org.mule.runtime.module.artifact.api.descriptor.BundleScope.valueOf(d.getScope().name()))
+        .build();
   }
 
 }

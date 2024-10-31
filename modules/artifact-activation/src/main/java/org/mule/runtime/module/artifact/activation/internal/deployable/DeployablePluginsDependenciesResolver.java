@@ -15,8 +15,8 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 
 import static java.util.stream.Collectors.toList;
 
-import org.mule.maven.pom.parser.api.model.BundleDependency;
-import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
@@ -77,7 +77,7 @@ public class DeployablePluginsDependenciesResolver {
 
   private List<BundleDependency> collectTransitiveDependencies(BundleDependency rootDependency) {
     List<BundleDependency> allTransitiveDependencies = new LinkedList<>();
-    for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependencies()) {
+    for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependenciesList()) {
       allTransitiveDependencies.add(transitiveDependency);
       if (transitiveDependency.getDescriptor().getClassifier().map(c -> !MULE_PLUGIN_CLASSIFIER.equals(c)).orElse(true)) {
         allTransitiveDependencies.addAll(collectTransitiveDependencies(transitiveDependency));

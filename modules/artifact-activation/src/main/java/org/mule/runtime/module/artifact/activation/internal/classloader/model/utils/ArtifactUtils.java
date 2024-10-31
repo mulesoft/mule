@@ -15,8 +15,8 @@ import static java.util.stream.Stream.concat;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.maven.pom.parser.api.MavenPomParser;
-import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
@@ -51,8 +51,27 @@ public class ArtifactUtils {
                                    bundleDescriptor.getType(), bundleDescriptor.getClassifier().orElse(null));
   }
 
+  public static ArtifactCoordinates toArtifactCoordinates(org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor bundleDescriptor) {
+    return new ArtifactCoordinates(bundleDescriptor.getGroupId(),
+                                   bundleDescriptor.getArtifactId(),
+                                   bundleDescriptor.getBaseVersion(),
+                                   bundleDescriptor.getType(),
+                                   bundleDescriptor.getClassifier().orElse(null));
+  }
+
   /**
-   * Convert a {@link BundleDependency} instance to {@link Artifact}.
+   * Convert a {@link org.mule.maven.pom.parser.api.model.BundleDependency} instance to {@link Artifact}.
+   *
+   * @param bundleDependency the bundle dependency to be converted.
+   * @return the corresponding artifact with normalized version.
+   */
+  public static Artifact toArtifact(org.mule.maven.pom.parser.api.model.BundleDependency bundleDependency) {
+    ArtifactCoordinates artifactCoordinates = toArtifactCoordinates(bundleDependency.getDescriptor());
+    return new Artifact(artifactCoordinates, bundleDependency.getBundleUri());
+  }
+
+  /**
+   * Convert a {@link org.mule.maven.pom.parser.api.model.BundleDependency} instance to {@link Artifact}.
    *
    * @param bundleDependency the bundle dependency to be converted.
    * @return the corresponding artifact with normalized version.
@@ -121,7 +140,7 @@ public class ArtifactUtils {
     return concat(filterSharedArtifacts(sharedBundleDependency.getDescriptor().getGroupId(),
                                         sharedBundleDependency.getDescriptor().getArtifactId(),
                                         artifacts),
-                  sharedBundleDependency.getTransitiveDependencies()
+                  sharedBundleDependency.getTransitiveDependenciesList()
                       .stream()
                       .flatMap(transitiveDependency -> filterTransitiveSharedDependencies(artifacts, transitiveDependency)));
   }
