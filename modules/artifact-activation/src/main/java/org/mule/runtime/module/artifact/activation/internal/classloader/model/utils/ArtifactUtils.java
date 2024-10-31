@@ -10,12 +10,13 @@ import static org.mule.runtime.module.artifact.activation.internal.classloader.C
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_PLUGIN;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
-import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
@@ -24,6 +25,7 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -93,35 +95,44 @@ public class ArtifactUtils {
     return artifact;
   }
 
-  public static List<Artifact> updateArtifactsSharedState(List<BundleDependency> appDependencies, List<Artifact> artifacts,
-                                                          MavenPomParser parser, List<String> activeProfiles) {
-    parser.getSharedLibraries()
-        .forEach(shareLibrary -> findAndExportSharedLibrary(shareLibrary.getGroupId(),
-                                                            shareLibrary.getArtifactId(), artifacts, appDependencies));
-    return artifacts;
+  public static List<Artifact> findArtifactsSharedDependencies(List<BundleDependency> appDependencies, List<Artifact> artifacts,
+                                                               MavenPomParser parser, List<String> activeProfiles) {
+    return parser.getSharedLibraries()
+        .stream()
+        .flatMap(shareLibrary -> findAndExportSharedLibraries(shareLibrary.getGroupId(),
+                                                              shareLibrary.getArtifactId(),
+                                                              artifacts,
+                                                              appDependencies))
+        .collect(toList());
   }
 
-  private static void findAndExportSharedLibrary(String sharedLibraryGroupId, String sharedLibraryArtifactId,
-                                                 List<Artifact> artifacts, List<BundleDependency> deployableDependencies) {
-    deployableDependencies.stream()
+  private static Stream<Artifact> findAndExportSharedLibraries(String sharedLibraryGroupId,
+                                                               String sharedLibraryArtifactId,
+                                                               List<Artifact> artifacts,
+                                                               List<BundleDependency> deployableDependencies) {
+    return deployableDependencies.stream()
         .filter(bundleDependency -> bundleDependency.getDescriptor().getGroupId().equals(sharedLibraryGroupId) &&
             bundleDependency.getDescriptor().getArtifactId().equals(sharedLibraryArtifactId))
-        .forEach(bundleDependency -> setArtifactTransitiveDependenciesAsShared(artifacts, bundleDependency));
-
+        .flatMap(sharedBundleDependency -> filterTransitiveSharedDependencies(artifacts, sharedBundleDependency));
   }
 
-  private static void setArtifactTransitiveDependenciesAsShared(List<Artifact> artifacts, BundleDependency bundleDependency) {
-    setArtifactAsShared(bundleDependency.getDescriptor().getGroupId(), bundleDependency.getDescriptor().getArtifactId(),
-                        artifacts);
-    bundleDependency.getTransitiveDependencies()
+  private static Stream<Artifact> filterTransitiveSharedDependencies(List<Artifact> artifacts,
+                                                                     BundleDependency sharedBundleDependency) {
+    return concat(filterSharedArtifacts(sharedBundleDependency.getDescriptor().getGroupId(),
+                                        sharedBundleDependency.getDescriptor().getArtifactId(),
+                                        artifacts),
+                  sharedBundleDependency.getTransitiveDependencies()
+                      .stream()
+                      .flatMap(transitiveDependency -> filterTransitiveSharedDependencies(artifacts, transitiveDependency)));
+  }
+
+  private static Stream<Artifact> filterSharedArtifacts(String sharedLibraryGroupId,
+                                                        String sharedLibraryArtifactId,
+                                                        List<Artifact> artifacts) {
+    return artifacts
         .stream()
-        .forEach(transitiveDependency -> setArtifactTransitiveDependenciesAsShared(artifacts, transitiveDependency));
-  }
-
-  private static void setArtifactAsShared(String sharedLibraryGroupId, String sharedLibraryArtifactId, List<Artifact> artifacts) {
-    artifacts.stream().filter(artifact -> artifact.getArtifactCoordinates().getGroupId().equals(sharedLibraryGroupId) &&
-        artifact.getArtifactCoordinates().getArtifactId().equals(sharedLibraryArtifactId))
-        .forEach(artifact -> artifact.setShared(true));
+        .filter(artifact -> artifact.getArtifactCoordinates().getGroupId().equals(sharedLibraryGroupId) &&
+            artifact.getArtifactCoordinates().getArtifactId().equals(sharedLibraryArtifactId));
   }
 
   public static void updateScopeIfDomain(Artifact artifact) {

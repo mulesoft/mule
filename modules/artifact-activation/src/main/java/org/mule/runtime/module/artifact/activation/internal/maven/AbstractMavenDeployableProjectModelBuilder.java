@@ -12,9 +12,9 @@ import static org.mule.maven.pom.parser.api.model.BundleScope.SYSTEM;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
+import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.findArtifactsSharedDependencies;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
 import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.getPomPropertiesFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
@@ -80,7 +80,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   private static final MavenPomParserProvider POM_PARSER_PROVIDER = MavenPomParserProvider.discoverProvider();
 
   protected static final Supplier<MavenConfiguration> DEFAULT_MAVEN_CONFIGURATION =
-      new LazyValue<>(() -> getDefaultMavenConfiguration());
+      new LazyValue<>(AbstractMavenDeployableProjectModelBuilder::getDefaultMavenConfiguration);
 
   protected final MavenConfiguration mavenConfiguration;
   protected final File projectFolder;
@@ -312,9 +312,11 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     // Get the dependencies as Artifacts, accounting for the shared libraries configuration
     List<Artifact> deployableArtifactDependencies =
-        updateArtifactsSharedState(deployableMavenBundleDependencies,
-                                   updatePackagesResources(toApplicationModelArtifacts(deployableMavenBundleDependencies)),
-                                   parser, activeProfiles);
+        updatePackagesResources(toApplicationModelArtifacts(deployableMavenBundleDependencies));
+    List<Artifact> deployableArtifactSharedDependencies =
+        findArtifactsSharedDependencies(deployableMavenBundleDependencies,
+                                        deployableArtifactDependencies,
+                                        parser, activeProfiles);
 
     // Prepare bundle dependencies as expected by the project model
     deployableBundleDependencies =
@@ -325,9 +327,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     sharedDeployableBundleDescriptors =
         deployableBundleDependencies.stream()
-            .filter(bd -> deployableArtifactDependencies.stream()
-                .anyMatch(artifact -> artifact.isShared()
-                    && bd.getDescriptor().getGroupId().equals(artifact.getArtifactCoordinates().getGroupId())
+            .filter(bd -> deployableArtifactSharedDependencies.stream()
+                .anyMatch(artifact -> bd.getDescriptor().getGroupId().equals(artifact.getArtifactCoordinates().getGroupId())
                     && bd.getDescriptor().getArtifactId().equals(artifact.getArtifactCoordinates().getArtifactId())))
             .map(org.mule.runtime.module.artifact.api.descriptor.BundleDependency::getDescriptor)
             .collect(toSet());
