@@ -22,14 +22,9 @@ import java.util.List;
  * Constructs a default set of JAR Urls located under Mule home folder.
  */
 public class DefaultMuleClassPathConfig {
-
-  private static final String JAVA_8_VERSION = "1.8";
-  private static final String JAVA_RUNNING_VERSION = "java.specification.version";
-
   protected static final String MULE_DIR = "/lib/mule";
   protected static final String USER_DIR = "/lib/user";
   protected static final String OPT_DIR = "/lib/opt";
-  protected static final String OPT_JDK8_DIR = "/lib/opt/jdk-8";
 
   protected List<URL> muleUrls = new ArrayList<>();
   protected List<URL> optUrls = new ArrayList<>();
@@ -52,11 +47,6 @@ public class DefaultMuleClassPathConfig {
 
     // Add resources paths. This is needed when using jdk 17 which uses module layers instead of classpath with urls.
     addFile(resourceUrls, new File(muleHome, USER_DIR));
-
-    // Do not use commons-lang3 to avoid having to add that jar to lib/boot
-    if (getProperty(JAVA_RUNNING_VERSION).startsWith(JAVA_8_VERSION)) {
-      addLibraryDirectory(optUrls, muleHome, OPT_JDK8_DIR);
-    }
   }
 
   protected void addMuleBaseUserLibs(File muleHome, File muleBase) {
