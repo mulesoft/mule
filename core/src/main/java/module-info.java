@@ -616,6 +616,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.value to
       spring.core;
+  opens org.mule.runtime.core.internal.util.store to
+      kryo.shaded;
 
   uses org.mule.runtime.core.privileged.transaction.TransactionFactory;
   uses org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
