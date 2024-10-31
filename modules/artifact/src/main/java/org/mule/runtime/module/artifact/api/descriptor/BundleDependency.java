@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static com.google.common.base.Preconditions.checkState;
-import static java.lang.String.format;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
+
+import static java.lang.String.format;
+
+import static com.google.common.base.Preconditions.checkState;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -22,6 +24,22 @@ import java.util.Set;
  * @since 4.0
  */
 public final class BundleDependency {
+
+  /**
+   * @return a fresh {@link Builder} for creating a {@link BundleDependency}
+   * @since 4.9
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * @return a fresh {@link Builder} for creating a {@link BundleDependency}
+   * @since 4.9
+   */
+  public static Builder builder(BundleDependency template) {
+    return new Builder(template);
+  }
 
   private BundleDescriptor descriptor;
   private BundleScope scope;

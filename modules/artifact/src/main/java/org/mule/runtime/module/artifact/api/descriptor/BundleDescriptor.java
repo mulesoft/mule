@@ -26,6 +26,14 @@ public final class BundleDescriptor implements ArtifactCoordinates {
 
   public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
 
+  /**
+   * @return a fresh {@link Builder} for creating a {@link BundleDescriptor}
+   * @since 4.9
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
   private static final String STRINGARTIFACT_FILENAME_SEPARATOR = "-";
   private String groupId;
   private String artifactId;
@@ -62,6 +70,7 @@ public final class BundleDescriptor implements ArtifactCoordinates {
     return type;
   }
 
+  @Override
   public Optional<String> getClassifier() {
     return classifier;
   }
