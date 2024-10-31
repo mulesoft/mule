@@ -14,7 +14,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
@@ -39,8 +38,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.ImmutableSet;
 
 import org.slf4j.Logger;
 
@@ -85,7 +82,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     dependenciesArtifactsUrls.forEach(classLoaderConfigurationBuilder::containing);
 
     if (shouldPopulateLocalPackages()) {
-      populateLocalPackages(packagerClassLoaderModel, classLoaderConfigurationBuilder);
+      populateLocalPackages(classLoaderConfigurationBuilder);
     }
 
     classLoaderConfigurationBuilder.dependingOn(new HashSet<>(bundleDependencies));
@@ -180,7 +177,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     }
   }
 
-  private boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId, String artifactFileName) {
+  protected boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId, String artifactFileName) {
     if (MULE_RUNTIME_GROUP_ID.equals(groupId)
         || MULE_RUNTIME_MODULES_GROUP_ID.equals(groupId)) {
       LOGGER.warn("Shared library '{}:{}' is a Mule Runtime dependency."
@@ -193,38 +190,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
     }
   }
 
-  protected void populateLocalPackages(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
-                                       ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
-    ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
-    if (packagerClassLoaderModel.getPackages() != null) {
-      packagesSetBuilder.add(packagerClassLoaderModel.getPackages());
-    }
-
-    ImmutableSet.Builder<String> resourcesSetBuilder = ImmutableSet.builder();
-    if (packagerClassLoaderModel.getResources() != null) {
-      resourcesSetBuilder.add(packagerClassLoaderModel.getResources());
-    }
-
-    packagerClassLoaderModel.getDependencies().forEach(artifact -> {
-      if (!MULE_PLUGIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
-          && !MULE_DOMAIN_CLASSIFIER.equals(artifact.getArtifactCoordinates().getClassifier())
-          && !validateMuleRuntimeSharedLibrary(artifact.getArtifactCoordinates().getGroupId(),
-                                               artifact.getArtifactCoordinates().getArtifactId(),
-                                               packagerClassLoaderModel.getArtifactCoordinates()
-                                                   .getArtifactId())
-          && artifact.getUri() != null) {
-        if (artifact.getPackages() != null) {
-          packagesSetBuilder.add(artifact.getPackages());
-        }
-        if (artifact.getResources() != null) {
-          resourcesSetBuilder.add(artifact.getResources());
-        }
-      }
-    });
-
-    classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder.build());
-    classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder.build());
-  }
+  protected abstract void populateLocalPackages(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder);
 
   protected org.mule.tools.api.classloader.model.ClassLoaderModel getPackagerClassLoaderModel() {
     return packagerClassLoaderModel;

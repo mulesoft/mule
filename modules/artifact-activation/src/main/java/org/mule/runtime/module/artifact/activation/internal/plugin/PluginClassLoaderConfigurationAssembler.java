@@ -8,6 +8,8 @@ package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -34,6 +36,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Assembles the class loader configuration for a plugin.
  */
@@ -53,7 +57,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
                                                  DeployableArtifactDescriptor ownerDescriptor) {
     super(new ClassLoaderModelAssembler(bundleDependency.getDescriptor(),
                                         bundleDependencies,
-                                        sharedProjectDependencies, attributeToList(bundleDependency.getPackages()),
+                                        sharedProjectDependencies,
+                                        attributeToList(bundleDependency.getPackages()),
                                         attributeToList(bundleDependency.getResources()))
                                             .createClassLoaderModel(),
           muleArtifactLoaderDescriptor);
@@ -131,6 +136,38 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
       }
       return additionalDependency.getBundleUri();
     }).collect(toList());
+  }
+
+  @Override
+  protected void populateLocalPackages(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
+    ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
+    if (bundleDependency.getPackages() != null) {
+      packagesSetBuilder.addAll(bundleDependency.getPackages());
+    }
+
+    ImmutableSet.Builder<String> resourcesSetBuilder = ImmutableSet.builder();
+    if (bundleDependency.getResources() != null) {
+      resourcesSetBuilder.addAll(bundleDependency.getResources());
+    }
+
+    bundleDependencies.forEach(dependency -> {
+      if (!dependency.getDescriptor().getClassifier().map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false)
+          && !dependency.getDescriptor().getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false)
+          && !validateMuleRuntimeSharedLibrary(dependency.getDescriptor().getGroupId(),
+                                               dependency.getDescriptor().getArtifactId(),
+                                               bundleDependency.getDescriptor().getArtifactId())
+          && dependency.getBundleUri() != null) {
+        if (dependency.getPackages() != null) {
+          packagesSetBuilder.addAll(dependency.getPackages());
+        }
+        if (dependency.getResources() != null) {
+          resourcesSetBuilder.addAll(dependency.getResources());
+        }
+      }
+    });
+
+    classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder.build());
+    classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder.build());
   }
 
   @Override

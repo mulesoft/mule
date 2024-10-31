@@ -6,21 +6,27 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
+
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 
 import java.io.File;
 import java.util.List;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Assembles the class loader configuration for a deployable artifact.
  */
 public class DeployableClassLoaderConfigurationAssembler extends AbstractArtifactClassLoaderConfigurationAssembler {
 
-  DeployableProjectModel deployableProjectModel;
+  private final DeployableProjectModel deployableProjectModel;
 
   public DeployableClassLoaderConfigurationAssembler(DeployableProjectModel deployableProjectModel,
                                                      MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor) {
@@ -41,7 +47,38 @@ public class DeployableClassLoaderConfigurationAssembler extends AbstractArtifac
 
   @Override
   protected ClassLoaderConfiguration.ClassLoaderConfigurationBuilder getClassLoaderConfigurationBuilder() {
-    return new DeployableClassLoaderConfigurationBuilder(getPackagerClassLoaderModel(), getProjectFolder());
+    return new DeployableClassLoaderConfigurationBuilder(deployableProjectModel, getProjectFolder());
   }
 
+  @Override
+  protected void populateLocalPackages(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
+    ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
+    if (deployableProjectModel.getPackages() != null) {
+      packagesSetBuilder.addAll(deployableProjectModel.getPackages());
+    }
+
+    ImmutableSet.Builder<String> resourcesSetBuilder = ImmutableSet.builder();
+    if (deployableProjectModel.getResources() != null) {
+      resourcesSetBuilder.addAll(deployableProjectModel.getResources());
+    }
+
+    deployableProjectModel.getDependencies().forEach(dependency -> {
+      if (!dependency.getDescriptor().getClassifier().map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false)
+          && !dependency.getDescriptor().getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false)
+          && !validateMuleRuntimeSharedLibrary(dependency.getDescriptor().getGroupId(),
+                                               dependency.getDescriptor().getArtifactId(),
+                                               deployableProjectModel.getDescriptor().getArtifactId())
+          && dependency.getBundleUri() != null) {
+        if (dependency.getPackages() != null) {
+          packagesSetBuilder.addAll(dependency.getPackages());
+        }
+        if (dependency.getResources() != null) {
+          resourcesSetBuilder.addAll(dependency.getResources());
+        }
+      }
+    });
+
+    classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder.build());
+    classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder.build());
+  }
 }

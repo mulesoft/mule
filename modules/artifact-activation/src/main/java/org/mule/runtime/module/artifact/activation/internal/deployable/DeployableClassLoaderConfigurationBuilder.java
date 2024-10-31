@@ -6,21 +6,25 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
+
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
-import org.mule.tools.api.classloader.model.AppClassLoaderModel;
 import org.mule.tools.api.classloader.model.Artifact;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,16 +34,18 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfigurationBuilder {
 
-  private final org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel;
+  private final DeployableProjectModel deployableProjectModel;
   private final File artifactFolder;
 
-  public DeployableClassLoaderConfigurationBuilder(org.mule.tools.api.classloader.model.ClassLoaderModel packagerClassLoaderModel,
+  public DeployableClassLoaderConfigurationBuilder(DeployableProjectModel deployableProjectModel,
                                                    File artifactFolder) {
-    if (!(packagerClassLoaderModel instanceof AppClassLoaderModel)) {
-      throw new IllegalArgumentException("Class loader model must be an 'AppClassLoaderModel' for deployables.");
+    if (!(deployableProjectModel.getDescriptor().getClassifier()
+        .map(c -> MULE_APPLICATION_CLASSIFIER.equals(c) || MULE_DOMAIN_CLASSIFIER.equals(c)).orElse(false))) {
+      throw new IllegalArgumentException("Model must be for a '" + MULE_APPLICATION_CLASSIFIER + "' or '" + MULE_DOMAIN_CLASSIFIER
+          + "' for deployables.");
     }
 
-    this.packagerClassLoaderModel = packagerClassLoaderModel;
+    this.deployableProjectModel = deployableProjectModel;
     this.artifactFolder = artifactFolder;
   }
 
@@ -56,8 +62,9 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfig
    * {@link org.mule.tools.api.classloader.model.ClassLoaderModel}.
    */
   private void exportSharedLibrariesResourcesAndPackages() {
-    packagerClassLoaderModel.getDependencies().stream()
-        .filter(Artifact::isShared)
+    deployableProjectModel.getDependencies()
+        .stream()
+        .filter(dep -> deployableProjectModel.getSharedLibraries().contains(dep.getDescriptor()))
         // No need to validate the shared dependency here, as it has already been done by now
         .forEach(sharedDep -> {
           this.exportingPackages(sharedDep.getPackages() == null ? emptySet() : newHashSet(sharedDep.getPackages()));
@@ -67,23 +74,18 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfig
   }
 
   private void processAdditionalPluginLibraries() {
-    AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
-    appClassLoaderModel.getAdditionalPluginDependencies()
-        .ifPresent(additionalDeps -> additionalDeps.forEach(this::updateDependency));
+    deployableProjectModel.getAdditionalPluginDependencies().entrySet()
+        .forEach(this::updateDependency);
   }
 
-  private void updateDependency(org.mule.tools.api.classloader.model.Plugin plugin) {
+  private void updateDependency(Entry<BundleDescriptor, List<BundleDependency>> plugin) {
     dependencies.stream()
-        .filter(dep -> areSameDependency(plugin, dep))
+        .filter(pluginDependency -> plugin.getKey().equals(pluginDependency.getDescriptor()))
         .findFirst()
-        .ifPresent(
-                   pluginDependency -> replaceBundleDependency(
-                                                               pluginDependency,
-                                                               createExtendedBundleDependency(
-                                                                                              pluginDependency,
-                                                                                              plugin.getAdditionalDependencies()
+        .ifPresent(pluginDependency -> replaceBundleDependency(pluginDependency,
+                                                               createExtendedBundleDependency(pluginDependency,
+                                                                                              plugin.getValue()
                                                                                                   .stream()
-                                                                                                  .map(this::toBundleDependency)
                                                                                                   .collect(toList()))));
   }
 
