@@ -52,7 +52,6 @@ import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractD
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.tools.api.classloader.model.ApplicationGAVModel;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
@@ -285,10 +284,10 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
    * @return the {@link ArtifactCoordinates} of the deployable project.
    */
   private ArtifactCoordinates getDeployableProjectArtifactCoordinates(MavenPomParser parser) {
-    ApplicationGAVModel deployableGAVModel =
-        new ApplicationGAVModel(getGroupId(parser), getArtifactId(parser),
-                                getVersion(parser));
-    return getDeployableArtifactCoordinates(parser.getModel().getPackaging(), deployableGAVModel);
+    return getDeployableArtifactCoordinates(getGroupId(parser),
+                                            getArtifactId(parser),
+                                            getVersion(parser),
+                                            parser.getModel().getPackaging());
   }
 
   /**

@@ -18,7 +18,6 @@ import org.mule.maven.pom.parser.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
-import org.mule.tools.api.classloader.model.ApplicationGAVModel;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
@@ -161,24 +160,26 @@ public class ArtifactUtils {
     }
   }
 
-  public static ArtifactCoordinates getDeployableArtifactCoordinates(String packaging, ApplicationGAVModel appGAVModel) {
-    ArtifactCoordinates deployableCoordinates = toArtifactCoordinates(getPomProjectBundleDescriptor(appGAVModel));
+  public static ArtifactCoordinates getDeployableArtifactCoordinates(String groupId, String artifactId, String version,
+                                                                     String packaging) {
+    ArtifactCoordinates deployableCoordinates =
+        toArtifactCoordinates(getPomProjectBundleDescriptor(groupId, artifactId, version));
     deployableCoordinates.setType(PACKAGE_TYPE);
     deployableCoordinates.setClassifier(packaging);
     return deployableCoordinates;
   }
 
-  public static BundleDescriptor getPomProjectBundleDescriptor(ApplicationGAVModel appGAVModel) {
-    return getBundleDescriptor(appGAVModel);
+  private static BundleDescriptor getPomProjectBundleDescriptor(String groupId, String artifactId, String version) {
+    return getBundleDescriptor(groupId, artifactId, version);
   }
 
 
-  public static BundleDescriptor getBundleDescriptor(ApplicationGAVModel appGAVModel) {
+  private static BundleDescriptor getBundleDescriptor(String groupId, String artifactId, String version) {
     return new BundleDescriptor.Builder()
-        .setGroupId(appGAVModel.getGroupId())
-        .setArtifactId(appGAVModel.getArtifactId())
-        .setVersion(appGAVModel.getVersion())
-        .setBaseVersion(appGAVModel.getVersion())
+        .setGroupId(groupId)
+        .setArtifactId(artifactId)
+        .setVersion(version)
+        .setBaseVersion(version)
         .setType(POM_TYPE)
         .build();
   }
