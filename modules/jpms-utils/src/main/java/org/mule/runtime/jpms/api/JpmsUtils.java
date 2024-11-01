@@ -178,9 +178,9 @@ public final class JpmsUtils {
           } else {
             // Original intention is to only expose standard java modules...
             return moduleName.startsWith("java.")
-            // ... however, the DB and SOAP Engine connectors, along with DataWeave, rely on an outdated version of Caffeine (2.x)
-            // which introduces a dependency on sun.misc.unsafe, requiring jdk.* modules to be accessible.
-              || moduleName.startsWith("jdk.");
+                // ... however, the DB and SOAP Engine connectors, along with DataWeave, rely on an outdated version
+                // of Caffeine (2.x) which introduces a dependency on sun.misc.unsafe, requiring jdk.* modules to be accessible.
+                || moduleName.startsWith("jdk.");
           }
         })
         .forEach(module -> packages.addAll(module.getPackages()));
