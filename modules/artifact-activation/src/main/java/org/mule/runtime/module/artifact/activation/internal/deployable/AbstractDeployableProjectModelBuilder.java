@@ -23,9 +23,6 @@ public abstract class AbstractDeployableProjectModelBuilder implements Deployabl
   public static final String CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR_LOCATION =
       "META-INF/mule-artifact/" + CLASSLOADER_MODEL_JSON_PATCH_DESCRIPTOR;
 
-  public static final String CLASS_LOADER_MODEL_VERSION_120 = "1.2.0";
-  public static final String CLASS_LOADER_MODEL_VERSION_110 = "1.1.0";
-
   /**
    * Determines if the given project corresponds to a heavyweight package or a lightweight one.
    *
