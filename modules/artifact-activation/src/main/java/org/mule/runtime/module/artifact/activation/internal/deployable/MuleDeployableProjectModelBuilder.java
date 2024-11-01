@@ -29,7 +29,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -51,6 +50,7 @@ import org.mule.tools.api.classloader.model.ClassLoaderModel;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -319,8 +319,8 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
                              .setBaseVersion(d.getArtifactCoordinates().getVersion())
                              .build())
           .setBundleUri(bundle)
-          .setPackages(d.getPackages() == null ? emptySet() : newHashSet(d.getPackages()))
-          .setResources(d.getResources() == null ? emptySet() : newHashSet(d.getResources()))
+          .setPackages(d.getPackages() == null ? emptySet() : new HashSet<>(asList(d.getPackages())))
+          .setResources(d.getResources() == null ? emptySet() : new HashSet<>(asList(d.getResources())))
           .build();
     };
   }

@@ -30,11 +30,10 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Assembles the class loader configuration for a plugin.
@@ -128,12 +127,12 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
 
   @Override
   protected void populateLocalPackages(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
-    ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
+    Set<String> packagesSetBuilder = new HashSet<>();
     if (bundleDependency.getPackages() != null) {
       packagesSetBuilder.addAll(bundleDependency.getPackages());
     }
 
-    ImmutableSet.Builder<String> resourcesSetBuilder = ImmutableSet.builder();
+    Set<String> resourcesSetBuilder = new HashSet<>();
     if (bundleDependency.getResources() != null) {
       resourcesSetBuilder.addAll(bundleDependency.getResources());
     }
@@ -154,8 +153,8 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
       }
     });
 
-    classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder.build());
-    classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder.build());
+    classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder);
+    classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder);
   }
 
   @Override

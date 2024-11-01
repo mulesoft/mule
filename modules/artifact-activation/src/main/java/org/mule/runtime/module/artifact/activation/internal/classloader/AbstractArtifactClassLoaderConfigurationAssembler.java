@@ -19,7 +19,6 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -66,8 +65,8 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
 
     if (muleArtifactLoaderDescriptor != null) {
       classLoaderConfigurationBuilder
-          .exportingPackages(newHashSet(getAttribute(muleArtifactLoaderDescriptor.getAttributes(), EXPORTED_PACKAGES)))
-          .exportingResources(newHashSet(getAttribute(muleArtifactLoaderDescriptor.getAttributes(), EXPORTED_RESOURCES)))
+          .exportingPackages(new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(), EXPORTED_PACKAGES)))
+          .exportingResources(new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(), EXPORTED_RESOURCES)))
           .exportingPrivilegedPackages(new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(),
                                                                   PRIVILEGED_EXPORTED_PACKAGES)),
                                        new HashSet<>(getAttribute(muleArtifactLoaderDescriptor.getAttributes(),

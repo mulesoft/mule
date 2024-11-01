@@ -17,9 +17,9 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
-
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 
 /**
  * Assembles the class loader configuration for a deployable artifact.
@@ -52,12 +52,12 @@ public class DeployableClassLoaderConfigurationAssembler extends AbstractArtifac
 
   @Override
   protected void populateLocalPackages(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
-    ImmutableSet.Builder<String> packagesSetBuilder = ImmutableSet.builder();
+    Set<String> packagesSetBuilder = new HashSet<>();
     if (deployableProjectModel.getPackages() != null) {
       packagesSetBuilder.addAll(deployableProjectModel.getPackages());
     }
 
-    ImmutableSet.Builder<String> resourcesSetBuilder = ImmutableSet.builder();
+    Set<String> resourcesSetBuilder = new HashSet<>();
     if (deployableProjectModel.getResources() != null) {
       resourcesSetBuilder.addAll(deployableProjectModel.getResources());
     }
@@ -78,7 +78,7 @@ public class DeployableClassLoaderConfigurationAssembler extends AbstractArtifac
       }
     });
 
-    classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder.build());
-    classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder.build());
+    classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder);
+    classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder);
   }
 }

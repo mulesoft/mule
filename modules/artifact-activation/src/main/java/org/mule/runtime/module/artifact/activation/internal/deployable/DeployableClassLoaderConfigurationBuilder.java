@@ -12,8 +12,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.M
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
-import static com.google.common.collect.Sets.newHashSet;
-
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -21,6 +19,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -63,9 +62,10 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfig
         .filter(dep -> deployableProjectModel.getSharedLibraries().contains(dep.getDescriptor()))
         // No need to validate the shared dependency here, as it has already been done by now
         .forEach(sharedDep -> {
-          this.exportingPackages(sharedDep.getPackages() == null ? emptySet() : newHashSet(sharedDep.getPackages()));
+          this.exportingPackages(sharedDep.getPackages() == null ? emptySet()
+              : new HashSet<>(sharedDep.getPackages()));
           this.exportingResources(sharedDep.getResources() == null ? emptySet()
-              : newHashSet(sharedDep.getResources()));
+              : new HashSet<>(sharedDep.getResources()));
         });
   }
 

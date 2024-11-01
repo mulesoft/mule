@@ -33,8 +33,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
-import static com.google.common.collect.Sets.newHashSet;
-
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.MavenReactorResolver;
@@ -519,8 +517,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
                              .setBaseVersion(d.getDescriptor().getVersion())
                              .build())
           .setBundleUri(bundle)
-          .setPackages(d.getPackages() == null ? emptySet() : newHashSet(d.getPackages()))
-          .setResources(d.getResources() == null ? emptySet() : newHashSet(d.getResources()))
+          .setPackages(d.getPackages() == null ? emptySet() : new HashSet<>(d.getPackages()))
+          .setResources(d.getResources() == null ? emptySet() : new HashSet<>(d.getResources()))
           .setTransitiveDependencies(deployableBundleDependencies)
           .build();
     };
