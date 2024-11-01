@@ -34,7 +34,7 @@ module org.mule.runtime.artifact.activation {
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires org.jgrapht.core;
-  requires semver4j;
+  requires org.semver4j;
 
   requires transitive java.xml;
 

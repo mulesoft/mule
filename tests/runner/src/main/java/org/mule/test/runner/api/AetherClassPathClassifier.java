@@ -32,7 +32,7 @@ import static java.util.stream.Collectors.toList;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
@@ -76,8 +76,8 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import com.vdurmont.semver4j.Semver;
-import com.vdurmont.semver4j.SemverException;
+import org.semver4j.Semver;
+import org.semver4j.SemverException;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;

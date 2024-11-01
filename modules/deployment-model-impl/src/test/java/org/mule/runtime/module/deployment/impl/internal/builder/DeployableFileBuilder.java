@@ -19,7 +19,7 @@ import static org.mule.tck.ZipUtils.compress;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.serializeToFile;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import com.vdurmont.semver4j.Semver;
+import org.semver4j.Semver;
 
 public abstract class DeployableFileBuilder<T extends DeployableFileBuilder<T>> extends AbstractArtifactFileBuilder<T> {
 
