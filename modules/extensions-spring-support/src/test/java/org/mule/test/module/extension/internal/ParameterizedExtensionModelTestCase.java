@@ -24,7 +24,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
-import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -47,7 +46,6 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
   protected static Map<String, ExtensionModel> EXTENSION_MODELS = new HashMap<>();
 
   protected static final ExtensionModelLoader JAVA_LOADER = new DefaultJavaExtensionModelLoader();
-  protected static final ExtensionModelLoader SOAP_LOADER = new SoapExtensionModelLoader();
 
   @Parameterized.Parameter
   public ExtensionModel extensionUnderTest;
