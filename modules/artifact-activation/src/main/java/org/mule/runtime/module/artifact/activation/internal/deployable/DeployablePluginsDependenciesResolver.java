@@ -13,7 +13,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 
 import static java.util.stream.Collectors.toList;
 
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
@@ -34,8 +33,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class DeployablePluginsDependenciesResolver {
 
-  public final Map<ArtifactCoordinates, List<BundleDependency>> resolve(List<BundleDependency> deployableDependencies) {
-    Map<ArtifactCoordinates, List<BundleDependency>> pluginsDependencies = new HashMap<>();
+  public final Map<BundleDescriptor, List<BundleDependency>> resolve(List<BundleDependency> deployableDependencies) {
+    Map<BundleDescriptor, List<BundleDependency>> pluginsDependencies = new HashMap<>();
 
     List<BundleDependency> dependencies = deployableDependencies.stream()
         .filter(dep -> dep.getDescriptor().getClassifier().isPresent())

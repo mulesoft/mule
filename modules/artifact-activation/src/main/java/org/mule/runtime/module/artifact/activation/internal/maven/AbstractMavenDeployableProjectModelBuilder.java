@@ -15,7 +15,9 @@ import static org.mule.runtime.module.artifact.activation.internal.classloader.m
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
+import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.artifactToMaven;
 import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.getPomPropertiesFolder;
+import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.mavenToArtifact;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM;
@@ -83,7 +85,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   protected final File projectFolder;
   protected List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableMavenBundleDependencies;
   protected List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
-  protected Map<ArtifactCoordinates, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsArtifactDependencies;
+  protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsArtifactDependencies;
   protected Set<BundleDescriptor> sharedDeployableBundleDescriptors;
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
@@ -355,20 +357,13 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
             try (MuleSystemPluginMavenReactorResolver reactor =
                 new MuleSystemPluginMavenReactorResolver(new File(bundleDependency.getBundleUri()), mavenClient)) {
               final BundleDependency mvnBundleDependency = mavenClient
-                  .resolveArtifactDependencies(singletonList(new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder()
-                      .setGroupId(bundleDependency.getDescriptor().getGroupId())
-                      .setArtifactId(bundleDependency.getDescriptor().getArtifactId())
-                      .setClassifier(bundleDependency.getDescriptor().getClassifier().orElse(null))
-                      .setType(bundleDependency.getDescriptor().getType())
-                      .setVersion(bundleDependency.getDescriptor().getVersion())
-                      .setBaseVersion(bundleDependency.getDescriptor().getVersion())
-                      .build()),
+                  .resolveArtifactDependencies(singletonList(artifactToMaven(bundleDependency.getDescriptor())),
                                                of(deployableArtifactRepositoryFolder),
                                                of(reactor))
                   .get(0);
 
               org.mule.runtime.module.artifact.api.descriptor.BundleDependency systemScopeDependency =
-                  from(mvnBundleDependency);
+                  mavenToArtifact(mvnBundleDependency);
 
               systemScopeDependenciesTransitiveDependencies.addAll(collectTransitivePluginDependencies(systemScopeDependency));
 
@@ -382,25 +377,6 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     result.addAll(systemScopeDependenciesTransitiveDependencies);
 
     return getUniqueDependencies(result);
-  }
-
-  private org.mule.runtime.module.artifact.api.descriptor.BundleDependency from(org.mule.maven.pom.parser.api.model.BundleDependency d) {
-    return org.mule.runtime.module.artifact.api.descriptor.BundleDependency.builder()
-        .setDescriptor(BundleDescriptor.builder()
-            .setArtifactId(d.getDescriptor().getArtifactId())
-            .setGroupId(d.getDescriptor().getGroupId())
-            .setClassifier(d.getDescriptor().getClassifier().orElse(null))
-            .setType(d.getDescriptor().getType())
-            .setVersion(d.getDescriptor().getVersion())
-            .setBaseVersion(d.getDescriptor().getVersion())
-            .build())
-        .setBundleUri(d.getBundleUri())
-        .setTransitiveDependencies(d.getTransitiveDependencies()
-            .stream()
-            .map(this::from)
-            .collect(toList()))
-        .setScope(org.mule.runtime.module.artifact.api.descriptor.BundleScope.valueOf(d.getScope().name()))
-        .build();
   }
 
   private List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> getUniqueDependencies(List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> dependencies) {
@@ -433,7 +409,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   }
 
   private void resolveAdditionalPluginDependencies(MavenClient mavenClient, MavenPomParser parser,
-                                                   Map<ArtifactCoordinates, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsDependencies) {
+                                                   Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsDependencies) {
     // Parse additional plugin dependencies
     Map<org.mule.maven.pom.parser.api.model.ArtifactCoordinates, AdditionalPluginDependencies> initialAdditionalPluginDependencies =
         parser.getPomAdditionalPluginDependenciesForArtifacts();
@@ -471,7 +447,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     deployableBundleDependencies = deployableBundleDependencies
         .stream()
-        .map(dbd -> new org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder(dbd)
+        .map(dbd -> org.mule.runtime.module.artifact.api.descriptor.BundleDependency.builder(dbd)
             .setTransitiveDependencies(pluginsBundleDependencies.get(dbd.getDescriptor()))
             .build())
         .collect(toList());
@@ -506,16 +482,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         bundle = uriResolver.apply(d.getBundleUri());
       }
 
-      return new org.mule.runtime.module.artifact.api.descriptor.BundleDependency.Builder()
-          .setDescriptor(
-                         new BundleDescriptor.Builder()
-                             .setGroupId(d.getDescriptor().getGroupId())
-                             .setArtifactId(d.getDescriptor().getArtifactId())
-                             .setClassifier(d.getDescriptor().getClassifier().orElse(null))
-                             .setType(d.getDescriptor().getType())
-                             .setVersion(d.getDescriptor().getVersion())
-                             .setBaseVersion(d.getDescriptor().getVersion())
-                             .build())
+      return org.mule.runtime.module.artifact.api.descriptor.BundleDependency.builder()
+          .setDescriptor(d.getDescriptor())
           .setBundleUri(bundle)
           .setPackages(d.getPackages() == null ? emptySet() : new HashSet<>(d.getPackages()))
           .setResources(d.getResources() == null ? emptySet() : new HashSet<>(d.getResources()))

@@ -73,21 +73,14 @@ public class AdditionalPluginDependenciesResolver {
         .collect(toMap(apd -> apd.getGroupId() + ":" + apd.getArtifactId(),
                        apd -> apd.getAdditionalDependencies()
                            .stream()
-                           .map(ad -> BundleDescriptor.builder()
-                               .setGroupId(ad.getGroupId())
-                               .setArtifactId(ad.getArtifactId())
-                               .setClassifier(ad.getClassifier().orElse(null))
-                               .setType(ad.getType())
-                               .setVersion(ad.getVersion())
-                               .setBaseVersion(ad.getVersion())
-                               .build())
+                           .map(MavenUtilsForArtifact::mavenToArtifact)
                            .collect(toList())));
     this.temporaryFolder = temporaryFolder;
     this.pomModels = pomModels;
   }
 
   public Map<BundleDependency, List<BundleDependency>> resolveDependencies(List<BundleDependency> applicationDependencies,
-                                                                           Map<ArtifactCoordinates, List<BundleDependency>> pluginsDependencies) {
+                                                                           Map<BundleDescriptor, List<BundleDependency>> pluginsDependencies) {
     addPluginDependenciesAdditionalLibraries(applicationDependencies);
     Map<BundleDependency, List<BundleDependency>> pluginsWithAdditionalDeps = new LinkedHashMap<>();
 
@@ -104,18 +97,7 @@ public class AdditionalPluginDependenciesResolver {
             pluginsWithAdditionalDeps.put(pluginBundleDependency,
                                           additionalDependencies
                                               .stream()
-                                              .map(d -> org.mule.runtime.module.artifact.api.descriptor.BundleDependency.builder()
-                                                  .setDescriptor(new BundleDescriptor.Builder()
-                                                      .setArtifactId(d.getDescriptor().getArtifactId())
-                                                      .setGroupId(d.getDescriptor().getGroupId())
-                                                      .setClassifier(d.getDescriptor().getClassifier()
-                                                          .orElse(null))
-                                                      .setType(d.getDescriptor().getType())
-                                                      .setVersion(d.getDescriptor().getVersion())
-                                                      .setBaseVersion(d.getDescriptor().getVersion())
-                                                      .build())
-                                                  .setBundleUri(d.getBundleUri())
-                                                  .build())
+                                              .map(MavenUtilsForArtifact::mavenToArtifact)
                                               .collect(toList()));
           }
         });
@@ -126,14 +108,7 @@ public class AdditionalPluginDependenciesResolver {
   private List<org.mule.maven.pom.parser.api.model.BundleDependency> resolveDependencies(List<BundleDescriptor> additionalDependencies) {
     return mavenClient.resolveArtifactDependencies(additionalDependencies
         .stream()
-        .map(d -> new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder()
-            .setGroupId(d.getGroupId())
-            .setArtifactId(d.getArtifactId())
-            .setClassifier(d.getClassifier().orElse(null))
-            .setType(d.getType())
-            .setVersion(d.getVersion())
-            .setBaseVersion(d.getVersion())
-            .build())
+        .map(MavenUtilsForArtifact::artifactToMaven)
         .collect(toList()),
                                                    of(mavenClient.getMavenConfiguration()
                                                        .getLocalMavenRepositoryLocation()),
@@ -152,7 +127,7 @@ public class AdditionalPluginDependenciesResolver {
   }
 
   private List<BundleDependency> getPluginDependencies(String pluginCoordinates,
-                                                       Map<ArtifactCoordinates, List<BundleDependency>> pluginsDependencies) {
+                                                       Map<BundleDescriptor, List<BundleDependency>> pluginsDependencies) {
     return pluginsDependencies.entrySet().stream()
         .filter(pluginDependenciesEntry -> StringUtils
             .equals(pluginDependenciesEntry.getKey().getGroupId() + ":" + pluginDependenciesEntry.getKey().getArtifactId(),
@@ -184,14 +159,7 @@ public class AdditionalPluginDependenciesResolver {
         .collect(toMap(apd -> apd.getGroupId() + ":" + apd.getArtifactId(),
                        apd -> apd.getAdditionalDependencies()
                            .stream()
-                           .map(ad -> BundleDescriptor.builder()
-                               .setGroupId(ad.getGroupId())
-                               .setArtifactId(ad.getArtifactId())
-                               .setClassifier(ad.getClassifier().orElse(null))
-                               .setType(ad.getType())
-                               .setVersion(ad.getVersion())
-                               .setBaseVersion(ad.getVersion())
-                               .build())
+                           .map(MavenUtilsForArtifact::mavenToArtifact)
                            .collect(toList()))));
   }
 

@@ -82,7 +82,9 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfig
 
   private BundleDependency createExtendedBundleDependency(BundleDependency original,
                                                           List<BundleDependency> additionalPluginDependencies) {
-    return new BundleDependency.Builder(original).setAdditionalDependencies(additionalPluginDependencies).build();
+    return BundleDependency.builder(original)
+        .setAdditionalDependencies(additionalPluginDependencies)
+        .build();
   }
 
   private void replaceBundleDependency(BundleDependency original, BundleDependency modified) {

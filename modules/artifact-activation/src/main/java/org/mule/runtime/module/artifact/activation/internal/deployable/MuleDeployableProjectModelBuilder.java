@@ -13,7 +13,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescrip
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.tools.api.classloader.AppClassLoaderModelJsonSerializer.deserialize;
 
@@ -35,9 +34,6 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarExplorer;
-import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer;
 import org.mule.tools.api.classloader.model.AppClassLoaderModel;
 import org.mule.tools.api.classloader.model.Artifact;
@@ -155,9 +151,11 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
           .orElse(createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver()).apply(artifact));
     }).collect(toList());
 
-    dependencies = dependencies.stream().map(d -> new BundleDependency.Builder(d)
-        .setTransitiveDependencies(getTransitiveDependencies(d))
-        .build()).collect(toList());
+    dependencies = dependencies.stream()
+        .map(d -> BundleDependency.builder(d)
+            .setTransitiveDependencies(getTransitiveDependencies(d))
+            .build())
+        .collect(toList());
 
     return dependencies;
   }
@@ -188,57 +186,6 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
     }
 
     return emptyList();
-  }
-
-  private BundleDependency discoverPackagesAndResources(BundleDependency dependency) {
-    JarExplorer jarExplorer = new FileJarExplorer();
-
-    if (MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null))) {
-      return discoverPluginPackagesAndResources(dependency, jarExplorer);
-    }
-
-    return addLocalPackagesAndResourcesToDependency(dependency, jarExplorer);
-  }
-
-  private List<BundleDependency> discoverPackagesAndResources(List<BundleDependency> dependencies) {
-    return dependencies.stream().map(this::discoverPackagesAndResources).collect(toList());
-  }
-
-  private BundleDependency discoverPluginPackagesAndResources(BundleDependency dependency, JarExplorer jarExplorer) {
-    if (!MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null))) {
-      throw new IllegalArgumentException("Expected dependency to be a Mule plugin");
-    }
-
-    List<BundleDependency> updatedTransitiveDependenciesList = dependency.getTransitiveDependenciesList()
-        .stream().map(transitiveDependency -> addLocalPackagesAndResourcesToDependency(transitiveDependency, jarExplorer))
-        .collect(toList());
-
-    JarInfo exploredJar = jarExplorer.explore(dependency.getBundleUri());
-
-    return new BundleDependency.Builder(dependency).setTransitiveDependencies(updatedTransitiveDependenciesList)
-        .setPackages(exploredJar.getPackages()).setResources(exploredJar.getResources()).build();
-  }
-
-  private BundleDependency addLocalPackagesAndResourcesToDependency(BundleDependency dependency, JarExplorer jarExplorer) {
-    if (MULE_PLUGIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null))
-        || MULE_DOMAIN_CLASSIFIER.equals(dependency.getDescriptor().getClassifier().orElse(null))
-        || validateMuleRuntimeSharedLibrary(dependency.getDescriptor().getGroupId(),
-                                            dependency.getDescriptor().getArtifactId())
-        || dependency.getBundleUri() == null) {
-      return dependency;
-    }
-
-    try {
-      final JarInfo exploredJar = jarExplorer.explore(dependency.getBundleUri());
-      return new BundleDependency.Builder(dependency).setPackages(exploredJar.getPackages())
-          .setResources(exploredJar.getResources()).build();
-    } catch (IllegalArgumentException e) {
-      // Workaround for MMP-499
-      LOGGER.warn("File for dependency artifact not found: '{}'. Skipped localPackages scanning for that artifact.",
-                  dependency.getBundleUri());
-    }
-
-    return dependency;
   }
 
   private Set<BundleDescriptor> getSharedLibraries(AppClassLoaderModel packagerClassLoaderModel,
@@ -274,15 +221,15 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
         bundle = uriResolver.apply(d.getUri());
       }
 
-      return new BundleDependency.Builder()
-          .setDescriptor(
-                         new BundleDescriptor.Builder().setArtifactId(d.getArtifactCoordinates().getArtifactId())
-                             .setGroupId(d.getArtifactCoordinates().getGroupId())
-                             .setClassifier(d.getArtifactCoordinates().getClassifier())
-                             .setType(d.getArtifactCoordinates().getType())
-                             .setVersion(d.getArtifactCoordinates().getVersion())
-                             .setBaseVersion(d.getArtifactCoordinates().getVersion())
-                             .build())
+      return BundleDependency.builder()
+          .setDescriptor(BundleDescriptor.builder()
+              .setArtifactId(d.getArtifactCoordinates().getArtifactId())
+              .setGroupId(d.getArtifactCoordinates().getGroupId())
+              .setClassifier(d.getArtifactCoordinates().getClassifier())
+              .setType(d.getArtifactCoordinates().getType())
+              .setVersion(d.getArtifactCoordinates().getVersion())
+              .setBaseVersion(d.getArtifactCoordinates().getVersion())
+              .build())
           .setBundleUri(bundle)
           .setPackages(d.getPackages() == null ? emptySet() : new HashSet<>(asList(d.getPackages())))
           .setResources(d.getResources() == null ? emptySet() : new HashSet<>(asList(d.getResources())))
