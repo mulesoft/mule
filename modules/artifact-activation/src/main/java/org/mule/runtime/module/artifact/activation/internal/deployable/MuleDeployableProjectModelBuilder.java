@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
 import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.MULE_APPLICATION_CLASSIFIER;
@@ -29,7 +27,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
@@ -53,13 +50,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.vdurmont.semver4j.Semver;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -145,10 +139,6 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
         createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
             .apply(additionalPluginArtifact);
 
-    if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_120)) {
-      additionalPluginDependency = discoverPackagesAndResources(additionalPluginDependency);
-    }
-
     return additionalPluginDependency;
   }
 
@@ -168,10 +158,6 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
     dependencies = dependencies.stream().map(d -> new BundleDependency.Builder(d)
         .setTransitiveDependencies(getTransitiveDependencies(d))
         .build()).collect(toList());
-
-    if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_120)) {
-      dependencies = discoverPackagesAndResources(dependencies);
-    }
 
     return dependencies;
   }
@@ -257,25 +243,8 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
 
   private Set<BundleDescriptor> getSharedLibraries(AppClassLoaderModel packagerClassLoaderModel,
                                                    Map<ArtifactCoordinates, BundleDescriptor> bundleDescriptors) {
-    // TODO check if this is needed
-    if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_110)) {
-      return discoverProvider().createMavenPomParserClient(projectFolder.toPath(), getActiveProfiles())
-          .getSharedLibraries().stream().map(shareLibrary -> {
-            if (!validateMuleRuntimeSharedLibrary(shareLibrary.getGroupId(), shareLibrary.getArtifactId())) {
-              return bundleDescriptors.values().stream()
-                  .filter(bundleDescriptor -> bundleDescriptor.getGroupId().equals(shareLibrary.getGroupId())
-                      && bundleDescriptor.getArtifactId().equals(shareLibrary.getArtifactId()))
-                  .findAny()
-                  .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Shared library '%s:%s' is not among the available dependencies",
-                                                                                  shareLibrary.getGroupId(),
-                                                                                  shareLibrary.getArtifactId())));
-            }
-            return null;
-          }).filter(Objects::nonNull).collect(toSet());
-    } else {
-      return packagerClassLoaderModel.getDependencies().stream().filter(Artifact::isShared)
-          .map(artifact -> bundleDescriptors.get(artifact.getArtifactCoordinates())).collect(toSet());
-    }
+    return packagerClassLoaderModel.getDependencies().stream().filter(Artifact::isShared)
+        .map(artifact -> bundleDescriptors.get(artifact.getArtifactCoordinates())).collect(toSet());
   }
 
   protected final boolean validateMuleRuntimeSharedLibrary(String groupId, String artifactId) {
@@ -288,10 +257,6 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
     } else {
       return false;
     }
-  }
-
-  protected List<String> getActiveProfiles() {
-    return getMavenConfig().getActiveProfiles().orElse(emptyList());
   }
 
   private File getClassLoaderModelPatchDescriptor(File artifactFile) {

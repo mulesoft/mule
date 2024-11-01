@@ -18,7 +18,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -30,11 +29,8 @@ import java.util.Map.Entry;
 public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfigurationBuilder {
 
   private final DeployableProjectModel deployableProjectModel;
-  // TODO remove this?
-  private final File artifactFolder;
 
-  public DeployableClassLoaderConfigurationBuilder(DeployableProjectModel deployableProjectModel,
-                                                   File artifactFolder) {
+  public DeployableClassLoaderConfigurationBuilder(DeployableProjectModel deployableProjectModel) {
     if (!(deployableProjectModel.getDescriptor().getClassifier()
         .map(c -> MULE_APPLICATION_CLASSIFIER.equals(c) || MULE_DOMAIN_CLASSIFIER.equals(c)).orElse(false))) {
       throw new IllegalArgumentException("Model must be for a '" + MULE_APPLICATION_CLASSIFIER + "' or '" + MULE_DOMAIN_CLASSIFIER
@@ -42,7 +38,6 @@ public class DeployableClassLoaderConfigurationBuilder extends ClassLoaderConfig
     }
 
     this.deployableProjectModel = deployableProjectModel;
-    this.artifactFolder = artifactFolder;
   }
 
   @Override

@@ -47,7 +47,7 @@ public class DeployableClassLoaderConfigurationAssembler extends AbstractArtifac
 
   @Override
   protected ClassLoaderConfiguration.ClassLoaderConfigurationBuilder getClassLoaderConfigurationBuilder() {
-    return new DeployableClassLoaderConfigurationBuilder(deployableProjectModel, getProjectFolder());
+    return new DeployableClassLoaderConfigurationBuilder(deployableProjectModel);
   }
 
   @Override
