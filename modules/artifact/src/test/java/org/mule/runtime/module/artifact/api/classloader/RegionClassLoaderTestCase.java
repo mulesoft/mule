@@ -18,24 +18,27 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_CLASSLOADERS;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.enumeration;
 import static java.util.Collections.list;
 import static java.util.Collections.singleton;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.anyString;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.test.TestArtifactClassLoader;
@@ -54,12 +57,7 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.hamcrest.CoreMatchers;
 
@@ -108,9 +106,6 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
   protected TestApplicationClassLoader appClassLoader;
   protected TestArtifactClassLoader pluginClassLoader;
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   public RegionClassLoaderTestCase() throws MalformedURLException {
     PARENT_LOADED_RESOURCE = new URL("file:///parent.txt");
@@ -267,9 +262,10 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
     regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
 
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(createClassLoaderAlreadyInRegionError(appClassLoader.getArtifactId()));
-    regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
+    IllegalArgumentException thrown =
+        assertThrows(IllegalArgumentException.class,
+                     () -> regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER));
+    assertThat(thrown.getMessage(), containsString(createClassLoaderAlreadyInRegionError(appClassLoader.getArtifactId())));
   }
 
   @Test
@@ -281,10 +277,11 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     createClassLoaders(regionClassLoader);
 
     regionClassLoader.addClassLoader(appClassLoader, new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
-    expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(duplicatePackageMappingError(PACKAGE_NAME, appClassLoader, pluginClassLoader));
-    regionClassLoader.addClassLoader(pluginClassLoader,
-                                     new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
+    IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> regionClassLoader
+        .addClassLoader(pluginClassLoader,
+                        new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet())));
+    assertThat(thrown.getMessage(),
+               containsString(duplicatePackageMappingError(PACKAGE_NAME, appClassLoader, pluginClassLoader)));
   }
 
   @Test
@@ -295,9 +292,9 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(regionClassLoader);
 
-    expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(illegalPackageMappingError(PACKAGE_NAME, PARENT_FIRST));
-    regionClassLoader.addClassLoader(appClassLoader, new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet()));
+    IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> regionClassLoader
+        .addClassLoader(appClassLoader, new DefaultArtifactClassLoaderFilter(singleton(PACKAGE_NAME), emptySet())));
+    assertThat(thrown.getMessage(), containsString(illegalPackageMappingError(PACKAGE_NAME, PARENT_FIRST)));
   }
 
   @Test
@@ -335,9 +332,9 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     createClassLoaders(regionClassLoader);
     regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
 
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(REGION_OWNER_CANNOT_BE_REMOVED_ERROR);
-    regionClassLoader.removeClassLoader(appClassLoader);
+    IllegalArgumentException thrown =
+        assertThrows(IllegalArgumentException.class, () -> regionClassLoader.removeClassLoader(appClassLoader));
+    assertThat(thrown.getMessage(), containsString(REGION_OWNER_CANNOT_BE_REMOVED_ERROR));
   }
 
   @Test
@@ -351,9 +348,9 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     regionClassLoader.addClassLoader(appClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(pluginClassLoader, new DefaultArtifactClassLoaderFilter(singleton("org.foo"), emptySet()));
 
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(createCannotRemoveClassLoaderError(appClassLoader.getArtifactId()));
-    regionClassLoader.removeClassLoader(pluginClassLoader);
+    IllegalArgumentException thrown =
+        assertThrows(IllegalArgumentException.class, () -> regionClassLoader.removeClassLoader(pluginClassLoader));
+    assertThat(thrown.getMessage(), containsString(createCannotRemoveClassLoaderError(appClassLoader.getArtifactId())));
   }
 
   @Test
@@ -367,9 +364,9 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     regionClassLoader.addClassLoader(pluginClassLoader,
                                      new DefaultArtifactClassLoaderFilter(emptySet(), singleton("META-INF/pom.xml")));
 
-    expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(createCannotRemoveClassLoaderError(appClassLoader.getArtifactId()));
-    regionClassLoader.removeClassLoader(pluginClassLoader);
+    IllegalArgumentException thrown =
+        assertThrows(IllegalArgumentException.class, () -> regionClassLoader.removeClassLoader(pluginClassLoader));
+    assertThat(thrown.getMessage(), containsString(createCannotRemoveClassLoaderError(appClassLoader.getArtifactId())));
   }
 
   @Test
@@ -525,7 +522,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(regionClassLoader);
     ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
-        .dependingOn(newHashSet(new BundleDependency.Builder()
+        .dependingOn(singleton(new BundleDependency.Builder()
             .setBundleUri(API_LOCATION.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
                 .setGroupId(GROUP_ID)
@@ -556,7 +553,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(regionClassLoader);
     ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
-        .dependingOn(newHashSet(new BundleDependency.Builder()
+        .dependingOn(singleton(new BundleDependency.Builder()
             .setBundleUri(API_LOCATION.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
                 .setGroupId(GROUP_ID)
@@ -590,26 +587,26 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   @Test
   public void findExportedPackageClasses() throws Exception {
     findExportedPackageClasses("com/mycompany", "com.mycompany",
-                               ImmutableList.of("com/mycompany/SomeClass.class", "com/mycompany/SomeOtherClass.class"),
-                               ImmutableList.of(new URL("http://com.mycompany/SomeClass.class"),
-                                                new URL("http://com.mycompany/SomeOtherClass.class")));
+                               asList("com/mycompany/SomeClass.class", "com/mycompany/SomeOtherClass.class"),
+                               asList(new URL("http://com.mycompany/SomeClass.class"),
+                                      new URL("http://com.mycompany/SomeOtherClass.class")));
   }
 
   @Test
   public void findExportedPackageClassesWithEndSlash() throws Exception {
     findExportedPackageClasses("com/mycompany/", "com.mycompany",
-                               ImmutableList.of("com/mycompany/SomeClass.class", "com/mycompany/SomeOtherClass.class"),
-                               ImmutableList.of(new URL("http://com.mycompany/SomeClass.class"),
-                                                new URL("http://com.mycompany/SomeOtherClass.class")));
+                               asList("com/mycompany/SomeClass.class", "com/mycompany/SomeOtherClass.class"),
+                               asList(new URL("http://com.mycompany/SomeClass.class"),
+                                      new URL("http://com.mycompany/SomeOtherClass.class")));
   }
 
 
   @Test
   public void findExportedPackageClassesInRootPackage() throws Exception {
     findExportedPackageClasses("", "",
-                               ImmutableList.of("SomeClass.class", "SomeOtherClass.class"),
-                               ImmutableList.of(new URL("http://com.mycompany/SomeClass.class"),
-                                                new URL("http://com.mycompany/SomeOtherClass.class")));
+                               asList("SomeClass.class", "SomeOtherClass.class"),
+                               asList(new URL("http://com.mycompany/SomeClass.class"),
+                                      new URL("http://com.mycompany/SomeOtherClass.class")));
   }
 
   private void findExportedPackageAsResource(String resource, URL resourceExpectedUrl, String resourcePackage) {
@@ -621,7 +618,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     when(lookupPolicy.getPackageLookupStrategy(resourcePackage)).thenReturn(CHILD_FIRST);
 
     regionClassLoader.addClassLoader(appClassLoader,
-                                     new DefaultArtifactClassLoaderFilter(ImmutableSet.of(resourcePackage), emptySet()));
+                                     new DefaultArtifactClassLoaderFilter(singleton(resourcePackage), emptySet()));
 
     URL result = regionClassLoader.findResource(resource);
     assertThat(result, is(resourceExpectedUrl));
@@ -639,7 +636,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
     when(lookupPolicy.getPackageLookupStrategy(exportedPackage)).thenReturn(CHILD_FIRST);
     regionClassLoader.addClassLoader(appClassLoader,
-                                     new DefaultArtifactClassLoaderFilter(ImmutableSet.of(exportedPackage), emptySet()));
+                                     new DefaultArtifactClassLoaderFilter(singleton(exportedPackage), emptySet()));
     Enumeration<URL> resources = regionClassLoader.findResources(resource);
     List<URL> resourcesAsList = list(resources);
     assertThat(resourcesAsList, containsInAnyOrder(urls.toArray()));
@@ -689,7 +686,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, appDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(regionClassLoader);
     ClassLoaderConfiguration classLoaderConfiguration = new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder()
-        .dependingOn(newHashSet(new BundleDependency.Builder()
+        .dependingOn(singleton(new BundleDependency.Builder()
             .setBundleUri(apiLocation.toURI())
             .setDescriptor(new BundleDescriptor.Builder()
                 .setGroupId(GROUP_ID)

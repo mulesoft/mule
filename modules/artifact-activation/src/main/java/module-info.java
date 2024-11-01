@@ -30,7 +30,6 @@ module org.mule.runtime.artifact.activation {
   requires mule.classloader.model;
   requires net.bytebuddy;
 
-  requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires org.jgrapht.core;

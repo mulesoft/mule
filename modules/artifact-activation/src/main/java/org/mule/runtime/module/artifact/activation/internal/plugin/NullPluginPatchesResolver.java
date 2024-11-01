@@ -8,7 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static java.util.Collections.emptyList;
 
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 
 import java.net.URL;
 import java.util.List;

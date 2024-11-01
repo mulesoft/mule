@@ -8,9 +8,10 @@ package org.mule.runtime.module.artifact.activation.internal.plugin;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
@@ -18,12 +19,10 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
-import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -31,6 +30,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -52,16 +52,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
                                                  MuleArtifactLoaderDescriptor muleArtifactLoaderDescriptor,
                                                  List<BundleDependency> bundleDependencies,
                                                  DeployableArtifactDescriptor ownerDescriptor) {
-    super(new ClassLoaderModelAssembler(new ArtifactCoordinates(bundleDependency.getDescriptor().getGroupId(),
-                                                                bundleDependency.getDescriptor().getArtifactId(),
-                                                                bundleDependency.getDescriptor().getVersion(),
-                                                                bundleDependency.getDescriptor().getType(),
-                                                                bundleDependency.getDescriptor().getClassifier().orElse(null)),
-                                        bundleDependencies,
-                                        sharedProjectDependencies, attributeToList(bundleDependency.getPackages()),
-                                        attributeToList(bundleDependency.getResources()))
-                                            .createClassLoaderModel(),
-          muleArtifactLoaderDescriptor);
+    super(bundleDependency.getDescriptor(), muleArtifactLoaderDescriptor);
     this.artifactLocation = artifactLocation;
     this.bundleDependencies = bundleDependencies;
     this.bundleDependency = bundleDependency;
@@ -82,17 +73,13 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     }
   }
 
-  private static List<String> attributeToList(Set<String> attribute) {
-    return attribute != null ? new ArrayList<>(attribute) : emptyList();
-  }
-
   @Override
   protected List<URL> addArtifactSpecificClassLoaderConfiguration(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
     // Patches resolution is done just for plugins because this should be the use case, but in the implementation previously used
     // in the Runtime (AbstractMavenClassLoaderConfigurationLoader in versions <= 4.4), it's done for deployables (applications
     // and
     // domains) as well
-    pluginPatchesResolver.resolve(getPackagerClassLoaderModel().getArtifactCoordinates())
+    pluginPatchesResolver.resolve(bundleDependency.getDescriptor())
         .forEach(classLoaderConfigurationBuilder::containing);
 
     final List<URL> dependenciesArtifactsUrls = new ArrayList<>();
@@ -136,6 +123,38 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
       }
       return additionalDependency.getBundleUri();
     }).collect(toList());
+  }
+
+  @Override
+  protected void populateLocalPackages(ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder) {
+    Set<String> packagesSetBuilder = new HashSet<>();
+    if (bundleDependency.getPackages() != null) {
+      packagesSetBuilder.addAll(bundleDependency.getPackages());
+    }
+
+    Set<String> resourcesSetBuilder = new HashSet<>();
+    if (bundleDependency.getResources() != null) {
+      resourcesSetBuilder.addAll(bundleDependency.getResources());
+    }
+
+    bundleDependencies.forEach(dependency -> {
+      if (!dependency.getDescriptor().getClassifier().map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false)
+          && !dependency.getDescriptor().getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false)
+          && !validateMuleRuntimeSharedLibrary(dependency.getDescriptor().getGroupId(),
+                                               dependency.getDescriptor().getArtifactId(),
+                                               bundleDependency.getDescriptor().getArtifactId())
+          && dependency.getBundleUri() != null) {
+        if (dependency.getPackages() != null) {
+          packagesSetBuilder.addAll(dependency.getPackages());
+        }
+        if (dependency.getResources() != null) {
+          resourcesSetBuilder.addAll(dependency.getResources());
+        }
+      }
+    });
+
+    classLoaderConfigurationBuilder.withLocalPackages(packagesSetBuilder);
+    classLoaderConfigurationBuilder.withLocalResources(resourcesSetBuilder);
   }
 
   @Override
