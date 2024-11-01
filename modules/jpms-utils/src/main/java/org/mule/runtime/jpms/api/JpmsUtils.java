@@ -173,7 +173,15 @@ public final class JpmsUtils {
         .filter(module -> {
           final String moduleName = module.getName();
 
-          return moduleName.startsWith("java.");
+          if (JAVA_MAJOR_VERSION >= 21) {
+            return moduleName.startsWith("java.");
+          } else {
+            // Original intention is to only expose standard java modules...
+            return moduleName.startsWith("java.")
+            // ... however, the DB and SOAP Engine connectors, along with DataWeave, rely on an outdated version of Caffeine (2.x)
+            // which introduces a dependency on sun.misc.unsafe, requiring jdk.* modules to be accessible.
+              || moduleName.startsWith("jdk.");
+          }
         })
         .forEach(module -> packages.addAll(module.getPackages()));
   }
