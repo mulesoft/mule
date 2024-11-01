@@ -16,7 +16,6 @@
 
     <properties>
         <javaModuleName>org.mule.test.extension.rick.and.morty</javaModuleName>
-        <testExtensionModelLoaderId>soap</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

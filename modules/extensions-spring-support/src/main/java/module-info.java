@@ -23,7 +23,6 @@ module org.mule.runtime.extensions.spring.support {
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.core;
   requires org.mule.runtime.extensions.support;
-  requires org.mule.runtime.extensions.soap.support;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.deployment.model;

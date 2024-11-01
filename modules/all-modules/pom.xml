@@ -46,8 +46,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-soap-support</artifactId>
-            <version>${project.version}</version>
+            <artifactId>mule-extensions-soap-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
