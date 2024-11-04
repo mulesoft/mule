@@ -50,8 +50,6 @@ module org.mule.runtime.artifact.activation {
 
   uses org.mule.runtime.module.artifact.activation.internal.plugin.PluginPatchesResolver;
 
-  exports org.mule.runtime.module.artifact.activation.internal to
-      org.mule.runtime.extensions.support;
   exports org.mule.runtime.module.artifact.activation.internal.ast to
       org.mule.runtime.extensions.mule.support;
   exports org.mule.runtime.module.artifact.activation.internal.ast.validation to

@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.module.extension.api.util;
 
-import static java.util.Collections.singleton;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADD_ANNOTATIONS_TO_CONFIG_CLASS;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+
+import static java.util.Collections.singleton;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -118,6 +120,19 @@ public class MuleExtensionUtils {
    */
   public static boolean isPollingSourceLimitEnabled(ExtensionLoadingContext loadingContext) {
     return loadingContext.getParameter(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER)
+        .map(v -> v instanceof Boolean ? (Boolean) v : false)
+        .orElse(false);
+  }
+
+  /**
+   * Determines if the java type for configurations must be enhanced to include the annotations from the DSL.
+   *
+   * @param loadingContext the {@link ExtensionLoadingContext}
+   * @return whether the java type for configurations must be enhanced to include the annotations from the DSL.
+   * @since 4.9.0, 4.8.2
+   */
+  public static boolean isAddAnnotationsToConfigClass(ExtensionLoadingContext loadingContext) {
+    return loadingContext.getParameter(ADD_ANNOTATIONS_TO_CONFIG_CLASS)
         .map(v -> v instanceof Boolean ? (Boolean) v : false)
         .orElse(false);
   }
