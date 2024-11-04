@@ -1,4 +1,18 @@
 {
+  "4.8.2": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.added",
+            "new": "interface org.mule.runtime.container.api.discoverer.ModuleDiscoverer",
+            "justification": "W-17132171: Make ModuleDiscoverer api"
+          }
+        ]
+      }
+    }
+  },
   "4.7.0": {
     "revapi": {
       "differences": {
