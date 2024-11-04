@@ -19,6 +19,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.el",
         "org.mule.runtime.core.privileged.event",
         "org.mule.runtime.core.privileged.exception",
+        "org.mule.runtime.core.privileged.execution",
         "org.mule.runtime.core.privileged.interception",
         "org.mule.runtime.core.privileged.message",
         "org.mule.runtime.core.privileged.metadata",
@@ -29,7 +30,8 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.registry",
         "org.mule.runtime.core.privileged.routing",
         "org.mule.runtime.core.privileged.profiling",
-        "org.mule.runtime.core.privileged.profiling.tracing"
+        "org.mule.runtime.core.privileged.profiling.tracing",
+        "org.mule.runtime.core.privileged.transaction"
     },
     privilegedArtifactIds = {
         "com.mulesoft.munit:munit-runner",
@@ -153,7 +155,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.util.queue;
   exports org.mule.runtime.core.api.util.xmlsecurity;
 
-  uses org.mule.runtime.core.api.transaction.TypedTransactionFactory;
+  uses org.mule.runtime.core.privileged.transaction.TypedTransactionFactory;
 
   provides org.mule.runtime.api.el.AbstractBindingContextBuilderFactory with
       org.mule.runtime.core.api.el.DefaultBindingContextBuilderFactory;
@@ -167,8 +169,8 @@ module org.mule.runtime.core {
   provides org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory with
       org.mule.runtime.core.api.metadata.DefaultDataTypeBuilderFactory;
 
-  provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
-      org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
+  provides org.mule.runtime.core.privileged.transaction.TypedTransactionFactory with
+      org.mule.runtime.core.internal.transaction.DelegateTransactionFactory;
 
   // for MUnit, MTF
   exports org.mule.runtime.core.privileged;
@@ -180,6 +182,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.event;
   // for MuleFwk, MUnit, ApiKit, DataWeave and Validation
   exports org.mule.runtime.core.privileged.exception;
+  // for test-components
+  exports org.mule.runtime.core.privileged.execution;
   // for MUnit
   exports org.mule.runtime.core.privileged.interception;
   // for MUnit
@@ -202,6 +206,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.registry;
   // for DataWeave
   exports org.mule.runtime.core.privileged.routing;
+  // for test-components
+  exports org.mule.runtime.core.privileged.transaction;
 
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
@@ -224,7 +230,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.connection to
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.extensions.support,
-      org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
@@ -376,7 +381,6 @@ module org.mule.runtime.core {
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.retry to
       org.mule.runtime.extensions.support,
-      org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.outbound to
@@ -433,6 +437,7 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.transaction to
       org.mule.runtime.core.components,
+      org.mule.runtime.extensions.mule.support,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.bti,
@@ -610,7 +615,7 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.value to
       spring.core;
 
-  uses org.mule.runtime.core.api.transaction.TransactionFactory;
+  uses org.mule.runtime.core.privileged.transaction.TransactionFactory;
   uses org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
 
 }

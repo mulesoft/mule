@@ -6,22 +6,26 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static com.google.common.collect.ImmutableSet.of;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
 
 import org.junit.Test;
 
 @SmallTest
 public class DefaultArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase {
 
-  private ArtifactClassLoaderFilter filter =
+  private final ArtifactClassLoaderFilter filter =
       new DefaultArtifactClassLoaderFilter(singleton("java.lang"), singleton("META-INF/schema.xsd"));
 
   @Test
@@ -77,7 +81,7 @@ public class DefaultArtifactClassLoaderFilterTestCase extends AbstractMuleTestCa
   @Test
   public void validatesEmptyPackageName() throws Exception {
     ArtifactClassLoaderFilter filter =
-        new DefaultArtifactClassLoaderFilter(of("java.lang", ""), singleton("META-INF/schema.xsd"));
+        new DefaultArtifactClassLoaderFilter(new HashSet<>(asList("java.lang", "")), singleton("META-INF/schema.xsd"));
     assertThat(filter.exportsPackage(""), is(true));
   }
 

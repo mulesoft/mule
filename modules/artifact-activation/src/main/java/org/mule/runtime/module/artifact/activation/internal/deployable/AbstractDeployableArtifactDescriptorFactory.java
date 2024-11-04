@@ -11,6 +11,7 @@ import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvi
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -38,8 +39,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +116,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     if (configs != null && !configs.isEmpty()) {
       descriptor.setConfigResources(new HashSet<>(configs));
     } else {
-      descriptor.setConfigResources(ImmutableSet.<String>builder().add(getDefaultConfigurationResource()).build());
+      descriptor.setConfigResources(singleton(getDefaultConfigurationResource()));
     }
 
     descriptor.setPlugins(createArtifactPluginDescriptors(descriptor));

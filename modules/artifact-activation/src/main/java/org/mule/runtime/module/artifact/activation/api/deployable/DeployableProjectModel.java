@@ -11,6 +11,9 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.joining;
@@ -28,16 +31,13 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents the structure of a project, providing what is needed in order to create its {@link ArtifactDescriptor} with a
@@ -120,16 +120,16 @@ public final class DeployableProjectModel {
                                 Set<BundleDescriptor> sharedLibraries,
                                 Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
 
-    this.packages = ImmutableList.copyOf(packages);
-    this.resources = ImmutableList.copyOf(resources);
-    this.resourcesPath = ImmutableList.copyOf(resourcesPath);
+    this.packages = unmodifiableList(new ArrayList<>(packages));
+    this.resources = unmodifiableList(new ArrayList<>(resources));
+    this.resourcesPath = unmodifiableList(new ArrayList<>(resourcesPath));
     this.descriptor = requireNonNull(descriptor);
     this.deployableModelSupplier = new LazyValue<>(requireNonNull(deployableModelSupplier));
     this.projectStructure = requireNonNull(projectStructure);
     this.projectFolder = requireNonNull(projectFolder);
-    this.dependencies = ImmutableList.copyOf(dependencies);
-    this.sharedLibraries = ImmutableSet.copyOf(sharedLibraries);
-    this.additionalPluginDependencies = ImmutableMap.copyOf(additionalPluginDependencies);
+    this.dependencies = unmodifiableList(new ArrayList<>(dependencies));
+    this.sharedLibraries = unmodifiableSet(new HashSet<>(sharedLibraries));
+    this.additionalPluginDependencies = unmodifiableMap(new HashMap<>(additionalPluginDependencies));
   }
 
   /**

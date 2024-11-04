@@ -29,7 +29,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -51,6 +50,7 @@ import org.mule.tools.api.classloader.model.ClassLoaderModel;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -71,6 +71,9 @@ import org.slf4j.Logger;
  * @since 4.5
  */
 public class MuleDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
+
+  public static final String CLASS_LOADER_MODEL_VERSION_120 = "1.2.0";
+  public static final String CLASS_LOADER_MODEL_VERSION_110 = "1.1.0";
 
   private static final Logger LOGGER = getLogger(MuleDeployableProjectModelBuilder.class);
 
@@ -145,6 +148,7 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
         createBundleDependencyFromPackagerDependency(getDeployableArtifactRepositoryUriResolver())
             .apply(additionalPluginArtifact);
 
+    // TODO W-17114699 Review support for older classloadeer-model versions
     if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_120)) {
       additionalPluginDependency = discoverPackagesAndResources(additionalPluginDependency);
     }
@@ -169,6 +173,7 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
         .setTransitiveDependencies(getTransitiveDependencies(d))
         .build()).collect(toList());
 
+    // TODO W-17114699 Review support for older classloadeer-model versions
     if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_120)) {
       dependencies = discoverPackagesAndResources(dependencies);
     }
@@ -257,6 +262,7 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
 
   private Set<BundleDescriptor> getSharedLibraries(AppClassLoaderModel packagerClassLoaderModel,
                                                    Map<ArtifactCoordinates, BundleDescriptor> bundleDescriptors) {
+    // TODO W-17114699 Review support for older classloadeer-model versions
     if (new Semver(packagerClassLoaderModel.getVersion(), LOOSE).isLowerThan(CLASS_LOADER_MODEL_VERSION_110)) {
       return discoverProvider().createMavenPomParserClient(projectFolder.toPath(), getActiveProfiles())
           .getSharedLibraries().stream().map(shareLibrary -> {
@@ -318,8 +324,8 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
                              .setBaseVersion(d.getArtifactCoordinates().getVersion())
                              .build())
           .setBundleUri(bundle)
-          .setPackages(d.getPackages() == null ? emptySet() : newHashSet(d.getPackages()))
-          .setResources(d.getResources() == null ? emptySet() : newHashSet(d.getResources()))
+          .setPackages(d.getPackages() == null ? emptySet() : new HashSet<>(asList(d.getPackages())))
+          .setResources(d.getResources() == null ? emptySet() : new HashSet<>(asList(d.getResources())))
           .build();
     };
   }

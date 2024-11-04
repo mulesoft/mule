@@ -7,12 +7,12 @@
 package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.lang.System.getProperty;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toSet;
 
-import static com.google.common.collect.Sets.newHashSet;
-
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ArtifactConstants {
 
@@ -22,7 +22,7 @@ public class ArtifactConstants {
    * @deprecated since 4.5 use {@link #getApiClassifiers()} instead.
    */
   @Deprecated
-  public static final Set<String> API_CLASSIFIERS = newHashSet("raml", "oas", "raml-fragment", "wsdl");
+  public static final Set<String> API_CLASSIFIERS = new HashSet<>(asList("raml", "oas", "raml-fragment", "wsdl"));
 
   private ArtifactConstants() {}
 
@@ -33,7 +33,7 @@ public class ArtifactConstants {
    */
   public static Set<String> getApiClassifiers() {
     final String apiClassifiers = getProperty(org.mule.runtime.api.util.MuleSystemProperties.API_CLASSIFIERS);
-    return apiClassifiers != null ? stream(apiClassifiers.split(",")).map(String::trim).collect(Collectors.toSet())
+    return apiClassifiers != null ? stream(apiClassifiers.split(",")).map(String::trim).collect(toSet())
         : API_CLASSIFIERS;
   }
 
