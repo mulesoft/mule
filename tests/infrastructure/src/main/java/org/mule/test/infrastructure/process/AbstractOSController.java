@@ -77,20 +77,27 @@ public abstract class AbstractOSController {
   protected final String muleAppName;
   protected final String muleAppLongName;
   protected final String muleBin;
+
+  private final String amcSetup;
+
   protected final int timeout;
   protected Map<String, String> testEnvVars;
 
   public AbstractOSController(String muleHome, int timeout) {
     this.muleHome = muleHome;
     this.muleBin = getMuleBin();
+    this.amcSetup = getAmcSetupBin();
     this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
     this.muleAppName = null;
     this.muleAppLongName = null;
   }
 
+  protected abstract String getAmcSetupBin();
+
   public AbstractOSController(String muleHome, int timeout, String locationSuffix) {
     this.muleHome = muleHome;
     this.muleBin = getMuleBin();
+    this.amcSetup = getAmcSetupBin();
     this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
     this.muleAppName = "mule_ee_node_" + locationSuffix;
     this.muleAppLongName = "MuleEnterpriseEditionNode" + locationSuffix;
@@ -152,6 +159,12 @@ public abstract class AbstractOSController {
     if (error != 0) {
       throw new MuleControllerException("The mule instance couldn't be restarted");
     }
+  }
+
+  public int installAgent(String... args) {
+    CommandLine commandLine = new CommandLine(amcSetup);
+    commandLine.addArguments(args, false);
+    return runSync(commandLine, null);
   }
 
   protected int runSync(String command, String... args) {

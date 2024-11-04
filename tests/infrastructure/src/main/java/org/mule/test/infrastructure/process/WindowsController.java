@@ -37,6 +37,11 @@ public class WindowsController extends AbstractOSController {
   }
 
   @Override
+  protected String getAmcSetupBin() {
+    return muleHome + "/bin/amc_setup.bat";
+  }
+
+  @Override
   public void start(String... args) {
     install(args);
     super.start(args);
