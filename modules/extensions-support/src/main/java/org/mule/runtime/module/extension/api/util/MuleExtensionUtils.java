@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.api.util;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADD_ANNOTATIONS_TO_CONFIG_CLASS;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
@@ -133,7 +132,7 @@ public class MuleExtensionUtils {
    */
   public static boolean isAddAnnotationsToConfigClass(ExtensionLoadingContext loadingContext) {
     return loadingContext.getParameter(ADD_ANNOTATIONS_TO_CONFIG_CLASS)
-        .map(v -> v instanceof Boolean ? (Boolean) v : false)
+        .map(v -> v instanceof Boolean ? (Boolean) v : true)
         .orElse(false);
   }
 
