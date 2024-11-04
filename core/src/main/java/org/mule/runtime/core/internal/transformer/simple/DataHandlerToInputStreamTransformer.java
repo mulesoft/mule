@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.AbstractDiscoverableTransformer;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 
 import javax.activation.DataHandler;
@@ -18,15 +19,19 @@ import javax.activation.DataHandler;
 public class DataHandlerToInputStreamTransformer extends AbstractDiscoverableTransformer {
 
   public DataHandlerToInputStreamTransformer() {
-    registerSourceType(DataType.fromType(DataHandler.class));
+    this(DataHandler.class);
+  }
+
+  public DataHandlerToInputStreamTransformer(Class<?> dataHandlerType) {
+    registerSourceType(DataType.fromType(dataHandlerType));
     setReturnDataType(DataType.INPUT_STREAM);
   }
 
   @Override
   public Object doTransform(Object src, Charset enc) throws TransformerException {
     try {
-      return ((DataHandler) src).getInputStream();
-    } catch (IOException e) {
+      return src.getClass().getDeclaredMethod("getInputStream").invoke(src);
+    } catch (Exception e) {
       throw new TransformerException(this, e);
     }
   }

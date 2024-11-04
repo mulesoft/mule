@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.transformer;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
+import org.mule.runtime.core.internal.transformer.simple.DataHandlerToInputStreamTransformer;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -99,6 +101,16 @@ public class DefaultTransformersRegistry implements TransformersRegistry, Initia
         return trans;
       }
     } else {
+      if (source.getType().getName().equals("javax.activation.DataHandler")) {
+        Transformer t = new DataHandlerToInputStreamTransformer(source.getType());
+        try {
+          registerTransformer(t);
+        } catch (MuleException e) {
+          throw new TransformerException(createStaticMessage("Unable to register DataHandler transformer", e));
+        }
+        return t;
+      }
+
       throw new TransformerException(noTransformerFoundForMessage(source, result));
     }
   }
