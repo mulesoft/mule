@@ -412,6 +412,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     if (isJavaVersionAtLeast(JAVA_17)) {
       exception.expect(IllegalModelDefinitionException.class);
       exception.expectMessage("specifies metadata resolvers that doesn't belong to the same category");
+
       validate(extensionModel, validator);
     } else {
       ProblemsReporter reporter = validate(extensionModel, validator);
