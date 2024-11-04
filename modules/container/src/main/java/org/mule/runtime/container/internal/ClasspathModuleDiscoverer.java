@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
@@ -49,11 +50,6 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   private static Logger logger = LoggerFactory.getLogger(ClasspathModuleDiscoverer.class);
 
   public static final String MODULE_PROPERTIES = "META-INF/mule-module.properties";
-  public static final String EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.export.classPackages";
-  public static final String PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY = "artifact.privileged.classPackages";
-  public static final String PRIVILEGED_ARTIFACTS_PROPERTY = "artifact.privileged.artifactIds";
-  public static final String EXPORTED_RESOURCE_PROPERTY = "artifact.export.resources";
-  public static final String EXPORTED_SERVICES_PROPERTY = "artifact.export.services";
 
   private final Function<String, File> serviceInterfaceToServiceFile;
   private final BiFunction<String, File, URL> fileToResource;
