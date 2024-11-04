@@ -1,4 +1,18 @@
 {
+  "4.8.2": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method boolean org.mule.runtime.module.extension.api.util.MuleExtensionUtils::isAddAnnotationsToConfigClass(org.mule.runtime.extension.api.loader.ExtensionLoadingContext)",
+            "justification": "W-17129224: Remove mule framework switches from mule runtime code"
+          }
+        ]
+      }
+    }
+  },
   "4.8.0": {
     "revapi": {
       "ignore": [
