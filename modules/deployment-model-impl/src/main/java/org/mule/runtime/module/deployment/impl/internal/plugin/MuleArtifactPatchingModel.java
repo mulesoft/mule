@@ -6,22 +6,30 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.loadFileContentFrom;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 public class MuleArtifactPatchingModel {
 
@@ -50,7 +58,9 @@ public class MuleArtifactPatchingModel {
   }
 
   private static MuleArtifactPatchingModel deserialize(byte[] muleArtifactPatchBytes) {
-    Gson gson = (new GsonBuilder()).enableComplexMapKeySerialization().setPrettyPrinting().create();
+    Gson gson = (new GsonBuilder()).enableComplexMapKeySerialization().setPrettyPrinting()
+        .registerTypeAdapter(ArtifactCoordinates.class, new ArtifactCoordinatesAdapter())
+        .create();
     return gson.fromJson(new String(muleArtifactPatchBytes), MuleArtifactPatchingModel.class);
   }
 
@@ -68,6 +78,42 @@ public class MuleArtifactPatchingModel {
 
   public void setAffectedVersions(List<String> affectedVersions) {
     this.affectedVersions = affectedVersions;
+  }
+
+  public static class ArtifactCoordinatesAdapter implements JsonDeserializer<ArtifactCoordinates> {
+
+    public ArtifactCoordinates deserialize(JsonElement jsonElement, Type type,
+                                           JsonDeserializationContext jsonDeserializationContext)
+        throws JsonParseException {
+
+      JsonObject jsonObject = jsonElement.getAsJsonObject();
+      String groupId = jsonObject.get("groupId").getAsString();
+      String artifactId = jsonObject.get("artifactId").getAsString();
+      Optional<String> classifier = ofNullable(jsonObject.get("classifier")).map(JsonElement::getAsString);
+
+      return new ArtifactCoordinates() {
+
+        @Override
+        public String getGroupId() {
+          return groupId;
+        }
+
+        @Override
+        public String getArtifactId() {
+          return artifactId;
+        }
+
+        @Override
+        public String getVersion() {
+          return null;
+        }
+
+        @Override
+        public Optional<String> getClassifier() {
+          return classifier;
+        }
+      };
+    }
   }
 }
 

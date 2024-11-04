@@ -39,13 +39,7 @@ public class MavenRefreshDeployableProjectModelBuilder extends MavenDeployablePr
 
   @Override
   public DeployableProjectModel build() {
-    return doBuild(projectStructure,
-                   new org.mule.tools.api.classloader.model.ArtifactCoordinates(deployableArtifactCoordinates.getGroupId(),
-                                                                                deployableArtifactCoordinates.getArtifactId(),
-                                                                                deployableArtifactCoordinates.getVersion(),
-                                                                                "jar",
-                                                                                deployableArtifactCoordinates.getClassifier()
-                                                                                    .orElse(null)));
+    return doBuild(projectStructure, deployableArtifactCoordinates);
   }
 
 }

@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static java.util.Collections.unmodifiableList;
+
 import org.mule.runtime.module.artifact.internal.descriptor.CompositeArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.internal.descriptor.MinMuleVersionArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.internal.descriptor.MuleProductArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.internal.descriptor.SupportedJvmArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.internal.descriptor.VersionFormatArtifactDescriptorValidator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Builder that allows to create a {@link ArtifactDescriptorValidator} with different aspects: from checking minMuleVersion to
@@ -129,25 +131,26 @@ public final class ArtifactDescriptorValidatorBuilder {
    * @return a {@link ArtifactDescriptorValidator} with the constraints defined by this builder.
    */
   public ArtifactDescriptorValidator build() {
-    ImmutableList.Builder<ArtifactDescriptorValidator> builder = ImmutableList.builder();
+    List<ArtifactDescriptorValidator> validations = new ArrayList<>();
+
     if (minMuleVersionArtifactDescriptorValidator) {
       if (muleRuntimeVersionSupplier != null) {
-        builder.add(new MinMuleVersionArtifactDescriptorValidator(validateMinMuleVersionWithSemanticVersioning,
-                                                                  muleRuntimeVersionSupplier));
+        validations.add(new MinMuleVersionArtifactDescriptorValidator(validateMinMuleVersionWithSemanticVersioning,
+                                                                      muleRuntimeVersionSupplier));
       } else {
-        builder.add(new MinMuleVersionArtifactDescriptorValidator(validateMinMuleVersionWithSemanticVersioning));
+        validations.add(new MinMuleVersionArtifactDescriptorValidator(validateMinMuleVersionWithSemanticVersioning));
       }
     }
     if (validateMuleProduct) {
-      builder.add(new MuleProductArtifactDescriptorValidator());
+      validations.add(new MuleProductArtifactDescriptorValidator());
     }
     if (validateVersionFormat) {
-      builder.add(new VersionFormatArtifactDescriptorValidator(doNotFailIfBundleDescriptorNotPresent));
+      validations.add(new VersionFormatArtifactDescriptorValidator(doNotFailIfBundleDescriptorNotPresent));
     }
     if (validateSupportedJavaVersions) {
-      builder.add(new SupportedJvmArtifactDescriptorValidator());
+      validations.add(new SupportedJvmArtifactDescriptorValidator());
     }
-    return new CompositeArtifactDescriptorValidator(builder.build());
+    return new CompositeArtifactDescriptorValidator(unmodifiableList(validations));
   }
 
 }

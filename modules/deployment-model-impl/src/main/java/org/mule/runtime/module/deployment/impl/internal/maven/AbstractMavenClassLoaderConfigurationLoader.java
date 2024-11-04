@@ -38,6 +38,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.client.api.VersionUtils;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -54,7 +55,6 @@ import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.runtime.module.deployment.impl.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
@@ -224,7 +224,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
           .collect(toList());
     }
 
-    List<URL> patches = getArtifactPatches(packagerClassLoaderModel);
+    List<URL> patches = getArtifactPatches(artifactBundleDescriptor);
 
     // This is already filtering out mule-plugin dependencies,
     // since for this case we explicitly need to consume the exported API from the plugin.
@@ -269,9 +269,9 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     return new ArtifactAttributes(packagesSetBuilder.build(), resourcesSetBuilder.build());
   }
 
-  private List<URL> getArtifactPatches(ClassLoaderModel packagerClassLoaderModel) {
+  private List<URL> getArtifactPatches(BundleDescriptor artifactBundleDescriptor) {
     List<URL> patches = new ArrayList<>();
-    ArtifactCoordinates thisArtifactCoordinates = packagerClassLoaderModel.getArtifactCoordinates();
+    ArtifactCoordinates thisArtifactCoordinates = artifactBundleDescriptor;
     String artifactId = thisArtifactCoordinates.getGroupId() + ":"
         + thisArtifactCoordinates.getArtifactId() + ":" + thisArtifactCoordinates.getVersion();
     try {

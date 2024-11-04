@@ -6,19 +6,31 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
-import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
-
 /**
  * Types of projects supported.
  */
 public enum Classifier {
 
-  MULE_APPLICATION, MULE_DOMAIN, MULE_PLUGIN;
+  MULE_APPLICATION("mule-application"),
+
+  MULE_DOMAIN("mule-domain"),
+
+  MULE_PLUGIN("mule-plugin");
 
   public static Classifier fromString(String name) {
-    String classifierName = LOWER_HYPHEN.to(UPPER_UNDERSCORE, name);
-    return valueOf(classifierName);
+    for (Classifier classifier : Classifier.values()) {
+      if (classifier.name.equals(name)) {
+        return classifier;
+      }
+    }
+
+    throw new IllegalArgumentException("No Classifier with name '" + name + "'." + name);
+  }
+
+  private final String name;
+
+  private Classifier(String name) {
+    this.name = name;
   }
 
   public boolean equals(String name) {
@@ -36,6 +48,6 @@ public enum Classifier {
 
   @Override
   public String toString() {
-    return UPPER_UNDERSCORE.to(LOWER_HYPHEN, this.name());
+    return name;
   }
 }
