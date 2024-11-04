@@ -133,7 +133,7 @@ public class MuleExtensionUtils {
   public static boolean isAddAnnotationsToConfigClass(ExtensionLoadingContext loadingContext) {
     return loadingContext.getParameter(ADD_ANNOTATIONS_TO_CONFIG_CLASS)
         .map(v -> v instanceof Boolean ? (Boolean) v : true)
-        .orElse(false);
+        .orElse(true);
   }
 
 }
