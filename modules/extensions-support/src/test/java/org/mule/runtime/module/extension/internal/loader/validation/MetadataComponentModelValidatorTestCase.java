@@ -409,10 +409,16 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
                                                                    SIMPLE_OUTPUT_RESOLVER,
                                                                    NullMetadataResolverSupplier.INSTANCE));
 
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("specifies metadata resolvers that doesn't belong to the same category");
-
-    validate(extensionModel, validator);
+    if (isJavaVersionAtLeast(JAVA_17)) {
+      exception.expect(IllegalModelDefinitionException.class);
+      exception.expectMessage("specifies metadata resolvers that doesn't belong to the same category");
+      validate(extensionModel, validator);
+    } else {
+      ProblemsReporter reporter = validate(extensionModel, validator);
+      assertThat(reporter.getWarnings(), hasSize(1));
+      assertThat(reporter.getWarningsAsString(),
+                 containsString("specifies metadata resolvers that doesn't belong to the same category"));
+    }
   }
 
   @Test
