@@ -13,6 +13,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getJdkVersion;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.isJava8;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADD_ANNOTATIONS_TO_CONFIG_CLASS;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 
@@ -77,17 +78,27 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     context.addCustomValidators(validators);
 
-    Optional<Object> disableComponentIgnore = context.getParameter(DISABLE_COMPONENT_IGNORE);
-    disableComponentIgnore
-        .ifPresent(value -> checkState(value instanceof Boolean,
-                                       format("Property value for %s expected to be boolean", DISABLE_COMPONENT_IGNORE)));
-
+    Optional<Object> disableComponentIgnore = ckeckBoolean(context, DISABLE_COMPONENT_IGNORE);
     if (IGNORE_DISABLED && !disableComponentIgnore.isPresent()) {
       context.addParameter(DISABLE_COMPONENT_IGNORE, true);
     }
+
     if (ENABLE_POLLING_SOURCE_LIMIT) {
       context.addParameter(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
     }
+
+    Optional<Object> addAnnotationstoConfigClass = ckeckBoolean(context, ADD_ANNOTATIONS_TO_CONFIG_CLASS);
+    if (addAnnotationstoConfigClass.isPresent()) {
+      context.addParameter(ADD_ANNOTATIONS_TO_CONFIG_CLASS, addAnnotationstoConfigClass.get());
+    }
+  }
+
+  private Optional<Object> ckeckBoolean(ExtensionLoadingContext context, String paramMame) {
+    Optional<Object> addAnnotationstoConfigClass = context.getParameter(paramMame);
+    addAnnotationstoConfigClass
+        .ifPresent(value -> checkState(value instanceof Boolean,
+                                       format("Property value for %s expected to be boolean", paramMame)));
+    return addAnnotationstoConfigClass;
   }
 
   /**
