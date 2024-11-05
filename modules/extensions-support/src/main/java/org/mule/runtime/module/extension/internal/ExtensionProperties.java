@@ -108,14 +108,14 @@ public class ExtensionProperties {
   /**
    * Disables the {@code ignore} directive when loading an Extension.
    *
-   * @since 1.4.0
+   * @since 4.4.0
    */
   public static final String DISABLE_COMPONENT_IGNORE = EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_COMPONENT_IGNORE";
 
   /**
    * When present, adds to polling sources the parameter to configure the item limit per poll feature.
    *
-   * @since 1.4.0
+   * @since 4.4.0
    */
   public static final String ENABLE_POLLING_SOURCE_LIMIT_PARAMETER =
       EXTENSION_LOADER_PROPERTY_PREFIX + "ENABLE_POLLING_SOURCE_LIMIT";
@@ -128,6 +128,14 @@ public class ExtensionProperties {
    */
   public static final String DISABLE_DESCRIPTIONS_ENRICHMENT =
       EXTENSION_LOADER_PROPERTY_PREFIX + "DISABLE_DESCRIPTIONS_ENRICHMENT";
+
+  /**
+   * When present, adds to polling sources the parameter to configure the item limit per poll feature.
+   *
+   * @since 4.9.0, 4.8.2
+   */
+  public static final String ADD_ANNOTATIONS_TO_CONFIG_CLASS =
+      EXTENSION_LOADER_PROPERTY_PREFIX + "ADD_ANNOTATIONS_TO_CONFIG_CLASS";
 
   private ExtensionProperties() {}
 }

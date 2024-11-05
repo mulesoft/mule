@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
-import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
@@ -121,11 +120,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     }
 
     descriptor.setPlugins(createArtifactPluginDescriptors(descriptor));
-
-    if (!isMuleFramework()) {
-      descriptor.setLogConfigFile(getLogConfigFile(getArtifactModel()));
-    }
-
+    descriptor.setLogConfigFile(getLogConfigFile(getArtifactModel()));
     descriptor.setSupportedJavaVersions(getArtifactModel().getSupportedJavaVersions());
   }
 

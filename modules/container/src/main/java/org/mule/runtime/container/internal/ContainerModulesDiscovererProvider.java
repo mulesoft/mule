@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.container.internal;
 
+import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
