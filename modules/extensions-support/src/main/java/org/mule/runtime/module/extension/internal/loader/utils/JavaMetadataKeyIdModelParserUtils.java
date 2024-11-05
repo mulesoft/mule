@@ -172,10 +172,6 @@ public class JavaMetadataKeyIdModelParserUtils {
                                                                               ExtensionElement extensionElement,
                                                                               String elementName,
                                                                               String elementType) {
-    if (outputResolverModelParser == null && inputResolverModelParsers.isEmpty() && isJavaVersionAtLeast(JAVA_17)) {
-      return empty();
-    }
-
     String categoryName = getCategoryName(outputResolverModelParser, attributesResolverModelParser, inputResolverModelParsers);
 
     Optional<MetadataKeyModelParser> keyIdResolverModelParser =
@@ -242,12 +238,6 @@ public class JavaMetadataKeyIdModelParserUtils {
 
     for (InputResolverModelParser inputResolverModelParser : inputResolverModelParsers) {
       return inputResolverModelParser.getInputResolver().getCategoryName();
-    }
-
-    // TODO W-14195099 - change this once we have `ProblemsReporter` available
-    if (isJavaVersionAtLeast(JAVA_17)) {
-      throw new IllegalModelDefinitionException("Unable to create Keys Resolver. A Keys Resolver is being defined " +
-          "without defining an Output Resolver, Input Resolver nor Attributes Resolver");
     }
 
     // TODO W-14195099 - change this once we have `ProblemsReporter` available

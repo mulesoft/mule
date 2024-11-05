@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 
 import java.util.Map;
@@ -25,6 +23,14 @@ import java.util.Optional;
 public final class BundleDescriptor implements ArtifactCoordinates {
 
   public static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
+
+  /**
+   * @return a fresh {@link Builder} for creating a {@link BundleDescriptor}
+   * @since 4.9
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
 
   private static final String STRINGARTIFACT_FILENAME_SEPARATOR = "-";
   private String groupId;
@@ -62,6 +68,7 @@ public final class BundleDescriptor implements ArtifactCoordinates {
     return type;
   }
 
+  @Override
   public Optional<String> getClassifier() {
     return classifier;
   }
@@ -172,8 +179,7 @@ public final class BundleDescriptor implements ArtifactCoordinates {
      * @return the builder
      */
     public BundleDescriptor.Builder setGroupId(String groupId) {
-      validateIsNotEmpty(groupId, GROUP_ID);
-      bundleDependency.groupId = groupId;
+      bundleDependency.groupId = validateIsNotEmpty(groupId, GROUP_ID);
       return this;
     }
 
@@ -182,8 +188,7 @@ public final class BundleDescriptor implements ArtifactCoordinates {
      * @return the builder
      */
     public BundleDescriptor.Builder setArtifactId(String artifactId) {
-      validateIsNotEmpty(artifactId, ARTIFACT_ID);
-      bundleDependency.artifactId = artifactId;
+      bundleDependency.artifactId = validateIsNotEmpty(artifactId, ARTIFACT_ID);
       return this;
     }
 
@@ -194,8 +199,7 @@ public final class BundleDescriptor implements ArtifactCoordinates {
      * @return the builder
      */
     public BundleDescriptor.Builder setVersion(String version) {
-      validateIsNotEmpty(version, VERSION);
-      bundleDependency.version = version;
+      bundleDependency.version = validateIsNotEmpty(version, VERSION);
       return this;
     }
 
@@ -206,8 +210,7 @@ public final class BundleDescriptor implements ArtifactCoordinates {
      * @return the builder
      */
     public BundleDescriptor.Builder setBaseVersion(String baseVersion) {
-      validateIsNotEmpty(baseVersion, BASE_VERSION);
-      bundleDependency.baseVersion = baseVersion;
+      bundleDependency.baseVersion = validateIsNotEmpty(baseVersion, BASE_VERSION);
       return this;
     }
 
@@ -218,8 +221,7 @@ public final class BundleDescriptor implements ArtifactCoordinates {
      * @return the builder
      */
     public BundleDescriptor.Builder setType(String type) {
-      validateIsNotEmpty(type, TYPE);
-      bundleDependency.type = type;
+      bundleDependency.type = validateIsNotEmpty(type, TYPE);;
       return this;
     }
 
@@ -260,12 +262,11 @@ public final class BundleDescriptor implements ArtifactCoordinates {
       return format(REQUIRED_FIELD_NOT_FOUND_TEMPLATE, field);
     }
 
-    private void validateIsNotEmpty(String value, String fieldId) {
-      checkState(!isEmpty(value), getNullFieldMessage(fieldId));
-    }
-
-    private static boolean isEmpty(String value) {
-      return value == null || value.equals("");
+    private String validateIsNotEmpty(String value, String fieldId) {
+      if (value == null || value.equals("")) {
+        throw new IllegalStateException(getNullFieldMessage(fieldId));
+      }
+      return value;
     }
   }
 }

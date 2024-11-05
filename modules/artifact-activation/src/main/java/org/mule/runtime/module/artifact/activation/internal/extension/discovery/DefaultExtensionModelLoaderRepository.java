@@ -17,7 +17,6 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
-import static com.google.common.collect.Maps.newHashMap;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -31,6 +30,7 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -47,7 +47,7 @@ public class DefaultExtensionModelLoaderRepository implements ExtensionModelLoad
 
   private static final Logger LOGGER = getLogger(DefaultExtensionModelLoaderRepository.class);
 
-  private final Map<String, ExtensionModelLoader> extensionModelLoaders = newHashMap();
+  private final Map<String, ExtensionModelLoader> extensionModelLoaders = new HashMap<>();
 
   private Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup;
 

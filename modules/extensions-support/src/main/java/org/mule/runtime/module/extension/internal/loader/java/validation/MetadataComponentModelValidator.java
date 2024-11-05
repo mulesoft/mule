@@ -310,11 +310,7 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
           new Problem(componentModel,
                       format("%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found '%s'",
                              capitalize(getComponentModelTypeName(componentModel)), componentModel.getName(), join(names, ",")));
-      if (isJavaVersionAtLeast(JAVA_17)) {
-        problemsReporter.addError(problem);
-      } else {
-        problemsReporter.addWarning(problem);
-      }
+      problemsReporter.addError(problem);
     }
   }
 

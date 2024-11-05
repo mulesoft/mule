@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 
 import org.mule.api.annotation.NoExtend;
@@ -16,8 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Describes a Mule Application artifact.
@@ -111,6 +110,6 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
 
   @Override
   protected Set<String> getDefaultConfigResources() {
-    return ImmutableSet.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
+    return singleton(DEFAULT_CONFIGURATION_RESOURCE);
   }
 }
