@@ -96,6 +96,10 @@
             <artifactId>mule-runtime-extension-model</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tools.maven</groupId>
+            <artifactId>mule-classloader-model</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.tests</groupId>
