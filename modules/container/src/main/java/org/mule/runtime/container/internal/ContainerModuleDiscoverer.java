@@ -8,6 +8,7 @@ package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.container.internal.ContainerModulesDiscovererProvider.containerModulesDiscoverer;
 
+import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.util.ArrayList;
