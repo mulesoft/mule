@@ -45,6 +45,7 @@ module org.mule.runtime.deployment.model.impl {
       org.mule.runtime.deployment,
       org.mule.runtime.launcher;
   exports org.mule.runtime.module.deployment.impl.internal.application to
+      com.mulesoft.mule.runtime.lambda,
       org.mule.runtime.deployment,
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.deployment.impl.internal.artifact to

@@ -20,4 +20,6 @@ public interface ParentMuleContextAwareConfigurationBuilder extends Configuratio
    */
   void setParentContext(MuleContext parentContext, ArtifactAst parentAst);
 
+  void setParentContext(MuleContext parentContext);
+
 }

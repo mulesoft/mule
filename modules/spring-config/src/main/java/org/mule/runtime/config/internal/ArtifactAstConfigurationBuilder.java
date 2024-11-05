@@ -260,8 +260,13 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   }
 
   @Override
-  public void setParentContext(MuleContext domainContext, ArtifactAst parentAst) {
-    this.parentContext = ((MuleContextWithRegistry) domainContext).getRegistry().get(SPRING_APPLICATION_CONTEXT);
+  public void setParentContext(MuleContext parentContext, ArtifactAst parentAst) {
+    setParentContext(parentContext);
+  }
+
+  @Override
+  public void setParentContext(MuleContext parentContext) {
+    this.parentContext = ((MuleContextWithRegistry) parentContext).getRegistry().get(SPRING_APPLICATION_CONTEXT);
   }
 
   public Map<String, String> getArtifactProperties() {

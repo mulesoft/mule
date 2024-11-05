@@ -98,4 +98,7 @@ public class SpringRegistry extends AbstractSpringRegistry {
     return configurationDependencyResolver;
   }
 
+  public ApplicationContext getBaseApplicationContext() {
+    return baseApplicationContext;
+  }
 }

@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.config.builders;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.configurationBuilderNoMatching;
 import static org.mule.runtime.core.api.util.ClassUtils.getResource;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
+
+import static java.lang.String.format;
+
+import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -103,7 +105,12 @@ public class AutoConfigurationBuilder extends AbstractResourceConfigurationBuild
 
   @Override
   public void setParentContext(MuleContext parentContext, ArtifactAst parentAst) {
-    this.parentContext = parentContext;
+    setParentContext(parentContext);
     this.parentAst = parentAst;
+  }
+
+  @Override
+  public void setParentContext(MuleContext parentContext) {
+    this.parentContext = parentContext;
   }
 }

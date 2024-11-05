@@ -94,6 +94,7 @@ module org.mule.runtime.spring.config {
       org.mule.runtime.tooling.support,
       spring.beans;
   exports org.mule.runtime.config.internal to
+      com.mulesoft.mule.runtime.lambda,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl;
   exports org.mule.runtime.config.internal.bean to
@@ -127,6 +128,9 @@ module org.mule.runtime.spring.config {
       org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.config.internal.processor to
       spring.beans;
+
+  exports org.mule.runtime.config.internal.registry to
+      com.mulesoft.mule.runtime.lambda;
 
   uses org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
   uses org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
