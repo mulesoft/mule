@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal.editors;
 
+import static org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
-import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
 import org.mule.runtime.core.api.MessageExchangePattern;

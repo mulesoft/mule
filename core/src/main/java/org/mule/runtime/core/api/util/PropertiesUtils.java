@@ -7,9 +7,9 @@
 package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
-import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import static java.lang.String.format;

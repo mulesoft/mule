@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal.model.dsl;
 
+import static org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
-import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 
 import java.io.IOException;
 import java.io.InputStream;
