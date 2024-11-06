@@ -308,22 +308,19 @@ public final class PropertiesUtils {
     try {
       allPropertiesResources = classLoader.getResources(resource);
     } catch (IOException e) {
-      throw new IOException(format("Error getting resources '%s' from classLoader '%s'", resource, classLoader.toString()), e);
+      throw new IOException(format("Error getting resources '%s' from classLoader '%s'", resource, classLoader), e);
     }
 
     while (allPropertiesResources.hasMoreElements()) {
       URL propertiesResource = allPropertiesResources.nextElement();
       if (logger.isDebugEnabled()) {
-        logger.debug("Reading properties from: " + propertiesResource.toString());
+        logger.debug("Reading properties from: {}", propertiesResource.toString());
       }
       Properties properties = new OrderedProperties();
-      // Avoid file descriptor leaks.
-      URLConnection urlConnection = propertiesResource.openConnection();
-      urlConnection.setUseCaches(false);
-      try (InputStream resourceStream = new BufferedInputStream(urlConnection.getInputStream())) {
+      try (InputStream resourceStream = new BufferedInputStream(getResourceAsStreamWithNoCache(propertiesResource))) {
         properties.load(resourceStream);
       } catch (IOException e) {
-        throw new IOException(format("Error loading properties from '%s'", propertiesResource.toString()), e);
+        throw new IOException(format("Error loading properties from '%s'", propertiesResource), e);
       }
 
       result.add(properties);
