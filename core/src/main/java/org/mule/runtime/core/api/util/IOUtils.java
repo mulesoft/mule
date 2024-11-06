@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE;
 
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
@@ -90,7 +89,7 @@ public class IOUtils {
     if (url == null) {
       return null;
     } else {
-      return getInputStreamWithCacheControl(url);
+      return org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl(url);
     }
   }
 
@@ -155,6 +154,22 @@ public class IOUtils {
     }
     return url;
   }
+
+  /**
+   * Returns an {@link InputStream} that will read from an {@link URL} connection without caching the underlying resources. This
+   * is important when working with jar files that are obtained via {@link ClassLoader#getResource(String)} in order to avoid file
+   * descriptor leaks. Note that {@link ClassLoader#getResourceAsStream(String)} already take care of closing such resources, so
+   * caching is not a problem in that case.
+   *
+   * @param url The URL to connect to.
+   * @return The InputStream.
+   * @throws IOException If it fails while obtaining the InputStream.
+   * @deprecated Use {@link org.mule.runtime.api.util.IOUtils#getInputStreamWithCacheControl(URL)}
+   */
+  public static InputStream getInputStreamWithCacheControl(URL url) throws IOException {
+    return org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl(url);
+  }
+
 
   /**
    * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream)</code> method but catches any
