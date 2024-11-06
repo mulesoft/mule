@@ -20,7 +20,6 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
@@ -100,7 +99,6 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
     triggerDirectoryWatcher();
     assertThat(appDeploymentListener.isArtifactUndeployed(), is(true));
     assertThat(appDeploymentListener.isLifecycleListenerCalled(), is(true));
-    assertThat(appDeploymentListener.wasLegacyReleaserCalledFirst(), is(false));
 
     // After some time, the application's ClassLoader should be collectable, thanks to the extension's LifecycleListener
     assertClassLoaderIsCollectable(appDeploymentListener.getPhantomReference());
@@ -142,7 +140,6 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
     assertThat(domainDeploymentListener.isArtifactUndeployed(), is(true));
     assertThat(appDeploymentListener.isLifecycleListenerCalled(), is(false));
     assertThat(domainDeploymentListener.isLifecycleListenerCalled(), is(true));
-    assertThat(domainDeploymentListener.wasLegacyReleaserCalledFirst(), is(false));
 
     // After some time, both the app's and the domain's ClassLoaders should be collectable, thanks to the extension's
     // LifecycleListener
@@ -215,9 +212,7 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
 
     private boolean artifactUndeployed;
 
-    private boolean legacyReleaserCalled;
     private boolean lifecycleListenerCalled;
-    private boolean wasLegacyReleaserCalledFirst;
 
     protected final DeployableFileBuilder<?> deployableFileBuilder;
 
@@ -233,7 +228,6 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
         phantomReference =
             new PhantomReference<>(artifactClassLoader, new ReferenceQueue<>());
         setArtifactDisposalCallback(artifactClassLoader);
-        setCustomLegacyResourceReleaser(artifactClassLoader);
       }
     }
 
@@ -260,10 +254,6 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
       return lifecycleListenerCalled;
     }
 
-    public boolean wasLegacyReleaserCalledFirst() {
-      return wasLegacyReleaserCalledFirst;
-    }
-
     protected abstract ArtifactClassLoader getArtifactClassLoader(String artifactName);
 
     private void setArtifactDisposalCallback(ArtifactClassLoader artifactClassLoader) {
@@ -274,32 +264,13 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
         artifactDisposalTrackerClass
             .getMethod("setOnArtifactDisposalCallback", Consumer.class)
             .invoke(null, (Consumer<ArtifactDisposalContext>) this::onArtifactDisposal);
-
-        artifactDisposalTrackerClass
-            .getMethod("setOnLegacyReleaser", Runnable.class)
-            .invoke(null, (Runnable) this::onLegacyReleaser);
       } catch (ReflectiveOperationException e) {
         throw new RuntimeException(e);
       }
     }
 
-    private void setCustomLegacyResourceReleaser(ArtifactClassLoader artifactClassLoader) {
-      // Sets a custom releaser which will take care of tracking when it got called
-      if (artifactClassLoader instanceof MuleArtifactClassLoader) {
-        ((MuleArtifactClassLoader) artifactClassLoader)
-            .setResourceReleaserClassLocation(ARTIFACT_DISPOSAL_TRACKER_CLASS_LOCATION);
-      }
-    }
-
-    private void onLegacyReleaser() {
-      legacyReleaserCalled = true;
-    }
-
     private void onArtifactDisposal(ArtifactDisposalContext artifactDisposalContext) {
       lifecycleListenerCalled = true;
-      if (legacyReleaserCalled) {
-        wasLegacyReleaserCalledFirst = true;
-      }
     }
   }
 

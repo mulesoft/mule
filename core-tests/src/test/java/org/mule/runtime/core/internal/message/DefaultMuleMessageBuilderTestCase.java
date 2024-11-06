@@ -17,7 +17,6 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.metadata.MediaType.HTML;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
-import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -39,8 +38,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalLong;
-
-import javax.activation.DataHandler;
 
 import org.junit.Test;
 
@@ -205,17 +202,6 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     assertThat(copy.getPayload().getValue(), equalTo(1));
     assertThat(copy.getPayload().getDataType().getType(), equalTo(Integer.class));
     assertThat(copy.getPayload().getDataType().getMediaType(), is(TEXT));
-  }
-
-  @Test
-  public void mutatePayloadDifferentTypeWithMediaTypeUpdateTypeAndConserveMimeType() {
-    Long payload = Long.valueOf(1);
-    DataHandler dataHandler = new DataHandler(payload, XML.toString());
-    Message copy = new DefaultMessageBuilder(createTestMessage()).value(dataHandler).build();
-
-    assertThat(copy.getPayload().getValue(), is(dataHandler));
-    assertThat(copy.getPayload().getDataType().getType(), equalTo(DataHandler.class));
-    assertThat(copy.getPayload().getDataType().getMediaType(), is(XML));
   }
 
   @Test
