@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

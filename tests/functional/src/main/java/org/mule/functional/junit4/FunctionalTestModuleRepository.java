@@ -10,11 +10,11 @@ import static java.lang.System.currentTimeMillis;
 import static java.nio.file.Files.createTempDirectory;
 
 import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
 import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.CompositeModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
-import org.mule.runtime.container.internal.ModuleDiscoverer;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.io.File;
