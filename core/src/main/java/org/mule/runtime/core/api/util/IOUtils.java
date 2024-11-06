@@ -89,7 +89,7 @@ public class IOUtils {
     if (url == null) {
       return null;
     } else {
-      return getResourceAsStreamWithNoCache(url);
+      return getInputStreamWithCacheControl(url);
     }
   }
 
@@ -165,7 +165,7 @@ public class IOUtils {
    * @return The InputStream.
    * @throws IOException If it fails while obtaining the InputStream.
    */
-  public static InputStream getResourceAsStreamWithNoCache(URL url) throws IOException {
+  public static InputStream getInputStreamWithCacheControl(URL url) throws IOException {
     URLConnection urlConnection = url.openConnection();
     if (urlConnection instanceof JarURLConnection) {
       urlConnection.setUseCaches(false);

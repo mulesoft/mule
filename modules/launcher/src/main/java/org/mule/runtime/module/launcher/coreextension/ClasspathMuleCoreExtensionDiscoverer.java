@@ -9,7 +9,7 @@ package org.mule.runtime.module.launcher.coreextension;
 import static java.lang.String.format;
 import static java.util.Comparator.comparingInt;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStreamWithNoCache;
+import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -63,7 +63,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
         if (logger.isDebugEnabled()) {
           logger.debug("Reading extension file: {}", url);
         }
-        extensions.add(loadProperties(getResourceAsStreamWithNoCache(url)));
+        extensions.add(loadProperties(getInputStreamWithCacheControl(url)));
       } catch (Exception ex) {
         throw new DefaultMuleException("Error loading Mule core extensions", ex);
       }

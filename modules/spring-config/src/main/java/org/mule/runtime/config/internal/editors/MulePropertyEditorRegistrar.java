@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.editors;
 
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStreamWithNoCache;
+import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
 import org.mule.runtime.core.api.MessageExchangePattern;
@@ -75,7 +75,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
         while (urls.hasMoreElements()) {
           URL url = urls.nextElement();
           Properties props = new Properties();
-          InputStream stream = getResourceAsStreamWithNoCache(url);
+          InputStream stream = getInputStreamWithCacheControl(url);
           try {
             props.load(stream);
             for (Map.Entry<Object, Object> entry : props.entrySet()) {

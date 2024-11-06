@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStreamWithNoCache;
+import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import static java.lang.String.format;
@@ -128,7 +128,7 @@ public final class PropertiesUtils {
     }
 
     try {
-      return loadProperties(getResourceAsStreamWithNoCache(url));
+      return loadProperties(getInputStreamWithCacheControl(url));
     } catch (IOException e) {
       throw new MuleRuntimeException(createStaticMessage("Failed to load resource from url: " + url), e);
     }
@@ -153,7 +153,7 @@ public final class PropertiesUtils {
         return -1;
       });
       for (URL resourceUrl : resourcesUrl) {
-        try (InputStream in = getResourceAsStreamWithNoCache(resourceUrl)) {
+        try (InputStream in = getInputStreamWithCacheControl(resourceUrl)) {
           p.load(in);
         }
       }
@@ -316,7 +316,7 @@ public final class PropertiesUtils {
         logger.debug("Reading properties from: {}", propertiesResource.toString());
       }
       Properties properties = new OrderedProperties();
-      try (InputStream resourceStream = new BufferedInputStream(getResourceAsStreamWithNoCache(propertiesResource))) {
+      try (InputStream resourceStream = new BufferedInputStream(getInputStreamWithCacheControl(propertiesResource))) {
         properties.load(resourceStream);
       } catch (IOException e) {
         throw new IOException(format("Error loading properties from '%s'", propertiesResource), e);

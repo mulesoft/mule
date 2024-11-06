@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.model.dsl;
 
 import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStreamWithNoCache;
+import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +31,7 @@ public class ClassLoaderResourceProvider implements ResourceProvider {
   public InputStream getResourceAsStream(String uri) {
     URL resource = getResourceOrFail(uri, classLoader, true);
     try {
-      return getResourceAsStreamWithNoCache(resource);
+      return getInputStreamWithCacheControl(resource);
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     }
