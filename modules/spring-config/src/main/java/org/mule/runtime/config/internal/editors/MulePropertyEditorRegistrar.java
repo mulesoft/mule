@@ -21,7 +21,6 @@ import org.springframework.beans.PropertyEditorRegistry;
 import java.beans.PropertyEditor;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
