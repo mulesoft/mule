@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
