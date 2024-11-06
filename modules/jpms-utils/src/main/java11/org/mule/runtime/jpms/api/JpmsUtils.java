@@ -76,8 +76,7 @@ public final class JpmsUtils {
                            "org.mule.boot.tanuki",
                            MULE_JPMS_UTILS_MODULE_NAME,
                            "com.fasterxml.jackson.core",
-                           "org.apache.commons.codec",
-                           "org.apache.log4j"));
+                           "org.apache.commons.codec"));
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG =
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
