@@ -22,6 +22,7 @@ import java.util.List;
  * Constructs a default set of JAR Urls located under Mule home folder.
  */
 public class DefaultMuleClassPathConfig {
+
   protected static final String MULE_DIR = "/lib/mule";
   protected static final String USER_DIR = "/lib/user";
   protected static final String OPT_DIR = "/lib/opt";
