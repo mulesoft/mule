@@ -7,11 +7,11 @@
 package org.mule.runtime.config.internal.model.dsl;
 
 import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStreamWithNoCache;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.properties.api.ResourceProvider;
@@ -30,11 +30,8 @@ public class ClassLoaderResourceProvider implements ResourceProvider {
   @Override
   public InputStream getResourceAsStream(String uri) {
     URL resource = getResourceOrFail(uri, classLoader, true);
-    // Avoid file descriptor leaks.
     try {
-      URLConnection urlConnection = resource.openConnection();
-      urlConnection.setUseCaches(false);
-      return urlConnection.getInputStream();
+      return getResourceAsStreamWithNoCache(resource);
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     }
