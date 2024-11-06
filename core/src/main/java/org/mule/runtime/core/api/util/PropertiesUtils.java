@@ -8,6 +8,8 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStreamWithNoCache;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import static java.lang.String.format;
@@ -21,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -105,7 +108,7 @@ public final class PropertiesUtils {
    * @return a java.util.Properties object containing the properties.
    */
   public static synchronized Properties loadProperties(String fileName, final Class<?> callingClass) throws IOException {
-    InputStream is = IOUtils.getResourceAsStream(fileName, callingClass, /* tryAsFile */true, /* tryAsUrl */false);
+    InputStream is = getResourceAsStream(fileName, callingClass, /* tryAsFile */true, /* tryAsUrl */false);
     if (is == null) {
       I18nMessage error = CoreMessages.cannotLoadFromClasspath(fileName);
       throw new IOException(error.toString());
@@ -126,7 +129,7 @@ public final class PropertiesUtils {
     }
 
     try {
-      return loadProperties(url.openStream());
+      return loadProperties(getResourceAsStreamWithNoCache(url));
     } catch (IOException e) {
       throw new MuleRuntimeException(createStaticMessage("Failed to load resource from url: " + url), e);
     }
@@ -151,9 +154,9 @@ public final class PropertiesUtils {
         return -1;
       });
       for (URL resourceUrl : resourcesUrl) {
-        InputStream in = resourceUrl.openStream();
-        p.load(in);
-        in.close();
+        try (InputStream in = getResourceAsStreamWithNoCache(resourceUrl)) {
+          p.load(in);
+        }
       }
     } catch (IOException e) {
       throw new MuleRuntimeException(createStaticMessage("Failed to load resource: " + fileName), e);
@@ -314,8 +317,10 @@ public final class PropertiesUtils {
         logger.debug("Reading properties from: " + propertiesResource.toString());
       }
       Properties properties = new OrderedProperties();
-
-      try (InputStream resourceStream = new BufferedInputStream(propertiesResource.openStream())) {
+      // Avoid file descriptor leaks.
+      URLConnection urlConnection = propertiesResource.openConnection();
+      urlConnection.setUseCaches(false);
+      try (InputStream resourceStream = new BufferedInputStream(urlConnection.getInputStream())) {
         properties.load(resourceStream);
       } catch (IOException e) {
         throw new IOException(format("Error loading properties from '%s'", propertiesResource.toString()), e);

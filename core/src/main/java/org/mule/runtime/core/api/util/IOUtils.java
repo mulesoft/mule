@@ -89,7 +89,7 @@ public class IOUtils {
     if (url == null) {
       return null;
     } else {
-      return getInputStreamWithCacheControl(url);
+      return getResourceAsStreamWithNoCache(url);
     }
   }
 
@@ -155,10 +155,18 @@ public class IOUtils {
     return url;
   }
 
-  public static InputStream getInputStreamWithCacheControl(URL url) throws IOException {
+  /**
+   * Returns an {@link InputStream} that will read from an {@link URL} connection without caching the underlying resources. This
+   * is important when working with jar files that are obtained via {@link ClassLoader#getResource(String)} in order to avoid file
+   * descriptor leaks. Note that {@link ClassLoader#getResourceAsStream(String)} already take care of closing such resources, so
+   * caching is not a problem in that case.
+   * 
+   * @param url The URL to connect to.
+   * @return The InputStream.
+   * @throws IOException If it fails while obtaining the InputStream.
+   */
+  public static InputStream getResourceAsStreamWithNoCache(URL url) throws IOException {
     URLConnection urlConnection = url.openConnection();
-    // It's necessary to disable connection caching when working with jar files
-    // in order to avoid file leaks in Windows environments
     if (urlConnection instanceof JarURLConnection) {
       urlConnection.setUseCaches(false);
     }

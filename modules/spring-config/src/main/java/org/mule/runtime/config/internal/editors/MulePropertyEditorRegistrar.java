@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.editors;
 
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStreamWithNoCache;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
 import org.mule.runtime.core.api.MessageExchangePattern;
@@ -20,6 +21,7 @@ import org.springframework.beans.PropertyEditorRegistry;
 import java.beans.PropertyEditor;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -74,7 +76,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
         while (urls.hasMoreElements()) {
           URL url = urls.nextElement();
           Properties props = new Properties();
-          InputStream stream = url.openStream();
+          InputStream stream = getResourceAsStreamWithNoCache(url);
           try {
             props.load(stream);
             for (Map.Entry<Object, Object> entry : props.entrySet()) {

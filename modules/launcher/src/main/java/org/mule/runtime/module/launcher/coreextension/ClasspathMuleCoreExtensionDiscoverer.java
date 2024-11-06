@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,10 +59,13 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
     while (e.hasMoreElements()) {
       try {
         URL url = (URL) e.nextElement();
+        // Avoid file descriptor leaks.
+        URLConnection urlConnection = url.openConnection();
+        urlConnection.setUseCaches(false);
         if (logger.isDebugEnabled()) {
-          logger.debug("Reading extension file: " + url.toString());
+          logger.debug("Reading extension file: {}", url);
         }
-        extensions.add(loadProperties(url.openStream()));
+        extensions.add(loadProperties(urlConnection.getInputStream()));
       } catch (Exception ex) {
         throw new DefaultMuleException("Error loading Mule core extensions", ex);
       }
