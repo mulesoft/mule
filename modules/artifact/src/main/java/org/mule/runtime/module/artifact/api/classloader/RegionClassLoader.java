@@ -8,7 +8,6 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
-import static org.mule.runtime.module.artifact.api.classloader.jar.CachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
@@ -346,8 +345,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
                       return descriptorMapping.get(descriptor);
                     } else {
                       try {
-                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()}, getSystemClassLoader(),
-                                                  getCachingURLStreamHandlerFactory());
+                        return new URLClassLoader(new URL[] {dependency.getBundleUri().toURL()}, getSystemClassLoader());
                       } catch (MalformedURLException e) {
                         throw new MuleRuntimeException(e);
                       }
