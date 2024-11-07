@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.context;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
@@ -147,10 +146,12 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   protected void createBootstrapBeanDefinitions() {
     try {
       SpringRegistryBootstrap springRegistryBootstrap =
-          new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, this::registerBeanDefinition,
+          new SpringRegistryBootstrap(artifactType,
+                                      muleContext.getRegistryBootstrapServiceDiscoverer(),
+                                      optionalObjectsController,
+                                      this::registerBeanDefinition,
                                       BINDING_PROVIDER_PREDICATE
-                                          .or(TRANSFORMER_PREDICATE)
-                                          .or(propertyKey -> propertyKey.endsWith(COMPATIBILITY_PLUGIN_INSTALLED)));
+                                          .or(TRANSFORMER_PREDICATE));
       springRegistryBootstrap.initialise();
     } catch (InitialisationException e) {
       throw new RuntimeException(e);
@@ -181,7 +182,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
     }
 
     originalRegistry.lookupByType(Object.class)
-        .forEach((key, value) -> registerConstantBeanDefinition(key, value));
+        .forEach(this::registerConstantBeanDefinition);
     originalRegistry = null;
   }
 

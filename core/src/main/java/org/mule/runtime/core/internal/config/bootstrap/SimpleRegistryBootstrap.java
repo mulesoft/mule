@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformerNotImplementDiscoverable;
+
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 /**
@@ -27,13 +28,18 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
  */
 public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
 
+  private final Registrer registrer;
+
   /**
-   * @param supportedArtifactType type of the artifact to support. This attributes defines which types of registry bootstrap
-   *                              entries will be created depending on the entry applyToArtifactType parameter value.
-   * @param muleContext           {@code MuleContext} in which the objects will be registered
+   * @param supportedArtifactType      type of the artifact to support. This attributes defines which types of registry bootstrap
+   *                                   entries will be created depending on the entry applyToArtifactType parameter value.
+   * @param bootstrapServiceDiscoverer {@link BootstrapServiceDiscoverer} used to bootstrap a {@link MuleContext}
+   * @param registrer                  adds an object to the registry, with any applicable rules (i.e.: service overrides)
    */
-  public SimpleRegistryBootstrap(ArtifactType supportedArtifactType, MuleContext muleContext) {
-    super(supportedArtifactType, muleContext, k -> true);
+  public SimpleRegistryBootstrap(ArtifactType supportedArtifactType, BootstrapServiceDiscoverer bootstrapServiceDiscoverer,
+                                 Registrer registrer) {
+    super(supportedArtifactType, bootstrapServiceDiscoverer, k -> true);
+    this.registrer = registrer;
   }
 
   @Override
@@ -42,7 +48,7 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
       throws Exception {
     Transformer trans = ClassUtils.instantiateClass(transformerClass);
     if (!(trans instanceof DiscoverableTransformer)) {
-      throw new RegistrationException(CoreMessages.transformerNotImplementDiscoverable(trans));
+      throw new RegistrationException(transformerNotImplementDiscoverable(trans));
     }
     if (returnClass != null) {
       DataTypeParamsBuilder builder = DataType.builder().type(returnClass);
@@ -58,12 +64,12 @@ public class SimpleRegistryBootstrap extends AbstractRegistryBootstrap {
       // the transformer with the same name
       trans.setName("_" + trans.getName());
     }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(trans.getName(), trans);
+    registrer.register(trans.getName(), trans);
   }
 
   @Override
   protected void doRegisterObject(ObjectBootstrapProperty bootstrapProperty) throws Exception {
-    Object value = bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName());
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(bootstrapProperty.getKey(), value);
+    registrer.register(bootstrapProperty.getKey(),
+                       bootstrapProperty.getService().instantiateClass(bootstrapProperty.getClassName()));
   }
 }

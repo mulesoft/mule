@@ -1,4 +1,24 @@
 {
+  "4.8.2": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.added",
+            "new": "interface org.mule.runtime.core.api.config.builders.RegistryBootstrap.Registrer",
+            "justification": "W-17146121: MinimalConfigurationBuilder: service overrides not applied to objects loaded from `registry-bootstrap.properties`"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.staticMethodAddedToInterface",
+            "new": "method org.mule.runtime.core.api.config.builders.RegistryBootstrap org.mule.runtime.core.api.config.builders.RegistryBootstrap::defaultRegistryBoostrap(org.mule.runtime.core.api.config.bootstrap.ArtifactType, org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer, org.mule.runtime.core.api.config.builders.RegistryBootstrap.Registrer)",
+            "justification": "W-17146121: MinimalConfigurationBuilder: service overrides not applied to objects loaded from `registry-bootstrap.properties`"
+          }
+        ]
+      }
+    }
+  },
   "4.8.0": {
     "revapi": {
       "differences": {
