@@ -11,6 +11,7 @@ import static java.util.regex.Pattern.compile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
@@ -111,11 +112,17 @@ public class MuleManifest {
         URL url = AccessController.doPrivileged(new UrlPrivilegedAction());
 
         if (url != null) {
-          is = url.openStream();
+          URLConnection urlConnection = url.openConnection();
+          urlConnection.setUseCaches(false);
+          is = urlConnection.getInputStream();
         }
 
         if (is != null) {
-          manifest.read(is);
+          try {
+            manifest.read(is);
+          } finally {
+            is.close();
+          }
         }
       } catch (IOException e) {
         logger.warn("Failed to read manifest Info, Manifest information will not display correctly: " + e.getMessage());
