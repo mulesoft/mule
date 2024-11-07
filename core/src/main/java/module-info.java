@@ -241,6 +241,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.context to
+      com.mulesoft.mule.runtime.lambda,
       org.mule.runtime.core.components,
       org.mule.runtime.artifact,
       org.mule.runtime.extensions.spring.support,
@@ -363,6 +364,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.profiling.tracing.event.span.condition to
       org.mule.runtime.tracer.internal.impl;
   exports org.mule.runtime.core.internal.registry to
+      com.mulesoft.mule.runtime.lambda,
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
