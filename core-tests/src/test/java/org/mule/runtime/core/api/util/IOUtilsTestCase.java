@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_SIZE;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.disablePlugins;
