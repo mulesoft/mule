@@ -111,6 +111,8 @@ import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
 import org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor;
+import org.mule.tck.junit4.FlakinessDetectorTestRunnerWithParameters;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -131,11 +133,13 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 /**
  * Contains test for application deployment on the default domain
  */
 @Feature(APP_DEPLOYMENT)
+@Parameterized.UseParametersRunnerFactory(FlakinessDetectorTestRunnerWithParameters.FlakinessDetectorTestRunnerWithParametersFactory.class)
 public class ApplicationDeploymentTestCase extends AbstractApplicationDeploymentTestCase {
 
   private static final String OVERWRITTEN_PROPERTY = "configFile";
@@ -1610,13 +1614,14 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   }
 
   @Test
+  @FlakyTest(times = 300)
   @Story(DEPLOYMENT_SUCCESS)
   public void synchronizesDeploymentOnStart() throws Exception {
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
     Thread deploymentServiceThread = new Thread(() -> {
       try {
-        startDeployment();
+        startDeployment(false);
       } catch (MuleException e) {
         throw new RuntimeException(e);
       }
@@ -1648,9 +1653,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
       return null;
     }).when(applicationDeploymentListener).onDeploymentStart(emptyAppFileBuilder.getId());
 
+    serviceManager.start();
     deploymentServiceThread.start();
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    deploymentServiceThread.join();
 
     assertFalse("Able to lock deployment service during start", lockedFromClient[0]);
   }
