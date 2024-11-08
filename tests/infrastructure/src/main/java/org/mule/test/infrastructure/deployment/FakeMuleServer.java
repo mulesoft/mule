@@ -38,7 +38,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
@@ -54,8 +53,6 @@ import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensio
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.tooling.api.ToolingService;
-import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -83,7 +80,6 @@ public class FakeMuleServer {
   private final DeploymentService deploymentService;
   private final DeploymentListener domainDeploymentListener;
   private final DeploymentListener deploymentListener;
-  private final ToolingService toolingService;
 
   private final List<MuleCoreExtension> coreExtensions;
 
@@ -139,10 +135,6 @@ public class FakeMuleServer {
 
     repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
-    toolingService = new DefaultToolingService(muleArtifactResourcesRegistry.getDomainRepository(),
-                                               muleArtifactResourcesRegistry.getDomainFactory(),
-                                               muleArtifactResourcesRegistry.getApplicationFactory(),
-                                               muleArtifactResourcesRegistry.getToolingApplicationDescriptorFactory());
     deploymentService = DeploymentServiceBuilder.deploymentServiceBuilder()
         .withArtifactStartExecutorSupplier(() -> findSchedulerService(serviceManager))
         .withDomainFactory(muleArtifactResourcesRegistry.getDomainFactory())
@@ -167,7 +159,6 @@ public class FakeMuleServer {
     coreExtensionManager =
         new DefaultMuleCoreExtensionManagerServer(() -> coreExtensions, new ReflectionMuleCoreExtensionDependencyResolver());
     coreExtensionManager.setDeploymentService(deploymentService);
-    coreExtensionManager.setToolingService(toolingService);
     coreExtensionManager.setArtifactClassLoaderManager(muleArtifactResourcesRegistry.getArtifactClassLoaderManager());
     coreExtensionManager.setRepositoryService(repositoryService);
     coreExtensionManager.setServiceRepository(serviceManager);
@@ -187,10 +178,6 @@ public class FakeMuleServer {
     coreExtensionManager.start();
     startIfNeeded(extensionModelLoaderRepository);
     deploymentService.start();
-  }
-
-  public ToolingService toolingService() {
-    return this.toolingService;
   }
 
   public void assertDeploymentSuccess(String appName) {

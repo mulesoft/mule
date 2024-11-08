@@ -22,7 +22,6 @@ import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerSe
 import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -62,8 +61,6 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
 
   private final TroubleshootingService troubleshootingService = mock(TroubleshootingService.class);
 
-  private final ToolingService toolingService = mock(ToolingService.class);
-
   @Before
   public void setUp() throws Exception {
     coreExtensionManager = mock(MuleCoreExtensionManagerServer.class);
@@ -72,7 +69,7 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
   }
 
   private DefaultMuleContainer createMuleContainer() throws InitialisationException {
-    return new DefaultMuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
+    return new DefaultMuleContainer(deploymentService, repositoryService, coreExtensionManager, serviceManager,
                                     extensionModelLoaderRepository, troubleshootingService);
   }
 
@@ -82,7 +79,6 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
 
     verify(coreExtensionManager).setDeploymentService(deploymentService);
     verify(coreExtensionManager).setRepositoryService(repositoryService);
-    verify(coreExtensionManager).setToolingService(toolingService);
     verify(coreExtensionManager).setServiceRepository(serviceManager);
     verify(coreExtensionManager).initialise();
     verify(coreExtensionManager).start();

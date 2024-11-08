@@ -59,8 +59,6 @@ import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.tooling.api.ToolingService;
-import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingService;
 
@@ -89,7 +87,6 @@ public class DefaultMuleContainer implements MuleContainer {
 
   protected final DeploymentService deploymentService;
   private final RepositoryService repositoryService;
-  private final ToolingService toolingService;
   private final MuleCoreExtensionManagerServer coreExtensionManager;
   private final TroubleshootingService troubleshootingService;
   private ServerLockFactory muleLockFactory;
@@ -130,10 +127,6 @@ public class DefaultMuleContainer implements MuleContainer {
     this.troubleshootingService = new DefaultTroubleshootingService(deploymentService);
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
-    this.toolingService = new DefaultToolingService(artifactResourcesRegistry.getDomainRepository(),
-                                                    artifactResourcesRegistry.getDomainFactory(),
-                                                    artifactResourcesRegistry.getApplicationFactory(),
-                                                    artifactResourcesRegistry.getToolingApplicationDescriptorFactory());
     this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
                                                                           new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
                                                                               .getContainerClassLoader()),
@@ -156,7 +149,7 @@ public class DefaultMuleContainer implements MuleContainer {
    * Configure the server.
    */
   DefaultMuleContainer(DeploymentService deploymentService, RepositoryService repositoryService,
-                       ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
+                       MuleCoreExtensionManagerServer coreExtensionManager,
                        ServiceManager serviceManager, ExtensionModelLoaderRepository extensionModelLoaderRepository,
                        TroubleshootingService troubleshootingService)
       throws IllegalArgumentException, InitialisationException {
@@ -167,7 +160,6 @@ public class DefaultMuleContainer implements MuleContainer {
     this.repositoryService = repositoryService;
     this.serviceManager = serviceManager;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
-    this.toolingService = toolingService;
     this.troubleshootingService = troubleshootingService;
   }
 
@@ -220,7 +212,6 @@ public class DefaultMuleContainer implements MuleContainer {
       coreExtensionManager.setDeploymentService(deploymentService);
       coreExtensionManager.setRepositoryService(repositoryService);
       coreExtensionManager.setArtifactClassLoaderManager(artifactResourcesRegistry.getArtifactClassLoaderManager());
-      coreExtensionManager.setToolingService(toolingService);
       coreExtensionManager.setServiceRepository(serviceManager);
       coreExtensionManager.setTroubleshootingService(troubleshootingService);
       coreExtensionManager.setServerLockFactory(muleLockFactory);
@@ -234,7 +225,6 @@ public class DefaultMuleContainer implements MuleContainer {
 
       coreExtensionManager.initialise();
       coreExtensionManager.start();
-      toolingService.initialise();
 
       startIfNeeded(extensionModelLoaderRepository);
       deploymentService.start();
@@ -335,10 +325,6 @@ public class DefaultMuleContainer implements MuleContainer {
 
     if (serviceManager != null) {
       serviceManager.stop();
-    }
-
-    if (toolingService != null) {
-      toolingService.stop();
     }
 
     LoggerContextFactory defaultLogManagerFactory = getFactory();

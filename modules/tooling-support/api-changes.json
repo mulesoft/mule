@@ -1,4 +1,51 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+        // 4.10
+// ------------------>>
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder<T extends org.mule.runtime.module.tooling.api.ArtifactAgnosticServiceBuilder, S>",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.module.tooling.api.ToolingService",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.module.tooling.api.ToolingServiceAware",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.module.tooling.api.artifact.DeclarationSession",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.module.tooling.api.artifact.DeclarationSessionBuilder",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          }
+// <<------------------
+        ]
+      }
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [
