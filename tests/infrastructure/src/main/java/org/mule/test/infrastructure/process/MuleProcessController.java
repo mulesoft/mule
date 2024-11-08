@@ -59,6 +59,10 @@ public class MuleProcessController {
     return getController().isRunning();
   }
 
+  public int installAgent(String consoleURI, String serverName, String token) {
+    return getController().installAgent(serverName, consoleURI, token);
+  }
+
   public void start(String... baseArgs) {
     String[] args = baseArgs;
 

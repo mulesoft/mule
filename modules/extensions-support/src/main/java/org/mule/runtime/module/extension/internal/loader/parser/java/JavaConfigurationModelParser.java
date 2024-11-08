@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isAddAnnotationsToConfigClass;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
@@ -148,7 +149,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
         : Thread.currentThread().getContextClassLoader();
 
     TypeAwareConfigurationFactory typeAwareConfigurationFactory =
-        new TypeAwareConfigurationFactory(configClass, classLoader);
+        new TypeAwareConfigurationFactory(configClass, classLoader, isAddAnnotationsToConfigClass(loadingContext));
 
     return new ConfigurationFactoryModelProperty(typeAwareConfigurationFactory);
   }

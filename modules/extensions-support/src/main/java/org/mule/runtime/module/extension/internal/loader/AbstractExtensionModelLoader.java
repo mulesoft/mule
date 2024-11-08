@@ -6,18 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
-import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_8;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getJdkVersion;
-import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.isJava8;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADD_ANNOTATIONS_TO_CONFIG_CLASS;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -77,17 +75,27 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     context.addCustomValidators(validators);
 
-    Optional<Object> disableComponentIgnore = context.getParameter(DISABLE_COMPONENT_IGNORE);
-    disableComponentIgnore
-        .ifPresent(value -> checkState(value instanceof Boolean,
-                                       format("Property value for %s expected to be boolean", DISABLE_COMPONENT_IGNORE)));
-
+    Optional<Object> disableComponentIgnore = ckeckBoolean(context, DISABLE_COMPONENT_IGNORE);
     if (IGNORE_DISABLED && !disableComponentIgnore.isPresent()) {
       context.addParameter(DISABLE_COMPONENT_IGNORE, true);
     }
+
     if (ENABLE_POLLING_SOURCE_LIMIT) {
       context.addParameter(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
     }
+
+    Optional<Object> addAnnotationstoConfigClass = ckeckBoolean(context, ADD_ANNOTATIONS_TO_CONFIG_CLASS);
+    if (addAnnotationstoConfigClass.isPresent()) {
+      context.addParameter(ADD_ANNOTATIONS_TO_CONFIG_CLASS, addAnnotationstoConfigClass.get());
+    }
+  }
+
+  private Optional<Object> ckeckBoolean(ExtensionLoadingContext context, String paramMame) {
+    Optional<Object> addAnnotationstoConfigClass = context.getParameter(paramMame);
+    addAnnotationstoConfigClass
+        .ifPresent(value -> checkState(value instanceof Boolean,
+                                       format("Property value for %s expected to be boolean", paramMame)));
+    return addAnnotationstoConfigClass;
   }
 
   /**
@@ -125,8 +133,7 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
           throw new IllegalSourceException(format("Extension '%s' version %s does not support Mule 4.6+ on Java %s. Supported Java versions are: %s. (%s)",
                                                   context.getExtensionDeclarer().getDeclaration().getName(),
                                                   context.getExtensionDeclarer().getDeclaration().getVersion(),
-                                                  isJava8(runningJdkVersion) ? JAVA_VERSION_8
-                                                      : valueOf(runningJdkVersion.getMajor()),
+                                                  runningJdkVersion.getMajor(),
                                                   supportedJavaVersions,
                                                   ncdfe.toString()));
         }

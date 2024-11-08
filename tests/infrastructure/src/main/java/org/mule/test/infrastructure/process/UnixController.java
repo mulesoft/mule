@@ -35,6 +35,11 @@ public class UnixController extends AbstractOSController {
   }
 
   @Override
+  protected String getAmcSetupBin() {
+    return muleHome + "/bin/amc_setup";
+  }
+
+  @Override
   public int getProcessId() {
     Map<String, String> newEnv = this.copyEnvironmentVariables();
     DefaultExecutor executor = new DefaultExecutor();

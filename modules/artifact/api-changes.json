@@ -1,4 +1,18 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader::setResourceReleaserClassLocation(java.lang.String)",
+            "justification": "W-14572248: Remove resource releasers form runtime"
+          }
+        ]
+      }
+    }
+  },
   "4.8.0": {
     "revapi": {
       "differences": {
