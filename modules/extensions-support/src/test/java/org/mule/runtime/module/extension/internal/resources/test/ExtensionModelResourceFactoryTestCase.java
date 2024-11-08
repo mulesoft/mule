@@ -40,7 +40,7 @@ public class ExtensionModelResourceFactoryTestCase {
     GeneratedResource resource = resourceFactory.generateResource(extensionModel).get();
     assertThat(resource.getPath(), equalTo(RESOURCE_NAME));
     XMLUnit.setIgnoreWhitespace(true);
-    String expected = IOUtils.toString(currentThread().getContextClassLoader().getResource(RESOURCE_NAME).openStream());
+    String expected = IOUtils.toString(currentThread().getContextClassLoader().getResourceAsStream(RESOURCE_NAME));
     XMLUnit.compareXML(expected, new String(resource.getContent()));
   }
 }
