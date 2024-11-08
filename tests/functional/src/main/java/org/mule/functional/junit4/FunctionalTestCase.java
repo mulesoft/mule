@@ -23,7 +23,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -108,15 +107,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    ArtifactDeclaration artifactDeclaration = getArtifactDeclaration();
-    if (artifactDeclaration != null) {
-      return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
-                                                          enableLazyInit(),
-                                                          addToolingObjectsToRegistry(),
-                                                          artifactDeclaration,
-                                                          getExpressionLanguageMetadataService());
-    }
-
     String configResources = getConfigResources();
     if (configResources != null) {
       return new ArtifactAstXmlParserConfigurationBuilder(artifactProperties(),
@@ -184,13 +174,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * @return a several files that define a mule application configuration
    */
   protected String[] getConfigFiles() {
-    return null;
-  }
-
-  /**
-   * @return {@link ArtifactDeclaration} that defines the mule application configuration.
-   */
-  protected ArtifactDeclaration getArtifactDeclaration() {
     return null;
   }
 

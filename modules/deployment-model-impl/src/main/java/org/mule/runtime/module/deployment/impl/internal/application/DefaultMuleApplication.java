@@ -281,7 +281,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setServiceRepository(serviceRepository)
               .setExtensionModelLoaderRepository(extensionModelLoaderRepository)
               .setClassLoaderRepository(classLoaderRepository)
-              .setArtifactDeclaration(descriptor.getArtifactDeclaration())
               .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager)
@@ -352,7 +351,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   }
 
   private void setMuleContext(final MuleContext muleContext, Registry registry) {
-    statusListener = new MuleContextNotificationListener<MuleContextNotification>() {
+    statusListener = new MuleContextNotificationListener<>() {
 
       @Override
       public boolean isBlocking() {

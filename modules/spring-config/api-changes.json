@@ -8,6 +8,24 @@
           {
             "ignore": true,
             "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
             "old": "class org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory",
             "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
           },

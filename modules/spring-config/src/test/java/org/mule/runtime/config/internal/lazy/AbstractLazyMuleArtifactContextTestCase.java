@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.lazy;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
@@ -45,7 +44,6 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.dsl.model.AbstractDslModelTestCase;
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
@@ -132,8 +130,6 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
 
   protected abstract void onProcessorInitialization();
 
-  protected abstract ArtifactDeclaration getArtifactDeclaration();
-
   protected DefaultListableBeanFactory doCreateBeanFactoryMock() {
     return mock(ObjectProviderAwareBeanFactory.class);
   }
@@ -178,7 +174,8 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
   private LazyMuleArtifactContext createLazyMuleArtifactContextStub(MuleContext muleContext) {
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext,
-                                    toArtifactast(getArtifactDeclaration(), getExtensions(muleContext.getExtensionManager())),
+                                    // TODO generate the ast
+                                    null,
                                     empty(),
                                     new BaseConfigurationComponentLocator(),
                                     new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),

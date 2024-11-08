@@ -7,10 +7,6 @@
 package org.mule.runtime.config.internal.lazy;
 
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.COMPONENT_LIFE_CYCLE;
 import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
@@ -19,7 +15,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.api.LazyComponentInitializer.ComponentLocationFilter;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -89,13 +84,13 @@ public class LazyComponentInitializerAdapterTestCase extends AbstractLazyMuleArt
     assertThat(initializations.get(), is(2));
   }
 
-  @Override
-  protected ArtifactDeclaration getArtifactDeclaration() {
-    return newArtifact()
-        .withGlobalElement(forExtension(MULE_NAME)
-            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
-            .withRefName(MY_FLOW)
-            .getDeclaration())
-        .getDeclaration();
-  }
+  // @Override
+  // protected ArtifactDeclaration getArtifactDeclaration() {
+  // return newArtifact()
+  // .withGlobalElement(forExtension(MULE_NAME)
+  // .newConstruct(FLOW_ELEMENT_IDENTIFIER)
+  // .withRefName(MY_FLOW)
+  // .getDeclaration())
+  // .getDeclaration();
+  // }
 }

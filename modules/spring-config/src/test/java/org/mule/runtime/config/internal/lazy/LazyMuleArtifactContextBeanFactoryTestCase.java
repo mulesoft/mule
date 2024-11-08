@@ -7,10 +7,6 @@
 package org.mule.runtime.config.internal.lazy;
 
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.COMPONENT_LIFE_CYCLE;
 import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
@@ -35,7 +31,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
 
 import java.lang.reflect.Method;
@@ -241,20 +236,19 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
     verify(beanFactory).registerBeanDefinition(eq(MY_FLOW), any());
   }
 
-  @Override
-  protected ArtifactDeclaration getArtifactDeclaration() {
-    return newArtifact()
-        .withGlobalElement(forExtension(MULE_NAME)
-            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
-            .withRefName(MY_FLOW)
-            .getDeclaration())
-        .withGlobalElement(forExtension(MULE_NAME)
-            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
-            .withRefName(ANOTHER_FLOW)
-            .getDeclaration())
-        .getDeclaration();
-  }
-
+  // @Override
+  // protected ArtifactDeclaration getArtifactDeclaration() {
+  // return newArtifact()
+  // .withGlobalElement(forExtension(MULE_NAME)
+  // .newConstruct(FLOW_ELEMENT_IDENTIFIER)
+  // .withRefName(MY_FLOW)
+  // .getDeclaration())
+  // .withGlobalElement(forExtension(MULE_NAME)
+  // .newConstruct(FLOW_ELEMENT_IDENTIFIER)
+  // .withRefName(ANOTHER_FLOW)
+  // .getDeclaration())
+  // .getDeclaration();
+  // }
 
   @Override
   protected void onProcessorInitialization() {

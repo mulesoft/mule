@@ -22,7 +22,6 @@ open module org.mule.runtime.deployment.test {
   requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.serialization;
   requires org.mule.runtime.artifact.ast.xmlParser;
-  requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.container;
   requires org.mule.runtime.core;
   requires org.mule.runtime.core.components;

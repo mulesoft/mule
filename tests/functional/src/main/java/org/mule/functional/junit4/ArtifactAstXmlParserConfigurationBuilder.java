@@ -11,7 +11,6 @@ import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.ast.internal.serialization.json.JsonArtifactAstSerializerFormat.JSON;
 import static org.mule.runtime.config.api.ArtifactContextFactory.createArtifactContextFactory;
-import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 
 import static java.lang.Boolean.getBoolean;
@@ -24,7 +23,6 @@ import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
 import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
@@ -80,7 +78,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
 
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
-  private ArtifactDeclaration artifactDeclaration;
   private String[] configResources;
 
   private ArtifactType artifactType = APPLICATION;
@@ -91,7 +88,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean enableLazyInit,
                                                   boolean addToolingObjectsToRegistry,
-                                                  ArtifactDeclaration artifactDeclaration,
                                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.artifactProperties = artifactProperties;
     this.disableXmlValidations = false;
@@ -100,8 +96,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     this.ignoreCaches = false;
 
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
-
-    this.artifactDeclaration = requireNonNull(artifactDeclaration);
   }
 
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
@@ -135,9 +129,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     Set<ExtensionModel> extensions = muleContext.getExtensionManager().getExtensions();
 
     final ArtifactAst artifactAst;
-    if (artifactDeclaration != null) {
-      artifactAst = toArtifactast(artifactDeclaration, extensions);
-    } else if (configResources.length == 0) {
+    if (configResources.length == 0) {
       artifactAst = emptyArtifact();
     } else if (ignoreCaches) {
       artifactAst = parseArtifactIntoAst(extensions, muleContext, expressionLanguageMetadataService);
@@ -209,16 +201,12 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   }
 
   private org.mule.runtime.core.api.config.bootstrap.ArtifactType resolveArtifactType() {
-    switch (artifactType) {
-      case APPLICATION:
-        return org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-      case DOMAIN:
-        return org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-      case POLICY:
-        return org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-      default:
-        return null;
-    }
+    return switch (artifactType) {
+      case APPLICATION -> org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+      case DOMAIN -> org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+      case POLICY -> org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+      default -> null;
+    };
   }
 
   private static final class XmlParserFactory {
