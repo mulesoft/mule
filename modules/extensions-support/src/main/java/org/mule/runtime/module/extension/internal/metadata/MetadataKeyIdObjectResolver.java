@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static java.lang.String.format;
-import static java.lang.String.valueOf;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
+
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
@@ -29,6 +30,7 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
@@ -47,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Provides an instance of the annotated {@link MetadataKeyId} parameter type. The instance will be populated with all the
@@ -56,7 +59,7 @@ import java.util.Optional;
  */
 final class MetadataKeyIdObjectResolver {
 
-  private static final DsqlParser dsqlParser = DsqlParser.getInstance();
+  private static final Supplier<DsqlParser> dsqlParser = new LazyValue<>(DsqlParser::getInstance);
   private final ComponentModel component;
   private final List<ParameterModel> keyParts;
   private final Map<String, ParameterModel> parameterModelIndex = new HashMap<>();
@@ -315,7 +318,7 @@ final class MetadataKeyIdObjectResolver {
       if (metadataKeyType.isEnum()) {
         keyValueHolder.set(Enum.valueOf(metadataKeyType, id));
       } else if (getQueryModelProperty().isPresent() && isDsqlQuery(id)) {
-        DsqlQuery dsqlQuery = dsqlParser.parse(id);
+        DsqlQuery dsqlQuery = dsqlParser.get().parse(id);
         keyValueHolder.set(dsqlQuery);
       } else {
         keyValueHolder.set(id);
