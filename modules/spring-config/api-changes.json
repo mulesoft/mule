@@ -1,4 +1,39 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+        // 4.10
+// ------------------>>
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.dsl.artifact.SpringArtifactConfigurationProcessor",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.dsl.processor.ArtifactConfig",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.dsl.processor.xml.XmlApplicationServiceRegistry",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          }
+// <<------------------
+        ]
+      }
+    }
+  },
   "4.7.0": {
     "revapi": {
       "differences": {

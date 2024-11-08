@@ -3,6 +3,27 @@
     "revapi": {
       "differences": {
         "differences": [
+        // 4.10
+// ------------------>>
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.config.builders.AbstractResourceConfigurationBuilder",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.MuleContext org.mule.runtime.core.api.context.DefaultMuleContextFactory::createMuleContext(java.lang.String, java.util.Map<java.lang.String, java.lang.Object>) throws org.mule.runtime.api.lifecycle.InitialisationException, org.mule.runtime.core.api.config.ConfigurationException",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.MuleContext org.mule.runtime.core.api.context.DefaultMuleContextFactory::createMuleContext(java.lang.String) throws org.mule.runtime.api.lifecycle.InitialisationException, org.mule.runtime.core.api.config.ConfigurationException",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+// <<------------------
           {
             "ignore": true,
             "code": "java.method.parameterTypeChanged",

@@ -71,17 +71,13 @@ module org.mule.runtime.spring.config {
   // PropertyDescriptor and PropertyEditor from java.beans
   requires java.desktop;
   requires java.inject;
-  // Spring JNDI support
-  requires java.naming;
   requires java.transaction;
 
   exports org.mule.runtime.config.api;
   exports org.mule.runtime.config.api.dsl;
-  exports org.mule.runtime.config.api.dsl.artifact;
   exports org.mule.runtime.config.api.dsl.model;
   exports org.mule.runtime.config.api.dsl.model.properties;
   exports org.mule.runtime.config.api.dsl.processor;
-  exports org.mule.runtime.config.api.dsl.processor.xml;
   exports org.mule.runtime.config.api.factories.streaming;
 
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
@@ -89,6 +85,8 @@ module org.mule.runtime.spring.config {
 
   // Required to build MUnit chains
   exports org.mule.runtime.config.privileged.dsl.spring;
+  exports org.mule.runtime.config.privileged.spring to
+      spring.core;
 
   exports org.mule.runtime.config.api.dsl.model.metadata to
       org.mule.runtime.tooling.support,
@@ -155,6 +153,5 @@ module org.mule.runtime.spring.config {
       spring.core;
   opens org.mule.runtime.config.internal.factories.streaming to
       net.bytebuddy;
-  exports org.mule.runtime.config.privileged.spring to spring.core;
 
 }
