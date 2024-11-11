@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
@@ -152,7 +153,7 @@ public final class PropertiesUtils {
         }
       }
     } catch (IOException e) {
-      throw new MuleRuntimeException(CoreMessages.createStaticMessage("Failed to load resource: " + fileName), e);
+      throw new MuleRuntimeException(createStaticMessage("Failed to load resource: " + fileName), e);
     }
     return p;
   }
