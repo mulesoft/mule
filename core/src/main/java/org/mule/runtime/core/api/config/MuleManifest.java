@@ -11,6 +11,7 @@ import static java.util.regex.Pattern.compile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
@@ -134,13 +135,18 @@ public class MuleManifest {
         // We want to load the MANIFEST.MF from the mule-core jar. Sine we
         // don't know the version we're using we have to search for the jar on the classpath
         URL url = AccessController.doPrivileged(new UrlPrivilegedAction());
-
         if (url != null) {
-          is = url.openStream();
+          URLConnection urlConnection = url.openConnection();
+          urlConnection.setUseCaches(false);
+          is = urlConnection.getInputStream();
         }
 
         if (is != null) {
-          manifest.read(is);
+          try {
+            manifest.read(is);
+          } finally {
+            is.close();
+          }
         }
       } catch (IOException e) {
         logger.warn("Failed to read manifest Info, Manifest information will not display correctly: " + e.getMessage());
