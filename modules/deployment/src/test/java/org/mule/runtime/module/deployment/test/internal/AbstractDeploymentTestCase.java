@@ -624,9 +624,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void startDeployment() throws MuleException {
-    serviceManager.start();
-    startIfNeeded(extensionModelLoaderRepository);
-    deploymentService.start(false);
+    startDeployment(true);
   }
 
   protected void triggerDirectoryWatcher() {
