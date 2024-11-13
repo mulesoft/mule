@@ -1616,7 +1616,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     Thread deploymentServiceThread = new Thread(() -> {
       try {
-        startDeployment();
+        startDeployment(false);
       } catch (MuleException e) {
         throw new RuntimeException(e);
       }
@@ -1648,9 +1648,12 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
       return null;
     }).when(applicationDeploymentListener).onDeploymentStart(emptyAppFileBuilder.getId());
 
+    serviceManager.start();
     deploymentServiceThread.start();
 
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+
+    deploymentServiceThread.join();
 
     assertFalse("Able to lock deployment service during start", lockedFromClient[0]);
   }
