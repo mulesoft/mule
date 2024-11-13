@@ -13,13 +13,10 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetada
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import static org.apache.commons.lang3.JavaVersion.JAVA_17;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -172,7 +169,9 @@ public class JavaMetadataKeyIdModelParserUtils {
                                                                               ExtensionElement extensionElement,
                                                                               String elementName,
                                                                               String elementType) {
-    String categoryName = getCategoryName(outputResolverModelParser, attributesResolverModelParser, inputResolverModelParsers);
+    String categoryName =
+        getCategoryName(outputResolverModelParser, attributesResolverModelParser, inputResolverModelParsers,
+                        extensionElement.getName(), elementName);
 
     Optional<MetadataKeyModelParser> keyIdResolverModelParser =
         (Optional<MetadataKeyModelParser>) parameterGroupModelParsers.stream()
@@ -226,7 +225,9 @@ public class JavaMetadataKeyIdModelParserUtils {
 
   private static String getCategoryName(OutputResolverModelParser outputResolverModelParser,
                                         AttributesResolverModelParser attributesResolverModelParser,
-                                        List<InputResolverModelParser> inputResolverModelParsers) {
+                                        List<InputResolverModelParser> inputResolverModelParsers,
+                                        String extensionElementName,
+                                        String elementName) {
 
     if (outputResolverModelParser != null) {
       return outputResolverModelParser.getOutputResolver().getCategoryName();
@@ -241,7 +242,9 @@ public class JavaMetadataKeyIdModelParserUtils {
     }
 
     // TODO W-14195099 - change this once we have `ProblemsReporter` available
-    LOGGER.warn("A Keys Resolver is being defined without defining an Output Resolver, Input Resolver nor Attributes Resolver");
+    LOGGER
+        .warn("A Keys Resolver is being defined without defining an Output Resolver, Input Resolver nor Attributes Resolver for element {} of extension {}",
+              elementName, extensionElementName);
 
     return null;
   }
