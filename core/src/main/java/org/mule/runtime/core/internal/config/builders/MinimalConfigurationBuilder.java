@@ -138,7 +138,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
     MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
 
-    defaultRegistryBoostrap(APP, muleContext).initialise();
+    defaultRegistryBoostrap(APP, muleContext.getRegistryBootstrapServiceDiscoverer(), (n, o) -> registerObject(n, o, muleContext))
+        .initialise();
 
     configureQueueManager(muleContext);
 
@@ -302,10 +303,11 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       return;
     }
 
-    if (serviceImpl.get() instanceof MuleContextAware) {
-      ((MuleContextAware) serviceImpl.get()).setMuleContext(muleContext);
+    var service = serviceImpl.orElseThrow();
+    if (service instanceof MuleContextAware) {
+      ((MuleContextAware) service).setMuleContext(muleContext);
     }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl.get());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, service);
   }
 
   protected void registerObjectStoreManager(MuleContext muleContext) throws RegistrationException {

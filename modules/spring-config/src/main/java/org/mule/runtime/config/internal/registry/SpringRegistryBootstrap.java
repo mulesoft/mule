@@ -16,6 +16,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap;
 import org.mule.runtime.core.internal.config.bootstrap.ObjectBootstrapProperty;
@@ -42,15 +43,15 @@ public class SpringRegistryBootstrap extends AbstractRegistryBootstrap implement
   private final BiConsumer<String, BeanDefinition> beanDefinitionRegister;
 
   /**
-   * @param artifactType           type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's
-   *                               not associated to the related artifact it will be ignored.
-   * @param muleContext            the {@code MuleContext} of the artifact.
-   * @param beanDefinitionRegister a {@link BiConsumer} on which the bean definitions are registered
+   * @param artifactType               type of artifact. Bootstrap entries may be associated to an specific type of artifact. If
+   *                                   it's not associated to the related artifact it will be ignored.
+   * @param bootstrapServiceDiscoverer {@link BootstrapServiceDiscoverer} used to bootstrap a {@link MuleContext}
+   * @param beanDefinitionRegister     a {@link BiConsumer} on which the bean definitions are registered
    */
-  public SpringRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext,
+  public SpringRegistryBootstrap(ArtifactType artifactType, BootstrapServiceDiscoverer bootstrapServiceDiscoverer,
                                  BiConsumer<String, BeanDefinition> beanDefinitionRegister,
                                  Predicate<String> propertyKeyfilter) {
-    super(artifactType, muleContext, propertyKeyfilter);
+    super(artifactType, bootstrapServiceDiscoverer, propertyKeyfilter);
     this.beanDefinitionRegister = beanDefinitionRegister;
   }
 

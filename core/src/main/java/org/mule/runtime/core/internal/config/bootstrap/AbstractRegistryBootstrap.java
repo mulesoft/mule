@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.createFromString;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -18,10 +17,12 @@ import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.PropertiesUtils;
@@ -46,6 +47,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
+  static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
+
   private static final String RETURN_CLASS_PROPERTY = "returnClass";
   private static final String MIME_TYPE_PROPERTY = "mimeType";
 
@@ -66,17 +69,18 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
   protected ArtifactType artifactType = APP;
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
-  protected MuleContext muleContext;
+  private BootstrapServiceDiscoverer bootstrapServiceDiscoverer;
   private final Predicate<String> propertyKeyfilter;
 
   /**
-   * @param artifactType type of artifact. Bootstrap entries may be associated to an specific type of artifact. If it's not
-   *                     associated to the related artifact it will be ignored.
-   * @param muleContext  the {@code MuleContext} of the artifact.
+   * @param artifactType               type of artifact. Bootstrap entries may be associated to an specific type of artifact. If
+   *                                   it's not associated to the related artifact it will be ignored.
+   * @param bootstrapServiceDiscoverer {@link BootstrapServiceDiscoverer} used to bootstrap a {@link MuleContext}
    */
-  public AbstractRegistryBootstrap(ArtifactType artifactType, MuleContext muleContext, Predicate<String> propertyKeyfilter) {
+  public AbstractRegistryBootstrap(ArtifactType artifactType, BootstrapServiceDiscoverer bootstrapServiceDiscoverer,
+                                   Predicate<String> propertyKeyfilter) {
     this.artifactType = artifactType;
-    this.muleContext = muleContext;
+    this.bootstrapServiceDiscoverer = bootstrapServiceDiscoverer;
     this.propertyKeyfilter = propertyKeyfilter;
   }
 
@@ -84,7 +88,7 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
   public void initialise() throws InitialisationException {
     List<BootstrapService> bootstrapServices;
     try {
-      bootstrapServices = muleContext.getRegistryBootstrapServiceDiscoverer().discover();
+      bootstrapServices = bootstrapServiceDiscoverer.discover();
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
@@ -172,7 +176,6 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
   private ObjectBootstrapProperty createObjectBootstrapProperty(BootstrapService bootstrapService, String propertyKey,
                                                                 String propertyValue) {
-    boolean optional = false;
     String className;
     Set<ArtifactType> artifactTypesParameterValue = new HashSet<>(asList(APP, DOMAIN, POLICY));
 
@@ -183,7 +186,7 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
       if (p.containsKey(APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY)) {
 
         artifactTypesParameterValue = stream(((String) p.get(APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY)).split("\\/"))
-            .map(t -> createFromString(t))
+            .map(AbstractRegistryBootstrap::fromString)
             .collect(toSet());
       }
       className = value.substring(0, index);
@@ -192,6 +195,15 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
     }
 
     return new ObjectBootstrapProperty(bootstrapService, artifactTypesParameterValue, propertyKey, className);
+  }
+
+  private static ArtifactType fromString(String artifactTypeAsString) {
+    for (ArtifactType artifactType : ArtifactType.values()) {
+      if (artifactType.getAsString().equals(artifactTypeAsString)) {
+        return artifactType;
+      }
+    }
+    throw new MuleRuntimeException(createStaticMessage("No artifact type found for value: " + artifactTypeAsString));
   }
 
   private void registerUnnamedObjects(List<ObjectBootstrapProperty> bootstrapProperties) throws Exception {

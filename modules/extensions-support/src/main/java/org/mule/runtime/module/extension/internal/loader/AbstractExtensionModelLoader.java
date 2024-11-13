@@ -6,19 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
-import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_8;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getJdkVersion;
-import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.isJava8;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ADD_ANNOTATIONS_TO_CONFIG_CLASS;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -136,8 +133,7 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
           throw new IllegalSourceException(format("Extension '%s' version %s does not support Mule 4.6+ on Java %s. Supported Java versions are: %s. (%s)",
                                                   context.getExtensionDeclarer().getDeclaration().getName(),
                                                   context.getExtensionDeclarer().getDeclaration().getVersion(),
-                                                  isJava8(runningJdkVersion) ? JAVA_VERSION_8
-                                                      : valueOf(runningJdkVersion.getMajor()),
+                                                  runningJdkVersion.getMajor(),
                                                   supportedJavaVersions,
                                                   ncdfe.toString()));
         }
