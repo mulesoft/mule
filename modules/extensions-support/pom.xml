@@ -27,6 +27,7 @@
             --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.property=org.mule.runtime.extensions.support
             --add-reads=org.mule.runtime.extensions.support=com.google.gson
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.validation=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.resources.documentation=jakarta.xml.bind
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.client=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.config=org.mule.runtime.core
