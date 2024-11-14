@@ -557,6 +557,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util.store to
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
