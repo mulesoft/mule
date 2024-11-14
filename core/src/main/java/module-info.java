@@ -520,6 +520,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util.store to
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.util.version to
       org.mule.runtime.extensions.support,
@@ -614,8 +615,6 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.value to
       spring.core;
-  opens org.mule.runtime.core.internal.util.store to
-      kryo.shaded;
 
   uses org.mule.runtime.core.privileged.transaction.TransactionFactory;
   uses org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
