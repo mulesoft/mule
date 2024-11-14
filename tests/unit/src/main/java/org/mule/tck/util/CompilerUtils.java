@@ -478,8 +478,11 @@ public class CompilerUtils {
 
         // Adds extra jars files required to compile the source classes
         fullClassPath =
-            concat(CLASS_PATH_ENTRIES.stream(), Stream.of(jarFiles).map(File::getAbsolutePath))
-                .collect(joining(PATH_SEPARATOR));
+            concat(CLASS_PATH_ENTRIES.stream()
+                // skip armeria libs that causes a split package with reactor
+                .filter(cpe -> !cpe.contains("armeria")),
+                   Stream.of(jarFiles).map(File::getAbsolutePath))
+                       .collect(joining(PATH_SEPARATOR));
       } else {
         fullClassPath = CLASS_PATH_ENTRIES.stream()
             .collect(joining(PATH_SEPARATOR));
