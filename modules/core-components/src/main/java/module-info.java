@@ -57,6 +57,7 @@ module org.mule.runtime.core.components {
       spring.core;
   opens org.mule.runtime.core.internal.processor to
       org.mule.runtime.core,
-      spring.core;
+      spring.core,
+      kryo.shaded;
 
 }
