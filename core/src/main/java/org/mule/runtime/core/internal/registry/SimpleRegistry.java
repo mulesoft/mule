@@ -110,7 +110,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
     registryMap.putAll(defaultEntries);
   }
 
-  private static FeatureFlaggingService createFeatureFlaggingService(MuleContext muleContext) {
+  public static FeatureFlaggingService createFeatureFlaggingService(MuleContext muleContext) {
     // Initial feature flagging service setup
     FeatureFlaggingRegistry ffRegistry = getInstance();
     return new FeatureFlaggingServiceBuilder()
