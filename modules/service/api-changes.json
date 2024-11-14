@@ -1,4 +1,36 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.exception.checkedAdded",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy)",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "exception": "org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "justification": "W-17244755: Indicate the service that fails to create its classloader"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.exception.checkedAdded",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, org.mule.runtime.container.api.MuleContainerClassLoaderWrapper)",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, org.mule.runtime.container.api.MuleContainerClassLoaderWrapper) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "exception": "org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "justification": "W-17244755: Indicate the service that fails to create its classloader"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.exception.checkedAdded",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader)",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "exception": "org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "justification": "W-17244755: Indicate the service that fails to create its classloader"
+          }
+        ]
+      }
+    }
+  },
   "4.7.0": {
     "revapi": {
       "differences": {

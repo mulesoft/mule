@@ -45,8 +45,6 @@ import javax.inject.Inject;
 public class ParseTemplateProcessor extends SimpleMessageProcessor implements HasParamsAsTemplateProcessor {
 
   private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-  private static final Boolean KEEP_TYPE_TARGET_AND_TARGET_VAR =
-      true;
 
   private ExtendedExpressionManager expressionManager;
 

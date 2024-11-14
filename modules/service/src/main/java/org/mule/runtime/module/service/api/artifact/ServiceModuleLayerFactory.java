@@ -20,6 +20,7 @@ import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.service.internal.artifact.ModuleLayerGraph;
 
@@ -65,7 +66,17 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
   @Override
   @Deprecated
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
-                                    ClassLoaderLookupPolicy lookupPolicy) {
+                                    ClassLoaderLookupPolicy lookupPolicy)
+      throws ArtifactClassloaderCreationException {
+    try {
+      return doCreate(artifactId, descriptor, parent, lookupPolicy);
+    } catch (Exception e) {
+      throw new ArtifactClassloaderCreationException("Exception creating classloader for service '" + artifactId + "'", e);
+    }
+  }
+
+  private ArtifactClassLoader doCreate(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
+                                       ClassLoaderLookupPolicy lookupPolicy) {
     URL[] classLoaderConfigurationUrls = descriptor.getClassLoaderConfiguration().getUrls();
 
     LOGGER.debug(" >> Creating ModuleLayer for service: '" + artifactId + "'...");
@@ -147,7 +158,8 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
    */
   @Override
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor,
-                                    MuleContainerClassLoaderWrapper containerClassLoader) {
+                                    MuleContainerClassLoaderWrapper containerClassLoader)
+      throws ArtifactClassloaderCreationException {
     return create(artifactId, descriptor,
                   containerClassLoader.getContainerClassLoader().getClassLoader(),
                   containerClassLoader.getContainerClassLoaderLookupPolicy());

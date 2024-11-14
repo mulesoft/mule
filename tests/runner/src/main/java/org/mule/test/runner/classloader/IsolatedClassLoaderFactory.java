@@ -30,7 +30,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFactory;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
-import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
@@ -47,6 +46,8 @@ import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLo
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -277,7 +278,9 @@ public class IsolatedClassLoaderFactory {
     String testRunnerArtifactId = getArtifactPluginId(regionClassLoader.getArtifactId(), "test-runner");
 
     List<String> pluginDependencies =
-        artifactsUrlClassification.getPluginUrlClassifications().stream().map(p -> p.getName()).collect(toList());
+        artifactsUrlClassification.getPluginUrlClassifications().stream()
+            .map(PluginUrlClassification::getName)
+            .collect(toList());
 
     PluginUrlClassification testRunnerPluginClassification =
         new PluginUrlClassification(TEST_RUNNER_ARTIFACT_ID + ":", artifactsUrlClassification.getTestRunnerLibUrls(), emptyList(),
@@ -370,7 +373,8 @@ public class IsolatedClassLoaderFactory {
    */
   protected List<ArtifactClassLoader> createServiceClassLoaders(ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
                                                                 MuleContainerClassLoaderWrapper containerClassLoaderWrapper,
-                                                                ArtifactsUrlClassification artifactsUrlClassification) {
+                                                                ArtifactsUrlClassification artifactsUrlClassification)
+      throws ArtifactClassloaderCreationException {
     List<ArtifactClassLoader> servicesArtifactClassLoaders = newArrayList();
     for (ServiceUrlClassification serviceUrlClassification : artifactsUrlClassification.getServiceUrlClassifications()) {
       logClassLoaderUrls("SERVICE (" + serviceUrlClassification.getArtifactId() + ")", serviceUrlClassification.getUrls());
