@@ -147,7 +147,7 @@ public class MavenTestUtils {
 
   private static void runMavenGoal(List<String> goals, String baseDirectory, Properties props) {
     InvocationRequest request = new DefaultInvocationRequest();
-    request.setGoals(goals);
+    request.addArgs(goals);
     request.setBatchMode(true);
     request.setProperties(props);
     // avoid JVM optimizations for short-lived jvms running maven builds
