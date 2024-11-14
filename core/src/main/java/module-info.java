@@ -230,7 +230,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.connection to
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.extensions.support,
-      org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
@@ -382,7 +381,6 @@ module org.mule.runtime.core {
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.retry to
       org.mule.runtime.extensions.support,
-      org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.outbound to

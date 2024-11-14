@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.manager.jdk;
 
-import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_8;
-import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.isJava8;
-
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
@@ -27,7 +24,7 @@ abstract class BaseExtensionJdkValidator implements ExtensionJdkValidator {
 
   public BaseExtensionJdkValidator(JdkVersion runningJdkVersion) {
     this.runningJdkVersion = runningJdkVersion;
-    versionAsString = isJava8(runningJdkVersion) ? JAVA_VERSION_8 : valueOf(runningJdkVersion.getMajor());
+    this.versionAsString = valueOf(runningJdkVersion.getMajor());
   }
 
   @Override

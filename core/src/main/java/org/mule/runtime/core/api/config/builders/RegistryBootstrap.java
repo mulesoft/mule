@@ -6,12 +6,19 @@
  */
 package org.mule.runtime.core.api.config.builders;
 
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.config.bootstrap.SimpleRegistryBootstrap;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+
+import java.util.function.BiConsumer;
 
 /**
  * Loads objects defined in a file called <code>registry-bootstrap.properties</code> into the local registry. This allows modules
@@ -80,9 +87,30 @@ public interface RegistryBootstrap extends Initialisable {
    * @param supportedArtifactType the type of artifact being configured
    * @param muleContext           the configured {@link MuleContext}
    * @return a {@link RegistryBootstrap} instance
+   * 
+   * @deprecated Use {@link #defaultRegistryBoostrap(ArtifactType, BootstrapServiceDiscoverer, Registrer)} instead.
    */
-  static RegistryBootstrap defaultRegistryBoostrap(ArtifactType supportedArtifactType, MuleContext muleContext) {
-    return new SimpleRegistryBootstrap(supportedArtifactType, muleContext);
+  @Deprecated
+  static RegistryBootstrap defaultRegistryBoostrap(org.mule.runtime.core.api.config.bootstrap.ArtifactType supportedArtifactType,
+                                                   MuleContext muleContext) {
+    return defaultRegistryBoostrap(ArtifactType.valueOf(supportedArtifactType.name()),
+                                   muleContext.getRegistryBootstrapServiceDiscoverer(),
+                                   ((MuleContextWithRegistry) muleContext).getRegistry()::registerObject);
+  }
+
+  /**
+   * Returns a default instance for the given parameters
+   *
+   * @param supportedArtifactType the type of artifact being configured
+   * @param muleContext           the configured {@link MuleContext}
+   * @param registrer             adds an object to the registry, with any applicable rules (i.e.: service overrides)
+   * @return a {@link RegistryBootstrap} instance
+   * @since 4.8
+   */
+  static RegistryBootstrap defaultRegistryBoostrap(ArtifactType supportedArtifactType,
+                                                   BootstrapServiceDiscoverer bootstrapServiceDiscoverer,
+                                                   Registrer registrer) {
+    return new SimpleRegistryBootstrap(supportedArtifactType, bootstrapServiceDiscoverer, registrer);
   }
 
   /**
@@ -92,4 +120,26 @@ public interface RegistryBootstrap extends Initialisable {
    */
   @Override
   void initialise() throws InitialisationException;
+
+  @FunctionalInterface
+  public static interface Registrer extends BiConsumer<String, Object> {
+
+    @Override
+    default void accept(String serviceId, Object defaultServiceImpl) {
+      try {
+        register(serviceId, defaultServiceImpl);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
+
+    /**
+     * Registers an object in the registry with a key.
+     * 
+     * @param key   the key to store the value against. This is a non-null value
+     * @param value the object to store in the registry. This is a non-null value
+     * @throws RegistrationException if an object with the same key already exists
+     */
+    void register(String serviceId, Object defaultServiceImpl) throws MuleException;
+  }
 }

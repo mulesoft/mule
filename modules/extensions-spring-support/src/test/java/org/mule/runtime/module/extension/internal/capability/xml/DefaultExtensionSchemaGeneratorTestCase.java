@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
-import static com.google.common.collect.ImmutableSet.copyOf;
-import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
+
+import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
+
+import static com.google.common.collect.ImmutableSet.copyOf;
 
 import org.mule.extension.test.extension.reconnection.ReconnectionExtension;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -36,9 +38,7 @@ import org.mule.test.module.extension.internal.util.extension.connectivity.basic
 import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfigExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
-import org.mule.test.ram.RickAndMortyExtension;
 import org.mule.test.semantic.extension.SemanticTermsExtension;
-import org.mule.test.soap.extension.FootballSoapExtension;
 import org.mule.test.substitutiongroup.extension.SubstitutionGroupExtension;
 import org.mule.test.subtypes.extension.SubTypesMappingConnector;
 import org.mule.test.transactional.TransactionalExtension;
@@ -82,8 +82,6 @@ public class DefaultExtensionSchemaGeneratorTestCase extends FileGenerationParam
                         newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.xsd"),
                         newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.xsd"),
                         newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.xsd"),
-                        newUnitTest(SOAP_LOADER, FootballSoapExtension.class, "soap.xsd"),
-                        newUnitTest(SOAP_LOADER, RickAndMortyExtension.class, "ram.xsd"),
                         newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.xsd"),
                         newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.xsd"),
                         newUnitTest(JAVA_LOADER, WeaveFunctionExtension.class, "test-fn.xsd"),

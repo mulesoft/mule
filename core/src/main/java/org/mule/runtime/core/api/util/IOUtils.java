@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE;
+
+import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -21,10 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -89,7 +89,7 @@ public class IOUtils {
     if (url == null) {
       return null;
     } else {
-      return getInputStreamWithCacheControl(url);
+      return org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl(url);
     }
   }
 
@@ -155,15 +155,21 @@ public class IOUtils {
     return url;
   }
 
+  /**
+   * Returns an {@link InputStream} that will read from an {@link URL} connection without caching the underlying resources. This
+   * is important when working with jar files that are obtained via {@link ClassLoader#getResource(String)} in order to avoid file
+   * descriptor leaks. Note that {@link ClassLoader#getResourceAsStream(String)} already takes care of closing such resources, so
+   * caching is not a problem in that case.
+   *
+   * @param url The URL to connect to.
+   * @return The InputStream.
+   * @throws IOException If it fails while obtaining the InputStream.
+   * @deprecated Use {@link org.mule.runtime.api.util.IOUtils#getInputStreamWithCacheControl(URL)}
+   */
   public static InputStream getInputStreamWithCacheControl(URL url) throws IOException {
-    URLConnection urlConnection = url.openConnection();
-    // It's necessary to disable connection caching when working with jar files
-    // in order to avoid file leaks in Windows environments
-    if (urlConnection instanceof JarURLConnection) {
-      urlConnection.setUseCaches(false);
-    }
-    return urlConnection.getInputStream();
+    return org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl(url);
   }
+
 
   /**
    * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream)</code> method but catches any

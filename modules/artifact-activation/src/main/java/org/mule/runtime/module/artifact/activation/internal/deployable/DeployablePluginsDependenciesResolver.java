@@ -7,18 +7,14 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toArtifactCoordinates;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.VersionUtils.getMajor;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.util.stream.Collectors.toList;
 
-import org.mule.maven.pom.parser.api.model.BundleDependency;
-import org.mule.maven.pom.parser.api.model.BundleDescriptor;
-import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,14 +27,14 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Resolves the dependencies of a deployable as {@link Artifact artifacts}.
+ * Resolves the dependencies of a deployable as {@link BundleDependency artifacts}.
  *
  * @since 4.5
  */
 public class DeployablePluginsDependenciesResolver {
 
-  public final Map<ArtifactCoordinates, List<Artifact>> resolve(List<BundleDependency> deployableDependencies) {
-    Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies = new HashMap<>();
+  public final Map<BundleDescriptor, List<BundleDependency>> resolve(List<BundleDependency> deployableDependencies) {
+    Map<BundleDescriptor, List<BundleDependency>> pluginsDependencies = new HashMap<>();
 
     List<BundleDependency> dependencies = deployableDependencies.stream()
         .filter(dep -> dep.getDescriptor().getClassifier().isPresent())
@@ -50,8 +46,8 @@ public class DeployablePluginsDependenciesResolver {
     for (Map.Entry<BundleDependency, List<BundleDependency>> dependencyListEntry : dependenciesMap.entrySet()) {
       List<BundleDependency> dependencyDependencies =
           resolveConflicts(dependencyListEntry.getValue(), dependencies);
-      pluginsDependencies.put(toArtifactCoordinates(dependencyListEntry.getKey().getDescriptor()),
-                              updatePackagesResources(toArtifacts(dependencyDependencies)));
+      pluginsDependencies.put(dependencyListEntry.getKey().getDescriptor(),
+                              updatePackagesResources(dependencyDependencies));
     }
 
     return pluginsDependencies;
@@ -77,7 +73,7 @@ public class DeployablePluginsDependenciesResolver {
 
   private List<BundleDependency> collectTransitiveDependencies(BundleDependency rootDependency) {
     List<BundleDependency> allTransitiveDependencies = new LinkedList<>();
-    for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependencies()) {
+    for (BundleDependency transitiveDependency : rootDependency.getTransitiveDependenciesList()) {
       allTransitiveDependencies.add(transitiveDependency);
       if (transitiveDependency.getDescriptor().getClassifier().map(c -> !MULE_PLUGIN_CLASSIFIER.equals(c)).orElse(true)) {
         allTransitiveDependencies.addAll(collectTransitiveDependencies(transitiveDependency));

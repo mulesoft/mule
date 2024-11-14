@@ -318,7 +318,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   private boolean recreateRouter(ContextView ctx) {
-    return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false);
+    return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false) || isTransactionActive();
   }
 
   private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier, boolean recreateRouter) {
