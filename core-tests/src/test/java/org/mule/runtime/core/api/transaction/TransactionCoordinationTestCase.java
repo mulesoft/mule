@@ -23,6 +23,8 @@ import io.qameta.allure.Story;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
+import org.mule.runtime.core.internal.transaction.TransactionCoordinationSuspended;
+import org.mule.runtime.core.internal.transaction.TransactionSuspended;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -41,11 +43,11 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
 
   private NotificationDispatcher notificationDispatcher;
 
-  private TransactionCoordination tc;
+  private TransactionCoordinationSuspended tc;
 
   @Before
   public void setUpTransaction() {
-    tc = TransactionCoordination.getInstance();
+    tc = TransactionCoordinationSuspended.getInstance();
 
     notificationDispatcher = mock(DefaultNotificationDispatcher.class);
     doNothing().when(notificationDispatcher).dispatch(any());
@@ -184,7 +186,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testSuspendResumeTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    Transaction tx = mock(Transaction.class);
+    TransactionSuspended tx = mock(TransactionSuspended.class);
     tc.bindTransaction(tx);
     tc.suspendCurrentTransaction();
     assertThat(tc.getTransaction(), is(nullValue()));
@@ -199,7 +201,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     assertThat(tc.getTransaction(), nullValue());
     tc.resumeXaTransactionIfAvailable();
 
-    Transaction tx = spy(new TestTransaction("appName", notificationDispatcher));
+    TransactionSuspended tx = spy(new TestTransaction("appName", notificationDispatcher));
     tc.bindTransaction(tx);
     tc.resumeXaTransactionIfAvailable();
     verify(tx, times(0)).resume();
@@ -256,8 +258,8 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Issue("MULE-19430")
   public void suspendMultipleTransactions() throws TransactionException {
     assertThat(tc.getTransaction(), nullValue());
-    Transaction tx1 = mock(Transaction.class);
-    Transaction tx2 = mock(Transaction.class);
+    TransactionSuspended tx1 = mock(TransactionSuspended.class);
+    TransactionSuspended tx2 = mock(TransactionSuspended.class);
 
     tc.bindTransaction(tx1);
     tc.suspendCurrentTransaction();

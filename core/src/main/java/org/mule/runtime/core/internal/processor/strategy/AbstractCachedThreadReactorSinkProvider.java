@@ -12,6 +12,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.TransactionCoordinationSuspended;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public abstract class AbstractCachedThreadReactorSinkProvider implements Reactor
 
   @Override
   public FluxSink<CoreEvent> getSink() {
-    TransactionCoordination txCoord = TransactionCoordination.getInstance();
+    TransactionCoordinationSuspended txCoord = TransactionCoordinationSuspended.getInstance();
     if (txCoord.runningNestedTransaction()) {
       if (sinkIndexEnabled) {
         return getNestedTxFluxSinkWrapper(txCoord);
