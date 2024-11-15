@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
@@ -24,6 +25,7 @@ public interface ArtifactClassLoaderFactory<T extends ArtifactDescriptor> {
    * @param lookupPolicy lookup policy to use on the created classloader.
    * @return a new classLoader for described artifact
    */
-  ArtifactClassLoader create(String artifactId, T descriptor, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy);
+  ArtifactClassLoader create(String artifactId, T descriptor, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy)
+      throws ArtifactClassloaderCreationException;
 
 }

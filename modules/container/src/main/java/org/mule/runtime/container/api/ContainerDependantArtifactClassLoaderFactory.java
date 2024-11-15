@@ -8,6 +8,7 @@ package org.mule.runtime.container.api;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
@@ -26,7 +27,8 @@ public interface ContainerDependantArtifactClassLoaderFactory<T extends Artifact
    * @param containerClassLoader parent for the new artifact class loader.
    * @return a new class loader for described artifact.
    */
-  ArtifactClassLoader create(String artifactId, T descriptor, MuleContainerClassLoaderWrapper containerClassLoader);
+  ArtifactClassLoader create(String artifactId, T descriptor, MuleContainerClassLoaderWrapper containerClassLoader)
+      throws ArtifactClassloaderCreationException;
 
   /**
    * When using a Java version with JPMS support, will put the {@link ModuleLayer} where the given class is found as a parent of
