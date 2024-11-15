@@ -9,14 +9,18 @@ package org.mule.runtime.core.api.transaction;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.transaction.DelegateTransaction;
+import org.mule.runtime.core.internal.transaction.TransactionSuspended;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TransactionCoordination {
+public final class TransactionCoordination {
 
-  static final Logger logger = LoggerFactory.getLogger(TransactionCoordination.class);
+  protected static final Logger logger = LoggerFactory.getLogger(TransactionCoordination.class);
 
   private static final TransactionCoordination instance = new TransactionCoordination();
 
@@ -25,7 +29,14 @@ public class TransactionCoordination {
    * instance field by methods {@link #getTransaction()}, {@link #unbindTransaction(Transaction)} and
    * {@link #bindTransaction(Transaction)}, it may be more consistent to have it as an instance variable.
    */
-  protected final ThreadLocal<Transaction> transactions = new ThreadLocal<>();
+  private final ThreadLocal<Transaction> transactions = new ThreadLocal<>();
+  private final ThreadLocal<Deque<Transaction>> suspendedTransaction = new ThreadLocal<>();
+  private final ThreadLocal<Deque<Transaction>> isolatedTransactions = new ThreadLocal<>();
+
+  public boolean runningNestedTransaction() {
+    Deque<Transaction> suspended = suspendedTransaction.get();
+    return suspended != null && suspended.size() >= 1;
+  }
 
   /** Lock variable that is used to access {@link #txCounter}. */
   private final Object txCounterLock = new Object();
@@ -34,7 +45,7 @@ public class TransactionCoordination {
   private int txCounter = 0;
 
   /** Do not instanciate. */
-  protected TransactionCoordination() {
+  private TransactionCoordination() {
     super();
   }
 
@@ -106,6 +117,16 @@ public class TransactionCoordination {
     }
   }
 
+  public void resumeXaTransactionIfAvailable() {
+    try {
+      if (suspendedTransaction.get() != null && suspendedTransaction.get().peek() != null) {
+        resumeSuspendedTransaction();
+      }
+    } catch (TransactionException e) {
+      logger.error("Failure resuming suspended transaction", e);
+    }
+  }
+
   public void commitCurrentTransaction() {
     Transaction tx = transactions.get();
     if (tx != null) {
@@ -140,6 +161,65 @@ public class TransactionCoordination {
         logger.debug("Committing transaction " + tx);
       }
       tx.commit();
+    }
+  }
+
+  public void suspendCurrentTransaction() throws TransactionException {
+    TransactionSuspended tx = (TransactionSuspended) TransactionCoordination.getInstance().getTransaction();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Suspending " + tx);
+    }
+
+    tx.suspend();
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("Successfully suspended " + tx);
+      logger.debug("Unbinding the following TX from the current context: " + tx);
+    }
+
+    TransactionCoordination.getInstance().unbindTransaction(tx);
+    if (suspendedTransaction.get() == null) {
+      suspendedTransaction.set(new ArrayDeque<>());
+    }
+    suspendedTransaction.get().push(tx);
+  }
+
+  public void resumeSuspendedTransaction() throws TransactionException {
+    TransactionSuspended tx =
+        (suspendedTransaction.get() == null) ? null : (TransactionSuspended) suspendedTransaction.get().pop();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Re-binding and Resuming " + tx);
+    }
+    TransactionCoordination.getInstance().bindTransaction(tx);
+    tx.resume();
+  }
+
+  public void clear() {
+    if (suspendedTransaction.get() != null) {
+      suspendedTransaction.get().clear();
+    }
+    suspendedTransaction.remove();
+    transactions.remove();
+    if (isolatedTransactions.get() != null) {
+      isolatedTransactions.get().clear();
+    }
+    isolatedTransactions.remove();
+  }
+
+  public void isolateTransaction() {
+    Transaction currentTransaction = transactions.get();
+    if (currentTransaction != null) {
+      if (isolatedTransactions.get() == null) {
+        isolatedTransactions.set(new ArrayDeque<>());
+      }
+      isolatedTransactions.get().push(transactions.get());
+      transactions.set(null);
+    }
+  }
+
+  public void restoreIsolatedTransaction() {
+    if (isolatedTransactions.get() != null && !isolatedTransactions.get().isEmpty()) {
+      transactions.set(isolatedTransactions.get().pop());
     }
   }
 

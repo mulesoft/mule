@@ -49,7 +49,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.transaction.TransactionCoordinationSuspended;
 import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -333,9 +332,9 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   }
 
   private void configureXaTransactionAndSingleResourceTransaction() throws TransactionException {
-    TransactionCoordinationSuspended.getInstance().bindTransaction(mockXaTransaction);
-    TransactionCoordinationSuspended.getInstance().suspendCurrentTransaction();
-    TransactionCoordinationSuspended.getInstance().bindTransaction(mockTransaction);
+    TransactionCoordination.getInstance().bindTransaction(mockXaTransaction);
+    TransactionCoordination.getInstance().suspendCurrentTransaction();
+    TransactionCoordination.getInstance().bindTransaction(mockTransaction);
   }
 
   private static class TestOnErrorPropagateHandler extends OnErrorPropagateHandler {

@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.execution;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.transaction.TransactionCoordinationSuspended;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 
 public class IsolateCurrentTransactionInterceptor<T> implements ExecutionInterceptor<T> {
@@ -31,14 +30,14 @@ public class IsolateCurrentTransactionInterceptor<T> implements ExecutionInterce
       if (transactionConfig.getAction() == TransactionConfig.ACTION_NOT_SUPPORTED) {
         Transaction transaction = TransactionCoordination.getInstance().getTransaction();
         if (transaction != null) {
-          TransactionCoordinationSuspended.getInstance().isolateTransaction();
+          TransactionCoordination.getInstance().isolateTransaction();
           transactionIsolated = true;
         }
       }
       return next.execute(muleEventProcessingCallback, executionContext);
     } finally {
       if (transactionIsolated) {
-        TransactionCoordinationSuspended.getInstance().restoreIsolatedTransaction();
+        TransactionCoordination.getInstance().restoreIsolatedTransaction();
       }
     }
   }

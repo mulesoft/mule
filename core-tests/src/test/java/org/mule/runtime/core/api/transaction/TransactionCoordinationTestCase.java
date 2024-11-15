@@ -23,7 +23,6 @@ import io.qameta.allure.Story;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
-import org.mule.runtime.core.internal.transaction.TransactionCoordinationSuspended;
 import org.mule.runtime.core.internal.transaction.TransactionSuspended;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -43,11 +42,11 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
 
   private NotificationDispatcher notificationDispatcher;
 
-  private TransactionCoordinationSuspended tc;
+  private TransactionCoordination tc;
 
   @Before
   public void setUpTransaction() {
-    tc = TransactionCoordinationSuspended.getInstance();
+    tc = TransactionCoordination.getInstance();
 
     notificationDispatcher = mock(DefaultNotificationDispatcher.class);
     doNothing().when(notificationDispatcher).dispatch(any());

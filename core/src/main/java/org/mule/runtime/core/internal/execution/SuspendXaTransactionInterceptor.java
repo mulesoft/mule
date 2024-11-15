@@ -10,7 +10,6 @@ import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.transaction.TransactionCoordinationSuspended;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 
@@ -49,18 +48,18 @@ public class SuspendXaTransactionInterceptor<T> implements ExecutionInterceptor<
       return result;
     } catch (MessagingException e) {
       if (processOnException) {
-        TransactionCoordinationSuspended.getInstance().resumeXaTransactionIfAvailable();
+        TransactionCoordination.getInstance().resumeXaTransactionIfAvailable();
       }
       throw e;
     }
   }
 
   protected void suspendXATransaction(Transaction tx) throws TransactionException {
-    TransactionCoordinationSuspended.getInstance().suspendCurrentTransaction();
+    TransactionCoordination.getInstance().suspendCurrentTransaction();
   }
 
   protected void resumeXATransaction(Transaction tx) throws TransactionException {
-    TransactionCoordinationSuspended.getInstance().resumeSuspendedTransaction();
+    TransactionCoordination.getInstance().resumeSuspendedTransaction();
   }
 
   private void resumeXaTransactionIfRequired(Transaction suspendedXATx) throws TransactionException {

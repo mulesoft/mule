@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.internal.transaction.TransactionCoordinationSuspended;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -99,7 +98,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
 
   @Before
   public void removeTransaction() {
-    TransactionCoordinationSuspended.getInstance().clear();
+    TransactionCoordination.getInstance().clear();
   }
 
   @Test
