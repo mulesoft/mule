@@ -557,6 +557,11 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
     if (fromGlobalErrorHandler && exception != null) {
       String transactionLocation = txAdapter.getComponentLocation().get().getLocation();
+      if (transactionLocation.endsWith("/source")) {
+        // Set the flow as the location, as flows are the owners of transactions started by sources
+        transactionLocation = transactionLocation.substring(0, transactionLocation.lastIndexOf('/'));
+      }
+
       String failingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
 
       if (!componentsReferencingGlobalErrorHandler.contains(transactionLocation)) {
@@ -567,8 +572,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       // and within a subflow, and the transaction owner also references this handler and is outside of the subflow. In that case
       // we can't properly determine in which execution of this handler the transaction should be rolled back, and it gets rolled
       // back prematurely in the first execution.
+      String finalTransactionLocation = transactionLocation;
       Set<String> referencesContainingFailingComponentUpToTxOwner =
-          componentsReferencingGlobalErrorHandler.stream().filter(c -> c.startsWith(transactionLocation))
+          componentsReferencingGlobalErrorHandler.stream().filter(c -> c.startsWith(finalTransactionLocation))
               .filter(failingComponentLocation::startsWith).collect(Collectors.toSet());
       if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
         // The failing component is nested within more than one component that reference this handler:
