@@ -23,7 +23,7 @@ import io.qameta.allure.Story;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
-import org.mule.runtime.core.internal.transaction.TransactionSuspended;
+import org.mule.runtime.core.internal.transaction.SuspendableTransaction;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -185,7 +185,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Test
   public void testSuspendResumeTransaction() throws Exception {
     assertThat(tc.getTransaction(), nullValue());
-    TransactionSuspended tx = mock(TransactionSuspended.class);
+    SuspendableTransaction tx = mock(SuspendableTransaction.class);
     tc.bindTransaction(tx);
     tc.suspendCurrentTransaction();
     assertThat(tc.getTransaction(), is(nullValue()));
@@ -200,7 +200,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
     assertThat(tc.getTransaction(), nullValue());
     tc.resumeXaTransactionIfAvailable();
 
-    TransactionSuspended tx = spy(new TestTransaction("appName", notificationDispatcher));
+    SuspendableTransaction tx = spy(new TestTransaction("appName", notificationDispatcher));
     tc.bindTransaction(tx);
     tc.resumeXaTransactionIfAvailable();
     verify(tx, times(0)).resume();
@@ -257,8 +257,8 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase {
   @Issue("MULE-19430")
   public void suspendMultipleTransactions() throws TransactionException {
     assertThat(tc.getTransaction(), nullValue());
-    TransactionSuspended tx1 = mock(TransactionSuspended.class);
-    TransactionSuspended tx2 = mock(TransactionSuspended.class);
+    SuspendableTransaction tx1 = mock(SuspendableTransaction.class);
+    SuspendableTransaction tx2 = mock(SuspendableTransaction.class);
 
     tc.bindTransaction(tx1);
     tc.suspendCurrentTransaction();

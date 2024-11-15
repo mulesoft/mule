@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.transaction;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.internal.transaction.DelegateTransaction;
-import org.mule.runtime.core.internal.transaction.TransactionSuspended;
+import org.mule.runtime.core.internal.transaction.SuspendableTransaction;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 
 import java.util.ArrayDeque;
@@ -165,7 +165,7 @@ public final class TransactionCoordination {
   }
 
   public void suspendCurrentTransaction() throws TransactionException {
-    TransactionSuspended tx = (TransactionSuspended) TransactionCoordination.getInstance().getTransaction();
+    SuspendableTransaction tx = (SuspendableTransaction) TransactionCoordination.getInstance().getTransaction();
     if (logger.isDebugEnabled()) {
       logger.debug("Suspending " + tx);
     }
@@ -185,8 +185,8 @@ public final class TransactionCoordination {
   }
 
   public void resumeSuspendedTransaction() throws TransactionException {
-    TransactionSuspended tx =
-        (suspendedTransaction.get() == null) ? null : (TransactionSuspended) suspendedTransaction.get().pop();
+    SuspendableTransaction tx =
+        (suspendedTransaction.get() == null) ? null : (SuspendableTransaction) suspendedTransaction.get().pop();
     if (logger.isDebugEnabled()) {
       logger.debug("Re-binding and Resuming " + tx);
     }

@@ -41,7 +41,7 @@ public class DelegateTransaction extends AbstractTransaction {
                             .findFirst();
   }
 
-  private TransactionSuspended delegate = new NullTransaction();
+  private SuspendableTransaction delegate = new NullTransaction();
 
   private final TransactionManager transactionManager;
 
@@ -107,7 +107,7 @@ public class DelegateTransaction extends AbstractTransaction {
     }
 
     this.unbindTransaction();
-    this.delegate = (TransactionSuspended) TX_FACTORY
+    this.delegate = (SuspendableTransaction) TX_FACTORY
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No %s for transactional resource %s",
                                                                                TransactionFactory.class.getName(),
                                                                                key.getClass().getName()))))

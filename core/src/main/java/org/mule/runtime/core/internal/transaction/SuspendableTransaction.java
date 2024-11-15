@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
  *
  * @since 4.9
  */
-public interface TransactionSuspended extends Transaction {
+public interface SuspendableTransaction extends Transaction {
 
   /**
    * Resume the XA transaction
