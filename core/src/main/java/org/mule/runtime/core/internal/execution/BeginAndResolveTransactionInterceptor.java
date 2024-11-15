@@ -62,9 +62,9 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
 
       // Timeout is a traversal attribute of all Transaction implementations.
       // Setting it up here for all of them rather than in every implementation.
-      tx = (Transaction) transactionConfig.getFactory().beginTransaction(applicationName,
-                                                                         notificationDispatcher,
-                                                                         transactionManager);
+      tx = transactionConfig.getFactory().beginTransaction(applicationName,
+                                                           notificationDispatcher,
+                                                           transactionManager);
       tx.setTimeout(timeout);
       if (tx instanceof TransactionAdapter) {
         ((TransactionAdapter) tx).setRollbackIfTimeout(errorAtTimeout);

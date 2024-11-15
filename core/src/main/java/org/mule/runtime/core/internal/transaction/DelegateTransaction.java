@@ -107,7 +107,7 @@ public class DelegateTransaction extends AbstractTransaction {
     }
 
     this.unbindTransaction();
-    this.delegate = (Transaction) TX_FACTORY
+    this.delegate = TX_FACTORY
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No %s for transactional resource %s",
                                                                                TransactionFactory.class.getName(),
                                                                                key.getClass().getName()))))
