@@ -24,7 +24,6 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.getPr
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Integer.valueOf;
 import static java.util.Collections.newSetFromMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
@@ -47,7 +46,6 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
-import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
@@ -58,7 +56,6 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
-import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.transaction.TransactionAdapter;
