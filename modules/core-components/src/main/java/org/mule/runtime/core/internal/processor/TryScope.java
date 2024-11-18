@@ -247,7 +247,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       messagingExceptionHandler = muleContext.getDefaultErrorHandler(of(getRootContainerLocation().toString()));
       if (shouldSetLocation()) {
         ((ErrorHandler) messagingExceptionHandler)
-            .setExceptionListenersLocation(this.getLocation());
+            .setExceptionListenersLocation(getLocation());
       }
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
@@ -255,6 +255,9 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
                                                          componentTracerFactory
                                                              .fromComponent(this, TRY_SCOPE_INNER_CHAIN_SPAN_NAME, ""));
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
+    if (messagingExceptionHandler instanceof GlobalErrorHandler) {
+      ((GlobalErrorHandler) messagingExceptionHandler).addComponentReference(getLocation());
+    }
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);
     startProducer = profilingService.getProfilingDataProducer(TX_START);
