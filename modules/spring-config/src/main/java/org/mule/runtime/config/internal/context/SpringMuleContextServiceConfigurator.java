@@ -15,7 +15,6 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJE
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.FORWARD_COMPATIBILITY_HELPER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
@@ -329,7 +328,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     coreFunctionsProvider.setConfigurationProperties(configurationProperties);
     registerConstantBeanDefinition(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY, coreFunctionsProvider);
 
-    artifactProperties.forEach((k, v) -> registerConstantBeanDefinition(k, v));
+    artifactProperties.forEach(this::registerConstantBeanDefinition);
 
     if (valueOf(artifactProperties.getOrDefault(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY, FALSE.toString()))) {
       registerConstantBeanDefinition(OBJECT_ARTIFACT_AST, artifactAst);
@@ -429,10 +428,12 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
   protected void createBootstrapBeanDefinitions() {
     try {
       SpringRegistryBootstrap springRegistryBootstrap =
-          new SpringRegistryBootstrap(artifactType, muleContext, optionalObjectsController, this::registerBeanDefinition,
+          new SpringRegistryBootstrap(artifactType,
+                                      muleContext.getRegistryBootstrapServiceDiscoverer(),
+                                      optionalObjectsController,
+                                      this::registerBeanDefinition,
                                       BINDING_PROVIDER_PREDICATE
                                           .or(TRANSFORMER_PREDICATE)
-                                          .or(propertyKey -> propertyKey.endsWith(COMPATIBILITY_PLUGIN_INSTALLED))
                                           .negate());
       springRegistryBootstrap.initialise();
     } catch (InitialisationException e) {
