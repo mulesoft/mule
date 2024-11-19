@@ -6,26 +6,6 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
-import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
-import static java.lang.String.format;
-import static java.lang.Boolean.parseBoolean;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.startsWith;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
@@ -63,8 +43,30 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POL
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_SILENT_DEPLOY;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
-import static uk.org.lidalia.slf4jext.Level.DEBUG;
-import static uk.org.lidalia.slf4jext.Level.INFO;
+
+import static java.lang.String.format;
+import static java.lang.Boolean.parseBoolean;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+
+import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.INFO;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -121,7 +123,8 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import uk.org.lidalia.slf4jext.Level;
+
+import org.slf4j.event.Level;
 
 /**
  * Contains test for application deployment with policies on the default domain

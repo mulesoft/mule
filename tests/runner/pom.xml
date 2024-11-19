@@ -24,8 +24,6 @@
 
         <javaModuleName>org.mule.test.runner</javaModuleName>
         
-        <javassist.version>3.28.0-GA</javassist.version>
-         
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -38,9 +36,8 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>groovy-maven-plugin</artifactId>
-                <version>2.1.1</version>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -48,10 +45,12 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <source>
-                                for (art in project.getArtifacts())
-                                    project.properties['resolvedVersion.' + art.getArtifactId()] = art.getVersion()
-                            </source>
+                            <scripts>
+                                <script>
+                                    for (art in project.getArtifacts())
+                                        project.properties['resolvedVersion.' + art.getArtifactId()] = art.getVersion()
+                                </script>
+                            </scripts>
                         </configuration>
                     </execution>
                 </executions>
@@ -130,7 +129,6 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>${javassist.version}</version>
         </dependency>
 
         <dependency>
@@ -161,6 +159,11 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-petstore-extension</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

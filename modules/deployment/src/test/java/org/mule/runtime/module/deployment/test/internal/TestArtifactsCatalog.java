@@ -54,11 +54,10 @@ import java.net.URISyntaxException;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.apache.logging.log4j.LogManager;
+import org.slf4j.event.Level;
 
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
-
-import uk.org.lidalia.slf4jext.Level;
 
 /**
  * Utility class that holds most of the artifacts used in the deployment module test cases, in order to avoid compiling or
