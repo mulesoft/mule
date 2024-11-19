@@ -68,7 +68,10 @@ import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,6 +80,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -122,12 +126,18 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private String errorHandlerLocation;
   private boolean isLocalErrorHandlerLocation;
+  private final Set<String> componentsReferencingGlobalErrorHandler = new HashSet<>();
+  private final Map<String, Integer> failingComponentHandled = new HashMap<>();
 
   private Optional<ProcessingStrategy> ownedProcessingStrategy;
 
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
 
   private final CopyOnWriteArrayList<String> suppressedErrorTypeMatches = new CopyOnWriteArrayList<>();
+
+  public void addGlobalErrorHandlerComponentReference(ComponentLocation location) {
+    componentsReferencingGlobalErrorHandler.add(location.getLocation());
+  }
 
   private final class OnErrorHandlerFluxObjectFactory
       implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
@@ -547,11 +557,43 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
     if (fromGlobalErrorHandler && exception != null) {
       String transactionLocation = transaction.getComponentLocation().get().getLocation();
+      if (transactionLocation.endsWith("/source")) {
+        // Set the flow as the location, as flows are the owners of transactions started by sources
+        transactionLocation = transactionLocation.substring(0, transactionLocation.lastIndexOf('/'));
+      }
+
       String failingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
-      // Get the location of the Try that contains this component.
-      failingComponentLocation = failingComponentLocation.substring(0, failingComponentLocation.lastIndexOf('/'));
-      failingComponentLocation = failingComponentLocation.substring(0, failingComponentLocation.lastIndexOf('/'));
-      return failingComponentLocation.equals(transactionLocation);
+
+      if (!componentsReferencingGlobalErrorHandler.contains(transactionLocation)) {
+        return false;
+      }
+
+      // TODO W-17239370 - there is a corner case when the failing component is within a component that references this handler
+      // and within a subflow, and the transaction owner also references this handler and is outside of the subflow. In that case
+      // we can't properly determine in which execution of this handler the transaction should be rolled back, and it gets rolled
+      // back prematurely in the first execution.
+      String finalTransactionLocation = transactionLocation;
+      Set<String> referencesContainingFailingComponentUpToTxOwner =
+          componentsReferencingGlobalErrorHandler.stream().filter(c -> c.startsWith(finalTransactionLocation))
+              .filter(failingComponentLocation::startsWith).collect(Collectors.toSet());
+      if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
+        // The failing component is nested within more than one component that reference this handler:
+        // transactionOwnerWithThisHandler-componentWithThisHandler-...-failingComponent
+        int timesToHandleBeforeReachingTxOwner = referencesContainingFailingComponentUpToTxOwner.size() - 1;
+        Integer timesHandled = failingComponentHandled.putIfAbsent(failingComponentLocation, 1);
+        if (timesHandled != null) {
+          if (timesHandled < timesToHandleBeforeReachingTxOwner) {
+            failingComponentHandled.put(failingComponentLocation, timesHandled + 1);
+          } else {
+            failingComponentHandled.remove(failingComponentLocation);
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      return true;
     }
 
     return isOwnedTransactionByLocalErrorHandler(transaction);
