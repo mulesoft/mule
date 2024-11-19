@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 public class CoreValidationsProvider implements ValidationsProvider, ArtifactAstGraphDependencyProviderAware {
 
@@ -94,6 +93,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                                                                      ignoreParamsWithProperties),
                                                           new OperationParameterDefaultValueDoesntSupportExpressions(),
                                                           new NoExpressionsInNoExpressionsSupportedParams(),
+                                                          new ResourceExistsAndAccessible(artifactRegionClassLoader),
                                                           new DynamicConfigWithStatefulOperationConfigurationOverride(),
                                                           new PollingSourceHasSchedulingStrategy(),
                                                           new RoundRobinRoutes(),
