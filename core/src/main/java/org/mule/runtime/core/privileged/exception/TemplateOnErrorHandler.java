@@ -138,7 +138,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   public void addGlobalErrorHandlerComponentReference(ComponentLocation location) {
     componentsReferencingGlobalErrorHandler.add(location.getLocation());
   }
-  
+
   private final class OnErrorHandlerFluxObjectFactory
       implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
 
