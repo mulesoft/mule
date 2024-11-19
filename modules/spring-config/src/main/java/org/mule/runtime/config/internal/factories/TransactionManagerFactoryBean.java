@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.internal.transaction.TransactionManagerFactory;
 
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;

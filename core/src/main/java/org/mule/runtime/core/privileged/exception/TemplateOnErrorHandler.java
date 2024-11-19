@@ -543,7 +543,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   /**
    * Creates a copy of this ErrorHandler, with the defined location. This location allows to retrieve the
-   * {@link ProcessingStrategy}, and define if a running {@link org.mule.runtime.core.api.transaction.Transaction} is owned by the
+   * {@link ProcessingStrategy}, and define if a running {@link Transaction} is owned by the
    * {@link org.mule.runtime.core.api.construct.Flow} or {@link org.mule.runtime.core.internal.processor.TryScope} executing this
    * ErrorHandler. This is intended to be used when having references to Global ErrorHandlers, since each instance reference
    * should run with the processing strategy defined by the flow referencing it, and be able to rollback transactions.
