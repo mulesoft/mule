@@ -7,10 +7,10 @@
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
-import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -38,8 +38,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,15 +115,11 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     if (configs != null && !configs.isEmpty()) {
       descriptor.setConfigResources(new HashSet<>(configs));
     } else {
-      descriptor.setConfigResources(ImmutableSet.<String>builder().add(getDefaultConfigurationResource()).build());
+      descriptor.setConfigResources(singleton(getDefaultConfigurationResource()));
     }
 
     descriptor.setPlugins(createArtifactPluginDescriptors(descriptor));
-
-    if (!isMuleFramework()) {
-      descriptor.setLogConfigFile(getLogConfigFile(getArtifactModel()));
-    }
-
+    descriptor.setLogConfigFile(getLogConfigFile(getArtifactModel()));
     descriptor.setSupportedJavaVersions(getArtifactModel().getSupportedJavaVersions());
   }
 

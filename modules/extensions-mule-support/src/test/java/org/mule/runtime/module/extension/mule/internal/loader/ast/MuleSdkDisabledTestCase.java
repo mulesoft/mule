@@ -13,11 +13,13 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLI
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
 
 import static java.util.stream.Collectors.toList;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.validation.Validation;
@@ -26,14 +28,13 @@ import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.junit.ClassRule;
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @Feature(REUSE)
 @Stories({@Story(APPLICATION_EXTENSION_MODEL), @Story(OPERATIONS)})
@@ -42,9 +43,6 @@ public class MuleSdkDisabledTestCase extends AbstractMuleSdkAstTestCase {
 
   @ClassRule
   public static SystemProperty disableMuleSdk = new SystemProperty(ENABLE_MULE_SDK_PROPERTY, "false");
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Override
   protected String getConfigFile() {
@@ -69,10 +67,9 @@ public class MuleSdkDisabledTestCase extends AbstractMuleSdkAstTestCase {
 
   @Test
   public void whenMuleSdkIsDisabledTheNamespaceThisIsNotResolved() {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException
-        .expectMessage("Can't resolve http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd, A dependency or plugin might be missing");
-    getArtifactAst("validation/app-using-namespace-this.xml");
+    var thrown = assertThrows(MuleRuntimeException.class, () -> getArtifactAst("validation/app-using-namespace-this.xml"));
+    assertThat(thrown.getMessage(),
+               containsString("Can't resolve http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd, A dependency or plugin might be missing"));
   }
 
   private void assertAllValidationsLevel(ValidationResult validationResult, Level expectedValidationLevel) {

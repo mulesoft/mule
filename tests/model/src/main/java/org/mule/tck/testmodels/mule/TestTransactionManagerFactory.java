@@ -7,7 +7,7 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.internal.transaction.TransactionManagerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;

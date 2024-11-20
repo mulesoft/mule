@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static com.google.common.base.Preconditions.checkState;
-import static java.lang.String.format;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.COMPILE;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptySet;
+import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -23,14 +25,30 @@ import java.util.Set;
  */
 public final class BundleDependency {
 
+  /**
+   * @return a fresh {@link Builder} for creating a {@link BundleDependency}
+   * @since 4.9
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  /**
+   * @return a fresh {@link Builder} for creating a {@link BundleDependency}
+   * @since 4.9
+   */
+  public static Builder builder(BundleDependency template) {
+    return new Builder(template);
+  }
+
   private BundleDescriptor descriptor;
   private BundleScope scope;
   private URI bundleUri;
   private List<BundleDependency> additionalDependencies;
   private List<BundleDependency> transitiveDependencies;
 
-  private Set<String> packages;
-  private Set<String> resources;
+  private Set<String> packages = emptySet();
+  private Set<String> resources = emptySet();
 
   private BundleDependency() {}
 
@@ -115,8 +133,8 @@ public final class BundleDependency {
       bundleDependency.scope = template.scope;
       bundleDependency.additionalDependencies = template.additionalDependencies;
       bundleDependency.transitiveDependencies = template.transitiveDependencies;
-      bundleDependency.packages = template.packages;
-      bundleDependency.resources = template.resources;
+      bundleDependency.packages = requireNonNull(template.packages, () -> getNullFieldMessage("packages"));
+      bundleDependency.resources = requireNonNull(template.resources, () -> getNullFieldMessage("resources"));
     }
 
     /**
@@ -126,7 +144,7 @@ public final class BundleDependency {
      * @return the builder
      */
     public Builder setDescriptor(BundleDescriptor descriptor) {
-      validateIsNotNull(descriptor, BUNDLE_DESCRIPTOR);
+      requireNonNull(descriptor, () -> getNullFieldMessage(BUNDLE_DESCRIPTOR));
       this.bundleDependency.descriptor = descriptor;
 
       return this;
@@ -139,7 +157,7 @@ public final class BundleDependency {
      * @return the builder
      */
     public Builder setScope(BundleScope scope) {
-      checkState(scope != null, "scope cannot be null");
+      requireNonNull(scope, "scope cannot be null");
       bundleDependency.scope = scope;
 
       return this;
@@ -185,12 +203,12 @@ public final class BundleDependency {
     }
 
     public Builder setPackages(Set<String> packages) {
-      this.bundleDependency.packages = packages;
+      this.bundleDependency.packages = requireNonNull(packages, () -> getNullFieldMessage("packages"));
       return this;
     }
 
     public Builder setResources(Set<String> resources) {
-      this.bundleDependency.resources = resources;
+      this.bundleDependency.resources = requireNonNull(resources, () -> getNullFieldMessage("resources"));
       return this;
     }
 
@@ -198,17 +216,13 @@ public final class BundleDependency {
      * @return a {@code BundleDescriptor} with the previous provided parameters to the builder.
      */
     public BundleDependency build() {
-      validateIsNotNull(bundleDependency.descriptor, BUNDLE_DESCRIPTOR);
+      requireNonNull(bundleDependency.descriptor, () -> getNullFieldMessage(BUNDLE_DESCRIPTOR));
 
       return this.bundleDependency;
     }
 
     private String getNullFieldMessage(String field) {
       return format(REQUIRED_FIELD_IS_NULL, field);
-    }
-
-    private void validateIsNotNull(Object value, String fieldId) {
-      checkState(value != null, getNullFieldMessage(fieldId));
     }
   }
 }

@@ -19,7 +19,6 @@ import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
@@ -767,11 +766,11 @@ public class CoreMessages extends I18nMessageFactory {
     return factory.createMessage(BUNDLE_PATH, 277, property, object);
   }
 
-  public static I18nMessage commitTxButNoResource(Transaction tx) {
+  public static I18nMessage commitTxButNoResource(Object tx) {
     return factory.createMessage(BUNDLE_PATH, 300, tx);
   }
 
-  public static I18nMessage rollbackTxButNoResource(Transaction tx) {
+  public static I18nMessage rollbackTxButNoResource(Object tx) {
     return factory.createMessage(BUNDLE_PATH, 301, tx);
   }
 

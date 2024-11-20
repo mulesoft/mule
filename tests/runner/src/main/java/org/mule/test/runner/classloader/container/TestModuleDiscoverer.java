@@ -11,8 +11,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static java.util.Collections.emptyList;
 
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
-import org.mule.runtime.container.internal.ModuleDiscoverer;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.util.ArrayList;

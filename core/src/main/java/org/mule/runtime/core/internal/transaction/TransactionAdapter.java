@@ -16,7 +16,7 @@ import java.util.Optional;
  *
  * @since 4.2
  */
-public interface TransactionAdapter extends Transaction {
+public interface TransactionAdapter extends SuspendableTransaction {
 
   /**
    * @return the {@link ComponentLocation} corresponding to this transaction

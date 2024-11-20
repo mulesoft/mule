@@ -43,9 +43,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 /**
@@ -496,14 +493,7 @@ public class DefaultDataTypeBuilder
     if (value == null) {
       return type(Object.class);
     } else {
-      DataTypeParamsBuilder builder = type(value.getClass());
-
-      final String mimeType = getObjectMimeType(value);
-      if (mimeType != null) {
-        builder = builder.mediaType(mimeType);
-      }
-
-      return builder;
+      return type(value.getClass());
     }
   }
 
@@ -512,16 +502,6 @@ public class DefaultDataTypeBuilder
     return functionType(expressionFunction.getClass())
         .returnType(expressionFunction.returnType().orElse(null))
         .parametersType(expressionFunction.parameters());
-  }
-
-  private String getObjectMimeType(Object value) {
-    if (value instanceof DataHandler) {
-      return ((DataHandler) value).getContentType();
-    } else if (value instanceof DataSource) {
-      return ((DataSource) value).getContentType();
-    } else {
-      return null;
-    }
   }
 
   /**

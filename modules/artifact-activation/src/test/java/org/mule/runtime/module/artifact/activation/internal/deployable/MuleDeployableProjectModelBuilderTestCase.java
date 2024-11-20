@@ -9,11 +9,12 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
@@ -21,7 +22,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.rules.ExpectedException.none;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -29,23 +30,20 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
 public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Test
   public void createBasicDeployableProjectModel() throws Exception {
@@ -166,11 +164,10 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
   @Test
   @Issue("W-12680624")
   public void projectWithInvalidClassLoaderModel() throws URISyntaxException {
-    expectedException.expect(IllegalStateException.class);
-    expectedException
-        .expectMessage("Error deserializing 'classloader-model.json'. \"classifier\" not specified for 'com.test:basic'");
-
-    getDeployableProjectModel("apps/heavyweight/invalid-classloader-model");
+    IllegalStateException thrown =
+        assertThrows(IllegalStateException.class, () -> getDeployableProjectModel("apps/heavyweight/invalid-classloader-model"));
+    assertThat(thrown.getMessage(),
+               containsString("Error deserializing 'classloader-model.json'. \"classifier\" not specified for 'com.test:basic'"));
   }
 
   private void testBasicDeployableProjectModel(DeployableProjectModel deployableProjectModel) {
@@ -180,8 +177,10 @@ public class MuleDeployableProjectModelBuilderTestCase extends AbstractMuleTestC
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
 
-    Map<String, Integer> transitiveDependenciesNum =
-        of("mule-http-connector", 13, "mule-sockets-connector", 7, "mule-db-connector", 10);
+    Map<String, Integer> transitiveDependenciesNum = new HashMap<>();
+    transitiveDependenciesNum.put("mule-http-connector", 13);
+    transitiveDependenciesNum.put("mule-sockets-connector", 7);
+    transitiveDependenciesNum.put("mule-db-connector", 10);
 
     deployableProjectModel.getDependencies()
         .forEach(dependency -> assertThat(dependency.getTransitiveDependenciesList(),

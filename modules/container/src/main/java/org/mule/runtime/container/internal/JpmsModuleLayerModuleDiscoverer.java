@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
 import org.mule.api.annotation.jpms.PrivilegedApi;
+import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.io.InputStream;

@@ -12,6 +12,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorUtils.isCompatibleVersion;
 
 import static java.lang.String.format;
+import static java.util.Collections.singleton;
 import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -219,13 +219,12 @@ public class BundlePluginDependenciesResolver {
                     pluginDescriptor
                         .setClassLoaderConfiguration(createBuilderWithoutDependency(originalClassLoaderConfiguration, dependency,
                                                                                     includeLocals)
-                                                                                        .dependingOn(ImmutableSet.of(
-                                                                                                                     new BundleDependency.Builder()
-                                                                                                                         .setDescriptor(artifactPluginDescriptorResolved
-                                                                                                                             .getBundleDescriptor())
-                                                                                                                         .setScope(dependency
-                                                                                                                             .getScope())
-                                                                                                                         .build()))
+                                                                                        .dependingOn(singleton(new BundleDependency.Builder()
+                                                                                            .setDescriptor(artifactPluginDescriptorResolved
+                                                                                                .getBundleDescriptor())
+                                                                                            .setScope(dependency
+                                                                                                .getScope())
+                                                                                            .build()))
                                                                                         .build());
                   } else {
                     throw new ArtifactActivationException(createStaticMessage(format("Transitive dependencies should be resolved by now for mule-plugin '%s', but '%s' is missing",
