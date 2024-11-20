@@ -7,7 +7,6 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.classloader.jar.CachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
@@ -193,7 +192,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             synchronized (descriptorMappingLock) {
               if (descriptorMapping.get(matchDescriptor) == null) {
                 URLClassLoader urlClassLoader =
-                    new URLClassLoader(new URL[] {url}, getSystemClassLoader(), getCachingURLStreamHandlerFactory());;
+                    new URLClassLoader(new URL[] {url}, getSystemClassLoader());;
                 descriptorMapping.put(matchDescriptor, urlClassLoader);
               }
             }
