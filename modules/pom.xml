@@ -52,7 +52,6 @@
         <module>extensions-mule-support</module>
         <module>repository</module>
         <module>tls</module>
-        <module>soap-api</module>
         <module>tracing</module>
         <module>metrics</module>
         <module>troubleshooting</module>
