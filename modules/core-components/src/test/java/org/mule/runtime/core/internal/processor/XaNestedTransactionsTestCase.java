@@ -34,7 +34,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.runtime.api.component.location.ComponentLocation;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -45,17 +45,14 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
-import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.transaction.TransactionManager;
-import javax.xml.namespace.QName;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Feature(TRANSACTION)
 @Story(XA_TRANSACTION)

@@ -103,7 +103,7 @@ import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.internal.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler;
 import org.mule.runtime.core.internal.config.DefaultResourceLocator;

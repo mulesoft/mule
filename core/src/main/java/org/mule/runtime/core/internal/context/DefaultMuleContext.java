@@ -86,7 +86,6 @@ import static org.mule.runtime.core.api.management.stats.AllStatistics.configure
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
-import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getSupportedJdks;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.validateJdk;
 
@@ -202,8 +201,6 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.lang3.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
-
-import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
 
@@ -334,9 +331,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
 
   static {
-    // Log dropped events/errors
-    Hooks.onErrorDropped(error -> LOGGER.debug("ERROR DROPPED", error));
-    Hooks.onNextDropped(event -> LOGGER.debug("EVENT DROPPED {}", event));
     // Feature flags (see FeatureFlaggingService)
     if (!areFeatureFlagsConfigured.getAndSet(true)) {
       configurePropertiesResolverFeatureFlag();
@@ -414,7 +408,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
         // TODO (MULE-19231): remove this from here after ExpressionManager is available in the validations
         // (this won't be more necessary here anymore). If there is an error in the expression, it will be detected here
         getConfiguration().getDefaultCorrelationIdGenerator()
-            .filter(generator -> generator instanceof ExpressionCorrelationIdGenerator)
+            .filter(ExpressionCorrelationIdGenerator.class::isInstance)
             .ifPresent(generator -> ((ExpressionCorrelationIdGenerator) generator).initializeGenerator());
 
         MeterProvider meterProvider = muleRegistryHelper.lookupObject(MULE_ARTIFACT_METER_PROVIDER_KEY);
@@ -556,14 +550,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       try {
         getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
-
-        // THis is a little odd. I find the relationship between the MuleRegistry Helper and the registry broker, too much
-        // abstraction?
-        if (muleRegistryHelper != null) {
-          safely(() -> muleRegistryHelper.dispose());
-        }
       } catch (Exception e) {
-        LOGGER.debug("Failed to cleanly dispose Mule: " + e.getMessage(), e);
+        LOGGER.warn("Failed to cleanly dispose Mule: " + e.getMessage(), e);
       }
 
       notificationManager.fireNotification(new MuleContextNotification(this, CONTEXT_DISPOSED));
@@ -580,10 +568,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   private void disposeManagers() {
-    safely(() -> {
+    try {
       disposeIfNeeded(getFlowTraceManager(), LOGGER);
       notificationManager.dispose();
-    });
+    } catch (Exception e) {
+      LOGGER.warn(e.toString());
+    }
   }
 
   /**

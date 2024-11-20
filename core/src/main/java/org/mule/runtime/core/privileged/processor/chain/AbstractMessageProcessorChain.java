@@ -120,6 +120,7 @@ import org.slf4j.MDC;
 
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Hooks;
 import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
@@ -139,6 +140,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private static Class<ClassLoader> appClClass;
 
+  private static final Logger MULE_CTX_LOGGER = getLogger(DefaultMuleContext.class);
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
   private static final Consumer<Context> TCCL_REACTOR_CTX_CONSUMER =
@@ -150,6 +152,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
 
   static {
+    // Log dropped events/errors
+    // Use a different logger for keeping compatibility with currently available tools and documentation
+    Hooks.onErrorDropped(error -> MULE_CTX_LOGGER.debug("ERROR DROPPED", error));
+    Hooks.onNextDropped(event -> MULE_CTX_LOGGER.debug("EVENT DROPPED {}", event));
+
     try {
       appClClass = (Class<ClassLoader>) AbstractMessageProcessorChain.class.getClassLoader()
           .loadClass("org.mule.runtime.deployment.model.api.application.ApplicationClassLoader");

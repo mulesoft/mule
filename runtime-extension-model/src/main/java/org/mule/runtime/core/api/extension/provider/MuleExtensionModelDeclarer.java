@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
@@ -361,9 +363,10 @@ public class MuleExtensionModelDeclarer {
   private void declareIdempotentValidator(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer validator = extensionDeclarer
         .withOperation("idempotentMessageValidator")
-        .describedAs("Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. "
-            + "Note that the ID used can be generated from the message using an expression defined in the 'idExpression' "
-            + "attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.");
+        .describedAs("""
+            Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. \
+            Note that the ID used can be generated from the message using an expression defined in the 'idExpression' \
+            attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.""");
 
     withNoErrorMapping(validator);
 
@@ -396,9 +399,10 @@ public class MuleExtensionModelDeclarer {
             .allowsReferences(true).build())
         .ofType(OBJECT_STORE_TYPE).withExpressionSupport(NOT_SUPPORTED)
         .withAllowedStereotypes(singletonList(OBJECT_STORE))
-        .describedAs("The object store where the IDs of the processed events are going to be stored. " +
-            "If defined as an argument, it should reference a globally created object store. Otherwise, " +
-            "it can be defined inline or not at all. In the last case, a default object store will be provided.");
+        .describedAs("""
+            The object store where the IDs of the processed events are going to be stored. \
+            If defined as an argument, it should reference a globally created object store. Otherwise, \
+            it can be defined inline or not at all. In the last case, a default object store will be provided.""");
 
     validator.withErrorModel(duplicateMessageError);
   }
@@ -429,9 +433,10 @@ public class MuleExtensionModelDeclarer {
 
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer flowRef = extensionDeclarer.withOperation("flowRef")
-        .describedAs("Allows a \u0027flow\u0027 to be referenced so that message processing will continue in the referenced flow "
-            + "before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the "
-            + "referenced flow and will therefore use its error handler etc.")
+        .describedAs("""
+            Allows a \u0027flow\u0027 to be referenced so that message processing will continue in the referenced flow \
+            before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the \
+            referenced flow and will therefore use its error handler etc.""")
         .withErrorModel(routingError);
 
     withNoErrorMapping(flowRef);
@@ -562,6 +567,8 @@ public class MuleExtensionModelDeclarer {
         .withOptionalParameter("location")
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
+        .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, EMBEDDED, new String[] {"*"}))
+            .build())
         .describedAs("The location of the template. The order in which the processor will attempt to load the file is: from the file system, from a URL, then from the classpath.");
 
     parseTemplate.onDefaultParameterGroup()
@@ -689,9 +696,10 @@ public class MuleExtensionModelDeclarer {
         .ofType(INTEGER_TYPE)
         .defaultingTo(60000)
         .withExpressionSupport(SUPPORTED)
-        .describedAs("Specifies the minimum time interval between two process retries in milliseconds.\n" +
-            " The actual time interval depends on the previous execution but should not exceed twice this number.\n" +
-            " Default value is 60000 (one minute)");
+        .describedAs("""
+            Specifies the minimum time interval between two process retries in milliseconds.
+             The actual time interval depends on the previous execution but should not exceed twice this number.
+             Default value is 60000 (one minute)""");
 
     untilSuccessful.withOutput().ofDynamicType(ANY_TYPE);
     untilSuccessful.withOutputAttributes().ofDynamicType(ANY_TYPE);
@@ -700,9 +708,10 @@ public class MuleExtensionModelDeclarer {
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer choice = extensionDeclarer.withOperation("choice")
-        .describedAs("Sends the message to the first message processor whose condition is satisfied. "
-            + "If none of the conditions are satisfied, it sends the message to the configured default message processor "
-            + "or fails if there is none.")
+        .describedAs("""
+            Sends the message to the first message processor whose condition is satisfied. \
+            If none of the conditions are satisfied, it sends the message to the configured default message processor \
+            or fails if there is none.""")
         .withErrorModel(routingError).blocking(false);
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
@@ -853,7 +862,7 @@ public class MuleExtensionModelDeclarer {
             .build())
         .describedAs("Strategy that determines that the results are aggregated in a list rather than on a map.");
 
-    scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
+    scatterGather.withOutput().ofDynamicType(ANY_TYPE);
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
     configurerFactory.create()
         .addRoutePassThroughChainInputResolver("route")
@@ -1161,23 +1170,25 @@ public class MuleExtensionModelDeclarer {
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("5000")
-        .describedAs("The time in milliseconds to wait for any in-progress work to finish running before Mule shuts down. "
-            + "After this threshold has been reached, Mule starts stopping schedulers and interrupting threads, "
-            + "and messages can be lost. If you have a very large number of services in the same Mule instance, "
-            + "if you have components that take more than a couple seconds to process, or if you are using large "
-            + "payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown."
-            + " The value you specify is applied to services and separately to dispatchers, so the default value of "
-            + "5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after "
-            + "shutdown is initiated.");
+        .describedAs("""
+            The time in milliseconds to wait for any in-progress work to finish running before Mule shuts down. \
+            After this threshold has been reached, Mule starts stopping schedulers and interrupting threads, \
+            and messages can be lost. If you have a very large number of services in the same Mule instance, \
+            if you have components that take more than a couple seconds to process, or if you are using large \
+            payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown.\
+             The value you specify is applied to services and separately to dispatchers, so the default value of \
+            5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after \
+            shutdown is initiated.""");
 
     params
         .withOptionalParameter("maxQueueTransactionFilesSize")
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo("500")
-        .describedAs("Sets the approximate maximum space in megabytes allowed for the transaction log files for transactional persistent queues."
-            + " Take into account that this number applies both to the set of transaction log files for XA and for local transactions. "
-            + "If both types of transactions are used then the approximate maximum space used, will be twice the configured value.");
+        .describedAs("""
+            Sets the approximate maximum space in megabytes allowed for the transaction log files for transactional persistent queues.\
+             Take into account that this number applies both to the set of transaction log files for XA and for local transactions. \
+            If both types of transactions are used then the approximate maximum space used, will be twice the configured value.""");
 
     params
         .withOptionalParameter("defaultObjectSerializer-ref")
@@ -1277,15 +1288,20 @@ public class MuleExtensionModelDeclarer {
     ConstructDeclarer configuration = extensionDeclarer.withConstruct("configurationProperties")
         .allowingTopLevelDefinition()
         .withStereotype(APP_CONFIG)
-        .describedAs("Configuration properties are key/value pairs that can be stored in configuration files or set as system environment variables. "
-            + "\nEach property%2Cs value can be referenced inside the attributes of a mule configuration file by wrapping the property%2Cs key name in the syntax: \n${key_name}. "
-            + "\n At runtime, each property placeholder expression is substituted with the property's value. "
-            + "\nThis allows you to externalize configuration of properties outside"
-            + " the Mule application's deployable archive, and to allow others to change these properties based on the environment the application is being deployed to. "
-            + "Note that a system environment variable with a matching key name will override the same key%2Cs value from a properties file. Each property has a key and a value. \n"
-            + "The key can be referenced from the mule configuration files using the following semantics: \n"
-            + "${key_name}. This allows to externalize configuration and change it based\n"
-            + "on the environment the application is being deployed to.");
+        .describedAs("""
+            Configuration properties are key/value pairs that can be stored in configuration files or set as system environment variables. \
+
+            Each property%2Cs value can be referenced inside the attributes of a mule configuration file by wrapping the property%2Cs key name in the syntax:\s
+            ${key_name}. \
+
+             At runtime, each property placeholder expression is substituted with the property's value. \
+
+            This allows you to externalize configuration of properties outside\
+             the Mule application's deployable archive, and to allow others to change these properties based on the environment the application is being deployed to. \
+            Note that a system environment variable with a matching key name will override the same key%2Cs value from a properties file. Each property has a key and a value.\s
+            The key can be referenced from the mule configuration files using the following semantics:\s
+            ${key_name}. This allows to externalize configuration and change it based
+            on the environment the application is being deployed to.""");
 
     ParameterGroupDeclarer defaultParameterGroup = configuration.onDefaultParameterGroup();
 
@@ -1294,10 +1310,12 @@ public class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .withDisplayModel(DisplayModel.builder().path(new PathModel(FILE, false, EMBEDDED, new String[] {"yaml", "properties"}))
             .build())
-        .describedAs(" The location of the file with the configuration properties to use. "
-            + "It may be a location in the classpath or an absolute location. \nThe file location"
-            + " value may also contains references to properties that will only be resolved based on "
-            + "system properties or properties set at deployment time.");
+        .describedAs("""
+             The location of the file with the configuration properties to use. \
+            It may be a location in the classpath or an absolute location.\s
+            The file location\
+             value may also contains references to properties that will only be resolved based on \
+            system properties or properties set at deployment time.""");
 
     defaultParameterGroup.withOptionalParameter("encoding")
         .ofType(STRING_TYPE)
@@ -1317,10 +1335,11 @@ public class MuleExtensionModelDeclarer {
         .ofType(BOOLEAN_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .defaultingTo(false)
-        .describedAs("If the notification manager is dynamic, listeners can be registered dynamically at runtime via the "
-            + "MuleContext, and the configured notification can be changed. Otherwise, some parts of Mule will cache "
-            + "notification configuration for efficiency and will not generate events for newly enabled notifications or "
-            + "listeners. The default value is false.");
+        .describedAs("""
+            If the notification manager is dynamic, listeners can be registered dynamically at runtime via the \
+            MuleContext, and the configured notification can be changed. Otherwise, some parts of Mule will cache \
+            notification configuration for efficiency and will not generate events for newly enabled notifications or \
+            listeners. The default value is false.""");
 
     declareEnableNotification(notificationsConstructDeclarer.withOptionalComponent("notification"));
     declareDisableNotification(notificationsConstructDeclarer.withOptionalComponent("disable-notification"));
@@ -1400,10 +1419,11 @@ public class MuleExtensionModelDeclarer {
   }
 
   private void declareNotificationListener(NestedComponentDeclarer notificationListenerDeclarer) {
-    notificationListenerDeclarer.describedAs("Registers a bean as a listener with the notification system. Events are "
-        + "dispatched by reflection - the listener will receive all events associated with any interfaces it implements."
-        + " The relationship between interfaces and events is configured by the notification and disable-notification "
-        + "elements.");
+    notificationListenerDeclarer.describedAs("""
+        Registers a bean as a listener with the notification system. Events are \
+        dispatched by reflection - the listener will receive all events associated with any interfaces it implements.\
+         The relationship between interfaces and events is configured by the notification and disable-notification \
+        elements.""");
 
     notificationListenerDeclarer.onDefaultParameterGroup()
         .withRequiredParameter("ref")
@@ -1496,9 +1516,10 @@ public class MuleExtensionModelDeclarer {
 
     ParameterGroupDeclarer passwordEncryptionStrategyParameterGroup = securityManagerDeclarer
         .withOptionalComponent("passwordEncryptionStrategy")
-        .describedAs("Provides password-based encryption using JCE. Users must specify a password and"
-            + "optionally a salt and iteration count as well. The default algorithm is"
-            + "PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.")
+        .describedAs("""
+            Provides password-based encryption using JCE. Users must specify a password and\
+            optionally a salt and iteration count as well. The default algorithm is\
+            PBEWithMD5AndDES, but users can specify any valid algorithm supported by JCE.""")
         .onDefaultParameterGroup();
     passwordEncryptionStrategyParameterGroup.withRequiredParameter("name")
         .describedAs("An encryption strategy provides support for a specific encryption algorithm.")

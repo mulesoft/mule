@@ -24,7 +24,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 import org.mule.runtime.core.internal.registry.Registry;
 
@@ -52,11 +51,17 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
   @Override
   public void onTransition(String phaseName, T object) throws MuleException {
-    try {
-      final CheckedRunnable transitionCommand = (CheckedRunnable) () -> doOnTransition(phaseName, object);
+    final Runnable transitionCommand = () -> {
+      try {
+        doOnTransition(phaseName, object);
+      } catch (LifecycleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    };
 
+    try {
       registryLifecycleManager.getMuleContext()
-          .map(muleContext -> (CheckedRunnable) () -> muleContext.withLifecycleLock(transitionCommand))
+          .map(muleContext -> (Runnable) () -> muleContext.withLifecycleLock(transitionCommand))
           .orElse(transitionCommand)
           .run();
     } catch (RuntimeException e) {
@@ -69,7 +74,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
     }
   }
 
-  private void doOnTransition(String phaseName, T object) throws MuleException {
+  private void doOnTransition(String phaseName, T object) throws LifecycleException {
 
     LifecyclePhase phase = registryLifecycleManager.getPhase(phaseName);
 

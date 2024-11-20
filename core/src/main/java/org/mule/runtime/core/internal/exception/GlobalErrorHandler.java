@@ -113,4 +113,17 @@ public class GlobalErrorHandler extends ErrorHandler {
   public void clearRouterForChain(MessageProcessorChain chain) {
     routers.remove(chain);
   }
+
+  /**
+   * Keeps track of all the components referencing this global error handler.
+   *
+   * @param location {@link ComponentLocation} of the component referencing this global error handler.
+   */
+  public void addComponentReference(ComponentLocation location) {
+    this.getExceptionListeners().stream()
+        .filter(TemplateOnErrorHandler.class::isInstance)
+        .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener)
+            .addGlobalErrorHandlerComponentReference(location));
+  }
+
 }
