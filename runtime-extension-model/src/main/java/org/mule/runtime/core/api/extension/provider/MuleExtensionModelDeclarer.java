@@ -850,7 +850,7 @@ public class MuleExtensionModelDeclarer {
             .build())
         .describedAs("Strategy that determines that the results are aggregated in a list rather than on a map.");
 
-    scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
+    scatterGather.withOutput().ofDynamicType(ANY_TYPE);
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
     configurerFactory.create()
         .addRoutePassThroughChainInputResolver("route")
