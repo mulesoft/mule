@@ -32,7 +32,7 @@ module org.mule.runtime.service {
 
   exports org.mule.runtime.module.service.internal.artifact to
       org.mule.test.runner,
-      giorg.mule.framework;
+      gorg.mule.framework;
   exports org.mule.runtime.module.service.internal.discoverer to
       org.mule.runtime.artifact.activation,
       org.mule.runtime.deployment.model.impl;

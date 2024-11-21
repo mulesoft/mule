@@ -33,5 +33,5 @@ module org.mule.runtime.container {
       org.mule.runtime.service,
       org.mule.runtime.spring.config,
       org.mule.test.runner,
-      gorg.mule.framework;
+      org.mule.framework;
 }
