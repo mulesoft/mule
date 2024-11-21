@@ -14,9 +14,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Has a factory method for obtaining a {@link ServiceClassLoaderFactory}.
- * <p>
- * This overrides the default class when running in a JVM that supports JPMS (9+), but has a fallback mechanism to provide the
- * previous implementation.
  * 
  * @since 4.5
  * @deprecated since 4.8, use {@link ServiceClassLoaderFactoryProvider} instead.

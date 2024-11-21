@@ -11,6 +11,7 @@ import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
 
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
@@ -24,11 +25,13 @@ public class ServiceClassLoaderFactory
   @Override
   @Deprecated
   ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
-                             ClassLoaderLookupPolicy lookupPolicy);
+                             ClassLoaderLookupPolicy lookupPolicy)
+      throws ArtifactClassloaderCreationException;
 
   @Override
   ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor,
-                             MuleContainerClassLoaderWrapper containerClassLoader);
+                             MuleContainerClassLoaderWrapper containerClassLoader)
+      throws ArtifactClassloaderCreationException;
 
   @Override
   void setParentLayerFrom(Class clazz);
