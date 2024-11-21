@@ -27,8 +27,8 @@ public class ServiceClassLoaderFactoryProvider {
   }
 
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
-    LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceClassLoaderFactoryImpl'...");
-    final ServiceClassLoaderFactory serviceModuleLayerFactory = new ServiceClassLoaderFactoryImpl();
+    LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceModuleLayerFactory'...");
+    final ServiceClassLoaderFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
     serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);
     return serviceModuleLayerFactory;
   }

@@ -36,7 +36,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
-import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryImpl;
+import org.mule.runtime.module.service.api.artifact.ServiceModuleLayerFactory;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -66,7 +66,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   @Rule
   public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
 
-  private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceClassLoaderFactoryImpl.class);
+  private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceModuleLayerFactory.class);
   private final ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
   private final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
   private final ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);

@@ -38,11 +38,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
  */
-public class ServiceClassLoaderFactoryImpl
+public class ServiceModuleLayerFactory
     implements
     ServiceClassLoaderFactory {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ServiceClassLoaderFactoryImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ServiceModuleLayerFactory.class);
   private static final String CONTAINER_LAYER_NAME = "Mule Container Module Layer";
 
   // prefixes of services provided by the Mule Runtime team
@@ -58,7 +58,7 @@ public class ServiceClassLoaderFactoryImpl
     }
   }
 
-  private Optional<ModuleLayer> parentLayer = ofNullable(ServiceClassLoaderFactoryImpl.class.getModule().getLayer());
+  private Optional<ModuleLayer> parentLayer = ofNullable(ServiceModuleLayerFactory.class.getModule().getLayer());
 
   /**
    * {@inheritDoc}
