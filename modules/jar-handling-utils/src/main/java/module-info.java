@@ -18,7 +18,4 @@ module org.mule.runtime.jar.handling.utils {
   exports org.mule.runtime.core.internal.util.jar to
       org.mule.runtime.artifact.activation,
       org.mule.runtime.deployment.model.impl;
-  exports org.mule.runtime.module.artifact.api.classloader.jar to
-      org.mule.runtime.artifact;
-
 }
