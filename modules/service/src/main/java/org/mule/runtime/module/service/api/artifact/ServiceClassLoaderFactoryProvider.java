@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.service.api.artifact;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
-
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 
@@ -31,23 +29,10 @@ public class ServiceClassLoaderFactoryProvider {
     return new LibFolderClassLoaderConfigurationLoader();
   }
 
-  private static boolean withinModularizedContainer = ServiceClassLoaderFactoryProvider.class.getModule().isNamed();
-
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
-    if (classloaderContainerJpmsModuleLayer()
-        // Only if the container is modularized it makes sense to load services as module layers
-        && withinModularizedContainer) {
-      LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceModuleLayerFactory'...");
-      final ServiceModuleLayerFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
-      serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);
-      return serviceModuleLayerFactory;
-    } else {
-      LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceClassLoaderFactory'...");
-      return new ServiceClassLoaderFactory();
-    }
-  }
-
-  public static void setWithinModularizedContainer(boolean withinModularizedContainer) {
-    ServiceClassLoaderFactoryProvider.withinModularizedContainer = withinModularizedContainer;
+    LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceClassLoaderFactoryImpl'...");
+    final ServiceClassLoaderFactory serviceModuleLayerFactory = new ServiceClassLoaderFactoryImpl();
+    serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);
+    return serviceModuleLayerFactory;
   }
 }

@@ -31,7 +31,8 @@ module org.mule.runtime.service {
   exports org.mule.runtime.module.service.api.manager;
 
   exports org.mule.runtime.module.service.internal.artifact to
-      org.mule.test.runner;
+      org.mule.test.runner,
+      giorg.mule.framework;
   exports org.mule.runtime.module.service.internal.discoverer to
       org.mule.runtime.artifact.activation,
       org.mule.runtime.deployment.model.impl;
