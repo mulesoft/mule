@@ -32,6 +32,5 @@ module org.mule.runtime.container {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.service,
       org.mule.runtime.spring.config,
-      org.mule.test.runner,
-      org.mule.framework;
+      org.mule.test.runner;
 }

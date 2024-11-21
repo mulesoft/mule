@@ -8,6 +8,7 @@ package org.mule.runtime.module.service.api.artifact;
 
 import org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFactory;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
+import org.mule.runtime.container.internal.DefaultMuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -32,6 +33,22 @@ public class ServiceClassLoaderFactory
   ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor,
                              MuleContainerClassLoaderWrapper containerClassLoader)
       throws ArtifactClassloaderCreationException;
+
+  /**
+   * Creates a {@link ClassLoader} from a given descriptor.
+   *
+   * @param artifactId           artifact unique ID.
+   * @param descriptor           descriptor of the artifact owner of the created class loader.
+   * @param containerClassLoader parent for the new artifact class loader.
+   * @return a new class loader for described artifact.
+   *
+   * @since 4.6
+   */
+  default ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ArtifactClassLoader containerClassLoader)
+      throws ArtifactClassloaderCreationException {
+    return create(artifactId, descriptor, new DefaultMuleContainerClassLoaderWrapper(containerClassLoader));
+  }
+
 
   @Override
   void setParentLayerFrom(Class clazz);
