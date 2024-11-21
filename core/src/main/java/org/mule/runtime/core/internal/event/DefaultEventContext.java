@@ -13,7 +13,6 @@ import static org.mule.runtime.core.privileged.event.DefaultFlowCallStack.newDef
 import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;
 import static java.time.Instant.now;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -42,6 +41,7 @@ import org.mule.runtime.tracer.api.context.SpanContextAware;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -163,7 +163,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   @Override
   public ProcessorsTrace getProcessorsTrace() {
-    return () -> emptyList();
+    return Collections::emptyList;
   }
 
   @Override
