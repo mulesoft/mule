@@ -8,19 +8,25 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 
+import javax.inject.Inject;
+
 /** <code>ObjectToOutputHandler</code> converts a byte array into a String. */
 public class ObjectToOutputHandler extends AbstractTransformer implements DiscoverableTransformer {
+
+  private ObjectSerializer objectSerializer;
 
   /** Give core transformers a slighty higher priority */
   private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING + 1;
@@ -45,7 +51,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
     } else if (src instanceof InputStream) {
       return handleInputStream((InputStream) src);
     } else if (src instanceof Serializable) {
-      return (OutputHandler) (event, out) -> muleContext.getObjectSerializer().getExternalProtocol().serialize(src, out);
+      return (OutputHandler) (event, out) -> objectSerializer.getExternalProtocol().serialize(src, out);
     } else {
       throw new TransformerException(I18nMessageFactory
           .createStaticMessage("Unable to convert " + src.getClass() + " to OutputHandler."));
@@ -70,5 +76,14 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
   @Override
   public void setPriorityWeighting(int priorityWeighting) {
     this.priorityWeighting = priorityWeighting;
+  }
+
+  public void setObjectSerializer(ObjectSerializer objectSerializer) {
+    this.objectSerializer = objectSerializer;
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext context) {
+    setObjectSerializer(context.getObjectSerializer());
   }
 }

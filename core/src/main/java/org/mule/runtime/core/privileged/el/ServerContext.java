@@ -16,6 +16,8 @@ import static org.apache.commons.lang3.SystemUtils.OS_VERSION;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.apache.commons.lang3.SystemUtils.USER_HOME;
 import static org.apache.commons.lang3.SystemUtils.USER_NAME;
+
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.api.util.NetworkUtils;
 
 import java.net.UnknownHostException;
@@ -46,6 +48,7 @@ import java.util.TimeZone;
  * <li><b>userHome</b> <i>User home directory</i>
  * <li><b>userDir</b> <i>User working directory</i>
  **/
+@NoInstantiate
 public class ServerContext {
 
   public String getHost() throws UnknownHostException {

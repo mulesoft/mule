@@ -8,19 +8,18 @@ package org.mule.runtime.core.api.transformer;
 
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.core.internal.transformer.TransformerUtils;
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractTransformer implements Transformer {
 
-  protected MuleContext muleContext;
+  private ArtifactEncoding artifactEncoding;
 
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -141,7 +140,7 @@ public abstract class AbstractTransformer implements Transformer {
     if (returnType == null) {
       synchronized (this) {
         if (returnType == null) {
-          returnType = builder().charset(getDefaultEncoding(muleContext)).build();
+          returnType = builder().charset(artifactEncoding.getDefaultEncoding()).build();
         }
       }
     }
@@ -202,9 +201,9 @@ public abstract class AbstractTransformer implements Transformer {
   private Charset getEncoding(Object src) {
     if (src instanceof Message) {
       return ((Message) src).getPayload().getDataType().getMediaType().getCharset()
-          .orElse(getDefaultEncoding(muleContext));
+          .orElse(artifactEncoding.getDefaultEncoding());
     } else {
-      return getDefaultEncoding(muleContext);
+      return artifactEncoding.getDefaultEncoding();
     }
   }
 
@@ -308,10 +307,9 @@ public abstract class AbstractTransformer implements Transformer {
     return false;
   }
 
-  @Override
   @Inject
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
+  public void setArtifactEncoding(ArtifactEncoding artifactEncoding) {
+    this.artifactEncoding = artifactEncoding;
   }
 
   @Override

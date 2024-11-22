@@ -33,6 +33,7 @@ import static java.util.Optional.of;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -154,6 +155,7 @@ public class OperationClient implements Lifecycle {
                                      ComponentTracerFactory<CoreEvent> componentTracerFactory,
                                      MuleContext muleContext,
                                      MuleConfiguration muleConfiguration,
+                                     ArtifactEncoding artifactEncoding,
                                      NotificationDispatcher notificationDispatcher,
                                      TransactionManager transactionManager) {
 
@@ -171,7 +173,7 @@ public class OperationClient implements Lifecycle {
                                                        notificationDispatcher,
                                                        transactionManager),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache),
-                               new ValueReturnDelegate(key.getOperationModel(), muleContext),
+                               new ValueReturnDelegate(key.getOperationModel(), artifactEncoding),
                                streamingManager,
                                extensionManager,
                                expressionManager,

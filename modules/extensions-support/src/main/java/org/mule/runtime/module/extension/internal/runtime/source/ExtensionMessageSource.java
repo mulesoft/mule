@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnec
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
@@ -36,6 +35,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.cluster.ClusterService;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -155,6 +155,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private MuleConfiguration configuration;
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   // obtained through setter injection
   private MessageProcessingManager messageProcessingManager;
@@ -361,7 +364,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setConfigurationInstance(getConfigurationInstance().orElse(null))
         .setTransactionConfig(transactionConfig.get())
         .setSource(this)
-        .setDefaultEncoding(getDefaultEncoding(configuration))
+        .setDefaultEncoding(artifactEncoding.getDefaultEncoding())
         .setTransactionManager(transactionManager.orElse(null))
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)

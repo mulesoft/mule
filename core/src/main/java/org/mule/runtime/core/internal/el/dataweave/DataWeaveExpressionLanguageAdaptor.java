@@ -13,7 +13,6 @@ import static org.mule.runtime.api.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 
 import static java.lang.System.getProperty;
@@ -22,6 +21,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.BindingContext.Builder;
@@ -42,6 +42,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
@@ -69,6 +70,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private ExpressionLanguage expressionExecutor;
   private final MuleContext muleContext;
   private final Registry registry;
+  private final MuleConfiguration configuration;
+  private final ArtifactEncoding artifactEncoding;
   private final DefaultExpressionLanguageFactoryService service;
   private final FeatureFlaggingService featureFlaggingService;
   private List<BindingContext> globalBindings = new LinkedList<>();
@@ -78,10 +81,14 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
+                                            MuleConfiguration configuration,
+                                            ArtifactEncoding artifactEncoding,
                                             DefaultExpressionLanguageFactoryService service,
                                             FeatureFlaggingService featureFlaggingService) {
     this.muleContext = muleContext;
     this.registry = registry;
+    this.configuration = configuration;
+    this.artifactEncoding = artifactEncoding;
     this.service = service;
     this.featureFlaggingService = featureFlaggingService;
   }
@@ -92,10 +99,10 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
       synchronized (this) {
         if (!initialised) {
           this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
-              .defaultEncoding(getDefaultEncoding(muleContext))
+              .defaultEncoding(artifactEncoding.getDefaultEncoding())
               .featureFlaggingService(featureFlaggingService)
-              .appId(muleContext.getConfiguration().getId())
-              .minMuleVersion(muleContext.getConfiguration().getMinMuleVersion())
+              .appId(configuration.getId())
+              .minMuleVersion(configuration.getMinMuleVersion())
               .build());
 
           initialised = true;
@@ -109,13 +116,13 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private void registerGlobalBindings(Registry registry) {
     BindingContext.Builder contextBuilder = BindingContext.builder();
     contextBuilder.addBinding(MULE,
-                              new TypedValue<>(new MuleInstanceContext(muleContext),
+                              new TypedValue<>(new MuleInstanceContext(muleContext, configuration),
                                                fromType(MuleInstanceContext.class)));
     contextBuilder.addBinding(SERVER,
                               new TypedValue<>(new ServerContext(),
                                                fromType(ServerContext.class)));
     contextBuilder.addBinding(APP,
-                              new TypedValue<>(new DataWeaveArtifactContext(muleContext, registry),
+                              new TypedValue<>(new DataWeaveArtifactContext(configuration, registry),
                                                fromType(DataWeaveArtifactContext.class)));
     addGlobalBindings(contextBuilder instanceof DefaultBindingContextBuilder
         ? ((DefaultBindingContextBuilder) contextBuilder).flattenAndBuild()

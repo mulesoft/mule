@@ -17,6 +17,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -69,6 +70,7 @@ import org.mule.runtime.module.extension.internal.value.DefaultValueProviderMedi
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -81,6 +83,9 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
 
   @Inject
   private ReflectionCache reflectionCache;
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   @Inject
   private ExpressionManager expressionManager;
@@ -219,7 +224,8 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                                                           .getParameterGroupModels());
 
     Map<String, ParameterModel> paramModels =
-        parameterizedModel.getAllParameterModels().stream().collect(toMap(p -> p.getName(), identity()));
+        parameterizedModel.getAllParameterModels().stream()
+            .collect(toMap((Function<? super ParameterModel, ? extends String>) ParameterModel::getName, identity()));
 
     ResolverSet typeSafeResolverSet = new ResolverSet(muleContext);
     typeUnsafeResolverSet.getResolvers().forEach((paramName, resolver) -> {
@@ -254,6 +260,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                  componentModel,
                                                  component,
                                                  muleContext,
+                                                 artifactEncoding,
                                                  reflectionCache,
                                                  streamingManager);
   }

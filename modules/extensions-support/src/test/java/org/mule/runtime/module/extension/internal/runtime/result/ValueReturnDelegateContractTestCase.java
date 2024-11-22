@@ -6,34 +6,37 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.result;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+import static org.mule.tck.probe.PollingProber.probe;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
+import static java.nio.charset.Charset.defaultCharset;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
-import static org.mule.tck.probe.PollingProber.probe;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -68,6 +71,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -100,12 +104,16 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Mock
   protected ConnectionHandler connectionHandler;
 
+  protected ArtifactEncoding artifactEncoding;
+
   protected ReturnDelegate delegate;
   protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected DefaultStreamingManager streamingManager;
 
   @Before
   public void before() throws MuleException {
+    artifactEncoding = () -> defaultCharset();
+
     streamingManager = new DefaultStreamingManager();
     LifecycleUtils.initialiseIfNeeded(streamingManager, muleContext);
 
@@ -147,7 +155,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Test
   public void operationReturnsOperationResultButKeepsAttributes() throws Exception {
     Object payload = new Object();
-    MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
+    MediaType mediaType = ANY.withCharset(defaultCharset());
 
     CoreEvent result =
         delegate.asReturnValue(Result.builder().output(payload).mediaType(mediaType).build(), operationContext);

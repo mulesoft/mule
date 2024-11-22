@@ -13,11 +13,13 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
@@ -61,6 +63,12 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     private NotificationListenerRegistry notificationListenerRegistry;
 
     @Inject
+    private TransformationService transformationService;
+
+    @Inject
+    private ArtifactEncoding artifactEncoding;
+
+    @Inject
     private Optional<TransactionManager> transactionManager;
 
     public Registry getRegistry() {
@@ -77,6 +85,14 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
     public NotificationListenerRegistry getNotificationListenerRegistry() {
       return notificationListenerRegistry;
+    }
+
+    public TransformationService getTransformationService() {
+      return transformationService;
+    }
+
+    public ArtifactEncoding getArtifactEncoding() {
+      return artifactEncoding;
     }
 
     public TransactionManager getTransactionManager() {

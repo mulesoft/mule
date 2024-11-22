@@ -20,6 +20,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
+import javax.inject.Inject;
+
 /**
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object representation
  */
@@ -74,10 +76,9 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
     this.objectSerializer = objectSerializer;
   }
 
-  @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
-    super.setMuleContext(context);
-    setObjectSerializer(muleContext.getObjectSerializer());
+    setObjectSerializer(context.getObjectSerializer());
   }
 
 }
