@@ -61,7 +61,7 @@ public class EventContextBenchmark extends AbstractBenchmark {
     registerObject(muleContext, FLOW_NAME, flow);
     Message.Builder messageBuilder = Message.builder().value(PAYLOAD);
     CoreEvent.Builder eventBuilder =
-        CoreEvent.builder(create(flow, CONNECTOR_LOCATION)).message(messageBuilder.build());
+        CoreEvent.builder(create(flow, muleContext.getEventContextService(), CONNECTOR_LOCATION)).message(messageBuilder.build());
     event = eventBuilder.build();
   }
 
@@ -78,14 +78,14 @@ public class EventContextBenchmark extends AbstractBenchmark {
 
   @Benchmark
   public EventContext createEventContextWithFlow() {
-    return create(flow, CONNECTOR_LOCATION);
+    return create(flow, muleContext.getEventContextService(), CONNECTOR_LOCATION);
   }
 
   @Benchmark
   public Object[] createEventContextWithFlowAndComplete() {
     AtomicReference<CoreEvent> result = new AtomicReference<>();
     AtomicBoolean complete = new AtomicBoolean();
-    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION);
+    BaseEventContext eventContext = (BaseEventContext) create(flow, muleContext.getEventContextService(), CONNECTOR_LOCATION);
     from(from(eventContext.getResponsePublisher())).doOnSuccess(response -> result.set(response)).subscribe();
     eventContext.onTerminated((response, throwable) -> complete.set(true));
     eventContext.success(event);
@@ -97,7 +97,8 @@ public class EventContextBenchmark extends AbstractBenchmark {
     CompletableFuture<Void> completableFuture = new CompletableFuture<>();
     AtomicReference<CoreEvent> result = new AtomicReference<>();
     AtomicBoolean complete = new AtomicBoolean();
-    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION, null, of(completableFuture));
+    BaseEventContext eventContext =
+        (BaseEventContext) create(flow, muleContext.getEventContextService(), CONNECTOR_LOCATION, null, of(completableFuture));
     from(from(eventContext.getResponsePublisher())).doOnSuccess(response -> result.set(response)).subscribe();
     eventContext.onTerminated((response, throwable) -> complete.set(true));
     eventContext.success(event);
@@ -118,7 +119,7 @@ public class EventContextBenchmark extends AbstractBenchmark {
   private Object[] createEventContextTerminateAllAtOnce(int childrenCount) {
     AtomicReference<CoreEvent> result = new AtomicReference<>();
     AtomicBoolean complete = new AtomicBoolean();
-    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION);
+    BaseEventContext eventContext = (BaseEventContext) create(flow, muleContext.getEventContextService(), CONNECTOR_LOCATION);
 
     List<BaseEventContext> children = new ArrayList<>(childrenCount);
     for (int i = 0; i < childrenCount; ++i) {
@@ -149,7 +150,7 @@ public class EventContextBenchmark extends AbstractBenchmark {
   private Object[] childEventContextForEach(int childrenCount) {
     AtomicReference<CoreEvent> result = new AtomicReference<>();
     AtomicBoolean complete = new AtomicBoolean();
-    BaseEventContext eventContext = (BaseEventContext) create(flow, CONNECTOR_LOCATION);
+    BaseEventContext eventContext = (BaseEventContext) create(flow, muleContext.getEventContextService(), CONNECTOR_LOCATION);
 
     for (int i = 0; i < childrenCount; ++i) {
       BaseEventContext child = child(eventContext, empty());
