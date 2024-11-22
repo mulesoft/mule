@@ -58,7 +58,7 @@ public interface EventContextFactory {
    * @param location            the location of the component that received the first message for this context.
    */
   static EventContext create(FlowConstruct flow, EventContextService eventContextService, ComponentLocation location) {
-    return create(flow, location, null);
+    return create(flow, eventContextService, location, null);
   }
 
   /**
@@ -71,7 +71,7 @@ public interface EventContextFactory {
    */
   static EventContext create(FlowConstruct flow, EventContextService eventContextService, ComponentLocation location,
                              String correlationId) {
-    return create(flow, location, correlationId, empty());
+    return create(flow, eventContextService, location, correlationId, empty());
   }
 
   /**
