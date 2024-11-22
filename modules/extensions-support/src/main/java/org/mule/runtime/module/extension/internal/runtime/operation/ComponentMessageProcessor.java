@@ -1107,7 +1107,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Override
   protected ParameterValueResolver getParameterValueResolver() {
-    CoreEvent event = getNullEvent(muleContext);
+    CoreEvent event = getNullEvent();
     try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
       LazyExecutionContext executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
       return new OperationParameterValueResolver(executionContext, resolverSet, reflectionCache, expressionManager);
@@ -1220,7 +1220,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 extensionModel.getName()));
     }
 
-    CoreEvent initializerEvent = NullEventFactory.getNullEvent(muleContext);
+    CoreEvent initializerEvent = getNullEvent();
     try {
       return SdkOperationTransactionalActionUtils.from(resolver.resolve(ValueResolvingContext.builder(initializerEvent).build()));
     } finally {
