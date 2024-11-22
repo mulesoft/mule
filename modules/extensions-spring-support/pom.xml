@@ -142,8 +142,6 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <!-- Compilation must be done with the api, not the impl -->
-            <scope>runtime</scope>
         </dependency>
 
         <!-- Test dependencies -->
