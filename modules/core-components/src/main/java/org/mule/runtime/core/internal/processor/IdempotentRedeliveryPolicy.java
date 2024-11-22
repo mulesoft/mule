@@ -114,8 +114,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
     private static final long serialVersionUID = 5513487261745816555L;
 
-    private AtomicInteger counter;
-    private List<Error> errors;
+    private final AtomicInteger counter;
+    private final List<Error> errors;
 
     public RedeliveryCounter(AtomicInteger counter, List<Error> errors) {
       this.counter = counter;

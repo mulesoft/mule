@@ -44,8 +44,7 @@ module org.mule.runtime.core.components {
       org.mule.runtime.deployment,
       org.mule.runtime.spring.config,
       spring.beans,
-      com.mulesoft.mule.runtime.kryo,
-      kryo.shaded;
+      com.mulesoft.mule.runtime.kryo;
   exports org.mule.runtime.core.internal.processor.simple to
       org.mule.runtime.core,
       org.mule.runtime.spring.config,
