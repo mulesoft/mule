@@ -20,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -30,10 +30,15 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * A referencable chain of transformers that can be used as a single transformer
  */
 public final class TransformerChain extends AbstractTransformer {
+
+  @Inject
+  private MuleConfiguration muleConfiguration;
 
   private final List<Transformer> transformers;
 
@@ -88,7 +93,7 @@ public final class TransformerChain extends AbstractTransformer {
     Message message;
     if (src instanceof Message) {
       message = (Message) src;
-    } else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform()) {
+    } else if (muleConfiguration.isAutoWrapMessageAwareTransform()) {
       message = of(src);
     } else {
       throw new TransformerException(noCurrentEventForTransformer(), this);
@@ -141,14 +146,6 @@ public final class TransformerChain extends AbstractTransformer {
   public void initialise() throws InitialisationException {
     for (Transformer transformer : transformers) {
       transformer.initialise();
-    }
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    super.setMuleContext(muleContext);
-    for (Transformer transformer : transformers) {
-      transformer.setMuleContext(muleContext);
     }
   }
 

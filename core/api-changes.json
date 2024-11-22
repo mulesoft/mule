@@ -3,6 +3,236 @@
     "revapi": {
       "differences": {
         "differences": [
+{
+  "ignore": true,
+  "code": "java.method.numberOfParametersChanged",
+  "old": "method void org.mule.runtime.core.privileged.el.MuleInstanceContext::<init>(org.mule.runtime.core.api.MuleContext)",
+  "new": "method void org.mule.runtime.core.privileged.el.MuleInstanceContext::<init>(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.config.MuleConfiguration)",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.privileged.el",
+  "classQualifiedName": "org.mule.runtime.core.privileged.el.MuleInstanceContext",
+  "classSimpleName": "MuleInstanceContext",
+  "methodName": "<init>",
+  "elementKind": "constructor",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.removed",
+  "old": "class org.mule.runtime.core.api.DefaultTransformationService",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api",
+  "classQualifiedName": "org.mule.runtime.core.api.DefaultTransformationService",
+  "classSimpleName": "DefaultTransformationService",
+  "elementKind": "class",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.noLongerImplementsInterface",
+  "old": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+  "new": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+  "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.transformer",
+  "classQualifiedName": "org.mule.runtime.core.api.transformer.AbstractTransformer",
+  "classSimpleName": "AbstractTransformer",
+  "elementKind": "class",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.noLongerImplementsInterface",
+  "old": "interface org.mule.runtime.core.api.transformer.Converter",
+  "new": "interface org.mule.runtime.core.api.transformer.Converter",
+  "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.transformer",
+  "classQualifiedName": "org.mule.runtime.core.api.transformer.Converter",
+  "classSimpleName": "Converter",
+  "elementKind": "interface",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.noLongerImplementsInterface",
+  "old": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+  "new": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+  "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.transformer",
+  "classQualifiedName": "org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+  "classSimpleName": "DiscoverableTransformer",
+  "elementKind": "interface",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.noLongerImplementsInterface",
+  "old": "interface org.mule.runtime.core.api.transformer.MessageTransformer",
+  "new": "interface org.mule.runtime.core.api.transformer.MessageTransformer",
+  "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.transformer",
+  "classQualifiedName": "org.mule.runtime.core.api.transformer.MessageTransformer",
+  "classSimpleName": "MessageTransformer",
+  "elementKind": "interface",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.noLongerImplementsInterface",
+  "old": "interface org.mule.runtime.core.api.transformer.Transformer",
+  "new": "interface org.mule.runtime.core.api.transformer.Transformer",
+  "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.transformer",
+  "classQualifiedName": "org.mule.runtime.core.api.transformer.Transformer",
+  "classSimpleName": "Transformer",
+  "elementKind": "interface",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.noLongerImplementsInterface",
+  "old": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+  "new": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+  "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.util.compression",
+  "classQualifiedName": "org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+  "classSimpleName": "AbstractCompressionTransformer",
+  "elementKind": "class",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.method.parameterTypeChanged",
+  "old": "parameter void org.mule.runtime.core.privileged.el.DataWeaveArtifactContext::<init>(===org.mule.runtime.core.api.MuleContext===, org.mule.runtime.api.artifact.Registry)",
+  "new": "parameter void org.mule.runtime.core.privileged.el.DataWeaveArtifactContext::<init>(===org.mule.runtime.core.api.config.MuleConfiguration===, org.mule.runtime.api.artifact.Registry)",
+  "parameterIndex": "0",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "oldType": "org.mule.runtime.core.api.MuleContext",
+  "newType": "org.mule.runtime.core.api.config.MuleConfiguration",
+  "package": "org.mule.runtime.core.privileged.el",
+  "classQualifiedName": "org.mule.runtime.core.privileged.el.DataWeaveArtifactContext",
+  "classSimpleName": "DataWeaveArtifactContext",
+  "methodName": "<init>",
+  "elementKind": "parameter",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.annotation.added",
+  "old": "class org.mule.runtime.core.privileged.el.DataWeaveArtifactContext",
+  "new": "class org.mule.runtime.core.privileged.el.DataWeaveArtifactContext",
+  "annotation": "@org.mule.api.annotation.NoInstantiate",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "annotationType": "org.mule.api.annotation.NoInstantiate",
+  "package": "org.mule.runtime.core.privileged.el",
+  "classQualifiedName": "org.mule.runtime.core.privileged.el.DataWeaveArtifactContext",
+  "classSimpleName": "DataWeaveArtifactContext",
+  "elementKind": "class",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.annotation.added",
+  "old": "class org.mule.runtime.core.privileged.el.MuleInstanceContext",
+  "new": "class org.mule.runtime.core.privileged.el.MuleInstanceContext",
+  "annotation": "@org.mule.api.annotation.NoInstantiate",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "annotationType": "org.mule.api.annotation.NoInstantiate",
+  "package": "org.mule.runtime.core.privileged.el",
+  "classQualifiedName": "org.mule.runtime.core.privileged.el.MuleInstanceContext",
+  "classSimpleName": "MuleInstanceContext",
+  "elementKind": "class",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.annotation.added",
+  "old": "class org.mule.runtime.core.privileged.el.ServerContext",
+  "new": "class org.mule.runtime.core.privileged.el.ServerContext",
+  "annotation": "@org.mule.api.annotation.NoInstantiate",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "annotationType": "org.mule.api.annotation.NoInstantiate",
+  "package": "org.mule.runtime.core.privileged.el",
+  "classQualifiedName": "org.mule.runtime.core.privileged.el.ServerContext",
+  "classSimpleName": "ServerContext",
+  "elementKind": "class",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
           {
             "ignore": true,
             "code": "java.class.removed",

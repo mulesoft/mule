@@ -7,25 +7,28 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.util.Arrays;
 
 public class StringByteArrayTransformersTestCase extends AbstractTransformerTestCase {
 
+  @Override
   public Transformer getTransformer() throws Exception {
-    return new ObjectToByteArray();
+    return configureTransformer(new ObjectToByteArray());
   }
 
+  @Override
   public Transformer getRoundTripTransformer() throws Exception {
-    return new ByteArrayToObject();
+    return configureTransformer(new ByteArrayToObject());
   }
 
+  @Override
   public Object getTestData() {
     return "Test";
   }
 
+  @Override
   public Object getResultData() {
     return "Test".getBytes();
   }

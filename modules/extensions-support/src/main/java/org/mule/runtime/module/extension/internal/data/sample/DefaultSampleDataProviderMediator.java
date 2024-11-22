@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.NullCursorProviderFactory;
@@ -70,6 +71,7 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
                                            ComponentModel componentModel,
                                            Component component,
                                            MuleContext muleContext,
+                                           ArtifactEncoding artifactEncoding,
                                            ReflectionCache reflectionCache,
                                            StreamingManager streamingManager) {
     this.extensionModel = extensionModel;
@@ -79,7 +81,7 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
     this.reflectionCache = reflectionCache;
     this.streamingManager = streamingManager;
     sampleDataProperty = componentModel.getModelProperty(SampleDataProviderFactoryModelProperty.class).orElse(null);
-    returnDelegate = new ValueReturnDelegate(componentModel, muleContext);
+    returnDelegate = new ValueReturnDelegate(componentModel, artifactEncoding);
   }
 
   /**

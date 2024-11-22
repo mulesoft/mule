@@ -4,13 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api;
+package org.mule.runtime.core.internal.transformer;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectNotOfSpecifiedType;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,11 +19,11 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -39,15 +38,10 @@ import javax.inject.Inject;
 @NoExtend
 public class DefaultTransformationService implements TransformationService {
 
-  protected MuleContext muleContext;
-
   @Inject
   private TransformersRegistry transformersRegistry;
 
-  @Inject
-  public DefaultTransformationService(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
+  private ArtifactEncoding artifactEncoding;
 
   /**
    * Attempts to obtain the payload of this message with the desired Class type. This will try and resolve a transformer that can
@@ -157,7 +151,7 @@ public class DefaultTransformationService implements TransformationService {
   }
 
   protected Charset resolveEncoding(Message message) {
-    return message.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
+    return message.getPayload().getDataType().getMediaType().getCharset().orElse(artifactEncoding.getDefaultEncoding());
   }
 
   @Override
@@ -178,5 +172,14 @@ public class DefaultTransformationService implements TransformationService {
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  public ArtifactEncoding getArtifactEncoding() {
+    return artifactEncoding;
+  }
+
+  @Inject
+  public void setArtifactEncoding(ArtifactEncoding artifactEncoding) {
+    this.artifactEncoding = artifactEncoding;
   }
 }

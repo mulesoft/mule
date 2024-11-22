@@ -66,6 +66,7 @@ import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -243,7 +244,13 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       throws MuleException {
     DefaultExpressionManager expressionManager = new DefaultExpressionManager();
     DefaultExpressionLanguageFactoryService service = getExpressionLanguageFactoryService(registry);
-    expressionManager.setExpressionLanguage(new DataWeaveExpressionLanguageAdaptor(muleContext, null, service, null));
+    ArtifactEncoding artifactEncoding = getArtifactEncoding(registry);
+    expressionManager.setExpressionLanguage(new DataWeaveExpressionLanguageAdaptor(muleContext,
+                                                                                   null,
+                                                                                   muleContext.getConfiguration(),
+                                                                                   artifactEncoding,
+                                                                                   service,
+                                                                                   null));
 
     muleContext.getInjector().inject(expressionManager);
 
@@ -255,11 +262,16 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     return registry.lookupObject(DefaultExpressionLanguageFactoryService.class);
   }
 
+  protected ArtifactEncoding getArtifactEncoding(MuleRegistry registry)
+      throws RegistrationException {
+    return registry.lookupObject(ArtifactEncoding.class);
+  }
+
   protected void registerTransformerRegistry(MuleContext muleContext) throws RegistrationException {
     TransformersRegistry transformersRegistry = new DefaultTransformersRegistry();
     registerObject(OBJECT_TRANSFORMERS_REGISTRY, transformersRegistry, muleContext);
     registerObject(OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(transformersRegistry), muleContext);
-    registerObject(OBJECT_TRANSFORMATION_SERVICE, new ExtendedTransformationService(muleContext), muleContext);
+    registerObject(OBJECT_TRANSFORMATION_SERVICE, new ExtendedTransformationService(), muleContext);
     registerObject(OBJECT_TRANSFORMER_RESOLVER, new TypeBasedTransformerResolver(), muleContext);
   }
 

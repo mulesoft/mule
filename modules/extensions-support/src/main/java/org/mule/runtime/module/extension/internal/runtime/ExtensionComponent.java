@@ -66,6 +66,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -179,6 +180,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected Optional<MuleMetadataService> metadataService;
 
   protected ConfigurationComponentLocator componentLocator;
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   @Inject
   protected ReflectionCache reflectionCache;
@@ -595,6 +599,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                              componentModel,
                                                                              this,
                                                                              muleContext,
+                                                                             artifactEncoding,
                                                                              reflectionCache,
                                                                              streamingManager);
         }

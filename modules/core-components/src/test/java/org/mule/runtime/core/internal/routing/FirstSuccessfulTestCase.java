@@ -7,12 +7,12 @@
 package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.FirstSuccessfulStory.FIRST_SUCCESSFUL;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -135,7 +135,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         Message transformedMessage = muleContext.getTransformationService()
             .transform(event.getMessage(), DataType.builder()
                 .type(String.class)
-                .charset(getDefaultEncoding(muleContext.getConfiguration()))
+                .charset(defaultCharset())
                 .build());
         String payload = (String) transformedMessage.getPayload().getValue();
         if (payload.indexOf(rejectIfMatches) >= 0) {

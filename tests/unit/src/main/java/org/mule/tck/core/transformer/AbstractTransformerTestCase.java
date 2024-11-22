@@ -6,14 +6,19 @@
  */
 package org.mule.tck.core.transformer;
 
+import static org.mule.runtime.api.message.Message.of;
+
 import static java.lang.String.format;
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -109,6 +114,13 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
   public abstract Transformer getTransformer() throws Exception;
 
   public abstract Transformer getRoundTripTransformer() throws Exception;
+
+  protected final <T extends Transformer> T configureTransformer(T transformer) {
+    if (transformer instanceof AbstractTransformer t) {
+      t.setArtifactEncoding(() -> defaultCharset());
+    }
+    return transformer;
+  }
 
   public abstract Object getTestData();
 

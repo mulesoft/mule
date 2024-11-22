@@ -81,6 +81,7 @@ import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -242,6 +243,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private NotificationDispatcher notificationDispatcher;
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   @Inject
   private Optional<TransactionManager> transactionManager;
@@ -894,13 +898,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected ReturnDelegate getTargetReturnDelegate() {
     if (isSanitizedPayload(sanitize(targetValue))) {
-      return new PayloadTargetReturnDelegate(target, componentModel, muleContext);
+      return new PayloadTargetReturnDelegate(target, componentModel, artifactEncoding);
     }
-    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, muleContext, streamingManager);
+    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, artifactEncoding,
+                                    streamingManager);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
-    return new ValueReturnDelegate(componentModel, muleContext);
+    return new ValueReturnDelegate(componentModel, artifactEncoding);
   }
 
   protected boolean isTargetPresent() {
