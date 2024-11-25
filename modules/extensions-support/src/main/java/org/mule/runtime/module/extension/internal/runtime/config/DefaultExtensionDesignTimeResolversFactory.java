@@ -7,8 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
-import static org.mule.runtime.module.extension.internal.runtime.operation.OperationParameterValueResolver.createOperationParameterValueResolver;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
 
@@ -28,7 +26,6 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
@@ -205,15 +202,10 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                                           reflectionCache,
                                                                           expressionManager,
                                                                           parameterizedModel.getName());
-    if (parameterizedModel instanceof OperationModel) {
-      return createOperationParameterValueResolver((OperationModel) parameterizedModel, null, resolverSet, reflectionCache,
-                                                   expressionManager);
-    }
-    return new ResolverSetBasedParameterResolver(resolverSet,
-                                                 parameterizedModel,
-                                                 reflectionCache,
-                                                 expressionManager);
-
+    return new DesignTimeParameterValueResolver(resolverSet,
+                                                parameterizedModel,
+                                                reflectionCache,
+                                                expressionManager);
   }
 
   @Override

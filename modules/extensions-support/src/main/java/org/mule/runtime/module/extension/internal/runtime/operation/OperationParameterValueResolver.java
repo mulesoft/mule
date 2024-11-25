@@ -8,14 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
-
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getShowInDslParameters;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -23,11 +20,9 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.LazyExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -48,17 +43,6 @@ public final class OperationParameterValueResolver<T extends ComponentModel> imp
   private final ExecutionContext<T> executionContext;
   private final Map<String, String> showInDslParameters;
   private final ReflectionCache reflectionCache;
-
-  public static <T extends ComponentModel> OperationParameterValueResolver<T> createOperationParameterValueResolver(T operationModel,
-                                                                                                                    ExtensionModel extensionModel,
-                                                                                                                    ResolverSet resolverSet,
-                                                                                                                    ReflectionCache reflectionCache,
-                                                                                                                    ExpressionManager expressionManager) {
-    try (ValueResolvingContext ctx = ValueResolvingContext.builder(getNullEvent(), expressionManager).build()) {
-      LazyExecutionContext<T> executionContext = new LazyExecutionContext<>(resolverSet, operationModel, extensionModel, ctx);
-      return new OperationParameterValueResolver<>(executionContext, resolverSet, reflectionCache, expressionManager);
-    }
-  }
 
   OperationParameterValueResolver(ExecutionContext<T> executionContext,
                                   ResolverSet resolverSet,
