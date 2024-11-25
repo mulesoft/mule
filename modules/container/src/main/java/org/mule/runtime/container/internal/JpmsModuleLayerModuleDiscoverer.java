@@ -171,6 +171,10 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
       return this.privilegedArtifacts;
     }
 
+    @Override
+    public String toString() {
+      return "JpmsMuleContainerModule[" + getName() + "]";
+    }
   }
 
 }

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.container.internal;
 
-import static java.util.Collections.emptySet;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.getLookupPolicy;
 
 import static java.util.Collections.emptyEnumeration;
+import static java.util.Collections.emptySet;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.jpms.api.MuleContainerModule;
@@ -38,9 +38,7 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
   private Set<String> resourceDirs = emptySet();
 
   public DefaultPreFilteredContainerClassLoaderCreator(ModuleRepository moduleRepository) {
-    checkArgument(moduleRepository != null, "moduleRepository cannot be null");
-
-    this.moduleRepository = moduleRepository;
+    this.moduleRepository = requireNonNull(moduleRepository, "moduleRepository cannot be null");
   }
 
   public DefaultPreFilteredContainerClassLoaderCreator(ModuleRepository moduleRepository, Set<String> bootPackages,

@@ -9,23 +9,17 @@ package org.mule.functional.junit4;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.junit.MockitoJUnit.rule;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerConfigSystemProperty;
 
@@ -43,8 +37,7 @@ import org.mockito.junit.MockitoRule;
  */
 @ArtifactClassLoaderRunnerConfig(
     providedExclusions = {
-        "org.mule.tests:*:*:*:*",
-        "com.mulesoft.compatibility.tests:*:*:*:*"
+        "org.mule.tests:*:*:*:*"
     },
     testExclusions = {
         "org.mule.runtime:*:*:*:*",
