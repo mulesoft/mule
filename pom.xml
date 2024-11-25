@@ -195,12 +195,24 @@
         <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
         <surefire.test.unit.open.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-opens=java.base/java.lang=ALL-UNNAMED
-            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
-            --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
-            --add-opens=java.sql/java.sql=ALL-UNNAMED
+            --add-opens=java.base/java.lang=org.mule.runtime.jpms.utils
+            --add-opens=java.base/java.lang.reflect=org.mule.runtime.jpms.utils
+            --add-opens=java.base/java.lang.invoke=org.mule.runtime.jpms.utils
+            --add-opens=java.sql/java.sql=org.mule.runtime.jpms.utils
             ${surefire.args.base}
         </surefire.test.unit.open.args>
+        <surefire.module.path>
+            ${org.slf4j:slf4j-api:jar}
+        </surefire.module.path>
+        <surefire.add.modules>
+            org.slf4j
+        </surefire.add.modules>
+        <surefire.module.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --module-path=${surefire.module.path}
+            --add-modules=${surefire.add.modules}
+            ${surefire.test.unit.open.args}
+        </surefire.module.args>
         <!-- Emulate the behaviour in standalone, where slf4j is loaded in the boot layer -->
         <surefire.slf4j.module.args>
             -XX:+IgnoreUnrecognizedVMOptions
@@ -435,7 +447,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
-                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         <workingDirectory>${project.build.directory}</workingDirectory>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>

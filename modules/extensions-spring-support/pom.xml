@@ -16,9 +16,15 @@
     </description>
 
     <properties>
+        <surefire.module.path>
+            ${org.mule.runtime.boot:mule-module-jpms-utils:jar}
+        </surefire.module.path>
+        <surefire.add.modules>
+            org.mule.runtime.jpms.utils
+        </surefire.add.modules>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            ${surefire.test.unit.open.args}
+            ${surefire.module.args}
         </surefire.args>
 
         <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
@@ -65,6 +71,9 @@
                 <configuration>
                     <!-- Module layer is created by the tests-runner, don't need surefire to config the boot layer for the JVM -->
                     <useModulePath>false</useModulePath>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.mule.runtime.boot:mule-module-jpms-utils</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
             <plugin>

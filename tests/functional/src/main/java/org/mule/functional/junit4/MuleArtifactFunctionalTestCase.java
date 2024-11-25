@@ -49,7 +49,7 @@ import org.mockito.junit.MockitoRule;
         "org.mule.tests.plugin:*:*:*:*",
         "com.mulesoft.mule.runtime*:*:*:*:*",
         "com.mulesoft.licm:*:*:*:*",
-        // Force logging libs to be used form the container
+        // Force logging libs to be used from the container
         "org.slf4j:*:*:*:*",
         "org.apache.logging.log4j:*:*:*:*",
         "com.lmax.disruptor:*:*:*:*"
