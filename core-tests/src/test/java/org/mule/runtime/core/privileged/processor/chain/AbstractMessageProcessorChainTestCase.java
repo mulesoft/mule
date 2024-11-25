@@ -43,12 +43,11 @@ public class AbstractMessageProcessorChainTestCase extends AbstractMuleTestCase 
     startIfNeeded(messageChain);
     stopIfNeeded(messageChain);
 
-    ArgumentCaptor<MuleContextListener> addListenerCaptor = ArgumentCaptor.forClass(MuleContextListener.class);
-    ArgumentCaptor<MuleContextListener> removeListenerCaptor = ArgumentCaptor.forClass(MuleContextListener.class);
+    ArgumentCaptor<MuleContextListener> listenerCaptor = ArgumentCaptor.forClass(MuleContextListener.class);
 
-    verify(muleContext, times(1)).addListener(addListenerCaptor.capture());
-    verify(muleContext, times(1)).removeListener(removeListenerCaptor.capture());
+    verify(muleContext, times(1)).addListener(listenerCaptor.capture());
+    verify(muleContext, times(1)).removeListener(listenerCaptor.capture());
 
-    assertThat(addListenerCaptor.getValue(), is(sameInstance(removeListenerCaptor.getValue())));
+    assertThat(listenerCaptor.getValue(), is(sameInstance(listenerCaptor.getValue())));
   }
 }
