@@ -53,7 +53,7 @@ public abstract class AbstractOSController {
    * These values represent the status returned by running `mule status` for the wrapper and Java processes respectively.
    */
   public enum MuleProcessStatus {
-    STARTING_STARTING, STARTED_STARTING, STARTED_STARTED, STARTING_LAUNCH, STARTING_LAUNCHING
+    STARTING_STARTING, STARTED_STARTING, STARTED_STARTED, STARTING_LAUNCH, STARTING_LAUNCHING, STARTING_STOPPING
   }
 
   private static final Logger logger = getLogger(AbstractOSController.class);
