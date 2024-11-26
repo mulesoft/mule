@@ -10,17 +10,19 @@ import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.BOOLEAN_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_TLS_SCHEMA_LOCATION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.TLS_CONTEXT_FACTORY_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_PREFIX;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -57,6 +59,8 @@ class TlsExtensionModelDeclarer {
             .setSchemaLocation(MULE_TLS_SCHEMA_LOCATION)
             .build());
 
+    declareExportedTypes(declarer);
+
     ConstructDeclarer context = declarer.withConstruct("context")
         .describedAs("Reusable configuration element for TLS. A TLS context optionally defines a key store and a trust store.\n" +
             "The key store contains the private and public keys of this server/client. The trust store contains\n" +
@@ -79,6 +83,10 @@ class TlsExtensionModelDeclarer {
     declareRevocationCheck(context);
 
     return declarer;
+  }
+
+  private void declareExportedTypes(ExtensionDeclarer extensionDeclarer) {
+    extensionDeclarer.getDeclaration().addType((ObjectType) TLS_CONTEXT_FACTORY_TYPE);
   }
 
   private void declareRevocationCheck(ConstructDeclarer context) {
