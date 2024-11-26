@@ -34,7 +34,6 @@ import io.qameta.allure.Story;
 
 @Features({@Feature(LAZY_INITIALIZATION), @Feature(CONFIGURATION_COMPONENT_LOCATOR)})
 @Story(COMPONENT_LIFE_CYCLE)
-@Ignore("W-16639192")
 public class LazyComponentInitializerAdapterTestCase extends AbstractLazyMuleArtifactContextTestCase {
 
   private final AtomicInteger initializations = new AtomicInteger(0);
