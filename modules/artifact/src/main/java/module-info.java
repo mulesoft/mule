@@ -14,7 +14,6 @@ module org.mule.runtime.artifact {
 
   requires transitive org.mule.runtime.api;
   requires org.mule.sdk.api;
-  requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.core;
   requires org.mule.runtime.jar.handling.utils;
   requires org.mule.runtime.manifest;

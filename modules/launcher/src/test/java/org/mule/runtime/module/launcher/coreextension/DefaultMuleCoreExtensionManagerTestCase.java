@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CORE_EXTENSIONS;
+import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CoreExtensionsStory.CORE_EXTENSIONS_DEPENDENCY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LOCK_FACTORY;
+import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LockFactoryStory.SERVER_LOCK_FACTORY;
+
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -18,11 +24,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CORE_EXTENSIONS;
-import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CoreExtensionsStory.CORE_EXTENSIONS_DEPENDENCY_INJECTION;
-import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LOCK_FACTORY;
-import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LockFactoryStory.SERVER_LOCK_FACTORY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.service.Service;
@@ -39,7 +40,6 @@ import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
-import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -52,13 +52,15 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.InOrder;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @SmallTest
 @Feature(CORE_EXTENSIONS)
@@ -83,7 +85,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   @Test
   public void injectsDeploymentServiceAwareCoreExtension() throws Exception {
-    Consumer<DeploymentService> setServiceFunction = (service) -> coreExtensionManager.setDeploymentService(service);
+    Consumer<DeploymentService> setServiceFunction = service -> coreExtensionManager.setDeploymentService(service);
     BiConsumer<List<TestDeploymentServiceAwareExtension>, DeploymentService> verificationFunction =
         (extensions, service) -> verify(extensions.get(0)).setDeploymentService(service);
     testServiceInjection(DeploymentService.class, TestDeploymentServiceAwareExtension.class, setServiceFunction,
@@ -92,7 +94,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   @Test
   public void injectRepositoryServiceAwareCoreExtension() throws Exception {
-    Consumer<RepositoryService> setServiceFunction = (service) -> coreExtensionManager.setRepositoryService(service);
+    Consumer<RepositoryService> setServiceFunction = service -> coreExtensionManager.setRepositoryService(service);
     BiConsumer<List<TestRepositoryServiceAwareExtension>, RepositoryService> verificationFunction =
         (extensions, service) -> verify(extensions.get(0)).setRepositoryService(service);
     testServiceInjection(RepositoryService.class, TestRepositoryServiceAwareExtension.class, setServiceFunction,
@@ -102,7 +104,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
   @Test
   public void initializesDeploymentListenerCoreExtension() throws Exception {
 
-    Consumer<DeploymentService> setServiceFunction = (service) -> coreExtensionManager.setDeploymentService(service);
+    Consumer<DeploymentService> setServiceFunction = service -> coreExtensionManager.setDeploymentService(service);
     BiConsumer<List<TestDeploymentListenerExtension>, DeploymentService> verificationFunction =
         (extensions, service) -> verify(service).addDeploymentListener(extensions.get(0));
     testServiceInjection(DeploymentService.class, TestDeploymentListenerExtension.class, setServiceFunction,
@@ -111,7 +113,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   @Test
   public void injectsCoreExtensionsAwareCoreExtension() throws Exception {
-    Consumer<DeploymentService> setServiceFunction = (service) -> {
+    Consumer<DeploymentService> setServiceFunction = service -> {
     };
     BiConsumer<List<TestCoreExtensionsAwareExtension>, DeploymentService> verificationFunction =
         (extensions, service) -> verify(extensions.get(0)).setCoreExtensions(new ArrayList<>(extensions));
@@ -138,7 +140,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   @Test
   public void injectsCoreExtensionsOnExtension() throws Exception {
-    Consumer<DeploymentService> setServiceFunction = (service) -> {
+    Consumer<DeploymentService> setServiceFunction = service -> {
     };
     BiConsumer<List<TestCoreExtensionsExtension>, DeploymentService> verificationFunction =
         (extensions, service) -> verify(extensions.get(0), atLeastOnce()).setCoreExtensions(new ArrayList<>(extensions));
@@ -148,23 +150,13 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
   @Test
   public void injectsArtifactClassLoaderManagerOnExtension() throws Exception {
     Consumer<ArtifactClassLoaderManager> setServiceFunction =
-        (service) -> coreExtensionManager.setArtifactClassLoaderManager(service);
+        service -> coreExtensionManager.setArtifactClassLoaderManager(service);
 
     BiConsumer<List<TestArtifactClassLoaderManagerExtension>, ArtifactClassLoaderManager> verificationFunction =
         (extensions, service) -> verify(extensions.get(0), atLeastOnce()).setArtifactClassLoaderManager(same(service));
 
     testServiceInjection(ArtifactClassLoaderManager.class, TestArtifactClassLoaderManagerExtension.class, setServiceFunction,
                          verificationFunction);
-  }
-
-  @Test
-  public void injectsToolingServiceOnExtension() throws Exception {
-    Consumer<ToolingService> setServiceFunction = coreExtensionManager::setToolingService;
-
-    BiConsumer<List<TestToolingServiceExtension>, ToolingService> verificationFunction =
-        (extensions, service) -> verify(extensions.get(0), atLeastOnce()).setToolingService(service);
-
-    testServiceInjection(ToolingService.class, TestToolingServiceExtension.class, setServiceFunction, verificationFunction);
   }
 
   @Test
@@ -498,12 +490,6 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
     @Inject
     void setArtifactClassLoaderManager(ArtifactClassLoaderManager artifactClassLoaderManager);
-  }
-
-  public interface TestToolingServiceExtension extends MuleCoreExtension {
-
-    @Inject
-    void setToolingService(ToolingService toolingService);
   }
 
   public interface InjectedTestServiceExtension extends MuleCoreExtension {

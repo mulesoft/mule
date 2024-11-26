@@ -26,7 +26,6 @@ module org.mule.runtime.launcher {
   requires org.mule.runtime.manifest;
   requires org.mule.runtime.repository;
   requires org.mule.runtime.service;
-  requires org.mule.runtime.tooling.support;
   requires org.mule.runtime.tls;
   requires org.mule.runtime.troubleshooting;
 

@@ -16,7 +16,6 @@ import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -35,7 +34,6 @@ public final class ArtifactContextConfiguration {
 
   private MuleContext muleContext;
   private String[] configResources;
-  private ArtifactDeclaration artifactDeclaration;
   private Map<String, String> artifactProperties = emptyMap();
   private ArtifactType artifactType;
   private boolean enableLazyInitialization;
@@ -72,13 +70,6 @@ public final class ArtifactContextConfiguration {
    */
   public String[] getConfigResources() {
     return configResources;
-  }
-
-  /**
-   * @return configuration of the artifact.
-   */
-  public ArtifactDeclaration getArtifactDeclaration() {
-    return artifactDeclaration;
   }
 
   /**
@@ -190,15 +181,6 @@ public final class ArtifactContextConfiguration {
      */
     public ArtifactContextConfigurationBuilder setConfigResources(String[] configResources) {
       artifactContextConfiguration.configResources = configResources;
-      return this;
-    }
-
-    /**
-     * @param artifactDeclaration configuration of the artifact.
-     * @return {@code this} builder
-     */
-    public ArtifactContextConfigurationBuilder setArtifactDeclaration(ArtifactDeclaration artifactDeclaration) {
-      artifactContextConfiguration.artifactDeclaration = artifactDeclaration;
       return this;
     }
 

@@ -20,7 +20,6 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.repository.api.RepositoryService;
-import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 
 import java.util.HashMap;
@@ -89,16 +88,6 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
     for (MuleCoreExtension muleCoreExtension : coreExtensions) {
       registerObject("_coreExtension_" + muleCoreExtension.getName(), muleCoreExtension);
     }
-
-    return getThis();
-  }
-
-  /**
-   * @param toolingService tooling service used on the container
-   * @return same builder instance
-   */
-  public T withToolingService(ToolingService toolingService) {
-    registerObject(ToolingService.class.getName(), toolingService);
 
     return getThis();
   }

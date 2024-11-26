@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -28,8 +29,6 @@ import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.deployment.internal.DeploymentListenerAdapter;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
-import org.mule.runtime.module.tooling.api.ToolingService;
-import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 
 import java.util.ArrayList;
@@ -47,7 +46,6 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private List<MuleCoreExtension> coreExtensions = new LinkedList<>();
   private DeploymentService deploymentService;
   private RepositoryService repositoryService;
-  private ToolingService toolingService;
   private List<MuleCoreExtension> orderedCoreExtensions;
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private ServiceRepository serviceRepository;
@@ -155,10 +153,6 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         ((RepositoryServiceAware) extension).setRepositoryService(repositoryService);
       }
 
-      if (extension instanceof ToolingServiceAware) {
-        ((ToolingServiceAware) extension).setToolingService(toolingService);
-      }
-
       if (extension instanceof ArtifactDeploymentListener) {
         deploymentService.addDeploymentListener(createDeploymentListenerAdapter((ArtifactDeploymentListener) extension, APP));
         deploymentService
@@ -196,7 +190,6 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         .withCoreExtensions(coreExtensions)
         .withArtifactClassLoaderManager(artifactClassLoaderManager)
         .withEventContextService(eventContextService)
-        .withToolingService(toolingService)
         .withServerLockFactory(serverLockFactory)
         .build();
   }
@@ -209,11 +202,6 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   @Override
   public void setRepositoryService(RepositoryService repositoryService) {
     this.repositoryService = repositoryService;
-  }
-
-  @Override
-  public void setToolingService(ToolingService toolingService) {
-    this.toolingService = toolingService;
   }
 
   @Override

@@ -13,21 +13,9 @@
     <description>This modules provides a set of services for tooling applications.</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.tooling.support</javaModuleName>
-        <!-- Add visibility required by the tests exclusively -->
-        <surefire.args>
-            -XX:+IgnoreUnrecognizedVMOptions
-            --add-modules=net.bytebuddy.agent
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
-            --add-opens=org.mule.runtime.tooling.support/org.mule.runtime.module.tooling.internal=ALL-UNNAMED
-            ${surefire.test.unit.open.args}
-        </surefire.args>
+        <javaModuleName>org.mule.runtime.tooling.support.old</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
-
 
     <profiles>
         <profile>
@@ -45,62 +33,5 @@
             </build>
         </profile>
     </profiles>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-repository</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-deployment</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- Add logging libraries required by maven-client -->
-        <dependency>
-            <groupId>org.mule.runtime.boot</groupId>
-            <artifactId>mule-module-logging</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-			
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-weave</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-allure</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
 </project>

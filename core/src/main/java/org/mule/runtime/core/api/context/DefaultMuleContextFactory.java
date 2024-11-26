@@ -9,10 +9,9 @@ package org.mule.runtime.core.api.context;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
+
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -22,7 +21,6 @@ import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
-import org.mule.runtime.core.internal.config.builders.AutoConfigurationBuilder;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 
 import java.util.Collections;
@@ -76,44 +74,6 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
   }
 
   // Additional Factory methods provided by this implementation.
-
-  /**
-   * Creates a new {@link MuleContext} instance from the resource provided. Implementations of {@link MuleContextFactory} can
-   * either use a default {@link ConfigurationBuilder} to implement this, or do some auto-detection to determine the
-   * {@link ConfigurationBuilder} that should be used.
-   *
-   * @param resource comma separated list of configuration resources.
-   * @throws InitialisationException
-   * @throws ConfigurationException
-   * @deprecated Use SpringXmlConfigurationBuilder instead
-   */
-  @Deprecated
-  public MuleContext createMuleContext(String resource) throws InitialisationException, ConfigurationException {
-    return createMuleContext(resource, emptyMap());
-  }
-
-  /**
-   * Creates a new {@link MuleContext} instance from the resource provided. Implementations of {@link MuleContextFactory} can
-   * either use a default {@link ConfigurationBuilder} to implement this, or do some auto-detection to determine the
-   * {@link ConfigurationBuilder} that should be used. Properties if provided are used to replace "property placeholder" value in
-   * configuration files.
-   *
-   * @deprecated Use SpringXmlConfigurationBuilder instead
-   */
-  @Deprecated
-  public MuleContext createMuleContext(final String configResources, final Map<String, Object> properties)
-      throws InitialisationException, ConfigurationException {
-    return doCreateMuleContext(MuleContextBuilder.builder(APP), muleContext -> {
-      // Configure with startup properties
-      if (!properties.isEmpty()) {
-        new SimpleConfigurationBuilder(properties).configure(muleContext);
-      }
-
-      // Automatically resolve Configuration to be used and delegate configuration
-      // to it.
-      new AutoConfigurationBuilder(configResources, emptyMap(), APP).configure(muleContext);
-    });
-  }
 
   /**
    * Creates a new MuleContext using the given configurationBuilder. Properties if provided are used to replace "property

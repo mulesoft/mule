@@ -8,10 +8,12 @@ package org.mule.runtime.config.internal.registry;
 
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_IN_MEMORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_PERSISTENT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_OBJECT_STORE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 
@@ -19,7 +21,7 @@ import static java.util.Collections.emptyMap;
 
 import static org.junit.Assert.assertSame;
 
-import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -30,7 +32,7 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new SpringXmlConfigurationBuilder(new String[0], emptyMap());
+    return new ArtifactAstConfigurationBuilder(emptyArtifact(), emptyMap(), APP, false, false);
   }
 
   @Test
@@ -62,4 +64,5 @@ public class LocalStoreAliasConfigTestCase extends AbstractMuleContextTestCase {
     Object obj2 = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(key2);
     assertSame(obj1, obj2);
   }
+
 }

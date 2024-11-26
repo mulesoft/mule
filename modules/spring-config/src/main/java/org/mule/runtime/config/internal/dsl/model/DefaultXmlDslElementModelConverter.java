@@ -6,21 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
-import static java.util.stream.Stream.of;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.config.internal.dsl.declaration.DefaultXmlArtifactDeclarationLoader.TRANSFORM_IDENTIFIER;
-import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.DECLARED_PREFIX;
-import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
-import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
@@ -33,6 +20,20 @@ import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.DECLARED_PREFIX;
+import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
+import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
+
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.stream.Stream.of;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -44,12 +45,12 @@ import org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
+import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.mule.runtime.metadata.api.dsl.DslElementModel;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -78,6 +79,8 @@ public class DefaultXmlDslElementModelConverter implements XmlDslElementModelCon
 
   private static final String XMLNS_ATTRIBUTE_NAMESPACE = "http://www.w3.org/2000/xmlns/";
   private static final String XMLNS = "xmlns:";
+
+  private static final String TRANSFORM_IDENTIFIER = "transform";
 
   private final Document doc;
 

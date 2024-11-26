@@ -17,7 +17,6 @@ module org.mule.runtime.deployment.model {
   requires org.mule.runtime.api;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
-  requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.core;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;

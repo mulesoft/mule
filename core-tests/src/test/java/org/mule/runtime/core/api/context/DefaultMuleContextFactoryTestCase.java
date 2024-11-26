@@ -7,7 +7,6 @@
 package org.mule.runtime.core.api.context;
 
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP;
@@ -21,8 +20,6 @@ import static org.mule.test.allure.AllureConstants.MuleContextFeature.MuleContex
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 
-import static junit.framework.Assert.assertNotNull;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -170,37 +167,6 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testCreateMuleContextString() throws InitialisationException, ConfigurationException {
-    context = null;
-    try {
-      context = muleContextFactory.createMuleContext("log4j2-test.xml");
-    } catch (ConfigurationException e) {
-      assertThat(e.getMessage(),
-                 equalTo("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
-                     + "Check you have configuration module on your classpath and are using correct file extension."));
-    }
-    assertNull(context);
-  }
-
-  @Test
-  public void testCreateMuleContextStringProperties() throws InitialisationException, ConfigurationException {
-    Properties properties = new Properties();
-    properties.put("testKey1", "testValue1");
-    properties.put("testKey2", "testValue2");
-
-    context = null;
-    try {
-      context = muleContextFactory.createMuleContext("log4j2-test.xml", (Map) properties);
-    } catch (ConfigurationException e) {
-      assertThat(e.getMessage(),
-                 equalTo("No suitable configuration builder for resource \"[ConfigResource{resourceName='log4j2-test.xml'}]\" found.  "
-                     + "Check you have configuration module on your classpath and are using correct file extension."));
-    }
-
-    assertNull(context);
-  }
-
-  @Test
   public void testCreateMuleContextConfigurationBuilderProperties() throws InitialisationException, ConfigurationException {
     Properties properties = new Properties();
     properties.put("testKey3", "testValue3");
@@ -287,9 +253,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   private void assertDefaults(MuleContext context) {
     // Assert existance of defaults in registry
-    assertNotNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
-    assertNotNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER));
-    assertNotNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(BASE_IN_MEMORY_OBJECT_STORE_KEY));
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER), notNullValue());
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER), notNullValue());
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER), notNullValue());
   }
 
   private void assertNoDefaults(MuleContext context) {
@@ -325,7 +291,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     assertEquals(TEST_STRING_VALUE, ((MuleContextWithRegistry) context).getRegistry().lookupObject(TEST_STRING_KEY));
 
     Object obj = ((MuleContextWithRegistry) context).getRegistry().lookupObject(TEST_OBJECT_NAME);
-    assertNotNull(obj);
+    assertThat(obj, notNullValue());
     assertEquals(Banana.class, obj.getClass());
   }
 

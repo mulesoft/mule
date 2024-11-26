@@ -10,7 +10,6 @@ import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
@@ -27,7 +26,6 @@ import java.util.Optional;
  */
 public class DefaultDslElementModelFactory implements DslElementModelFactory {
 
-  private final DeclarationBasedElementModelFactory declarationBasedDelegate;
   private final ConfigurationBasedElementModelFactory configurationBasedDelegate;
   private final ComponentAstBasedElementModelFactory componentAstBasedDelegate;
 
@@ -35,17 +33,8 @@ public class DefaultDslElementModelFactory implements DslElementModelFactory {
     final Map<ExtensionModel, DslSyntaxResolver> resolvers = context.getExtensions().stream()
         .collect(toMap(e -> e, e -> DslSyntaxResolver.getDefault(e, context)));
 
-    this.declarationBasedDelegate = new DeclarationBasedElementModelFactory(context, resolvers);
     this.configurationBasedDelegate = new ConfigurationBasedElementModelFactory(resolvers);
     this.componentAstBasedDelegate = new ComponentAstBasedElementModelFactory();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <T> Optional<DslElementModel<T>> create(ElementDeclaration componentDeclaration) {
-    return declarationBasedDelegate.create(componentDeclaration);
   }
 
   @Override
