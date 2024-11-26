@@ -9,8 +9,11 @@ package org.mule.runtime.module.extension.internal.config;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Provider for building definitions for java based extensions.
@@ -38,5 +41,14 @@ public interface ExtensionBuildingDefinitionProvider extends ComponentBuildingDe
    * @since 4.4
    */
   void setDslResolvingContext(DslResolvingContext dslResolvingContext);
+
+  /**
+   * This method is expected to be invoked before calling to {@link ComponentBuildingDefinitionProvider#init()}
+   *
+   * @param dslSyntaxResolverLookup lookup for DslSyntaxResolver to use for the definitions
+   *
+   * @since 4.9
+   */
+  void setDslSyntaxResolverLookup(Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup);
 
 }
