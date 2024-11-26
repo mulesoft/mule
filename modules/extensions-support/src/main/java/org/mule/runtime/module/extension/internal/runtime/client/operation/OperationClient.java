@@ -269,7 +269,7 @@ public class OperationClient implements Lifecycle {
     boolean shouldCompleteEvent = false;
     CoreEvent contextEvent = parameterizer.getContextEvent().orElse(null);
     if (contextEvent == null) {
-      contextEvent = getNullEvent(muleContext);
+      contextEvent = getNullEvent();
       shouldCompleteEvent = true;
     }
 

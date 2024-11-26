@@ -477,7 +477,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
 
     // Since the resolver is not dynamic, we can resolve it using a null Event
-    CoreEvent nullEvent = getNullEvent(muleContext);
+    CoreEvent nullEvent = getNullEvent();
 
     try {
       return of(resolveConfigurationProvider(configurationProviderResolver, nullEvent));
@@ -524,7 +524,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
     CoreEvent initialiserEvent = null;
     try {
-      initialiserEvent = getNullEvent(muleContext);
+      initialiserEvent = getNullEvent();
       return configurationResolver.apply(initialiserEvent);
     } finally {
       if (initialiserEvent != null) {
@@ -889,7 +889,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
     try {
-      fakeEvent = getNullEvent(muleContext);
+      fakeEvent = getNullEvent();
 
       Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
@@ -918,7 +918,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return new ExtensionResolvingContext(() -> {
       CoreEvent fakeEvent = null;
       try {
-        fakeEvent = getNullEvent(muleContext);
+        fakeEvent = getNullEvent();
         return getConfiguration(fakeEvent);
       } finally {
         if (fakeEvent != null) {
