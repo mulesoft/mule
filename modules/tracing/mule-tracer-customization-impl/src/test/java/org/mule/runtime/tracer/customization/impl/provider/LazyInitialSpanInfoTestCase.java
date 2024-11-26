@@ -11,24 +11,26 @@ import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.NO_EXPORTA
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.impl.CoreEventTracer;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
+
+import org.junit.Test;
+
+import org.mockito.Mockito;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 
 @Feature(PROFILING)
@@ -39,7 +41,7 @@ public class LazyInitialSpanInfoTestCase {
 
   @Test
   public void whenNoopCoreEventTracerIsUsedLazyInitializationSpanInfoIsNotComputed() {
-    LazyInitialSpanInfo lazyInitialSpanInfo = new LazyInitialSpanInfo(() -> new InitialSpanInfo() {
+    final LazyInitialSpanInfo lazyInitialSpanInfo = new LazyInitialSpanInfo(() -> new InitialSpanInfo() {
 
       @Override
       public String getName() {
@@ -58,7 +60,7 @@ public class LazyInitialSpanInfoTestCase {
 
   @Test
   public void whenCoreEventTracerIsUsedLazyInitializationSpanInfoIsComputed() throws Exception {
-    LazyInitialSpanInfo lazyInitialSpanInfo = new LazyInitialSpanInfo(() -> new InitialSpanInfo() {
+    final LazyInitialSpanInfo lazyInitialSpanInfo = new LazyInitialSpanInfo(() -> new InitialSpanInfo() {
 
       @Override
       public String getName() {
@@ -71,7 +73,7 @@ public class LazyInitialSpanInfoTestCase {
       }
     });
 
-    CoreEventTracer coreEventTracer = new CoreEventTracer(mock(FeatureFlaggingService.class), new TestEventSpanFactory());
+    final CoreEventTracer coreEventTracer = new CoreEventTracer(mock(FeatureFlaggingService.class), new TestEventSpanFactory());
     coreEventTracer.initialise();
     coreEventTracer.startSpan(mock(CoreEvent.class), lazyInitialSpanInfo);
     assertThat(lazyInitialSpanInfo.isComputed(), equalTo(true));
@@ -83,9 +85,9 @@ public class LazyInitialSpanInfoTestCase {
     @Override
     public InternalSpan getSpan(SpanContext spanContext,
                                 InitialSpanInfo initialSpanInfo) {
-      InternalSpan internalSpan = mock(InternalSpan.class);
+      final InternalSpan internalSpan = mock(InternalSpan.class);
       // We retrieve info so that the initialSpanInfo is computed.
-      String name = initialSpanInfo.getName();
+      final String name = initialSpanInfo.getName();
       Mockito.when(internalSpan.getName()).thenReturn(name);
       return internalSpan;
     }

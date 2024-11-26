@@ -1,4 +1,34 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeValueChanged",
+            "old": "class org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor",
+            "new": "class org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor",
+            "annotationType": "javax.annotation.processing.SupportedSourceVersion",
+            "attribute": "value",
+            "oldValue": "javax.lang.model.SourceVersion.RELEASE_8",
+            "newValue": "javax.lang.model.SourceVersion.RELEASE_17",
+            "justification": "W-15934597: Update annotation processors source level"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeValueChanged",
+            "old": "class org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor",
+            "new": "class org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor",
+            "annotationType": "javax.annotation.processing.SupportedSourceVersion",
+            "attribute": "value",
+            "oldValue": "javax.lang.model.SourceVersion.RELEASE_8",
+            "newValue": "javax.lang.model.SourceVersion.RELEASE_17",
+            "justification": "W-15934597: Update annotation processors source level"
+          }
+        ]
+      }
+    }
+  },
   "4.8.0": {
     "revapi": {
       "differences": {

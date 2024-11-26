@@ -36,18 +36,20 @@ public class SetVariableVariableNameValidationTestCase extends AbstractCoreValid
 
   @Test
   public void variableNameSupportsExpressionsSoNoValidationShouldArise() {
-    final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\" xmlns:doc=\"http://www.mulesoft.org/schema/mule/documentation\"\n"
-        +
-        "   xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-        "   xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
-        +
-        "   <flow name=\"expression-for-variablenameFlow\">\n" +
-        "       <set-variable value=\"myVariable\" variableName=\"targetName\"/>" +
-        "       <set-variable value=\"specialValue\" variableName=\"#[vars.targetName]\"/>\n" +
-        "   </flow>\n" +
-        "</mule>")
-            .stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("SetVariableVariableNameValidationTestCase#variableNameSupportsExpressionsSoNoValidationShouldArise",
+                      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                          "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\" xmlns:doc=\"http://www.mulesoft.org/schema/mule/documentation\"\n"
+                          +
+                          "   xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                          "   xsi:schemaLocation=\"http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n"
+                          +
+                          "   <flow name=\"expression-for-variablenameFlow\">\n" +
+                          "       <set-variable value=\"myVariable\" variableName=\"targetName\"/>" +
+                          "       <set-variable value=\"specialValue\" variableName=\"#[vars.targetName]\"/>\n" +
+                          "   </flow>\n" +
+                          "</mule>")
+                              .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("An expression value was given for parameter 'variableName' but it doesn't support expressions"));

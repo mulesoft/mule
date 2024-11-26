@@ -46,11 +46,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-soap-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -84,6 +79,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-tls</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-global-config</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -107,11 +107,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-oauth-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-soap-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.privileged.event.DefaultFlowCallStack.newDefaultFlowCallStack;
 
 import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;
 import static java.time.Instant.now;
-import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -21,6 +20,7 @@ import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -42,6 +42,7 @@ import org.mule.runtime.tracer.api.context.SpanContextAware;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -163,7 +164,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
   @Override
   public ProcessorsTrace getProcessorsTrace() {
-    return () -> emptyList();
+    return Collections::emptyList;
   }
 
   @Override
@@ -179,58 +180,49 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   /**
    * Builds a new execution context with the given parameters.
    *
-   * @param flow               the flow that processes events of this context.
-   * @param location           the location of the component that received the first message for this context.
-   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
-   *                           this context, if available.
-   * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
-   *                           depend on completion of source.
+   * @param flow                the flow that processes events of this context.
+   * @param eventContextService the keeper of all currently active {@link EventContext}s to generate a dump on demand.
+   * @param location            the location of the component that received the first message for this context.
+   * @param correlationId       the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                            this context, if available.
+   * @param externalCompletion  future that completes when source completes enabling termination of {@link BaseEventContext} to
+   *                            depend on completion of source.
    */
-  public DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
+  public DefaultEventContext(FlowConstruct flow,
+                             EventContextService eventContextService,
+                             ComponentLocation location,
+                             String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
-    super(NullExceptionHandler.getInstance(), 0, externalCompletion);
-
-    checkArgument(flow != null, "'flow' can't be null");
-
-    this.id = flow.getUniqueIdString();
-    this.serverId = flow.getServerId();
-    this.location = location;
-    this.processingTime = ProcessingTime.newInstance(flow);
-    this.correlationId = correlationId;
-
-    // Only generate flowStack dump information for when the eventContext is created for a flow.
-    if (flow != null && flow.getMuleContext() != null) {
-      eventContextMaintain(flow.getMuleContext().getEventContextService());
-    }
-    this.flowCallStack = newDefaultFlowCallStack();
-    createStreamingState();
+    this(flow, NullExceptionHandler.getInstance(), eventContextService, location, correlationId, externalCompletion);
   }
 
   /**
    * Builds a new execution context with the given parameters.
    *
-   * @param flow               the flow that processes events of this context.
-   * @param exceptionHandler   the exception handler that will deal with an error context. This will be used instead of the one
-   *                           from the given {@code flow}
-   * @param location           the location of the component that received the first message for this context.
-   * @param correlationId      the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
-   *                           this context, if available.
-   * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
-   *                           depend on completion of source.
+   * @param flow                the flow that processes events of this context.
+   * @param exceptionHandler    the exception handler that will deal with an error context. This will be used instead of the one
+   *                            from the given {@code flow}
+   * @param eventContextService the keeper of all currently active {@link EventContext}s to generate a dump on demand.
+   * @param location            the location of the component that received the first message for this context.
+   * @param correlationId       the correlation id that was set by the {@link MessageSource} for the first {@link CoreEvent} of
+   *                            this context, if available.
+   * @param externalCompletion  future that completes when source completes enabling termination of {@link BaseEventContext} to
+   *                            depend on completion of source.
    */
-  public DefaultEventContext(FlowConstruct flow, FlowExceptionHandler exceptionHandler, ComponentLocation location,
-                             String correlationId, Optional<CompletableFuture<Void>> externalCompletion) {
+  public DefaultEventContext(FlowConstruct flow,
+                             FlowExceptionHandler exceptionHandler,
+                             EventContextService eventContextService,
+                             ComponentLocation location,
+                             String correlationId,
+                             Optional<CompletableFuture<Void>> externalCompletion) {
     super(exceptionHandler, 0, externalCompletion);
-    this.id = flow.getUniqueIdString();
+    this.id = requireNonNull(flow, "'flow' can't be null").getUniqueIdString();
     this.serverId = flow.getServerId();
     this.location = location;
     this.processingTime = ProcessingTime.newInstance(flow);
     this.correlationId = correlationId;
 
-    // Only generate flowStack dump information for when the eventContext is created for a flow.
-    if (flow != null && flow.getMuleContext() != null) {
-      eventContextMaintain(flow.getMuleContext().getEventContextService());
-    }
+    eventContextMaintain(eventContextService);
     this.flowCallStack = newDefaultFlowCallStack();
     createStreamingState();
   }

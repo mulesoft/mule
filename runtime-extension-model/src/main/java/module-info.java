@@ -31,7 +31,7 @@ module org.mule.runtime.extension.model {
   requires org.mule.runtime.metadata.model.catalog;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.dsl.api;
-  requires org.mule.runtime.artifact.ast;
+  requires transitive org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.dependency.graph;
   requires org.mule.runtime.errors;
   

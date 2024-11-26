@@ -26,21 +26,15 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExtensionFunctionalTestCase {
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   private Transaction transaction;
 
@@ -75,7 +69,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
         .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(3));
-    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+    assertThat(getConnectionThreads().stream().map(Thread::getThreadGroup).collect(toSet()),
                everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
   }
 
@@ -84,7 +78,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
     flowRunner("fail-connection-validation").runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(3));
-    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+    assertThat(getConnectionThreads().stream().map(Thread::getThreadGroup).collect(toSet()),
                everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
   }
 
@@ -94,7 +88,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
         .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(4));
-    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+    assertThat(getConnectionThreads().stream().map(Thread::getThreadGroup).collect(toSet()),
                everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
   }
 
@@ -104,7 +98,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
         .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(4));
-    assertThat(getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet()),
+    assertThat(getConnectionThreads().stream().map(Thread::getThreadGroup).collect(toSet()),
                everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
   }
 
@@ -112,11 +106,11 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
   public void retryPolicyExhaustedDueToInvalidConnectionExecutingOperationTxFlow() throws Exception {
     transaction = createTransactionMock();
     flowRunner("fail-operation-with-connection-exception")
-        .transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory(transaction))
+        .transactionally(ACTION_ALWAYS_BEGIN, transaction)
         .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(3));
-    Set<ThreadGroup> connectionThreadsSet = getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet());
+    Set<ThreadGroup> connectionThreadsSet = getConnectionThreads().stream().map(Thread::getThreadGroup).collect(toSet());
     assertThat("Transactional retry must not change threads", connectionThreadsSet, hasSize(1));
     assertThat(connectionThreadsSet, everyItem(sameInstance(currentThread().getThreadGroup())));
   }
@@ -124,11 +118,11 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
   @Test
   public void retryPolicyExhaustedDueToInvalidConnectionAtValidateTimeTxFlow() throws Exception {
     transaction = createTransactionMock();
-    flowRunner("fail-connection-validation").transactionally(ACTION_ALWAYS_BEGIN, new TestTransactionFactory(transaction))
+    flowRunner("fail-connection-validation").transactionally(ACTION_ALWAYS_BEGIN, transaction)
         .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(3));
-    Set<ThreadGroup> connectionThreadsSet = getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet());
+    Set<ThreadGroup> connectionThreadsSet = getConnectionThreads().stream().map(Thread::getThreadGroup).collect(toSet());
     assertThat("Transactional retry must not change threads", connectionThreadsSet, hasSize(1));
     assertThat(connectionThreadsSet, everyItem(sameInstance(currentThread().getThreadGroup())));
   }
@@ -139,7 +133,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
         .runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(3));
-    Set<ThreadGroup> connectionThreadsSet = getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet());
+    Set<ThreadGroup> connectionThreadsSet = getConnectionThreads().stream().map(Thread::getThreadGroup).collect(toSet());
     assertThat("Transactional retry must not change threads", connectionThreadsSet, hasSize(1));
     assertThat(connectionThreadsSet, everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
   }
@@ -149,7 +143,7 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
     flowRunner("fail-connection-validation-tx").runExpectingException(errorType("PETSTORE", CONNECTIVITY_ERROR_IDENTIFIER));
 
     assertThat(getConnectionThreads(), hasSize(3));
-    Set<ThreadGroup> connectionThreadsSet = getConnectionThreads().stream().map(t -> t.getThreadGroup()).collect(toSet());
+    Set<ThreadGroup> connectionThreadsSet = getConnectionThreads().stream().map(Thread::getThreadGroup).collect(toSet());
     assertThat("Transactional retry must not change threads", connectionThreadsSet, hasSize(1));
     assertThat(connectionThreadsSet, everyItem(sameInstance(UNIT_TEST_THREAD_GROUP)));
   }

@@ -19,8 +19,6 @@ import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
@@ -768,11 +766,11 @@ public class CoreMessages extends I18nMessageFactory {
     return factory.createMessage(BUNDLE_PATH, 277, property, object);
   }
 
-  public static I18nMessage commitTxButNoResource(Transaction tx) {
+  public static I18nMessage commitTxButNoResource(Object tx) {
     return factory.createMessage(BUNDLE_PATH, 300, tx);
   }
 
-  public static I18nMessage rollbackTxButNoResource(Transaction tx) {
+  public static I18nMessage rollbackTxButNoResource(Object tx) {
     return factory.createMessage(BUNDLE_PATH, 301, tx);
   }
 
@@ -808,16 +806,12 @@ public class CoreMessages extends I18nMessageFactory {
    * Provides a log-friendly string to use for deployable artifact types.
    */
   public static String getArtifactTypeLoggableName(ArtifactType artifactType) {
-    switch (artifactType) {
-      case APP:
-        return "Application";
-      case DOMAIN:
-        return "Domain";
-      case POLICY:
-        return "Policy";
-      default:
-        return "Artifact";
-    }
+    return switch (artifactType) {
+      case APP -> "Application";
+      case DOMAIN -> "Domain";
+      case POLICY -> "Policy";
+      default -> "Artifact";
+    };
   }
 
   public static I18nMessage applicationWasUpForDuration(long duration) {
@@ -852,7 +846,7 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage errorInvokingMessageProcessorWithinTransaction(Processor processor,
-                                                                           TransactionConfig transactionConfig) {
+                                                                           Object transactionConfig) {
     return factory.createMessage(BUNDLE_PATH, 311, processor, transactionConfig);
   }
 

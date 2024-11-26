@@ -21,10 +21,10 @@ import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
 import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.JAVA_VERSIONS_IN_EXTENSION_MODEL;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME;
@@ -47,12 +47,13 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -117,9 +118,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.hamcrest.Matcher;
 
@@ -133,9 +132,6 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final ExtensionModel heisenbergExtension = loadExtension(HeisenbergExtension.class);
   private final ExtensionModel veganExtension = loadExtension(VeganExtension.class);
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Test
   public void flyweight() {
@@ -321,18 +317,16 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sourceWithInvalidDefaultBackPressureStrategies() {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException
-        .expectMessage("backPressureStrategy parameter has a default value which is not listed as an available option");
+    final var thrown =
+        assertThrows(IllegalModelDefinitionException.class, () -> loadExtension(BadBackPressureHeisenbergExtension.class));
 
-    loadExtension(BadBackPressureHeisenbergExtension.class);
+    assertThat(thrown.getMessage(),
+               containsString("backPressureStrategy parameter has a default value which is not listed as an available option"));
   }
 
   @Test
   public void sourceWithInvalidBackPressureStrategies() {
-    expectedException.expect(IllegalModelDefinitionException.class);
-
-    loadExtension(IllegalBackPressureHeisenbergExtension.class);
+    assertThrows(IllegalModelDefinitionException.class, () -> loadExtension(IllegalBackPressureHeisenbergExtension.class));
   }
 
   @Test

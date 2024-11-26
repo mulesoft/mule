@@ -156,7 +156,7 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
                                        ofNullable(configurationSupplier.get()),
                                        emptyMap(),
                                        componentModel,
-                                       getNullEvent(muleContext),
+                                       getNullEvent(),
                                        cursorProviderFactory,
                                        streamingManager,
                                        component,

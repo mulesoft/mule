@@ -43,6 +43,7 @@ import java.util.function.Consumer;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoSink;
 
@@ -76,8 +77,10 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   private final int depthLevel;
 
-  private AtomicInteger state = new AtomicInteger(STATE_READY);
-  private volatile boolean childrenComplete = false;
+  // Kept for backwards compatibility of deserialization of objects serialized with previous versions
+  private byte state = -1;
+  private transient AtomicInteger stateCtx = new AtomicInteger(STATE_READY);
+  private transient volatile boolean childrenComplete = false;
   private volatile Either<Throwable, CoreEvent> result;
 
   private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(ResponsePublisher::new);
@@ -98,7 +101,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     this.depthLevel = depthLevel;
     this.externalCompletion = externalCompletion.orElse(null);
     if (this.externalCompletion != null) {
-      this.externalCompletion.thenAccept((aVoid) -> tryTerminate());
+      this.externalCompletion.thenAccept(aVoid -> tryTerminate());
     }
     this.exceptionHandler = exceptionHandler;
   }
@@ -143,7 +146,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
    */
   @Override
   public final void success(CoreEvent event) {
-    if (state.compareAndSet(STATE_READY, STATE_RESPONSE_RECEIVED)) {
+    if (stateCtx.compareAndSet(STATE_READY, STATE_RESPONSE_RECEIVED)) {
       if (debugLogEnabled) {
         LOGGER.debug("{} response completed with result.", this);
       }
@@ -160,7 +163,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
    */
   @Override
   public final Publisher<Void> error(Throwable throwable) {
-    if (state.compareAndSet(STATE_READY, STATE_RESPONSE_RECEIVED)) {
+    if (stateCtx.compareAndSet(STATE_READY, STATE_RESPONSE_RECEIVED)) {
 
       if (debugLogEnabled) {
         LOGGER.debug("{} responseDone completed with error.", this);
@@ -172,7 +175,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
         }
 
         final Consumer<Exception> router = exceptionHandler.router(identity(),
-                                                                   handled -> success(handled),
+                                                                   this::success,
                                                                    rethrown -> receiveResponse(left(rethrown)));
         try {
           router.accept((Exception) throwable);
@@ -205,15 +208,13 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     }
     onResponseConsumerList.clear();
 
+    stateCtx.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED);
     tryComplete();
   }
 
   protected void tryComplete() {
-    boolean completable =
-        state.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED) || state.get() == STATE_RESPONSE_PROCESSED;
-
-    if (completable && areAllChildrenComplete()) {
-      if (!state.compareAndSet(STATE_RESPONSE_PROCESSED, STATE_COMPLETE)) {
+    if (stateCtx.get() == STATE_RESPONSE_PROCESSED && areAllChildrenComplete()) {
+      if (!stateCtx.compareAndSet(STATE_RESPONSE_PROCESSED, STATE_COMPLETE)) {
         return;
       }
 
@@ -253,7 +254,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   protected void tryTerminate() {
-    if ((externalCompletion == null || externalCompletion.isDone()) && state.compareAndSet(STATE_COMPLETE, STATE_TERMINATED)) {
+    if ((externalCompletion == null || externalCompletion.isDone()) && stateCtx.compareAndSet(STATE_COMPLETE, STATE_TERMINATED)) {
 
       if (debugLogEnabled) {
         LOGGER.debug("{} terminated.", this);
@@ -308,22 +309,22 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   private boolean isResponseDone() {
-    return state.get() >= STATE_RESPONSE_RECEIVED;
+    return stateCtx.get() >= STATE_RESPONSE_RECEIVED;
   }
 
   @Override
   public boolean isComplete() {
-    return state.get() >= STATE_COMPLETE;
+    return stateCtx.get() >= STATE_COMPLETE;
   }
 
   @Override
   public boolean isTerminated() {
-    return state.get() == STATE_TERMINATED;
+    return stateCtx.get() == STATE_TERMINATED;
   }
 
   @Override
   public synchronized void onTerminated(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state.get() >= STATE_TERMINATED) {
+    if (stateCtx.get() >= STATE_TERMINATED) {
       signalConsumerSilently(consumer);
     } else {
       onTerminatedConsumerList.add(requireNonNull(consumer));
@@ -332,7 +333,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   @Override
   public synchronized void onComplete(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state.get() >= STATE_COMPLETE) {
+    if (stateCtx.get() >= STATE_COMPLETE) {
       signalConsumerSilently(consumer);
     } else {
       onCompletionConsumerList.add(requireNonNull(consumer));
@@ -341,7 +342,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   @Override
   public synchronized void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state.get() >= STATE_RESPONSE_RECEIVED) {
+    if (stateCtx.get() >= STATE_RESPONSE_RECEIVED) {
       signalConsumerSilently(consumer);
     } else {
       onBeforeResponseConsumerList.add(requireNonNull(consumer));
@@ -350,7 +351,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   @Override
   public synchronized void onResponse(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state.get() >= STATE_RESPONSE_RECEIVED) {
+    if (stateCtx.get() >= STATE_RESPONSE_RECEIVED) {
       signalConsumerSilently(consumer);
     } else {
       onResponseConsumerList.add(requireNonNull(consumer));
@@ -442,7 +443,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   protected int getState() {
-    return state.get();
+    return stateCtx.get();
   }
 
 }

@@ -72,4 +72,7 @@ module org.mule.runtime.extensions.xml.support {
       spring.core;
   opens org.mule.runtime.extension.internal.processor to
       spring.core;
+  exports org.mule.runtime.extension.internal.loader.xml to
+      org.mule.runtime.deployment.test;
+
 }

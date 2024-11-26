@@ -6,36 +6,28 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE;
+
+import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.slf4j.LoggerFactory.getLogger;
-import org.mule.runtime.api.metadata.MediaType;
+
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.message.ds.ByteArrayDataSource;
-import org.mule.runtime.core.api.message.ds.InputStreamDataSource;
-import org.mule.runtime.core.api.message.ds.StringDataSource;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 
 import org.slf4j.Logger;
 
@@ -97,7 +89,7 @@ public class IOUtils {
     if (url == null) {
       return null;
     } else {
-      return getInputStreamWithCacheControl(url);
+      return org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl(url);
     }
   }
 
@@ -163,15 +155,21 @@ public class IOUtils {
     return url;
   }
 
+  /**
+   * Returns an {@link InputStream} that will read from an {@link URL} connection without caching the underlying resources. This
+   * is important when working with jar files that are obtained via {@link ClassLoader#getResource(String)} in order to avoid file
+   * descriptor leaks. Note that {@link ClassLoader#getResourceAsStream(String)} already takes care of closing such resources, so
+   * caching is not a problem in that case.
+   *
+   * @param url The URL to connect to.
+   * @return The InputStream.
+   * @throws IOException If it fails while obtaining the InputStream.
+   * @deprecated Use {@link org.mule.runtime.api.util.IOUtils#getInputStreamWithCacheControl(URL)}
+   */
   public static InputStream getInputStreamWithCacheControl(URL url) throws IOException {
-    URLConnection urlConnection = url.openConnection();
-    // It's necessary to disable connection caching when working with jar files
-    // in order to avoid file leaks in Windows environments
-    if (urlConnection instanceof JarURLConnection) {
-      urlConnection.setUseCaches(false);
-    }
-    return urlConnection.getInputStream();
+    return org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl(url);
   }
+
 
   /**
    * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toString(InputStream)</code> method but catches any
@@ -281,45 +279,6 @@ public class IOUtils {
       count += n;
     }
     return count;
-  }
-
-  /**
-   * Transforms an Object into a DataHandler of its corresponding type.
-   *
-   * @param name        the name of the attachment being handled
-   * @param object      the attachment to be handled
-   * @param contentType the Content-Type of the attachment that is being handled
-   * @return a {@link DataHandler} of the corresponding attachment
-   * @throws IOException if the transformation fails.
-   */
-  public static DataHandler toDataHandler(String name, Object object, MediaType contentType) throws IOException {
-    DataHandler dh;
-    if (object instanceof File) {
-      if (contentType != null) {
-        dh = new DataHandler(new FileInputStream((File) object), contentType.toString());
-      } else {
-        dh = new DataHandler(new FileDataSource((File) object));
-      }
-    } else if (object instanceof URL) {
-      if (contentType != null) {
-        dh = new DataHandler(((URL) object).openStream(), contentType.toString());
-      } else {
-        dh = new DataHandler((URL) object);
-      }
-    } else if (object instanceof String) {
-      if (contentType != null) {
-        dh = new DataHandler(new StringDataSource((String) object, name, contentType));
-      } else {
-        dh = new DataHandler(new StringDataSource((String) object, name));
-      }
-    } else if (object instanceof byte[] && contentType != null) {
-      dh = new DataHandler(new ByteArrayDataSource((byte[]) object, contentType, name));
-    } else if (object instanceof InputStream && contentType != null) {
-      dh = new DataHandler(new InputStreamDataSource((InputStream) object, contentType, name));
-    } else {
-      dh = new DataHandler(object, contentType != null ? contentType.toString() : null);
-    }
-    return dh;
   }
 
   public static void ifInputStream(Object value, CheckedConsumer<InputStream> consumer) throws NotAnInputStreamException {

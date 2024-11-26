@@ -1,4 +1,20 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.exception.checkedAdded",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::create(java.lang.String, T, org.mule.runtime.container.api.MuleContainerClassLoaderWrapper)",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::create(java.lang.String, T, org.mule.runtime.container.api.MuleContainerClassLoaderWrapper) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "exception": "org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "justification": "W-17244755: Indicate the service that fails to create its classloader"
+          }
+        ]
+      }
+    }
+  },
   "4.7.0": {
     "revapi": {
       "differences": {

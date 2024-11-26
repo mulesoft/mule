@@ -312,14 +312,4 @@ public class JdkVersionUtils {
       logger.warn("You're executing with a JDK made by a recommended vendor.");
     }
   }
-
-  /**
-   * @param version a {@link JdkVersion}
-   * @return Whether the given {@code version} represents {@code Java 1.8}
-   * @since 4.5.0
-   */
-  public static boolean isJava8(JdkVersion version) {
-    return version.getMajor() == 1 && version.getMinor() == 8;
-  }
-
 }

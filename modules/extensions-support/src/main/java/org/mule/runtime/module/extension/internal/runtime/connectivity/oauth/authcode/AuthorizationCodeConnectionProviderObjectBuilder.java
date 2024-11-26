@@ -182,7 +182,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
     ValueResolvingContext ctxForConfig = null;
     ValueResolvingContext ctxForCallback = null;
     try {
-      initialiserEvent = getNullEvent(muleContext);
+      initialiserEvent = getNullEvent();
       ValueResolver<?> oauthAuthCodeGroup = resolverSet.getResolvers().get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME);
 
       MapValueResolver mapResolver = staticOnly((MapValueResolver) oauthAuthCodeGroup);

@@ -23,7 +23,6 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
@@ -31,17 +30,13 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.collection.SmallMap;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.event.InternalEvent.Builder;
 import org.mule.runtime.core.internal.message.EventInternalContext;
-import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
@@ -405,7 +400,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
    * component understands. The event can also maintain any number of flowVariables that can be set and retrieved by Mule
    * components.
    */
-  public static class InternalEventImplementation implements InternalEvent, DeserializationPostInitialisable {
+  public static class InternalEventImplementation implements InternalEvent {
 
     private static final long serialVersionUID = 1L;
 
@@ -437,8 +432,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private transient EventInternalContext foreachInternalContext;
     private transient EventInternalContext sourcePolicyContext;
     private transient EventInternalContext operationPolicyContext;
-    private transient LazyValue<BindingContext> bindingContextBuilder =
-        new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
+    private transient volatile BindingContext bindingContextBuilder;
 
     // Needed for deserialization with kryo
     private InternalEventImplementation() {
@@ -535,33 +529,9 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
           '}';
     }
 
-    /**
-     * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
-     * This will get invoked after the object has been deserialized passing in the current MuleContext.
-     *
-     * @param muleContext the current muleContext instance
-     * @throws MuleException if there is an error initializing
-     */
-    @SuppressWarnings({"unused"})
-    private void initAfterDeserialisation(MuleContext muleContext) throws MuleException {
-      // TODO MULE-10013 remove this logic from here
-      if (message instanceof InternalMessage) {
-        setMessage(message);
-      }
-
-      bindingContextBuilder = new LazyValue<>(() -> addEventBindings(this, NULL_BINDING_CONTEXT));
-      if (context instanceof DefaultEventContext) {
-        ((DefaultEventContext) context).createStreamingState();
-      }
-    }
-
     @Override
     public Optional<Map<String, String>> getLoggingVariables() {
       return ofNullable(loggingVariables);
-    }
-
-    private void setMessage(Message message) {
-      this.message = message;
     }
 
     @Override
@@ -683,7 +653,14 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
     @Override
     public BindingContext asBindingContext() {
-      return bindingContextBuilder.get();
+      if (bindingContextBuilder == null) {
+        synchronized (this) {
+          if (bindingContextBuilder == null) {
+            bindingContextBuilder = addEventBindings(this, NULL_BINDING_CONTEXT);
+          }
+        }
+      }
+      return bindingContextBuilder;
     }
   }
 

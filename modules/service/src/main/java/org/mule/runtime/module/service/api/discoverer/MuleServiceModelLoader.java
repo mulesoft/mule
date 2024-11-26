@@ -31,8 +31,7 @@ public class MuleServiceModelLoader {
 
   public static MuleServiceModel loadServiceModel(ClassLoader serviceClassLoader) {
     try (InputStream stream =
-        serviceClassLoader.getResource(MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR)
-            .openStream()) {
+        serviceClassLoader.getResourceAsStream(MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR)) {
       return new MuleServiceModelJsonSerializer().deserialize(IOUtils.toString(stream));
     } catch (IOException e) {
       throw new IllegalArgumentException(format("Could not read extension describer on service '%s'", "a"),

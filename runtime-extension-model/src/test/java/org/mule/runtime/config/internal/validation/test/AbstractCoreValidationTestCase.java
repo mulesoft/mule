@@ -110,11 +110,11 @@ public abstract class AbstractCoreValidationTestCase {
     return asList(MuleExtensionModelProvider.getExtensionModel());
   }
 
-  protected List<ValidationResultItem> runValidation(final String... xmlConfigs) {
+  protected List<ValidationResultItem> runValidation(String configFileNamePrefix, final String... xmlConfigs) {
     final List<Pair<String, InputStream>> configs = new ArrayList<>();
 
     for (int i = 0; i < xmlConfigs.length; i++) {
-      configs.add(new Pair<>("test" + i, new ReaderInputStream(new StringReader(xmlConfigs[i]), UTF_8)));
+      configs.add(new Pair<>(configFileNamePrefix + i, new ReaderInputStream(new StringReader(xmlConfigs[i]), UTF_8)));
     }
 
     final ArtifactAst ast = parser.parse(configs);

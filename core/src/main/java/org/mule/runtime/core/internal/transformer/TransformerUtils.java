@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.transformer;
 
+import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformUnexpectedType;
 
@@ -18,7 +19,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -31,9 +31,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,14 +114,7 @@ public class TransformerUtils {
     }
 
     if (transformer.getReturnDataType() != null) {
-      DataTypeParamsBuilder dtBuilder = DataType.builder().fromObject(value);
-
-      if (!(value instanceof DataHandler) && !(value instanceof DataSource)) {
-        // To avoid getting an error because the DataType was constructed with a default mediaType
-        dtBuilder = dtBuilder.mediaType(transformer.getReturnDataType().getMediaType());
-      }
-
-      DataType dt = dtBuilder.build();
+      DataType dt = builder().fromObject(value).mediaType(transformer.getReturnDataType().getMediaType()).build();
       if (!transformer.getReturnDataType().isCompatibleWith(dt)) {
         throw new TransformerException(transformUnexpectedType(dt, transformer.getReturnDataType()), transformer);
       }

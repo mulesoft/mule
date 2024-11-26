@@ -1,4 +1,138 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.api.transaction.Transaction::resume() throws org.mule.runtime.api.tx.TransactionException",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method javax.transaction.Transaction org.mule.runtime.core.api.transaction.Transaction::suspend() throws org.mule.runtime.api.tx.TransactionException",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::commitTxButNoResource(===org.mule.runtime.core.api.transaction.Transaction===)",
+            "new": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::commitTxButNoResource(===java.lang.Object===)",
+            "parameterIndex": "0",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::rollbackTxButNoResource(===org.mule.runtime.core.api.transaction.Transaction===)",
+            "new": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::rollbackTxButNoResource(===java.lang.Object===)",
+            "parameterIndex": "0",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionManagerFactory",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::errorInvokingMessageProcessorWithinTransaction(org.mule.runtime.core.api.processor.Processor, ===org.mule.runtime.core.api.transaction.TransactionConfig===)",
+            "new": "parameter org.mule.runtime.api.i18n.I18nMessage org.mule.runtime.core.api.config.i18n.CoreMessages::errorInvokingMessageProcessorWithinTransaction(org.mule.runtime.core.api.processor.Processor, ===java.lang.Object===)",
+            "parameterIndex": "1",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.DelegateTransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transaction.MuleTransactionConfig",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionConfig",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.TypedTransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.UnboundTransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transaction.UniversalTransactionFactory",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>",
+            "justification": "W-17083823: Refactor transactions support in FlowRunner - Encapsulate internal transaction stuff"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.core.api.config.MuleManifest.logger",
+            "justification": "W-16519697: add new `mule-manifest` module compatible with Java 8"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.message.ds.ByteArrayDataSource",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.message.ds.InputStreamDataSource",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.message.ds.StringDataSource",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method javax.activation.DataHandler org.mule.runtime.core.api.util.IOUtils::toDataHandler(java.lang.String, java.lang.Object, org.mule.runtime.api.metadata.MediaType) throws java.io.IOException",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
+            "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"
+          }
+        ]
+      }
+    }
+  },
   "4.8.0": {
     "revapi": {
       "differences": {

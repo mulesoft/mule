@@ -10,10 +10,14 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ConstraintViolation;
+import org.mule.runtime.api.el.validation.ValidationPhase;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -29,6 +33,7 @@ import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,6 +147,12 @@ public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguage
   @Override
   public ValidationResult validate(String expression) {
     return delegate().validate(expression);
+  }
+
+  @Override
+  public List<ConstraintViolation> validate(String script, String nameIdentifier, ValidationPhase validationScopePhase,
+                                            TypeBindings typeBindings, Optional<MetadataType> outputType) {
+    return delegate().validate(script, nameIdentifier, validationScopePhase, typeBindings, outputType);
   }
 
   @Override

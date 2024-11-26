@@ -195,7 +195,11 @@ public class PropertiesResolverUtils {
             return of(provider);
           } catch (Exception e) {
             if (ignoreCreateProviderExceptions) {
-              LOGGER.warn("Exception creating property provider for component `" + comp.toString() + "`", e);
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn("Exception creating property provider for component `" + comp.toString() + "`", e);
+              } else {
+                LOGGER.warn("Exception creating property provider for component `{}`: {}", comp, e);
+              }
               return Optional.<ConfigurationPropertiesProvider>empty();
             } else {
               throw e;

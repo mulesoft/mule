@@ -19,9 +19,9 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.client.api.VersionUtils;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.internal.plugin.PluginPatchesResolver;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
 
                 if (patchedArtifactCoordinates.getGroupId().equals(pluginArtifactCoordinates.getGroupId()) &&
                     patchedArtifactCoordinates.getArtifactId().equals(pluginArtifactCoordinates.getArtifactId()) &&
-                    patchedArtifactCoordinates.getClassifier().equals(MULE_PLUGIN_CLASSIFIER)) {
+                    patchedArtifactCoordinates.getClassifier().map(MULE_PLUGIN_CLASSIFIER::equals).orElse(false)) {
                   boolean versionContained;
                   try {
                     versionContained = versionUtils

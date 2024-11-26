@@ -13,11 +13,11 @@
 module org.mule.runtime.artifact.activation {
 
   requires transitive org.mule.runtime.api;
-  requires org.mule.runtime.artifact;
+  requires transitive org.mule.runtime.artifact;
   requires transitive org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.xmlParser;
   requires org.mule.runtime.container;
-  requires org.mule.runtime.core;
+  requires transitive org.mule.runtime.core;
   requires org.mule.runtime.extension.model;
   requires transitive org.mule.runtime.extensions.api;
   requires org.mule.runtime.global.config;
@@ -28,16 +28,14 @@ module org.mule.runtime.artifact.activation {
   requires org.mule.runtime.service;
 
   requires mule.classloader.model;
-  requires plexus.utils;
   requires net.bytebuddy;
 
-  requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires org.jgrapht.core;
   requires semver4j;
 
-  requires java.xml;
+  requires transitive java.xml;
 
   exports org.mule.runtime.module.artifact.activation.api;
   exports org.mule.runtime.module.artifact.activation.api.ast;
@@ -52,8 +50,6 @@ module org.mule.runtime.artifact.activation {
 
   uses org.mule.runtime.module.artifact.activation.internal.plugin.PluginPatchesResolver;
 
-  exports org.mule.runtime.module.artifact.activation.internal to
-      org.mule.runtime.extensions.support;
   exports org.mule.runtime.module.artifact.activation.internal.ast to
       org.mule.runtime.extensions.mule.support;
   exports org.mule.runtime.module.artifact.activation.internal.ast.validation to

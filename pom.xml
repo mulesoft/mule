@@ -7,6 +7,7 @@
         <groupId>org.mule</groupId>
         <artifactId>mule-plugin-mgmt-parent-pom</artifactId>
         <version>4.9.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
 
     <groupId>org.mule.runtime</groupId>
@@ -183,7 +184,7 @@
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
-        <oldMuleArtifactVersion>4.8.0-SNAPSHOT</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.8.0</oldMuleArtifactVersion>
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
@@ -197,6 +198,7 @@
             --add-opens=java.base/java.lang=ALL-UNNAMED
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
             --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
+            --add-opens=java.sql/java.sql=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.test.unit.open.args>
         <!-- Emulate the behaviour in standalone, where slf4j is loaded in the boot layer -->
@@ -207,11 +209,8 @@
             ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
-        <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
-        <!-- this groovy version is to be used during the build process or for tests, not bundled in the distro -->
-        <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
-        <mule.maven.plugin.version>4.2.0</mule.maven.plugin.version>
+        <mule.maven.plugin.version>4.3.1</mule.maven.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -413,8 +412,8 @@
                                 <Build-Revision>${buildNumber}</Build-Revision>
                                 <Build-Date>${timestamp}</Build-Date>
                                 <Dev-List-Email>${dev.list}</Dev-List-Email>
-                                <Supported-Jdks>[${javaVersion},18)</Supported-Jdks>
-                                <Recommended-Jdks>[${javaVersion},18)</Recommended-Jdks>
+                                <Supported-Jdks>[${javaVersion},22)</Supported-Jdks>
+                                <Recommended-Jdks>[${javaVersion},18),[21,22)</Recommended-Jdks>
                                 <More-Info>For more information go to ${productUrl}</More-Info>
                                 <Support>Get commercial support: ${project.organization.url}/support</Support>
                                 <Description>Mule Runtime and Integration Platform</Description>
@@ -471,16 +470,6 @@
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>${assembly.verifier.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <configuration>
-                        <header>${licensePath}</header>
-                        <properties>
-                            <year>${licenseYear}</year>
-                        </properties>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.mule.runtime.plugins</groupId>
@@ -747,6 +736,27 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <exclude>org.mule.weave:*</exclude>
+                                                <exclude>org.mule.runtime:mule-dwb-api</exclude>
+                                                <exclude>org.mule.services:mule-service-weave:*</exclude>
+                                            </excludes>
+                                        </requireReleaseDeps>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

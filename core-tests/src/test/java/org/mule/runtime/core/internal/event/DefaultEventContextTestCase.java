@@ -6,16 +6,6 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
@@ -25,6 +15,18 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.RESPONSE_AND_COMPLETION_PUBLISHERS;
+
+import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutor;
 
@@ -57,7 +59,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.hamcrest.Matcher;
+import org.reactivestreams.Publisher;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,12 +68,14 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.reactivestreams.Publisher;
+
+import org.hamcrest.Matcher;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -84,9 +89,6 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
   private static final String TEST_CORRELATION_ID = "Gracia al fulbo";
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private final Supplier<DefaultEventContext> context;
   private final Function<CompletableFuture<Void>, BaseEventContext> contextWithCompletion;
@@ -149,10 +151,13 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
             "FlowContext",
             (CheckedSupplier<EventContext>) () -> create(getTestFlow(muleContext), TEST_CONNECTOR_LOCATION),
             (CheckedFunction<CompletableFuture<Void>, EventContext>) externalCompletion -> create(getTestFlow(muleContext),
+                                                                                                  muleContext
+                                                                                                      .getEventContextService(),
                                                                                                   TEST_CONNECTOR_LOCATION,
                                                                                                   null,
                                                                                                   of(externalCompletion)),
-            (CheckedFunction<ComponentLocation, EventContext>) location -> create(getTestFlow(muleContext), location)
+            (CheckedFunction<ComponentLocation, EventContext>) location -> create(getTestFlow(muleContext),
+                                                                                  muleContext.getEventContextService(), location)
         },
         {
             "RawContext",

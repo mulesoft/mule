@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.maven;
 
+import static org.mule.runtime.api.deployment.meta.Product.MULE_EE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
@@ -30,6 +31,7 @@ import static org.apache.commons.io.FilenameUtils.getExtension;
 
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.pom.parser.api.MavenPomParser;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
@@ -39,7 +41,6 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.api.deployable.MuleProjectStructure;
 import org.mule.runtime.module.artifact.activation.api.descriptor.MuleConfigurationsFilter;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.io.IOException;
@@ -136,31 +137,15 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
   private Supplier<MuleDeployableModel> getDeployableModelResolver(ArtifactCoordinates deployableArtifactCoordinates,
                                                                    List<String> allResources, Set<String> muleConfigs,
                                                                    List<String> packages) {
-    if (MULE_APPLICATION_CLASSIFIER.equals(deployableArtifactCoordinates.getClassifier())) {
-      return () -> {
-        MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
-        if (shouldEditDeployableModel(applicationModel)) {
-          applicationModel = buildApplicationModel(applicationModel, allResources, muleConfigs, packages);
-        }
-        return applicationModel;
-      };
-    } else if (MULE_DOMAIN_CLASSIFIER.equals(deployableArtifactCoordinates.getClassifier())) {
-      return () -> {
-        MuleDomainModel domainModel = domainModelResolver().resolve(projectFolder);
-        if (shouldEditDeployableModel(domainModel)) {
-          domainModel = buildDomainModel(domainModel, allResources, muleConfigs, packages);
-        }
-        return domainModel;
-      };
+    if (deployableArtifactCoordinates.getClassifier().map(MULE_APPLICATION_CLASSIFIER::equals).orElse(false)) {
+      return () -> buildApplicationModel(applicationModelResolver().resolve(projectFolder),
+                                         allResources, muleConfigs, packages);
+    } else if (deployableArtifactCoordinates.getClassifier().map(MULE_DOMAIN_CLASSIFIER::equals).orElse(false)) {
+      return () -> buildDomainModel(domainModelResolver().resolve(projectFolder),
+                                    allResources, muleConfigs, packages);
     } else {
       throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
     }
-  }
-
-  private boolean shouldEditDeployableModel(MuleDeployableModel deployableModel) {
-    return (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor
-        && deployableModel.getClassLoaderModelLoaderDescriptor() == null) || includeTestDependencies
-        || deployableModel.getConfigs() == null;
   }
 
   @Override
@@ -173,7 +158,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     MuleApplicationModel.MuleApplicationModelBuilder builder = new MuleApplicationModel.MuleApplicationModelBuilder()
         .setName(applicationModel.getName() != null ? applicationModel.getName() : "mule")
         .setMinMuleVersion(applicationModel.getMinMuleVersion())
-        .setRequiredProduct(applicationModel.getRequiredProduct())
+        .setRequiredProduct(applicationModel.getRequiredProduct() != null ? applicationModel.getRequiredProduct() : MULE_EE)
         .withClassLoaderModelDescriptorLoader(createClassLoaderModelDescriptorLoader(applicationModel
             .getClassLoaderModelLoaderDescriptor(), allResources, packages))
         .withBundleDescriptorLoader(applicationModel.getBundleDescriptorLoader() != null
@@ -194,7 +179,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     MuleDomainModel.MuleDomainModelBuilder builder = new MuleDomainModel.MuleDomainModelBuilder()
         .setName(domainModel.getName() != null ? domainModel.getName() : "mule")
         .setMinMuleVersion(domainModel.getMinMuleVersion())
-        .setRequiredProduct(domainModel.getRequiredProduct())
+        .setRequiredProduct(domainModel.getRequiredProduct() != null ? domainModel.getRequiredProduct() : MULE_EE)
         .withClassLoaderModelDescriptorLoader(createClassLoaderModelDescriptorLoader(domainModel
             .getClassLoaderModelLoaderDescriptor(), allResources, packages))
         .withBundleDescriptorLoader(domainModel.getBundleDescriptorLoader() != null

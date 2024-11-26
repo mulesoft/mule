@@ -14,21 +14,20 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.pom.parser.api.MavenPomParser;
-import org.mule.maven.pom.parser.api.model.BundleDependency;
-import org.mule.maven.pom.parser.api.model.BundleDescriptor;
-import org.mule.maven.pom.parser.api.model.MavenPomModel;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
+import org.mule.maven.pom.parser.api.model.MavenPomModel;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.tools.api.classloader.model.Artifact;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,6 +38,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.vdurmont.semver4j.Semver;
+
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -54,7 +54,7 @@ public class AdditionalPluginDependenciesResolver {
 
   private final MavenClient mavenClient;
 
-  private final List<AdditionalPluginDependencies> pluginsWithAdditionalDependencies;
+  private final Map<String, List<BundleDescriptor>> pluginsWithAdditionalDependencies;
 
   public AdditionalPluginDependenciesResolver(MavenClient muleMavenPluginClient,
                                               List<AdditionalPluginDependencies> additionalPluginDependencies,
@@ -67,68 +67,81 @@ public class AdditionalPluginDependenciesResolver {
                                               File temporaryFolder,
                                               Map<ArtifactCoordinates, Supplier<MavenPomModel>> pomModels) {
     this.mavenClient = muleMavenPluginClient;
-    this.pluginsWithAdditionalDependencies = new ArrayList<>(additionalPluginDependencies);
+
+    this.pluginsWithAdditionalDependencies = additionalPluginDependencies
+        .stream()
+        .collect(toMap(apd -> apd.getGroupId() + ":" + apd.getArtifactId(),
+                       apd -> apd.getAdditionalDependencies()
+                           .stream()
+                           .map(MavenUtilsForArtifact::mavenToArtifact)
+                           .collect(toList())));
     this.temporaryFolder = temporaryFolder;
     this.pomModels = pomModels;
   }
 
   public Map<BundleDependency, List<BundleDependency>> resolveDependencies(List<BundleDependency> applicationDependencies,
-                                                                           Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
+                                                                           Map<BundleDescriptor, List<BundleDependency>> pluginsDependencies) {
     addPluginDependenciesAdditionalLibraries(applicationDependencies);
     Map<BundleDependency, List<BundleDependency>> pluginsWithAdditionalDeps = new LinkedHashMap<>();
-    for (AdditionalPluginDependencies pluginWithAdditionalDependencies : pluginsWithAdditionalDependencies) {
-      BundleDependency pluginBundleDependency =
-          getPluginBundleDependency(pluginWithAdditionalDependencies, applicationDependencies);
-      List<Artifact> pluginDependencies =
-          getPluginDependencies(pluginWithAdditionalDependencies, pluginsDependencies);
-      List<BundleDependency> additionalDependencies =
-          resolveDependencies(pluginWithAdditionalDependencies.getAdditionalDependencies().stream()
-              .filter(additionalDep -> pluginDependencies.stream()
-                  .noneMatch(artifactDependency -> areSameArtifact(additionalDep, artifactDependency)))
-              .collect(toList()));
-      if (!additionalDependencies.isEmpty()) {
-        pluginsWithAdditionalDeps.put(pluginBundleDependency,
-                                      additionalDependencies);
-      }
-    }
+
+    pluginsWithAdditionalDependencies
+        .forEach((k, v) -> {
+          BundleDependency pluginBundleDependency = getPluginBundleDependency(k, applicationDependencies);
+          List<BundleDependency> pluginDependencies = getPluginDependencies(k, pluginsDependencies);
+          List<org.mule.maven.pom.parser.api.model.BundleDependency> additionalDependencies =
+              resolveDependencies(v.stream()
+                  .filter(additionalDep -> pluginDependencies.stream()
+                      .noneMatch(artifactDependency -> areSameArtifact(additionalDep, artifactDependency)))
+                  .collect(toList()));
+          if (!additionalDependencies.isEmpty()) {
+            pluginsWithAdditionalDeps.put(pluginBundleDependency,
+                                          additionalDependencies
+                                              .stream()
+                                              .map(MavenUtilsForArtifact::mavenToArtifact)
+                                              .collect(toList()));
+          }
+        });
+
     return pluginsWithAdditionalDeps;
   }
 
-  private List<BundleDependency> resolveDependencies(List<BundleDescriptor> additionalDependencies) {
-    return mavenClient.resolveArtifactDependencies(additionalDependencies,
+  private List<org.mule.maven.pom.parser.api.model.BundleDependency> resolveDependencies(List<BundleDescriptor> additionalDependencies) {
+    return mavenClient.resolveArtifactDependencies(additionalDependencies
+        .stream()
+        .map(MavenUtilsForArtifact::artifactToMaven)
+        .collect(toList()),
                                                    of(mavenClient.getMavenConfiguration()
                                                        .getLocalMavenRepositoryLocation()),
                                                    empty());
   }
 
-  private BundleDependency getPluginBundleDependency(AdditionalPluginDependencies plugin,
+  private BundleDependency getPluginBundleDependency(String pluginCoordinates,
                                                      List<BundleDependency> mulePlugins) {
     return mulePlugins.stream()
-        .filter(mulePlugin -> StringUtils.equals(mulePlugin.getDescriptor().getArtifactId(), plugin.getArtifactId())
-            && StringUtils.equals(mulePlugin.getDescriptor().getGroupId(), plugin.getGroupId()))
+        .filter(mulePlugin -> StringUtils
+            .equals(mulePlugin.getDescriptor().getGroupId() + ":" + mulePlugin.getDescriptor().getArtifactId(),
+                    pluginCoordinates))
         .findFirst()
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Declared additional dependencies for a plugin not present: "
-            + plugin)));
+            + pluginCoordinates)));
   }
 
-  private List<Artifact> getPluginDependencies(AdditionalPluginDependencies plugin,
-                                               Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
-    return pluginsDependencies.entrySet().stream().filter(
-                                                          pluginDependenciesEntry -> StringUtils
-                                                              .equals(pluginDependenciesEntry.getKey().getGroupId(),
-                                                                      plugin.getGroupId())
-                                                              && StringUtils.equals(pluginDependenciesEntry.getKey()
-                                                                  .getArtifactId(), plugin.getArtifactId()))
+  private List<BundleDependency> getPluginDependencies(String pluginCoordinates,
+                                                       Map<BundleDescriptor, List<BundleDependency>> pluginsDependencies) {
+    return pluginsDependencies.entrySet().stream()
+        .filter(pluginDependenciesEntry -> StringUtils
+            .equals(pluginDependenciesEntry.getKey().getGroupId() + ":" + pluginDependenciesEntry.getKey().getArtifactId(),
+                    pluginCoordinates))
         .map(Map.Entry::getValue)
         .findFirst()
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find dependencies for plugin: "
-            + plugin)));
+            + pluginCoordinates)));
   }
 
-  private boolean areSameArtifact(BundleDescriptor dependency, Artifact artifact) {
-    return StringUtils.equals(dependency.getArtifactId(), artifact.getArtifactCoordinates().getArtifactId())
-        && StringUtils.equals(dependency.getGroupId(), artifact.getArtifactCoordinates().getGroupId())
-        && StringUtils.equals(dependency.getVersion(), artifact.getArtifactCoordinates().getVersion());
+  private boolean areSameArtifact(BundleDescriptor dependency, BundleDependency artifact) {
+    return StringUtils.equals(dependency.getArtifactId(), artifact.getDescriptor().getArtifactId())
+        && StringUtils.equals(dependency.getGroupId(), artifact.getDescriptor().getGroupId())
+        && StringUtils.equals(dependency.getVersion(), artifact.getDescriptor().getVersion());
   }
 
   private void addPluginDependenciesAdditionalLibraries(List<BundleDependency> applicationDependencies) {
@@ -141,9 +154,13 @@ public class AdditionalPluginDependenciesResolver {
     Collection<AdditionalPluginDependencies> additionalDependenciesFromMulePlugins =
         resolveAdditionalDependenciesFromMulePlugins(mulePlugins);
 
-    pluginsWithAdditionalDependencies.addAll(additionalDependenciesFromMulePlugins.stream()
+    pluginsWithAdditionalDependencies.putAll(additionalDependenciesFromMulePlugins.stream()
         .filter(isNotRedefinedAtApplicationLevel())
-        .collect(toList()));
+        .collect(toMap(apd -> apd.getGroupId() + ":" + apd.getArtifactId(),
+                       apd -> apd.getAdditionalDependencies()
+                           .stream()
+                           .map(MavenUtilsForArtifact::mavenToArtifact)
+                           .collect(toList()))));
   }
 
   private Collection<AdditionalPluginDependencies> resolveAdditionalDependenciesFromMulePlugins(List<BundleDependency> mulePlugins) {
@@ -174,12 +191,12 @@ public class AdditionalPluginDependenciesResolver {
             AdditionalPluginDependencies alreadyDefinedPluginAdditionalDependencies =
                 additionalDependenciesFromMulePlugins.get(artifact);
             if (alreadyDefinedPluginAdditionalDependencies != null) {
-              List<BundleDescriptor> effectiveDependencies =
+              List<org.mule.maven.pom.parser.api.model.BundleDescriptor> effectiveDependencies =
                   new LinkedList<>(alreadyDefinedPluginAdditionalDependencies.getAdditionalDependencies());
               mavenPlugin.getAdditionalDependencies().forEach(additionalDependenciesDependency -> {
                 boolean addDependency = true;
                 for (int i = 0; i < effectiveDependencies.size(); i++) {
-                  BundleDescriptor effectiveDependency = effectiveDependencies.get(i);
+                  org.mule.maven.pom.parser.api.model.BundleDescriptor effectiveDependency = effectiveDependencies.get(i);
                   if (effectiveDependency.getGroupId().equals(additionalDependenciesDependency.getGroupId()) &&
                       effectiveDependency.getArtifactId().equals(additionalDependenciesDependency.getArtifactId())
                       &&
@@ -223,16 +240,15 @@ public class AdditionalPluginDependenciesResolver {
   }
 
   private ArtifactCoordinates getArtifactCoordinates(BundleDependency mulePlugin) {
-    BundleDescriptor descriptor = mulePlugin.getDescriptor();
-    return new ArtifactCoordinates(descriptor.getGroupId(), descriptor.getArtifactId(), descriptor.getVersion());
+    return mulePlugin.getDescriptor();
   }
 
   private Predicate<AdditionalPluginDependencies> isNotRedefinedAtApplicationLevel() {
-    return dependencyPluginAdditionalDependencies -> !pluginsWithAdditionalDependencies.stream()
-        .filter(applicationPluginAdditionalDependency -> (dependencyPluginAdditionalDependencies.getGroupId()
-            .equals(applicationPluginAdditionalDependency.getGroupId())
-            && dependencyPluginAdditionalDependencies.getArtifactId()
-                .equals(applicationPluginAdditionalDependency.getArtifactId())))
-        .findAny().isPresent();
+
+    return dependencyPluginAdditionalDependencies -> !pluginsWithAdditionalDependencies.entrySet()
+        .stream()
+        .anyMatch(pluginWithAdditionalDependenciesEntry -> pluginWithAdditionalDependenciesEntry.getKey()
+            .equals(dependencyPluginAdditionalDependencies.getGroupId() + ":"
+                + dependencyPluginAdditionalDependencies.getArtifactId()));
   }
 }

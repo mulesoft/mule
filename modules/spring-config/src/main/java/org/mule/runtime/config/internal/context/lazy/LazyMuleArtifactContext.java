@@ -60,7 +60,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
+import org.mule.runtime.core.internal.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;

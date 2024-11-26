@@ -19,6 +19,7 @@ import static org.mule.runtime.module.extension.api.loader.java.type.PropertyEle
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIgnoreDisabled;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+import static org.mule.runtime.module.extension.internal.spring.ByteBuddySpringCacheInstrumentator.instrumentSpringCachesForCleanup;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 
@@ -36,12 +37,11 @@ import static java.util.stream.Collectors.toSet;
 
 import static javax.lang.model.element.ElementKind.METHOD;
 import static javax.lang.model.element.Modifier.PUBLIC;
+
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
-import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.ResolvableType.NONE;
-import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -121,6 +121,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.RequireNa
 import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVersionModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser;
+import org.mule.runtime.module.extension.internal.spring.ByteBuddySpringCachesManager;
 import org.mule.sdk.api.annotation.param.NullSafe;
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.sdk.api.runtime.parameter.Literal;
@@ -162,13 +163,8 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import com.google.common.collect.ImmutableList;
-
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
  * Set of utility operations to get insights about objects and their components
@@ -180,35 +176,14 @@ public final class IntrospectionUtils {
   private static final AnyType ANY_TYPE = typeBuilder().anyType().build();
   private static final ArrayType ANY_ARRAY_TYPE = typeBuilder().arrayType().of(ANY_TYPE).build();
   private static final MetadataTypeEnricher enricher = new MetadataTypeEnricher();
-  private static final Logger LOGGER = getLogger(IntrospectionUtils.class);
 
   static {
-    setWeakHashCaches();
+    // A shade of the spring-core library is the cause for this additional cleanup.
+    // If that shade is no longer present, this cleanup can be safely removed.
+    instrumentSpringCachesForCleanup();
   }
 
   private IntrospectionUtils() {}
-
-  /**
-   * Set caches in spring so that they are weakly (and not softly) referenced by default.
-   * <p>
-   * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
-   * <p>
-   * This hack is also present in the {@code deployment} module. It's because this module shades the spring dependencies and
-   * changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
-   */
-  private static void setWeakHashCaches() {
-    try {
-      Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
-      Field modifiersField = Field.class.getDeclaredField("modifiers");
-      modifiersField.setAccessible(true);
-      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-      field.set(null, WEAK);
-    } catch (Exception e) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes.", e);
-      }
-    }
-  }
 
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
@@ -1862,12 +1837,10 @@ public final class IntrospectionUtils {
   }
 
   /**
-   * We already do it in {@code spring-config} module, but we need to do this here too because we're shading springcore and then
-   * the classes (and their caches) are created twice.
+   * Allows the cleanup of the shaded Spring {@link org.springframework.util.ConcurrentReferenceHashMap} caches.
    */
-  public static void resetCommonCaches() {
-    org.springframework.util.ReflectionUtils.clearCache();
-    AnnotationUtils.clearCache();
-    ResolvableType.clearCache();
+  public static void resetCommonCaches()
+      throws Exception {
+    ByteBuddySpringCachesManager.clearCaches();
   }
 }
