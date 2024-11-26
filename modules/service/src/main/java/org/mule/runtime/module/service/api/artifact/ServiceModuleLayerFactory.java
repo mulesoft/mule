@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
+ * @deprecated since 4.8, see {@link IServiceClassLoaderFactory}
  */
 class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
