@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.extension.internal.config.dsl;
 
-import static java.util.Collections.emptySet;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -21,6 +20,8 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.DEFAULT_GLOBAL_ELEMENTS;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
+
+import static java.util.Collections.emptySet;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -59,6 +60,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 /**
  * A {@link ComponentBuildingDefinitionProvider} which makes all definitions of extensions done with the XML SDK be declared by
@@ -74,6 +76,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
   private Set<ExtensionModel> extensions = emptySet();
   private DslResolvingContext dslResolvingContext;
+  private Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup;
 
   @Override
   public void init() {
@@ -95,7 +98,8 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
 
     final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
     final Builder tnsDefinitionBuilder = new Builder().withNamespace(TNS_PREFIX);
-    final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
+    final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolverLookup.apply(extensionModel)
+        .orElseGet(() -> DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext));
 
     // For private operations, register its parser for use from within its same extensions
     extensionModel.getModelProperty(PrivateOperationsModelProperty.class)
@@ -204,6 +208,11 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
   @Override
   public void setDslResolvingContext(DslResolvingContext dslResolvingContext) {
     this.dslResolvingContext = dslResolvingContext;
+  }
+
+  @Override
+  public void setDslSyntaxResolverLookup(Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup) {
+    this.dslSyntaxResolverLookup = dslSyntaxResolverLookup;
   }
 
   private void processInlineParameterDefinition(Builder baseDefinition, DslSyntaxResolver dslSyntaxResolver,

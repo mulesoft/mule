@@ -6,25 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
-import static java.util.Collections.emptySet;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
-import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
+
+import static java.util.Collections.emptySet;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.extension.multiple.config.TestExtensionWithDocumentationAndMultipleConfig;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.ByteSource;
 
 import java.io.StringReader;
 
@@ -33,12 +33,18 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
-import net.sf.saxon.xpath.XPathFactoryImpl;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.ByteSource;
+
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import org.mockito.ArgumentCaptor;
+
+import net.sf.saxon.xpath.XPathFactoryImpl;
 
 @SmallTest
 public class ExtensionResourcesGeneratorAnnotationProcessorTestCase extends AbstractMuleTestCase {

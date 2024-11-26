@@ -36,18 +36,22 @@ public class JavaScopeModelValidator implements ExtensionModelValidator {
 
   @Override
   public void validate(ExtensionModel model, ProblemsReporter problemsReporter) {
-    DslSyntaxResolver dsl = getDefault(model, new SingleExtensionImportTypesStrategy());
+    validate(model, getDefault(model, new SingleExtensionImportTypesStrategy()), problemsReporter);
+  }
 
+
+  @Override
+  public void validate(ExtensionModel model, DslSyntaxResolver syntaxResolver, ProblemsReporter problemsReporter) {
     new ExtensionWalker() {
 
       @Override
       protected void onOperation(HasOperationModels owner, OperationModel model) {
-        validateScope(model, problemsReporter, dsl);
+        validateScope(model, problemsReporter, syntaxResolver);
       }
 
       @Override
       protected void onConstruct(HasConstructModels owner, ConstructModel model) {
-        validateScope(model, problemsReporter, dsl);
+        validateScope(model, problemsReporter, syntaxResolver);
       }
     }.walk(model);
   }
@@ -84,9 +88,10 @@ public class JavaScopeModelValidator implements ExtensionModelValidator {
               .forEach(parameter -> {
                 if (dsl.resolve(parameter).supportsChildDeclaration()) {
                   problemsReporter.addError(new Problem(model,
-                                                        format("Invalid parameter [%s] found in group [%s] of operation [%s], "
-                                                            + "parameters that allow inline declaration are not allowed in %s. "
-                                                            + "Use attribute declaration only for all the parameters.",
+                                                        format("""
+                                                            Invalid parameter [%s] found in group [%s] of operation [%s], \
+                                                            parameters that allow inline declaration are not allowed in %s. \
+                                                            Use attribute declaration only for all the parameters.""",
                                                                parameter.getName(), group.getName(), model.getName(), kind)));
                 }
               });

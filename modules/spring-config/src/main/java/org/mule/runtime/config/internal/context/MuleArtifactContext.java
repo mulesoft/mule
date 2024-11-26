@@ -95,15 +95,14 @@ import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfi
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
-import org.mule.runtime.config.privileged.spring.ByteBuddySpringCachesManager;
 import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
+import org.mule.runtime.config.privileged.spring.ByteBuddySpringCachesManager;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler;
 import org.mule.runtime.core.internal.config.DefaultResourceLocator;
@@ -114,6 +113,7 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
+import org.mule.runtime.core.internal.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -132,6 +132,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+
 import org.slf4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -234,7 +235,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     // TODO (MULE-19608) remove this and make it into a component building definition
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
-                                  componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies()),
+                                  componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies(),
+                                                                                    artifactAst::dependenciesDsl),
                                   featureFlaggingService.isEnabled(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING),
                                   featureFlaggingService.isEnabled(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING));
 
@@ -356,8 +358,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     final ErrorTypeLocator errorTypeLocator =
         createDefaultErrorTypeLocator(errorTypeRepository, ofNullable(featureFlaggingService));
 
-    final Set<ExtensionModel> dependencies = artifactAst.dependencies();
-    registerErrorMappings(errorTypeRepository, errorTypeLocator, dependencies);
+    registerErrorMappings(errorTypeRepository, errorTypeLocator,
+                          artifactAst.dependencies(), artifactAst::dependenciesDsl);
 
     // Because instances of the repository and locator may be already created and injected into another objects, those instances
     // cannot just be set into the registry, and this contributing layer is needed to ensure the correct functioning of the DI
@@ -479,7 +481,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    */
   private void clearSpringSoftReferencesCachesForDynamicClassLoaders() {
     ClassLoader regionClassLoader = getRegionClassLoader();
-    if (!(regionClassLoader instanceof RegionClassLoader)) {
+    if (!(regionClassLoader instanceof RegionClassLoader region)) {
       // The method #getRegionClassLoader() should always return the corresponding RegionClassLoader. However, in the
       // integration tests (which is an ArtifactFunctionalTestCase), the classloader here is an instance of
       // TestRegionClassLoader. That class extends RegionClassLoader, but it's loaded with a different classloader, and
@@ -488,11 +490,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                    regionClassLoader.getClass().getCanonicalName());
       return;
     }
-    RegionClassLoader region = (RegionClassLoader) regionClassLoader;
     clearClassLoader(region.getClassLoader());
     for (ArtifactClassLoader pluginClassLoader : region.getArtifactPluginClassLoaders()) {
-      if (pluginClassLoader instanceof WithAttachedClassLoaders) {
-        WithAttachedClassLoaders withAttachedClassLoaders = (WithAttachedClassLoaders) pluginClassLoader;
+      if (pluginClassLoader instanceof WithAttachedClassLoaders withAttachedClassLoaders) {
         for (ClassLoader dynamicClassLoader : withAttachedClassLoaders.getAttachedClassLoaders()) {
           clearClassLoader(dynamicClassLoader);
         }
