@@ -28,6 +28,7 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
+import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
@@ -35,8 +36,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
-import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
-import org.mule.runtime.module.service.api.artifact.ServiceModuleLayerFactory;
+import org.mule.runtime.module.service.api.artifact.IServiceClassLoaderFactory;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -49,15 +49,13 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(SERVICES)
 @Story(SERVICE_PROVIDER_DISCOVERER)
@@ -66,7 +64,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   @Rule
   public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
 
-  private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceModuleLayerFactory.class);
+  private final IServiceClassLoaderFactory serviceClassLoaderFactory = mock(IServiceClassLoaderFactory.class);
   private final ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
   private final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
   private final ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
@@ -119,9 +117,8 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
 
     ArtifactClassLoader serviceClassLoader = mock(ArtifactClassLoader.class);
     when(serviceClassLoaderFactory.create(argThat(any(String.class)),
-                                          argThat(any(ServiceDescriptor.class)), argThat(any(ClassLoader.class)), argThat(any(
-                                                                                                                              ClassLoaderLookupPolicy.class))))
-                                                                                                                                  .thenReturn(serviceClassLoader);
+                                          argThat(any(ServiceDescriptor.class)),
+                                          argThat(any(MuleContainerClassLoaderWrapper.class)))).thenReturn(serviceClassLoader);
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
                                                 builder());

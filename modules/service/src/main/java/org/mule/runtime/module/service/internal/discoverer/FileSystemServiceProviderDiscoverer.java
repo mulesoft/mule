@@ -17,12 +17,13 @@ import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.container.internal.DefaultMuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
+import org.mule.runtime.module.service.api.artifact.IServiceClassLoaderFactory;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
@@ -40,7 +41,7 @@ import java.util.function.Supplier;
 public class FileSystemServiceProviderDiscoverer implements ServiceProviderDiscoverer {
 
   private final ArtifactClassLoader apiClassLoader;
-  private final ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory;
+  private final IServiceClassLoaderFactory serviceClassLoaderFactory;
   private final DescriptorLoaderRepository descriptorLoaderRepository;
   private final ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder;
   private final Supplier<File> targetServicesFolder;
@@ -58,7 +59,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    * @param targetServicesFolder               {@link File} where services are exploded and would be discovered. Non null.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
-                                             ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
+                                             IServiceClassLoaderFactory serviceClassLoaderFactory,
                                              DescriptorLoaderRepository descriptorLoaderRepository,
                                              ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
                                              File targetServicesFolder) {
@@ -78,7 +79,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
    *                                           in order to check the state of the descriptor once loaded.
    */
   public FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
-                                             ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
+                                             IServiceClassLoaderFactory serviceClassLoaderFactory,
                                              DescriptorLoaderRepository descriptorLoaderRepository,
                                              ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder) {
     this(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository, artifactDescriptorValidatorBuilder,
@@ -88,7 +89,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   // Supplier in order to resolve the services folder after initialization due use MULE_HOME and tests set
   // this value after these discoverer is created
   private FileSystemServiceProviderDiscoverer(ArtifactClassLoader containerClassLoader,
-                                              ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
+                                              IServiceClassLoaderFactory serviceClassLoaderFactory,
                                               DescriptorLoaderRepository descriptorLoaderRepository,
                                               ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder,
                                               Supplier<File> targetServicesFolder) {
@@ -133,7 +134,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   }
 
   private List<ServiceAssembly> assemble(List<ServiceDescriptor> serviceDescriptors,
-                                         ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory)
+                                         IServiceClassLoaderFactory serviceClassLoaderFactory)
       throws ServiceResolutionError {
 
     List<ServiceAssembly> assemblies = new ArrayList<>(serviceDescriptors.size());
@@ -141,8 +142,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
 
       final Supplier<ClassLoader> serviceClassLoader = new LazyValue<>(() -> {
         try {
-          return createClassLoader(serviceClassLoaderFactory,
-                                   serviceDescriptor);
+          return createClassLoader(serviceClassLoaderFactory, serviceDescriptor);
         } catch (ArtifactClassloaderCreationException e) {
           throw new MuleRuntimeException(e);
         }
@@ -170,15 +170,13 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
     return assemblies;
   }
 
-  private ClassLoader createClassLoader(ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
+  private ClassLoader createClassLoader(IServiceClassLoaderFactory serviceClassLoaderFactory,
                                         ServiceDescriptor serviceDescriptor)
       throws ArtifactClassloaderCreationException {
     return (ClassLoader) serviceClassLoaderFactory
         .create(getServiceArtifactId(serviceDescriptor),
                 serviceDescriptor,
-                apiClassLoader.getClassLoader(),
-                apiClassLoader
-                    .getClassLoaderLookupPolicy());
+                new DefaultMuleContainerClassLoaderWrapper(apiClassLoader));
   }
 
   private String getServiceArtifactId(ServiceDescriptor serviceDescriptor) {

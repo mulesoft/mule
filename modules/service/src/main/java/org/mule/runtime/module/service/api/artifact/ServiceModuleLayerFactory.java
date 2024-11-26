@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * Creates {@link ArtifactClassLoader} for service descriptors.
  */
 public class ServiceModuleLayerFactory
-    implements
+    extends
     ServiceClassLoaderFactory {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceModuleLayerFactory.class);
