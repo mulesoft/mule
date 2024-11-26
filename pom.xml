@@ -192,13 +192,13 @@
         <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
         
         <surefire.args.base>-XX:+TieredCompilation ${surefire.args.encoding} ${surefire.args.aspectj} ${surefire.args.jacoco}</surefire.args.base>
-        <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
+        <surefire.test.unit.open.args.target>org.mule.runtime.jpms.utils</surefire.test.unit.open.args.target>
         <surefire.test.unit.open.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-opens=java.base/java.lang=org.mule.runtime.jpms.utils
-            --add-opens=java.base/java.lang.reflect=org.mule.runtime.jpms.utils
-            --add-opens=java.base/java.lang.invoke=org.mule.runtime.jpms.utils
-            --add-opens=java.sql/java.sql=org.mule.runtime.jpms.utils
+            --add-opens=java.base/java.lang=${surefire.test.unit.open.args.target}
+            --add-opens=java.base/java.lang.reflect=${surefire.test.unit.open.args.target}
+            --add-opens=java.base/java.lang.invoke=${surefire.test.unit.open.args.target}
+            --add-opens=java.sql/java.sql=${surefire.test.unit.open.args.target}
             ${surefire.args.base}
         </surefire.test.unit.open.args>
         <surefire.module.path>
