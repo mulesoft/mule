@@ -10,6 +10,12 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.util.NameUtils.sanitizeName;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_SCHEMA_LOCATION;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EE_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TLS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -17,12 +23,6 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.componentHasAnImplicitConfiguration;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EE_NAMESPACE;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.capability.xml.DocumenterUtils.isOperationTransactionalActionType;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.ENUM_TYPE_SUFFIX;
@@ -176,6 +176,27 @@ public final class SchemaBuilder {
     return builder;
   }
 
+  public static SchemaBuilder newSchema(ExtensionModel extensionModel, XmlDslModel xmlDslModel, DslResolvingContext dslContext,
+                                        DslSyntaxResolver dslResolver) {
+    SchemaBuilder builder = new SchemaBuilder();
+    builder.extensionModel = extensionModel;
+    builder.schema = new Schema();
+    builder.schema.setTargetNamespace(xmlDslModel.getNamespace());
+    builder.schema.setElementFormDefault(FormChoice.QUALIFIED);
+    builder.schema.setAttributeFormDefault(FormChoice.UNQUALIFIED);
+    builder.withDslSyntaxResolver(dslContext, dslResolver)
+        .importXmlNamespace()
+        .importMuleNamespace();
+
+    builder.initialiseDelegates();
+
+    builder.withImportedTypes(extensionModel.getImportedTypes());
+    builder.withTypeMapping(extensionModel);
+    builder.withTypes(extensionModel.getTypes());
+
+    return builder;
+  }
+
   private void initialiseDelegates() {
     configurationSchemaDelegate = new ConfigurationSchemaDelegate(this);
     connectionProviderSchemaDelegate = new ConnectionProviderSchemaDelegate(this);
@@ -189,6 +210,12 @@ public final class SchemaBuilder {
   private SchemaBuilder withDslSyntaxResolver(ExtensionModel model, DslResolvingContext dslContext) {
     this.dslContext = dslContext;
     this.dslResolver = DslSyntaxResolver.getDefault(model, dslContext);
+    return this;
+  }
+
+  private SchemaBuilder withDslSyntaxResolver(DslResolvingContext dslContext, DslSyntaxResolver dslResolver) {
+    this.dslContext = dslContext;
+    this.dslResolver = dslResolver;
     return this;
   }
 
@@ -796,7 +823,7 @@ public final class SchemaBuilder {
       return EE_NAMESPACE;
     }
     Optional<ExtensionModel> extensionModelFromPrefix = dslContext.getExtensions().stream()
-        .filter((extensionModel) -> prefix.equals(extensionModel.getXmlDslModel().getPrefix())).findFirst();
+        .filter(extensionModel -> prefix.equals(extensionModel.getXmlDslModel().getPrefix())).findFirst();
     if (extensionModelFromPrefix.isPresent()) {
       registerExtensionImport(extensionModelFromPrefix.get());
       return extensionModelFromPrefix.get().getXmlDslModel().getNamespace();

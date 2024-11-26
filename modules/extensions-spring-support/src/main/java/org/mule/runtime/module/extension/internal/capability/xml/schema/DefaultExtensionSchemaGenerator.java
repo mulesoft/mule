@@ -12,6 +12,7 @@ import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -21,6 +22,7 @@ import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
@@ -45,15 +47,20 @@ import org.dom4j.io.XMLWriter;
  */
 public class DefaultExtensionSchemaGenerator implements ExtensionSchemaGenerator {
 
+  @Override
+  public String generate(ExtensionModel extensionModel, DslResolvingContext context) {
+    return generate(extensionModel, context, DslSyntaxResolver.getDefault(extensionModel, context));
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public String generate(ExtensionModel extensionModel, DslResolvingContext dslContext) {
+  public String generate(ExtensionModel extensionModel, DslResolvingContext dslContext, DslSyntaxResolver dsl) {
     XmlDslModel xmlDslModel = extensionModel.getXmlDslModel();
     validate(extensionModel, xmlDslModel);
 
-    SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlDslModel, dslContext);
+    SchemaBuilder schemaBuilder = SchemaBuilder.newSchema(extensionModel, xmlDslModel, dslContext, dsl);
 
     new IdempotentExtensionWalker() {
 

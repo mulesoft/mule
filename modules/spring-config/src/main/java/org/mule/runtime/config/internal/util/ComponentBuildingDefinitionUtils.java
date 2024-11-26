@@ -12,11 +12,14 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Utility class for registering {@link ComponentBuildingDefinition}.
@@ -62,15 +65,15 @@ public final class ComponentBuildingDefinitionUtils {
    * @return the list of {@link ComponentBuildingDefinition}s to be used for creating components declared by the extension models.
    */
   public static List<ComponentBuildingDefinition> getExtensionModelsComponentBuildingDefinitions(Set<ExtensionModel> extensionModels,
-                                                                                                 DslResolvingContext dslResolvingContext) {
+                                                                                                 DslResolvingContext dslResolvingContext,
+                                                                                                 Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup) {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
     lookupComponentBuildingDefinitionProviders()
         .forEach(componentBuildingDefinitionProvider -> {
-          if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
-            ExtensionBuildingDefinitionProvider extensionBuildingDefinitionProvider =
-                (ExtensionBuildingDefinitionProvider) componentBuildingDefinitionProvider;
+          if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider extensionBuildingDefinitionProvider) {
             extensionBuildingDefinitionProvider.setExtensionModels(extensionModels);
             extensionBuildingDefinitionProvider.setDslResolvingContext(dslResolvingContext);
+            extensionBuildingDefinitionProvider.setDslSyntaxResolverLookup(dslSyntaxResolverLookup);
             extensionBuildingDefinitionProvider.init();
             componentBuildingDefinitions.addAll(extensionBuildingDefinitionProvider.getComponentBuildingDefinitions());
           }
