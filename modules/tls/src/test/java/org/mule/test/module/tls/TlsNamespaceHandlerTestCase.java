@@ -8,18 +8,18 @@ package org.mule.test.module.tls;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 
-import org.junit.Test;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.junit.Test;
 
 public class TlsNamespaceHandlerTestCase extends MuleArtifactFunctionalTestCase {
 
