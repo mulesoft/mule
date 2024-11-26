@@ -205,7 +205,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private ComponentTracer<CoreEvent> chainComponentTracer;
 
-  private MuleContextListener listener;
+  private MuleContextListener stopListener;
 
   // This is used to verify if a span has to be ended in case of error handling.
   // In case an exception is raised before the chain begins to execute, there is no current span set for the chain.
@@ -610,7 +610,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private void registerStopListener() {
     if (muleContext instanceof DefaultMuleContext) {
-      listener = new MuleContextListener() {
+      stopListener = new MuleContextListener() {
 
         @Override
         public void onCreation(MuleContext context) {
@@ -633,7 +633,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           ((DefaultMuleContext) muleContext).removeListener(this);
         }
       };
-      ((DefaultMuleContext) muleContext).addListener(listener);
+      ((DefaultMuleContext) muleContext).addListener(stopListener);
     }
   }
 
@@ -801,8 +801,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     canProcessMessage = false;
     stopIfNeeded(getMessageProcessorsForLifecycle());
 
-    if (listener != null) {
-      ((DefaultMuleContext) muleContext).removeListener(listener);
+    if (stopListener != null) {
+      ((DefaultMuleContext) muleContext).removeListener(stopListener);
     }
   }
 

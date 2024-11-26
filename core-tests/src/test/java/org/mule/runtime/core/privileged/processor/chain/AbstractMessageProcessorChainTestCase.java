@@ -18,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
@@ -41,7 +42,7 @@ public class AbstractMessageProcessorChainTestCase extends AbstractMuleTestCase 
   DefaultMuleContext muleContext;
 
   public AbstractMessageProcessorChainTestCase() {
-    MockitoAnnotations.openMocks(this);
+    openMocks(this);
   }
 
   @Test
@@ -49,11 +50,12 @@ public class AbstractMessageProcessorChainTestCase extends AbstractMuleTestCase 
     startIfNeeded(messageChain);
     stopIfNeeded(messageChain);
 
-    ArgumentCaptor<MuleContextListener> listenerCaptor = ArgumentCaptor.forClass(MuleContextListener.class);
+    ArgumentCaptor<MuleContextListener> addListenerCaptor = ArgumentCaptor.forClass(MuleContextListener.class);
+    ArgumentCaptor<MuleContextListener> removeListenerCaptor = ArgumentCaptor.forClass(MuleContextListener.class);
 
-    verify(muleContext, times(1)).addListener(listenerCaptor.capture());
-    verify(muleContext, times(1)).removeListener(listenerCaptor.capture());
+    verify(muleContext, times(1)).addListener(addListenerCaptor.capture());
+    verify(muleContext, times(1)).removeListener(removeListenerCaptor.capture());
 
-    assertThat(listenerCaptor.getValue(), is(sameInstance(listenerCaptor.getValue())));
+    assertThat(addListenerCaptor.getValue(), is(sameInstance(removeListenerCaptor.getValue())));
   }
 }
