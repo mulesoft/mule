@@ -202,11 +202,10 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                                           reflectionCache,
                                                                           expressionManager,
                                                                           parameterizedModel.getName());
-    return new ResolverSetBasedParameterResolver(resolverSet,
-                                                 parameterizedModel,
-                                                 reflectionCache,
-                                                 expressionManager);
-
+    return new DesignTimeParameterValueResolver(resolverSet,
+                                                parameterizedModel,
+                                                reflectionCache,
+                                                expressionManager);
   }
 
   @Override
