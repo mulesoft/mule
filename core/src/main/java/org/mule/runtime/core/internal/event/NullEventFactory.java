@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
+import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -44,16 +45,6 @@ public final class NullEventFactory {
    * @return a new {@link CoreEvent}
    */
   public static CoreEvent getNullEvent() {
-    return getNullEvent(null);
-  }
-
-  /**
-   * Creates an null
-   *
-   * @param muleContext context on which the event will be associated.
-   * @return a new {@link CoreEvent}
-   */
-  public static CoreEvent getNullEvent(MuleContext muleContext) {
     FlowConstruct flowConstruct = new FlowConstruct() {
 
       @Override
@@ -82,7 +73,7 @@ public final class NullEventFactory {
 
       @Override
       public MuleContext getMuleContext() {
-        return muleContext;
+        return null;
       }
 
       @Override
@@ -115,7 +106,9 @@ public final class NullEventFactory {
         return null;
       }
     };
-    return InternalEvent.builder(create(flowConstruct, from(INITIALIZER_EVENT)))
+    return InternalEvent.builder(create(flowConstruct,
+                                        null,
+                                        from(INITIALIZER_EVENT)))
         .message(of(null))
         .build();
   }

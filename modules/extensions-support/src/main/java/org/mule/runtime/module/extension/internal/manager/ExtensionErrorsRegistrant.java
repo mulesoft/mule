@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
+
+import static java.util.stream.Stream.concat;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -29,7 +30,9 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportTypesStrategy;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Extension's {@link ErrorType} registrant.
@@ -46,11 +49,13 @@ import java.util.Set;
 public final class ExtensionErrorsRegistrant {
 
   public static void registerErrorMappings(final ErrorTypeRepository errorTypeRepository, final ErrorTypeLocator errorTypeLocator,
-                                           final Set<ExtensionModel> dependencies) {
+                                           final Set<ExtensionModel> dependencies,
+                                           Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup) {
     dependencies
         .stream()
         .forEach(extModel -> {
-          DslSyntaxResolver syntaxResolver = DslSyntaxResolver.getDefault(extModel, new SingleExtensionImportTypesStrategy());
+          DslSyntaxResolver syntaxResolver = dslSyntaxResolverLookup.apply(extModel)
+              .orElseGet(() -> DslSyntaxResolver.getDefault(extModel, new SingleExtensionImportTypesStrategy()));
           String nsp = getExtensionsNamespace(extModel);
 
           final Builder mapperBuilder = ExceptionMapper.builder();

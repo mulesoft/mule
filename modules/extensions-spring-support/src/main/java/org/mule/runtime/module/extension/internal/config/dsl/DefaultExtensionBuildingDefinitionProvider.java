@@ -55,6 +55,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
@@ -71,6 +72,7 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
   private Set<ExtensionModel> extensions = emptySet();
   private DslResolvingContext dslResolvingContext;
+  private Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup;
 
   /**
    * Gets a hold on a {@link ExtensionManager} instance and generates the definitions.
@@ -97,7 +99,8 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
 
     final ExtensionParsingContext parsingContext = createParsingContext(extensionModel);
     final Builder definitionBuilder = new Builder().withNamespace(xmlDslModel.getPrefix());
-    final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
+    final DslSyntaxResolver dslSyntaxResolver = dslSyntaxResolverLookup.apply(extensionModel)
+        .orElseGet(() -> DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext));
     final Optional<ClassTypeLoader> typeLoader =
         extensionModel.getModelProperty(TypeLoaderModelProperty.class).map(TypeLoaderModelProperty::getTypeLoader);
 
@@ -289,5 +292,10 @@ public class DefaultExtensionBuildingDefinitionProvider implements ExtensionBuil
   @Override
   public void setDslResolvingContext(DslResolvingContext dslResolvingContext) {
     this.dslResolvingContext = dslResolvingContext;
+  }
+
+  @Override
+  public void setDslSyntaxResolverLookup(Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup) {
+    this.dslSyntaxResolverLookup = dslSyntaxResolverLookup;
   }
 }

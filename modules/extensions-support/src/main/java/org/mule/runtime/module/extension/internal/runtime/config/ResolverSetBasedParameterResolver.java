@@ -63,7 +63,7 @@ public class ResolverSetBasedParameterResolver implements ParameterValueResolver
     }
   }
 
-  private Object resolveFromParameterGroup(String parameterName) throws ValueResolvingException, MuleException {
+  protected Object resolveFromParameterGroup(String parameterName) throws ValueResolvingException, MuleException {
     Optional<? extends ValueResolver<?>> paramGroupValueResolver = getParameterGroupValueResolver(parameterName);
     if (paramGroupValueResolver.isPresent()) {
       ValueResolver<?> paramGroup = paramGroupValueResolver.get();
