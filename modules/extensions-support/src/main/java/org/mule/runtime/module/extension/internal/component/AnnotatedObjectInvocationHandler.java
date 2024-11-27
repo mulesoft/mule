@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.component;
+package org.mule.runtime.module.extension.internal.component;
 
 import static org.mule.runtime.core.internal.util.MultiParentClassLoaderUtils.multiParentClassLoaderFor;
 
@@ -22,10 +22,10 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.privileged.component.ComponentAdditionalInterceptor;
-import org.mule.runtime.core.privileged.component.ComponentInterceptor;
-import org.mule.runtime.core.privileged.component.DynamicallyComponent;
-import org.mule.runtime.core.privileged.component.DynamicallySerializableComponent;
+import org.mule.runtime.module.extension.privileged.component.ComponentAdditionalInterceptor;
+import org.mule.runtime.module.extension.privileged.component.ComponentInterceptor;
+import org.mule.runtime.module.extension.privileged.component.DynamicallyComponent;
+import org.mule.runtime.module.extension.privileged.component.DynamicallySerializableComponent;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -80,6 +80,18 @@ public final class AnnotatedObjectInvocationHandler {
           + Component.class.getName() + "'");
     }
 
+    ClassLoader classLoader = multiParentClassLoaderFor(clazz.getClassLoader());
+    final String enhancedClassName = clazz.getName() + "$ByteBuddy$withAnnotations";
+
+    try {
+      return (Class<A>) classLoader.loadClass(enhancedClassName);
+    } catch (ClassNotFoundException e) {
+      return doAddAnnotationsToClass(clazz, classLoader, enhancedClassName);
+    }
+  }
+
+  private static <T, A extends Component> Class<A> doAddAnnotationsToClass(Class<T> clazz, ClassLoader classLoader,
+                                                                           final String enhancedClassName) {
     Class dynamicInterface;
     if (Serializable.class.isAssignableFrom(clazz)) {
       try {
@@ -110,6 +122,7 @@ public final class AnnotatedObjectInvocationHandler {
 
     final ComponentAdditionalInterceptor annotatedObjectAdditionalInvocationHandler = new ComponentAdditionalInterceptor();
     builder = builder
+        .name(enhancedClassName)
         .method(named("writeReplace").or(isToString().and(isDeclaredBy(Object.class))))
         .intercept(to(annotatedObjectAdditionalInvocationHandler));
 
@@ -117,7 +130,6 @@ public final class AnnotatedObjectInvocationHandler {
         .intercept(SuperMethodCall.INSTANCE
             .andThen(invoke(COMPONENT_ADDITIONAL_INTERCEPTOR_SET_OBJ).on(annotatedObjectAdditionalInvocationHandler).withThis()));
 
-    ClassLoader classLoader = multiParentClassLoaderFor(clazz.getClassLoader());
     return builder.make().load(classLoader).getLoaded();
   }
 
