@@ -11,6 +11,7 @@ upstreamProjects:
 # Uncomment it after they are copied
 # "mavenSettingsXmlId" : "mule-runtime-maven-settings-MuleSettings",
 mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C -pl core-tests
+enableSonarQubeStage: false
 mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
 projectType: runtime
 mavenTool: "3.9.9"
