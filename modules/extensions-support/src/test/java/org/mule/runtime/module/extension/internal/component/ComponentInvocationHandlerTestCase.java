@@ -155,6 +155,13 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     assertThat(annotated.toString(), is("Expected string"));
   }
 
+  @Test
+  public void fromJdk() throws Exception {
+    Object notAnnotated = addAnnotationsToClass(Object.class).newInstance();
+
+    assertThat(notAnnotated, not(instanceOf(Component.class)));
+  }
+
   private ClassLoader createDelegatorClassLoader() {
     ClassLoader testClassLoader = new ClassLoader(this.getClass().getClassLoader()) {
 

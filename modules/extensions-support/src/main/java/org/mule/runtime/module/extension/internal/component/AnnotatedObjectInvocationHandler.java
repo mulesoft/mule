@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.component;
 
 import static org.mule.runtime.core.internal.util.MultiParentClassLoaderUtils.multiParentClassLoaderFor;
 
+import static java.lang.Thread.currentThread;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
@@ -70,6 +71,10 @@ public final class AnnotatedObjectInvocationHandler {
    * @throws UnsupportedOperationException if the given {@code clazz} is <b>not</b> annotated and is declared as {@code final}.
    */
   public static <T, A extends Component> Class<A> addAnnotationsToClass(Class<T> clazz) {
+    if (clazz.getPackageName().startsWith("java.")) {
+      return (Class<A>) clazz;
+    }
+
     if (Component.class.isAssignableFrom(clazz)
         && asList(clazz.getMethods()).stream().anyMatch(m -> "getAnnotations".equals(m.getName()) && !m.isDefault())) {
       return (Class<A>) clazz;

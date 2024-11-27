@@ -22,7 +22,6 @@
             --add-reads=org.mule.runtime.spring.config=org.yaml.snakeyaml
             --add-reads=org.mule.runtime.spring.config=org.apache.commons.io
               --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
-              --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.component=ALL-UNNAMED
               --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.exception=ALL-UNNAMED
               --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
