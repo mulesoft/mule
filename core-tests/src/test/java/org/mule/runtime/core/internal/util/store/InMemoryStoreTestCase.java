@@ -145,7 +145,7 @@ public class InMemoryStoreTestCase extends AbstractMuleContextTestCase {
 
   private void assertObjectsExpired(String... identifiers) throws Exception {
     for (String id : identifiers) {
-      assertFalse(store.contains(id));
+      assertFalse("object " + id + " not expired", store.contains(id));
     }
   }
 
