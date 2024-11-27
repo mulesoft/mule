@@ -136,25 +136,6 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
     return decorated.invokeAny(tasks.stream().map(t -> wrap(t)).collect(toList()), timeout, unit);
   }
 
-  private static Field threadLocalsField;
-
-  static {
-    try {
-      threadLocalsField = Thread.class.getDeclaredField("threadLocals");
-      threadLocalsField.setAccessible(true);
-    } catch (NoSuchFieldException | SecurityException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  protected static void clearAllThreadLocals() {
-    try {
-      threadLocalsField.set(currentThread(), null);
-    } catch (Exception e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
-
   private Runnable wrap(Runnable command) {
     return () -> {
       try {
@@ -168,8 +149,6 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
               .error(format("Task '%s' finished with exception in test scheduler '%s'", command.toString(), decorated.getName()),
                      t);
         }
-      } finally {
-        clearAllThreadLocals();
       }
     };
   }
@@ -188,8 +167,6 @@ public class SimpleUnitTestSupportLifecycleSchedulerDecorator implements Schedul
                      t);
         }
         return null;
-      } finally {
-        clearAllThreadLocals();
       }
     };
   }
