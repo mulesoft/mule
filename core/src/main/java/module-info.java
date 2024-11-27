@@ -100,8 +100,6 @@ module org.mule.runtime.core {
   // InvalidTransactionException extends java.rmi.RemoteException
   requires java.rmi;
   requires java.transaction;
-  // used by DateTime
-  requires java.xml.bind;
 
   exports org.mule.runtime.core.api;
   exports org.mule.runtime.core.api.artifact;
@@ -579,8 +577,6 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.context.notification to
       kryo.shaded,
       spring.core;
-  opens org.mule.runtime.core.internal.el.datetime to
-      kryo.shaded;
   opens org.mule.runtime.core.internal.el.function to
       spring.core;
   opens org.mule.runtime.core.internal.exception to

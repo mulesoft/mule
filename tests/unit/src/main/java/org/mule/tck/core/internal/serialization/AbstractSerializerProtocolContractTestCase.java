@@ -6,25 +6,17 @@
  */
 package org.mule.tck.core.internal.serialization;
 
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.el.datetime.DateTime;
-import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
@@ -92,23 +84,5 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
 
     assertThat(inputStream.getCloseCount(), greaterThanOrEqualTo(1));
     assertThat(output, equalTo(STRING_MESSAGE));
-  }
-
-  @Test
-  public final void serializeWithoutDefaultConstructor() throws Exception {
-    Calendar calendar = Calendar.getInstance();
-    Locale locale = Locale.ITALIAN;
-
-    DateTime dateTime = new DateTime(calendar, locale);
-    dateTime.changeTimeZone("Pacific/Midway");
-
-    CoreEvent event = eventBuilder(muleContext).message(of(dateTime)).build();
-    byte[] bytes = serializationProtocol.serialize(event.getMessage());
-
-    InternalMessage message = serializationProtocol.deserialize(bytes);
-    DateTime deserealized = (DateTime) message.getPayload().getValue();
-
-    assertThat(calendar, equalTo(deserealized.toCalendar()));
-    assertThat(dateTime.format(), equalTo(deserealized.format()));
   }
 }
