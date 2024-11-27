@@ -16,8 +16,11 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.util.ComponentBuildingDefinitionUtils;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Default implementation of {@link ComponentBuildingDefinitionRegistryFactory} which creates instances of
@@ -28,15 +31,17 @@ import java.util.Set;
 public class DefaultComponentBuildingDefinitionRegistryFactory implements ComponentBuildingDefinitionRegistryFactory {
 
   @Override
-  public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels) {
+  public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels,
+                                                    Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup) {
     ComponentBuildingDefinitionRegistry registry = new ComponentBuildingDefinitionRegistry();
 
     getRuntimeComponentBuildingDefinitionProvider().getComponentBuildingDefinitions()
         .forEach(registry::register);
 
     if (extensionModels != null) {
-      getExtensionModelsComponentBuildingDefinitions(extensionModels, DslResolvingContext.getDefault(extensionModels))
-          .forEach(registry::register);
+      getExtensionModelsComponentBuildingDefinitions(extensionModels, DslResolvingContext.getDefault(extensionModels),
+                                                     dslSyntaxResolverLookup)
+                                                         .forEach(registry::register);
     }
 
     for (ClassLoader pluginArtifactClassLoader : resolveContextArtifactPluginClassLoaders()) {

@@ -15,11 +15,15 @@ import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry
 import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+
 import org.slf4j.Logger;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Test implementation of {@link ComponentBuildingDefinitionRegistryFactory} which cache created factory and return same instance
@@ -38,7 +42,8 @@ public class TestComponentBuildingDefinitionRegistryFactory implements Component
   private boolean refreshRuntimeComponentBuildingDefinitions = false;
 
   @Override
-  public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels) {
+  public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels,
+                                                    Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup) {
     String key = getExtensionsKey(extensionModels);
 
     return registries.computeIfAbsent(key, k -> {
@@ -47,7 +52,7 @@ public class TestComponentBuildingDefinitionRegistryFactory implements Component
       if (refreshRuntimeComponentBuildingDefinitions) {
         registryFactory.refreshRuntimeComponentBuildingDefinitions();
       }
-      return registryFactory.create(extensionModels);
+      return registryFactory.create(extensionModels, dslSyntaxResolverLookup);
     });
   }
 

@@ -21,7 +21,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -41,6 +40,7 @@ import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -55,7 +55,6 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import org.mockito.ArgumentCaptor;
@@ -71,9 +70,6 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
       "Can't resolve http://www.mulesoft.org/schema/mule/invalid-namespace/current/invalid-schema.xsd, A dependency or plugin might be missing";
 
   private MuleContext muleContext;
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Rule
   public SystemProperty disableExpressionsSupport = new SystemProperty(DISABLE_TRANSFORMERS_SUPPORT, "true");
@@ -160,6 +156,11 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
 
     @Override
     public String generate(ExtensionModel extensionModel, DslResolvingContext context) {
+      return "";
+    }
+
+    @Override
+    public String generate(ExtensionModel extensionModel, DslResolvingContext context, DslSyntaxResolver dsl) {
       return "";
     }
   }

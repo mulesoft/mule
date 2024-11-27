@@ -30,8 +30,7 @@ module org.mule.runtime.extensions.spring.support {
 
   requires java.compiler;
   requires java.inject;
-
-  requires com.sun.xml.bind;
+  requires java.xml.bind;
 
   requires com.google.common;
   requires org.apache.commons.lang3;

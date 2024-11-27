@@ -8,6 +8,7 @@ package org.mule.test.runner.api;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 
 /**
@@ -18,28 +19,34 @@ public class TestExtensionSchemaGenerator implements ExtensionSchemaGenerator {
   @Override
   public String generate(ExtensionModel extensionModel, DslResolvingContext context) {
     // Simple test XSD
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
-        + "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n"
-        + "\n"
-        + "<xs:element name=\"shiporder\">\n"
-        + "  <xs:complexType>\n"
-        + "    <xs:sequence>\n"
-        + "      <xs:element name=\"orderperson\" type=\"xs:string\"/>\n"
-        + "      <xs:element name=\"shipto\">\n"
-        + "        <xs:complexType>\n"
-        + "          <xs:sequence>\n"
-        + "            <xs:element name=\"name\" type=\"xs:string\"/>\n"
-        + "            <xs:element name=\"address\" type=\"xs:string\"/>\n"
-        + "            <xs:element name=\"city\" type=\"xs:string\"/>\n"
-        + "            <xs:element name=\"country\" type=\"xs:string\"/>\n"
-        + "          </xs:sequence>\n"
-        + "        </xs:complexType>\n"
-        + "      </xs:element>\n"
-        + "    </xs:sequence>\n"
-        + "    <xs:attribute name=\"orderid\" type=\"xs:string\" use=\"required\"/>\n"
-        + "  </xs:complexType>\n"
-        + "</xs:element>\n"
-        + "\n"
-        + "</xs:schema>";
+    return """
+        <?xml version="1.0" encoding="UTF-8" ?>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+        <xs:element name="shiporder">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="orderperson" type="xs:string"/>
+              <xs:element name="shipto">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:string"/>
+                    <xs:element name="address" type="xs:string"/>
+                    <xs:element name="city" type="xs:string"/>
+                    <xs:element name="country" type="xs:string"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="orderid" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+
+        </xs:schema>""";
+  }
+
+  @Override
+  public String generate(ExtensionModel extensionModel, DslResolvingContext context, DslSyntaxResolver dsl) {
+    return generate(extensionModel, context);
   }
 }
