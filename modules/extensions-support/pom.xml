@@ -219,6 +219,26 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.testing.compile</groupId>
+            <artifactId>compile-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
             <version>${project.version}</version>
@@ -280,16 +300,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-model</artifactId>
             <version>${project.version}</version>
@@ -299,11 +309,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.testing.compile</groupId>
-            <artifactId>compile-testing</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -319,9 +324,10 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit4</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

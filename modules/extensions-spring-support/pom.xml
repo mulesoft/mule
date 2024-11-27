@@ -139,6 +139,11 @@
             <artifactId>dom4j</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <!-- Needed for tests to be able to parse test config files -->

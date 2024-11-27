@@ -190,6 +190,7 @@ import java.util.function.Supplier;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.apache.logging.log4j.LogManager;
+import org.slf4j.event.Level;
 import org.slf4j.Logger;
 
 import org.junit.After;
@@ -203,8 +204,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.mockito.verification.VerificationMode;
-
-import uk.org.lidalia.slf4jext.Level;
 
 /**
  * Base class for deployment tests using a {@link MuleDeploymentService} instance.
