@@ -12,6 +12,7 @@ upstreamProjects:
 # "mavenSettingsXmlId" : "mule-runtime-maven-settings-MuleSettings",
 mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C -pl core-tests
 enableSonarQubeStage: false
+archiveArtifacts: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml'
 mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
 projectType: runtime
 mavenTool: "3.9.9"
