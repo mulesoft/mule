@@ -73,7 +73,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
@@ -484,7 +484,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         new MuleArtifactContext(mockMuleContext, emptyArtifact(), empty(),
                                 new BaseConfigurationComponentLocator(),
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                emptyMap(), false, APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                emptyMap(), false, APP,
+                                new ComponentBuildingDefinitionRegistry(),
                                 mock(MemoryManagementService.class),
                                 mock(FeatureFlaggingService.class),
                                 mock(ExpressionLanguageMetadataService.class)) {
@@ -567,13 +568,11 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   private Answer<?> successAnswer() {
-    return invocation -> {
-      return Mono.from(invocation.getArgument(0))
-          .cast(CoreEvent.class)
-          .doOnNext(event -> ((BaseEventContext) event.getContext())
-              .success(CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build()))
-          .map(event -> CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build());
-    };
+    return invocation -> Mono.from(invocation.getArgument(0))
+        .cast(CoreEvent.class)
+        .doOnNext(event -> ((BaseEventContext) event.getContext())
+            .success(CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build()))
+        .map(event -> CoreEvent.builder(event).message(result.getMessage()).variables(result.getVariables()).build());
   }
 
   private void verifyProcess(FlowRefFactoryBean flowRefFactoryBean, Processor target, ApplicationContext applicationContext)

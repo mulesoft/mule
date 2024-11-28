@@ -39,6 +39,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
@@ -48,6 +49,7 @@ import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
+import org.mule.runtime.config.internal.model.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
 import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
@@ -252,6 +254,9 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
         createApplicationModel(getExtensions(muleContext.getExtensionManager()),
                                artifactDeclaration, resolveArtifactConfigResources(), getArtifactProperties(),
                                disableXmlValidations, featureFlaggingService);
+    final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
+        componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies(),
+                                                          artifactAst::dependenciesDsl);
 
     MuleArtifactContext muleArtifactContext;
     if (enableLazyInit) {
@@ -262,7 +267,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         getArtifactProperties(), true, artifactType,
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
-                                                        componentBuildingDefinitionRegistryFactory,
+                                                        componentBuildingDefinitionRegistry,
                                                         new ArtifactMemoryManagementService(memoryManagementService),
                                                         featureFlaggingService, expressionLanguageMetadataService);
     } else {
@@ -271,7 +276,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     baseConfigurationComponentLocator,
                                                     errorTypeRepository, errorTypeLocator,
                                                     getArtifactProperties(), true, artifactType,
-                                                    componentBuildingDefinitionRegistryFactory,
+                                                    componentBuildingDefinitionRegistry,
                                                     new ArtifactMemoryManagementService(memoryManagementService),
                                                     featureFlaggingService, expressionLanguageMetadataService);
       muleArtifactContext.initialize();

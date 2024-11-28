@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 /**
  * Abstract class to generate an {@link ExtensionModel} from an extension built from an XML file.
  *
@@ -41,6 +43,9 @@ import java.util.Set;
 public abstract class AbstractXmlExtensionMuleArtifactFunctionalTestCase extends MuleArtifactFunctionalTestCase {
 
   private static final LazyValue<ExtensionModelLoader> LOADER = new LazyValue<>(() -> getLoaderById(XML_SDK_LOADER_ID));
+
+  @Inject
+  protected ExtensionManager extensionManager;
 
   /**
    * @return a path pointing to an extension built with XML. If null, defaults to the {@link #getModulePaths()}
