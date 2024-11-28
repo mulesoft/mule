@@ -7,21 +7,25 @@
 package org.mule.test.functional;
 
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.check;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.test.functional.ByteArrayToInputStreamSdkTestCase.EventRecorder;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import io.qameta.allure.Issue;
 import org.junit.Test;
-import org.mule.runtime.api.metadata.TypedValue;
+
+import io.qameta.allure.Issue;
 
 public class ByteArrayToInputStreamSdkTestCase extends MuleArtifactFunctionalTestCase {
 

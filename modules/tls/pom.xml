@@ -12,7 +12,13 @@
     <description>A Mule module for connectivity using TLS/SSL authentication.</description>
 
     <properties>
-        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+        <surefire.module.path>
+            ${org.mule.runtime.boot:mule-module-jpms-utils:jar}
+        </surefire.module.path>
+        <surefire.add.modules>
+            org.mule.runtime.jpms.utils
+        </surefire.add.modules>
+        <surefire.args>${surefire.module.args}</surefire.args>
 
         <javaModuleName>org.mule.runtime.tls</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -26,6 +32,9 @@
                 <configuration>
                     <!-- Module layer is created by the tests-runner, don't need surefire to config the boot layer for the JVM -->
                     <useModulePath>false</useModulePath>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.mule.runtime.boot:mule-module-jpms-utils</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
         </plugins>
