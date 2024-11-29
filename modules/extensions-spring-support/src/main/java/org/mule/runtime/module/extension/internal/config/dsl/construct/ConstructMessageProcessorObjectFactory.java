@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessageProcessorObjectFactory;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
+
+import javax.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link ConstructMessageProcessor} instances
@@ -25,19 +29,29 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 public class ConstructMessageProcessorObjectFactory
     extends ComponentMessageProcessorObjectFactory<ConstructModel, ConstructMessageProcessor> {
 
+  @Inject
+  private ReflectionCache reflectionCache;
+  @Inject
+  private ExpressionManager expressionManager;
+  @Inject
+  private ExtensionConnectionSupplier extensionConnectionSupplier;
+  @Inject
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
+
   public ConstructMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 ConstructModel componentModel,
-                                                MuleContext muleContext,
-                                                Registry registry) {
-    super(extensionModel, componentModel, muleContext, registry);
+                                                MuleContext muleContext) {
+    super(extensionModel, componentModel, muleContext);
   }
 
   @Override
   protected ConstructMessageProcessorBuilder getMessageProcessorBuilder() {
     return new ConstructMessageProcessorBuilder(extensionModel, componentModel,
-                                                registry.lookupByType(ReflectionCache.class).get(),
-                                                registry.lookupByType(ExpressionManager.class).get(),
-                                                muleContext, registry);
+                                                reflectionCache,
+                                                expressionManager,
+                                                extensionConnectionSupplier,
+                                                componentTracerFactory,
+                                                muleContext);
   }
 
 }
