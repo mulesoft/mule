@@ -159,6 +159,10 @@
             <groupId>jakarta.inject</groupId>
             <artifactId>jakarta.inject-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
 
         <!--Test Dependencies-->
         <dependency>
@@ -324,12 +328,6 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-sample-data-extension</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
