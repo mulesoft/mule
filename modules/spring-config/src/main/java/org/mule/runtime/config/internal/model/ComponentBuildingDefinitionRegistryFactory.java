@@ -23,6 +23,12 @@ import java.util.function.Function;
 @NoImplement
 public interface ComponentBuildingDefinitionRegistryFactory {
 
+  static final ComponentBuildingDefinitionRegistryFactory DEFAULT_FACTORY =
+      new DefaultComponentBuildingDefinitionRegistryFactory();
+
+  static final ComponentBuildingDefinitionRegistryFactory CACHING_FACTORY =
+      new CachingComponentBuildingDefinitionRegistryFactory();
+
   /**
    * Creates a new {@link ComponentBuildingDefinitionRegistry}
    *
