@@ -17,7 +17,6 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
@@ -74,7 +73,6 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
         .withConstructorParameterDefinition(fromFixedValue(extensionModel).build())
         .withConstructorParameterDefinition(fromFixedValue(componentModel).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
-        .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
         .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
                                        fromChildConfiguration(CursorProviderFactory.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());
@@ -94,7 +92,7 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
     }
 
     Optional<? extends NestableElementModel> nestedChain = componentModel.getNestedComponents().stream()
-        .filter(c -> c instanceof NestedChainModel)
+        .filter(NestedChainModel.class::isInstance)
         .findFirst();
 
     if (nestedChain.isPresent()) {

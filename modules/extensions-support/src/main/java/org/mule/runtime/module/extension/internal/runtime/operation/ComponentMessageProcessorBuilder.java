@@ -6,24 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
@@ -33,7 +30,6 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.Extension
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.Map;
 
@@ -47,14 +43,12 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected final ExtensionModel extensionModel;
   protected final M operationModel;
   protected final ReflectionCache reflectionCache;
-  protected final MuleContext muleContext;
   protected final ExpressionManager expressionManager;
-  protected final ComponentTracerFactory<CoreEvent> componentTracerFactory;
-  protected Registry registry;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
-  protected ConfigurationProvider configurationProvider;
-  protected long terminationTimeout;
 
+  private final MuleContext muleContext;
+
+  protected ConfigurationProvider configurationProvider;
   protected Map<String, ?> parameters;
   protected String target;
   protected String targetValue;
@@ -62,24 +56,19 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected RetryPolicyTemplate retryPolicyTemplate;
   protected MessageProcessorChain nestedChain;
   protected ClassLoader classLoader;
+  protected long terminationTimeout;
 
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
                                           ReflectionCache reflectionCache,
                                           ExpressionManager expressionManager,
-                                          MuleContext muleContext,
-                                          Registry registry) {
-    checkArgument(extensionModel != null, "ExtensionModel cannot be null");
-    checkArgument(operationModel != null, "OperationModel cannot be null");
-    checkArgument(muleContext != null, "muleContext cannot be null");
-
-    this.muleContext = muleContext;
-    this.extensionModel = extensionModel;
-    this.operationModel = operationModel;
+                                          ExtensionConnectionSupplier extensionConnectionSupplier,
+                                          MuleContext muleContext) {
+    this.muleContext = requireNonNull(muleContext, "muleContext cannot be null");
+    this.extensionModel = requireNonNull(extensionModel, "extensionModel cannot be null");
+    this.operationModel = requireNonNull(operationModel, "operationModel cannot be null");
     this.reflectionCache = reflectionCache;
-    this.registry = registry;
-    this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
-    this.componentTracerFactory = registry.lookupByType(ComponentTracerFactory.class).get();
+    this.extensionConnectionSupplier = extensionConnectionSupplier;
     this.expressionManager = expressionManager;
     this.terminationTimeout = muleContext.getConfiguration().getShutdownTimeout();
   }
