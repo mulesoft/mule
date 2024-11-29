@@ -11,19 +11,21 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 
@@ -37,16 +39,25 @@ public final class OperationMessageProcessorBuilder
 
   private final List<EnrichedErrorMapping> errorMappings;
 
+  private final ComponentTracerFactory<CoreEvent> componentTracerFactory;
+
   public OperationMessageProcessorBuilder(ExtensionModel extension,
                                           OperationModel operation,
                                           List<EnrichedErrorMapping> errorMappings,
-                                          MuleContext muleContext,
-                                          Registry registry) {
+                                          ReflectionCache reflectionCache,
+                                          ExpressionManager expressionManager,
+                                          ExtensionConnectionSupplier extensionConnectionSupplier,
+                                          ComponentTracerFactory<CoreEvent> componentTracerFactory,
+                                          MuleContext muleContext) {
 
-    super(extension, operation, registry.lookupByType(ReflectionCache.class).get(),
-          registry.lookupByType(ExpressionManager.class).get(), muleContext, registry);
+    super(extension, operation,
+          reflectionCache,
+          expressionManager,
+          extensionConnectionSupplier,
+          muleContext);
 
     this.errorMappings = errorMappings;
+    this.componentTracerFactory = componentTracerFactory;
   }
 
   @Override
