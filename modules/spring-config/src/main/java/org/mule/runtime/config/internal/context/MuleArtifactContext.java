@@ -81,6 +81,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResult;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.bean.NotificationConfig;
 import org.mule.runtime.config.internal.bean.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
@@ -89,7 +90,6 @@ import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
-import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
@@ -203,7 +203,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              Map<String, String> artifactProperties,
                              boolean addToolingObjectsToRegistry,
                              ArtifactType artifactType,
-                             ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
+                             ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
                              MemoryManagementService memoryManagementService,
                              FeatureFlaggingService featureFlaggingService,
                              ExpressionLanguageMetadataService expressionLanguageMetadataService) {
@@ -235,8 +235,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     // TODO (MULE-19608) remove this and make it into a component building definition
     this.beanDefinitionFactory =
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
-                                  componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies(),
-                                                                                    artifactAst::dependenciesDsl),
+                                  componentBuildingDefinitionRegistry,
                                   featureFlaggingService.isEnabled(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING),
                                   featureFlaggingService.isEnabled(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING));
 
