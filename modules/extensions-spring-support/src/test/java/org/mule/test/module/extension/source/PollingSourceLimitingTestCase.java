@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.source;
 
+import static org.mule.runtime.config.api.ArtifactContextFactory.CACHE_COMPONENT_BUILDING_DEFINITION_REGISTRY_DISABLE_OVERRIDE_PROPERTY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.tck.probe.PollingProber.checkNot;
@@ -24,10 +25,12 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.Map;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -37,6 +40,12 @@ import io.qameta.allure.Story;
 @Feature(SOURCES)
 @Stories({@Story(POLLING), @Story(WATERMARK)})
 public class PollingSourceLimitingTestCase extends AbstractExtensionFunctionalTestCase {
+
+  // Since the ENABLE_POLLING_SOURCE_LIMIT_PARAMETER changes the extension model generator, we have to make the parsers cache
+  // aware of this property so that each tests uses the expected parser with the expected extension model definition.
+  @ClassRule
+  public static SystemProperty disableCacheComponentBuildingDefinitionRegistry =
+      new SystemProperty(CACHE_COMPONENT_BUILDING_DEFINITION_REGISTRY_DISABLE_OVERRIDE_PROPERTY, "true");
 
   private static int PROBER_TIMEOUT = 10000;
   private static int CHECK_NOT_PROBER_TIMEOUT = 2000;
