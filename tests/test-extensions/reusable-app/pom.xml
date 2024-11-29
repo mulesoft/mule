@@ -26,6 +26,11 @@
 
     <build>
         <plugins>
+             <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>exchange-mule-maven-plugin</artifactId>
+                <version>${exchange.mule.maven.plugin.version}</version>
+             </plugin>
             <plugin>
                 <groupId>org.mule.tools.maven</groupId>
                 <artifactId>mule-maven-plugin</artifactId>
