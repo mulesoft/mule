@@ -5,6 +5,30 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.component.ComponentAdditionalInterceptor",
+            "justification": "W-17331120: Reuse generated dynamic classes `withAnnotations` if available"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.component.ComponentInterceptor",
+            "justification": "W-17331120: Reuse generated dynamic classes `withAnnotations` if available"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.component.DynamicallyComponent",
+            "justification": "W-17331120: Reuse generated dynamic classes `withAnnotations` if available"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.component.DynamicallySerializableComponent",
+            "justification": "W-17331120: Reuse generated dynamic classes `withAnnotations` if available"
+          },
+          {
+            "ignore": true,
             "code": "java.method.removed",
             "old": "method void org.mule.runtime.core.api.transaction.Transaction::resume() throws org.mule.runtime.api.tx.TransactionException",
             "justification": "W-15838197: Remove APIs from mule exposing removed java ee classes/interfaces"

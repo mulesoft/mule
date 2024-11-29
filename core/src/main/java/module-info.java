@@ -172,8 +172,6 @@ module org.mule.runtime.core {
 
   // for MUnit, MTF
   exports org.mule.runtime.core.privileged;
-  // for ByteBuddy dynamically generated classes
-  exports org.mule.runtime.core.privileged.component;
   // for MUnit and muleFwk
   exports org.mule.runtime.core.privileged.el;
   // for MuleFwk, MUnit, MTF, ApiGateway, Tracing and Validation

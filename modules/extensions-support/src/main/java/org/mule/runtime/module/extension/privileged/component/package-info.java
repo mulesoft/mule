@@ -9,4 +9,4 @@
  * These package needs to be accessible from the classloader of the mule-extensions, because the dynamic classes generated with
  * bytebuddy reference this package classes, and those dynamic classes exist within the classloader of the mule-extension.
  */
-package org.mule.runtime.core.privileged.component;
+package org.mule.runtime.module.extension.privileged.component;

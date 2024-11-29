@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.module.extension.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 
 import static java.util.Objects.requireNonNull;

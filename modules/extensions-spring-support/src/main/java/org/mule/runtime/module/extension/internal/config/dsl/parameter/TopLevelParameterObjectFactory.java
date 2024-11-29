@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+import static org.mule.runtime.module.extension.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.util.LazyValue;

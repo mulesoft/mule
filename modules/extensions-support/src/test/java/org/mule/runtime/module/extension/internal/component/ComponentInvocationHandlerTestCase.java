@@ -4,17 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.component;
+package org.mule.runtime.module.extension.internal.component;
 
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+import static org.mule.runtime.module.extension.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.module.extension.internal.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
 
 import static java.util.Collections.singletonMap;
 
+import static org.apache.commons.io.IOUtils.toByteArray;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -22,7 +23,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
@@ -155,6 +155,13 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     assertThat(annotated.toString(), is("Expected string"));
   }
 
+  @Test
+  public void fromJdk() throws Exception {
+    Object notAnnotated = addAnnotationsToClass(Object.class).newInstance();
+
+    assertThat(notAnnotated, not(instanceOf(Component.class)));
+  }
+
   private ClassLoader createDelegatorClassLoader() {
     ClassLoader testClassLoader = new ClassLoader(this.getClass().getClassLoader()) {
 
@@ -167,7 +174,8 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
             byte[] classBytes;
             try {
               classBytes =
-                  toByteArray(this.getClass().getResourceAsStream("/org/mule/runtime/core/internal/component/Delegator.class"));
+                  toByteArray(this.getClass()
+                      .getResourceAsStream("/org/mule/runtime/module/extension/internal/component/Delegator.class"));
               delegatorClassDefined = this.defineClass(null, classBytes, 0, classBytes.length);
             } catch (Exception e) {
               return super.loadClass(name);
