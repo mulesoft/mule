@@ -30,8 +30,7 @@ module org.mule.runtime.extensions.spring.support {
 
   requires java.compiler;
   requires java.inject;
-
-  requires com.sun.xml.bind;
+  requires java.xml.bind;
 
   requires com.google.common;
   requires org.apache.commons.lang3;
@@ -92,7 +91,8 @@ module org.mule.runtime.extensions.spring.support {
       net.bytebuddy,
       spring.core;
   opens org.mule.runtime.module.extension.internal.config.dsl.operation to
-      net.bytebuddy;
+      net.bytebuddy,
+      spring.core;
   opens org.mule.runtime.module.extension.internal.config.dsl.parameter to
       net.bytebuddy,
       spring.core;

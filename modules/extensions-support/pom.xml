@@ -53,12 +53,13 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.component=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.exception=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED
             --add-opens=org.mule.runtime.errors/org.mule.runtime.config.internal.error=ALL-UNNAMED
             --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.runtime.extensions.support
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.extensions.support
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el.dataweave=org.mule.runtime.extensions.support
             ${surefire.test.unit.open.args}
         </surefire.args>
 
@@ -219,6 +220,26 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.testing.compile</groupId>
+            <artifactId>compile-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
             <version>${project.version}</version>
@@ -280,16 +301,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-model</artifactId>
             <version>${project.version}</version>
@@ -299,11 +310,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.testing.compile</groupId>
-            <artifactId>compile-testing</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -319,9 +325,10 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit4</artifactId>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -356,6 +363,7 @@
                                 <arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.property=org.mule.runtime.extensions.support</arg>
                                 <arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.runtime.extensions.support</arg>
                                 <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el.dataweave=org.mule.runtime.extensions.support</arg>
                             </compilerArgs>
                         </configuration>
                     </execution>

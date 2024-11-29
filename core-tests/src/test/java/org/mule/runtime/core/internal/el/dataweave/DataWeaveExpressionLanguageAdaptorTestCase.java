@@ -28,7 +28,6 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
@@ -48,6 +47,8 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
@@ -56,8 +57,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -66,9 +66,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import org.mule.runtime.api.component.Component;
@@ -123,6 +123,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import org.hamcrest.BaseMatcher;
+import org.hamcrest.Matchers;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -134,9 +135,6 @@ import io.qameta.allure.Story;
 public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExpressionLanguageTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
-
-  @Rule
-  public ExpectedException expectedEx = none();
 
   private final ExpressionLanguage genericExpressionLanguage = spy(ExpressionLanguage.class);
   private DefaultExpressionLanguageFactoryService genericExpressionLanguageService;
@@ -272,11 +270,11 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     doReturn(testEvent().getMessage()).when(event).getMessage();
     String expressionThatThrowsException = "payload + 'foo'";
 
-    expectedEx.expect(ExpressionRuntimeException.class);
-    expectedEx.expectMessage(containsString("You called the function '+' with these arguments"));
-    expectedEx.expectMessage(containsString("evaluating expression: \"" + expressionThatThrowsException));
-
-    expressionLanguage.evaluate(expressionThatThrowsException, event, BindingContext.builder().build());
+    var thrown =
+        assertThrows(ExpressionRuntimeException.class,
+                     () -> expressionLanguage.evaluate(expressionThatThrowsException, event, BindingContext.builder().build()));
+    assertThat(thrown.getMessage(), allOf(containsString("You called the function '+' with these arguments"),
+                                          containsString("evaluating expression: \"" + expressionThatThrowsException)));
   }
 
   @Test
@@ -288,9 +286,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     CoreEvent event = getEventWithError(opt);
     doReturn(testEvent().getMessage()).when(event).getMessage();
 
-    expectedEx.expect(ExpressionRuntimeException.class);
-
-    expressionLanguage.evaluateLogExpression(invalidExpression, event, null, BindingContext.builder().build());
+    assertThrows(ExpressionRuntimeException.class, () -> expressionLanguage
+        .evaluateLogExpression(invalidExpression, event, null, BindingContext.builder().build()));
   }
 
   @Test
@@ -447,18 +444,6 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   }
 
   @Test
-  public void accessRegistryCglibAnnotatedBean() throws Exception {
-    CoreEvent event = testEvent();
-
-    MyBean annotatedMyBean = (MyBean) addAnnotationsToClass(MyBean.class).newInstance();
-    annotatedMyBean.setName("DataWeave");
-    when(registry.lookupByName("myBean")).thenReturn(of(annotatedMyBean));
-    TypedValue<?> evaluate = expressionLanguage.evaluate("app.registry.myBean", fromType(MyBean.class), event,
-                                                         from("flow"), BindingContext.builder().build(), false);
-    assertThat(evaluate.getValue(), is(instanceOf(MyBean.class)));
-  }
-
-  @Test
   public void accessServerFileSeparator() throws MuleException {
     CoreEvent event = testEvent();
     when(registry.lookupByName("myBean")).thenReturn(of(new MyBean("DataWeave")));
@@ -587,9 +572,9 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void unbalancedBrackets() throws MuleException {
     CoreEvent event = eventBuilder(muleContext).message(Message.of(TEST_PAYLOAD)).build();
 
-    expectedEx.expect(ExpressionExecutionException.class);
-    expectedEx.expectMessage(containsString("Unbalanced brackets in expression"));
-    expressionLanguage.evaluate("#[unbalanced", event, BindingContext.builder().build());
+    var thrown = assertThrows(ExpressionExecutionException.class,
+                              () -> expressionLanguage.evaluate("#[unbalanced", event, BindingContext.builder().build()));
+    assertThat(thrown.getMessage(), containsString("Unbalanced brackets in expression"));
   }
 
   @Test
@@ -659,8 +644,7 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
     ExpressionLanguageSessionAdaptor session = expressionLanguage.openSession(null, null, testEvent().asBindingContext());
 
     assertThat(session.evaluate("payload").getValue(), is("test"));
-    expectedEx.expect(ExpressionRuntimeException.class);
-    assertThat(session.evaluate("flow.name").getValue(), is(nullValue()));
+    assertThrows(ExpressionRuntimeException.class, () -> session.evaluate("flow.name"));
   }
 
   @Test
@@ -711,9 +695,9 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void compilationExceptionPropagates() {
     setProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT, "true");
-    expectedEx.expect(ExpressionCompilationException.class);
     try {
-      expressionLanguage.compile("#[ble]", getTargetBindingContext(Message.of("")));
+      assertThrows(ExpressionCompilationException.class,
+                   () -> expressionLanguage.compile("#[ble]", getTargetBindingContext(Message.of(""))));
     } finally {
       clearProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT);
     }
@@ -722,13 +706,12 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void evaluateInvalidCompiledExpression() throws MuleException {
     ExpressionCompilationException e = new ExpressionCompilationException(createStaticMessage("oopsy"));
-    expectedEx.expect(ExpressionRuntimeException.class);
-    expectedEx.expectCause(is(sameInstance(e)));
 
     CompiledExpression compiled = new IllegalCompiledExpression("#[ble]", e);
     try (ExpressionLanguageSessionAdaptor session =
         expressionLanguage.openSession(TEST_CONNECTOR_LOCATION, testEvent(), NULL_BINDING_CONTEXT)) {
-      session.evaluate(compiled);
+      var thrown = assertThrows(ExpressionRuntimeException.class, () -> session.evaluate(compiled));
+      assertThat(thrown.getCause(), sameInstance(e));
     }
   }
 

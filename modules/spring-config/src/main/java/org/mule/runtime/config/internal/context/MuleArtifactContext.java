@@ -104,7 +104,6 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler;
 import org.mule.runtime.core.internal.config.DefaultResourceLocator;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
@@ -118,6 +117,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.internal.classloader.WithAttachedClassLoaders;
+import org.mule.runtime.module.extension.internal.component.AnnotatedObjectInvocationHandler;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 

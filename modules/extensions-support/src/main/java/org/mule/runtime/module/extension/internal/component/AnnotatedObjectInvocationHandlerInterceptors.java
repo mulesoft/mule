@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.component;
+package org.mule.runtime.module.extension.internal.component;
 
 import static java.lang.reflect.Modifier.isStatic;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.privileged.component.DynamicallyComponent;
+import org.mule.runtime.module.extension.privileged.component.DynamicallyComponent;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

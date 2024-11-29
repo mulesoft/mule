@@ -97,6 +97,9 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.runtime.privileged to
       org.mule.runtime.extensions.spring.support;
 
+  // for ByteBuddy dynamically generated classes
+  exports org.mule.runtime.module.extension.privileged.component;
+
   exports org.mule.runtime.module.extension.internal to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.tooling.support,
@@ -146,7 +149,8 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
       org.mule.runtime.core,
       org.mule.runtime.extensions.spring.support,
