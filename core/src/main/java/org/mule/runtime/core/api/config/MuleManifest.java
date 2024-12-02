@@ -6,82 +6,69 @@
  */
 package org.mule.runtime.core.api.config;
 
-import static java.util.regex.Pattern.compile;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Enumeration;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.jar.Attributes;
+import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
-import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is a static class that provides access to the Mule core manifest file.
+ *
+ * @deprecated since 4.9, use {@link org.mule.runtime.manifest.api.MuleManifest} instead.
  */
+@Deprecated
 public class MuleManifest {
 
-  /**
-   * logger used by this class
-   */
-  protected static final Logger logger = LoggerFactory.getLogger(MuleManifest.class);
-
-  private static Manifest manifest;
-
   public static String getProductVersion() {
-    final String version = getManifestProperty("Implementation-Version");
-    return version == null ? "4.8.0" : version;
+    return getMuleManifest().getProductVersion();
+  }
+
+  public static String getProductVersionFromPropertiesFile() {
+    return getMuleManifest().getProductVersion();
   }
 
   public static String getVendorName() {
-    return getManifestProperty("Specification-Vendor");
+    return getMuleManifest().getVendorName();
   }
 
   public static String getVendorUrl() {
-    return getManifestProperty("Vendor-Url");
+    return getMuleManifest().getVendorUrl();
   }
 
   public static String getProductUrl() {
-    return getManifestProperty("Product-Url");
+    return getMuleManifest().getProductUrl();
   }
 
   public static String getProductName() {
-    return getManifestProperty("Implementation-Title");
+    return getMuleManifest().getProductName();
   }
 
   public static String getProductMoreInfo() {
-    return getManifestProperty("More-Info");
+    return getMuleManifest().getProductMoreInfo();
   }
 
   public static String getProductSupport() {
-    return getManifestProperty("Support");
+    return getMuleManifest().getProductSupport();
   }
 
   public static String getProductLicenseInfo() {
-    return getManifestProperty("License");
+    return getMuleManifest().getProductLicenseInfo();
   }
 
   public static String getProductDescription() {
-    return getManifestProperty("Description");
+    return getMuleManifest().getProductDescription();
   }
 
   public static String getBuildNumber() {
-    return getManifestProperty("Build-Revision");
+    return getMuleManifest().getBuildNumber();
   }
 
   public static String getBuildDate() {
-    return getManifestProperty("Build-Date");
+    return getMuleManifest().getBuildDate();
   }
 
   public static String getSupportedJdks() {
-    return getManifestProperty("Supported-Jdks");
+    return getMuleManifest().getSupportedJdks();
   }
 
   /**
@@ -89,105 +76,23 @@ public class MuleManifest {
    */
   @Deprecated
   public static String getRecommndedJdks() {
-    return getManifestProperty("Recommended-Jdks");
+    return getMuleManifest().getRecommendedJdks();
   }
 
   /**
    * @since 4.6
    */
   public static String getRecommendedJdks() {
-    return getManifestProperty("Recommended-Jdks");
+    return getMuleManifest().getRecommendedJdks();
+  }
+
+  protected static String getManifestProperty(String name) {
+    return getManifest().getMainAttributes().getValue(new Name(name));
   }
 
   // synchronize this method as manifest initialized here.
   public static synchronized Manifest getManifest() {
-    if (manifest == null) {
-      manifest = new Manifest();
-
-      InputStream is = null;
-      try {
-        // We want to load the MANIFEST.MF from the mule-core jar. Sine we
-        // don't know the version we're using we have to search for the jar on the classpath
-        URL url = AccessController.doPrivileged(new UrlPrivilegedAction());
-
-        if (url != null) {
-          is = url.openStream();
-        }
-
-        if (is != null) {
-          manifest.read(is);
-        }
-      } catch (IOException e) {
-        logger.warn("Failed to read manifest Info, Manifest information will not display correctly: " + e.getMessage());
-      }
-    }
-    return manifest;
-  }
-
-  protected static String getManifestProperty(String name) {
-    return getManifest().getMainAttributes().getValue(new Attributes.Name(name));
-  }
-
-  static class UrlPrivilegedAction implements PrivilegedAction<URL> {
-
-    private static final Pattern EMBEDDED_JAR_PATTERN = compile("mule[^-]*-[^-]*-embedded");
-    private static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";
-
-    @Override
-    public URL run() {
-      URL result = null;
-      try {
-        Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources(MANIFEST_PATH);
-        result = getManifestJarURL(e);
-        if (result == null) {
-          // if we haven't found a valid manifest yet, maybe we're running tests
-          result = getManifestTestJarURL();
-        }
-      } catch (IOException e1) {
-        logger.warn("Failure reading manifest: " + e1.getMessage(), e1);
-      }
-      return result;
-    }
-
-    URL getManifestJarURL(Enumeration<URL> e) {
-      SortedMap<String, URL> candidates = new TreeMap<>();
-      while (e.hasMoreElements()) {
-        URL url = e.nextElement();
-        if ((url.toExternalForm().contains("mule-core")
-            && !url.toExternalForm().contains("tests.jar")
-            && !url.toExternalForm().contains("mule-core-components"))
-            || url.toExternalForm().contains("mule-runtime-extension-model")
-            || url.toExternalForm().contains("mule-runtime-ee-extension-model")
-            || (EMBEDDED_JAR_PATTERN.matcher(url.toExternalForm()).find() && url.toExternalForm().endsWith(".jar"))) {
-          candidates.put(url.toExternalForm(), url);
-        }
-      }
-      if (!candidates.isEmpty()) {
-        // if mule-core and mule-core-ee jars are present, then mule-core-ee gets precedence
-        for (String candidateKey : candidates.keySet()) {
-          if (candidateKey.contains("mule-core-ee")
-              || candidateKey.contains("mule-runtime-ee-extension-model")) {
-            return candidates.get(candidateKey);
-          }
-        }
-        return candidates.get(candidates.lastKey());
-      }
-      return null;
-    }
-
-    URL getManifestTestJarURL() throws IOException {
-      String testManifestPath = "core-tests/target/test-classes";
-      Enumeration<URL> e = MuleConfiguration.class.getClassLoader().getResources(MANIFEST_PATH);
-      while (e.hasMoreElements()) {
-        URL url = e.nextElement();
-        if ((url.toExternalForm().contains(testManifestPath)
-            && !url.toExternalForm().contains("tests.jar"))
-            || (EMBEDDED_JAR_PATTERN.matcher(url.toExternalForm()).find() && url.toExternalForm().endsWith(".jar"))) {
-          return url;
-        }
-      }
-      return null;
-    }
+    return getMuleManifest().getManifest();
   }
 
   private MuleManifest() {}

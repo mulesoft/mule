@@ -30,7 +30,9 @@ public interface EventContextFactory {
    *
    * @param flow     the flow that processes events of this context.
    * @param location the location of the component that received the first message for this context.
+   * @deprecated Use {@link #create(FlowConstruct, EventContextService, ComponentLocation)} instead.
    */
+  @Deprecated
   static EventContext create(FlowConstruct flow, ComponentLocation location) {
     return create(flow, location, null);
   }
@@ -41,9 +43,35 @@ public interface EventContextFactory {
    * @param flow          the flow that processes events of this context.
    * @param location      the location of the component that received the first message for this context.
    * @param correlationId See {@link EventContext#getCorrelationId()}.
+   * @deprecated Use {@link #create(FlowConstruct, EventContextService, ComponentLocation, String)} instead.
    */
+  @Deprecated
   static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId) {
     return create(flow, location, correlationId, empty());
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
+   * @param flow                the flow that processes events of this context.
+   * @param eventContextService the keeper of all currently active {@link EventContext}s to generate a dump on demand.
+   * @param location            the location of the component that received the first message for this context.
+   */
+  static EventContext create(FlowConstruct flow, EventContextService eventContextService, ComponentLocation location) {
+    return create(flow, eventContextService, location, null);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters and an empty publisher.
+   *
+   * @param flow                the flow that processes events of this context.
+   * @param eventContextService the keeper of all currently active {@link EventContext}s to generate a dump on demand.
+   * @param location            the location of the component that received the first message for this context.
+   * @param correlationId       See {@link EventContext#getCorrelationId()}.
+   */
+  static EventContext create(FlowConstruct flow, EventContextService eventContextService, ComponentLocation location,
+                             String correlationId) {
+    return create(flow, eventContextService, location, correlationId, empty());
   }
 
   /**
@@ -89,10 +117,31 @@ public interface EventContextFactory {
    * @param correlationId      See {@link EventContext#getCorrelationId()}.
    * @param externalCompletion future that completes when source completes enabling termination of {@link BaseEventContext} to
    *                           depend on completion of source.
+   * @deprecated Use {@link #create(FlowConstruct, EventContextService, ComponentLocation, String, Optional)} instead.
    */
+  @Deprecated
   static EventContext create(FlowConstruct flow, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
-    return new DefaultEventContext(flow, location, correlationId, externalCompletion);
+    return new DefaultEventContext(flow, flow.getMuleContext().getEventContextService(), location, correlationId,
+                                   externalCompletion);
+  }
+
+  /**
+   * Builds a new execution context with the given parameters.
+   *
+   * @param flow                the flow that processes events of this context.
+   * @param eventContextService the keeper of all currently active {@link EventContext}s to generate a dump on demand.
+   * @param location            the location of the component that received the first message for this context.
+   * @param correlationId       See {@link EventContext#getCorrelationId()}.
+   * @param externalCompletion  future that completes when source completes enabling termination of {@link BaseEventContext} to
+   *                            depend on completion of source.
+   * 
+   * @since 4.9
+   */
+  static EventContext create(FlowConstruct flow, EventContextService eventContextService, ComponentLocation location,
+                             String correlationId,
+                             Optional<CompletableFuture<Void>> externalCompletion) {
+    return new DefaultEventContext(flow, eventContextService, location, correlationId, externalCompletion);
   }
 
   /**
@@ -112,7 +161,8 @@ public interface EventContextFactory {
   @Deprecated
   static EventContext create(FlowConstruct flow, FlowExceptionHandler exceptionHandler, ComponentLocation location,
                              String correlationId, Optional<CompletableFuture<Void>> externalCompletion) {
-    return new DefaultEventContext(flow, exceptionHandler, location, correlationId, externalCompletion);
+    return new DefaultEventContext(flow, exceptionHandler, flow.getMuleContext().getEventContextService(), location,
+                                   correlationId, externalCompletion);
   }
 
   /**

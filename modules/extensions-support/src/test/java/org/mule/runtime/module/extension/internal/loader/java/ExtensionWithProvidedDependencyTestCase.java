@@ -6,23 +6,35 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.test.allure.AllureConstants.Sdk.MinMuleVersion.MIN_MULE_VERSION;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
+import static org.mule.test.allure.AllureConstants.Sdk.MinMuleVersion.MIN_MULE_VERSION;
+
+import static java.util.Collections.singleton;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.util.collection.SmallMap;
+import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.test.provided.dependency.ProvidedDependencyExtension;
+
+import java.util.Map;
+
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(SDK)
 @Story(MIN_MULE_VERSION)
@@ -33,7 +45,7 @@ public class ExtensionWithProvidedDependencyTestCase {
   @Description("Tests that a component that internally relies on a class from a provided dependency doesn't break MMV " +
       "resolution due to the dependency not being available at design time")
   public void extensionWithParametersRelyingOnProvidedDependencyTypesIsLoaded() {
-    ExtensionModel extension = loadExtension(ProvidedDependencyExtension.class);
+    ExtensionModel extension = loadExtension(ProvidedDependencyExtension.class, new SmallMap<>());
 
     assertThat(extension.getName(), is(ProvidedDependencyExtension.NAME));
     assertThat(extension.getMinMuleVersion().isPresent(), is(true));
@@ -47,6 +59,19 @@ public class ExtensionWithProvidedDependencyTestCase {
             .orElseThrow(() -> new RuntimeException("'dummyOperation' not found"));
     assertThat(operationModel.getMinMuleVersion().isPresent(), is(true));
     assertThat(operationModel.getMinMuleVersion().get().toString(), is("4.1.1"));
+  }
+
+  public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
+    params.put(TYPE_PROPERTY_NAME, clazz.getName());
+    params.put(VERSION, getMuleManifest().getProductVersion());
+    // TODO MULE-11797: as this utils is consumed from
+    // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
+    // this util should get dropped once the ticket gets implemented.
+    final DslResolvingContext dslResolvingContext = getDefault(singleton(MuleExtensionModelProvider.getExtensionModel()));
+    return new DefaultJavaExtensionModelLoader().loadExtensionModel(builder(clazz.getClassLoader(), dslResolvingContext)
+        .setResolveMinMuleVersion(true)
+        .addParameters(params)
+        .build());
   }
 
 }

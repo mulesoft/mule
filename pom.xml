@@ -6,13 +6,14 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule-plugin-mgmt-parent-pom</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
 
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.8.0-SNAPSHOT</version>
+    <version>4.9.0-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
@@ -131,13 +132,14 @@
         <module>runtime-extension-model</module>
         <module>core</module>
         <module>core-tests</module>
+        <module>manifest</module>
         <module>modules</module>
         <module>tests</module>
     </modules>
 
     <properties>
-        <javaVersion>1.8</javaVersion>
-        <javaReleaseVersion>8</javaReleaseVersion>
+        <javaVersion>17</javaVersion>
+        <javaReleaseVersion>${javaVersion}</javaReleaseVersion>
         <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
         <javaTestModuleName>${javaModuleName}.test</javaTestModuleName>
         <mule.termination.log.path.env.variable>${java.io.tmpdir}/termination_log_set_by_env_property</mule.termination.log.path.env.variable>
@@ -150,7 +152,6 @@
         <skipInstalls>false</skipInstalls>
         <skipNoSnapshotsEnforcerPluginRule>true</skipNoSnapshotsEnforcerPluginRule>
 
-        <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
@@ -158,44 +159,32 @@
         <productUrl>https://developer.mulesoft.com/</productUrl>
         <dev.list>mule-esb@mulesoft.com</dev.list>
 
-        <!--
-             Use the name of an Eclipse Java execution environment, Eclipse will
-             choose the right one by itself.
-        -->
-        <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
+        <muleBomVersion>4.9.0-SNAPSHOT</muleBomVersion>
+        <muleMavenClientBomVersion>2.4.0-SNAPSHOT</muleMavenClientBomVersion>
 
-        <muleBomVersion>4.8.0-SNAPSHOT</muleBomVersion>
-        <muleMavenClientBomVersion>2.3.0-SNAPSHOT</muleMavenClientBomVersion>
-
-        <weaveVersion>2.8.0-SNAPSHOT</weaveVersion>
-        <aspectjVersion>1.9.2</aspectjVersion>
+        <weaveVersion>2.9.0-SNAPSHOT</weaveVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.4.0-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.8.0-SNAPSHOT</muleExtensionsApiVersion>
+        <mulePropertiesApiVersion>1.5.0-SNAPSHOT</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.9.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
-        <muleHttpPolicyApiVersion>1.8.0-SNAPSHOT</muleHttpPolicyApiVersion>
-        <mulePolicyApiVersion>1.8.0-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.8.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.8.0-SNAPSHOT</muleMetadataModelVersion>
+        <muleHttpPolicyApiVersion>1.9.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <mulePolicyApiVersion>1.9.0-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.9.0-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.9.0-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
         <licenseYear>2023</licenseYear>
 
-        <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
-        <eclipsePluginVersion>2.10</eclipsePluginVersion>
-
-        <muleAnnotationsApiVersion>1.7.0-SNAPSHOT</muleAnnotationsApiVersion>
-        <mule.module.maven.plugin.version>1.8.0-SNAPSHOT</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.8.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.8.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleAnnotationsApiVersion>1.8.0-SNAPSHOT</muleAnnotationsApiVersion>
+        <mule.module.maven.plugin.version>1.9.0-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.9.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.9.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
-        <awaitilityVersion>3.0.0</awaitilityVersion>
-
         <formatterConfigPath>formatter.xml</formatterConfigPath>
-        <oldMuleArtifactVersion>4.7.0-rc1</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.8.0</oldMuleArtifactVersion>
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
@@ -203,13 +192,27 @@
         <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
         
         <surefire.args.base>-XX:+TieredCompilation ${surefire.args.encoding} ${surefire.args.aspectj} ${surefire.args.jacoco}</surefire.args.base>
-        <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
+        <surefire.test.unit.open.args.target>org.mule.runtime.jpms.utils</surefire.test.unit.open.args.target>
         <surefire.test.unit.open.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-opens=java.base/java.lang=ALL-UNNAMED
-            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+            --add-opens=java.base/java.lang=${surefire.test.unit.open.args.target}
+            --add-opens=java.base/java.lang.reflect=${surefire.test.unit.open.args.target}
+            --add-opens=java.base/java.lang.invoke=${surefire.test.unit.open.args.target}
+            --add-opens=java.sql/java.sql=${surefire.test.unit.open.args.target}
             ${surefire.args.base}
         </surefire.test.unit.open.args>
+        <surefire.module.path>
+            ${org.slf4j:slf4j-api:jar}
+        </surefire.module.path>
+        <surefire.add.modules>
+            org.slf4j
+        </surefire.add.modules>
+        <surefire.module.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --module-path=${surefire.module.path}
+            --add-modules=${surefire.add.modules}
+            ${surefire.test.unit.open.args}
+        </surefire.module.args>
         <!-- Emulate the behaviour in standalone, where slf4j is loaded in the boot layer -->
         <surefire.slf4j.module.args>
             -XX:+IgnoreUnrecognizedVMOptions
@@ -218,46 +221,8 @@
             ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
-        <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
-        <!-- this groovy version is to be used during the build process or for tests, not bundled in the distro -->
-        <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
-
-        <!-- *************************** -->
-        <!-- Test dependencies versions: -->
-        <!-- *************************** -->
-
-        <junitVersion>4.13.2</junitVersion>
-        <hamcrestVersion>2.2</hamcrestVersion>
-        <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <tikaVersion>1.28.3</tikaVersion>
-        <mockitoVersion>4.11.0</mockitoVersion>
-        <xmlUnitVersion>1.6</xmlUnitVersion>
-        <assertJVersion>3.5.2</assertJVersion>
-        <byteBuddyVersion>1.14.0</byteBuddyVersion>
-        <wireMockVersion>2.27.2</wireMockVersion>
-        <jettyVersion>9.4.53.v20231009</jettyVersion>
-        <compileTestingVersion>0.21.0</compileTestingVersion>
-        <activemqVersion>5.15.15</activemqVersion>
-        <hawtbufVersion>1.1</hawtbufVersion>
-        <activemqProtobuf>1.1</activemqProtobuf>
-        <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
-        <derbyVersion>10.14.2.0</derbyVersion>
-        <jsonassert.version>1.5.2</jsonassert.version>
-        <commonsNet.version>3.9.0</commonsNet.version>
-        <sshdVersion>2.12.1</sshdVersion>
-        <ftpServerVersion>1.2.0</ftpServerVersion>
-        <commonsExecVersion>1.3</commonsExecVersion>
-        <testcontainersVersion>1.17.6</testcontainersVersion>
-        <armeriaVersion>1.20.3</armeriaVersion>
-        <protobufVersion>3.21.9</protobufVersion>
-        <openTelemetryProtoVersion>1.7.1-alpha</openTelemetryProtoVersion>
-        <springSecurityVersion>5.7.12</springSecurityVersion>
-
-        <!-- These are declared here so that version upgrading bots keep the version property up to date -->
-        <springVersion>5.3.33</springVersion>
-        <commonsCliVersion>1.6.0</commonsCliVersion>
-        <mule.maven.plugin.version>4.1.1</mule.maven.plugin.version>
+        <mule.maven.plugin.version>4.3.1</mule.maven.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -270,261 +235,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainersVersion}</version>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-tests-bom</artifactId>
+                <version>${muleBomVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
-                <groupId>com.googlecode.multithreadedtc</groupId>
-                <artifactId>multithreadedtc</artifactId>
-                <version>${multithreadedtcVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junitVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.hamcrest</groupId>
-                        <artifactId>hamcrest-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>${hamcrestVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-core</artifactId>
-                <version>${tikaVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockitoVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-inline</artifactId>
-                <version>${mockitoVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertJVersion}</version>
-            </dependency>
-            <!-- Added to avoid conflicting transitive versions from Mockito and PowerMock -->
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy-agent</artifactId>
-                <version>${byteBuddyVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mule.skyscreamer</groupId>
-                <artifactId>jsonassert</artifactId>
-                <version>${jsonassert.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitilityVersion}</version>
-                <exclusions>
-                   <exclusion>
-                       <groupId>org.hamcrest</groupId>
-                       <artifactId>hamcrest-library</artifactId>
-                   </exclusion>
-                   <exclusion>
-                       <groupId>org.hamcrest</groupId>
-                       <artifactId>hamcrest-core</artifactId>
-                   </exclusion>
-                </exclusions>
-            </dependency>
-            
-            <dependency>
-                <groupId>xmlunit</groupId>
-                <artifactId>xmlunit</artifactId>
-                <version>${xmlUnitVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <!-- Other deps used in testing -->
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derby</artifactId>
-                <version>${derbyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derbynet</artifactId>
-                <version>${derbyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derbytools</artifactId>
-                <version>${derbyVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-net</groupId>
-                <artifactId>commons-net</artifactId>
-                <version>${commonsNet.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.ftpserver</groupId>
-                <artifactId>ftpserver-core</artifactId>
-                <version>${ftpServerVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock</artifactId>
-                <version>${wireMockVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock-standalone</artifactId>
-                <version>${wireMockVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-server</artifactId>
-                <version>${jettyVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.eclipse.jetty.orbit</groupId>
-                        <artifactId>javax.servlet</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlet</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-util</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-security</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-http</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-io</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-continuation</artifactId>
-                <version>${jettyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-osgi</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-common</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-core</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-scp</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.sshd</groupId>
-                <artifactId>sshd-sftp</artifactId>
-                <version>${sshdVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-exec</artifactId>
-                <version>${commonsExecVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.testing.compile</groupId>
-                <artifactId>compile-testing</artifactId>
-                <version>${compileTestingVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.linecorp.armeria</groupId>
-                <artifactId>armeria-junit4</artifactId>
-                <version>${armeriaVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>jsr305</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.linecorp.armeria</groupId>
-                <artifactId>armeria-grpc</artifactId>
-                <version>${armeriaVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>jsr305</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-proto</artifactId>
-                <version>${openTelemetryProtoVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${protobufVersion}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-config</artifactId>
-                <version>${springSecurityVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-core</artifactId>
-                <version>${springSecurityVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-crypto</artifactId>
-                <version>${springSecurityVersion}</version>
             </dependency>
 
             <!-- NOT the service (with mule-service classifier) -->
@@ -608,32 +323,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>default-compile</id>
-                            <configuration>
-                                <release>11</release>
-                                <!-- no excludes: compile everything to ensure module-info contains right entries -->
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>base-compile</id>
-                            <goals>
-                                <goal>compile</goal>
-                            </goals>
-                            <configuration>
-                                <release>${javaReleaseVersion}</release>
-                                <!-- recompile everything for target VM except the module-info.java -->
-                                <excludes>
-                                    <exclude>module-info.java</exclude>
-                                </excludes>
-                            </configuration>
-                        </execution>
-                    </executions>
                     <configuration>
-                        <proc>none</proc>
                         <source>${javaVersion}</source>
                         <target>${javaVersion}</target>
+                        <release>${javaReleaseVersion}</release>
+                        <testSource>${javaVersion}</testSource>
+                        <testTarget>${javaVersion}</testTarget>
                         <testRelease>${javaReleaseVersion}</testRelease>
                         <parameters>true</parameters>
                     </configuration>
@@ -672,14 +367,6 @@
                             </configuration>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.bsc.maven</groupId>
-                    <artifactId>maven-processor-plugin</artifactId>
-                    <version>4.5</version>
-                    <configuration>
-                        <skipSourcesUnchanged>true</skipSourcesUnchanged>
-                    </configuration>
                 </plugin>
 
                 <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
@@ -737,8 +424,8 @@
                                 <Build-Revision>${buildNumber}</Build-Revision>
                                 <Build-Date>${timestamp}</Build-Date>
                                 <Dev-List-Email>${dev.list}</Dev-List-Email>
-                                <Supported-Jdks>[${javaVersion}.0,18)</Supported-Jdks>
-                                <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12),[17,18)</Recommended-Jdks>
+                                <Supported-Jdks>[${javaVersion},22)</Supported-Jdks>
+                                <Recommended-Jdks>[${javaVersion},18),[21,22)</Recommended-Jdks>
                                 <More-Info>For more information go to ${productUrl}</More-Info>
                                 <Support>Get commercial support: ${project.organization.url}/support</Support>
                                 <Description>Mule Runtime and Integration Platform</Description>
@@ -760,7 +447,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
-                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         <workingDirectory>${project.build.directory}</workingDirectory>
                         <trimStackTrace>false</trimStackTrace>
                         <excludes>
@@ -795,16 +481,6 @@
                     <groupId>org.mule.tools</groupId>
                     <artifactId>mule-assembly-verifier</artifactId>
                     <version>${assembly.verifier.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <configuration>
-                        <header>${licensePath}</header>
-                        <properties>
-                            <year>${licenseYear}</year>
-                        </properties>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.mule.runtime.plugins</groupId>
@@ -929,18 +605,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>${eclipsePluginVersion}</version>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk8Name}
-                        </classpathContainer>
-                    </classpathContainers>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>io.qameta.allure</groupId>
@@ -1037,63 +701,6 @@
     </reporting>
     <profiles>
         <profile>
-            <id>testJdkWithoutXmlModule</id>
-            <activation>
-                <!-- This profile cannot be activated based on the jdk because the jdk on which this has to be activated or not -->
-                <!-- is the one used to run the tests, not the one used to run Maven. -->
-                <property>
-                    <name>!testJdkWithXmlModule</name>
-                </property>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <additionalClasspathElements>
-                                    <!-- Add this to the classpath so it is available when running tests with jvm8 -->
-                                    <!-- but it does not interfere with the module system --> 
-                                    <!-- (it has colliding packages with java.xml module) when running with java11+ -->
-                                    <additionalClasspathElement>${settings.localRepository}/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</additionalClasspathElement>
-                                </additionalClasspathElements>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>get-xml-apis</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>get</goal>
-                                </goals>
-                                <configuration>
-                                    <artifact>xml-apis:xml-apis:1.4.01</artifact>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>mac</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <properties>
-                <vmtype>org.eclipse.jdt.internal.launching.macosx.MacOSXType</vmtype>
-            </properties>
-        </profile>
-        <profile>
             <id>yourkit-agent</id>
             <properties>
                 <!-- When using this profile, the location of the YourKit agent has to be provided with a vm argument -->
@@ -1140,6 +747,27 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                            <excludes>
+                                                <exclude>org.mule.weave:*</exclude>
+                                                <exclude>org.mule.runtime:mule-dwb-api</exclude>
+                                                <exclude>org.mule.services:mule-service-weave:*</exclude>
+                                            </excludes>
+                                        </requireReleaseDeps>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

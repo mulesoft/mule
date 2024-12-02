@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
-import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
+import static org.mule.runtime.module.extension.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
@@ -33,34 +33,39 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
   /**
    * Creates an instance of a given {@code configurationType} on each invocation to {@link #newInstance()}.
    *
-   * @param configurationType    the type to be instantiated. Must be not {@code null}, and have a public default constructor
-   * @param extensionClassLoader the {@link ClassLoader} on which the extension is loaded
+   * @param configurationType     the type to be instantiated. Must be not {@code null}, and have a public default constructor
+   * @param extensionClassLoader  the {@link ClassLoader} on which the extension is loaded
+   * @param addAnnotationsToClass whether the given {@code configurationType} must be enhanced to include the annotations from the
+   *                              DSL.
    * @throws IllegalArgumentException if the type is {@code null} or doesn't have a default public constructor
    */
-  public TypeAwareConfigurationFactory(Class<?> configurationType, ClassLoader extensionClassLoader) {
-    checkArgument(configurationType != null, "configuration type cannot be null");
-    checkArgument(extensionClassLoader != null, "extensionClassLoader type cannot be null");
+  public TypeAwareConfigurationFactory(Class<?> configurationType, ClassLoader extensionClassLoader,
+                                       boolean addAnnotationsToClass) {
+    requireNonNull(configurationType, "configuration type cannot be null");
+    requireNonNull(extensionClassLoader, "extensionClassLoader type cannot be null");
     checkInstantiable(configurationType, new ReflectionCache());
 
     this.extensionClassLoader = extensionClassLoader;
 
     this.configurationType = new LazyValue<>(() -> {
-      if (isMuleFramework()) {
+      if (!addAnnotationsToClass) {
         return configurationType;
-      } else {
-        return withContextClassLoader(this.extensionClassLoader, () -> {
-          // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an
-          // extension with the annotations stuff.
-          Class<?> annotated = addAnnotationsToClass(configurationType);
-          if (extensionClassLoader instanceof WithAttachedClassLoaders) {
-            // The annotated class is added to a spring cache that has to be cleared later, and for that we'll need the
-            // classloader it was loaded with (or a classloader in the parents' hierarchy).
-            // For the cleaning part, see MuleArtifactContext code.
-            ((WithAttachedClassLoaders) extensionClassLoader).attachClassLoader(annotated.getClassLoader().getParent());
-          }
-          return annotated;
-        });
       }
+
+      return withContextClassLoader(this.extensionClassLoader, () -> {
+        // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an
+        // extension with the annotations stuff.
+        Class<?> annotated = addAnnotationsToClass(configurationType);
+        if (extensionClassLoader instanceof WithAttachedClassLoaders) {
+          // The annotated class is added to a spring cache that has to be cleared later, and for that we'll need the
+          // classloader it was loaded with (or a classloader in the parents' hierarchy).
+          // For the cleaning part, see MuleArtifactContext code.
+          ((WithAttachedClassLoaders) extensionClassLoader)
+              .attachClassLoader(annotated.getClassLoader().getParent() != null ? annotated.getClassLoader().getParent()
+                  : annotated.getClassLoader());
+        }
+        return annotated;
+      });
     });
   }
 

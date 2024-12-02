@@ -9,15 +9,16 @@ package org.mule.runtime.core.internal.el.dataweave;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
 import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
+import static org.mule.runtime.api.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 
 import static java.lang.System.getProperty;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -32,7 +33,9 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.ExpressionLanguageConfiguration;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ConstraintViolation;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
+import org.mule.runtime.api.el.validation.ValidationPhase;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -52,6 +55,7 @@ import org.mule.runtime.core.privileged.el.ServerContext;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -69,6 +73,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private final FeatureFlaggingService featureFlaggingService;
   private List<BindingContext> globalBindings = new LinkedList<>();
   private volatile boolean initialised = false;
+
+  private boolean disposed = false;
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
@@ -236,6 +242,12 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
+  public List<ConstraintViolation> validate(String script, String nameIdentifier, ValidationPhase validationScopePhase,
+                                            TypeBindings typeBindings, Optional<MetadataType> outputType) {
+    return expressionExecutor.validate(script, nameIdentifier, validationScopePhase, typeBindings, outputType);
+  }
+
+  @Override
   public Iterator<TypedValue<?>> split(String expression, CoreEvent event, ComponentLocation componentLocation,
                                        BindingContext bindingContext)
       throws ExpressionRuntimeException {
@@ -289,9 +301,10 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public void dispose() {
-    if (expressionExecutor != null) {
+  public synchronized void dispose() {
+    if (expressionExecutor != null && !disposed) {
       expressionExecutor.dispose();
+      disposed = true;
     }
   }
 

@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
@@ -36,6 +30,13 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.ster
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getParameterType;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -79,13 +80,13 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exclusive
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkParameterPlacementUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaInputResolverModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -508,4 +509,5 @@ public class JavaParameterModelParser implements ParameterModelParser, HasExtens
   public ExtensionParameter getExtensionParameter() {
     return parameter;
   }
+
 }

@@ -16,12 +16,12 @@ import static java.util.Optional.empty;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 /**
@@ -49,7 +50,12 @@ import javax.xml.namespace.QName;
 public abstract class ComponentMessageProcessorObjectFactory<M extends ComponentModel, P extends ComponentMessageProcessor>
     extends AbstractExtensionObjectFactory<P> {
 
-  protected final Registry registry;
+  @Inject
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
+
+  @Inject
+  private StreamingManager streamingManager;
+
   protected final ExtensionModel extensionModel;
   protected final M componentModel;
   protected ConfigurationProvider configurationProvider;
@@ -61,28 +67,25 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
 
   public ComponentMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 M componentModel,
-                                                MuleContext muleContext,
-                                                Registry registry) {
+                                                MuleContext muleContext) {
     super(muleContext);
-    this.registry = registry;
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
   }
 
   @Override
   public P doGetObject() {
-    final MessageProcessorChain nestedChain;
+    final MessageProcessorChain chain;
 
     if (nestedProcessors != null) {
-      nestedChain = newChain(empty(), nestedProcessors,
-                             registry.lookupByType(ComponentTracerFactory.class).get()
-                                 .fromComponent(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
+      chain = newChain(empty(), nestedProcessors,
+                       componentTracerFactory
+                           .fromComponent(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
       componentModel.getNestedComponents().stream()
-          .filter(component -> component instanceof NestedChainModel)
+          .filter(NestedChainModel.class::isInstance)
           .findFirst()
-          .ifPresent(chain -> parameters.put(chain.getName(),
-                                             new ProcessorChainValueResolver(registry.lookupByType(StreamingManager.class).get(),
-                                                                             nestedChain)));
+          .ifPresent(chainModel -> parameters.put(chainModel.getName(),
+                                                  new ProcessorChainValueResolver(chainModel, chain, streamingManager)));
 
       // For MULE-18771 we need access to the chain's location to create a new event and sdk context
       // Update for W-15158118: since the scope and the chain were having the same location, the chain was overriding the
@@ -92,9 +95,9 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
       ComponentLocation chainLocation = this.getLocation();
       annotations.put(LOCATION_KEY, ((DefaultComponentLocation) chainLocation).appendProcessorsPart());
       annotations.put(CHAIN_OWNER_LOCATION_KEY, chainLocation);
-      nestedChain.setAnnotations(annotations);
+      chain.setAnnotations(annotations);
     } else {
-      nestedChain = null;
+      chain = null;
     }
 
     return getMessageProcessorBuilder()
@@ -104,7 +107,7 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
         .setTargetValue(targetValue)
         .setCursorProviderFactory(cursorProviderFactory)
         .setRetryPolicyTemplate(retryPolicyTemplate)
-        .setNestedChain(nestedChain)
+        .setNestedChain(chain)
         .setClassLoader(Thread.currentThread().getContextClassLoader())
         .build();
   }

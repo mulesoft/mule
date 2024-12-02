@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.isChildKey;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingUtils.unwrapChildKey;
+
+import static java.lang.String.format;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -49,6 +50,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
   protected ExpressionManager expressionManager;
 
   protected final MuleContext muleContext;
+
   protected Map<String, Object> parameters = new HashMap<>();
   private LazyValue<ParametersResolver> parametersResolver;
 
@@ -68,7 +70,7 @@ public abstract class AbstractExtensionObjectFactory<T> extends AbstractComponen
 
   private Exception handleMissingRequiredParameter(RequiredParameterNotSetException e) {
     String description = getAnnotations().values().stream()
-        .filter(v -> v instanceof ComponentLocation)
+        .filter(ComponentLocation.class::isInstance)
         .map(v -> (ComponentLocation) v)
         .findFirst()
         .map(v -> format("Element <%s:%s> in line %s of file %s is missing required parameter '%s'",

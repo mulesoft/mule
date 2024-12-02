@@ -9,8 +9,11 @@ package org.mule.runtime.config.internal.model;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Factory to create instances of {@link ComponentBuildingDefinitionRegistry}
@@ -20,6 +23,12 @@ import java.util.Set;
 @NoImplement
 public interface ComponentBuildingDefinitionRegistryFactory {
 
+  static final ComponentBuildingDefinitionRegistryFactory DEFAULT_FACTORY =
+      new DefaultComponentBuildingDefinitionRegistryFactory();
+
+  static final ComponentBuildingDefinitionRegistryFactory CACHING_FACTORY =
+      new CachingComponentBuildingDefinitionRegistryFactory();
+
   /**
    * Creates a new {@link ComponentBuildingDefinitionRegistry}
    *
@@ -27,5 +36,6 @@ public interface ComponentBuildingDefinitionRegistryFactory {
    *
    * @return a non {@code null} {@link ComponentBuildingDefinitionRegistry}
    */
-  public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels);
+  public ComponentBuildingDefinitionRegistry create(Set<ExtensionModel> extensionModels,
+                                                    Function<ExtensionModel, Optional<DslSyntaxResolver>> dslSyntaxResolverLookup);
 }

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
@@ -16,7 +17,6 @@ import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
-import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 
 import static java.nio.charset.Charset.forName;
@@ -45,8 +45,6 @@ import javax.inject.Inject;
 public class ParseTemplateProcessor extends SimpleMessageProcessor implements HasParamsAsTemplateProcessor {
 
   private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-  private static final Boolean KEEP_TYPE_TARGET_AND_TARGET_VAR =
-      true;
 
   private ExtendedExpressionManager expressionManager;
 

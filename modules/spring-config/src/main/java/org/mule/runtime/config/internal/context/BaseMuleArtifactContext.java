@@ -12,10 +12,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.config.privileged.spring.ByteBuddySpringCacheInstrumentator;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -43,28 +43,29 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
   private final MuleContextWithRegistry muleContext;
   private final Registry originalRegistry;
   private final ArtifactType artifactType;
-  private final OptionalObjectsController optionalObjectsController;
   private final PropertiesResolverConfigurationProperties configurationProperties;
   private final boolean enableLazyInit;
+
+  static {
+    ByteBuddySpringCacheInstrumentator.instrumentSpringCachesForCleanup();
+  }
 
   /**
    * Configures the context.
    *
    * @param muleContext                   the {@link MuleContext} that own this context
-   * @param optionalObjectsController     the {@link OptionalObjectsController} for this context
    * @param parentConfigurationProperties optional {@link ConfigurationProperties}
    * @param artifactProperties            the artifact properties
    * @param artifactType                  the {@link ArtifactType}
    * @param enableLazyInit                whether lazy init is enabled
    */
-  public BaseMuleArtifactContext(MuleContext muleContext, OptionalObjectsController optionalObjectsController,
+  public BaseMuleArtifactContext(MuleContext muleContext,
                                  Optional<ConfigurationProperties> parentConfigurationProperties,
                                  Map<String, String> artifactProperties, ArtifactType artifactType, boolean enableLazyInit) {
     this.muleContext = (MuleContextWithRegistry) muleContext;
     this.originalRegistry = ((MuleRegistryHelper) (((MuleContextWithRegistry) muleContext).getRegistry())).getDelegate();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
     this.artifactType = artifactType;
-    this.optionalObjectsController = optionalObjectsController;
 
     this.configurationProperties = createConfigurationAttributeResolver(parentConfigurationProperties,
                                                                         artifactProperties,
@@ -94,7 +95,6 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
     new BaseSpringMuleContextServiceConfigurator(muleContext,
                                                  configurationProperties,
                                                  artifactType,
-                                                 optionalObjectsController,
                                                  beanFactory,
                                                  serviceDiscoverer,
                                                  originalRegistry,

@@ -18,12 +18,12 @@ import static java.util.Optional.of;
 
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.rules.ExpectedException.none;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.runtime.module.deployment.internal.processor.AstXmlParserArtifactConfigurationProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -50,7 +51,6 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import io.qameta.allure.Issue;
@@ -69,9 +69,6 @@ public class AstXmlParserArtifactConfigurationProcessorTestCase extends Abstract
   private MuleContext muleContext;
 
   @Rule
-  public ExpectedException expectedException = none();
-
-  @Rule
   public SystemProperty disableExpressionsSupport = new SystemProperty(DISABLE_TRANSFORMERS_SUPPORT, "true");
 
   @Before
@@ -85,35 +82,35 @@ public class AstXmlParserArtifactConfigurationProcessorTestCase extends Abstract
   @Test
   @Issue("MULE-19534")
   public void configureWithFailOnFirstError() throws ConfigurationException {
-    expectedException.expect(ConfigurationException.class);
-    expectedException
-        .expectMessage(containsString(SCHEMA_VALIDATION_ERROR));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
 
-    configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
+    final ArtifactContextConfiguration artifactContextConfiguration = ArtifactContextConfiguration.builder()
         .setConfigResources(new String[] {"invalid-schema.xml"})
         .setArtifactType(APP)
         .setMuleContext(muleContext)
         .setEnableLazyInitialization(false)
         .setDisableXmlValidations(false)
-        .build());
+        .build();
+    var thrown = assertThrows(ConfigurationException.class,
+                              () -> configurationBuilder.createArtifactContext(artifactContextConfiguration));
+    assertThat(thrown.getMessage(), containsString(SCHEMA_VALIDATION_ERROR));
   }
 
   @Test
   @Issue("MULE-19534")
   public void configureWithFailAfterTenErrors() throws ConfigurationException {
-    expectedException.expect(ConfigurationException.class);
-    expectedException
-        .expectMessage(containsString(SCHEMA_VALIDATION_ERROR));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-    configurationBuilder.createArtifactContext(ArtifactContextConfiguration.builder()
+    final ArtifactContextConfiguration artifactContextConfiguration = ArtifactContextConfiguration.builder()
         .setConfigResources(new String[] {"invalid-schema.xml"})
         .setArtifactType(APP)
         .setMuleContext(muleContext)
         .setEnableLazyInitialization(false)
         .setDisableXmlValidations(false)
-        .build());
+        .build();
+    var thrown = assertThrows(ConfigurationException.class,
+                              () -> configurationBuilder.createArtifactContext(artifactContextConfiguration));
+    assertThat(thrown.getMessage(), containsString(SCHEMA_VALIDATION_ERROR));
   }
 
   @Test
@@ -163,6 +160,11 @@ public class AstXmlParserArtifactConfigurationProcessorTestCase extends Abstract
 
     @Override
     public String generate(ExtensionModel extensionModel, DslResolvingContext context) {
+      return "";
+    }
+
+    @Override
+    public String generate(ExtensionModel extensionModel, DslResolvingContext context, DslSyntaxResolver dsl) {
       return "";
     }
   }

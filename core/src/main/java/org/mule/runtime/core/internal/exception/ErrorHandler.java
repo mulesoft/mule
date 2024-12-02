@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 

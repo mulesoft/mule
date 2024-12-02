@@ -15,7 +15,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.metadata.extension.resolver.SdkTestInputResolverWithKeyResolver.SDK_TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.SdkTestOutputAnyTypeResolver.TEST_OUTPUT_ANY_TYPE_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
@@ -66,7 +66,7 @@ public class OperationModelLoaderDelegateTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() {
-    ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getProductVersion());
+    ExtensionDeclarer declarer = declarerFor(MetadataExtension.class, getMuleManifest().getProductVersion());
     declaration = declarer.getDeclaration();
   }
 

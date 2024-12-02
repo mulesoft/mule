@@ -16,6 +16,7 @@ import java.util.concurrent.locks.Lock;
 
 import static org.mule.oauth.client.api.state.DancerState.HAS_TOKEN;
 import static org.mule.oauth.client.api.state.DancerState.NO_TOKEN;
+import static org.mule.oauth.client.api.state.DancerState.TOKEN_INVALIDATED;
 
 /**
  * OAuth state for a particular resource owner which typically represents an user. Only used for compatibility purposes in case of
@@ -127,6 +128,16 @@ public final class ResourceOwnerOAuthContextWithRefreshState implements Resource
   @Override
   public Lock getRefreshOAuthContextLock(String lockNamePrefix, LockFactory lockProvider) {
     return createRefreshOAuthContextLock(lockNamePrefix, lockProvider, resourceOwnerId);
+  }
+
+  @Override
+  public boolean isTokenInvalid() {
+    return getDancerState() == TOKEN_INVALIDATED;
+  }
+
+  @Override
+  public void markTokenAsInvalid() {
+    setDancerState(TOKEN_INVALIDATED);
   }
 
   /**

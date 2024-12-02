@@ -68,8 +68,6 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
-import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.el.TemplateParser;
 import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
@@ -77,10 +75,12 @@ import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
@@ -254,7 +254,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       CompletableFuture<Void> future = new CompletableFuture<>();
       retryScheduler.execute(() -> {
         if (retryPolicyTemplate.isAsync()) {
-          // in theory we only have to lock on started, but for avoiding deadlocks we need to lock on lifecycleManager first.
+          // in theory, we only have to lock on started, but for avoiding deadlocks we need to lock on lifecycleManager first.
           // Otherwise, doWork may internally call `stop`, which would attempt to take both these locks in this order.
           synchronized (lifecycleManager) {
             synchronized (started) {

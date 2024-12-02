@@ -241,4 +241,5 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
    * @since 4.7.0
    */
   Optional<RoutesChainInputTypesResolverModelParser> getRoutesChainInputTypesResolverModelParser();
+
 }

@@ -23,11 +23,11 @@ import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.maven.pom.parser.api.MavenPomParser;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +68,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
     return new DeployableProjectModel(exportedPackages, exportedResources, emptyList(),
                                       buildBundleDescriptor(deployableArtifactCoordinates, isDomain),
                                       deployableModelResolver,
-                                      projectFolder, deployableBundleDependencies,
+                                      empty(), projectFolder, deployableBundleDependencies,
                                       sharedDeployableBundleDescriptors, additionalPluginDependencies);
   }
 
@@ -109,7 +109,7 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
         .setGroupId(artifactCoordinates.getGroupId())
         .setVersion(artifactCoordinates.getVersion())
         .setBaseVersion(artifactCoordinates.getVersion())
-        .setType(artifactCoordinates.getType())
+        .setType(PACKAGE_TYPE)
         .setClassifier(isDomain ? MULE_DOMAIN_CLASSIFIER : MULE_APPLICATION_CLASSIFIER)
         .build();
   }

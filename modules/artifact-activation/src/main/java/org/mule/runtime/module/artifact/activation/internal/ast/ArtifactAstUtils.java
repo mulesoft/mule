@@ -6,21 +6,28 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
-import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_MULE_SDK_PROPERTY;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
+import static java.util.stream.Collectors.toList;
 
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.ConfigResource;
 import org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.w3c.dom.Document;
 
 /**
  * Utilities for parsing and handling {@link ArtifactAst} (for internal usage only).
@@ -28,6 +35,8 @@ import java.util.Set;
  * @since 4.5.0
  */
 public class ArtifactAstUtils {
+
+  private static final boolean IS_MULE_SDK_ENABLED = getBoolean(ENABLE_MULE_SDK_PROPERTY);
 
   /**
    * Parses {@code configResources} for a Mule artifact and returns an {@link ArtifactAst} enriched with an additional
@@ -45,43 +54,67 @@ public class ArtifactAstUtils {
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the artifact couldn't be parsed
    */
-  public static ArtifactAst parseArtifact(String[] configResources,
+  public static ArtifactAst parseArtifact(String artifactName,
+                                          Either<ConfigResource[], Map<String, Document>> configs,
                                           AstXmlParserSupplier parserSupplier,
                                           Set<ExtensionModel> extensions,
                                           boolean disableValidations,
                                           ClassLoader artifactClassLoader,
                                           MuleSdkExtensionModelLoadingMediator extensionModelMediator)
       throws ConfigurationException {
+    if (!IS_MULE_SDK_ENABLED) {
+      return doParseArtifactIntoAst(artifactName, configs, parserSupplier, extensions, disableValidations, artifactClassLoader);
+    }
 
-    final ArtifactAst partialAst = doParseArtifactIntoAst(configResources, parserSupplier, extensions, true, artifactClassLoader);
+    final ArtifactAst partialAst =
+        doParseArtifactIntoAst(artifactName, configs, parserSupplier, extensions, true, artifactClassLoader);
 
     Optional<ExtensionModel> extensionModel =
         extensionModelMediator.loadExtensionModel(partialAst, artifactClassLoader.getParent(), extensions);
     if (extensionModel.isPresent()) {
       Set<ExtensionModel> enrichedExtensionModels = new HashSet<>(extensions);
       enrichedExtensionModels.add(extensionModel.get());
-      return doParseArtifactIntoAst(configResources, parserSupplier, enrichedExtensionModels, disableValidations,
+      return doParseArtifactIntoAst(artifactName, configs, parserSupplier, enrichedExtensionModels, disableValidations,
                                     artifactClassLoader);
     }
 
-    return disableValidations
+    return disableValidations || configs.isRight()
         ? partialAst
-        : doParseArtifactIntoAst(configResources, parserSupplier, extensions, false, artifactClassLoader);
+        : doParseArtifactIntoAst(artifactName, configs, parserSupplier, extensions, false, artifactClassLoader);
   }
 
-  private static ArtifactAst doParseArtifactIntoAst(String[] configResources,
+  private static ArtifactAst doParseArtifactIntoAst(String artifactName,
+                                                    Either<ConfigResource[], Map<String, Document>> configs,
                                                     AstXmlParserSupplier parserSupplier,
                                                     Set<ExtensionModel> extensions,
                                                     boolean disableValidations,
                                                     ClassLoader artifactClassLoader)
       throws ConfigurationException {
-    return parserSupplier.getParser(extensions, disableValidations)
-        .parse(loadConfigResources(configResources, artifactClassLoader));
+    if (configs.isLeft()) {
+      return parserSupplier.getParser(extensions, disableValidations)
+          .parse(artifactName, configs.getLeft());
+    } else {
+      return configs.mapRight(appXmlConfigDocuments -> {
+        final AstXmlParser parser = parserSupplier.getParser(extensions, true);
+
+        ClassLoader currentClassLoader = currentThread().getContextClassLoader();
+        setContextClassLoader(currentThread(), currentClassLoader, artifactClassLoader);
+        try {
+          return parser.parseDocument(artifactName, appXmlConfigDocuments.entrySet()
+              .stream()
+              .map(e -> new Pair<>(e.getKey(), e.getValue()))
+              .collect(toList()));
+        } finally {
+          setContextClassLoader(currentThread(), artifactClassLoader, currentClassLoader);
+        }
+      })
+          .getRight();
+    }
   }
 
-  private static ConfigResource[] loadConfigResources(String[] configs, ClassLoader artifactClassLoader)
+  public static ConfigResource[] loadConfigResources(String[] configs, ClassLoader artifactClassLoader)
       throws ConfigurationException {
-    ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassLoader currentClassLoader = currentThread().getContextClassLoader();
     setContextClassLoader(currentThread(), currentClassLoader, artifactClassLoader);
     try {
       ConfigResource[] artifactConfigResources = new ConfigResource[configs.length];
@@ -93,6 +126,12 @@ public class ArtifactAstUtils {
       throw new ConfigurationException(e);
     } finally {
       setContextClassLoader(currentThread(), artifactClassLoader, currentClassLoader);
+    }
+  }
+
+  private static void setContextClassLoader(Thread thread, ClassLoader currentClassLoader, ClassLoader newClassLoader) {
+    if (currentClassLoader != newClassLoader) {
+      thread.setContextClassLoader(newClassLoader);
     }
   }
 

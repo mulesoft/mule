@@ -96,6 +96,7 @@ public class DefaultMuleContainer implements MuleContainer {
   private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
       .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
       .withActionOnMuleArtifactDeployment(getDefaultReconfigurationAction())
+      .withAdditionalResourceDirectory("")
       .build();
 
   private static MuleLog4jContextFactory log4jContextFactory;

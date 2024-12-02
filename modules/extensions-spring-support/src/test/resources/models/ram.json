@@ -581,7 +581,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 1,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 },
@@ -615,7 +616,8 @@
                   "modelProperties": {
                     "org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty": {
                       "order": 2,
-                      "providedByKeyResolver": true
+                      "providedByKeyResolver": true,
+                      "expressionSupport": "NOT_SUPPORTED"
                     }
                   }
                 }

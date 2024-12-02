@@ -354,4 +354,9 @@ public class Controller {
   public void setTestEnvVars(Map<String, String> testEnvVars) {
     osSpecificController.setTestEnvVars(testEnvVars);
   }
+
+  public int installAgent(String serverName, String consoleURI, String token) {
+    // Installed in hyperforce environment to prevent trustore verification
+    return osSpecificController.installAgent("-H", token, serverName, "--amc-host", consoleURI, "--environment", "hyperforce");
+  }
 }

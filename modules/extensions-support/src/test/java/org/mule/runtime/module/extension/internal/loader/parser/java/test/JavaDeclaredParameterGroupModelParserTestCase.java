@@ -6,20 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.test;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+
+import static java.util.Collections.emptySet;
+
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaDeclaredParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.sdk.api.annotation.Configuration;
 import org.mule.sdk.api.annotation.Configurations;
 import org.mule.sdk.api.annotation.Extension;
@@ -54,13 +60,14 @@ public class JavaDeclaredParameterGroupModelParserTestCase {
 
   private JavaDeclaredParameterGroupModelParser getParser(Class<?> extension) {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
     ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
     ExtensionElement extensionElement = new ExtensionTypeWrapper<>(extension, typeLoader);
     ConfigurationElement configurationElement = extensionElement.getConfigurations().get(0);
     ExtensionParameter extensionParameter = configurationElement.getParameters().get(0);
 
     return new JavaDeclaredParameterGroupModelParser(extensionParameter,
-                                                     ParameterDeclarationContext.forConfig("config"),
+                                                     ParameterDeclarationContext.forConfig("config", ctx),
                                                      ParameterModelParserDecorator::new);
   }
 

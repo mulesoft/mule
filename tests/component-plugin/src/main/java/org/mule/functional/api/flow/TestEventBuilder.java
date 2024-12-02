@@ -224,9 +224,10 @@ public class TestEventBuilder {
             .identifier(buildFromStringRepresentation("test"))
             .build()), empty(), OptionalInt.empty(), OptionalInt.empty());
     if (externalCompletionCallback != null) {
-      eventContext = create(flow, location, sourceCorrelationId, of(externalCompletionCallback));
+      eventContext = create(flow, flow.getMuleContext().getEventContextService(), location, sourceCorrelationId,
+                            of(externalCompletionCallback));
     } else {
-      eventContext = create(flow, location, sourceCorrelationId);
+      eventContext = create(flow, flow.getMuleContext().getEventContextService(), location, sourceCorrelationId);
     }
     return eventContext;
   }

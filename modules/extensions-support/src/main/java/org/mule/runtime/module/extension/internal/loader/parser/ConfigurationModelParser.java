@@ -105,4 +105,5 @@ public interface ConfigurationModelParser extends StereotypeModelParser, Additio
    *         that version was assigned.
    */
   Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
+
 }

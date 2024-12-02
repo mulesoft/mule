@@ -30,14 +30,12 @@ import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.util.MuleAstUtils;
 import org.mule.runtime.ast.api.validation.ArtifactAstValidatorBuilder;
 import org.mule.runtime.ast.internal.validation.DefaultValidatorBuilder;
-import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
@@ -45,16 +43,19 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
-
 @Issue("W-10808757")
 @Story(APP_DEPLOYMENT)
-@RunWith(MockitoJUnitRunner.class)
 public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -99,10 +100,11 @@ public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
                                                             FeatureFlaggingService featureFlaggingService) {
 
     MuleArtifactContext muleArtifactContext =
-        new MuleArtifactContext(mockMuleContext, emptyArtifact(), mock(OptionalObjectsController.class), empty(),
+        new MuleArtifactContext(mockMuleContext, emptyArtifact(), empty(),
                                 new BaseConfigurationComponentLocator(),
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                emptyMap(), false, APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                emptyMap(), false, APP,
+                                new ComponentBuildingDefinitionRegistry(),
                                 mock(MemoryManagementService.class),
                                 featureFlaggingService, mock(ExpressionLanguageMetadataService.class)) {
 

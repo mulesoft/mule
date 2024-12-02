@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
-import static java.util.Optional.of;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarationWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 
-import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
+import static java.util.Optional.of;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,15 +29,14 @@ import java.util.Map;
  */
 final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionProviderModelLoaderDelegate.class);
-
   private final Map<ConnectionProviderModelParser, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
   ConnectionProviderModelLoaderDelegate(DefaultExtensionModelLoaderDelegate loader) {
     super(loader);
   }
 
-  void declareConnectionProviders(HasConnectionProviderDeclarer declarer, List<ConnectionProviderModelParser> parsers) {
+  void declareConnectionProviders(HasConnectionProviderDeclarer declarer, List<ConnectionProviderModelParser> parsers,
+                                  ExtensionLoadingContext context) {
     for (ConnectionProviderModelParser parser : parsers) {
 
       ConnectionProviderDeclarer providerDeclarer = connectionProviderDeclarers.get(parser);
@@ -54,10 +53,10 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModel
       ConnectionProviderDeclaration connectionProviderDeclaration = providerDeclarer.getDeclaration();
       parser.getDeprecationModel().ifPresent(connectionProviderDeclaration::withDeprecation);
       parser.getDisplayModel().ifPresent(connectionProviderDeclaration::setDisplayModel);
-      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-        connectionProviderDeclaration.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-        LOGGER.debug(resolvedMMV.getReason());
-      });
+      if (context.isResolveMinMuleVersion()) {
+        parser.getResolvedMinMuleVersion()
+            .ifPresent(resolvedMMV -> declarationWithMmv(connectionProviderDeclaration, resolvedMMV));
+      }
 
       parser.getConnectionProviderFactoryModelProperty().ifPresent(providerDeclarer::withModelProperty);
 
@@ -68,7 +67,7 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModel
       parser.getExternalLibraryModels().forEach(providerDeclarer::withExternalLibrary);
       parser.getOAuthModelProperty().ifPresent(providerDeclarer::withModelProperty);
 
-      loader.getParameterModelsLoaderDelegate().declare(providerDeclarer, parser.getParameterGroupModelParsers());
+      loader.getParameterModelsLoaderDelegate().declare(providerDeclarer, parser.getParameterGroupModelParsers(), context);
       parser.getAdditionalModelProperties().forEach(providerDeclarer::withModelProperty);
       addSemanticTerms(providerDeclarer.getDeclaration(), parser);
       getStereotypeModelLoaderDelegate().addStereotypes(

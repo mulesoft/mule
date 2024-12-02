@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
 import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isNoErrorMapping;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.VoidType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -17,6 +18,8 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinition
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.parser.AbstractComponentDefinitionParser;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
+
+import java.util.Optional;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing {@link OperationMessageProcessor} instances through a
@@ -29,8 +32,9 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
   public OperationDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                    OperationModel operationModel,
                                    DslSyntaxResolver dslSyntaxResolver,
-                                   ExtensionParsingContext parsingContext) {
-    super(definition, extensionModel, operationModel, dslSyntaxResolver, parsingContext);
+                                   ExtensionParsingContext parsingContext,
+                                   Optional<ClassTypeLoader> typeLoader) {
+    super(definition, extensionModel, operationModel, dslSyntaxResolver, parsingContext, typeLoader);
   }
 
   @Override

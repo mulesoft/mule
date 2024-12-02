@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-extensions-mule-support</artifactId>
     <name>Mule SDK Extension Support</name>
@@ -15,10 +15,13 @@
     </description>
 
     <properties>
-        <surefire.args>
-            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.model=org.mule.runtime.extensions.mule.support
-            ${surefire.test.unit.open.args}
-        </surefire.args>
+        <surefire.module.path>
+            ${org.mule.runtime.boot:mule-module-jpms-utils:jar}
+        </surefire.module.path>
+        <surefire.add.modules>
+            org.mule.runtime.jpms.utils
+        </surefire.add.modules>
+        <surefire.args>${surefire.module.args}</surefire.args>
 
         <javaModuleName>org.mule.runtime.extensions.mule.support</javaModuleName>
         <skipExportTests>false</skipExportTests>
@@ -204,7 +207,6 @@
         <dependency>
             <groupId>org.mule.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
-            <version>${jsonassert.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -250,6 +252,20 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.model=org.mule.runtime.extensions.mule.support</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
@@ -258,6 +274,9 @@
                     </systemPropertyVariables>
                     <!-- Module layer is created by the tests-runner, don't need surefire to config the boot layer for the JVM -->
                     <useModulePath>false</useModulePath>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.mule.runtime.boot:mule-module-jpms-utils</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
         </plugins>

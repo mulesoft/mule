@@ -70,4 +70,5 @@ public interface FunctionModelParser extends SemanticTermsParser, AdditionalProp
    *         that version was assigned.
    */
   Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
+
 }

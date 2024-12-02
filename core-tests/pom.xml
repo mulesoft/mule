@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-core-tests</artifactId>
     <packaging>jar</packaging>
@@ -13,7 +13,6 @@
 
     <properties>
         <surefire.args>
-            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.test.core
             ${surefire.test.unit.open.args}
         </surefire.args>
 		
@@ -104,7 +103,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -128,6 +127,15 @@
                         </configuration>
                     </execution>
                 </executions>                
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <muleVersion>${project.version}</muleVersion>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>        
     </build>

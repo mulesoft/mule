@@ -10,14 +10,16 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.internal.bean.NotificationConfig.DisabledNotificationConfig;
 import org.mule.runtime.config.internal.bean.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.core.api.MuleContext;
@@ -42,6 +44,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
+  private ApplicationContext springContext;
 
   @Before
   public void before() {
@@ -54,7 +57,7 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     configurator = new ServerNotificationManagerConfigurator();
     configurator.setMuleContext(context);
     configurator.setRegistry(registry);
-    final ApplicationContext springContext = mock(ApplicationContext.class);
+    springContext = mock(ApplicationContext.class);
     doReturn(new String[0]).when(springContext).getBeanNamesForType(NotificationListener.class, false, true);
     configurator.setApplicationContext(springContext);
   }
@@ -107,6 +110,27 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     configurator.initialise();
 
     verify(notificationManager).disableType(CompliantNotification.class);
+  }
+
+  @Test
+  public void notificationListenersAreRemovedOnDisposal() throws InitialisationException {
+    doReturn(singletonList((NotificationsProvider) () -> singletonMap("test:COMPLIANT",
+                                                                      new Pair(CompliantNotification.class,
+                                                                               CompliantNotificationListener.class))))
+                                                                                   .when(registry)
+                                                                                   .lookupAllByType(NotificationsProvider.class);
+
+    configurator.setEnabledNotifications(singletonList(new EnabledNotificationConfig(CompliantNotificationListener.class,
+                                                                                     CompliantNotification.class)));
+
+    doReturn(new String[] {"notificationName"}).when(springContext).getBeanNamesForType(NotificationListener.class, false, true);
+    when(notificationManager.isListenerRegistered(any())).thenReturn(true);
+    configurator.initialise();
+    verify(notificationManager).addListenerSubscriptionPair(any());
+    // In the initialization phase, the listener is removed and a listener pair is registered
+    verify(notificationManager).removeListener(any());
+    configurator.dispose();
+    verify(notificationManager, times(2)).removeListener(any());
   }
 
   @Test

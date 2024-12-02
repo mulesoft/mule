@@ -18,9 +18,11 @@ import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForS
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyList;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
@@ -29,7 +31,9 @@ import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.el.validation.ConstraintViolation;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
+import org.mule.runtime.api.el.validation.ValidationPhase;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
@@ -48,6 +52,8 @@ import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.runtime.core.internal.util.log.OneTimeWarning;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -314,6 +320,19 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
       return failure(message.toString());
     }
     return success();
+  }
+
+  @Override
+  public List<ConstraintViolation> validate(String script, String nameIdentifier, ValidationPhase validationScopePhase,
+                                            TypeBindings typeBindings, Optional<MetadataType> outputType) {
+    if (!muleContext.getConfiguration().isValidateExpressions()) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Validate expressions is turned off, no checking done for: " + script);
+      }
+      return emptyList();
+    }
+
+    return expressionLanguage.validate(script, nameIdentifier, validationScopePhase, typeBindings, outputType);
   }
 
   @Override

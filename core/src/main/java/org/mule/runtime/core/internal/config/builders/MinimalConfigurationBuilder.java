@@ -15,6 +15,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGE
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONENT_TRACER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_FACTORY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
@@ -106,6 +108,8 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
@@ -134,7 +138,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
     MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
 
-    defaultRegistryBoostrap(APP, muleContext).initialise();
+    defaultRegistryBoostrap(APP, muleContext.getRegistryBootstrapServiceDiscoverer(), (n, o) -> registerObject(n, o, muleContext))
+        .initialise();
 
     configureQueueManager(muleContext);
 
@@ -172,14 +177,13 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MULE_PROFILING_SERVICE_KEY) == null) {
       registerObject(MULE_PROFILING_SERVICE_KEY, new NoOpProfilingService(), muleContext);
     }
-
     configureCoreTracer(muleContext);
-
     configureComponentTracerFactory(muleContext);
-
     configureSpanExporterConfiguration(muleContext);
-
     configureSpanExporterFactory(muleContext);
+
+    configureErrorMetricsFactory(muleContext);
+    configureBaseArtifactMeterProvider(muleContext);
 
     registerObject(ComponentInitialStateManager.SERVICE_ID, new ComponentInitialStateManager() {
 
@@ -196,6 +200,14 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
         registerObject(serviceId, null, muleContext);
       }
     }
+  }
+
+  protected void configureBaseArtifactMeterProvider(MuleContext muleContext) throws RegistrationException {
+    registerObject(MULE_METER_PROVIDER_KEY, MeterProvider.NO_OP, muleContext);
+  }
+
+  protected void configureErrorMetricsFactory(MuleContext muleContext) throws RegistrationException {
+    registerObject(MULE_ERROR_METRICS_FACTORY_KEY, ErrorMetricsFactory.NO_OP, muleContext);
   }
 
   protected void registerTransactionFactoryLocator(MuleContext muleContext) throws RegistrationException {
@@ -291,10 +303,11 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       return;
     }
 
-    if (serviceImpl.get() instanceof MuleContextAware) {
-      ((MuleContextAware) serviceImpl.get()).setMuleContext(muleContext);
+    var service = serviceImpl.orElseThrow();
+    if (service instanceof MuleContextAware) {
+      ((MuleContextAware) service).setMuleContext(muleContext);
     }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl.get());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, service);
   }
 
   protected void registerObjectStoreManager(MuleContext muleContext) throws RegistrationException {
@@ -344,4 +357,5 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   protected void configureSpanExporterConfiguration(MuleContext muleContext) throws RegistrationException {
     registerObject(MULE_SPAN_EXPORTER_CONFIGURATION_KEY, new EmptySpanExporterConfiguration(), muleContext);
   }
+
 }

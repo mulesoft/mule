@@ -6,9 +6,9 @@
  */
 package org.mule.functional.api.flow;
 
-import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
@@ -20,20 +20,21 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
-import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
+import org.mule.runtime.core.privileged.transaction.TransactionConfig;
+import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 import org.mule.tck.junit4.matcher.EventMatcher;
 import org.mule.tck.processor.FlowAssert;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -92,11 +93,10 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    * @param factory See {@link MuleTransactionConfig#setFactory(TransactionFactory)}.
    * @return this {@link FlowRunner}
    */
-  public FlowRunner transactionally(TransactionConfigEnum action, TransactionFactory factory) {
-    MuleTransactionConfig transactionConfig = new MuleTransactionConfig(action.getAction());
-    transactionConfig.setFactory(factory);
-
-    txExecutionTemplate = createTransactionalExecutionTemplate(registry.lookupByType(MuleContext.class).get(), transactionConfig);
+  public FlowRunner transactionally(TransactionConfigEnum action, Transaction transaction) {
+    txExecutionTemplate = createTransactionalExecutionTemplate(registry,
+                                                               action.getAction(),
+                                                               new TestTransactionFactory(transaction));
 
     return this;
   }

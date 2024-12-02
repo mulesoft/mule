@@ -7,13 +7,17 @@
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
+
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
+
+import java.util.Optional;
 
 /**
  * A {@link ExtensionDefinitionParser} for parsing extension objects that are expressed as an inline {@link ParameterGroupModel}
@@ -32,8 +36,9 @@ public abstract class ParameterGroupParser extends ExtensionDefinitionParser {
   protected final String namespace;
 
   public ParameterGroupParser(Builder definition, ParameterGroupModel group, ClassLoader classLoader, DslElementSyntax groupDsl,
-                              DslSyntaxResolver dslResolver, ExtensionParsingContext context) {
-    super(definition, dslResolver, context);
+                              DslSyntaxResolver dslResolver, ExtensionParsingContext context,
+                              Optional<ClassTypeLoader> typeLoader) {
+    super(definition, dslResolver, context, typeLoader);
 
     checkArgument(group.isShowInDsl(), "Cannot parse an implicit group");
     this.group = group;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 
@@ -20,13 +20,15 @@ import org.apache.commons.lang3.NotImplementedException;
 public class DefaultQueueStore implements RecoverableQueueStore {
 
   private QueueConfiguration config;
-  private String name;
+  private final String name;
   private QueueStoreDelegate delegate;
-  private MuleContext muleContext;
+  private final String workingDirectory;
+  private final SerializationProtocol serializer;
 
-  public DefaultQueueStore(String name, MuleContext muleContext, QueueConfiguration config) {
+  public DefaultQueueStore(String name, String workingDirectory, SerializationProtocol serializer, QueueConfiguration config) {
     this.name = name;
-    this.muleContext = muleContext;
+    this.workingDirectory = workingDirectory;
+    this.serializer = serializer;
     setConfigAndDelegate(config);
   }
 
@@ -43,8 +45,8 @@ public class DefaultQueueStore implements RecoverableQueueStore {
       this.config = new DefaultQueueConfiguration();
     }
     if (this.config.isPersistent()) {
-      delegate = new DualRandomAccessFileQueueStoreDelegate(this.name, muleContext.getConfiguration().getWorkingDirectory(),
-                                                            muleContext, this.config.getCapacity());
+      delegate = new DualRandomAccessFileQueueStoreDelegate(this.name, workingDirectory,
+                                                            serializer, this.config.getCapacity());
     } else {
       delegate = new DefaultQueueStoreDelegate(this.config.getCapacity());
     }
@@ -55,6 +57,7 @@ public class DefaultQueueStore implements RecoverableQueueStore {
     return (obj instanceof DefaultQueueStore && name.equals(((DefaultQueueStore) obj).name));
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -64,42 +67,52 @@ public class DefaultQueueStore implements RecoverableQueueStore {
     return name.hashCode();
   }
 
+  @Override
   public void putNow(Serializable o) {
     delegate.putNow(o);
   }
 
+  @Override
   public boolean offer(Serializable o, int room, long timeout) throws InterruptedException {
     return delegate.offer(o, room, timeout);
   }
 
+  @Override
   public Serializable poll(long timeout) throws InterruptedException {
     return delegate.poll(timeout);
   }
 
+  @Override
   public Serializable peek() throws InterruptedException {
     return delegate.peek();
   }
 
+  @Override
   public void untake(Serializable item) throws InterruptedException {
     delegate.untake(item);
   }
 
+  @Override
   public int getSize() {
     return delegate.getSize();
   }
 
+  @Override
   public void clear() throws InterruptedException {
     this.delegate.clear();
   }
 
+  @Override
   public void dispose() {
     this.delegate.dispose();
   }
 
+  @Override
   public int getCapacity() {
     return config == null ? null : config.getCapacity();
   }
 
+  @Override
   public void remove(Serializable value) {
     if (this.delegate instanceof TransactionalQueueStoreDelegate) {
       ((TransactionalQueueStoreDelegate) delegate).remove(value);
@@ -109,6 +122,7 @@ public class DefaultQueueStore implements RecoverableQueueStore {
     }
   }
 
+  @Override
   public boolean contains(Serializable value) {
     if (this.delegate instanceof TransactionalQueueStoreDelegate) {
       return ((TransactionalQueueStoreDelegate) delegate).contains(value);
@@ -118,6 +132,7 @@ public class DefaultQueueStore implements RecoverableQueueStore {
     }
   }
 
+  @Override
   public void close() {
     if (this.delegate instanceof TransactionalQueueStoreDelegate) {
       ((TransactionalQueueStoreDelegate) delegate).close();

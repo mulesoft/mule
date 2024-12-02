@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-test-extensions-parent</artifactId>
@@ -86,11 +86,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-extensions-soap-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

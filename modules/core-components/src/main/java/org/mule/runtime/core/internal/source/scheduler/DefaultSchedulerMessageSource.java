@@ -36,12 +36,12 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.execution.FlowProcessTemplate;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 
 import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;

@@ -34,7 +34,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
-import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

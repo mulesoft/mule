@@ -7,16 +7,16 @@
 package org.mule.runtime.core.internal.util.journal.queue;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.core.internal.util.journal.JournalEntry;
 import org.mule.runtime.core.internal.util.journal.JournalEntrySerializer;
-import org.mule.runtime.core.internal.util.journal.TransactionCompletePredicate;
 import org.mule.runtime.core.internal.util.journal.TransactionJournal;
 import org.mule.runtime.core.internal.util.queue.QueueStore;
 
-import com.google.common.collect.Multimap;
-
 import java.io.Serializable;
 import java.util.Collection;
+
+import com.google.common.collect.Multimap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,17 +33,13 @@ public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<
 
   private TransactionJournal<T, K> logFile;
 
-  public AbstractQueueTransactionJournal(String logFilesDirectory, JournalEntrySerializer journalEntrySerializer,
+  public AbstractQueueTransactionJournal(String logFilesDirectory, JournalEntrySerializer<T, K> journalEntrySerializer,
                                          Integer maximumFileSizeInMegabytes) {
     checkArgument(maximumFileSizeInMegabytes == null || maximumFileSizeInMegabytes > 0,
                   "Maximum tx log file size needs to be greater than zero");
-    this.logFile = new TransactionJournal(logFilesDirectory, new TransactionCompletePredicate() {
-
-      @Override
-      public boolean isTransactionComplete(JournalEntry journalEntry) {
-        AbstractQueueTxJournalEntry abstractQueueTxJournalEntry = (AbstractQueueTxJournalEntry) journalEntry;
-        return abstractQueueTxJournalEntry.isCommit() || abstractQueueTxJournalEntry.isRollback();
-      }
+    this.logFile = new TransactionJournal<>(logFilesDirectory, journalEntry -> {
+      AbstractQueueTxJournalEntry<T> abstractQueueTxJournalEntry = (AbstractQueueTxJournalEntry<T>) journalEntry;
+      return abstractQueueTxJournalEntry.isCommit() || abstractQueueTxJournalEntry.isRollback();
     }, journalEntrySerializer, maximumFileSizeInMegabytes);
   }
 

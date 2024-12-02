@@ -15,6 +15,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_ST
 import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
@@ -31,6 +32,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingCon
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * An {@link ExtensionMessageSource} used to parse instances of {@link ExtensionMessageSource} instances through a
@@ -46,8 +48,8 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
 
   public SourceDefinitionParser(Builder definition, ExtensionModel extensionModel,
                                 SourceModel sourceModel, DslSyntaxResolver dslSyntaxResolver,
-                                ExtensionParsingContext parsingContext) {
-    super(definition, dslSyntaxResolver, parsingContext);
+                                ExtensionParsingContext parsingContext, Optional<ClassTypeLoader> typeLoader) {
+    super(definition, dslSyntaxResolver, parsingContext, typeLoader);
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.sourceDsl = dslSyntaxResolver.resolve(sourceModel);

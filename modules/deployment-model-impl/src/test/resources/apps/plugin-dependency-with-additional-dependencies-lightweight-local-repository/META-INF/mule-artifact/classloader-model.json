@@ -38,10 +38,10 @@
           "artifactCoordinates": {
             "groupId": "org.apache.commons",
             "artifactId": "commons-collections4",
-            "version": "${commonsCollections4Version}",
+            "version": "${commonsCollectionsVersion}",
             "type": "jar"
           },
-          "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/apache/commons/commons-collections4/${commonsCollections4Version}/commons-collections4-${commonsCollections4Version}.jar",
+          "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/apache/commons/commons-collections4/${commonsCollectionsVersion}/commons-collections4-${commonsCollectionsVersion}.jar",
           "packages": [
             "org.apache.commons.collections4",
             "org.apache.commons.collections4.bag",

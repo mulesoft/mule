@@ -14,6 +14,7 @@ import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUti
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataModelProperties;
 
@@ -26,7 +27,9 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
@@ -38,17 +41,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Helper class for declaring operations through a {@link DefaultExtensionModelLoaderDelegate}
  *
  * @since 4.0
  */
 final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDelegate {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(OperationModelLoaderDelegate.class);
 
   private final Map<OperationModelParser, OperationDeclarer> operationDeclarers = new HashMap<>();
 
@@ -59,7 +57,8 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
   void declareOperations(ExtensionDeclarer extensionDeclarer,
                          ExtensionDevelopmentFramework extensionDevelopmentFramework,
                          HasOperationDeclarer ownerDeclarer,
-                         List<OperationModelParser> operations) {
+                         List<OperationModelParser> operations,
+                         ExtensionLoadingContext context) {
 
     for (OperationModelParser parser : operations) {
 
@@ -91,12 +90,13 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
         continue;
       }
 
-      operationDeclarers.put(parser, createOperationDeclarer(parser, extensionDeclarer, actualDeclarer));
+      operationDeclarers.put(parser, createOperationDeclarer(parser, extensionDeclarer, actualDeclarer, context));
     }
   }
 
   private OperationDeclarer createOperationDeclarer(OperationModelParser parser, ExtensionDeclarer extensionDeclarer,
-                                                    HasOperationDeclarer actualDeclarer) {
+                                                    HasOperationDeclarer actualDeclarer,
+                                                    ExtensionLoadingContext context) {
     final OperationDeclarer operation = actualDeclarer.withOperation(parser.getName())
         .describedAs(parser.getDescription())
         .supportsStreaming(parser.supportsStreaming())
@@ -126,11 +126,10 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
 
     parser.getDeprecationModel().ifPresent(operation::withDeprecation);
     parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));
-    parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
-      operation.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
-      LOGGER.debug(resolvedMMV.getReason());
-    });
-    loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
+    if (context.isResolveMinMuleVersion()) {
+      parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(operation, resolvedMMV));
+    }
+    loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers(), context);
     addSemanticTerms(operation.getDeclaration(), parser);
     parser.getExecutionType().ifPresent(operation::withExecutionType);
 
@@ -152,7 +151,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
     parser.getAdditionalModelProperties().forEach(operation::withModelProperty);
     parser.getExceptionHandlerModelProperty().ifPresent(operation::withModelProperty);
 
-    declareChains(parser, operation);
+    declareChains(parser, operation, context);
 
     loader.registerOutputTypes(operation.getDeclaration());
     declareErrorModels(operation, parser, extensionDeclarer, loader.createErrorModelFactory());
@@ -167,7 +166,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
     return operation;
   }
 
-  private void declareChains(OperationModelParser parser, OperationDeclarer operation) {
+  private void declareChains(OperationModelParser parser, OperationDeclarer operation, ExtensionLoadingContext context) {
     if (parser.isScope()) {
       parser.getNestedChainParser().ifPresent(chain -> {
         NestedChainDeclarer chainDeclarer = operation.withChain(chain.getName())
@@ -176,6 +175,9 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
             .setExecutionOccurrence(chain.getExecutionOccurrence());
         addSemanticTerms(chainDeclarer.getDeclaration(), chain);
         getStereotypeModelLoaderDelegate().addAllowedStereotypes(chain, chainDeclarer);
+        if (chain.isSdkApiDefined()) {
+          chainDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);
+        }
       });
     } else if (parser.isRouter()) {
       parser.getNestedRouteParsers().forEach(route -> {
@@ -185,13 +187,17 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
             .withMinOccurs(route.getMinOccurs())
             .withMaxOccurs(route.getMaxOccurs().orElse(null));
 
+        if (route.isSdkApiDefined()) {
+          routeDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);
+        }
+
         NestedChainDeclarer chain = routeDeclarer
             .withChain()
             .setExecutionOccurrence(route.getExecutionOccurrence());
         getStereotypeModelLoaderDelegate().addAllowedStereotypes(route, chain);
 
         route.getAdditionalModelProperties().forEach(routeDeclarer::withModelProperty);
-        loader.getParameterModelsLoaderDelegate().declare(routeDeclarer, route.getParameterGroupModelParsers());
+        loader.getParameterModelsLoaderDelegate().declare(routeDeclarer, route.getParameterGroupModelParsers(), context);
       });
     }
   }

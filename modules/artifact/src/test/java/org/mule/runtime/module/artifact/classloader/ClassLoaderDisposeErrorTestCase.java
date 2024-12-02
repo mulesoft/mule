@@ -14,7 +14,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -74,10 +73,6 @@ public class ClassLoaderDisposeErrorTestCase extends AbstractMuleTestCase {
       super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, PARENT_FIRST_CLASSLOADER_LOOKUP_POLICY);
     }
 
-    @Override
-    protected ResourceReleaser createResourceReleaserInstance() {
-      throw new Error("Error while creating resource releaser instance");
-    }
   }
 
 }

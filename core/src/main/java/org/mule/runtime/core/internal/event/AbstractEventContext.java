@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static com.google.common.base.Functions.identity;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
+
+import static com.google.common.base.Functions.identity;
 import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.mule.runtime.api.functional.Either.left;
-import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.functional.Either;
@@ -23,20 +25,21 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.exception.MessagingException;
+import org.mule.runtime.tracer.api.context.SpanContextAware;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,10 +54,11 @@ import reactor.core.publisher.MonoSink;
  */
 abstract class AbstractEventContext implements SpanContextAware, BaseEventContext {
 
-  private static final byte STATE_READY = 0;
-  private static final byte STATE_RESPONSE = 1;
-  private static final byte STATE_COMPLETE = 2;
-  private static final byte STATE_TERMINATED = 3;
+  private static final int STATE_READY = 0;
+  private static final int STATE_RESPONSE_RECEIVED = 1;
+  private static final int STATE_RESPONSE_PROCESSED = 2;
+  private static final int STATE_COMPLETE = 3;
+  private static final int STATE_TERMINATED = 4;
 
   private static final int TO_STRING_TAB_SIZE = 4;
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventContext.class);
@@ -73,7 +77,10 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   private final int depthLevel;
 
-  private volatile byte state = STATE_READY;
+  // Kept for backwards compatibility of deserialization of objects serialized with previous versions
+  private byte state = -1;
+  private transient AtomicInteger stateCtx = new AtomicInteger(STATE_READY);
+  private transient volatile boolean childrenComplete = false;
   private volatile Either<Throwable, CoreEvent> result;
 
   private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(ResponsePublisher::new);
@@ -85,7 +92,6 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   /**
-   *
    * @param exceptionHandler   exception handler to to handle errors before propagation of errors to response listeners.
    * @param externalCompletion optional future that allows an external entity (e.g. a source) to signal completion of response
    *                           processing and delay termination.
@@ -94,7 +100,9 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
                               Optional<CompletableFuture<Void>> externalCompletion) {
     this.depthLevel = depthLevel;
     this.externalCompletion = externalCompletion.orElse(null);
-    externalCompletion.ifPresent(completableFuture -> completableFuture.thenAccept((aVoid) -> tryTerminate()));
+    if (this.externalCompletion != null) {
+      this.externalCompletion.thenAccept(aVoid -> tryTerminate());
+    }
     this.exceptionHandler = exceptionHandler;
   }
 
@@ -130,17 +138,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
    */
   @Override
   public final void success() {
-    if (isResponseDone()) {
-      if (debugLogEnabled) {
-        LOGGER.debug("{} empty response was already completed, ignoring.", this);
-      }
-      return;
-    }
-
-    if (debugLogEnabled) {
-      LOGGER.debug("{} response completed with no result.", this);
-    }
-    responseDone(right(null));
+    success(null);
   }
 
   /**
@@ -148,17 +146,16 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
    */
   @Override
   public final void success(CoreEvent event) {
-    if (isResponseDone()) {
+    if (stateCtx.compareAndSet(STATE_READY, STATE_RESPONSE_RECEIVED)) {
+      if (debugLogEnabled) {
+        LOGGER.debug("{} response completed with result.", this);
+      }
+      receiveResponse(right(event));
+    } else {
       if (debugLogEnabled) {
         LOGGER.debug("{} response was already completed, ignoring.", this);
       }
-      return;
     }
-
-    if (debugLogEnabled) {
-      LOGGER.debug("{} response completed with result.", this);
-    }
-    responseDone(right(event));
   }
 
   /**
@@ -166,41 +163,40 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
    */
   @Override
   public final Publisher<Void> error(Throwable throwable) {
-    if (isResponseDone()) {
+    if (stateCtx.compareAndSet(STATE_READY, STATE_RESPONSE_RECEIVED)) {
+
+      if (debugLogEnabled) {
+        LOGGER.debug("{} responseDone completed with error.", this);
+      }
+
+      if (throwable instanceof MessagingException) {
+        if (debugLogEnabled) {
+          LOGGER.debug("{} handling messaging exception.", this);
+        }
+
+        final Consumer<Exception> router = exceptionHandler.router(identity(),
+                                                                   this::success,
+                                                                   rethrown -> receiveResponse(left(rethrown)));
+        try {
+          router.accept((Exception) throwable);
+        } finally {
+          disposeIfNeeded(router, LOGGER);
+        }
+      } else {
+        receiveResponse(left(throwable));
+      }
+    } else {
       if (debugLogEnabled) {
         LOGGER.debug("{} error response was already completed, ignoring.", this);
       }
-      return empty();
     }
 
-    if (debugLogEnabled) {
-      LOGGER.debug("{} responseDone completed with error.", this);
-    }
-
-    if (throwable instanceof MessagingException) {
-      if (debugLogEnabled) {
-        LOGGER.debug("{} handling messaging exception.", this);
-      }
-
-      final Consumer<Exception> router = exceptionHandler.router(identity(),
-                                                                 handled -> success(handled),
-                                                                 rethrown -> responseDone(left(rethrown)));
-      try {
-        router.accept((Exception) throwable);
-      } finally {
-        disposeIfNeeded(router, LOGGER);
-      }
-    } else {
-      responseDone(left(throwable));
-    }
     return empty();
   }
 
-  private synchronized void responseDone(Either<Throwable, CoreEvent> result) {
+  private void receiveResponse(Either<Throwable, CoreEvent> result) {
     this.result = result;
     responsePublisher.ifComputed(rp -> rp.result = result);
-
-    state = STATE_RESPONSE;
 
     for (BiConsumer<CoreEvent, Throwable> onBeforeResponseConsumer : onBeforeResponseConsumerList) {
       signalConsumerSilently(onBeforeResponseConsumer);
@@ -211,50 +207,63 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
       signalConsumerSilently(onResponseConsumer);
     }
     onResponseConsumerList.clear();
+
+    stateCtx.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED);
     tryComplete();
   }
 
   protected void tryComplete() {
-    boolean allChildrenComplete;
-
-    getChildContextsReadLock().lock();
-    try {
-      allChildrenComplete = childContexts.stream().allMatch(BaseEventContext::isComplete);
-    } finally {
-      getChildContextsReadLock().unlock();
-    }
-
-    synchronized (this) {
-      if (state == STATE_RESPONSE && allChildrenComplete) {
-        if (debugLogEnabled) {
-          LOGGER.debug("{} completed.", this);
-        }
-        this.state = STATE_COMPLETE;
-
-        for (BiConsumer<CoreEvent, Throwable> consumer : onCompletionConsumerList) {
-          signalConsumerSilently(consumer);
-        }
-        onCompletionConsumerList.clear();
-        getParentContext().ifPresent(context -> {
-          if (context instanceof AbstractEventContext) {
-            ((AbstractEventContext) context).tryComplete();
-          }
-        });
-        tryTerminate();
+    if (stateCtx.get() == STATE_RESPONSE_PROCESSED && areAllChildrenComplete()) {
+      if (!stateCtx.compareAndSet(STATE_RESPONSE_PROCESSED, STATE_COMPLETE)) {
+        return;
       }
+
+      if (debugLogEnabled) {
+        LOGGER.debug("{} completed.", this);
+      }
+
+      for (BiConsumer<CoreEvent, Throwable> consumer : onCompletionConsumerList) {
+        signalConsumerSilently(consumer);
+      }
+      onCompletionConsumerList.clear();
+
+      Optional<BaseEventContext> parentContext = getParentContext();
+      if (parentContext.isPresent()) {
+        BaseEventContext context = parentContext.get();
+        if (context instanceof AbstractEventContext) {
+          ((AbstractEventContext) context).tryComplete();
+        }
+      }
+
+      tryTerminate();
     }
   }
 
-  protected synchronized void tryTerminate() {
-    if (this.state == STATE_COMPLETE && (externalCompletion == null || externalCompletion.isDone())) {
+  private boolean areAllChildrenComplete() {
+    if (childrenComplete) {
+      return true;
+    } else {
+      getChildContextsReadLock().lock();
+      try {
+        childrenComplete = childrenComplete || childContexts.stream().allMatch(BaseEventContext::isComplete);
+      } finally {
+        getChildContextsReadLock().unlock();
+      }
+      return childrenComplete;
+    }
+  }
+
+  protected void tryTerminate() {
+    if ((externalCompletion == null || externalCompletion.isDone()) && stateCtx.compareAndSet(STATE_COMPLETE, STATE_TERMINATED)) {
+
       if (debugLogEnabled) {
         LOGGER.debug("{} terminated.", this);
       }
-      this.state = STATE_TERMINATED;
 
       for (BiConsumer<CoreEvent, Throwable> consumer : onTerminatedConsumerList) {
         signalConsumerSilently(consumer);
       }
+
       onTerminatedConsumerList.clear();
 
       getChildContextsWriteLock().lock();
@@ -273,7 +282,6 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
           parent.getChildContextsWriteLock().unlock();
         }
       });
-
       result = null;
       responsePublisher = null;
     }
@@ -301,22 +309,22 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
   }
 
   private boolean isResponseDone() {
-    return state >= STATE_RESPONSE;
+    return stateCtx.get() >= STATE_RESPONSE_RECEIVED;
   }
 
   @Override
   public boolean isComplete() {
-    return state >= STATE_COMPLETE;
+    return stateCtx.get() >= STATE_COMPLETE;
   }
 
   @Override
   public boolean isTerminated() {
-    return state == STATE_TERMINATED;
+    return stateCtx.get() == STATE_TERMINATED;
   }
 
   @Override
   public synchronized void onTerminated(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_TERMINATED) {
+    if (stateCtx.get() >= STATE_TERMINATED) {
       signalConsumerSilently(consumer);
     } else {
       onTerminatedConsumerList.add(requireNonNull(consumer));
@@ -325,7 +333,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   @Override
   public synchronized void onComplete(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_COMPLETE) {
+    if (stateCtx.get() >= STATE_COMPLETE) {
       signalConsumerSilently(consumer);
     } else {
       onCompletionConsumerList.add(requireNonNull(consumer));
@@ -334,7 +342,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   @Override
   public synchronized void onBeforeResponse(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_RESPONSE) {
+    if (stateCtx.get() >= STATE_RESPONSE_RECEIVED) {
       signalConsumerSilently(consumer);
     } else {
       onBeforeResponseConsumerList.add(requireNonNull(consumer));
@@ -343,7 +351,7 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
 
   @Override
   public synchronized void onResponse(BiConsumer<CoreEvent, Throwable> consumer) {
-    if (state >= STATE_RESPONSE) {
+    if (stateCtx.get() >= STATE_RESPONSE_RECEIVED) {
       signalConsumerSilently(consumer);
     } else {
       onResponseConsumerList.add(requireNonNull(consumer));
@@ -355,7 +363,6 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     if (isTerminated()) {
       throw new IllegalStateException("getResponsePublisher() cannot be called after eventContext termination.");
     }
-
     return Mono.create(responsePublisher.get());
   }
 
@@ -435,8 +442,8 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
             .collect(joining(lineSeparator()));
   }
 
-  protected byte getState() {
-    return state;
+  protected int getState() {
+    return stateCtx.get();
   }
 
 }

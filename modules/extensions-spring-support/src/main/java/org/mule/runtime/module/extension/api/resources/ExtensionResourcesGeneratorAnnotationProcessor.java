@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.api.resources.BaseExtensionResou
 import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_SKIP;
 import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION;
 
-import static javax.lang.model.SourceVersion.RELEASE_8;
+import static javax.lang.model.SourceVersion.RELEASE_17;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
@@ -33,7 +33,7 @@ import javax.annotation.processing.SupportedSourceVersion;
     "org.mule.runtime.extension.api.annotation.Extension",
     "org.mule.sdk.api.annotation.Extension"
 })
-@SupportedSourceVersion(RELEASE_8)
+@SupportedSourceVersion(RELEASE_17)
 @SupportedOptions({
     EXTENSION_VERSION,
     EXTENSION_RESOURCES,

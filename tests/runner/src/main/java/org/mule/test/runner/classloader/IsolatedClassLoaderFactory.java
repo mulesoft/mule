@@ -46,6 +46,8 @@ import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLo
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -276,7 +278,9 @@ public class IsolatedClassLoaderFactory {
     String testRunnerArtifactId = getArtifactPluginId(regionClassLoader.getArtifactId(), "test-runner");
 
     List<String> pluginDependencies =
-        artifactsUrlClassification.getPluginUrlClassifications().stream().map(p -> p.getName()).collect(toList());
+        artifactsUrlClassification.getPluginUrlClassifications().stream()
+            .map(PluginUrlClassification::getName)
+            .collect(toList());
 
     PluginUrlClassification testRunnerPluginClassification =
         new PluginUrlClassification(TEST_RUNNER_ARTIFACT_ID + ":", artifactsUrlClassification.getTestRunnerLibUrls(), emptyList(),
@@ -369,7 +373,8 @@ public class IsolatedClassLoaderFactory {
    */
   protected List<ArtifactClassLoader> createServiceClassLoaders(ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
                                                                 MuleContainerClassLoaderWrapper containerClassLoaderWrapper,
-                                                                ArtifactsUrlClassification artifactsUrlClassification) {
+                                                                ArtifactsUrlClassification artifactsUrlClassification)
+      throws ArtifactClassloaderCreationException {
     List<ArtifactClassLoader> servicesArtifactClassLoaders = newArrayList();
     for (ServiceUrlClassification serviceUrlClassification : artifactsUrlClassification.getServiceUrlClassifications()) {
       logClassLoaderUrls("SERVICE (" + serviceUrlClassification.getArtifactId() + ")", serviceUrlClassification.getUrls());
@@ -521,9 +526,12 @@ public class IsolatedClassLoaderFactory {
     applicationUrls.addAll(artifactsUrlClassification.getApplicationSharedLibUrls());
 
     logClassLoaderUrls("APP", applicationUrls);
-    return new MuleApplicationClassLoader(APP_NAME, new ArtifactDescriptor(APP_NAME), parent,
+    ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(APP_NAME);
+    return new MuleApplicationClassLoader(APP_NAME, applicationDescriptor, parent,
                                           new DefaultNativeLibraryFinderFactory()
-                                              .create(APP_NAME, applicationUrls.toArray(new URL[applicationUrls.size()])),
+                                              .create(APP_NAME,
+                                                      applicationDescriptor.getLoadedNativeLibrariesFolderName(),
+                                                      applicationUrls.toArray(new URL[applicationUrls.size()])),
                                           applicationUrls,
                                           childClassLoaderLookupPolicy);
   }

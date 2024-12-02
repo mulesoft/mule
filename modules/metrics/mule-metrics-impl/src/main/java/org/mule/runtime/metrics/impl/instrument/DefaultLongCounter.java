@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.metrics.impl.instrument;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.metrics.api.instrument.LongCounter;
@@ -14,8 +15,10 @@ import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -27,17 +30,17 @@ public class DefaultLongCounter implements LongCounter {
     return new DefaultLongCounterBuilder(name, meter);
   }
 
-  private final AtomicLong value = new AtomicLong(0);
   private final String name;
   private final String description;
   private final String unit;
   private final Meter meter;
 
+  private final AtomicLong value = new AtomicLong(0);
   private Supplier<Long> valueSupplier = value::get;
 
-  private Consumer<Long> addOperation = value::addAndGet;
+  private BiConsumer<Long, Map<String, String>> addOperation = getDefaultAddOperation();
 
-  private Supplier<Long> incrementAndGetOperation = value::incrementAndGet;
+  private Function<Map<String, String>, Long> incrementAndGetOperation = getDefaultIncrementAndGetOperation();
 
   private DefaultLongCounter(String name, String description, String unit, Meter meter) {
     this.name = name;
@@ -66,8 +69,12 @@ public class DefaultLongCounter implements LongCounter {
     if (value < 0) {
       throw new IllegalArgumentException("The value to add must be positive");
     }
+    addOperation.accept(value, emptyMap());
+  }
 
-    addOperation.accept(value);
+  @Override
+  public void add(long value, Map<String, String> attributes) {
+    addOperation.accept(value, attributes);
   }
 
   @Override
@@ -87,17 +94,27 @@ public class DefaultLongCounter implements LongCounter {
 
   @Override
   public int incrementAndGetAsInt() {
-    return incrementAndGetOperation.get().intValue();
+    return incrementAndGetOperation.apply(emptyMap()).intValue();
   }
 
   @Override
   public long incrementAndGetAsLong() {
-    return incrementAndGetOperation.get();
+    return incrementAndGetOperation.apply(emptyMap());
   }
 
   @Override
   public void reset() {
     value.set(0L);
+  }
+
+  private BiConsumer<Long, Map<String, String>> getDefaultAddOperation() {
+    return (delta, context) -> {
+      value.addAndGet(delta);
+    };
+  }
+
+  private Function<Map<String, String>, Long> getDefaultIncrementAndGetOperation() {
+    return contextAttributes -> value.incrementAndGet();
   }
 
   public static class DefaultLongCounterBuilder implements LongCounterBuilder {
@@ -109,8 +126,9 @@ public class DefaultLongCounter implements LongCounter {
     private String unit;
     private MeterExporter meterExporter;
 
-    private Consumer<Long> addOperation;
-    private Supplier<Long> incrementAndGetOperation;
+    private BiConsumer<Long, Map<String, String>> addOperation;
+    private Function<Map<String, String>, Long> incrementAndGetOperation;
+
     private Supplier<Long> valueSupplier;
 
     public DefaultLongCounterBuilder(String name, Meter meter) {
@@ -144,11 +162,7 @@ public class DefaultLongCounter implements LongCounter {
     public LongCounter build() {
       LongCounter longCounter = ofNullable(instrumentRepository)
           .map(repository -> (LongCounter) repository.create(name, name -> doBuild()))
-          .orElse(doBuild());
-
-      if (meterExporter != null) {
-        meterExporter.enableExport(longCounter);
-      }
+          .orElseGet(this::doBuild);
 
       return longCounter;
     }
@@ -168,18 +182,21 @@ public class DefaultLongCounter implements LongCounter {
         longCounter.setIncrementAndGetOperation(incrementAndGetOperation);
       }
 
+      if (meterExporter != null) {
+        meterExporter.enableExport(longCounter);
+      }
+
       return longCounter;
     }
 
     @Override
-    public DefaultLongCounterBuilder withConsumerForAddOperation(Consumer<Long> consumerForAddOperation) {
-      this.addOperation = consumerForAddOperation;
+    public DefaultLongCounterBuilder withAddOperation(BiConsumer<Long, Map<String, String>> addOperation) {
+      this.addOperation = addOperation;
       return this;
     }
 
-    @Override
-    public DefaultLongCounterBuilder withSupplierForIncrementAndGetOperation(Supplier<Long> supplierForIncrementOperation) {
-      this.incrementAndGetOperation = supplierForIncrementOperation;
+    public DefaultLongCounterBuilder withIncrementAndGetOperation(Function<Map<String, String>, Long> incrementAndGetOperation) {
+      this.incrementAndGetOperation = incrementAndGetOperation;
       return this;
     }
 
@@ -190,11 +207,11 @@ public class DefaultLongCounter implements LongCounter {
     }
   }
 
-  private void setIncrementAndGetOperation(Supplier<Long> incrementAndGetOperation) {
+  private void setIncrementAndGetOperation(Function<Map<String, String>, Long> incrementAndGetOperation) {
     this.incrementAndGetOperation = incrementAndGetOperation;
   }
 
-  private void setAddOperation(Consumer<Long> addOperation) {
+  private void setAddOperation(BiConsumer<Long, Map<String, String>> addOperation) {
     this.addOperation = addOperation;
   }
 

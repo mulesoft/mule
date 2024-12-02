@@ -34,8 +34,6 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cli
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
-import org.mule.runtime.module.extension.soap.internal.runtime.connection.SoapConnectionProviderObjectBuilder;
 
 import java.util.concurrent.Callable;
 
@@ -84,13 +82,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
 
     BaseConnectionProviderObjectBuilder builder;
-    if (extensionModel.getModelProperty(SoapExtensionModelProperty.class).isPresent()) {
-      builder = new SoapConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
-                                                        reconnectionConfig,
-                                                        extensionModel,
-                                                        expressionManager,
-                                                        muleContext);
-    } else if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
+    if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
       builder = resolveOAuthBuilder(resolverSet);
     } else {
       builder = new DefaultConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,

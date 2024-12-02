@@ -8,12 +8,12 @@ package org.mule.tck.util;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
@@ -89,6 +89,8 @@ import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -302,7 +304,7 @@ public class MuleContextUtils {
     when(((PrivilegedMuleContext) muleContext).getErrorTypeLocator()).thenReturn(typeLocator);
 
     final MuleConfiguration configuration = muleContext.getConfiguration();
-    lenient().when(configuration.getMinMuleVersion()).thenReturn(of(new MuleVersion(getProductVersion())));
+    lenient().when(configuration.getMinMuleVersion()).thenReturn(of(new MuleVersion(getMuleManifest().getProductVersion())));
 
     NotificationListenerRegistry notificationListenerRegistry = mock(NotificationListenerRegistry.class);
     ConfigurationProperties configProps = mock(ConfigurationProperties.class, withSettings().lenient());
@@ -337,6 +339,8 @@ public class MuleContextUtils {
       injectableObjects.put(InternalProfilingService.class, coreProfilingService);
       injectableObjects.put(ProfilingService.class, coreProfilingService);
       injectableObjects.put(ComponentTracerFactory.class, new DummyComponentTracerFactory());
+      injectableObjects.put(ErrorMetricsFactory.class, ErrorMetricsFactory.NO_OP);
+      injectableObjects.put(MeterProvider.class, MeterProvider.NO_OP);
 
       // Ensure injection of consistent mock objects
       when(muleContext.getInjector()).thenReturn(new MocksInjector(injectableObjects));

@@ -190,6 +190,7 @@ import java.util.function.Supplier;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.apache.logging.log4j.LogManager;
+import org.slf4j.event.Level;
 import org.slf4j.Logger;
 
 import org.junit.After;
@@ -203,8 +204,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.mockito.verification.VerificationMode;
-
-import uk.org.lidalia.slf4jext.Level;
 
 /**
  * Base class for deployment tests using a {@link MuleDeploymentService} instance.
@@ -615,10 +614,16 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     verifyAnchorFileExistsAction.perform();
   }
 
-  protected void startDeployment() throws MuleException {
-    serviceManager.start();
+  protected void startDeployment(boolean startServiceManager) throws MuleException {
+    if (startServiceManager) {
+      serviceManager.start();
+    }
     startIfNeeded(extensionModelLoaderRepository);
     deploymentService.start(false);
+  }
+
+  protected void startDeployment() throws MuleException {
+    startDeployment(true);
   }
 
   protected void triggerDirectoryWatcher() {
@@ -1361,9 +1366,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static class TestMuleDeploymentService extends MuleDeploymentService {
 
+    private final Supplier<SchedulerService> schedulerServiceSupplier;
+
     public TestMuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                      Supplier<SchedulerService> schedulerServiceSupplier) {
       super(domainFactory, applicationFactory, schedulerServiceSupplier);
+      this.schedulerServiceSupplier = schedulerServiceSupplier;
     }
 
     @Override
@@ -1377,8 +1385,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                         new DomainDeploymentTemplate(applicationDeployer,
                                                                                                      this,
                                                                                                      applicationDeploymentListener),
-                                                                        new DeploymentMuleContextListenerFactory(
-                                                                                                                 domainDeploymentListener)),
+                                                                        new DeploymentMuleContextListenerFactory(domainDeploymentListener),
+                                                                        schedulerServiceSupplier),
                                            applicationDeployer, this);
 
     }

@@ -19,7 +19,7 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
 import java.util.Optional;
 
@@ -41,7 +41,7 @@ public class DelegateTransaction extends AbstractTransaction {
                             .findFirst();
   }
 
-  private Transaction delegate = new NullTransaction();
+  private SuspendableTransaction delegate = new NullTransaction();
 
   private final TransactionManager transactionManager;
 
@@ -107,7 +107,7 @@ public class DelegateTransaction extends AbstractTransaction {
     }
 
     this.unbindTransaction();
-    this.delegate = TX_FACTORY
+    this.delegate = (SuspendableTransaction) TX_FACTORY
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No %s for transactional resource %s",
                                                                                TransactionFactory.class.getName(),
                                                                                key.getClass().getName()))))

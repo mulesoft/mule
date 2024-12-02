@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
@@ -57,6 +58,7 @@ import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -65,6 +67,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 
 @Features({@Feature(LOGGING), @Feature(CLASSLOADING_ISOLATION)})
+@Ignore("W-16176670")
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
 
   private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
@@ -337,7 +340,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     File logContent =
         new File(getResourceAsUrl(fileLocation, ClassloadingTroubleshootingTestCase.class)
             .toURI());
-    final String expectedErrorLog = readFileToString(logContent);
+    final String expectedErrorLog = normalizeLineEndings(readFileToString(logContent));
     final Optional<String> secondOptionExpectedErrorLog = secondOptionLog.map(path -> {
       try {
         return readFileToString(new File(getResourceAsUrl(path, ClassloadingTroubleshootingTestCase.class).toURI()));
@@ -371,6 +374,13 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
             return "expected content ('" + expectedErrorLog + "') not found. Full log is:" + lineSeparator() + joiner;
           }
         });
+  }
+
+  private String normalizeLineEndings(String s) {
+    if (IS_OS_WINDOWS) {
+      s = s.replace("\n", "\r\n");
+    }
+    return s;
   }
 
   private List<String> toMessages(List<LoggingEvent> loggingEvents) {

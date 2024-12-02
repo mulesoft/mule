@@ -11,9 +11,9 @@ import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DS
 
 import static java.lang.String.format;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -40,8 +40,9 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
 
   @Test
   public void repeatedGlobalNames() {
-    final Optional<ValidationResultItem> msg = runValidation(getConfigDsl())
-        .stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("NameIsNotRepeatedTestCase#repeatedGlobalNames",
+                                                             getConfigDsl())
+                                                                 .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString(format("Two (or more) configuration elements have been defined with the same global name. Global name '%s' must be unique",
@@ -51,8 +52,9 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
   @Test
   @Issue("MULE-19959")
   public void repeatedGlobalNamesAllReported() {
-    final Optional<ValidationResultItem> msg = runValidation(getConfigDsl())
-        .stream().findFirst();
+    final Optional<ValidationResultItem> msg = runValidation("NameIsNotRepeatedTestCase#repeatedGlobalNamesAllReported",
+                                                             getConfigDsl())
+                                                                 .stream().findFirst();
 
     assertThat(msg.get().getComponents(), hasSize(2));
   }

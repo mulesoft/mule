@@ -31,6 +31,7 @@ import static org.mule.runtime.core.internal.profiling.tracing.event.span.condit
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.MULE_RUNTIME_ERROR_METRICS;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveError;
@@ -74,7 +75,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
@@ -89,7 +89,11 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.AbstractExecutableComponent;
+import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetrics;
+import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
@@ -116,6 +120,7 @@ import org.slf4j.MDC;
 
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Hooks;
 import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
@@ -135,6 +140,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private static Class<ClassLoader> appClClass;
 
+  private static final Logger MULE_CTX_LOGGER = getLogger(DefaultMuleContext.class);
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
   private static final Consumer<Context> TCCL_REACTOR_CTX_CONSUMER =
@@ -146,6 +152,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
 
   static {
+    // Log dropped events/errors
+    // Use a different logger for keeping compatibility with currently available tools and documentation
+    Hooks.onErrorDropped(error -> MULE_CTX_LOGGER.debug("ERROR DROPPED", error));
+    Hooks.onNextDropped(event -> MULE_CTX_LOGGER.debug("EVENT DROPPED {}", event));
+
     try {
       appClClass = (Class<ClassLoader>) AbstractMessageProcessorChain.class.getClassLoader()
           .loadClass("org.mule.runtime.deployment.model.api.application.ApplicationClassLoader");
@@ -194,12 +205,20 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private ComponentTracer<CoreEvent> chainComponentTracer;
 
+  private MuleContextListener stopListener;
+
   // This is used to verify if a span has to be ended in case of error handling.
   // In case an exception is raised before the chain begins to execute, there is no current span set for the chain.
   // This can happen, for example, if an exception is raised because of too many child context created
   // in a possible infinite recursion with flow-refs -> (flows/subflows)
   private boolean chainSpanCreated = false;
   private static final Component UNKNOWN_COMPONENT = getUnnamedComponent();
+
+  @Inject
+  MeterProvider meterProvider;
+  @Inject
+  ErrorMetricsFactory errorMetricsFactory;
+  private ErrorMetrics errorMetrics;
 
   AbstractMessageProcessorChain(String name,
                                 Optional<ProcessingStrategy> processingStrategyOptional,
@@ -290,6 +309,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       });
 
     } else {
+      // Errors at this AbstractMessageProcessorChain will not be forwarded to the error handling (no FlowExceptionHandler set).
       return doApply(publisher, interceptors, (context, throwable) -> {
         // Record the error and end current (Processor) Span.
         CoreEvent coreEvent = ((MessagingException) throwable).getEvent();
@@ -299,14 +319,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         // Record the error and end current MessageProcessor chain Span.
         muleEventTracer.recordErrorAtCurrentSpan(coreEvent, true);
         chainComponentTracer.endCurrentSpan(coreEvent);
-
+        // Measure the error since it will not be forwarded to OnError handlers (see TemplateOnErrorHandler#measure)
+        errorMetrics.measure(throwable);
         context.error(throwable);
       });
     }
   }
 
   private boolean recreateRouter(ContextView ctx) {
-    return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false);
+    return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false) || isTransactionActive();
   }
 
   private Consumer<Exception> getRouter(Supplier<Consumer<Exception>> errorRouterSupplier, boolean recreateRouter) {
@@ -589,7 +610,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private void registerStopListener() {
     if (muleContext instanceof DefaultMuleContext) {
-      MuleContextListener listener = new MuleContextListener() {
+      stopListener = new MuleContextListener() {
 
         @Override
         public void onCreation(MuleContext context) {
@@ -612,7 +633,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           ((DefaultMuleContext) muleContext).removeListener(this);
         }
       };
-      ((DefaultMuleContext) muleContext).addListener(listener);
+      ((DefaultMuleContext) muleContext).addListener(stopListener);
     }
   }
 
@@ -752,6 +773,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (chainComponentTracer == null) {
       this.chainComponentTracer = componentTracerFactory.fromComponent(this);
     }
+
+    errorMetrics = errorMetricsFactory.create(meterProvider.getMeterBuilder(MULE_RUNTIME_ERROR_METRICS).build());
   }
 
   @Override
@@ -777,6 +800,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   public void stop() throws MuleException {
     canProcessMessage = false;
     stopIfNeeded(getMessageProcessorsForLifecycle());
+
+    if (stopListener != null) {
+      ((DefaultMuleContext) muleContext).removeListener(stopListener);
+    }
   }
 
   @Override

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-extensions-spring-support</artifactId>
     <name>Mule Extensions Spring Support</name>
@@ -16,9 +16,15 @@
     </description>
 
     <properties>
+        <surefire.module.path>
+            ${org.mule.runtime.boot:mule-module-jpms-utils:jar}
+        </surefire.module.path>
+        <surefire.add.modules>
+            org.mule.runtime.jpms.utils
+        </surefire.add.modules>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            ${surefire.test.unit.open.args}
+            ${surefire.module.args}
         </surefire.args>
 
         <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
@@ -47,10 +53,27 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader=org.mule.runtime.extensions.spring.support</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <!-- Module layer is created by the tests-runner, don't need surefire to config the boot layer for the JVM -->
                     <useModulePath>false</useModulePath>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>org.mule.runtime.boot:mule-module-jpms-utils</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -89,11 +112,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-soap-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -113,11 +131,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-javaee</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -133,6 +146,11 @@
         <dependency>
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
@@ -326,14 +344,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-objectstore-connector</artifactId>
-            <version>1.1.1</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-football-soap-extension</artifactId>
-            <version>${project.version}</version>
+            <version>1.2.2</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
@@ -360,13 +371,6 @@
                     <artifactId>Saxon-HE</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-rick-and-morty-extension</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -428,7 +432,6 @@
         <dependency>
             <groupId>org.mule.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
-            <version>${jsonassert.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

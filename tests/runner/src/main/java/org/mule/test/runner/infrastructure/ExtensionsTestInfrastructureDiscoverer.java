@@ -8,10 +8,10 @@ package org.mule.test.runner.infrastructure;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.privileged.spi.ExtensionsApiSpiUtils.loadDslResourceFactories;
 import static org.mule.runtime.extension.privileged.spi.ExtensionsApiSpiUtils.loadExtensionSchemaGenerators;
 import static org.mule.runtime.extension.privileged.spi.ExtensionsApiSpiUtils.loadGeneratedResourceFactories;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
@@ -21,7 +21,6 @@ import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.util.FileUtils;
@@ -86,7 +85,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
                                           DslResolvingContext dslResolvingContext) {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, annotatedClass.getName());
-    params.put(VERSION, getProductVersion());
+    params.put(VERSION, getMuleManifest().getProductVersion());
     ExtensionModel model = loader.loadExtensionModel(annotatedClass.getClassLoader(), dslResolvingContext, params);
     extensionManager.registerExtension(model);
     return model;
@@ -151,7 +150,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
   }
 
   private File createManifestFileIfNecessary(File targetDirectory) {
-    return createManifestFileIfNecessary(targetDirectory, MuleManifest.getManifest());
+    return createManifestFileIfNecessary(targetDirectory, getMuleManifest().getManifest());
   }
 
   private File createManifestFileIfNecessary(File targetDirectory, Manifest sourceManifest) {

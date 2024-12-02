@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
-import static java.util.Optional.empty;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.func.Once.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+
+import static java.util.Optional.empty;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
@@ -72,25 +73,25 @@ public class RouteComponentObjectFactory extends AbstractExtensionObjectFactory<
     return withContextClassLoader(classLoader, () -> {
       initialiser.runOnce();
 
-      final MessageProcessorChain nestedChain;
+      final MessageProcessorChain chain;
 
       if (nestedProcessors != null) {
-        nestedChain = newChain(empty(), nestedProcessors);
+        chain = newChain(empty(), nestedProcessors);
         final StreamingManager streamingManager =
             ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(StreamingManager.class);
         model.getNestedComponents().stream()
             .filter(component -> component instanceof NestedChainModel)
             .findFirst()
-            .ifPresent(chain -> parameters.put(chain.getName(),
-                                               new ProcessorChainValueResolver(streamingManager, nestedChain)));
+            .ifPresent(chainModel -> parameters.put(chainModel.getName(),
+                                                    new ProcessorChainValueResolver(model, chain, streamingManager)));
       } else {
-        nestedChain = null;
+        chain = null;
       }
 
       resolveParameters(objectType, builder);
       resolveParameterGroups(objectType, builder);
 
-      return new RouteBuilderValueResolver(builder, muleContext, nestedChain);
+      return new RouteBuilderValueResolver(builder, muleContext, chain);
 
     }, Exception.class, exception -> {
       throw exception;

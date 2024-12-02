@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.rules.ExpectedException.none;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -45,6 +45,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -62,7 +63,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import io.qameta.allure.Issue;
@@ -90,9 +90,6 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   private MuleContext muleContext;
 
   @Rule
-  public ExpectedException expectedException = none();
-
-  @Rule
   public SystemProperty disableExpressionsSupport = new SystemProperty(DISABLE_TRANSFORMERS_SUPPORT, "true");
 
   @Before
@@ -110,23 +107,21 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
   @Test
   @Issue("MULE-19534")
   public void configureWithFailOnFirstError() throws ConfigurationException {
-    expectedException.expect(ConfigurationException.class);
-    expectedException
-        .expectMessage(containsString(SCHEMA_VALIDATION_ERROR));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(true);
 
-    configurationBuilderWithUsedInvalidSchema.configure(muleContext);
+    var thrown =
+        assertThrows(ConfigurationException.class, () -> configurationBuilderWithUsedInvalidSchema.configure(muleContext));
+    assertThat(thrown.getMessage(), containsString(SCHEMA_VALIDATION_ERROR));
   }
 
   @Test
   @Issue("MULE-19534")
   public void configureWithFailAfterTenErrors() throws ConfigurationException {
-    expectedException.expect(ConfigurationException.class);
-    expectedException
-        .expectMessage(containsString(SCHEMA_VALIDATION_ERROR));
     when(featureFlaggingService.isEnabled(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR)).thenReturn(false);
 
-    configurationBuilderWithUsedInvalidSchema.configure(muleContext);
+    var thrown =
+        assertThrows(ConfigurationException.class, () -> configurationBuilderWithUsedInvalidSchema.configure(muleContext));
+    assertThat(thrown.getMessage(), containsString(SCHEMA_VALIDATION_ERROR));
   }
 
   @Test
@@ -210,6 +205,11 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
 
     @Override
     public String generate(ExtensionModel extensionModel, DslResolvingContext context) {
+      return "";
+    }
+
+    @Override
+    public String generate(ExtensionModel extensionModel, DslResolvingContext context, DslSyntaxResolver dsl) {
       return "";
     }
   }

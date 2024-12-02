@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.core.internal.context;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
+import static org.mule.runtime.core.internal.registry.SimpleRegistry.createFeatureFlaggingService;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -67,6 +71,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
 
   private ArtifactCoordinates artifactCoordinates;
 
+  private Optional<FeatureFlaggingService> featureFlaggingService;
 
   /**
    * Creates a new builder
@@ -107,7 +112,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   }
 
   protected void configureRegistry(DefaultMuleContext muleContext) {
-    final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
+    final SimpleRegistry registry =
+        new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor(),
+                           featureFlaggingService == null ? of(createFeatureFlaggingService(muleContext))
+                               : featureFlaggingService);
     muleContext.setRegistry(registry);
     muleContext.setInjector(registry);
   }
@@ -257,5 +265,10 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   @Override
   public void setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
     this.artifactCoordinates = artifactCoordinates;
+  }
+
+  @Override
+  public void setFeatureFlaggingService(Optional<FeatureFlaggingService> featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
   }
 }

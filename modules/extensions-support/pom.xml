@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-extensions-support</artifactId>
     <name>Mule Extensions Support</name>
@@ -53,12 +53,13 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.component=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.exception=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED
             --add-opens=org.mule.runtime.errors/org.mule.runtime.config.internal.error=ALL-UNNAMED
             --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.runtime.extensions.support
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.extensions.support
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el.dataweave=org.mule.runtime.extensions.support
             ${surefire.test.unit.open.args}
         </surefire.args>
 
@@ -219,6 +220,26 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.testing.compile</groupId>
+            <artifactId>compile-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
             <version>${project.version}</version>
@@ -280,16 +301,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-model</artifactId>
             <version>${project.version}</version>
@@ -299,11 +310,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.testing.compile</groupId>
-            <artifactId>compile-testing</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -317,6 +323,12 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-sample-data-extension</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -336,6 +348,27 @@
         </testResources>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>--add-exports=org.mule.runtime.metadata.support/org.mule.runtime.metadata.internal.cache=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader.enricher=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader.validator=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.property=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el.dataweave=org.mule.runtime.extensions.support</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Required by mule-extension-ast-loader -->
             <!-- Force creation of the test-jar before the shade-plugin runs -->
             <plugin>
@@ -373,6 +406,7 @@
                                 <includes>
                                     <!-- From Spring we just require ResolvableType and DefaultConversionService for use in this module. -->
                                     <!-- Shading and minimizing it we avoid including the whole spring-core jar as a dependency. -->
+                                    <!-- If this shading is removed, all the ByteBuddySpringCacheInstrumentator related logic should be removed from the extensions-support module too -->
                                     <includes>org.springframework:spring-core</includes>
                                 </includes>
                             </artifactSet>

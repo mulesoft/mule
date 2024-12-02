@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import static java.lang.String.format;
@@ -30,12 +29,6 @@ import java.util.function.Predicate;
  */
 public class AllComponentsBelongToSomeExtensionModel implements Validation {
 
-  private final boolean shouldBeError;
-
-  public AllComponentsBelongToSomeExtensionModel(boolean isCompatibilityPluginInstalled) {
-    this.shouldBeError = !isCompatibilityPluginInstalled;
-  }
-
   @Override
   public String getName() {
     return "All components belong to some extension model";
@@ -48,7 +41,7 @@ public class AllComponentsBelongToSomeExtensionModel implements Validation {
 
   @Override
   public Level getLevel() {
-    return shouldBeError ? ERROR : WARN;
+    return ERROR;
   }
 
   @Override

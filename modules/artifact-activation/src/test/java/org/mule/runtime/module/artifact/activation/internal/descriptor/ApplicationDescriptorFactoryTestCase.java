@@ -97,8 +97,9 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractDeployableArti
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-db-connector")).findAny()
             .get().getAdditionalDependenciesList();
 
-    assertThat(additionalDependencies, hasSize(1));
+    assertThat(additionalDependencies, hasSize(2));
     assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("derby"));
+    assertThat(additionalDependencies.get(1).getDescriptor().getArtifactId(), is("derbyshared"));
 
     ArtifactPluginDescriptor dbPlugin = applicationDescriptor.getPlugins()
         .stream()
@@ -115,10 +116,11 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractDeployableArti
     ApplicationDescriptor applicationDescriptor = createApplicationDescriptor("apps/additional-plugin-dependency-and-dep");
 
     assertThat(applicationDescriptor.getClassLoaderConfiguration().getExportedPackages(), hasSize(0));
-    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(4));
+    assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(5));
 
     assertThat(applicationDescriptor.getClassLoaderConfiguration().getDependencies(),
                hasItems(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
+                        hasProperty("descriptor", hasProperty("artifactId", equalTo("derbyshared"))),
                         hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
 
     List<BundleDependency> additionalDependencies =
@@ -126,8 +128,9 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractDeployableArti
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-db-connector")).findAny()
             .get().getAdditionalDependenciesList();
 
-    assertThat(additionalDependencies, hasSize(1));
+    assertThat(additionalDependencies, hasSize(2));
     assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("derby"));
+    assertThat(additionalDependencies.get(1).getDescriptor().getArtifactId(), is("derbyshared"));
 
     ArtifactPluginDescriptor dbPlugin = applicationDescriptor.getPlugins()
         .stream()
@@ -154,7 +157,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractDeployableArti
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-spring-module")).findAny()
             .get().getAdditionalDependenciesList();
 
-    assertThat(additionalDependencies, hasSize(6));
+    assertThat(additionalDependencies, hasSize(8));
     assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("spring-context"));
 
     ArtifactPluginDescriptor springPlugin = applicationDescriptor.getPlugins()

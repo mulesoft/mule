@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.tracer.customization.impl.provider;
 
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import java.util.Objects;
 
@@ -30,7 +30,7 @@ public class InitialSpanInfoIdentifier {
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    InitialSpanInfoIdentifier that = (InitialSpanInfoIdentifier) o;
+    final InitialSpanInfoIdentifier that = (InitialSpanInfoIdentifier) o;
     return Objects.equals(stringId, that.stringId);
   }
 

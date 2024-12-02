@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.artifact.api.descriptor;
 
+import static java.util.Collections.singleton;
+
 import org.mule.api.annotation.NoExtend;
 
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents the description of a domain.
@@ -47,6 +47,6 @@ public class DomainDescriptor extends DeployableArtifactDescriptor {
 
   @Override
   protected Set<String> getDefaultConfigResources() {
-    return ImmutableSet.<String>builder().add(DEFAULT_CONFIGURATION_RESOURCE).build();
+    return singleton(DEFAULT_CONFIGURATION_RESOURCE);
   }
 }

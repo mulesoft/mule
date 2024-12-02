@@ -31,8 +31,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
-import static org.apache.commons.lang3.JavaVersion.JAVA_11;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import static org.junit.Assert.fail;
 
@@ -56,11 +54,10 @@ import java.net.URISyntaxException;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.apache.logging.log4j.LogManager;
+import org.slf4j.event.Level;
 
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
-
-import uk.org.lidalia.slf4jext.Level;
 
 /**
  * Utility class that holds most of the artifacts used in the deployment module test cases, in order to avoid compiling or
@@ -123,6 +120,14 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static File pluginEchoJavaxTestClassFile;
   public static File withLifecycleListenerExtensionJarFile;
   public static File withBrokenLifecycleListenerExtensionJarFile;
+  public static File bridgeMethodExtensionJarFile;
+  public static File overriderClassFile;
+  public static File moduleOverriderClassFile;
+  public static File xercesJarFile;
+  public static File pluginClassFile;
+  public static JarFileBuilder testOverriderLibrary;
+  public static JarFileBuilder jreExtensionLibrary;
+  public static ArtifactPluginFileBuilder testPlugin;
 
   private static TemporaryFolder compilerWorkFolder;
 
@@ -179,8 +184,28 @@ public final class TestArtifactsCatalog extends ExternalResource {
         new JarCompiler().compiling(getResourceFile("/packagetesting/javax/annotation/BarUtils.java"))
             .compile("bar-javax.jar");
 
-    barUtilsForbiddenJavaClassFile = new SingleClassCompiler()
+    xercesJarFile = getResourceFile("/sources/jar/xercesImpl-2.11.0.jar");
+    overriderClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/OverrideMe.java"));
+    moduleOverriderClassFile = new SingleClassCompiler().compile(getResourceFile("/modules/org/foo/OverrideMe.java"));
+    testOverriderLibrary = new JarFileBuilder("test-overrider-library", new JarCompiler()
+        .compiling(getResourceFile("/override-library/org/foo/OverrideMe.java"))
+        .compile("test-overrider-library.jar"));
+    pluginClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/pluginlib/org/foo/OverrideMe.java"));
+    testPlugin = new ArtifactPluginFileBuilder("plugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .containingClass(pluginClassFile, "org/foo/OverrideMe.class");
+    jreExtensionLibrary = new JarFileBuilder("jre-extension-library", new JarCompiler()
         .targetJavaVersion(8)
+        .compiling(getResourceFile("/jre-extension-library/src/main/java/org/foo/OverrideMe.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/javax/annotation/JavaxExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/ietf/jgss/IetfExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/omg/test/OmgExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/w3c/dom/DomExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/xml/sax/SaxExtender.java"))
+        .compile("jre-extension-library.jar"));
+
+    barUtilsForbiddenJavaClassFile = new SingleClassCompiler()
         .compile(getResourceFile("/packagetesting/java/lang/BarUtils.java"));
     barUtilsForbiddenJavaJarFile =
         new JarCompiler().compiling(getResourceFile("/packagetesting/java/lang/BarUtils.java"))
@@ -208,22 +233,20 @@ public final class TestArtifactsCatalog extends ExternalResource {
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 
     defaultServiceEchoJarFile = new JarCompiler()
-        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
+        .targetJavaVersion(17)
         .compiling(getResourceFile("/packagetesting/org/mule/echo/DefaultEchoService.java"),
-                   getResourceFile("/packagetesting/org/mule/echo/EchoServiceProvider.java"))
-        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
-                                getResourceFile("/packagetesting/org/mule/echo/module-info.java"))
+                   getResourceFile("/packagetesting/org/mule/echo/EchoServiceProvider.java"),
+                   getResourceFile("/packagetesting/org/mule/echo/module-info.java"))
         .including(getResourceFile("/packagetesting/org/mule/echo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")
         .dependingOn(new File(getProperty("testServicesLib")))
         .compile("mule-module-service-echo-4.0-SNAPSHOT.jar");
 
     defaultFooServiceJarFile = new JarCompiler()
-        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
+        .targetJavaVersion(17)
         .compiling(getResourceFile("/packagetesting/org/mule/service/foo/DefaultFooService.java"),
-                   getResourceFile("/packagetesting/org/mule/service/foo/FooServiceProvider.java"))
-        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
-                                getResourceFile("/packagetesting/org/mule/service/foo/module-info.java"))
+                   getResourceFile("/packagetesting/org/mule/service/foo/FooServiceProvider.java"),
+                   getResourceFile("/packagetesting/org/mule/service/foo/module-info.java"))
         .dependingOn(defaultServiceEchoJarFile.getAbsoluteFile(), new File(getProperty("testServicesLib")))
         .including(getResourceFile("/packagetesting/org/mule/service/foo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")
@@ -350,6 +373,12 @@ public final class TestArtifactsCatalog extends ExternalResource {
     pluginEchoJavaxTestClassFile = new SingleClassCompiler()
         .dependingOn(barUtilsJavaxJarFile)
         .compile(getResourceFile("/org/foo/echo/PluginJavaxEcho.java"));
+
+    bridgeMethodExtensionJarFile = new ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/bridge/JavaBridgeMethodExtension.java"),
+                   getResourceFile("/org/foo/bridge/JavaBridgeMethodOperation.java"),
+                   getResourceFile("/org/foo/bridge/GenericHello.java"))
+        .compile("mule-module-bridge-method-1.0.0.jar", "1.0.0");
   }
 
 
@@ -383,11 +412,13 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static ArtifactPluginFileBuilder echoPluginWithJavaxLib;
   public static ArtifactPluginFileBuilder withLifecycleListenerPlugin;
   public static ArtifactPluginFileBuilder withBrokenLifecycleListenerPlugin;
+  public static ArtifactPluginFileBuilder bridgeMethodExtensionPlugin;
 
   public static void initArtifactPluginFileBuilders() throws URISyntaxException {
     echoPlugin = createEchoPluginBuilder();
     helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
     helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
+    bridgeMethodExtensionPlugin = createBridgeExtensionPluginFileBuilder();
     goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
     oracleExtensionPlugin = createOracleExtensionPluginFileBuilder();
     loadClassExtensionPlugin = createLoadClassExtensionPluginFileBuilder();
@@ -695,5 +726,20 @@ public final class TestArtifactsCatalog extends ExternalResource {
     return new ArtifactPluginFileBuilder(artifactId)
         .dependingOn(new JarFileBuilder(artifactId, jarFile))
         .describedBy(mulePluginModelBuilder.build());
+  }
+
+  private static ArtifactPluginFileBuilder createBridgeExtensionPluginFileBuilder() {
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("bridgeExtensionPlugin").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("bridgeExtensionPlugin", MULE_PLUGIN_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.bridge.JavaBridgeMethodExtension")
+        .addProperty("version", "1.0.0");
+    return new ArtifactPluginFileBuilder("bridgeExtensionPlugin-1.0.0")
+        .dependingOn(new JarFileBuilder("bridgeExtensionPlugin", bridgeMethodExtensionJarFile))
+        .describedBy((mulePluginModelBuilder.build()));
   }
 }

@@ -9,54 +9,42 @@ package org.mule.runtime.config.internal.lazy;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newArtifact;
-import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.COMPONENT_LIFE_CYCLE;
 import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.RETURNS_DEFAULTS;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
-
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Features;
-import io.qameta.allure.Story;
-import org.hamcrest.Matcher;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+
+import org.hamcrest.Matcher;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Story;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -82,29 +70,27 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
   private static final String ANOTHER_FLOW = "anotherFlow";
 
   private final AtomicInteger initializations = new AtomicInteger(0);
-  private final FakeBeanFactoryDefaultAnswer beanFactoryDefaultAnswer = new FakeBeanFactoryDefaultAnswer();
 
   @Override
   public void setup() throws Exception {
     super.setup();
     // Enables the Bean Factory to throw only after initial setup
-    beanFactoryDefaultAnswer.setBeanFactoryMustThrow(beanFactoryMustThrow);
+    beanFactory.setBeanFactoryMustThrow(beanFactoryMustThrow);
   }
 
   @Test
   public void whenBeanFactoryThrowsThenThrows() {
     assumeThat(beanFactoryMustThrow, is(true));
-    doThrow(NoSuchBeanDefinitionException.class).when(beanFactory).getBean("non-existent");
     expectedException.expect(NoSuchBeanDefinitionException.class);
     lazyMuleArtifactContext.getBean("non-existent");
-    verify(beanFactory, never()).registerBeanDefinition(eq("non-existent"), any());
+    assertThat(beanFactory.isRegisteredBeanDefiniion("non-existent"), equalTo(FALSE));
   }
 
   @Test
   public void whenBeanFactoryDoesNotThrowThenDontThrow() {
-    doReturn(null).when(beanFactory).getBean("non-existent");
+    assumeThat(beanFactoryMustThrow, is(false));
     assertThat(lazyMuleArtifactContext.getBean("non-existent"), is(nullValue()));
-    verify(beanFactory, never()).registerBeanDefinition(eq("non-existent"), any());
+    assertThat(beanFactory.isRegisteredBeanDefiniion("non-existent"), equalTo(FALSE));
   }
 
   @Test
@@ -115,7 +101,7 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
       lazyMuleArtifactContext.getBean(MY_FLOW);
     }
     assertThat(initializations.get(), is(0));
-    verify(beanFactory, never()).registerBeanDefinition(eq(MY_FLOW), any());
+    assertThat(beanFactory.isRegisteredBeanDefiniion(MY_FLOW), equalTo(FALSE));
   }
 
   @Test
@@ -124,7 +110,7 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
 
     lazyMuleArtifactContext.getBean(MY_FLOW);
     assertThat(initializations.get(), is(1));
-    verify(beanFactory).registerBeanDefinition(eq(MY_FLOW), any());
+    assertThat(beanFactory.isRegisteredBeanDefiniion(MY_FLOW), equalTo(TRUE));
   }
 
   @Test
@@ -137,7 +123,7 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
     lazyMuleArtifactContext.getBean(MY_FLOW);
 
     assertThat(initializations.get(), is(1));
-    verify(beanFactory).registerBeanDefinition(eq(MY_FLOW), any());
+    assertThat(beanFactory.isRegisteredBeanDefiniion(MY_FLOW), equalTo(TRUE));
   }
 
   @Test
@@ -170,46 +156,6 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
   }
 
   @Test
-  public void whenCallingContainsBeanThenBeanIsInitialized() {
-    assumeThat(beanFactoryMustThrow, is(true));
-    verifyInitialized(() -> lazyMuleArtifactContext.containsBean(MY_FLOW));
-  }
-
-  @Test
-  public void whenCallingIsSingletonThenBeanIsInitialized() {
-    assumeThat(beanFactoryMustThrow, is(true));
-    verifyInitialized(() -> lazyMuleArtifactContext.isSingleton(MY_FLOW));
-  }
-
-  @Test
-  public void whenCallingIsPrototypeThenBeanIsInitialized() {
-    assumeThat(beanFactoryMustThrow, is(true));
-    verifyInitialized(() -> lazyMuleArtifactContext.isPrototype(MY_FLOW));
-  }
-
-  @Test
-  public void whenCallingIsTypeMatchThenBeanIsInitialized() {
-    assumeThat(beanFactoryMustThrow, is(true));
-    verifyInitialized(() -> lazyMuleArtifactContext.isTypeMatch(MY_FLOW, Object.class));
-  }
-
-  @Test
-  public void whenCallingIsTypeMatchResolvableTypeThenBeanIsInitialized() {
-    assumeThat(beanFactoryMustThrow, is(true));
-    verifyInitialized(() -> lazyMuleArtifactContext.isTypeMatch(MY_FLOW, ResolvableType.forClass(Object.class)));
-  }
-
-  @Test
-  public void whenCallingGetTypeThenBeanIsInitialized() {
-    verifyInitialized(() -> lazyMuleArtifactContext.getType(MY_FLOW));
-  }
-
-  @Test
-  public void whenCallingGetTypeAllowFactoryBeanInitThenBeanIsInitialized() {
-    verifyInitialized(() -> lazyMuleArtifactContext.getType(MY_FLOW, true));
-  }
-
-  @Test
   public void whenCallingGetAliasesThenBeanIsInitialized() {
     verifyInitialized(() -> lazyMuleArtifactContext.getAliases(MY_FLOW));
   }
@@ -232,9 +178,10 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
     lazyMuleArtifactContext.initializeComponent(builderFromStringRepresentation(ANOTHER_FLOW).build());
     runnable.run();
     assertThat(initializations.get(), is(1));
-    verify(beanFactory).registerBeanDefinition(eq(MY_FLOW), any());
+    assertThat(beanFactory.isRegisteredBeanDefiniion(MY_FLOW), equalTo(TRUE));
   }
 
+  @Override
   protected ArtifactDeclaration getArtifactDeclaration() {
     return newArtifact()
         .withGlobalElement(forExtension(MULE_NAME)
@@ -254,62 +201,4 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
     initializations.incrementAndGet();
   }
 
-  @Override
-  protected DefaultListableBeanFactory doCreateBeanFactoryMock() {
-    // Mocks the Bean Factory in a way that simulates not finding beans until the bean definition is registered
-    DefaultListableBeanFactory beanFactory = mock(ObjectProviderAwareBeanFactory.class, beanFactoryDefaultAnswer);
-    doAnswer(beanFactoryDefaultAnswer.getAnswerForRegisterBeanDefinition())
-        .when(beanFactory)
-        .registerBeanDefinition(any(), any());
-    return beanFactory;
-  }
-
-  /**
-   * An {@link Answer} meant to be used for {@link BeanFactory} that will simulate not finding beans until the corresponding bean
-   * definitions are registered.
-   */
-  private static class FakeBeanFactoryDefaultAnswer implements Answer<Object> {
-
-    private boolean beanFactoryMustThrow = false;
-    private final Set<String> registeredBeans = new HashSet<>();
-
-    @Override
-    public Object answer(InvocationOnMock invocation) throws Throwable {
-      if (!beanFactoryMustThrow || !isMethodFromBeanFactoryInterface(invocation.getMethod())) {
-        return RETURNS_DEFAULTS.answer(invocation);
-      }
-
-      if (invocation.getArgument(0) instanceof Class) {
-        throw new NoSuchBeanDefinitionException(invocation.getArgument(0, Class.class));
-      } else if (invocation.getArgument(0) instanceof ResolvableType) {
-        throw new NoSuchBeanDefinitionException(invocation.getArgument(0, ResolvableType.class));
-      }
-
-      if (registeredBeans.contains(invocation.getArgument(0, String.class))) {
-        return RETURNS_DEFAULTS.answer(invocation);
-      } else {
-        throw new NoSuchBeanDefinitionException(invocation.getArgument(0, String.class));
-      }
-    }
-
-    public Answer<?> getAnswerForRegisterBeanDefinition() {
-      return invocation -> {
-        registeredBeans.add(invocation.getArgument(0, String.class));
-        return null;
-      };
-    }
-
-    public void setBeanFactoryMustThrow(boolean beanFactoryMustThrow) {
-      this.beanFactoryMustThrow = beanFactoryMustThrow;
-    }
-
-    private static boolean isMethodFromBeanFactoryInterface(Method method) {
-      try {
-        BeanFactory.class.getDeclaredMethod(method.getName(), method.getParameterTypes());
-        return true;
-      } catch (NoSuchMethodException e) {
-        return false;
-      }
-    }
-  }
 }

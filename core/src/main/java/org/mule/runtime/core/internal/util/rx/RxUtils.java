@@ -28,8 +28,8 @@ import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.ConsumeOnce;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;

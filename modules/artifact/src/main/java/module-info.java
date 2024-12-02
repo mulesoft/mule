@@ -12,18 +12,18 @@
  */
 module org.mule.runtime.artifact {
 
-  requires org.mule.runtime.api;
+  requires transitive org.mule.runtime.api;
   requires org.mule.sdk.api;
   requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.core;
   requires org.mule.runtime.jar.handling.utils;
+  requires org.mule.runtime.manifest;
 
   requires java.desktop;
   requires java.management;
   requires java.sql;
 
   requires com.github.benmanes.caffeine;
-  requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires semver4j;

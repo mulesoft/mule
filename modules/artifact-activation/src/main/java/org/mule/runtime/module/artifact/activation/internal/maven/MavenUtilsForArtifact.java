@@ -8,12 +8,16 @@ package org.mule.runtime.module.artifact.activation.internal.maven;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
 
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,6 +72,40 @@ public class MavenUtilsForArtifact {
                                                          artifactFolder.getName()));
     }
     return mulePropertiesPom;
+  }
+
+  public static BundleDependency mavenToArtifact(org.mule.maven.pom.parser.api.model.BundleDependency d) {
+    return BundleDependency.builder()
+        .setDescriptor(mavenToArtifact(d.getDescriptor()))
+        .setBundleUri(d.getBundleUri())
+        .setTransitiveDependencies(d.getTransitiveDependencies()
+            .stream()
+            .map(MavenUtilsForArtifact::mavenToArtifact)
+            .collect(toList()))
+        .setScope(BundleScope.valueOf(d.getScope().name()))
+        .build();
+  }
+
+  public static BundleDescriptor mavenToArtifact(org.mule.maven.pom.parser.api.model.BundleDescriptor d) {
+    return BundleDescriptor.builder()
+        .setGroupId(d.getGroupId())
+        .setArtifactId(d.getArtifactId())
+        .setClassifier(d.getClassifier().orElse(null))
+        .setType(d.getType())
+        .setVersion(d.getVersion())
+        .setBaseVersion(d.getVersion())
+        .build();
+  }
+
+  public static org.mule.maven.pom.parser.api.model.BundleDescriptor artifactToMaven(BundleDescriptor d) {
+    return new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder()
+        .setGroupId(d.getGroupId())
+        .setArtifactId(d.getArtifactId())
+        .setClassifier(d.getClassifier().orElse(null))
+        .setType(d.getType())
+        .setVersion(d.getVersion())
+        .setBaseVersion(d.getVersion())
+        .build();
   }
 
 }

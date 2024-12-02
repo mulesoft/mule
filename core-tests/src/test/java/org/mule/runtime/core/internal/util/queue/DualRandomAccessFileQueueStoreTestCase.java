@@ -8,10 +8,10 @@ package org.mule.runtime.core.internal.util.queue;
 
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 
 import java.io.ObjectInputStream;
@@ -34,8 +34,8 @@ public class DualRandomAccessFileQueueStoreTestCase extends QueueStoreTestCase {
   }
 
   @Override
-  protected QueueStore createQueueInfoDelegate(int capacity, MuleContext muleContext) {
-    return new DefaultQueueStore("testQueue", muleContext, new DefaultQueueConfiguration(capacity, true));
+  protected QueueStore createQueueInfoDelegate(int capacity, String workingDirectory, SerializationProtocol serializer) {
+    return new DefaultQueueStore("testQueue", workingDirectory, serializer, new DefaultQueueConfiguration(capacity, true));
   }
 
   @Test

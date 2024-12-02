@@ -13,6 +13,7 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.internal.event.InternalEvent;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -135,6 +136,18 @@ public class ErrorHandlerContextManager {
     ErrorHandlerContext errorHandlerContext =
         from(exception.getEvent()).items.get(getParameterId(exception.getEvent(), handler)).removeFirst();
     errorHandlerContext.errorCallback.accept(exception);
+  }
+
+  /**
+   * Determines if a {@link MessagingException} has an associated error handling context. True means that it's currently inside
+   * what can be called the error handling scope.
+   *
+   * @param exception A {@link MessagingException}.
+   * @return True if the exception has an associated error handling context.
+   */
+  public static boolean isHandling(MessagingException exception) {
+    ErrorHandlerContextManager errorHandlerContextManager = from(exception.getEvent());
+    return errorHandlerContextManager != null && !errorHandlerContextManager.items.isEmpty();
   }
 
   /**

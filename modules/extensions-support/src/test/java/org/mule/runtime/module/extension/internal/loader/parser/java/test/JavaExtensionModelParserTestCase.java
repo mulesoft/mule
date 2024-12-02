@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.test;
 
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.test.MinMuleVersionTestUtils.ctxResolvingMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
 
 import static java.lang.Class.forName;
-import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -33,8 +32,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParser;
 import org.mule.sdk.api.annotation.Configurations;
@@ -181,11 +178,10 @@ public class JavaExtensionModelParserTestCase {
   }
 
   protected JavaExtensionModelParser getParser(Class<?> extensionClass) {
-    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(contextClassLoader);
+    ClassTypeLoader typeLoader =
+        ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(Thread.currentThread().getContextClassLoader());
     ExtensionTypeWrapper extensionTypeWrapper = new ExtensionTypeWrapper<>(extensionClass, typeLoader);
-    ExtensionLoadingContext ctx = new DefaultExtensionLoadingContext(contextClassLoader, getDefault(emptySet()));
-    return new JavaExtensionModelParser(extensionTypeWrapper, ctx);
+    return new JavaExtensionModelParser(extensionTypeWrapper, ctxResolvingMinMuleVersion());
   }
 
   @Extension(name = "SimpleExtension")

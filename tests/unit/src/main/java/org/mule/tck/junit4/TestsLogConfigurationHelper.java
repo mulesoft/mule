@@ -58,7 +58,7 @@ public class TestsLogConfigurationHelper {
   }
 
   private static String findLogConfigurationPath(Class<?> testClass) {
-    String encodedFolder = testClass.getClassLoader().getResource("").getPath().toString();
+    String encodedFolder = testClass.getProtectionDomain().getCodeSource().getLocation().getPath();
 
     String folderPath;
     try {
@@ -69,7 +69,7 @@ public class TestsLogConfigurationHelper {
 
     File folder = new File(folderPath);
 
-    if (folder != null && "target".equals(folder.getParentFile().getName())) {
+    if ("target".equals(folder.getParentFile().getName())) {
       folder = folder.getParentFile();
     }
 

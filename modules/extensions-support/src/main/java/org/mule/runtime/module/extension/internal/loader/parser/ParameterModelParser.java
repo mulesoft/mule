@@ -126,9 +126,9 @@ public interface ParameterModelParser extends SemanticTermsParser, AllowedStereo
    */
   Optional<InputResolverModelParser> getInputResolverModelParser();
 
-
   /**
    * @return the order and if the part is resolved by a key resolver if metadata key part is defined on the parameter
    */
   Optional<Pair<Integer, Boolean>> getMetadataKeyPart();
+
 }

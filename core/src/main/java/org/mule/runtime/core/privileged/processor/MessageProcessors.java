@@ -8,7 +8,7 @@ package org.mule.runtime.core.privileged.processor;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SUB_FLOW;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
@@ -44,7 +44,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategySupplier;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
@@ -54,6 +53,7 @@ import org.mule.runtime.core.internal.rx.SinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
@@ -746,8 +746,7 @@ public class MessageProcessors {
         .filter(id -> id.getType().equals(FLOW)
             // a top level router is a policy...
             || id.getType().equals(ROUTER)
-            // a top level scope should only be a subflow
-            || id.getType().equals(SCOPE))
+            || id.getType().equals(SUB_FLOW))
         .flatMap(id -> getProcessingStrategy(locator, component.getRootContainerLocation()));
   }
 

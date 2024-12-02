@@ -19,8 +19,6 @@ import static java.util.stream.Stream.concat;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
-import static org.apache.commons.lang3.JavaVersion.JAVA_11;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -37,7 +35,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
@@ -228,22 +225,6 @@ public class CompilerUtils {
     public T compiling(File... sources) {
       checkArgument(sources != null && sources.length > 0, "sources cannot be empty");
       this.sources = concat(Stream.of(this.sources), Stream.of(sources)).toArray(File[]::new);
-
-      return getThis();
-    }
-
-    /**
-     * Indicates which source file must be compiled. <b> does nothing if {@code condition} is {@code false}. This method is useful
-     * to keep the fluent use of the api.
-     *
-     * @param condition whether to compile the given sources or not
-     * @param sources   source files. Non empty.
-     * @return the same compiler instance
-     */
-    public T compilingConditionally(boolean condition, File... sources) {
-      if (condition) {
-        return compiling(sources);
-      }
 
       return getThis();
     }
@@ -491,37 +472,27 @@ public class CompilerUtils {
         options.add(target.getAbsolutePath());
       }
 
-      Predicate<String> classpathEntryPredicate;
-      final String xmlApisLib = System.getProperty("xmlApisLib");
-      if (xmlApisLib == null) {
-        classpathEntryPredicate = cpe -> true;
-      } else {
-        classpathEntryPredicate = cpe -> !cpe.equals(xmlApisLib);
-      }
       // Adds same classpath as the one used on the runner
       String fullClassPath;
       if (jarFiles.length > 0) {
 
         // Adds extra jars files required to compile the source classes
-        fullClassPath = concat(CLASS_PATH_ENTRIES
-            .stream()
-            .filter(classpathEntryPredicate),
-                               Stream.of(jarFiles)
-                                   .map(File::getAbsolutePath))
-                                       .collect(joining(PATH_SEPARATOR));
+        fullClassPath =
+            concat(CLASS_PATH_ENTRIES.stream()
+                // skip armeria libs that causes a split package with reactor
+                .filter(cpe -> !cpe.contains("armeria")),
+                   Stream.of(jarFiles).map(File::getAbsolutePath))
+                       .collect(joining(PATH_SEPARATOR));
       } else {
         fullClassPath = CLASS_PATH_ENTRIES.stream()
-            .filter(classpathEntryPredicate)
             .collect(joining(PATH_SEPARATOR));
       }
 
       if (targetJavaVersion <= 8) {
         options.addAll(asList("-classpath", fullClassPath));
-        if (isJavaVersionAtLeast(JAVA_11)) {
-          // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing
-          // what happens when deploying.
-          options.addAll(asList("--release", "8"));
-        }
+        // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing
+        // what happens when deploying.
+        options.addAll(asList("--release", "8"));
       } else {
         options.addAll(asList("--module-path", fullClassPath));
       }

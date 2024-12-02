@@ -8,8 +8,8 @@ package org.mule.runtime.module.artifact.activation.internal.extension.discovery
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.setConfigurerFactory;
-import static org.mule.runtime.extension.api.provider.RuntimeExtensionModelProviderLoaderUtils.discoverRuntimeExtensionModels;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
+import static org.mule.runtime.extension.api.provider.RuntimeExtensionModelProviderLoaderUtils.discoverRuntimeExtensionModels;
 import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
 
 import static java.util.Collections.emptySet;
@@ -17,13 +17,13 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -39,10 +39,12 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
-import org.junit.Test;
 
 @Feature(EXTENSION_MODEL_DISCOVERY)
 public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
@@ -98,7 +100,8 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
                                                                                             .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(singletonList(descriptor),
                                                                                                                                                                  emptySet(),
                                                                                                                                                                  false,
-                                                                                                                                                                 false));
+                                                                                                                                                                 false,
+                                                                                                                                                                 true));
     assertThat(extensionDeclared.get(), is(true));
     assertThat(extensionModels.size(), is(1 + discoverRuntimeExtensionModels().size()));
     assertThat((extensionModels.stream()
@@ -108,15 +111,11 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
   }
 
   private static ComponentMetadataConfigurerFactory createMockedFactory() {
-    ComponentMetadataConfigurer mockConfigurer = mock(ComponentMetadataConfigurer.class);
-    when(mockConfigurer.asAllOfRouter()).thenReturn(mockConfigurer);
-    when(mockConfigurer.asPassthroughScope()).thenReturn(mockConfigurer);
-    when(mockConfigurer.asOneOfRouter()).thenReturn(mockConfigurer);
     return new ComponentMetadataConfigurerFactory() {
 
       @Override
       public ComponentMetadataConfigurer create() {
-        return mockConfigurer;
+        return mock(ComponentMetadataConfigurer.class, RETURNS_DEEP_STUBS);
       }
     };
   }

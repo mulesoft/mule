@@ -56,17 +56,22 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
-import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.error.ErrorMetrics;
+import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,6 +80,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -92,6 +98,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
+  public static final String MULE_RUNTIME_ERROR_METRICS = "Mule runtime error metrics";
   private ComponentTracer<CoreEvent> componentTracer;
 
   private boolean fromGlobalErrorHandler = false;
@@ -121,12 +128,24 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private String errorHandlerLocation;
   private boolean isLocalErrorHandlerLocation;
+  private final Set<String> componentsReferencingGlobalErrorHandler = new HashSet<>();
+  private final Map<String, Integer> failingComponentHandled = new HashMap<>();
 
   private Optional<ProcessingStrategy> ownedProcessingStrategy;
 
   private Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>> fluxFactory;
 
   private final CopyOnWriteArrayList<String> suppressedErrorTypeMatches = new CopyOnWriteArrayList<>();
+
+  @Inject
+  MeterProvider meterProvider;
+  @Inject
+  ErrorMetricsFactory errorMetricsFactory;
+  private ErrorMetrics errorMetrics;
+
+  public void addGlobalErrorHandlerComponentReference(ComponentLocation location) {
+    componentsReferencingGlobalErrorHandler.add(location.getLocation());
+  }
 
   private final class OnErrorHandlerFluxObjectFactory
       implements Function<Function<Publisher<CoreEvent>, Publisher<CoreEvent>>, FluxSink<CoreEvent>>, Disposable {
@@ -200,6 +219,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Override
   public synchronized void initialise() throws InitialisationException {
     componentTracer = componentTracerFactory.fromComponent(TemplateOnErrorHandler.this);
+    errorMetrics = errorMetricsFactory.create(meterProvider.getMeterBuilder(MULE_RUNTIME_ERROR_METRICS).build());
     super.initialise();
   }
 
@@ -217,11 +237,18 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       }
 
       @Override
+      // All calling methods will end up transforming any error class other than MessagingException into that one.
       public void accept(Exception error) {
-        // All calling methods will end up transforming any error class other than MessagingException into that one
+        // Measure only when enter the error handling scope and not when bubbling inside it.
+        if (!ErrorHandlerContextManager.isHandling((MessagingException) error))
+          measure((MessagingException) error);
         fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));
       }
     };
+  }
+
+  private void measure(MessagingException error) {
+    errorMetrics.measure(error);
   }
 
   @Override
@@ -234,7 +261,6 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       final Consumer<Exception> router = router(identity(),
                                                 handledEvent -> sink.success(handledEvent),
                                                 rethrownError -> sink.error(rethrownError));
-
       try {
         router.accept(exception);
       } finally {
@@ -252,12 +278,13 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
-        // Do nothing
         logger.warn(ex.getMessage());
       }
       CoreEvent result = afterRouting().apply(((MessagingException) me).getEvent());
       fireEndNotification(ErrorHandlerContextManager.from(this, ((MessagingException) me).getEvent()).getOriginalEvent(), result,
                           me);
+      // We measure the error because it's an error during the handling of an error X(
+      measure((MessagingException) me);
       ErrorHandlerContextManager.resolveHandling(this, (MessagingException) me);
     };
   }
@@ -451,7 +478,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   protected Function<CoreEvent, CoreEvent> beforeRouting() {
     return event -> {
-      Exception exception = getException(event);
+      MessagingException exception = (MessagingException) getException(event);
 
       getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
 
@@ -467,7 +494,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   protected Exception getException(CoreEvent event) {
+    // #getException() will always return a MessagingException but cannot be changed without breaking backwards compatibility
     return ErrorHandlerContextManager.from(this, event).getException();
+  }
+
+  protected Error getError(CoreEvent event) {
+    return ((MessagingException) getException(event)).getEvent().getError().orElse(null);
   }
 
   /**
@@ -511,7 +543,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   /**
    * Creates a copy of this ErrorHandler, with the defined location. This location allows to retrieve the
-   * {@link ProcessingStrategy}, and define if a running {@link org.mule.runtime.core.api.transaction.Transaction} is owned by the
+   * {@link ProcessingStrategy}, and define if a running {@link Transaction} is owned by the
    * {@link org.mule.runtime.core.api.construct.Flow} or {@link org.mule.runtime.core.internal.processor.TryScope} executing this
    * ErrorHandler. This is intended to be used when having references to Global ErrorHandlers, since each instance reference
    * should run with the processing strategy defined by the flow referencing it, and be able to rollback transactions.
@@ -548,11 +580,43 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
     if (fromGlobalErrorHandler && exception != null) {
       String transactionLocation = txAdapter.getComponentLocation().get().getLocation();
+      if (transactionLocation.endsWith("/source")) {
+        // Set the flow as the location, as flows are the owners of transactions started by sources
+        transactionLocation = transactionLocation.substring(0, transactionLocation.lastIndexOf('/'));
+      }
+
       String failingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
-      // Get the location of the Try that contains this component.
-      failingComponentLocation = failingComponentLocation.substring(0, failingComponentLocation.lastIndexOf('/'));
-      failingComponentLocation = failingComponentLocation.substring(0, failingComponentLocation.lastIndexOf('/'));
-      return failingComponentLocation.equals(transactionLocation);
+
+      if (!componentsReferencingGlobalErrorHandler.contains(transactionLocation)) {
+        return false;
+      }
+
+      // TODO W-17239370 - there is a corner case when the failing component is within a component that references this handler
+      // and within a subflow, and the transaction owner also references this handler and is outside of the subflow. In that case
+      // we can't properly determine in which execution of this handler the transaction should be rolled back, and it gets rolled
+      // back prematurely in the first execution.
+      String finalTransactionLocation = transactionLocation;
+      Set<String> referencesContainingFailingComponentUpToTxOwner =
+          componentsReferencingGlobalErrorHandler.stream().filter(c -> c.startsWith(finalTransactionLocation))
+              .filter(failingComponentLocation::startsWith).collect(Collectors.toSet());
+      if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
+        // The failing component is nested within more than one component that reference this handler:
+        // transactionOwnerWithThisHandler-componentWithThisHandler-...-failingComponent
+        int timesToHandleBeforeReachingTxOwner = referencesContainingFailingComponentUpToTxOwner.size() - 1;
+        Integer timesHandled = failingComponentHandled.putIfAbsent(failingComponentLocation, 1);
+        if (timesHandled != null) {
+          if (timesHandled < timesToHandleBeforeReachingTxOwner) {
+            failingComponentHandled.put(failingComponentLocation, timesHandled + 1);
+          } else {
+            failingComponentHandled.remove(failingComponentLocation);
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      return true;
     }
 
     return isOwnedTransactionByLocalErrorHandler(txAdapter);

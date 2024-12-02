@@ -56,6 +56,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.internal.bean.TestCustomServiceDependingOnMuleConfiguration;
+import org.mule.runtime.config.internal.model.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -80,13 +81,15 @@ import org.mule.tck.junit4.matcher.EventMatcher;
 import java.util.Calendar;
 import java.util.Set;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(CONFIGURATION_PROPERTIES)
 @Story(COMPONENT_CONFIGURATION_PROPERTIES_STORY)
@@ -325,13 +328,18 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
       if (configFiles.length == 0) {
         artifactAst = emptyArtifact();
       } else {
-        artifactAst = parseAndBuildAppExtensionModel(configFiles, this, muleContext.getExtensionManager().getExtensions(), false,
-                                                     muleContext, null);
+        artifactAst = parseAndBuildAppExtensionModel(muleContext.getConfiguration().getId(),
+                                                     configFiles, this, muleContext.getExtensionManager().getExtensions(), false,
+                                                     muleContext.getExecutionClassLoader(), muleContext.getConfiguration(), null);
       }
-      new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false, false)
-          .configure(muleContext);
+      new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false, false,
+                                          new DefaultComponentBuildingDefinitionRegistryFactory()
+                                              .create(artifactAst.dependencies(),
+                                                      artifactAst::dependenciesDsl))
+                                                          .configure(muleContext);
     }
 
+    @Override
     public AstXmlParser getParser(Set<ExtensionModel> extensions, boolean disableValidations) {
       return AstXmlParser.builder()
           .withArtifactType(APPLICATION)

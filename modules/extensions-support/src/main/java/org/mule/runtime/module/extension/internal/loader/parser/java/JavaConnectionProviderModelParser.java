@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
-import static java.util.Objects.hash;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
@@ -30,6 +24,13 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.ster
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveConnectionProviderMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
+import static java.lang.String.format;
+import static java.util.Objects.hash;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
@@ -46,6 +47,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantT
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -82,21 +84,22 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   private final JavaExtensionModelParser extensionModelParser;
   private final ConnectionProviderElement element;
+  private final ExtensionLoadingContext loadingContext;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
-  private final ResolvedMinMuleVersion resolvedMinMuleVersion;
 
   public JavaConnectionProviderModelParser(JavaExtensionModelParser extensionModelParser,
                                            ExtensionElement extensionElement,
-                                           ConnectionProviderElement element) {
+                                           ConnectionProviderElement element,
+                                           ExtensionLoadingContext loadingContext) {
     this.extensionModelParser = extensionModelParser;
     this.element = element;
+    this.loadingContext = loadingContext;
     extensionClassLoader = extensionElement.getDeclaringClass()
         .map(Class::getClassLoader)
         .orElse(ExtensionModel.class.getClassLoader());
 
     collectAdditionalModelProperties();
-    this.resolvedMinMuleVersion = resolveConnectionProviderMinMuleVersion(element);
   }
 
   @Override
@@ -115,7 +118,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public List<ParameterGroupModelParser> getParameterGroupModelParsers() {
-    return getParameterGroupParsers(element.getParameters(), forConnectionProvider(getName()));
+    return getParameterGroupParsers(element.getParameters(), forConnectionProvider(getName(), loadingContext));
   }
 
   @Override
@@ -230,7 +233,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(this.resolvedMinMuleVersion);
+    return of(resolveConnectionProviderMinMuleVersion(element));
   }
 
   @Override
@@ -323,4 +326,5 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
                                               .getEnumValue(clientCredentials -> from(clientCredentials
                                                   .credentialsPlacement())));
   }
+
 }

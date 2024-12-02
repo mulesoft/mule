@@ -103,8 +103,6 @@ module org.mule.runtime.spring.config {
       spring.beans;
   exports org.mule.runtime.config.internal.context.lazy to
       org.mule.runtime.tooling.support;
-  exports org.mule.runtime.config.internal.context.metrics to
-      spring.beans;
   exports org.mule.runtime.config.internal.dsl.processor to
       org.mule.runtime.core,
       spring.beans;
@@ -157,5 +155,6 @@ module org.mule.runtime.spring.config {
       spring.core;
   opens org.mule.runtime.config.internal.factories.streaming to
       net.bytebuddy;
+  exports org.mule.runtime.config.privileged.spring to spring.core;
 
 }

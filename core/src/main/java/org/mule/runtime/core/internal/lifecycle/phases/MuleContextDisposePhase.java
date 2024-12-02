@@ -10,18 +10,10 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.Config;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.internal.util.annotation.AnnotationMetaData;
-import org.mule.runtime.core.internal.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-
-import java.lang.reflect.Method;
-import java.util.List;
-
-import javax.annotation.PreDestroy;
 
 /**
  * Objects are disposed of via the Registry since the Registry manages the creation/initialisation of the objects it must also
@@ -93,20 +85,6 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase {
       if (logger.isWarnEnabled()) {
         logger.warn("Failed to dispose object " + o, e);
       }
-    }
-
-    List<AnnotationMetaData> annos = AnnotationUtils.getMethodAnnotations(o.getClass(), PreDestroy.class);
-    if (annos.size() == 0) {
-      return;
-    }
-    // Note that the registry has a processor that validates that there is at most one {@link PostConstruct} annotation
-    // per object and that the method conforms to a lifecycle method
-    AnnotationMetaData anno = annos.get(0);
-    try {
-      ((Method) anno.getMember()).invoke(o);
-    } catch (Exception e) {
-      throw new LifecycleException(CoreMessages.failedToInvokeLifecycle((anno == null ? "null" : anno.getMember().getName()), o),
-                                   e, this);
     }
   }
 }

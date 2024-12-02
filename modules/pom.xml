@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.8.0-SNAPSHOT</version>
+        <version>4.9.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-modules</artifactId>
     <packaging>pom</packaging>
@@ -29,7 +29,6 @@
         <module>extensions-support</module>
         <module>extensions-xml-support</module>
         <module>global-config</module>
-        <module>javaee</module>
         <module>launcher</module>
         <module>license-api</module>
         <module>log4j-boot-configurator</module>
@@ -53,8 +52,6 @@
         <module>extensions-mule-support</module>
         <module>repository</module>
         <module>tls</module>
-        <module>soap-api</module>
-        <module>extensions-soap-support</module>
         <module>tracing</module>
         <module>metrics</module>
         <module>troubleshooting</module>

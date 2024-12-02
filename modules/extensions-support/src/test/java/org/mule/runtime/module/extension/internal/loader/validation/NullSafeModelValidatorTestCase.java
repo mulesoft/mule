@@ -6,21 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.Optional.of;
+
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.module.extension.internal.loader.java.property.TypeLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.validation.NullSafeModelValidator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -30,31 +37,38 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class NullSafeModelValidatorTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule().strictness(LENIENT);
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModel extensionModel;
 
-  @Mock(lenient = true)
+  @Mock
   private OperationModel operationModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ParameterModel parameterModel;
 
-  private ExtensionModelValidator validator = new NullSafeModelValidator();
+  private final ExtensionModelValidator validator = new NullSafeModelValidator();
 
   @Before
   public void before() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     mockParameters(operationModel, parameterModel);
     when(extensionModel.getImportedTypes()).thenReturn(emptySet());
+    when(extensionModel.getModelProperty(TypeLoaderModelProperty.class))
+        .thenReturn(of(new TypeLoaderModelProperty(ExtensionsTypeLoaderFactory.getDefault().createTypeLoader())));
+
   }
 
   @Test(expected = IllegalModelDefinitionException.class)

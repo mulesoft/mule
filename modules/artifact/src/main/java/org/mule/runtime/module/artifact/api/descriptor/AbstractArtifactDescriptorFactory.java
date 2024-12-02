@@ -12,16 +12,17 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -29,11 +30,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-
-import com.google.common.collect.ImmutableMap;
 
 import org.slf4j.Logger;
 
@@ -221,10 +221,11 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
                                                                       MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
                                                                       BundleDescriptor bundleDescriptor) {
     // Adding BundleDescriptor to avoid resolving it again while loading the class loader configuration
-    return ImmutableMap.<String, Object>builder()
-        .putAll(classLoaderModelLoaderDescriptor.getAttributes())
-        .put(BundleDescriptor.class.getName(), bundleDescriptor)
-        .build();
+    Map<String, Object> attributes = new HashMap<>();
+    attributes.putAll(classLoaderModelLoaderDescriptor.getAttributes());
+    attributes.put(BundleDescriptor.class.getName(), bundleDescriptor);
+
+    return unmodifiableMap(attributes);
   }
 
   protected BundleDescriptor getBundleDescriptor(File appFolder, M artifactModel, Optional<Properties> deploymentProperties) {

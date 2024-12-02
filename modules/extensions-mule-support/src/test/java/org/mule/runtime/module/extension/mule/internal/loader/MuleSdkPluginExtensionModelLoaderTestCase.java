@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
-import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
@@ -24,7 +23,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.rules.ExpectedException.none;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThrows;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -44,9 +44,7 @@ import java.net.URL;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -62,45 +60,43 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
 
   private final ExtensionModelJsonSerializer serializer = new ExtensionModelJsonSerializer(true);
 
-  @Rule
-  public ExpectedException expectedException = none();
-
   @Test
   public void whenResourceIsNotFoundThenFailsWithConfigurationException() {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException.expectCause(instanceOf(ConfigurationException.class));
-    expectedException.expectMessage("extensions/non-existent.xml");
-    getExtensionModelFrom("extensions/non-existent.xml");
+    final var thrown = assertThrows(MuleRuntimeException.class, () -> getExtensionModelFrom("extensions/non-existent.xml"));
+
+    assertThat(thrown.getCause(), instanceOf(ConfigurationException.class));
+    assertThat(thrown.getMessage(), containsString("extensions/non-existent.xml"));
   }
 
   @Test
   public void whenExtensionWithoutDescriptionThenFailsDuringParsingValidations() {
-    expectedException.expect(RuntimeException.class);
-    expectedException.expectMessage("The content of element 'extension' is not complete.");
-    getExtensionModelFrom("extensions/extension-without-description.xml");
+    final var thrown =
+        assertThrows(RuntimeException.class, () -> getExtensionModelFrom("extensions/extension-without-description.xml"));
+
+    assertThat(thrown.getMessage(), containsString("The content of element 'extension' is not complete."));
   }
 
   @Test
   public void whenExtensionDoesNotHaveNameThenFailsDuringParsingValidations() {
-    expectedException.expect(RuntimeException.class);
-    expectedException.expectMessage("Attribute 'name' must appear on element 'description'");
-    getExtensionModelFrom("extensions/extension-without-name.xml");
+    final var thrown = assertThrows(RuntimeException.class, () -> getExtensionModelFrom("extensions/extension-without-name.xml"));
+
+    assertThat(thrown.getMessage(), containsString("Attribute 'name' must appear on element 'description'"));
   }
 
   @Test
   public void whenResourceIsAppInsteadOfExtensionThenFails() {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException
-        .expectMessage("Extension from artifact 'artifact' is missing a required top level element. 'extension:description' is expected.");
-    getExtensionModelFrom("app-as-mule-extension.xml");
+    final var thrown = assertThrows(MuleRuntimeException.class, () -> getExtensionModelFrom("app-as-mule-extension.xml"));
+
+    assertThat(thrown.getMessage(),
+               containsString("Extension from artifact 'TestExtension' is missing a required top level element. 'extension:description' is expected."));
   }
 
   @Test
   public void whenResourceIsEmptyAppInsteadOfExtensionThenFails() {
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException
-        .expectMessage("Extension from artifact 'artifact' is missing a required top level element. 'extension:description' is expected.");
-    getExtensionModelFrom("mule-empty-app-config.xml");
+    final var thrown = assertThrows(MuleRuntimeException.class, () -> getExtensionModelFrom("mule-empty-app-config.xml"));
+
+    assertThat(thrown.getMessage(),
+               containsString("Extension from artifact 'TestExtension' is missing a required top level element. 'extension:description' is expected."));
   }
 
   @Test
@@ -117,9 +113,8 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
     loadMuleSdkExtension(nonexistentResourceName, testClassLoader, astParserExtensionModels);
 
     // Control test to verify that loading from the non-existent name will actually fail if using the wrong class loader.
-    expectedException.expect(MuleRuntimeException.class);
-    expectedException.expectCause(hasCause(instanceOf(FileNotFoundException.class)));
-    getExtensionModelFrom(nonexistentResourceName);
+    final var thrown = assertThrows(MuleRuntimeException.class, () -> getExtensionModelFrom(nonexistentResourceName));
+    assertThat(thrown.getCause().getCause(), instanceOf(FileNotFoundException.class));
   }
 
   @Test

@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.management.stats;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
+import static org.mule.runtime.api.meta.MuleVersion.v4_4_0;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 
 import static java.lang.Boolean.getBoolean;
@@ -184,7 +185,8 @@ public class AllStatistics {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(COMPUTE_CONNECTION_ERRORS_IN_STATS,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                    .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+                                                    .filter(muleVersion -> muleVersion.atLeast(v4_4_0))
+                                                    .isPresent());
   }
 
   /**

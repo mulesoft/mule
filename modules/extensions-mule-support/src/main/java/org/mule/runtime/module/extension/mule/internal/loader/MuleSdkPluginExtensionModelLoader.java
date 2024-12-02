@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
+import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.ast.api.ArtifactType.MULE_EXTENSION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.validatorBuilder;
 import static org.mule.runtime.ast.api.xml.AstXmlParser.builder;
@@ -14,12 +15,14 @@ import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESS
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_RESOURCE_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
+import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.loadConfigResources;
 import static org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils.parseArtifact;
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.logWarningsAndThrowIfContainsErrors;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.utils.MuleSdkExtensionLoadingUtils.getRequiredLoadingParameter;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
@@ -115,7 +118,7 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     // Registers a callback in case the parser discovers the ExtensionModel as part of the process.
     MuleSdkExtensionModelLoadingMediator loadingHelper =
         new MuleSdkPluginExtensionModelLoadingMediator(expressionLanguageMetadataService,
-                                                       context.getArtifactCoordinates(),
+                                                       context,
                                                        version,
                                                        this,
                                                        em -> context.addParameter(MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME, em));
@@ -123,12 +126,14 @@ public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoa
     try {
       // Parses the full AST of the artifact by providing a helper for loading the ExtensionModel that represents the artifact
       // itself, this is so that schema validations can be performed properly.
-      ArtifactAst artifactAst = parseArtifact(resources,
-                                              this::createAstParser,
-                                              dependencies,
-                                              false,
-                                              context.getExtensionClassLoader(),
-                                              loadingHelper);
+      ArtifactAst artifactAst =
+          parseArtifact(context.getArtifactCoordinates().map(ArtifactCoordinates::getArtifactId).orElse(null),
+                        left(loadConfigResources(resources, context.getExtensionClassLoader())),
+                        this::createAstParser,
+                        dependencies,
+                        false,
+                        context.getExtensionClassLoader(),
+                        loadingHelper);
 
       // Applies the AST validators and throws if there was any error
       logWarningsAndThrowIfContainsErrors(validatorBuilder().build().validate(artifactAst), LOGGER);

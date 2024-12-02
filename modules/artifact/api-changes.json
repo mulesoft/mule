@@ -1,4 +1,106 @@
 {
+  "4.9.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader::setResourceReleaserClassLocation(java.lang.String)",
+            "justification": "W-14572248: Remove resource releasers form runtime"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.exception.checkedAdded",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::create(java.lang.String, T, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy)",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::create(java.lang.String, T, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "exception": "org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "justification": "W-17244755: Indicate the service that fails to create its classloader"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.exception.checkedAdded",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::create(java.lang.String, T, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy)",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.artifact.api.classloader.TrackingArtifactClassLoaderFactory<T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::create(java.lang.String, T, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "exception": "org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "justification": "W-17244755: Indicate the service that fails to create its classloader"
+          }
+        ]
+      }
+    }
+  },
+  "4.8.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader::supportsArtifactType(===org.mule.runtime.core.api.config.bootstrap.ArtifactType===)",
+            "new": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader::supportsArtifactType(===org.mule.runtime.api.artifact.ArtifactType===)",
+            "parameterIndex": "0",
+            "justification": "W-16447481: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader::supportsArtifactType(===org.mule.runtime.core.api.config.bootstrap.ArtifactType===)",
+            "new": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader::supportsArtifactType(===org.mule.runtime.api.artifact.ArtifactType===)",
+            "parameterIndex": "0",
+            "justification": "W-16447481: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::load(java.io.File, java.util.Map<java.lang.String, java.lang.Object>, ===org.mule.runtime.core.api.config.bootstrap.ArtifactType===) throws org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+            "new": "parameter T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::load(java.io.File, java.util.Map<java.lang.String, java.lang.Object>, ===org.mule.runtime.api.artifact.ArtifactType===) throws org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+            "parameterIndex": "2",
+            "justification": "W-16447481: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::load(java.io.File, java.util.Map<java.lang.String, java.lang.Object>, ===org.mule.runtime.core.api.config.bootstrap.ArtifactType===) throws org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+            "new": "parameter T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::load(java.io.File, java.util.Map<java.lang.String, java.lang.Object>, ===org.mule.runtime.api.artifact.ArtifactType===) throws org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException",
+            "parameterIndex": "2",
+            "justification": "W-16447481: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::supportsArtifactType(===org.mule.runtime.core.api.config.bootstrap.ArtifactType===)",
+            "new": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::supportsArtifactType(===org.mule.runtime.api.artifact.ArtifactType===)",
+            "parameterIndex": "0",
+            "justification": "W-16447481: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::supportsArtifactType(===org.mule.runtime.core.api.config.bootstrap.ArtifactType===)",
+            "new": "parameter boolean org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader<T>::supportsArtifactType(===org.mule.runtime.api.artifact.ArtifactType===)",
+            "parameterIndex": "0",
+            "justification": "W-16447481: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T extends org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader> T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository::get(java.lang.String, ===org.mule.runtime.core.api.config.bootstrap.ArtifactType===, java.lang.Class<T>) throws org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+            "new": "parameter <T extends org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader> T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository::get(java.lang.String, ===org.mule.runtime.api.artifact.ArtifactType===, java.lang.Class<T>) throws org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+            "parameterIndex": "1",
+            "justification": "W-16447481: Move ArtifactType to mule-api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T extends org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader> T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository::get(java.lang.String, ===org.mule.runtime.core.api.config.bootstrap.ArtifactType===, java.lang.Class<T>) throws org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+            "new": "parameter <T extends org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader> T org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository::get(java.lang.String, ===org.mule.runtime.api.artifact.ArtifactType===, java.lang.Class<T>) throws org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException",
+            "parameterIndex": "1",
+            "justification": "W-16447481: Move ArtifactType to mule-api"
+          }
+        ]
+      }
+	}
+  },
   "4.6.0": {
     "revapi": {
       "ignore": [

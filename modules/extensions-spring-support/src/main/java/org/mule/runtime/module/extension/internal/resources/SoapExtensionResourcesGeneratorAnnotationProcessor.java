@@ -10,7 +10,7 @@ import static org.mule.runtime.module.artifact.activation.api.extension.discover
 import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_CLASSES;
 import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 
-import static javax.lang.model.SourceVersion.RELEASE_8;
+import static javax.lang.model.SourceVersion.RELEASE_17;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
@@ -21,7 +21,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 
-
 /**
  * {@link BaseExtensionResourcesGeneratorAnnotationProcessor} implementation for SOAP BASED Extensions that use the soap
  * extensions api classes and annotations.
@@ -29,7 +28,7 @@ import javax.annotation.processing.SupportedSourceVersion;
  * @since 4.0.0
  */
 @SupportedAnnotationTypes(value = {"org.mule.runtime.extension.api.annotation.Extension"})
-@SupportedSourceVersion(RELEASE_8)
+@SupportedSourceVersion(RELEASE_17)
 @SupportedOptions({
     EXTENSION_VERSION,
     EXTENSION_CLASSES

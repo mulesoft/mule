@@ -7,7 +7,9 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
@@ -35,7 +37,8 @@ public final class TrackingArtifactClassLoaderFactory<T extends ArtifactDescript
 
   @Override
   public ArtifactClassLoader create(String artifactId, T descriptor, ClassLoader parent,
-                                    ClassLoaderLookupPolicy lookupPolicy) {
+                                    ClassLoaderLookupPolicy lookupPolicy)
+      throws ArtifactClassloaderCreationException {
     ArtifactClassLoader artifactClassLoader = artifactClassLoaderFactory.create(artifactId, descriptor, parent, lookupPolicy);
 
     track(artifactClassLoader);

@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser.ast;
 
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 
 import static java.util.Collections.singleton;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.artifact.activation.internal.ast.AbstractMuleSdkExtensionModelLoadingMediator;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
@@ -41,18 +43,19 @@ public class MuleSdkPluginExtensionModelLoadingMediator extends AbstractMuleSdkE
    * Creates a new mediator with the given parameters.
    *
    * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
-   * @param artifactCoordinates               the artifact's coordinates.
+   * @param artifactExtensionLoadingContext   the artifact's {@link ExtensionLoadingContext}.
    * @param version                           the artifact's version in case the full coordinates are not available.
    * @param extensionModelLoader              the loader to use for loading the {@link ExtensionModel}.
    * @param onNewExtensionModel               a consumer to call if the artifact's {@link ExtensionModel} is created as part of
    *                                          the parsing process.
    */
   public MuleSdkPluginExtensionModelLoadingMediator(ExpressionLanguageMetadataService expressionLanguageMetadataService,
-                                                    Optional<ArtifactCoordinates> artifactCoordinates,
+                                                    ExtensionLoadingContext artifactExtensionLoadingContext,
                                                     String version,
                                                     ExtensionModelLoader extensionModelLoader,
                                                     Consumer<ExtensionModel> onNewExtensionModel) {
-    super(artifactCoordinates, expressionLanguageMetadataService);
+    super(artifactExtensionLoadingContext.getArtifactCoordinates(), of(artifactExtensionLoadingContext),
+          expressionLanguageMetadataService);
     this.version = version;
     this.extensionModelLoader = extensionModelLoader;
     this.onNewExtensionModel = onNewExtensionModel;

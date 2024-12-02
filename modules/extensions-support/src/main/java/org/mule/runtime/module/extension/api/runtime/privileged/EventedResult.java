@@ -6,40 +6,29 @@
  */
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
-import static java.util.Optional.ofNullable;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import java.util.Optional;
-import java.util.OptionalLong;
-
 /**
- * An operation execution {@link Result} that is created based on the resulting {@link CoreEvent} of that execution. This allows
- * for executions to be concatenated by the plugin's developer without losing information of the event propagated through the
- * flow.
+ * Specialization of {@link org.mule.runtime.core.privileged.event.EventedResult} kept merely for backwards compatibility with
+ * privileged extensions.
  *
- * @param <T> the generic type of the output value
- * @param <A> the generic type of the message attributes
  * @since 4.0
+ * @deprecated since 4.8. Mule code should use {@link org.mule.runtime.core.privileged.event.EventedResult} instead. Privileged
+ *             artifacts should stop using it.
  */
-public final class EventedResult<T, A> extends Result<T, A> {
-
-  private final CoreEvent event;
+@Deprecated
+public final class EventedResult<T, A> extends org.mule.runtime.core.privileged.event.EventedResult<T, A> {
 
   private EventedResult(CoreEvent event) {
-    this.event = event;
+    super(event);
   }
 
   public static <T, A> EventedResult<T, A> from(CoreEvent event) {
     return new EventedResult<>(event);
-  }
-
-  public CoreEvent getEvent() {
-    return event;
   }
 
   @Override
@@ -75,38 +64,8 @@ public final class EventedResult<T, A> extends Result<T, A> {
 
       @Override
       public Result<T, A> build() {
-        return EventedResult.from(product.message(message.build()).build());
+        return from(product.message(message.build()).build());
       }
     };
-  }
-
-  @Override
-  public T getOutput() {
-    return (T) event.getMessage().getPayload().getValue();
-  }
-
-  @Override
-  public Optional<A> getAttributes() {
-    return ofNullable((A) event.getMessage().getAttributes().getValue());
-  }
-
-  @Override
-  public Optional<MediaType> getMediaType() {
-    return ofNullable(event.getMessage().getPayload().getDataType().getMediaType());
-  }
-
-  @Override
-  public Optional<MediaType> getAttributesMediaType() {
-    return ofNullable(event.getMessage().getAttributes().getDataType().getMediaType());
-  }
-
-  @Override
-  public Optional<Long> getLength() {
-    return event.getMessage().getPayload().getLength();
-  }
-
-  @Override
-  public OptionalLong getByteLength() {
-    return event.getMessage().getPayload().getByteLength();
   }
 }

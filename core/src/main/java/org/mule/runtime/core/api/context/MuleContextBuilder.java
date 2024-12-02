@@ -7,10 +7,11 @@
 package org.mule.runtime.core.api.context;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
@@ -80,4 +81,13 @@ public interface MuleContextBuilder {
    * @since 4.5.0
    */
   void setArtifactCoordinates(ArtifactCoordinates artifactCoordinates);
+
+  /**
+   * Sets the {@link FeatureFlaggingService} to use instead of the default one.
+   * 
+   * @param featureFlaggingService
+   * @since 4.9, 4.8.2
+   */
+  void setFeatureFlaggingService(Optional<FeatureFlaggingService> featureFlaggingService);
+
 }

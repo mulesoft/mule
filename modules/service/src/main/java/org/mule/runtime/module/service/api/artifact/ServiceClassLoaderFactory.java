@@ -13,6 +13,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
 
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
@@ -38,7 +39,8 @@ public class ServiceClassLoaderFactory
   @Override
   @Deprecated
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
-                                    ClassLoaderLookupPolicy lookupPolicy) {
+                                    ClassLoaderLookupPolicy lookupPolicy)
+      throws ArtifactClassloaderCreationException {
     return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(), parent,
                                        lookupPolicy);
   }
@@ -48,7 +50,8 @@ public class ServiceClassLoaderFactory
    */
   @Override
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor,
-                                    MuleContainerClassLoaderWrapper containerClassLoader) {
+                                    MuleContainerClassLoaderWrapper containerClassLoader)
+      throws ArtifactClassloaderCreationException {
     return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
                                        containerClassLoader.getContainerClassLoader().getClassLoader(),
                                        containerClassLoader.getContainerClassLoaderLookupPolicy());
@@ -65,7 +68,8 @@ public class ServiceClassLoaderFactory
    * @since 4.6
    */
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor,
-                                    ArtifactClassLoader containerClassLoader) {
+                                    ArtifactClassLoader containerClassLoader)
+      throws ArtifactClassloaderCreationException {
     return create(artifactId, descriptor, new DefaultMuleContainerClassLoaderWrapper(containerClassLoader));
   }
 

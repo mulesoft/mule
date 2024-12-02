@@ -14,6 +14,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 

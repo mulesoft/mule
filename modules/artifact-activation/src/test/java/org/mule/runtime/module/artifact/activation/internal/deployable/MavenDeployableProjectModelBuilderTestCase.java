@@ -24,9 +24,11 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -80,8 +82,8 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
 
   @Test
   public void createDeployableProjectModelForAnEmptyDeploymentMustFail() throws Exception {
-    expected.expect(MuleRuntimeException.class);
-    expected.expectMessage("src/main/mule cannot be empty");
+    expected.expect(ArtifactActivationException.class);
+    expected.expectCause(hasMessage(containsString("src/main/mule cannot be empty")));
     getDeployableProjectModel(deploymentTypePrefix + "/empty-app");
   }
 
@@ -185,14 +187,15 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     // checks there are no packages in the project
     assertThat(deployableProjectModel.getPackages(), hasSize(0));
 
-    assertThat(deployableProjectModel.getSharedLibraries(), contains(hasProperty("artifactId", equalTo("derby"))));
+    assertThat(deployableProjectModel.getSharedLibraries(), contains(hasProperty("artifactId", equalTo("derby")),
+                                                                     hasProperty("artifactId", equalTo("derbyshared"))));
   }
 
   @Test
   public void createDeployableProjectModelWithTransitiveSharedLibrary() throws URISyntaxException {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel(deploymentTypePrefix + "/shared-lib-transitive");
 
-    assertThat(deployableProjectModel.getSharedLibraries(), hasSize(6));
+    assertThat(deployableProjectModel.getSharedLibraries(), hasSize(8));
     assertThat(deployableProjectModel.getSharedLibraries(), hasItem(hasProperty("artifactId", equalTo("spring-context"))));
   }
 
@@ -208,7 +211,8 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(1));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
                hasEntry(hasProperty("artifactId", equalTo("mule-db-connector")),
-                        contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))))));
+                        contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
+                                 hasProperty("descriptor", hasProperty("artifactId", equalTo("derbyshared"))))));
   }
 
   @Test
@@ -216,15 +220,17 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     DeployableProjectModel deployableProjectModel =
         getDeployableProjectModel(deploymentTypePrefix + "/additional-plugin-dependency-and-dep");
 
-    assertThat(deployableProjectModel.getDependencies(), hasSize(4));
+    assertThat(deployableProjectModel.getDependencies(), hasSize(5));
     assertThat(deployableProjectModel.getDependencies(),
                hasItems(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
+                        hasProperty("descriptor", hasProperty("artifactId", equalTo("derbyshared"))),
                         hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
 
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(1));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
                hasEntry(hasProperty("artifactId", equalTo("mule-db-connector")),
-                        contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))))));
+                        contains(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
+                                 hasProperty("descriptor", hasProperty("artifactId", equalTo("derbyshared"))))));
   }
 
   @Test
@@ -238,7 +244,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
 
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(), aMapWithSize(1));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
-               hasEntry(hasProperty("artifactId", equalTo("mule-spring-module")), hasSize(6)));
+               hasEntry(hasProperty("artifactId", equalTo("mule-spring-module")), hasSize(8)));
     assertThat(deployableProjectModel.getAdditionalPluginDependencies(),
                hasEntry(hasProperty("artifactId", equalTo("mule-spring-module")),
                         hasItem(hasProperty("descriptor", hasProperty("artifactId", equalTo("spring-context"))))));

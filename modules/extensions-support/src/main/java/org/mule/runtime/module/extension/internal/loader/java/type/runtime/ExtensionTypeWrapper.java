@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
-import static java.util.Collections.emptyList;
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getExtensionInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -25,11 +24,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ParameterizableTypeElement;
 import org.mule.runtime.module.extension.internal.loader.java.info.ExtensionInfo;
 
-import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.WeakHashMap;
 
 /**
  * {@link ConfigurationWrapper} specification for classes that are considered as Extensions
@@ -38,20 +33,17 @@ import java.util.WeakHashMap;
  */
 public class ExtensionTypeWrapper<T> extends ComponentWrapper implements ExtensionElement, ParameterizableTypeElement {
 
-  private LazyValue<ExtensionInfo> extensionInfo;
+  private final LazyValue<ExtensionInfo> extensionInfo;
 
   public ExtensionTypeWrapper(Class<T> aClass, ClassTypeLoader typeLoader) {
-    super(aClass, newCachedClassTypeLoader(typeLoader));
+    super(aClass, typeLoader);
     extensionInfo = new LazyValue<>(() -> getExtensionInfo(aClass));
-  }
-
-  private static ClassTypeLoader newCachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
-    return new CachedClassTypeLoader(classTypeLoader);
   }
 
   /**
    * {@inheritDoc}
    */
+  @Override
   public List<ConfigurationElement> getConfigurations() {
     return mapReduceSingleAnnotation(
                                      this,
@@ -101,36 +93,6 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
   @Override
   public String getName() {
     return extensionInfo.get().getName();
-  }
-
-  private static class CachedClassTypeLoader implements ClassTypeLoader {
-
-    private ClassTypeLoader classTypeLoader;
-
-    private Map<Type, MetadataType> typeMetadataTypeMap = new WeakHashMap<>();
-    private Map<String, Optional<MetadataType>> typeIdentifierMetadataTypeMap = new WeakHashMap<>();
-
-    public CachedClassTypeLoader(ClassTypeLoader classTypeLoader) {
-      requireNonNull(classTypeLoader, "classTypeLoader cannot be null");
-
-      this.classTypeLoader = classTypeLoader;
-    }
-
-    @Override
-    public MetadataType load(Type type) {
-      return typeMetadataTypeMap.computeIfAbsent(type, k -> classTypeLoader.load(type));
-    }
-
-    @Override
-    public ClassLoader getClassLoader() {
-      return classTypeLoader.getClassLoader();
-    }
-
-    @Override
-    public Optional<MetadataType> load(String typeIdentifier) {
-      return typeIdentifierMetadataTypeMap.computeIfAbsent(typeIdentifier, k -> classTypeLoader.load(k));
-    }
-
   }
 
 }

@@ -47,7 +47,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -56,6 +55,7 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -94,6 +94,7 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingCont
 import org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProviderMediator;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.DefaultSampleDataProviderMediator;
+import org.mule.runtime.module.extension.internal.loader.java.property.TypeLoaderModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
@@ -216,7 +217,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.configurationProviderResolver.set(configurationProviderResolver);
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
+    this.typeLoader = extensionModel.getModelProperty(TypeLoaderModelProperty.class)
+        .map(TypeLoaderModelProperty::getTypeLoader)
+        .orElseGet(() -> ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader));
   }
 
   /**
@@ -474,7 +477,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }
 
     // Since the resolver is not dynamic, we can resolve it using a null Event
-    CoreEvent nullEvent = getNullEvent(muleContext);
+    CoreEvent nullEvent = getNullEvent();
 
     try {
       return of(resolveConfigurationProvider(configurationProviderResolver, nullEvent));
@@ -521,7 +524,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
     CoreEvent initialiserEvent = null;
     try {
-      initialiserEvent = getNullEvent(muleContext);
+      initialiserEvent = getNullEvent();
       return configurationResolver.apply(initialiserEvent);
     } finally {
       if (initialiserEvent != null) {
@@ -886,7 +889,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
     try {
-      fakeEvent = getNullEvent(muleContext);
+      fakeEvent = getNullEvent();
 
       Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
@@ -915,7 +918,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return new ExtensionResolvingContext(() -> {
       CoreEvent fakeEvent = null;
       try {
-        fakeEvent = getNullEvent(muleContext);
+        fakeEvent = getNullEvent();
         return getConfiguration(fakeEvent);
       } finally {
         if (fakeEvent != null) {

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+import static org.mule.runtime.core.privileged.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
@@ -16,25 +16,28 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.exception.MessagingException;
+import org.mule.runtime.core.privileged.transaction.TransactionConfig;
+import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import io.qameta.allure.Issue;
 
-@RunWith(MockitoJUnitRunner.class)
 @SmallTest
 public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   ExecutionInterceptor executionInterceptor;

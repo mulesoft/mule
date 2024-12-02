@@ -83,4 +83,17 @@ public class BlockingExtensionsClientTestCase extends ExtensionsClientTestCase {
     }
   }
 
+  @Test
+  public void executeOperationWithInternalParameterGroup() throws Throwable {
+    final String message = "Skyler cheated on you";
+    Result<String, Void> result = client.<String, Void>execute(HEISENBERG_EXT_NAME,
+                                                               "whisperSecret",
+                                                               params -> params
+                                                                   .withConfigRef(HEISENBERG_CONFIG)
+                                                                   .withParameter("internalGroup", "secret", message))
+        .get();
+
+    assertThat(result.getOutput(), equalTo(message));
+  }
+
 }

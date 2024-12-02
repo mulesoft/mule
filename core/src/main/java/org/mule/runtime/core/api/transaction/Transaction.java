@@ -82,20 +82,6 @@ public interface Transaction {
   boolean isXA();
 
   /**
-   * Resume the XA transaction
-   *
-   * @throws TransactionException if any error
-   */
-  void resume() throws TransactionException;
-
-  /**
-   * Suspend the XA transaction
-   *
-   * @throws TransactionException if any error
-   */
-  javax.transaction.Transaction suspend() throws TransactionException;
-
-  /**
    * @return TX identification.
    */
   String getId();

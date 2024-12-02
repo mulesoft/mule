@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 public class CoreValidationsProvider implements ValidationsProvider, ArtifactAstGraphDependencyProviderAware {
 
@@ -49,13 +48,9 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   @Inject
   private ExpressionLanguage expressionLanguage;
 
-  @Inject
-  @Named("_compatibilityPluginInstalled")
-  private Optional<Object> compatibilityPluginInstalled;
-
   @Override
   public List<Validation> get() {
-    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(isCompatibilityInstalled()),
+    List<Validation> validations = new ArrayList<>(asList(new AllComponentsBelongToSomeExtensionModel(),
                                                           new SingletonsAreNotRepeated(),
                                                           new SingletonsPerFileAreNotRepeated(),
                                                           new NamedTopLevelElementsHaveName(),
@@ -91,13 +86,14 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
 
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
-                                                          new NumberParameterWithinRange(),
+                                                          new NumberParameterWithinRange(ignoreParamsWithProperties),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
                                                           new ExpressionsInRequiredExpressionsParamsNonPropertyValue(),
                                                           new ExpressionsInRequiredExpressionsParams(featureFlaggingService,
                                                                                                      ignoreParamsWithProperties),
                                                           new OperationParameterDefaultValueDoesntSupportExpressions(),
                                                           new NoExpressionsInNoExpressionsSupportedParams(),
+                                                          new ResourceExistsAndAccessible(artifactRegionClassLoader),
                                                           new DynamicConfigWithStatefulOperationConfigurationOverride(),
                                                           new PollingSourceHasSchedulingStrategy(),
                                                           new RoundRobinRoutes(),
@@ -127,10 +123,6 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
     return validations;
   }
 
-  private boolean isCompatibilityInstalled() {
-    return compatibilityPluginInstalled != null && compatibilityPluginInstalled.isPresent();
-  }
-
   public static Level getExpressionSyntacticValidationErrorLevel(Optional<FeatureFlaggingService> featureFlaggingService) {
     // Honour the system property consistently with MuleConfiguration#isValidateExpressions
     boolean validateExpressions = true;
@@ -158,7 +150,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                   new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
                                                                       artifactAstDependencyGraphProviderForValidator),
                   new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProviderForValidator),
-                  new MelNotEnabled(isCompatibilityInstalled()));
+                  new MelNotEnabled());
   }
 
   @Override

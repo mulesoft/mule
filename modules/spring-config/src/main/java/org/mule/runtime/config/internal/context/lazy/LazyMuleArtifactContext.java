@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.context.lazy;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SUB_FLOW;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.filteredArtifactAst;
@@ -46,23 +47,22 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.SpringMuleContextServiceConfigurator;
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
-import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.security.SecurityManager;
-import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
+import org.mule.runtime.core.internal.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -127,8 +127,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *
    * @param muleContext                                the {@link MuleContext} that own this context
    * @param artifactAst                                the definition of the artifact to create a context for
-   * @param optionalObjectsController                  the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
-   *                                                   org.mule.runtime.config.internal.SpringRegistry
    * @param parentConfigurationProperties              the resolver for properties from the parent artifact to be used as fallback
    *                                                   in this artifact.
    * @param baseConfigurationComponentLocator          indirection to the actual ConfigurationComponentLocator in the full
@@ -145,7 +143,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    * @since 4.0
    */
   public LazyMuleArtifactContext(MuleContext muleContext, ArtifactAst artifactAst,
-                                 OptionalObjectsController optionalObjectsController,
                                  Optional<ConfigurationProperties> parentConfigurationProperties,
                                  BaseConfigurationComponentLocator baseConfigurationComponentLocator,
                                  ContributedErrorTypeRepository errorTypeRepository,
@@ -155,15 +152,15 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  LockFactory runtimeLockFactory,
-                                 ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory,
+                                 ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
                                  MemoryManagementService memoryManagementService,
                                  FeatureFlaggingService featureFlaggingService,
                                  ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws BeansException {
-    super(muleContext, artifactAst, optionalObjectsController, parentConfigurationProperties,
+    super(muleContext, artifactAst, parentConfigurationProperties,
           baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
           artifactProperties, addToolingObjectsToRegistry,
-          artifactType, componentBuildingDefinitionRegistryFactory, memoryManagementService,
+          artifactType, componentBuildingDefinitionRegistry, memoryManagementService,
           featureFlaggingService, expressionLanguageMetadataService);
 
     // Changes the component locator in order to allow accessing any component by location even when they are prototype
@@ -197,7 +194,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                                         getConfigurationProperties(),
                                                         getArtifactType(),
                                                         getApplicationModel(),
-                                                        getOptionalObjectsController(),
                                                         beanFactory,
                                                         getServiceDiscoverer(),
                                                         getResourceLocator(),
@@ -349,7 +345,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    */
   private void startConfigurationProviders(List<Object> components) {
     components.stream()
-        .filter(component -> component instanceof ConfigurationProvider)
+        .filter(ConfigurationProvider.class::isInstance)
         .forEach(configurationProviders -> {
           try {
             getMuleRegistry().applyLifecycle(configurationProviders, Initialisable.PHASE_NAME, Startable.PHASE_NAME);
@@ -567,7 +563,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Handle orphan named components...
     orphanComponents.stream()
-        .filter(cm -> asList(SOURCE, OPERATION, SCOPE).contains(cm.getComponentType()))
+        .filter(cm -> asList(SOURCE, OPERATION, SCOPE, SUB_FLOW).contains(cm.getComponentType()))
         .filter(cm -> cm.getComponentId().isPresent())
         .forEach(cm -> {
           final String nameAttribute = cm.getComponentId().get();
@@ -632,7 +628,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         }
       } catch (Exception e) {
         currentComponentInitializationState
-            .commitTrackedBeansContainedIn(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
+            .commitTrackedBeansContainedIn(objects.keySet().stream()
+                .map(Pair::getFirst).collect(toList()));
         safeUnregisterBean(componentPair.getFirst());
 
         throw new MuleRuntimeException(e);
@@ -649,7 +646,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // TODO: Once is implemented MULE-17778 we should use graph to get the order for disposing beans
     currentComponentInitializationState
-        .commitTrackedBeansContainedIn(objects.keySet().stream().map(pair -> pair.getFirst()).collect(toList()));
+        .commitTrackedBeansContainedIn(objects.keySet().stream()
+            .map(Pair::getFirst).collect(toList()));
 
     // Sort in order to later initialize and start components according to their dependencies
     List<Object> sortedObjects = new ArrayList<>(objects.values());
@@ -666,14 +664,16 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     try {
       initialiseIfNeeded(messageProcessorChain, getMuleContext());
     } catch (InitialisationException e) {
-      unregisterBeans(objects.keySet().stream().map(p -> p.getFirst()).collect(toList()));
+      unregisterBeans(objects.keySet().stream()
+          .map(Pair::getFirst).collect(toList()));
       throw new IllegalStateException("Couldn't initialise an instance of a MessageProcessorChain", e);
     }
     try {
       getMuleRegistry().registerObject(chainKey.getFirst(), messageProcessorChain);
     } catch (RegistrationException e) {
       // Unregister any already created component
-      unregisterBeans(objects.keySet().stream().map(p -> p.getFirst()).collect(toList()));
+      unregisterBeans(objects.keySet().stream()
+          .map(Pair::getFirst).collect(toList()));
       throw new IllegalStateException("Couldn't register an instance of a MessageProcessorChain", e);
     }
     objects.put(chainKey, messageProcessorChain);

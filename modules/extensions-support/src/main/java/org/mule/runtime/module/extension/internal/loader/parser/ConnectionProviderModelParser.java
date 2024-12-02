@@ -99,4 +99,5 @@ public interface ConnectionProviderModelParser extends SemanticTermsParser, Ster
    *         that version was assigned.
    */
   Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion();
+
 }

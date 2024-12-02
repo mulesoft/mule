@@ -229,11 +229,17 @@ public class MuleProperties {
   public static final String OBJECT_STATISTICS = "_muleStatistics";
   public static final String OBJECT_RESOURCE_LOCATOR = "_muleResourceLocator";
   public static final String OBJECT_ARTIFACT_AST = "_muleArtifactAst";
+  /**
+   * @deprecated since 4.9 there are no uses of this constant
+   */
+  @Deprecated
   public static final String COMPATIBILITY_PLUGIN_INSTALLED = "_compatibilityPluginInstalled";
   public static final String MULE_PROFILING_SERVICE_KEY = "_muleProfilingService";
   public static final String MULE_CORE_EVENT_TRACER_KEY = "_muleCoreEventTracer";
   public static final String MULE_CORE_COMPONENT_TRACER_FACTORY_KEY = "_muleCoreComponentTracerFactory";
+  public static final String MULE_ARTIFACT_METER_PROVIDER_KEY = "_muleArtifactMeterProvider";
   public static final String MULE_METER_PROVIDER_KEY = "_muleMeterProvider";
+  public static final String MULE_ERROR_METRICS_FACTORY_KEY = "_muleErrorMetricsFactory";
   public static final String MULE_METER_EXPORTER_CONFIGURATION_KEY = "_muleMeterExporterConfiguration";
   public static final String MULE_METER_EXPORTER_FACTORY_KEY = "_muleMeterExporterFactory";
   public static final String MULE_TRACING_LEVEL_CONFIGURATION_KEY = "_muleTracingLevelConfiguration";

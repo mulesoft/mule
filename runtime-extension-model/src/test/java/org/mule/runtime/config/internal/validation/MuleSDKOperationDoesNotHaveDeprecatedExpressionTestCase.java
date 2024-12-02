@@ -6,20 +6,27 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mule.runtime.api.el.validation.ScopePhaseValidationItemKind.DEPRECATED;
-import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.*;
-import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_END_POSITION_COLUMN;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_END_POSITION_LINE;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_END_POSITION_OFFSET;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_START_POSITION_COLUMN;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_START_POSITION_LINE;
+import static org.mule.runtime.config.api.validation.ExpressionsSyntacticallyValidAdditionalDataKeys.LOCATION_START_POSITION_OFFSET;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
+import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERATIONS;
+
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -28,22 +35,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.el.validation.*;
+import org.mule.runtime.api.el.validation.Location;
+import org.mule.runtime.api.el.validation.Position;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationItem;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationItemKind;
+import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.config.internal.validation.test.AbstractCoreValidationTestCase;
-
-import io.qameta.allure.Features;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Stories;
-import io.qameta.allure.Story;
-import org.hamcrest.CoreMatchers;
-import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.junit.Test;
+
+import org.hamcrest.CoreMatchers;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 
 
 @Features({@Feature(MULE_DSL), @Feature(REUSE)})
@@ -59,7 +72,7 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
       "       http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd\">\n";
   private static final String XML_CLOSE = "</mule>";
 
-  private ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
+  private final ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
 
   @Override
   protected Validation getValidation() {
@@ -73,12 +86,14 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                                                                                                         "dw::core::Objects::keySet"))));
     when(expressionLanguage.collectScopePhaseValidationMessages(not(contains("keySet(")), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages());
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[payload ++ 10]\"/>" +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#withoutDeprecation",
+                      XML_NAMESPACE_DEF +
+                          "<operation:def name=\"someOp\"><operation:body>" +
+                          "<set-payload value=\"10\"/>" +
+                          "<logger level=\"WARN\" message=\"#[payload ++ 10]\"/>" +
+                          "</operation:body></operation:def>" +
+                          XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -87,13 +102,15 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("keySet("), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.3.0",
                                                                                                         "dw::core::Objects::keySet"))));
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]\"/>"
-        +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#withDeprecation",
+                      XML_NAMESPACE_DEF +
+                          "<operation:def name=\"someOp\"><operation:body>" +
+                          "<set-payload value=\"10\"/>" +
+                          "<logger level=\"WARN\" message=\"#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]\"/>"
+                          +
+                          "</operation:body></operation:def>" +
+                          XML_CLOSE).stream().findFirst();
     assertThat(msg, is(CoreMatchers.not(empty())));
     assertThat(msg.get().getMessage(), containsString("Using an invalid function within a Mule SDK operation"));
   }
@@ -103,12 +120,14 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
                                                                                                         "Mule::lookup"))));
-    final List<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
-        "</operation:body></operation:def>" +
-        XML_CLOSE);
+    final List<ValidationResultItem> msg = runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#withLookup",
+                                                         XML_NAMESPACE_DEF +
+                                                             "<operation:def name=\"someOp\"><operation:body>" +
+                                                             "<set-payload value=\"10\"/>" +
+                                                             "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>"
+                                                             +
+                                                             "</operation:body></operation:def>" +
+                                                             XML_CLOSE);
     assertThat(msg, hasSize(1));
     assertThat(msg.get(0).getMessage(), containsString("Using an invalid function within a Mule SDK operation"));
   }
@@ -118,11 +137,13 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
                                                                                                         "Mule::lookup"))));
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#withoutExpression",
+                      XML_NAMESPACE_DEF +
+                          "<operation:def name=\"someOp\"><operation:body>" +
+                          "<set-payload value=\"10\"/>" +
+                          "</operation:body></operation:def>" +
+                          XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -133,14 +154,16 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                                                                                                         "dw::core::Objects::keySet"))));
     when(expressionLanguage.collectScopePhaseValidationMessages(not(contains("keySet(")), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages());
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[payload ++ 10]\"/>" +
-        "<set-payload value=\"#[payload + 1]\"/>" +
-        "<set-variable value=\"#[someFunction(10)]\"/>" +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#withMultipleCorrectExpressions",
+                      XML_NAMESPACE_DEF +
+                          "<operation:def name=\"someOp\"><operation:body>" +
+                          "<set-payload value=\"10\"/>" +
+                          "<logger level=\"WARN\" message=\"#[payload ++ 10]\"/>" +
+                          "<set-payload value=\"#[payload + 1]\"/>" +
+                          "<set-variable value=\"#[someFunction(10)]\"/>" +
+                          "</operation:body></operation:def>" +
+                          XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -151,16 +174,18 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
                                                                                                         "Mule::lookup"))));
-    final List<ValidationResultItem> msgs = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[payload ++ 10]\"/>" +
-        "<set-payload value=\"#[payload + 1]\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow1') }]\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow2') }]\"/>" +
-        "<set-variable value=\"#[someFunction(10)]\"/>" +
-        "</operation:body></operation:def>" +
-        XML_CLOSE);
+    final List<ValidationResultItem> msgs =
+        runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#withOneOverManyExpressionsDeprecated",
+                      XML_NAMESPACE_DEF +
+                          "<operation:def name=\"someOp\"><operation:body>" +
+                          "<set-payload value=\"10\"/>" +
+                          "<logger level=\"WARN\" message=\"#[payload ++ 10]\"/>" +
+                          "<set-payload value=\"#[payload + 1]\"/>" +
+                          "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow1') }]\"/>" +
+                          "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow2') }]\"/>" +
+                          "<set-variable value=\"#[someFunction(10)]\"/>" +
+                          "</operation:body></operation:def>" +
+                          XML_CLOSE);
     assertThat(msgs, hasSize(2));
     assertThat(msgs.get(0).getMessage(), containsString("Using an invalid function within a Mule SDK operation"));
     assertThat(msgs.get(0).getMessage(), containsString("Mule::lookup('someFlow1')"));
@@ -173,13 +198,15 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("keySet("), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.7.0",
                                                                                                         "dw::core::Objects::keySet"))));
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]\"/>"
-        +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#withFutureDeprecatedExpression",
+                      XML_NAMESPACE_DEF +
+                          "<operation:def name=\"someOp\"><operation:body>" +
+                          "<set-payload value=\"10\"/>" +
+                          "<logger level=\"WARN\" message=\"#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]\"/>"
+                          +
+                          "</operation:body></operation:def>" +
+                          XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -188,12 +215,14 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
                                                                                                         "Mule::lookup"))));
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<flow name=\"someFlow\">" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
-        "</flow>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#withoutOperation",
+                      XML_NAMESPACE_DEF +
+                          "<flow name=\"someFlow\">" +
+                          "<set-payload value=\"10\"/>" +
+                          "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
+                          "</flow>" +
+                          XML_CLOSE).stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -202,12 +231,14 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
     when(expressionLanguage.collectScopePhaseValidationMessages(contains("Mule::lookup("), anyString(), any()))
         .thenReturn(new TestScopePhaseValidationMessages(singletonList(new TestScopePhaseValidationItem("2.5.0",
                                                                                                         "Mule::lookup"))));
-    final Optional<ValidationResultItem> msg = runValidation(XML_NAMESPACE_DEF +
-        "<operation:def name=\"someOp\"><operation:body>" +
-        "<set-payload value=\"10\"/>" +
-        "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
-        "</operation:body></operation:def>" +
-        XML_CLOSE).stream().findFirst();
+    final Optional<ValidationResultItem> msg =
+        runValidation("MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase#correctLocation",
+                      XML_NAMESPACE_DEF +
+                          "<operation:def name=\"someOp\"><operation:body>" +
+                          "<set-payload value=\"10\"/>" +
+                          "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
+                          "</operation:body></operation:def>" +
+                          XML_CLOSE).stream().findFirst();
     assertThat(msg, is(CoreMatchers.not(empty())));
     Map<String, String> info = msg.get().getAdditionalData();
     assertThat(info.keySet(), hasSize(6));
