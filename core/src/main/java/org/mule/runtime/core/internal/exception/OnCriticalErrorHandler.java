@@ -53,6 +53,7 @@ public class OnCriticalErrorHandler extends AbstractExceptionListener implements
   @Override
   public CoreEvent handleException(Exception exception, CoreEvent event) {
     logException(exception);
+    fireNotification(exception, event);
     return event;
   }
 
