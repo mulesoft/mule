@@ -26,6 +26,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -63,6 +64,7 @@ public final class MuleExtensionModelProvider {
   public static final MetadataType ANY_TYPE = loadPrimitive(ANY);
   public static final MetadataType VOID_TYPE = BASE_TYPE_BUILDER.voidType().build();
   public static final MetadataType OBJECT_STORE_TYPE = TYPE_LOADER.load(ObjectStore.class);
+  public static final MetadataType TLS_CONTEXT_FACTORY_TYPE = TYPE_LOADER.load(TlsContextFactory.class);
 
   private static ComponentMetadataConfigurerFactory configurerFactory = ComponentMetadataConfigurerFactory.getDefault();
 
