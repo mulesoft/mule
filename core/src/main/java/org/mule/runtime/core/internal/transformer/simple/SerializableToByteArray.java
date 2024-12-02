@@ -8,15 +8,12 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
-
-import javax.inject.Inject;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String to a byte array. If <code>Message</code> is
@@ -24,8 +21,6 @@ import javax.inject.Inject;
  * be serialised. This is useful for transports such as TCP where the message headers would normally be lost.
  */
 public class SerializableToByteArray extends AbstractTransformer implements DiscoverableTransformer {
-
-  private ObjectSerializer objectSerializer;
 
   /**
    * Give core transformers a slightly higher priority
@@ -46,7 +41,7 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
      */
 
     try {
-      return objectSerializer.getExternalProtocol().serialize(src);
+      return muleContext.getObjectSerializer().getExternalProtocol().serialize(src);
     } catch (Exception e) {
       throw new TransformerException(this, e);
     }
@@ -60,10 +55,5 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
   @Override
   public void setPriorityWeighting(int priorityWeighting) {
     this.priorityWeighting = priorityWeighting;
-  }
-
-  @Inject
-  public void setObjectSerializer(ObjectSerializer objectSerializer) {
-    this.objectSerializer = objectSerializer;
   }
 }

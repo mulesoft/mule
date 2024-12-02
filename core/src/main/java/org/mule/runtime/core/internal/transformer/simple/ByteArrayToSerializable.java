@@ -7,25 +7,20 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
-
-import javax.inject.Inject;
 
 /**
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object representation
  */
 public class ByteArrayToSerializable extends AbstractTransformer implements DiscoverableTransformer {
-
-  private ObjectSerializer objectSerializer;
 
   /**
    * Give core transformers a slightly higher priority
@@ -57,7 +52,7 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
   }
 
   protected SerializationProtocol getSerializationProtocol() {
-    return objectSerializer.getExternalProtocol();
+    return muleContext.getObjectSerializer().getExternalProtocol();
   }
 
   @Override
@@ -68,10 +63,5 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
   @Override
   public void setPriorityWeighting(int priorityWeighting) {
     this.priorityWeighting = priorityWeighting;
-  }
-
-  @Inject
-  public void setObjectSerializer(ObjectSerializer objectSerializer) {
-    this.objectSerializer = objectSerializer;
   }
 }

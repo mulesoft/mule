@@ -14,6 +14,7 @@ import static org.mule.runtime.module.extension.internal.component.AnnotatedObje
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -61,7 +62,9 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractMuleCont
     weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
     when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class)).thenReturn(of(weaveExpressionExecutor));
     expressionLanguage =
-        new DataWeaveExpressionLanguageAdaptor(muleContext, registry, weaveExpressionExecutor, getFeatureFlaggingService());
+        new DataWeaveExpressionLanguageAdaptor(muleContext, registry, muleContext.getConfiguration(),
+                                               () -> defaultCharset(),
+                                               weaveExpressionExecutor, getFeatureFlaggingService());
     expressionLanguage.initialise();
   }
 
