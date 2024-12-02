@@ -91,6 +91,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -399,18 +400,9 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Test
   public void outputResolverForRouter() throws Exception {
     location = Location.builder().globalName(ROUTER_WITH_METADATA_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    RouterOutputMetadataContext routerOutputMetadataContext = new RouterOutputMetadataContext() {
-
-      @Override
-      public Map<String, Supplier<MessageMetadataType>> getRouteOutputMessageTypes() {
-        return singletonMap("metaroute", () -> MessageMetadataType.builder().payload(carType).build());
-      }
-
-      @Override
-      public Supplier<MessageMetadataType> getRouterInputMessageType() {
-        return () -> null;
-      }
-    };
+    RouterOutputMetadataContext routerOutputMetadataContext =
+        new TestRouterOutputMetadataContext(singletonMap("metaroute",
+                                                         () -> MessageMetadataType.builder().payload(carType).build()));
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
         metadataService.getRouterOutputMetadata(location, CAR_KEY, routerOutputMetadataContext);
     assertThat(outputMetadataResult.isSuccess(), is(true));
@@ -1025,6 +1017,12 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
       // Not needed for this test
       return () -> null;
     }
+
+    @Override
+    public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException {
+      // Not needed for this test
+      return null;
+    }
   }
 
   private static class TestRouterOutputMetadataContext implements RouterOutputMetadataContext {
@@ -1044,6 +1042,12 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     public Supplier<MessageMetadataType> getRouterInputMessageType() {
       // Not needed for this test
       return () -> null;
+    }
+
+    @Override
+    public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException {
+      // Not needed for this test
+      return null;
     }
   }
 }

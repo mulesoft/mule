@@ -13,6 +13,7 @@ import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.extension.internal.metadata.InternalMetadataContext;
@@ -53,9 +54,15 @@ public class DefaultChainInputMetadataContext implements ChainInputMetadataConte
   }
 
   @Override
-  public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException {
+  public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException, MetadataResolvingException {
     try {
-      return inputMetadataDescriptor.getParameterMetadata(parameterName).getType();
+      if (rootContext.getScopeOutputMetadataContext().isPresent()) {
+        return rootContext.getScopeOutputMetadataContext().get().getParameterResolvedType(parameterName);
+      } else if (rootContext.getRouterOutputMetadataContext().isPresent()) {
+        return rootContext.getRouterOutputMetadataContext().get().getParameterResolvedType(parameterName);
+      } else {
+        return inputMetadataDescriptor.getParameterMetadata(parameterName).getType();
+      }
     } catch (IllegalArgumentException e) {
       throw new NoSuchElementException(e.getMessage());
     }

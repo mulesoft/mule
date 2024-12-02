@@ -8,16 +8,19 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.sdk.api.metadata.MetadataCache;
 import org.mule.sdk.api.metadata.MetadataContext;
 import org.mule.sdk.api.metadata.RouterOutputMetadataContext;
 import org.mule.sdk.api.metadata.ScopeOutputMetadataContext;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -101,6 +104,11 @@ public class SdkMetadataContextAdapter implements InternalMetadataContext {
       return delegate.getScopeInputMessageType();
     }
 
+    @Override
+    public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException, MetadataResolvingException {
+      return delegate.getParameterResolvedType(parameterName);
+    }
+
     org.mule.runtime.api.metadata.ScopeOutputMetadataContext getDelegate() {
       return delegate;
     }
@@ -122,6 +130,11 @@ public class SdkMetadataContextAdapter implements InternalMetadataContext {
     @Override
     public Supplier<MessageMetadataType> getRouterInputMessageType() {
       return delegate.getRouterInputMessageType();
+    }
+
+    @Override
+    public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException, MetadataResolvingException {
+      return delegate.getParameterResolvedType(parameterName);
     }
 
     org.mule.runtime.api.metadata.RouterOutputMetadataContext getDelegate() {
