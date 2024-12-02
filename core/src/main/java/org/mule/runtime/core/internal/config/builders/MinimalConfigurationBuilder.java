@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_ENCODING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
@@ -76,6 +77,7 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
+import org.mule.runtime.core.internal.config.DefaultArtifactEncoding;
 import org.mule.runtime.core.internal.config.DefaultResourceLocator;
 import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
@@ -152,6 +154,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerLockFactory(muleContext);
     registerTransformerRegistry(muleContext);
     registerExpressionManager(muleContext, registry);
+    registerObject(OBJECT_ARTIFACT_ENCODING, new DefaultArtifactEncoding(muleContext.getConfiguration().getDefaultEncoding()),
+                   muleContext);
     registerConnectionManager(muleContext);
     registerNotificationHandlingObjects(muleContext);
     registerConnectivityTester(muleContext);

@@ -13,26 +13,26 @@ import static java.nio.charset.Charset.defaultCharset;
 import static java.nio.charset.Charset.forName;
 
 import org.mule.runtime.core.api.config.ArtifactEncoding;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.nio.charset.Charset;
 
-import javax.inject.Inject;
-
 public class DefaultArtifactEncoding implements ArtifactEncoding {
 
-  @Inject
-  private MuleConfiguration configuration;
+  private Charset defaultCharset;
+
+  public DefaultArtifactEncoding(String defaultEncoding) {
+    if (defaultEncoding != null) {
+      defaultCharset = forName(defaultEncoding);
+    } else if (getProperty(MULE_ENCODING_SYSTEM_PROPERTY) != null) {
+      defaultCharset = forName(getProperty(MULE_ENCODING_SYSTEM_PROPERTY));
+    } else {
+      defaultCharset = defaultCharset();
+    }
+  }
 
   @Override
   public Charset getDefaultEncoding() {
-    if (configuration != null && configuration.getDefaultEncoding() != null) {
-      return forName(configuration.getDefaultEncoding());
-    } else if (getProperty(MULE_ENCODING_SYSTEM_PROPERTY) != null) {
-      return forName(getProperty(MULE_ENCODING_SYSTEM_PROPERTY));
-    } else {
-      return defaultCharset();
-    }
+    return defaultCharset;
   }
 
 }
