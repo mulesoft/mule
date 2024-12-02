@@ -11,7 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.container.api.discoverer.ModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -38,8 +38,8 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlugin;
-import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaultServiceEchoJarFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaultFooServiceJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaultServiceEchoJarFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.exceptionThrowingPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
@@ -118,6 +118,7 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.config.api.properties.PropertiesResolverUtils;
 import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
@@ -190,8 +191,8 @@ import java.util.function.Supplier;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.apache.logging.log4j.LogManager;
-import org.slf4j.event.Level;
 import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import org.junit.After;
 import org.junit.Before;
@@ -274,16 +275,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void beforeClass() throws IllegalAccessException {
-    // Reduces unnecessary logging
-    TestLogger compilerUtilsTestLogger = getTestLogger(CompilerUtils.class);
-    compilerUtilsTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
-    TestLogger pollingProberTestLogger = getTestLogger(PollingProber.class);
-    pollingProberTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
-    TestLogger testLogger = getTestLogger(LoggerMessageProcessor.class);
-    testLogger.setEnabledLevelsForAllThreads(Level.ERROR);
-    // Initialises logging plugins with correct classloader
-    LogManager.getContext(false);
-
     internalIsRunningTests =
         (Boolean) readDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true);
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true, true);
@@ -433,6 +424,19 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     invocationCount = 0;
     correlationIdCount.clear();
     policyParametrization = "";
+  }
+
+  @Before
+  public void configulreLogging() {
+    // Reduces unnecessary logging
+    TestLogger compilerUtilsTestLogger = getTestLogger(CompilerUtils.class);
+    compilerUtilsTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    TestLogger pollingProberTestLogger = getTestLogger(PollingProber.class);
+    pollingProberTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    TestLogger testLogger = getTestLogger(LoggerMessageProcessor.class);
+    testLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    // Initialises logging plugins with correct classloader
+    LogManager.getContext(false);
   }
 
   @After
@@ -898,12 +902,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     assertThat(apps, not(nullValue()));
 
     if (totalAppsExpected >= 0) {
-      assertThat(apps.stream().map(a -> a.getArtifactName()).collect(joining()),
+      assertThat(apps.stream().map(Application::getArtifactName).collect(joining()),
                  apps, hasSize(totalAppsExpected));
     }
 
     final Application app = deploymentService.findApplication(appName);
-    assertThat(appName + " not in " + apps.stream().map(a -> a.getArtifactName()).collect(joining()),
+    assertThat(appName + " not in " + apps.stream().map(Application::getArtifactName).collect(joining()),
                app, not(nullValue()));
     return app;
   }
@@ -911,7 +915,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected DefaultMuleDomain createDefaultDomain() {
     DomainDescriptor descriptor = new DomainDescriptor(DEFAULT_DOMAIN_NAME);
     return new DefaultMuleDomain(descriptor,
-                                 domainClassLoaderFactory(name -> getAppDataFolder(name))
+                                 domainClassLoaderFactory(MuleFoldersUtil::getAppDataFolder)
                                      .create("domain/" + DEFAULT_DOMAIN_NAME,
                                              new RegionClassLoader("domainRegion", descriptor,
                                                                    containerClassLoader
@@ -1189,7 +1193,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     assertEquals("Wrong number of zombie artifacts registered.", 1, zombieMap.size());
     if (!zombieMap.containsKey(artifactName)) {
       Map.Entry<URI, Long> zombieEntry =
-          getZombieFromMap((entry) -> new File((URI) entry.getKey()).getName().equals(artifactName), zombieMap);
+          getZombieFromMap(entry -> new File((URI) entry.getKey()).getName().equals(artifactName), zombieMap);
       assertThat("Wrong URL tagged as zombie.", zombieEntry, is(notNullValue()));
     }
   }
@@ -1197,7 +1201,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected void assertArtifactIsNotRegisteredAsZombie(String artifactName, Map<String, Map<URI, Long>> zombieMap) {
     if (zombieMap.containsKey(artifactName)) {
       Map.Entry<URI, Long> zombieEntry =
-          getZombieFromMap((entry) -> new File((URI) entry.getKey()).getName().equals(artifactName), zombieMap);
+          getZombieFromMap(entry -> new File((URI) entry.getKey()).getName().equals(artifactName), zombieMap);
       assertThat("Artifact tagged as zombie.", zombieEntry, is(notNullValue()));
     }
   }
