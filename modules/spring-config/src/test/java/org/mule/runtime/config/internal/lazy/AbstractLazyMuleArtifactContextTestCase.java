@@ -42,11 +42,13 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.dsl.model.AbstractDslModelTestCase;
-import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
+import org.mule.runtime.config.internal.model.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -66,14 +68,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Features;
-import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
-import org.mockito.stubbing.Answer;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -83,6 +78,16 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.ResolvableType;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+
+import org.mockito.Mock;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Story;
 
 @Features({@Feature(LAZY_INITIALIZATION), @Feature(CONFIGURATION_COMPONENT_LOCATOR)})
 @Story(COMPONENT_LIFE_CYCLE)
@@ -173,14 +178,19 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
   }
 
   private LazyMuleArtifactContext createLazyMuleArtifactContextStub(MuleContext muleContext) {
+    final ArtifactAst artifactAst = toArtifactast(getArtifactDeclaration(), getExtensions(muleContext.getExtensionManager()));
+    final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
+        new DefaultComponentBuildingDefinitionRegistryFactory().create(artifactAst.dependencies(),
+                                                                       artifactAst::dependenciesDsl);
+
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext,
-                                    toArtifactast(getArtifactDeclaration(), getExtensions(muleContext.getExtensionManager())),
+                                    artifactAst,
                                     empty(),
                                     new BaseConfigurationComponentLocator(),
                                     new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
                                     emptyMap(), false, APP, empty(), lockFactory,
-                                    new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                    componentBuildingDefinitionRegistry,
                                     mock(MemoryManagementService.class),
                                     mock(FeatureFlaggingService.class),
                                     mock(ExpressionLanguageMetadataService.class)) {
@@ -260,7 +270,7 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
         throw new NoSuchBeanDefinitionException(requiredType);
       } else {
         T bean = mock(requiredType);
-        return new ObjectProvider<T>() {
+        return new ObjectProvider<>() {
 
           @Override
           public T getObject() throws BeansException {
@@ -282,7 +292,7 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
           throw new RuntimeException(e);
         }
         T finalBean = bean;
-        return new ObjectProvider<T>() {
+        return new ObjectProvider<>() {
 
           @Override
           public T getObject() throws BeansException {

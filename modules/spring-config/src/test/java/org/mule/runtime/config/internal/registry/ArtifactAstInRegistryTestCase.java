@@ -22,12 +22,12 @@ import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -93,7 +93,8 @@ public class ArtifactAstInRegistryTestCase extends AbstractMuleTestCase {
                                                                                                                        addArtifactAstToRegistry
                                                                                                                            .toString()),
                                                                                                           APP,
-                                                                                                          lazyInit, false);
+                                                                                                          lazyInit, false,
+                                                                                                          mock(ComponentBuildingDefinitionRegistry.class));
 
     muleContext = (MuleContextWithRegistry) new DefaultMuleContextFactory()
         .createMuleContext(testServicesConfigurationBuilder,

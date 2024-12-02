@@ -56,6 +56,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.config.internal.bean.TestCustomServiceDependingOnMuleConfiguration;
+import org.mule.runtime.config.internal.model.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
@@ -331,8 +332,11 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
                                                      configFiles, this, muleContext.getExtensionManager().getExtensions(), false,
                                                      muleContext.getExecutionClassLoader(), muleContext.getConfiguration(), null);
       }
-      new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false, false)
-          .configure(muleContext);
+      new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false, false,
+                                          new DefaultComponentBuildingDefinitionRegistryFactory()
+                                              .create(artifactAst.dependencies(),
+                                                      artifactAst::dependenciesDsl))
+                                                          .configure(muleContext);
     }
 
     @Override
