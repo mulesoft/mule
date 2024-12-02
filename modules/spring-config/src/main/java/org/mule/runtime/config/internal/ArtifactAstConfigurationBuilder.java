@@ -25,12 +25,12 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.api.ArtifactContextFactory;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
-import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
@@ -75,12 +75,12 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
   private final MemoryManagementService memoryManagementService;
-  private final ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
-      new DefaultComponentBuildingDefinitionRegistryFactory();
+  private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
 
   private ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
                                           ArtifactType artifactType, boolean enableLazyInit, boolean addToolingObjectsToRegistry,
-                                          LockFactory runtimeLockFactory, MemoryManagementService memoryManagementService)
+                                          LockFactory runtimeLockFactory, MemoryManagementService memoryManagementService,
+                                          ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
       throws ConfigurationException {
     this.artifactAst = artifactAst;
     this.artifactProperties = artifactProperties;
@@ -89,14 +89,17 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
+    this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
   }
 
   public ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
-                                         ArtifactType artifactType, boolean enableLazyInit, boolean addToolingObjectsToRegistry)
+                                         ArtifactType artifactType, boolean enableLazyInit, boolean addToolingObjectsToRegistry,
+                                         ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
       throws ConfigurationException {
     this(artifactAst, artifactProperties, artifactType, enableLazyInit, addToolingObjectsToRegistry,
          getRuntimeLockFactory(),
-         DefaultMemoryManagementService.getInstance());
+         DefaultMemoryManagementService.getInstance(),
+         componentBuildingDefinitionRegistry);
   }
 
   @Override
@@ -180,7 +183,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                          getArtifactProperties(), addToolingObjectsToRegistry, artifactType,
                                          resolveComponentModelInitializer(),
                                          runtimeLockFactory,
-                                         componentBuildingDefinitionRegistryFactory,
+                                         componentBuildingDefinitionRegistry,
                                          new ArtifactMemoryManagementService(memoryManagementService),
                                          featureFlaggingService, expressionLanguageMetadataService);
     } else {
@@ -190,7 +193,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                         baseConfigurationComponentLocator,
                                         errorTypeRepository, errorTypeLocator,
                                         getArtifactProperties(), addToolingObjectsToRegistry, artifactType,
-                                        componentBuildingDefinitionRegistryFactory,
+                                        componentBuildingDefinitionRegistry,
                                         new ArtifactMemoryManagementService(memoryManagementService),
                                         featureFlaggingService, expressionLanguageMetadataService);
       context.initialize();

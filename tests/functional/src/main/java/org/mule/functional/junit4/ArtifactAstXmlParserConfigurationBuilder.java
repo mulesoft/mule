@@ -72,6 +72,10 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
           .maximumSize(2)
           .build();
 
+  static {
+    System.setProperty(CACHE_COMPONENT_BUILDING_DEFINITION_REGISTRY_PROPERTY, "true");
+  }
+
   private final Map<String, String> artifactProperties;
   private final boolean disableXmlValidations;
   private final boolean enableLazyInit;
@@ -209,16 +213,12 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   }
 
   private org.mule.runtime.core.api.config.bootstrap.ArtifactType resolveArtifactType() {
-    switch (artifactType) {
-      case APPLICATION:
-        return org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-      case DOMAIN:
-        return org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-      case POLICY:
-        return org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-      default:
-        return null;
-    }
+    return switch (artifactType) {
+      case APPLICATION -> org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+      case DOMAIN -> org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+      case POLICY -> org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+      default -> null;
+    };
   }
 
   private static final class XmlParserFactory {

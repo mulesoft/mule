@@ -30,7 +30,7 @@ import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.util.MuleAstUtils;
 import org.mule.runtime.ast.api.validation.ArtifactAstValidatorBuilder;
 import org.mule.runtime.ast.internal.validation.DefaultValidatorBuilder;
-import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
@@ -103,7 +103,8 @@ public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
         new MuleArtifactContext(mockMuleContext, emptyArtifact(), empty(),
                                 new BaseConfigurationComponentLocator(),
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                emptyMap(), false, APP, new DefaultComponentBuildingDefinitionRegistryFactory(),
+                                emptyMap(), false, APP,
+                                new ComponentBuildingDefinitionRegistry(),
                                 mock(MemoryManagementService.class),
                                 featureFlaggingService, mock(ExpressionLanguageMetadataService.class)) {
 
