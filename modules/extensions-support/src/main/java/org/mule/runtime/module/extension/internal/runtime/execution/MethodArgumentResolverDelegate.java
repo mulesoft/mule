@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.lang.System.arraycopy;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.getParamNames;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.runtime.execution.MethodArgumentResolverUtils.isConfigParameter;
@@ -24,6 +23,10 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.Resolv
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.isParameterGroupShowInDsl;
+
+import static java.lang.System.arraycopy;
+
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -404,6 +407,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
   @Override
   public void initialise() throws InitialisationException {
+    // The dependencies for this bean are injected through the lifecycle utils. It is also initialized through it.
+    // That's why we have to initialized the extension client if needed, as the extension client is not singleton.
+    initialiseIfNeeded(extensionsClient);
     initArgumentResolvers();
   }
 
