@@ -14,6 +14,7 @@ import static org.mule.runtime.config.internal.bean.NotificationConfig.INTERFACE
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Pair;
@@ -40,7 +41,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-public class ServerNotificationManagerConfigurator extends AbstractComponent implements Initialisable {
+public class ServerNotificationManagerConfigurator extends AbstractComponent implements Initialisable, Disposable {
 
   @Inject
   private MuleContext muleContext;
@@ -55,6 +56,7 @@ public class ServerNotificationManagerConfigurator extends AbstractComponent imp
   private List<NotificationConfig<? extends Notification, ? extends NotificationListener>> disabledNotifications =
       new ArrayList<>();
   private Collection<ListenerSubscriptionPair> notificationListeners;
+  private ServerNotificationManager notificationManager;
 
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
@@ -69,7 +71,7 @@ public class ServerNotificationManagerConfigurator extends AbstractComponent imp
     Map<String, Class<? extends Notification>> eventMap = new HashMap<>(EVENT_MAP);
     Map<String, Class<? extends NotificationListener>> interfaceMap = new HashMap<>(INTERFACE_MAP);
 
-    ServerNotificationManager notificationManager = populateNotificationTypeMappings(eventMap, interfaceMap);
+    notificationManager = populateNotificationTypeMappings(eventMap, interfaceMap);
 
     enableNotifications(notificationManager, eventMap, interfaceMap);
     disableNotifications(notificationManager, eventMap, interfaceMap);
@@ -85,6 +87,18 @@ public class ServerNotificationManagerConfigurator extends AbstractComponent imp
         notificationManager.removeListener(sub.getListener());
         notificationManager.addListenerSubscriptionPair(sub);
       }
+    }
+  }
+
+  @Override
+  public void dispose() {
+    if (notificationManager != null) {
+      for (ListenerSubscriptionPair sub : getMergedListeners(notificationManager)) {
+        if (notificationManager.isListenerRegistered(sub.getListener())) {
+          notificationManager.removeListener(sub.getListener());
+        }
+      }
+      notificationManager = null;
     }
   }
 
