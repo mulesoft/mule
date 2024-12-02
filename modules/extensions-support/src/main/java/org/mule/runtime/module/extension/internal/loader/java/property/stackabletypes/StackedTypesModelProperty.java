@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.property.stackabl
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.util.LazyValue;
@@ -76,8 +77,18 @@ public class StackedTypesModelProperty implements ModelProperty {
    * @return an {@link Optional} {@link StackedTypesModelProperty}
    */
   public static Optional<StackedTypesModelProperty> getStackedTypesModelProperty(Set<ModelProperty> modelProperties) {
-    return modelProperties.stream().filter(mp -> mp instanceof StackedTypesModelProperty)
+    return modelProperties.stream().filter(StackedTypesModelProperty.class::isInstance)
         .map(mp -> (StackedTypesModelProperty) mp).findFirst();
+  }
+
+  /**
+   * Given a {@link Set} of {@link ModelProperty model properties} returns an {@link Optional} {@link StackedTypesModelProperty}
+   *
+   * @param modelProperties Model properties to introspect
+   * @return an {@link Optional} {@link StackedTypesModelProperty}
+   */
+  public static Optional<StackedTypesModelProperty> getStackedTypesModelProperty(EnrichableModel withModelPropertiesModel) {
+    return withModelPropertiesModel.getModelProperty(StackedTypesModelProperty.class);
   }
 
   public static class Builder {

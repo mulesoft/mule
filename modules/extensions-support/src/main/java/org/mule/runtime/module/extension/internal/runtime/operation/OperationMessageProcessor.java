@@ -38,6 +38,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataMediator;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -55,8 +56,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
 
   static final String INVALID_TARGET_MESSAGE =
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
-
-  private final EntityMetadataMediator entityMetadataMediator;
+  private EntityMetadataMediator entityMetadataMediator;
 
   private final List<EnrichedErrorMapping> errorMappings;
 
@@ -99,7 +99,6 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
     super(extensionModel, operationModel, configurationProviderResolver, target, targetValue, resolverSet,
           cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader,
           extensionManager, reflectionCache, resultTransformer, terminationTimeout);
-    this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
     this.errorMappings = errorMappings;
   }
 
@@ -170,6 +169,11 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   /////////////////////////////////////////////////////////////////////////////
   // "Fat" Tooling support
   /////////////////////////////////////////////////////////////////////////////
+
+  protected void initializeForFatTooling() {
+    this.entityMetadataMediator = new EntityMetadataMediator(componentModel);
+    super.initializeForFatTooling();
+  }
 
   @Override
   public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
