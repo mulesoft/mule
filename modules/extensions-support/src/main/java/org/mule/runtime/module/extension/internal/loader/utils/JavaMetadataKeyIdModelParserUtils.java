@@ -225,7 +225,9 @@ public class JavaMetadataKeyIdModelParserUtils {
         && outputResolverModelParser == null
         && attributesResolverModelParser == null
         && inputResolverModelParsers.isEmpty()) {
-      LOGGER.warn("A Keys Resolver is being defined without defining an Output Resolver, Input Resolver nor Attributes Resolver");
+      LOGGER
+          .warn("A Keys Resolver is being defined without defining an Output Resolver, Input Resolver nor Attributes Resolver for element {} of extension {}",
+                elementName, extensionElement.getName());
     }
 
     return keyIdResolverModelParser;
@@ -246,9 +248,6 @@ public class JavaMetadataKeyIdModelParserUtils {
     for (InputResolverModelParser inputResolverModelParser : inputResolverModelParsers) {
       return inputResolverModelParser.getInputResolver().getCategoryName();
     }
-
-    // TODO W-14195099 - change this once we have `ProblemsReporter` available
-    LOGGER.warn("A Keys Resolver is being defined without defining an Output Resolver, Input Resolver nor Attributes Resolver");
 
     return null;
   }
