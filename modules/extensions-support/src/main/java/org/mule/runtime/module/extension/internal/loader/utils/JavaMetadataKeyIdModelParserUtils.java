@@ -225,6 +225,7 @@ public class JavaMetadataKeyIdModelParserUtils {
         && outputResolverModelParser == null
         && attributesResolverModelParser == null
         && inputResolverModelParsers.isEmpty()) {
+      // TODO W-14195099 - change this once we have `ProblemsReporter` available
       LOGGER
           .warn("A Keys Resolver is being defined without defining an Output Resolver, Input Resolver nor Attributes Resolver for element {} of extension {}",
                 elementName, extensionElement.getName());
