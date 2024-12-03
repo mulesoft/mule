@@ -221,6 +221,13 @@ public class JavaMetadataKeyIdModelParserUtils {
       }
     }
 
+    if (keyIdResolverModelParser.isPresent()
+        && outputResolverModelParser != null
+        && attributesResolverModelParser != null
+        && inputResolverModelParsers.isEmpty()) {
+      LOGGER.warn("A Keys Resolver is being defined without defining an Output Resolver, Input Resolver nor Attributes Resolver");
+    }
+
     return keyIdResolverModelParser;
   }
 
