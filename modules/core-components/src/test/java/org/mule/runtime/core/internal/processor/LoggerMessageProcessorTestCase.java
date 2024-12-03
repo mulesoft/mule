@@ -18,9 +18,9 @@ import static org.mule.test.allure.AllureConstants.ComponentsFeature.LoggerStory
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonMap;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -42,14 +42,17 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.slf4j.Logger;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import org.mockito.stubbing.Answer;
+import org.mockito.verification.VerificationMode;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.verification.VerificationMode;
-import org.mockito.stubbing.Answer;
-import org.slf4j.Logger;
 
 @Feature(CORE_COMPONENTS)
 @Story(LOGGER)
@@ -150,11 +153,12 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn("INFO".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isWarnEnabled()).thenReturn("WARN".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isErrorEnabled()).thenReturn("ERROR".equals(enabledLevel));
-    loggerMessageProcessor.expressionManager = buildExpressionManager();
+    final ExtendedExpressionManager expressionManager = buildExpressionManager();
+    loggerMessageProcessor.setExpressionManager(expressionManager);
     loggerMessageProcessor.log(muleEvent);
-    verify(loggerMessageProcessor.expressionManager, timesEvaluateExpression).parseLogTemplate("some expression", muleEvent,
-                                                                                               ((Component) flow).getLocation(),
-                                                                                               NULL_BINDING_CONTEXT);
+    verify(expressionManager, timesEvaluateExpression).parseLogTemplate("some expression", muleEvent,
+                                                                        ((Component) flow).getLocation(),
+                                                                        NULL_BINDING_CONTEXT);
   }
 
   // Orchestrates the verifications for a call with a null MuleEvent
@@ -220,7 +224,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private LoggerMessageProcessor buildLoggerMessageProcessorForExpressionEvaluation(String level) {
     LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
-    loggerMessageProcessor.expressionManager = buildExpressionManager();
+    loggerMessageProcessor.setExpressionManager(buildExpressionManager());
     loggerMessageProcessor.setMessage("some expression");
     return loggerMessageProcessor;
   }

@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static com.google.common.collect.ImmutableList.copyOf;
-import static com.google.common.primitives.Primitives.wrap;
-import static java.lang.String.format;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
@@ -27,6 +22,13 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isNullSafe;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+
+import static com.google.common.collect.ImmutableList.copyOf;
+import static com.google.common.primitives.Primitives.wrap;
+
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NumberType;
@@ -37,7 +39,7 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.nested.NestableElementModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -58,6 +60,7 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ExclusiveParameterGroupObjectBuilder;
@@ -172,7 +175,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
         .orElseGet(group::getName);
 
     if (parameters.containsKey(groupKey)) {
-      resolverSet.add(groupKey, toValueResolver(parameters.get(groupKey), group.getModelProperties()));
+      resolverSet.add(groupKey, toValueResolver(parameters.get(groupKey), group));
     } else if (descriptor.isPresent()) {
       resolverSet.add(groupKey,
                       NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
@@ -230,7 +233,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
     ValueResolver<?> resolver;
     String parameterName = parameter.getName();
     if (parameters.containsKey(parameterName)) {
-      resolver = toValueResolver(parameters.get(parameterName), parameter.getModelProperties());
+      resolver = toValueResolver(parameters.get(parameterName), parameter);
     } else {
       // TODO MULE-13066 Extract ParameterResolver logic into a centralized resolver
       resolver = getDefaultValueResolver(parameter, muleContext);
@@ -397,7 +400,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
    * @return a {@link ValueResolver}
    */
   private ValueResolver<?> toValueResolver(Object value) {
-    return toValueResolver(value, emptySet());
+    return toValueResolver(value, null);
   }
 
   /**
@@ -412,7 +415,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
    * @param modelProperties of the value's parameter
    * @return a {@link ValueResolver}
    */
-  private ValueResolver<?> toValueResolver(Object value, Set<ModelProperty> modelProperties) {
+  private ValueResolver<?> toValueResolver(Object value, EnrichableModel withModelPropertiesModel) {
     ValueResolver<?> resolver;
     if (value instanceof ValueResolver) {
       resolver = (ValueResolver<?>) value;
@@ -420,14 +423,19 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
       resolver = getCollectionResolver((Collection) value);
     } else if (value instanceof Map) {
       resolver = getMapResolver((Map<Object, Object>) value);
-    } else if (getStackedTypesModelProperty(modelProperties).isPresent()) {
-      resolver = getStackedTypesModelProperty(modelProperties).get().getValueResolverFactory().getStaticValueResolver(value);
-    } else if (value instanceof ConfigurationProvider) {
-      resolver = new ConfigurationValueResolver<>((ConfigurationProvider) value);
     } else {
-      resolver = new StaticValueResolver<>(value);
-      if (value instanceof ObjectStore) {
-        resolver = new LifecycleInitialiserValueResolverWrapper<>(resolver, muleContext);
+      final Optional<StackedTypesModelProperty> stackedTypesModelProperty = withModelPropertiesModel == null
+          ? empty()
+          : getStackedTypesModelProperty(withModelPropertiesModel);
+      if (stackedTypesModelProperty.isPresent()) {
+        resolver = stackedTypesModelProperty.get().getValueResolverFactory().getStaticValueResolver(value);
+      } else if (value instanceof ConfigurationProvider) {
+        resolver = new ConfigurationValueResolver<>((ConfigurationProvider) value);
+      } else {
+        resolver = new StaticValueResolver<>(value);
+        if (value instanceof ObjectStore) {
+          resolver = new LifecycleInitialiserValueResolverWrapper<>(resolver, muleContext);
+        }
       }
     }
     return resolver;

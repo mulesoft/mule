@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.PROCESSING_TYPE;
+
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
