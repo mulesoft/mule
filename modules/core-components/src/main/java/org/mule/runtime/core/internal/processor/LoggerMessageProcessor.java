@@ -13,15 +13,13 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 
-import static java.util.Arrays.asList;
 import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -30,6 +28,8 @@ import org.mule.runtime.core.internal.interception.HasParamsAsTemplateProcessor;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * suit your needs.
  */
 public class LoggerMessageProcessor extends AbstractComponent
-    implements HasParamsAsTemplateProcessor, Processor, Initialisable, MuleContextAware {
+    implements HasParamsAsTemplateProcessor, Processor, Initialisable {
 
   // TODO - MULE-16446: Logger execution type should be defined according to the appender used
   private static final String BLOCKING_CATEGORIES_PROPERTY = System.getProperty(MULE_LOGGING_BLOCKING_CATEGORIES, "");
@@ -54,8 +54,7 @@ public class LoggerMessageProcessor extends AbstractComponent
   protected String category;
   protected String level = "INFO";
 
-  protected MuleContext muleContext;
-  ExtendedExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   private volatile ProcessingType processingType;
   private transient ClassLoader loggerExecutionClassloader;
@@ -64,7 +63,6 @@ public class LoggerMessageProcessor extends AbstractComponent
   public void initialise() throws InitialisationException {
     initLogger();
     initProcessingTypeIfPossible();
-    expressionManager = muleContext.getExpressionManager();
   }
 
   protected void initLogger() {
@@ -126,7 +124,7 @@ public class LoggerMessageProcessor extends AbstractComponent
         logWithLevel(event.getMessage());
       } else {
         LogLevel logLevel = LogLevel.valueOf(level);
-        if (LogLevel.valueOf(level).isEnabled(logger)) {
+        if (logLevel.isEnabled(logger)) {
           logLevel.log(logger, expressionManager.parseLogTemplate(message, event, getLocation(), NULL_BINDING_CONTEXT));
         }
       }
@@ -140,9 +138,9 @@ public class LoggerMessageProcessor extends AbstractComponent
     }
   }
 
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  @Inject
+  public void setExpressionManager(ExtendedExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 
   public void setMessage(String message) {

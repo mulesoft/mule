@@ -10,13 +10,9 @@ import static org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
-import org.mule.runtime.core.api.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
-
-import org.springframework.beans.PropertyEditorRegistrar;
-import org.springframework.beans.PropertyEditorRegistry;
 
 import java.beans.PropertyEditor;
 import java.io.InputStream;
@@ -28,6 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.springframework.beans.PropertyEditorRegistrar;
+import org.springframework.beans.PropertyEditorRegistry;
+
 /**
  * The preferred way to configure property editors in Spring 2/3 is to implement a registrar
  */
@@ -37,6 +36,9 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
   private Map<Class<?>, Class<PropertyEditor>> customPropertyEditorsCache;
   private static final String CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME = "META-INF/mule.custom-property-editors";
 
+  private final DatePropertyEditor datePropertyEditor = new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"),
+                                                                               new SimpleDateFormat("yyyy-MM-dd"), true);
+
   @Override
   public void setMuleContext(MuleContext context) {
     muleContext = context;
@@ -44,9 +46,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
 
   @Override
   public void registerCustomEditors(PropertyEditorRegistry registry) {
-    registry.registerCustomEditor(MessageExchangePattern.class, new MessageExchangePatternPropertyEditor());
-    registry.registerCustomEditor(Date.class, new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"),
-                                                                     new SimpleDateFormat("yyyy-MM-dd"), true));
+    registry.registerCustomEditor(Date.class, datePropertyEditor);
 
     if (customPropertyEditorsCache == null) {
       discoverCustomPropertyEditor();

@@ -60,7 +60,6 @@
             --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal=org.mule.runtime.deployment.test
             --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.processor=org.mule.runtime.deployment.test
             --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.util=org.mule.runtime.deployment.test
-              --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.core
             --add-exports=org.mule.test.runner/org.mule.test.runner.classloader.container=org.mule.runtime.deployment.test
             ${surefire.args.base}
         </surefire.args>
