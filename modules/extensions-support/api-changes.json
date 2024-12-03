@@ -5,6 +5,20 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.numberOfParametersChanged",
+            "old": "method org.mule.runtime.api.metadata.resolving.MetadataResult<org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor> org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator::getRouterInputMetadata(org.mule.runtime.api.metadata.MetadataContext, org.mule.runtime.api.metadata.MetadataKey, java.util.function.Supplier<org.mule.metadata.message.api.MessageMetadataType>)",
+            "new": "method org.mule.runtime.api.metadata.resolving.MetadataResult<org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor> org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator::getRouterInputMetadata(org.mule.runtime.api.metadata.MetadataContext, org.mule.runtime.api.metadata.MetadataKey, java.util.function.Supplier<org.mule.metadata.message.api.MessageMetadataType>, org.mule.runtime.module.extension.api.metadata.PropagatedParameterTypeResolver)",
+            "justification": "W-17050998: Adding propagation information to getResolvedParameterType. Method recently added, still experimental. All implementations are updated"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.numberOfParametersChanged",
+            "old": "method org.mule.runtime.api.metadata.resolving.MetadataResult<org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor> org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator::getScopeInputMetadata(org.mule.runtime.api.metadata.MetadataContext, org.mule.runtime.api.metadata.MetadataKey, java.util.function.Supplier<org.mule.metadata.message.api.MessageMetadataType>)",
+            "new": "method org.mule.runtime.api.metadata.resolving.MetadataResult<org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor> org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator::getScopeInputMetadata(org.mule.runtime.api.metadata.MetadataContext, org.mule.runtime.api.metadata.MetadataKey, java.util.function.Supplier<org.mule.metadata.message.api.MessageMetadataType>, org.mule.runtime.module.extension.api.metadata.PropagatedParameterTypeResolver)",
+            "justification": "W-17050998: Adding propagation information to getResolvedParameterType. Method recently added, still experimental. All implementations are updated"
+          },
+          {
+            "ignore": true,
             "code": "java.method.returnTypeTypeParametersChanged",
             "old": "method java.util.Optional<org.mule.runtime.core.api.transaction.TransactionConfig> org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getTransactionConfig()",
             "new": "method java.util.Optional<org.mule.runtime.core.privileged.transaction.TransactionConfig> org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getTransactionConfig()",
