@@ -230,7 +230,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void initialise() throws InitialisationException {
-    this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
+    if (metadataService.isPresent()) {
+      initializeForFatTooling();
+    }
 
     if (cursorProviderFactory == null) {
       if (isPagedOperation(componentModel)) {
@@ -624,6 +626,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   /////////////////////////////////////////////////////////////////////////////
   // "Fat" Tooling support
   /////////////////////////////////////////////////////////////////////////////
+
+  protected void initializeForFatTooling() {
+    this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
+  }
 
   /**
    * {@inheritDoc}
