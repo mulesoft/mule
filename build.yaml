@@ -10,8 +10,10 @@ upstreamProjects:
 # Comment public setting to get oldMuleArtifact 4.2.1 from private repo till we move them to the public Repo
 # Uncomment it after they are copied
 # "mavenSettingsXmlId" : "mule-runtime-maven-settings-MuleSettings",
-mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C
-mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip -P!testJdkWithoutXmlModule
+mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C -pl core-tests
+enableSonarQubeStage: false
+archiveArtifacts: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml'
+mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
 projectType: runtime
 jdkTool: OPEN-JDK11
 testJdkTool: OPEN-JDK8
