@@ -12,5 +12,7 @@
 //
 
 @jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.w3.org/2001/XMLSchema",
-    elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
+    elementFormDefault = QUALIFIED)
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
+
+import static jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED;

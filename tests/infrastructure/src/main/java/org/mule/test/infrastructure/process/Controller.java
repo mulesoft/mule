@@ -103,17 +103,11 @@ public class Controller {
       final StringBuilder muleLogBuilder = new StringBuilder();
       muleLogBuilder.append(muleLogFile.getName() + ":" + lineSeparator());
       muleLogBuilder.append("============" + lineSeparator());
-      if (appsDir.toString().contains("AppControlTestCase")) {
-        muleLogBuilder.append("[[AppControlTestCase]]" + lineSeparator());
-      }
       try (BufferedReader br = new BufferedReader(new FileReader(muleLogFile))) {
         String line;
         while ((line = br.readLine()) != null) {
           muleLogBuilder.append(" > " + line + lineSeparator());
         }
-      }
-      if (appsDir.toString().contains("AppControlTestCase")) {
-        muleLogBuilder.append("[[END]]");
       }
       LOGGER.info("{}", muleLogBuilder);
     } else {
