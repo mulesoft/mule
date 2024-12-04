@@ -27,6 +27,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -40,7 +41,6 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;

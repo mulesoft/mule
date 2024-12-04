@@ -20,11 +20,11 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.SystemProperty;

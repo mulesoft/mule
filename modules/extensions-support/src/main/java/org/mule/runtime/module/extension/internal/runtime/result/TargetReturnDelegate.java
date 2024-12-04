@@ -10,11 +10,11 @@ import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContex
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;

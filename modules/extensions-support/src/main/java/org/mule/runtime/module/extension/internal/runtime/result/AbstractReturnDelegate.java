@@ -25,6 +25,7 @@ import static org.apache.commons.io.IOUtils.EOF;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Message;
@@ -34,7 +35,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.util.StreamingUtils;

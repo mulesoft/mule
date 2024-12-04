@@ -17,6 +17,7 @@ import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -24,7 +25,6 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.NullCursorProviderFactory;

@@ -68,6 +68,7 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -81,7 +82,6 @@ import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;

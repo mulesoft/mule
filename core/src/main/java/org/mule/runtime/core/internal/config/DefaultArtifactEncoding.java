@@ -12,7 +12,7 @@ import static java.lang.System.getProperty;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.nio.charset.Charset.forName;
 
-import org.mule.runtime.core.api.config.ArtifactEncoding;
+import org.mule.runtime.api.config.ArtifactEncoding;
 
 import java.nio.charset.Charset;
 

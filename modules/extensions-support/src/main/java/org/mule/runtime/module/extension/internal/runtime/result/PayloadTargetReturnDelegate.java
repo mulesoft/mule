@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.result;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 

@@ -14,12 +14,12 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObje
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;

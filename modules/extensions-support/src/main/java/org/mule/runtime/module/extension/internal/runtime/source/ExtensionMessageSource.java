@@ -34,6 +34,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.cluster.ClusterService;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -51,7 +52,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;

@@ -57,6 +57,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -67,7 +68,6 @@ import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;

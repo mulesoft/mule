@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toMap;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,7 +28,6 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.oauth.api.OAuthService;
 
 import java.lang.reflect.Field;

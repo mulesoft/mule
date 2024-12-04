@@ -33,6 +33,7 @@ import static java.util.Optional.of;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -68,7 +69,6 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;

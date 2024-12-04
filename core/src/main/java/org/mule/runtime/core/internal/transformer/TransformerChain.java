@@ -10,6 +10,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCurrentEventForTransformer;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -134,7 +136,7 @@ public final class TransformerChain extends AbstractTransformer {
    */
   private Object checkReturnClass(Object object) throws TransformerException {
     try {
-      TransformerUtils.checkTransformerReturnClass(this, object);
+      checkTransformerReturnClass(this, object);
     } catch (TransformerException e) {
       throw new TransformerException(createStaticMessage(e.getMessage()), this);
     }
@@ -144,9 +146,7 @@ public final class TransformerChain extends AbstractTransformer {
 
   @Override
   public void initialise() throws InitialisationException {
-    for (Transformer transformer : transformers) {
-      transformer.initialise();
-    }
+    initialiseIfNeeded(transformers, muleContext);
   }
 
   @Override
