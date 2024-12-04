@@ -707,6 +707,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                             Supplier<MessageMetadataType> scopeInputMessageType)
       throws MetadataResolvingException {
     try {
+      // We use a no-op implementation for the PropagatedParameterTypeResolver because this is used only for type resolution
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
                                         .getScopeInputMetadata(context, key, scopeInputMessageType,
@@ -721,6 +722,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                               Supplier<MessageMetadataType> routerInputMessageType)
       throws MetadataResolvingException {
     try {
+      // We use a no-op implementation for the PropagatedParameterTypeResolver because this is used only for type resolution
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
                                         .getRouterInputMetadata(context, key, routerInputMessageType,
