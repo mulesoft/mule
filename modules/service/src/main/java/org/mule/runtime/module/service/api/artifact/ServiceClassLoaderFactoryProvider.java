@@ -13,10 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Has a factory method for obtaining a {@link ServiceClassLoaderFactory}.
+ * Has a factory method for obtaining a {@link IServiceClassLoaderFactory}.
  * 
  * @since 4.5
- * @deprecated since 4.8, use {@link ServiceClassLoaderFactoryProvider} instead.
  */
 public class ServiceClassLoaderFactoryProvider {
 
@@ -26,9 +25,9 @@ public class ServiceClassLoaderFactoryProvider {
     return new LibFolderClassLoaderConfigurationLoader();
   }
 
-  public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
+  public static IServiceClassLoaderFactory serviceClassLoaderFactory() {
     LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceModuleLayerFactory'...");
-    final ServiceClassLoaderFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
+    final IServiceClassLoaderFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
     serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);
     return serviceModuleLayerFactory;
   }
