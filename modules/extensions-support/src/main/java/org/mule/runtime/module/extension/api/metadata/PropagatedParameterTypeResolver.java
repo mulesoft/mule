@@ -16,7 +16,7 @@ import java.util.Optional;
 /**
  * Resolves the propagated parameter type by name.
  *
- * @since 4.8
+ * @since 4.8.2
  */
 public interface PropagatedParameterTypeResolver {
 
