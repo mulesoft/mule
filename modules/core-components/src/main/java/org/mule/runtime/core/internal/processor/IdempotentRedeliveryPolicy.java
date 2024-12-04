@@ -115,9 +115,21 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
     private static final long serialVersionUID = 5513487261745816555L;
 
-    private final AtomicInteger counter = new AtomicInteger();
-    private final List<Error> errors = new LinkedList<>();
+    private final AtomicInteger counter;
+    private final List<Error> errors;
 
+    public RedeliveryCounter(AtomicInteger counter, List<Error> errors) {
+      this.counter = counter;
+      this.errors = errors;
+    }
+
+    public AtomicInteger getCounter() {
+      return counter;
+    }
+
+    public List<Error> getErrors() {
+      return errors;
+    }
   }
 
   @Override
@@ -300,7 +312,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   private void resetCounter(String messageId) throws ObjectStoreException {
     store.remove(messageId);
-    store.store(messageId, new RedeliveryCounter());
+    store.store(messageId, new RedeliveryCounter(new AtomicInteger(), new LinkedList<>()));
   }
 
   public RedeliveryCounter findCounter(String messageId) throws ObjectStoreException {
@@ -314,7 +326,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private RedeliveryCounter incrementCounter(String messageId, MessagingException ex) throws ObjectStoreException {
     RedeliveryCounter counter = findCounter(messageId);
     if (counter == null) {
-      counter = new RedeliveryCounter();
+      counter = new RedeliveryCounter(new AtomicInteger(), new LinkedList<>());
     } else {
       store.remove(messageId);
     }
