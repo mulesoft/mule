@@ -6,19 +6,13 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.core.api.construct.Flow.builder;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
-
-import static java.util.Collections.singletonMap;
 
 import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -55,24 +49,8 @@ public class RegistryTransformerLifecycleTestCase extends AbstractMuleContextTes
     assertRegistrationOnlyLifecycle(transformer);
   }
 
-  @Test
-  public void testLifecycleInFlowTransientRegistry() throws Exception {
-    TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
-    transformer.setProperty("foo");
-    Flow flow = builder("flow", muleContext).processors(transformer).build();
-    flow.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(flow);
-
-    muleContext.dispose();
-    assertLifecycle(transformer);
-  }
-
   private void assertRegistrationOnlyLifecycle(TransformerLifecycleTracker transformer) {
     assertEquals("[setProperty, initialise]", transformer.getTracker().toString());
-  }
-
-  private void assertLifecycle(TransformerLifecycleTracker transformer) {
-    assertEquals("[setProperty, initialise, dispose]", transformer.getTracker().toString());
   }
 
   public static class TransformerLifecycleTracker extends AbstractTransformer implements Disposable {

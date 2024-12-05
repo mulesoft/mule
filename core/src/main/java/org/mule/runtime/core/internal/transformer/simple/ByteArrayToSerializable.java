@@ -6,13 +6,16 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformFailed;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.serialization.SerializationProtocol;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -21,6 +24,8 @@ import java.nio.charset.Charset;
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object representation
  */
 public class ByteArrayToSerializable extends AbstractTransformer implements DiscoverableTransformer {
+
+  private ObjectSerializer objectSerializer;
 
   /**
    * Give core transformers a slightly higher priority
@@ -47,12 +52,12 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
       }
       return result;
     } catch (Exception e) {
-      throw new TransformerException(CoreMessages.transformFailed("byte[]", "Object"), this, e);
+      throw new TransformerException(transformFailed("byte[]", "Object"), this, e);
     }
   }
 
   protected SerializationProtocol getSerializationProtocol() {
-    return muleContext.getObjectSerializer().getExternalProtocol();
+    return objectSerializer.getExternalProtocol();
   }
 
   @Override
@@ -64,4 +69,15 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
   public void setPriorityWeighting(int priorityWeighting) {
     this.priorityWeighting = priorityWeighting;
   }
+
+  public void setObjectSerializer(ObjectSerializer objectSerializer) {
+    this.objectSerializer = objectSerializer;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+    setObjectSerializer(muleContext.getObjectSerializer());
+  }
+
 }

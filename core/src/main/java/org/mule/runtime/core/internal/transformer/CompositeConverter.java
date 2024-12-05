@@ -6,15 +6,10 @@
  */
 package org.mule.runtime.core.internal.transformer;
 
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.nio.charset.Charset;
@@ -22,19 +17,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 /**
  * Composes many converters to behave as a single one.
  * <p/>
  * When {@link #transform(Object)} is called each converter in the same order they are included in the composition. The output of
  * a given converter is the input of the next composed converter.
  */
-public final class CompositeConverter extends AbstractComponent implements Converter, MuleContextAware {
+public final class CompositeConverter implements Converter {
 
   private final String name;
 
   private final LinkedList<Converter> chain;
-
-  private MuleContext muleContext;
 
   /**
    * Create a new conversion chain using the specified converters
@@ -127,26 +122,8 @@ public final class CompositeConverter extends AbstractComponent implements Conve
   }
 
   @Override
-  public CoreEvent process(CoreEvent event) throws MuleException {
-    if (event != null && event.getMessage() != null) {
-      try {
-        event = CoreEvent.builder(event)
-            .message(((ExtendedTransformationService) muleContext.getTransformationService())
-                .applyTransformers(event.getMessage(), event, this))
-            .build();
-      } catch (MessageTransformerException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new MessageTransformerException(this, e, event.getMessage());
-      }
-    }
-
-    return event;
-  }
-
-  @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
     for (Converter converter : chain) {
       converter.setMuleContext(context);
     }
