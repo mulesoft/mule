@@ -12,6 +12,7 @@ import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.metadata.message.api.MessageMetadataTypeBuilder;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
@@ -25,7 +26,7 @@ public class ForEachChainInputTypeResolver implements ChainInputTypeResolver {
   private static final String PARAMETER_NAME = "collection";
 
   @Override
-  public MessageMetadataType getChainInputMetadataType(ChainInputMetadataContext context) {
+  public MessageMetadataType getChainInputMetadataType(ChainInputMetadataContext context) throws MetadataResolvingException {
     MessageMetadataType messageMetadataType = context.getInputMessageMetadataType();
     MessageMetadataTypeBuilder chainMessageMetadataTypeBuilder = MessageMetadataType.builder();
 
