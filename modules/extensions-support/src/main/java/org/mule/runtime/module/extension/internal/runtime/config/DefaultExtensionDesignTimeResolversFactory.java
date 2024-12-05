@@ -14,7 +14,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -28,7 +27,6 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
@@ -86,9 +84,6 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
 
   @Inject
   private ExpressionManager expressionManager;
-
-  @Inject
-  private ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   @Inject
   private Registry registry;
@@ -279,18 +274,6 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                Optional<RouterOutputMetadataContext> routerOutputMetadataContext) {
     return new DefaultMetadataContext(configurationSupplier, connectionManager, cache, typeLoader, scopeOutputMetadataContext,
                                       routerOutputMetadataContext);
-  }
-
-  @Override
-  public MetadataContext createMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
-                                               ConnectionManager connectionManager, MetadataCache cache,
-                                               ClassTypeLoader typeLoader,
-                                               Optional<ScopeOutputMetadataContext> scopeOutputMetadataContext,
-                                               Optional<RouterOutputMetadataContext> routerOutputMetadataContext,
-                                               Optional<TypeBindings> typeBindings) {
-    return new DefaultMetadataContext(configurationSupplier, connectionManager, cache, typeLoader,
-                                      expressionLanguageMetadataService,
-                                      scopeOutputMetadataContext, routerOutputMetadataContext, typeBindings);
   }
 
   @Override
