@@ -10,19 +10,16 @@ import static java.util.Optional.empty;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
 import org.mule.runtime.module.extension.internal.metadata.SdkMetadataContextAdapter.SdkRouterOutputMetadataContextAdapter;
 import org.mule.runtime.module.extension.internal.metadata.SdkMetadataContextAdapter.SdkScopeOutputMetadataContext;
-import org.mule.runtime.privileged.metadata.InternalMetadataContext;
 import org.mule.sdk.api.metadata.MetadataContext;
 
 import java.util.Optional;
 
-public class MuleMetadataContextAdapter implements org.mule.runtime.api.metadata.MetadataContext, InternalMetadataContext {
+public class MuleMetadataContextAdapter implements org.mule.runtime.api.metadata.MetadataContext {
 
   private final MetadataContext delegate;
 
@@ -69,22 +66,6 @@ public class MuleMetadataContextAdapter implements org.mule.runtime.api.metadata
 
   @Override
   public <C> Optional<C> getConfig() {
-    return empty();
-  }
-
-  @Override
-  public Optional<ExpressionLanguageMetadataService> getExpressionLanguageMetadataService() {
-    if (delegate instanceof SdkMetadataContextAdapter) {
-      return ((SdkMetadataContextAdapter) delegate).getExpressionLanguageMetadataService();
-    }
-    return empty();
-  }
-
-  @Override
-  public Optional<TypeBindings> getTypeBindings() {
-    if (delegate instanceof SdkMetadataContextAdapter) {
-      return ((SdkMetadataContextAdapter) delegate).getTypeBindings();
-    }
     return empty();
   }
 }
