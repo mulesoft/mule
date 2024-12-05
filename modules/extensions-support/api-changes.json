@@ -5,6 +5,12 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.class.added",
+            "new": "interface org.mule.runtime.module.extension.api.metadata.PropagatedParameterTypeResolver",
+            "justification": "W-17050998: Adding propagation information to getResolvedParameterType. New interface, no implement."
+          },
+          {
+            "ignore": true,
             "code": "java.method.numberOfParametersChanged",
             "old": "method org.mule.runtime.api.metadata.resolving.MetadataResult<org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor> org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator::getRouterInputMetadata(org.mule.runtime.api.metadata.MetadataContext, org.mule.runtime.api.metadata.MetadataKey, java.util.function.Supplier<org.mule.metadata.message.api.MessageMetadataType>)",
             "new": "method org.mule.runtime.api.metadata.resolving.MetadataResult<org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor> org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator::getRouterInputMetadata(org.mule.runtime.api.metadata.MetadataContext, org.mule.runtime.api.metadata.MetadataKey, java.util.function.Supplier<org.mule.metadata.message.api.MessageMetadataType>, org.mule.runtime.module.extension.api.metadata.PropagatedParameterTypeResolver)",

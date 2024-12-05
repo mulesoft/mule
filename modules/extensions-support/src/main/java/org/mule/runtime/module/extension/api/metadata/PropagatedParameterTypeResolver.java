@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.api.metadata;
 
 import static java.util.Optional.empty;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
  *
  * @since 4.8.2
  */
+@NoImplement
 public interface PropagatedParameterTypeResolver {
 
   /**
