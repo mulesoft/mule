@@ -10,12 +10,11 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataType;
-import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.module.extension.internal.metadata.InternalMetadataContext;
+import org.mule.runtime.module.extension.api.metadata.PropagatedParameterTypeResolver;
 import org.mule.runtime.module.extension.internal.metadata.SdkMetadataContextAdapter;
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.MetadataCache;
@@ -32,30 +31,36 @@ import java.util.function.Supplier;
  *
  * @since 4.7.0
  */
-public class DefaultChainInputMetadataContext implements ChainInputMetadataContext, InternalMetadataContext {
+public class DefaultChainInputMetadataContext implements ChainInputMetadataContext {
 
   private final Supplier<MessageMetadataType> inputMessageMetadataType;
   private final InputMetadataDescriptor inputMetadataDescriptor;
   private final MetadataContext rootContext;
+  private final PropagatedParameterTypeResolver propagatedParameterTypeResolver;
 
   public DefaultChainInputMetadataContext(Supplier<MessageMetadataType> inputMessageMetadataType,
                                           InputMetadataDescriptor inputMetadataDescriptor,
+                                          PropagatedParameterTypeResolver propagatedParameterTypeResolver,
                                           MetadataContext rootContext) {
     this.inputMessageMetadataType = new LazyValue<>(inputMessageMetadataType);
     this.inputMetadataDescriptor = inputMetadataDescriptor;
+    this.propagatedParameterTypeResolver = propagatedParameterTypeResolver;
     this.rootContext = rootContext;
   }
 
   public DefaultChainInputMetadataContext(Supplier<MessageMetadataType> inputMessageMetadataType,
                                           InputMetadataDescriptor inputMetadataDescriptor,
+                                          PropagatedParameterTypeResolver propagatedParameterTypeResolver,
                                           org.mule.runtime.api.metadata.MetadataContext rootContext) {
-    this(inputMessageMetadataType, inputMetadataDescriptor, new SdkMetadataContextAdapter(rootContext));
+    this(inputMessageMetadataType, inputMetadataDescriptor, propagatedParameterTypeResolver,
+         new SdkMetadataContextAdapter(rootContext));
   }
 
   @Override
-  public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException {
+  public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException, MetadataResolvingException {
     try {
-      return inputMetadataDescriptor.getParameterMetadata(parameterName).getType();
+      return propagatedParameterTypeResolver.getResolvedType(parameterName)
+          .orElseGet(() -> inputMetadataDescriptor.getParameterMetadata(parameterName).getType());
     } catch (IllegalArgumentException e) {
       throw new NoSuchElementException(e.getMessage());
     }
@@ -99,19 +104,5 @@ public class DefaultChainInputMetadataContext implements ChainInputMetadataConte
   @Override
   public Optional<ScopeOutputMetadataContext> getScopeOutputMetadataContext() {
     return rootContext.getScopeOutputMetadataContext();
-  }
-
-  public Optional<ExpressionLanguageMetadataService> getExpressionLanguageMetadataService() {
-    if (rootContext instanceof InternalMetadataContext) {
-      return ((InternalMetadataContext) rootContext).getExpressionLanguageMetadataService();
-    }
-    return Optional.empty();
-  }
-
-  public Optional<TypeBindings> getTypeBindings() {
-    if (rootContext instanceof InternalMetadataContext) {
-      return ((InternalMetadataContext) rootContext).getTypeBindings();
-    }
-    return Optional.empty();
   }
 }
