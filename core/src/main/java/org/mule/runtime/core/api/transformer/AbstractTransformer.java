@@ -15,18 +15,14 @@ import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
 
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.internal.transformer.TransformerUtils;
 
 import java.io.InputStream;
@@ -45,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * <code>AbstractTransformer</code> is a base class for all transformers. Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer extends AbstractComponent implements Transformer {
+public abstract class AbstractTransformer implements Transformer {
 
   protected MuleContext muleContext;
 
@@ -83,20 +79,20 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
     super();
   }
 
-  @Override
-  public CoreEvent process(CoreEvent event) throws MuleException {
-    if (event != null && event.getMessage() != null) {
-      try {
-        return CoreEvent.builder(event)
-            .message(((ExtendedTransformationService) muleContext.getTransformationService())
-                .applyTransformers(event.getMessage(), event, this))
-            .build();
-      } catch (Exception e) {
-        throw new MessageTransformerException(this, e, event.getMessage());
-      }
-    }
-    return event;
-  }
+  // @Override
+  // public CoreEvent process(CoreEvent event) throws MuleException {
+  // if (event != null && event.getMessage() != null) {
+  // try {
+  // return CoreEvent.builder(event)
+  // .message(((ExtendedTransformationService) muleContext.getTransformationService())
+  // .applyTransformers(event.getMessage(), event, this))
+  // .build();
+  // } catch (Exception e) {
+  // throw new MessageTransformerException(this, e, event.getMessage());
+  // }
+  // }
+  // return event;
+  // }
 
   /**
    * Register a supported data type with this transformer. The will allow objects that match this data type to be transformed by
@@ -234,8 +230,7 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
     if (src instanceof TypedValue) {
       payload = ((TypedValue) src).getValue();
       sourceType = ((TypedValue) src).getDataType();
-    } else if (src instanceof Message) {
-      Message message = (Message) src;
+    } else if (src instanceof Message message) {
       if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true))) {
         payload = message.getPayload().getValue();
         sourceType = message.getPayload().getDataType();
@@ -328,7 +323,6 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
     return false;
   }
 
-  @Override
   @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
@@ -336,8 +330,12 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
 
   @Override
   public int hashCode() {
-    return hash(getReturnDataType(), getSourceDataTypes().hashCode(), isIgnoreBadInput(), isAllowNullReturn(), isAcceptNull(),
-                getName(), getProcessingType());
+    return hash(getReturnDataType(),
+                getSourceDataTypes(),
+                isIgnoreBadInput(),
+                isAllowNullReturn(),
+                isAcceptNull(),
+                getName());
   }
 
   @Override
@@ -352,9 +350,11 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
 
     AbstractTransformer that = (AbstractTransformer) obj;
 
-    return getReturnDataType().equals(that.getReturnDataType()) && getSourceDataTypes().equals(that.getSourceDataTypes())
+    return getReturnDataType().equals(that.getReturnDataType())
+        && getSourceDataTypes().equals(that.getSourceDataTypes())
         && Objects.equals(isIgnoreBadInput(), that.isIgnoreBadInput())
-        && Objects.equals(isAllowNullReturn(), that.isAllowNullReturn()) && Objects.equals(isAcceptNull(), that.isAcceptNull())
-        && Objects.equals(getName(), that.getName()) && Objects.equals(getProcessingType(), that.getProcessingType());
+        && Objects.equals(isAllowNullReturn(), that.isAllowNullReturn())
+        && Objects.equals(isAcceptNull(), that.isAcceptNull())
+        && Objects.equals(getName(), that.getName());
   }
 }
