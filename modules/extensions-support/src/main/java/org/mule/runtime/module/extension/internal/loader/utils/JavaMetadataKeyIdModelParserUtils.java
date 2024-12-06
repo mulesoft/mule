@@ -35,7 +35,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.Ja
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
-
 import org.mule.sdk.api.annotation.metadata.MetadataKeyId;
 import org.mule.sdk.api.annotation.metadata.MetadataKeyPart;
 import org.mule.sdk.api.annotation.metadata.MetadataScope;
