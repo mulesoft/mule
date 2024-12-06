@@ -21,8 +21,18 @@ public interface IServiceClassLoaderFactory
                              ClassLoaderLookupPolicy lookupPolicy)
       throws ArtifactClassloaderCreationException;
 
-  default ArtifactClassLoader create(String serviceName, ServiceDescriptor descriptor, ArtifactClassLoader containerClassLoader)
+  /**
+   * Creates a {@link ClassLoader} from a given descriptor.
+   *
+   * @param artifactId           artifact unique ID.
+   * @param descriptor           descriptor of the artifact owner of the created class loader.
+   * @param containerClassLoader parent for the new artifact class loader.
+   * @return a new class loader for described artifact.
+   *
+   * @since 4.6
+   */
+  default ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ArtifactClassLoader containerClassLoader)
       throws ArtifactClassloaderCreationException {
-    return create(serviceName, descriptor, new DefaultMuleContainerClassLoaderWrapper(containerClassLoader));
+    return create(artifactId, descriptor, new DefaultMuleContainerClassLoaderWrapper(containerClassLoader));
   }
 }

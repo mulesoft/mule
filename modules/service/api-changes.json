@@ -26,25 +26,6 @@
             "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
             "exception": "org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
             "justification": "W-17244755: Indicate the service that fails to create its classloader"
-          },
-          {
-            "ignore": true,
-            "code": "java.class.removed",
-            "old": "class org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory",
-            "justification": "W-16457453: Removed classloader fallback from ServiceClassLoaderFactoryProvider and associated classes"
-          },
-          {
-            "ignore": true,
-            "code": "java.method.returnTypeChanged",
-            "old": "method org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider::serviceClassLoaderFactory()",
-            "new": "method org.mule.runtime.module.service.api.artifact.IServiceClassLoaderFactory org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider::serviceClassLoaderFactory()",
-            "justification": "W-16457453: Removed classloader fallback from ServiceClassLoaderFactoryProvider and associated classes"
-          },
-          {
-            "ignore": true,
-            "code": "java.method.removed",
-            "old": "method void org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider::setWithinModularizedContainer(boolean)",
-            "justification": "W-16457453: Removed classloader fallback from ServiceClassLoaderFactoryProvider and associated classes"
           }
         ]
       }
