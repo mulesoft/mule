@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.api.runtime.config;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -144,15 +143,6 @@ public interface ExtensionDesignTimeResolversFactory {
                                         ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
                                         Optional<ScopeOutputMetadataContext> scopeOutputMetadataContext,
                                         Optional<RouterOutputMetadataContext> routerOutputMetadataContext);
-
-  /**
-   * Creates a new instance of a {@link MetadataContext}.
-   */
-  MetadataContext createMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
-                                        ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
-                                        Optional<ScopeOutputMetadataContext> scopeOutputMetadataContext,
-                                        Optional<RouterOutputMetadataContext> routerOutputMetadataContext,
-                                        Optional<TypeBindings> typeBindings);
 
   /**
    * Creates a new instance of a {@link MetadataMediator}.

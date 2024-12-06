@@ -10,14 +10,11 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataType;
-import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.extension.api.metadata.PropagatedParameterTypeResolver;
-import org.mule.runtime.module.extension.internal.metadata.InternalMetadataContext;
 import org.mule.runtime.module.extension.internal.metadata.SdkMetadataContextAdapter;
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.MetadataCache;
@@ -34,7 +31,7 @@ import java.util.function.Supplier;
  *
  * @since 4.7.0
  */
-public class DefaultChainInputMetadataContext implements ChainInputMetadataContext, InternalMetadataContext {
+public class DefaultChainInputMetadataContext implements ChainInputMetadataContext {
 
   private final Supplier<MessageMetadataType> inputMessageMetadataType;
   private final InputMetadataDescriptor inputMetadataDescriptor;
@@ -107,19 +104,5 @@ public class DefaultChainInputMetadataContext implements ChainInputMetadataConte
   @Override
   public Optional<ScopeOutputMetadataContext> getScopeOutputMetadataContext() {
     return rootContext.getScopeOutputMetadataContext();
-  }
-
-  public Optional<ExpressionLanguageMetadataService> getExpressionLanguageMetadataService() {
-    if (rootContext instanceof InternalMetadataContext) {
-      return ((InternalMetadataContext) rootContext).getExpressionLanguageMetadataService();
-    }
-    return Optional.empty();
-  }
-
-  public Optional<TypeBindings> getTypeBindings() {
-    if (rootContext instanceof InternalMetadataContext) {
-      return ((InternalMetadataContext) rootContext).getTypeBindings();
-    }
-    return Optional.empty();
   }
 }
