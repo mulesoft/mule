@@ -88,6 +88,7 @@ import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.extension.api.metadata.PropagatedParameterTypeResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
@@ -706,9 +707,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                             Supplier<MessageMetadataType> scopeInputMessageType)
       throws MetadataResolvingException {
     try {
+      // We use a no-op implementation for the PropagatedParameterTypeResolver because this is used only for type resolution
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getScopeInputMetadata(context, key, scopeInputMessageType)));
+                                        .getScopeInputMetadata(context, key, scopeInputMessageType,
+                                                               PropagatedParameterTypeResolver.NO_OP)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
@@ -719,9 +722,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                               Supplier<MessageMetadataType> routerInputMessageType)
       throws MetadataResolvingException {
     try {
+      // We use a no-op implementation for the PropagatedParameterTypeResolver because this is used only for type resolution
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getRouterInputMetadata(context, key, routerInputMessageType)));
+                                        .getRouterInputMetadata(context, key, routerInputMessageType,
+                                                                PropagatedParameterTypeResolver.NO_OP)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
