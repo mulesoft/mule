@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
  * previous implementation.
  * 
  * @since 4.5
+ * @deprecated since 4.8, use {@link ServiceClassLoaderFactoryProvider} instead.
  */
 public class ServiceClassLoaderFactoryProvider {
 
