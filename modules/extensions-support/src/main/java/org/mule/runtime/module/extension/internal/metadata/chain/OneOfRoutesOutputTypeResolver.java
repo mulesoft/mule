@@ -16,6 +16,7 @@ import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
@@ -63,9 +64,11 @@ public class OneOfRoutesOutputTypeResolver implements OutputTypeResolver<Object>
       throws MetadataResolvingException {
     UnionTypeBuilder builder = context.getTypeBuilder().unionType().flattens().removesRepetitions();
     Map<String, Supplier<MessageMetadataType>> routes = context.getRouterOutputMetadataContext()
-        .map(ctx -> ctx.getRouteOutputMessageTypes())
+        .map(RouterOutputMetadataContext::getRouteOutputMessageTypes)
         .orElseThrow(() -> new MetadataResolvingException("Route propagation context not available", UNKNOWN));
-
+    if (routes.isEmpty()) {
+      return VOID_TYPE;
+    }
     routes.values().forEach(route -> {
       MetadataType type = extractor.apply(route.get()).orElse(VOID_TYPE);
       builder.of(type);
