@@ -17,20 +17,20 @@ import org.apache.commons.lang3.SerializationUtils;
 
 public class SerialisedObjectTransformersTestCase extends AbstractTransformerTestCase {
 
-  private Orange testObject = new Orange(new Integer(4), new Double(14.3), "nice!");
+  private Orange testObject = new Orange(Integer.valueOf(4), Double.valueOf(14.3), "nice!");
 
   @Override
   public Transformer getTransformer() throws Exception {
-    SerializableToByteArray transfromer = new SerializableToByteArray();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
-    return transfromer;
+    SerializableToByteArray transformer = configureTransformer(new SerializableToByteArray());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transformer.hashCode()), transformer);
+    return transformer;
   }
 
   @Override
   public Transformer getRoundTripTransformer() throws Exception {
-    ByteArrayToSerializable transfromer = new ByteArrayToSerializable();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
-    return transfromer;
+    ByteArrayToSerializable transformer = configureTransformer(new ByteArrayToSerializable());
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transformer.hashCode()), transformer);
+    return transformer;
   }
 
   @Override

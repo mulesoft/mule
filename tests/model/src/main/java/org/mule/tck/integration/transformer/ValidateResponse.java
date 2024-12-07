@@ -8,20 +8,24 @@ package org.mule.tck.integration.transformer;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 /**
  * Throws an exception if the message does not contain "success".
  */
-public class ValidateResponse extends AbstractTransformer {
+public class ValidateResponse extends AbstractComponent implements Processor {
 
   @Override
-  protected Object doTransform(Object src, Charset encoding) throws TransformerException {
+  public CoreEvent process(CoreEvent event) throws MuleException {
+
+    final Object src = event.getMessage().getPayload().getValue();
     String response = null;
     if (src instanceof String) {
       response = (String) src;
@@ -30,11 +34,12 @@ public class ValidateResponse extends AbstractTransformer {
     }
 
     if (response != null && response.contains("success")) {
-      return response;
+      return event;
     } else {
       throw new TransformerException(createStaticMessage("Invalid response from flow: " + response));
     }
   }
+
 }
 
 

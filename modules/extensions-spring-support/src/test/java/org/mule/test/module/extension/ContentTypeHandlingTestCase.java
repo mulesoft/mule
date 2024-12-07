@@ -6,19 +6,21 @@
  */
 package org.mule.test.module.extension;
 
+import static org.mule.runtime.api.metadata.MediaType.TEXT;
+import static org.mule.tck.probe.PollingProber.check;
+
 import static java.nio.charset.Charset.availableCharsets;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.api.metadata.MediaType.TEXT;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.metadata.DataType;
@@ -31,6 +33,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,6 +49,9 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
 
   @Rule
   public SystemProperty customEncodingProperty = new SystemProperty("customEncoding", customEncoding.name());
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   @Override
   protected String getConfigFile() {
@@ -203,7 +210,7 @@ public class ContentTypeHandlingTestCase extends AbstractExtensionFunctionalTest
   }
 
   private void assertDefaultEncoding(DataType dataType) throws Exception {
-    assertThat(dataType.getMediaType().getCharset().get(), is(getDefaultEncoding(muleContext)));
+    assertThat(dataType.getMediaType().getCharset().get(), is(artifactEncoding.getDefaultEncoding()));
   }
 
   private void assertDefaultMimeType(DataType dataType) throws Exception {
