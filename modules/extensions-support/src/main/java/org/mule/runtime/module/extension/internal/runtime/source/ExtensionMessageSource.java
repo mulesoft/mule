@@ -759,7 +759,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
   }
 
-  private void reallyDoInitialise() throws InitialisationException {
+  protected void reallyDoInitialise() throws InitialisationException {
     try {
       lifecycle(() -> lifecycleManager.fireInitialisePhase((phase, o) -> {
         sourceConnectionManager = new SourceConnectionManager(connectionManager);

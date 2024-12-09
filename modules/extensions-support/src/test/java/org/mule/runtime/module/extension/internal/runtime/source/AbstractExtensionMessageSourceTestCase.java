@@ -366,7 +366,15 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         new TestExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
                                        retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager,
                                        notificationDispatcher,
-                                       muleContext.getConfiguration().getId());
+                                       muleContext.getConfiguration().getId()) {
+
+          @Override
+          protected void reallyDoInitialise() throws InitialisationException {
+            executedClassloader.set(Thread.currentThread().getContextClassLoader());
+            super.reallyDoInitialise();
+          }
+        };
+
     messageSource.setListener(messageProcessor);
     messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
     muleContext.getInjector().inject(messageSource);
@@ -388,12 +396,11 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
       super(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
             retryPolicyTemplate, cursorProviderFactory, backPressureStrategy, managerAdapter,
             notificationDispatcher, applicationName);
-      this.classLoader = artifactClassLoader;
     }
 
     @Override
     protected void doInitialise() throws InitialisationException {
-      executedClassloader.set(Thread.currentThread().getContextClassLoader());
+      this.classLoader = artifactClassLoader;
       super.doInitialise();
     }
   }
