@@ -44,6 +44,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -57,6 +58,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
@@ -79,6 +81,11 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
 import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
@@ -89,15 +96,15 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 
+import java.net.URL;
 import java.util.Collections;
-
+import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
-
 import org.mockito.Mock;
 
 public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
@@ -108,6 +115,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected static final String SOURCE_NAME = "source";
   protected static final String METADATA_KEY = "metadataKey";
   protected final JavaTypeLoader typeLoader = new JavaTypeLoader(this.getClass().getClassLoader());
+  protected final AtomicReference<ClassLoader> executedClassloader = new AtomicReference<>();
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
 
   @Rule
@@ -188,6 +196,9 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   @Mock
   protected MetadataResolverFactory metadataResolverFactory;
 
+  @Mock
+  private MuleApplicationClassLoader applicationClassLoader;
+
   @Inject
   private ProfilingService profilingService;
 
@@ -198,6 +209,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected ExtensionMessageSource messageSource;
   protected StreamingManager streamingManager = spy(new DefaultStreamingManager());
   protected NotificationDispatcher notificationDispatcher;
+  protected MuleArtifactClassLoader artifactClassLoader;
 
   @Override
   protected boolean doTestClassInjection() {
@@ -299,6 +311,16 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .build();
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);
+
+    RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
+    when(regionClassLoader.getOwnerClassLoader()).thenReturn(applicationClassLoader);
+    when(applicationClassLoader.getClassLoader()).thenReturn(applicationClassLoader);
+
+    URL url = new URL("file:///app.txt");
+    artifactClassLoader = new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
+                                                      new URL[] {url}, regionClassLoader,
+                                                      mock(ClassLoaderLookupPolicy.class));
+    executedClassloader.set(null);
   }
 
   @After
@@ -339,4 +361,47 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     return messageSource;
   }
 
+  protected ExtensionMessageSource getNewExtensionMessageSourceOverriddenInstance() throws MuleException {
+    ExtensionMessageSource messageSource =
+        new TestExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
+                                       retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager,
+                                       notificationDispatcher,
+                                       muleContext.getConfiguration().getId()) {
+
+          @Override
+          protected void reallyDoInitialise() throws InitialisationException {
+            executedClassloader.set(Thread.currentThread().getContextClassLoader());
+            super.reallyDoInitialise();
+          }
+        };
+
+    messageSource.setListener(messageProcessor);
+    messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
+    muleContext.getInjector().inject(messageSource);
+    return messageSource;
+  }
+
+  private class TestExtensionMessageSource extends ExtensionMessageSource {
+
+    TestExtensionMessageSource(ExtensionModel extensionModel,
+                               SourceModel sourceModel,
+                               SourceAdapterFactory sourceAdapterFactory,
+                               ConfigurationProvider configurationProvider,
+                               boolean primaryNodeOnly,
+                               RetryPolicyTemplate retryPolicyTemplate,
+                               CursorProviderFactory cursorProviderFactory,
+                               BackPressureStrategy backPressureStrategy,
+                               ExtensionManager managerAdapter, NotificationDispatcher notificationDispatcher,
+                               String applicationName) {
+      super(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
+            retryPolicyTemplate, cursorProviderFactory, backPressureStrategy, managerAdapter,
+            notificationDispatcher, applicationName);
+    }
+
+    @Override
+    protected void doInitialise() throws InitialisationException {
+      this.classLoader = artifactClassLoader;
+      super.doInitialise();
+    }
+  }
 }

@@ -65,6 +65,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.sdk.api.runtime.source.Source;
@@ -79,28 +80,25 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.LoggerFactory;
-
+import io.qameta.allure.Issue;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
-
 import org.mockito.InOrder;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
-
 
   private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(ExtensionMessageSource.class);
 
   protected static final int TEST_TIMEOUT = 3000;
   protected static final int TEST_POLL_DELAY = 1000;
+
   protected String property;
 
   @Parameterized.Parameters(name = "{0}")
@@ -187,6 +185,16 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
       verify((Initialisable) source).initialise();
       verify(source, never()).onStart(sourceCallback);
     }
+  }
+
+  @Test
+  @Issue("W-15923796")
+  public void doInitialise() throws Exception {
+    executedClassloader.set(Thread.currentThread().getContextClassLoader());
+    ExtensionMessageSource messageSource = getNewExtensionMessageSourceOverriddenInstance();
+    messageSource.initialise();
+    assertThat(executedClassloader.get(), instanceOf(MuleArtifactClassLoader.class));
+    assertThat(executedClassloader.get(), is(artifactClassLoader));
   }
 
   @Test
