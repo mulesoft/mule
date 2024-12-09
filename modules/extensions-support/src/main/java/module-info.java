@@ -58,7 +58,7 @@ module org.mule.runtime.extensions.support {
   // Usage of TypeElement, VariableElement and other
   requires java.compiler;
   // XML documentation classes
-  requires java.xml.bind;
+  requires jakarta.xml.bind;
   requires org.mule.apache.xerces;
 
   requires com.github.benmanes.caffeine;
@@ -215,7 +215,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.tooling.support;
 
   opens org.mule.runtime.module.extension.internal.resources.documentation to
-      java.xml.bind;
+      jakarta.xml.bind;
 
   provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
       org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy;
