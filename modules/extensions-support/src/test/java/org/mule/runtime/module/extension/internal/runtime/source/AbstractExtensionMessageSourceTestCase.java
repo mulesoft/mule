@@ -394,6 +394,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     @Override
     protected void doInitialise() throws InitialisationException {
       executedClassloader.set(Thread.currentThread().getContextClassLoader());
+      super.doInitialise();
     }
   }
 }
