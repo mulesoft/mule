@@ -10,6 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCurrentEventForTransformer;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -20,7 +21,6 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -139,17 +139,7 @@ public final class TransformerChain extends AbstractTransformer {
 
   @Override
   public void initialise() throws InitialisationException {
-    for (Transformer transformer : transformers) {
-      transformer.initialise();
-    }
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    super.setMuleContext(muleContext);
-    for (Transformer transformer : transformers) {
-      transformer.setMuleContext(muleContext);
-    }
+    initialiseIfNeeded(transformers, muleContext);
   }
 
   @Override
