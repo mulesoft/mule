@@ -30,7 +30,8 @@ module org.mule.runtime.extensions.spring.support {
 
   requires java.compiler;
   requires java.inject;
-  requires java.xml.bind;
+
+  requires jakarta.xml.bind;
 
   requires com.google.common;
   requires org.apache.commons.lang3;
@@ -78,7 +79,7 @@ module org.mule.runtime.extensions.spring.support {
       org.mule.runtime.ast.extension;
 
   opens org.mule.runtime.module.extension.internal.capability.xml.schema.model to
-      java.xml.bind;
+      jakarta.xml.bind;
   opens org.mule.runtime.module.extension.internal.config.dsl to
       spring.core;
   opens org.mule.runtime.module.extension.internal.config.dsl.config to

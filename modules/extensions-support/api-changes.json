@@ -5,6 +5,12 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.metadata.MetadataContext org.mule.runtime.module.extension.api.runtime.config.ExtensionDesignTimeResolversFactory::createMetadataContext(java.util.function.Supplier<java.util.Optional<org.mule.runtime.extension.api.runtime.config.ConfigurationInstance>>, org.mule.runtime.core.api.connector.ConnectionManager, org.mule.runtime.api.metadata.MetadataCache, org.mule.metadata.api.ClassTypeLoader, java.util.Optional<org.mule.runtime.api.metadata.ScopeOutputMetadataContext>, java.util.Optional<org.mule.runtime.api.metadata.RouterOutputMetadataContext>, java.util.Optional<org.mule.metadata.message.api.el.TypeBindings>)",
+            "justification": "W-17050998: Cleanup, removing things not needed from the API. API still experimental, only used by the Mule Framework."
+          },
+          {
+            "ignore": true,
             "code": "java.method.numberOfParametersChanged",
             "old": "method org.mule.runtime.api.metadata.resolving.MetadataResult<org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor> org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator::getRouterInputMetadata(org.mule.runtime.api.metadata.MetadataContext, org.mule.runtime.api.metadata.MetadataKey, java.util.function.Supplier<org.mule.metadata.message.api.MessageMetadataType>)",
             "new": "method org.mule.runtime.api.metadata.resolving.MetadataResult<org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor> org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator::getRouterInputMetadata(org.mule.runtime.api.metadata.MetadataContext, org.mule.runtime.api.metadata.MetadataKey, java.util.function.Supplier<org.mule.metadata.message.api.MessageMetadataType>, org.mule.runtime.module.extension.api.metadata.PropagatedParameterTypeResolver)",
