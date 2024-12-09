@@ -9,13 +9,13 @@ package org.mule.runtime.module.artifact.api.serializer;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.serialization.JavaExternalSerializerProtocol;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.protocol.CustomJavaSerializationProtocol;
@@ -56,7 +56,7 @@ public final class ArtifactObjectSerializer implements ObjectSerializer, Initial
     try {
       muleContext.getInjector().inject(javaInternalSerializerProtocol);
       muleContext.getInjector().inject(javaExternalSerializerProtocol);
-    } catch (MuleException e) {
+    } catch (IllegalDependencyInjectionException e) {
       throw new InitialisationException(e, this);
     }
   }

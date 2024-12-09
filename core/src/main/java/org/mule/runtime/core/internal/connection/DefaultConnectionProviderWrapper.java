@@ -12,9 +12,9 @@ import static java.util.Optional.of;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 
@@ -53,7 +53,7 @@ public class DefaultConnectionProviderWrapper<C> extends AbstractConnectionProvi
     C connection = super.connect();
     try {
       muleContext.getInjector().inject(connection);
-    } catch (MuleException e) {
+    } catch (IllegalDependencyInjectionException e) {
       throw new ConnectionException("Could not initialise connection", e);
     }
 
