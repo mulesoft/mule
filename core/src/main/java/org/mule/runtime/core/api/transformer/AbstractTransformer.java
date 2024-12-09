@@ -234,8 +234,7 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
     if (src instanceof TypedValue) {
       payload = ((TypedValue) src).getValue();
       sourceType = ((TypedValue) src).getDataType();
-    } else if (src instanceof Message) {
-      Message message = (Message) src;
+    } else if (src instanceof Message message) {
       if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true))) {
         payload = message.getPayload().getValue();
         sourceType = message.getPayload().getDataType();
@@ -336,8 +335,12 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
 
   @Override
   public int hashCode() {
-    return hash(getReturnDataType(), getSourceDataTypes().hashCode(), isIgnoreBadInput(), isAllowNullReturn(), isAcceptNull(),
-                getName(), getProcessingType());
+    return hash(getReturnDataType(),
+                getSourceDataTypes(),
+                isIgnoreBadInput(),
+                isAllowNullReturn(),
+                isAcceptNull(),
+                getName());
   }
 
   @Override
@@ -352,9 +355,11 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
 
     AbstractTransformer that = (AbstractTransformer) obj;
 
-    return getReturnDataType().equals(that.getReturnDataType()) && getSourceDataTypes().equals(that.getSourceDataTypes())
+    return getReturnDataType().equals(that.getReturnDataType())
+        && getSourceDataTypes().equals(that.getSourceDataTypes())
         && Objects.equals(isIgnoreBadInput(), that.isIgnoreBadInput())
-        && Objects.equals(isAllowNullReturn(), that.isAllowNullReturn()) && Objects.equals(isAcceptNull(), that.isAcceptNull())
-        && Objects.equals(getName(), that.getName()) && Objects.equals(getProcessingType(), that.getProcessingType());
+        && Objects.equals(isAllowNullReturn(), that.isAllowNullReturn())
+        && Objects.equals(isAcceptNull(), that.isAcceptNull())
+        && Objects.equals(getName(), that.getName());
   }
 }
