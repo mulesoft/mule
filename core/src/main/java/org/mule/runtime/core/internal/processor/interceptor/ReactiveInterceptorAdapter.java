@@ -39,6 +39,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
 import org.mule.runtime.core.internal.interception.HasParamsAsTemplateProcessor;
@@ -50,8 +51,10 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
@@ -242,7 +245,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       try {
         ((ParametersResolverProcessor<?>) component).resolveParameters(builder, (params, context) -> {
           resolvedParameters.putAll(params.entrySet().stream()
-              .collect(toMap(e -> e.getKey(),
+              .collect(toMap((Function<? super Entry<String, Supplier<Object>>, ? extends String>) Entry::getKey,
                              e -> new DefaultProcessorParameterValue(e.getKey(), null,
                                                                      () -> e.getValue().get()))));
 
@@ -276,7 +279,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       ReactiveInterceptorAdapter reactiveInterceptorAdapter = new ReactiveInterceptorAdapter(interceptorFactory);
       try {
         injector.inject(reactiveInterceptorAdapter);
-      } catch (MuleException e) {
+      } catch (IllegalDependencyInjectionException e) {
         throw new MuleRuntimeException(e);
       }
       interceptors.add(0, reactiveInterceptorAdapter);
@@ -285,7 +288,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       ReactiveAroundInterceptorAdapter reactiveInterceptorAdapter = new ReactiveAroundInterceptorAdapter(interceptorFactory);
       try {
         injector.inject(reactiveInterceptorAdapter);
-      } catch (MuleException e) {
+      } catch (IllegalDependencyInjectionException e) {
         throw new MuleRuntimeException(e);
       }
       interceptors.add(0, reactiveInterceptorAdapter);

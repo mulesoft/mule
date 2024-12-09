@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.internal.context;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
 import org.mule.runtime.config.internal.validation.ast.ArtifactAstGraphDependencyProviderAware;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 
 import java.util.function.Consumer;
 
@@ -45,7 +45,7 @@ public class RuntimeValidationEnricher implements Consumer<ValidationsProvider> 
   private void injectDependencies(ValidationsProvider validationsProvider) {
     try {
       muleContext.getInjector().inject(validationsProvider);
-    } catch (MuleException e) {
+    } catch (IllegalDependencyInjectionException e) {
       throw new MuleRuntimeException(e);
     }
   }

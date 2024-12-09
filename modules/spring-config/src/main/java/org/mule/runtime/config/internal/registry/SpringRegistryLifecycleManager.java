@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.registry;
 import static org.mule.runtime.config.internal.context.MuleArtifactContext.INNER_BEAN_PREFIX;
 
 import org.mule.runtime.api.el.ExpressionLanguage;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
@@ -117,11 +116,12 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     @Override
     public void applyLifecycle(Object o) throws LifecycleException {
-      try {
-        o = getMuleContext().get().getInjector().inject(o);
-      } catch (MuleException e) {
-        throw new LifecycleException(e, o);
-      }
+      // Initialization already done when the spring context is first refreshed
+      // try {
+      // o = getMuleContext().get().getInjector().inject(o);
+      // } catch (MuleException e) {
+      // throw new LifecycleException(e, o);
+      // }
       if (o instanceof Transformer) {
         String name = ((Transformer) o).getName();
         if (isNamedBean(name)) {
