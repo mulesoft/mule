@@ -48,7 +48,6 @@ import org.mule.runtime.api.connection.SourceRemoteConnectionException;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.interception.SourceInterceptor;
@@ -69,6 +68,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
@@ -196,7 +196,7 @@ public class FlowProcessMediator implements Initialisable {
         try {
           muleContext.getInjector().inject(reactiveInterceptorSuccessAdapter);
           muleContext.getInjector().inject(reactiveInterceptorFailureAdapter);
-        } catch (MuleException e) {
+        } catch (IllegalDependencyInjectionException e) {
           throw new MuleRuntimeException(e);
         }
         additionalSuccessInterceptors.add(0, reactiveInterceptorSuccessAdapter);
