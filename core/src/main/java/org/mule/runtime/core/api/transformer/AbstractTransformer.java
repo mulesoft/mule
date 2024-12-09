@@ -336,8 +336,12 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
 
   @Override
   public int hashCode() {
-    return hash(getReturnDataType(), getSourceDataTypes().hashCode(), isIgnoreBadInput(), isAllowNullReturn(), isAcceptNull(),
-                getName(), getProcessingType());
+    return hash(getReturnDataType(),
+                getSourceDataTypes(),
+                isIgnoreBadInput(),
+                isAllowNullReturn(),
+                isAcceptNull(),
+                getName());
   }
 
   @Override
@@ -352,9 +356,11 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
 
     AbstractTransformer that = (AbstractTransformer) obj;
 
-    return getReturnDataType().equals(that.getReturnDataType()) && getSourceDataTypes().equals(that.getSourceDataTypes())
+    return getReturnDataType().equals(that.getReturnDataType())
+        && getSourceDataTypes().equals(that.getSourceDataTypes())
         && Objects.equals(isIgnoreBadInput(), that.isIgnoreBadInput())
-        && Objects.equals(isAllowNullReturn(), that.isAllowNullReturn()) && Objects.equals(isAcceptNull(), that.isAcceptNull())
-        && Objects.equals(getName(), that.getName()) && Objects.equals(getProcessingType(), that.getProcessingType());
+        && Objects.equals(isAllowNullReturn(), that.isAllowNullReturn())
+        && Objects.equals(isAcceptNull(), that.isAcceptNull())
+        && Objects.equals(getName(), that.getName());
   }
 }
