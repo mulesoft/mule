@@ -457,7 +457,6 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(metadataKeyIdModelProperty.isPresent(), is(true));
     assertThat(metadataKeyIdModelProperty.get().getCategoryName().isPresent(), is(false));
     assertThat(metadataKeyIdModelProperty.get().getParameterName(), is("someMetadataKeyId"));
-  }
 
   }
 
