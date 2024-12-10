@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
