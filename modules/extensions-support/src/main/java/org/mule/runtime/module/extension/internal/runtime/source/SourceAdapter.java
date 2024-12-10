@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
-import static org.mule.runtime.api.util.MuleSystemProperties.COMMIT_REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_COMMIT_ON_REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -111,7 +111,8 @@ import org.slf4j.Logger;
 public class SourceAdapter implements Lifecycle, Restartable {
 
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
-  private static final Boolean COMMIT_ON_REDELIVERY = getBoolean(COMMIT_REDELIVERY_EXHAUSTED);
+
+  private static final Boolean COMMIT_ON_REDELIVERY_EXHAUSTED = !getBoolean(DISABLE_COMMIT_ON_REDELIVERY_EXHAUSTED);
 
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
@@ -352,7 +353,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
       }
 
       if (context.getTransactionHandle().isTransacted()) {
-        if (isRedeliveryExhaustedError && COMMIT_ON_REDELIVERY) {
+        if (isRedeliveryExhaustedError && COMMIT_ON_REDELIVERY_EXHAUSTED) {
           callback = callback.finallyBefore(this::commit);
         } else {
           callback = callback.finallyBefore(this::rollback);
