@@ -111,7 +111,6 @@ import org.slf4j.Logger;
 public class SourceAdapter implements Lifecycle, Restartable {
 
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
-  private static final Boolean COMMIT_ON_REDELIVERY = getBoolean(COMMIT_REDELIVERY_EXHAUSTED);
 
   private static final Boolean COMMIT_ON_REDELIVERY_EXHAUSTED = !getBoolean(DISABLE_COMMIT_ON_REDELIVERY_EXHAUSTED);
 
