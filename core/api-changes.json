@@ -3,6 +3,92 @@
     "revapi": {
       "differences": {
         "differences": [
+{
+  "ignore": true,
+  "code": "java.field.removedWithConstant",
+  "old": "field org.mule.runtime.api.lifecycle.Initialisable.PHASE_NAME @ org.mule.runtime.core.api.config.DefaultMuleConfiguration",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.config",
+  "classQualifiedName": "org.mule.runtime.core.api.config.DefaultMuleConfiguration",
+  "classSimpleName": "DefaultMuleConfiguration",
+  "fieldName": "PHASE_NAME",
+  "elementKind": "field",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.method.removed",
+  "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.config",
+  "classQualifiedName": "org.mule.runtime.core.api.config.DefaultMuleConfiguration",
+  "classSimpleName": "DefaultMuleConfiguration",
+  "methodName": "initialise",
+  "elementKind": "method",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.noLongerImplementsInterface",
+  "old": "class org.mule.runtime.core.api.config.DefaultMuleConfiguration",
+  "new": "class org.mule.runtime.core.api.config.DefaultMuleConfiguration",
+  "interface": "org.mule.runtime.api.lifecycle.Initialisable",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.config",
+  "classQualifiedName": "org.mule.runtime.core.api.config.DefaultMuleConfiguration",
+  "classSimpleName": "DefaultMuleConfiguration",
+  "elementKind": "class",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.field.removedWithConstant",
+  "old": "field org.mule.runtime.api.lifecycle.Initialisable.PHASE_NAME @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.config",
+  "classQualifiedName": "org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+  "classSimpleName": "ReconfigurableMuleConfiguration",
+  "fieldName": "PHASE_NAME",
+  "elementKind": "field",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.class.noLongerImplementsInterface",
+  "old": "class org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+  "new": "class org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+  "interface": "org.mule.runtime.api.lifecycle.Initialisable",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.api.config",
+  "classQualifiedName": "org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+  "classSimpleName": "ReconfigurableMuleConfiguration",
+  "elementKind": "class",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.8.0",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.9.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
           {
             "ignore": true,
             "code": "java.class.removed",
