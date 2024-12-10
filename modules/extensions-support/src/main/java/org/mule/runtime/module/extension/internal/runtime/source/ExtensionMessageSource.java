@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.TemplateParser.createMuleStyleParser;
@@ -738,7 +739,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         }
       }
 
-      reallyDoInitialise();
+      withContextClassLoader(classLoader, () -> {
+        reallyDoInitialise();
+        return null;
+      });
     } else {
       LOGGER
           .debug("Message source '{}' on flow '{}' cannot initialize. This Message source can only run on the primary node of the cluster",
@@ -746,13 +750,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       new PrimaryNodeLifecycleNotificationListener(() -> {
         LOGGER.debug("Message source '{}' on flow '{}' is initializing because the node became cluster's primary.",
                      sourceModel.getName(), getLocation().getRootContainerName());
-        reallyDoInitialise();
-        reallyDoStart();
+        withContextClassLoader(classLoader, () -> {
+          reallyDoInitialise();
+          reallyDoStart();
+          return null;
+        });
       }, notificationListenerRegistry).register();
     }
   }
 
-  private void reallyDoInitialise() throws InitialisationException {
+  protected void reallyDoInitialise() throws InitialisationException {
     try {
       lifecycle(() -> lifecycleManager.fireInitialisePhase((phase, o) -> {
         sourceConnectionManager = new SourceConnectionManager(connectionManager);
