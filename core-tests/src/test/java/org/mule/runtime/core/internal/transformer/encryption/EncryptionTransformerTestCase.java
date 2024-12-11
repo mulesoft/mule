@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.transformer.encryption;
 
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -54,7 +55,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase {
     } catch (InitialisationException e) {
       fail(e.getMessage());
     }
-    return transformer;
+    return configureTransformer(transformer);
   }
 
   @Override
@@ -66,7 +67,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase {
     } catch (InitialisationException e) {
       fail(e.getMessage());
     }
-    return transformer;
+    return configureTransformer(transformer);
   }
 
   @Override

@@ -6,17 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.result;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
+
+import static java.nio.charset.Charset.defaultCharset;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
@@ -37,6 +40,7 @@ import java.nio.charset.Charset;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -84,7 +88,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
 
   private TargetReturnDelegate createDelegate(String expression) {
     return new TargetReturnDelegate(TARGET, expression, componentModel, expressionManager,
-                                    muleContext, streamingManager);
+                                    () -> defaultCharset(), streamingManager);
   }
 
   @Test

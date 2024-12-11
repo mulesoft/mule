@@ -14,14 +14,14 @@ public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedOb
 
   @Override
   public Transformer getTransformer() throws Exception {
-    ObjectToByteArray transfromer = new ObjectToByteArray();
+    ObjectToByteArray transfromer = configureTransformer(new ObjectToByteArray());
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
     return transfromer;
   }
 
   @Override
   public Transformer getRoundTripTransformer() throws Exception {
-    ByteArrayToObject transfromer = new ByteArrayToObject();
+    ByteArrayToObject transfromer = configureTransformer(new ByteArrayToObject());
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
     return transfromer;
   }

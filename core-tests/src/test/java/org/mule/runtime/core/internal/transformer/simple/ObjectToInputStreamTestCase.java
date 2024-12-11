@@ -6,11 +6,18 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
-import static org.junit.Assert.assertEquals;
+import static java.nio.charset.Charset.defaultCharset;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.io.ByteArrayInputStream;
@@ -18,52 +25,49 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import org.junit.Before;
 import org.junit.Test;
 
-public class ObjectToInputStreamTestCase extends AbstractMuleContextTestCase {
+public class ObjectToInputStreamTestCase extends AbstractMuleTestCase {
+
+  public static final String TEST_MESSAGE = "Test Message";
 
   private ObjectToInputStream transformer;
 
-  @Override
-  protected void doSetUp() throws Exception {
+  @Before
+  public void doSetUp() throws Exception {
     transformer = new ObjectToInputStream();
-    transformer.setMuleContext(muleContext);
+    transformer.setArtifactEncoding(() -> defaultCharset());
+    transformer.setObjectSerializer(new JavaObjectSerializer());
   }
 
   @Test
   public void testTransformString() throws TransformerException, IOException {
-    assertTrue(InputStream.class.isAssignableFrom(transformer.transform(TEST_MESSAGE).getClass()));
+    assertThat(transformer.transform(TEST_MESSAGE), instanceOf(InputStream.class));
     assertTrue(compare(new ByteArrayInputStream(TEST_MESSAGE.getBytes()), (InputStream) transformer.transform(TEST_MESSAGE)));
   }
 
   @Test
   public void testTransformByteArray() throws TransformerException, IOException {
-    assertTrue(InputStream.class.isAssignableFrom(transformer.transform(TEST_MESSAGE.getBytes()).getClass()));
+    assertThat(transformer.transform(TEST_MESSAGE), instanceOf(InputStream.class));
     assertTrue(compare(new ByteArrayInputStream(TEST_MESSAGE.getBytes()), (InputStream) transformer.transform(TEST_MESSAGE)));
   }
 
   @Test
   public void testTransformInputStream() {
     InputStream inputStream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-    try {
-      assertEquals(inputStream, transformer.transform(inputStream));
-    } catch (Exception e) {
-      assertTrue(e instanceof TransformerException);
-      assertTrue(e.getMessage().contains("does not support source type"));
-    }
+
+    var thrown = assertThrows(TransformerException.class, () -> transformer.transform(inputStream));
+    assertThat(thrown.getMessage(), containsString("does not support source type"));
   }
 
   @Test
-  public void testTransformSerializable() {
+  public void testTransformSerializable() throws TransformerException {
     Apple apple = new Apple();
     InputStream serializedApple =
-        new ByteArrayInputStream(muleContext.getObjectSerializer().getExternalProtocol().serialize(apple));
-    try {
-      assertTrue(compare(serializedApple, (InputStream) transformer.transform(apple)));
-    } catch (Exception e) {
-      assertTrue(e instanceof TransformerException);
-      assertTrue(e.getMessage().contains("does not support source type"));
-    }
+        new ByteArrayInputStream(new JavaObjectSerializer().getExternalProtocol().serialize(apple));
+
+    assertTrue(compare(serializedApple, (InputStream) transformer.transform(apple)));
   }
 
   public static boolean compare(InputStream input1, InputStream input2) {

@@ -17,6 +17,7 @@ import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -70,6 +71,7 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
                                            ComponentModel componentModel,
                                            Component component,
                                            MuleContext muleContext,
+                                           ArtifactEncoding artifactEncoding,
                                            ReflectionCache reflectionCache,
                                            StreamingManager streamingManager) {
     this.extensionModel = extensionModel;
@@ -79,7 +81,7 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
     this.reflectionCache = reflectionCache;
     this.streamingManager = streamingManager;
     sampleDataProperty = componentModel.getModelProperty(SampleDataProviderFactoryModelProperty.class).orElse(null);
-    returnDelegate = new ValueReturnDelegate(componentModel, muleContext);
+    returnDelegate = new ValueReturnDelegate(componentModel, artifactEncoding);
   }
 
   /**

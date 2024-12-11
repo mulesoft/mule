@@ -6,31 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.of;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
@@ -39,7 +14,6 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -52,6 +26,35 @@ import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
+import static java.lang.String.format;
+import static java.nio.charset.Charset.defaultCharset;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.of;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
@@ -80,7 +83,6 @@ import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
@@ -110,9 +112,7 @@ import com.google.common.reflect.TypeToken;
 
 import org.slf4j.MDC;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -122,9 +122,6 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
   private static final String SOME_PARAM_NAME = "someParam";
   private static final String FLOW_NAME = "flowName";
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
@@ -171,7 +168,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationReturnsOperationResultWhichKeepsNoValues() throws Exception {
     Object payload = new Object();
-    MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
+    MediaType mediaType = ANY.withCharset(defaultCharset());
     Object attributes = mock(Object.class);
 
     stubResultComponentExecutor(payload, mediaType, attributes);
@@ -190,7 +187,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor = setUpOperationMessageProcessor();
 
     Object payload = new Object();
-    MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
+    MediaType mediaType = ANY.withCharset(defaultCharset());
     Object attributes = mock(Object.class);
 
     stubResultComponentExecutor(payload, mediaType, attributes);
@@ -206,7 +203,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationReturnsOperationResultButKeepsAttributes() throws Exception {
     Object payload = new Object();
-    MediaType mediaType = ANY.withCharset(getDefaultEncoding(context));
+    MediaType mediaType = ANY.withCharset(defaultCharset());
 
     stubResultComponentExecutor(payload, mediaType, null);
 
@@ -350,11 +347,10 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor.setMuleContext(context);
     context.getInjector().inject(messageProcessor);
 
-    expectedException.expect(IllegalOperationException.class);
-    expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression",
-                                           TARGET_PARAMETER_NAME));
-
-    messageProcessor.initialise();
+    var thrown = assertThrows(IllegalOperationException.class, () -> messageProcessor.initialise());
+    assertThat(thrown.getMessage(),
+               containsString(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression",
+                                     TARGET_PARAMETER_NAME)));
   }
 
   @Test
@@ -376,12 +372,11 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     messageProcessor.setMuleContext(context);
     context.getInjector().inject(messageProcessor);
 
-    expectedException.expect(IllegalOperationException.class);
-    expectedException
-        .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "something that is not an expression",
-                              TARGET_VALUE_PARAMETER_NAME));
-
-    messageProcessor.initialise();
+    var thrown = assertThrows(IllegalOperationException.class, () -> messageProcessor.initialise());
+    assertThat(thrown.getMessage(),
+               containsString(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(),
+                                     "something that is not an expression",
+                                     TARGET_VALUE_PARAMETER_NAME)));
   }
 
   @Test

@@ -11,6 +11,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonMap;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -21,7 +22,8 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -52,20 +54,14 @@ import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
-
 @Feature(MULE_EVENT)
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setUp() {
@@ -79,12 +75,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void serialization() throws Exception {
-    Transformer transformer = createSerializableToByteArrayTransformer();
-    transformer.setMuleContext(muleContext);
     Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(testEvent());
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
-    trans.setMuleContext(muleContext);
+    trans.setArtifactEncoding(() -> defaultCharset());
+    trans.setObjectSerializer(muleContext.getObjectSerializer());
     PrivilegedEvent deserialized = (PrivilegedEvent) trans.transform(serialized);
 
     // Assert that deserialized event is not null
@@ -92,8 +87,9 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
   private Transformer createSerializableToByteArrayTransformer() {
-    Transformer transformer = new SerializableToByteArray();
-    transformer.setMuleContext(muleContext);
+    SerializableToByteArray transformer = new SerializableToByteArray();
+    transformer.setArtifactEncoding(() -> defaultCharset());
+    transformer.setObjectSerializer(muleContext.getObjectSerializer());
 
     return transformer;
   }
@@ -112,7 +108,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     muleContext = createMuleContext();
     muleContext.start();
     ByteArrayToObject trans = new ByteArrayToObject();
-    trans.setMuleContext(muleContext);
+    trans.setArtifactEncoding(() -> defaultCharset());
+    trans.setObjectSerializer(muleContext.getObjectSerializer());
 
     // Recreate and register artifacts (this would happen if using any kind of static config e.g. XML)
     createAndRegisterTransformersEndpointBuilderService();
@@ -167,19 +164,17 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
-    expectedException.expect(UnsupportedOperationException.class);
-    event.getVariables().keySet().add("other");
+    assertThrows(UnsupportedOperationException.class, () -> event.getVariables().keySet().add("other"));
   }
 
   @Test
   public void testFlowVarNamesRemoveImmutable() throws Exception {
-    CoreEvent event = getEventBuilder()
+    CoreEvent eventBase = getEventBuilder()
         .message(of("whatever"))
         .addVariable("test", "val")
         .build();
-    event = CoreEvent.builder(event).addVariable("test", "val").build();
-    expectedException.expect(UnsupportedOperationException.class);
-    event.getVariables().keySet().remove("test");
+    var event = CoreEvent.builder(eventBase).addVariable("test", "val").build();
+    assertThrows(UnsupportedOperationException.class, () -> event.getVariables().keySet().remove("test"));
   }
 
   @Test
@@ -339,8 +334,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
         .parameters(testParameterValues())
         .build();
 
-    expectedException.expect(UnsupportedOperationException.class);
-    event.getParameters().put("a new param", new TypedValue<>("value", STRING));
+    assertThrows(UnsupportedOperationException.class,
+                 () -> event.getParameters().put("a new param", new TypedValue<>("value", STRING)));
   }
 
   @Test
@@ -396,15 +391,13 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void securityContextSerialization() throws Exception {
-    Transformer transformer = createSerializableToByteArrayTransformer();
-    transformer.setMuleContext(muleContext);
-
     CoreEvent event = CoreEvent.builder(testEvent()).securityContext(createTestAuthentication()).build();
 
     Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
-    trans.setMuleContext(muleContext);
+    trans.setArtifactEncoding(() -> defaultCharset());
+    trans.setObjectSerializer(muleContext.getObjectSerializer());
     CoreEvent deserialized = (CoreEvent) trans.transform(serialized);
 
     assertThat(deserialized.getSecurityContext().getAuthentication().getPrincipal(),
