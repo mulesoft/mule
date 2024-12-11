@@ -6,17 +6,23 @@
  */
 package org.mule.runtime.core.internal.serialization;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 
 /**
  * Serializes objects using the default Java serialization mechanism provided by writeObject and readObject methods.
  */
-public class JavaObjectSerializer implements ObjectSerializer, MuleContextAware {
+public class JavaObjectSerializer implements ObjectSerializer {
 
-  private volatile JavaExternalSerializerProtocol javaSerializerProtocol = new JavaExternalSerializerProtocol();
+  private volatile JavaExternalSerializerProtocol javaSerializerProtocol;
+
+  public JavaObjectSerializer(ClassLoader executionClassLoader) {
+    checkArgument(executionClassLoader != null, "executionClassLoader cannot be null");
+
+    javaSerializerProtocol = new JavaExternalSerializerProtocol(executionClassLoader);
+  }
 
   @Override
   public SerializationProtocol getInternalProtocol() {
@@ -28,8 +34,4 @@ public class JavaObjectSerializer implements ObjectSerializer, MuleContextAware 
     return javaSerializerProtocol;
   }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    javaSerializerProtocol.setMuleContext(context);
-  }
 }
