@@ -91,6 +91,7 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDes
 import org.mule.runtime.module.deployment.impl.internal.policy.ApplicationPolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.license.api.LicenseValidator;
+import org.mule.runtime.module.service.api.artifact.IServiceClassLoaderFactory;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
@@ -313,7 +314,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
 
-    ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = serviceClassLoaderFactory();
+    IServiceClassLoaderFactory serviceClassLoaderFactory = serviceClassLoaderFactory();
     serviceManager =
         ServiceManager.create(new DefaultServiceDiscoverer(new FileSystemServiceProviderDiscoverer(containerClassLoader,
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
