@@ -11,9 +11,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import static java.util.stream.Collectors.toList;
 
-import static org.apache.commons.lang3.JavaVersion.JAVA_11;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.discoverer.ContainerDiscovererHelper;
@@ -92,11 +89,9 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   // classloader), while the code in the Discoverer classes has to run within the Mule Container classloader.
   private static ReflectionAdapterModuleDiscoverer createContainerModuleDiscoverer(ClassLoader containerSystemClassloader) {
     try {
-      if (isJavaVersionAtLeast(JAVA_11)) {
-        final Class<?> clsContainerDiscovererHelper =
-            containerSystemClassloader.loadClass(ContainerDiscovererHelper.class.getName());
-        clsContainerDiscovererHelper.getDeclaredMethod("exportInternalsToTestRunner").invoke(null);
-      }
+      final Class<?> clsContainerDiscovererHelper =
+          containerSystemClassloader.loadClass(ContainerDiscovererHelper.class.getName());
+      clsContainerDiscovererHelper.getDeclaredMethod("exportInternalsToTestRunner").invoke(null);
 
       final Class<?> clsContainerModuleDiscoverer =
           containerSystemClassloader.loadClass(ContainerModuleDiscoverer.class.getName());

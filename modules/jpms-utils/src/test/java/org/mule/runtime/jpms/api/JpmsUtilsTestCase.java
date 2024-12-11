@@ -10,36 +10,26 @@ import static org.mule.runtime.jpms.api.JpmsUtils.exploreJdkModules;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_GENERATION;
 
-import static org.apache.commons.lang3.JavaVersion.JAVA_11;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assume.assumeTrue;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.Ignore;
+import org.junit.Test;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(CLASSLOADER_GENERATION)
 public class JpmsUtilsTestCase extends AbstractMuleTestCase {
-
-  @BeforeClass
-  public static void checkJdkVersion() {
-    assumeTrue("This test tests functionality that applies only when running on Java 11+", isJavaVersionAtLeast(JAVA_11));
-  }
 
   @Test
   @Ignore("W-16374984")
