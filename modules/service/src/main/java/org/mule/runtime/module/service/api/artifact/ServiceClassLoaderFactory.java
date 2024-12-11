@@ -18,8 +18,9 @@ import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassl
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
  *
+ * @deprecated since 4.8, use {@link IServiceClassLoaderFactory}
  */
-// TODO W-12780081 - remove usages of deprecated creation method
+@Deprecated
 public class ServiceClassLoaderFactory
     implements ArtifactClassLoaderFactory<ServiceDescriptor>, ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> {
 
