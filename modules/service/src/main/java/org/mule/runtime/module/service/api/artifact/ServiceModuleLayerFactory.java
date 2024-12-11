@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
  */
-class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
+class ServiceModuleLayerFactory extends ServiceClassLoaderFactory implements IServiceClassLoaderFactory {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceModuleLayerFactory.class);
   private static final String CONTAINER_LAYER_NAME = "Mule Container Module Layer";
