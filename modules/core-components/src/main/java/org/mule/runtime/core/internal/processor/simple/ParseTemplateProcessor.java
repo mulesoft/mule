@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import jakarta.activation.MimetypesFileTypeMap;
+import javax.activation.MimetypesFileTypeMap;
 import javax.inject.Inject;
 
 
