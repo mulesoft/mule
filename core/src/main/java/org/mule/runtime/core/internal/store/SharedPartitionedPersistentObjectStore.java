@@ -37,7 +37,7 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
    * deploymennts, registries.
    */
   private static Map<String, PersistentObjectStorePartition> partitionsByName =
-      new ConcurrentHashMap<String, PersistentObjectStorePartition>() {
+      new ConcurrentHashMap<>() {
 
         @Override
         public PersistentObjectStorePartition put(String key, PersistentObjectStorePartition value) {
@@ -80,7 +80,8 @@ public class SharedPartitionedPersistentObjectStore<T extends Serializable> exte
     // Create a new PersistentObjectStorePartition that references to the current muleContext to deserialize an entry that was
     // added
     // by another muleContext (serialization)
-    return new PersistentObjectStorePartition<>(muleContext, partitionName, partitionObjectStore.getPartitionDirectory());
+    return new PersistentObjectStorePartition<>(muleConfiguration, serializer, partitionName,
+                                                partitionObjectStore.getPartitionDirectory());
   }
 
   @Override

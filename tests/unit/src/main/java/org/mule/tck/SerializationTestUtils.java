@@ -63,7 +63,7 @@ public abstract class SerializationTestUtils {
     return objectSerializer;
   }
 
-  private static ObjectSerializer getJavaSerializer(MuleContext muleContext) {
+  public static ObjectSerializer getJavaSerializer(MuleContext muleContext) {
     JavaObjectSerializer serializer = new JavaObjectSerializer();
     serializer.setMuleContext(muleContext);
 

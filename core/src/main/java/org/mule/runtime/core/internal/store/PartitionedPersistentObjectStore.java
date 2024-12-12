@@ -10,10 +10,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.InternalComponent;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.FileUtils;
@@ -38,7 +40,8 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   private static final Logger LOGGER = getLogger(PartitionedPersistentObjectStore.class);
   public static final String OBJECT_STORE_DIR = "objectstore";
 
-  protected MuleContext muleContext;
+  protected MuleConfiguration muleConfiguration;
+  protected ObjectSerializer serializer;
   private File storeDirectory;
   private Map<String, PersistentObjectStorePartition> partitionsByName = new HashMap<>();
   private boolean initialized = false;
@@ -47,9 +50,10 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     super();
   }
 
-  public PartitionedPersistentObjectStore(MuleContext context) {
+  public PartitionedPersistentObjectStore(MuleConfiguration muleConfiguration, ObjectSerializer serializer) {
     super();
-    muleContext = context;
+    this.muleConfiguration = muleConfiguration;
+    this.serializer = serializer;
   }
 
   protected PartitionedPersistentObjectStore(Map<String, PersistentObjectStorePartition> getPartitionsByName) {
@@ -85,7 +89,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
 
   private void createPartition(String partitionName) throws ObjectStoreException {
     PersistentObjectStorePartition persistentObjectStorePartition =
-        new PersistentObjectStorePartition(muleContext, partitionName, getNewPartitionDirectory(partitionName));
+        new PersistentObjectStorePartition(muleConfiguration, serializer, partitionName, getNewPartitionDirectory(partitionName));
     persistentObjectStorePartition.open();
     partitionsByName.putIfAbsent(partitionName, persistentObjectStorePartition);
   }
@@ -194,7 +198,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     for (File partitionDirectory : directories) {
       try {
         PersistentObjectStorePartition persistentObjectStorePartition =
-            new PersistentObjectStorePartition(muleContext, partitionDirectory);
+            new PersistentObjectStorePartition(muleConfiguration, serializer, partitionDirectory);
         persistentObjectStorePartition.open();
         partitionsByName.putIfAbsent(persistentObjectStorePartition.getPartitionName(), persistentObjectStorePartition);
       } catch (Exception e) {
@@ -206,7 +210,8 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   @Override
   @Inject
   public void setMuleContext(MuleContext context) {
-    muleContext = context;
+    muleConfiguration = context.getConfiguration();
+    serializer = context.getObjectSerializer();
   }
 
   @Override
@@ -225,7 +230,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
   }
 
   protected String getWorkingDirectory() {
-    return muleContext.getConfiguration().getWorkingDirectory();
+    return muleConfiguration.getWorkingDirectory();
   }
 
 }
