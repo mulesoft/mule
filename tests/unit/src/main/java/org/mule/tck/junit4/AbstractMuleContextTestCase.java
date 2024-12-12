@@ -360,7 +360,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return the {@link ObjectSerializer} to use on the test's {@link MuleContext}
    */
   protected ObjectSerializer getObjectSerializer() {
-    return new JavaObjectSerializer();
+    return new JavaObjectSerializer(this.getClass().getClassLoader());
   }
 
   protected ClassLoader getExecutionClassLoader() {

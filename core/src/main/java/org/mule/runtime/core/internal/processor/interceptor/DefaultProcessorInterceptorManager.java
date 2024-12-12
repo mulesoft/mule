@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.interception.FlowInterceptorFactory.FLOW_INTERCEPTORS_ORDER_REGISTRY_KEY;
 import static org.mule.runtime.api.interception.ProcessorInterceptorFactory.INTERCEPTORS_ORDER_REGISTRY_KEY;
 import static org.mule.runtime.api.interception.SourceInterceptorFactory.SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY;
 
-import org.mule.runtime.api.exception.MuleException;
+import static java.lang.Integer.MAX_VALUE;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.interception.FlowInterceptorFactory;
 import org.mule.runtime.api.interception.FlowInterceptorFactory.FlowInterceptorOrder;
@@ -24,6 +24,7 @@ import org.mule.runtime.api.interception.SourceInterceptorFactory.SourceIntercep
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 
 import java.util.ArrayList;
@@ -49,21 +50,21 @@ public class DefaultProcessorInterceptorManager implements InterceptorManager, I
   @Inject
   @Named(INTERCEPTORS_ORDER_REGISTRY_KEY)
   public void setInterceptorsOrder(Optional<ProcessorInterceptorOrder> packagesOrder) {
-    interceptorsOrder = packagesOrder.map(order -> order.get()).orElse(emptyList());
+    interceptorsOrder = packagesOrder.map(ProcessorInterceptorOrder::get).orElse(emptyList());
   }
 
   @Override
   @Inject
   @Named(FLOW_INTERCEPTORS_ORDER_REGISTRY_KEY)
   public void setFlowInterceptorsOrder(Optional<FlowInterceptorOrder> packagesOrder) {
-    flowInterceptorsOrder = packagesOrder.map(order -> order.get()).orElse(emptyList());
+    flowInterceptorsOrder = packagesOrder.map(FlowInterceptorOrder::get).orElse(emptyList());
   }
 
   @Override
   @Inject
   @Named(SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY)
   public void setSourceInterceptorsOrder(Optional<SourceInterceptorOrder> packagesOrder) {
-    sourceInterceptorsOrder = packagesOrder.map(order -> order.get()).orElse(emptyList());
+    sourceInterceptorsOrder = packagesOrder.map(SourceInterceptorOrder::get).orElse(emptyList());
   }
 
   @Override
@@ -71,14 +72,14 @@ public class DefaultProcessorInterceptorManager implements InterceptorManager, I
     interceptorFactories.forEach(interceptorFactory -> {
       try {
         context.getInjector().inject(interceptorFactory);
-      } catch (MuleException e) {
+      } catch (IllegalDependencyInjectionException e) {
         throw new MuleRuntimeException(e);
       }
     });
     sourceInterceptorFactories.forEach(interceptorFactory -> {
       try {
         context.getInjector().inject(interceptorFactory);
-      } catch (MuleException e) {
+      } catch (IllegalDependencyInjectionException e) {
         throw new MuleRuntimeException(e);
       }
     });

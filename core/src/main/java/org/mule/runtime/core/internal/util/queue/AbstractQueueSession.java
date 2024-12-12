@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueSession;
@@ -41,8 +42,8 @@ public abstract class AbstractQueueSession implements QueueSession {
     return queueProvider;
   }
 
-  protected MuleContext getMuleContext() {
-    return muleContext;
+  protected ObjectSerializer getSerializer() {
+    return muleContext.getObjectSerializer();
   }
 
   protected abstract QueueTransactionContext getTransactionalContext();

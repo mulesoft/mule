@@ -8,29 +8,21 @@ package org.mule.runtime.core.internal.serialization;
 
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.inject.Inject;
-
 /**
  * Base class for implementations of {@link SerializationProtocol} This class implements all the base behavioral contract allowing
  * its extensions to only care about the actual serialization/deserialization part.
  */
-public abstract class AbstractSerializationProtocol implements SerializationProtocol, MuleContextAware {
-
-  protected MuleContext muleContext;
+public abstract class AbstractSerializationProtocol implements SerializationProtocol {
 
   /**
    * Serializes the given object. Should not care about error handling
@@ -88,7 +80,7 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
    */
   @Override
   public <T> T deserialize(byte[] bytes) throws SerializationException {
-    return deserialize(bytes, muleContext.getExecutionClassLoader());
+    return deserialize(bytes, getExecutionClassLoader());
   }
 
   /**
@@ -106,7 +98,7 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
   @Override
   @SuppressWarnings("unchecked")
   public <T> T deserialize(InputStream inputStream) throws SerializationException {
-    return deserialize(inputStream, muleContext.getExecutionClassLoader());
+    return deserialize(inputStream, getExecutionClassLoader());
   }
 
   /**
@@ -117,7 +109,7 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
     requireNonNull(inputStream, "Cannot deserialize a null stream");
     requireNonNull(classLoader, "Cannot deserialize with a null classloader");
     try {
-      return (T) postInitialize(doDeserialize(inputStream, classLoader));
+      return (T) doDeserialize(inputStream, classLoader);
     } catch (Exception e) {
       throw new SerializationException("Could not deserialize object", e);
     } finally {
@@ -125,24 +117,6 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
     }
   }
 
-  protected <T> T postInitialize(T object) throws SerializationException {
-    if (object instanceof DeserializationPostInitialisable) {
-      try {
-        DeserializationPostInitialisable.Implementation.init(object, muleContext);
-      } catch (Exception e) {
-        throw new SerializationException(format("Could not initialize instance of %s after deserialization",
-                                                object.getClass().getName()),
-                                         e);
-      }
-    }
-
-    return object;
-  }
-
-  @Inject
-  @Override
-  public final void setMuleContext(MuleContext context) {
-    muleContext = context;
-  }
+  protected abstract ClassLoader getExecutionClassLoader();
 
 }

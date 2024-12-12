@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import static java.lang.String.format;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
 import static org.mule.runtime.core.api.util.FileUtils.cleanDirectory;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.core.internal.util.store.MuleObjectStoreManager.UNBOUNDED;
+
+import static java.lang.String.format;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.Collections.unmodifiableList;
+
+import static org.apache.commons.io.FileUtils.readFileToString;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -24,9 +26,8 @@ import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.TemplateObjectStore;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -64,7 +65,7 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersistentObjectStorePartition.class);
 
-  private final MuleContext muleContext;
+  private final MuleConfiguration muleConfiguration;
   private final ObjectSerializer serializer;
 
   private boolean loaded = false;
@@ -79,23 +80,24 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   private final Lock rLock = rwLock.readLock();
   private final Lock wLock = rwLock.writeLock();
 
-  public PersistentObjectStorePartition(MuleContext muleContext, String partitionName, File partitionDirectory) {
-    this.muleContext = muleContext;
-    serializer = muleContext.getObjectSerializer();
+  public PersistentObjectStorePartition(MuleConfiguration muleConfiguration, ObjectSerializer serializer, String partitionName,
+                                        File partitionDirectory) {
+    this.muleConfiguration = muleConfiguration;
+    this.serializer = serializer;
     this.partitionName = partitionName;
     this.partitionDirectory = partitionDirectory;
   }
 
-  public PersistentObjectStorePartition(MuleContext muleContext, File partitionDirectory)
+  public PersistentObjectStorePartition(MuleConfiguration muleConfiguration, ObjectSerializer serializer, File partitionDirectory)
       throws ObjectStoreNotAvailableException {
-    this.muleContext = muleContext;
-    serializer = muleContext.getObjectSerializer();
+    this.muleConfiguration = muleConfiguration;
+    this.serializer = serializer;
     this.partitionDirectory = partitionDirectory;
     this.partitionName = readPartitionFileName(partitionDirectory);
   }
 
   protected PersistentObjectStorePartition() {
-    muleContext = null;
+    muleConfiguration = null;
     serializer = null;
   }
 
@@ -297,11 +299,11 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
   }
 
   private void moveToCorruptedFilesFolder(File file) throws IOException {
-    Path workingDirectory = (new File(muleContext.getConfiguration().getWorkingDirectory()))
+    Path workingDirectory = (new File(muleConfiguration.getWorkingDirectory()))
         .toPath().normalize();
     Path absoluteFilePath = file.toPath();
     Path relativePath = workingDirectory.relativize(absoluteFilePath);
-    File corruptedDir = new File(muleContext.getConfiguration().getWorkingDirectory() + File.separator + CORRUPTED_FOLDER);
+    File corruptedDir = new File(muleConfiguration.getWorkingDirectory() + File.separator + CORRUPTED_FOLDER);
     if (!corruptedDir.exists()) {
       corruptedDir.mkdir();
     }
@@ -422,9 +424,6 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
         BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
         ObjectInputStream objectInputStream = new ObjectInputStream(bufferedInputStream)) {
       StoreValue<T> storedValue = serializer.getInternalProtocol().deserialize(objectInputStream);
-      if (storedValue.getValue() instanceof DeserializationPostInitialisable) {
-        DeserializationPostInitialisable.Implementation.init(storedValue.getValue(), muleContext);
-      }
       return storedValue;
     } catch (Exception e) {
       throw new ObjectStoreException(e);

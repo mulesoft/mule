@@ -158,7 +158,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
     registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager(), muleContext);
     registerObject(OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService(), muleContext);
-    registerObject(DEFAULT_OBJECT_SERIALIZER_NAME, new JavaObjectSerializer(), muleContext);
+    registerObject(DEFAULT_OBJECT_SERIALIZER_NAME, new JavaObjectSerializer(muleContext.getExecutionClassLoader()), muleContext);
 
     final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
     registerObject(ErrorTypeRepository.class.getName(), contributedErrorTypeRepository, muleContext);
