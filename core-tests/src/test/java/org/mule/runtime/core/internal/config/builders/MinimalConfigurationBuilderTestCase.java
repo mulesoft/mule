@@ -63,6 +63,7 @@ public class MinimalConfigurationBuilderTestCase extends AbstractMuleTestCase {
     when(muleContext.getRegistry()).thenReturn(registry);
     when(muleContext.getRegistryBootstrapServiceDiscoverer()).thenReturn(bootstrapServiceDiscoverer);
     when(muleContext.getCustomizationService()).thenReturn(customizationService);
+    when(muleContext.getExecutionClassLoader()).thenReturn(this.getClass().getClassLoader());
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     when(muleContext.getInjector()).thenReturn(mock(Injector.class));
