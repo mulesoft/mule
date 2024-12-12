@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
+import static org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore.OBJECT_STORE_DIR;
+
 import static java.io.File.separator;
+
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore.OBJECT_STORE_DIR;
-import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -28,10 +29,10 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.commons.io.FileUtils;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Answers;
 
 /**
  *
@@ -41,23 +42,22 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
   private static final String OBJECT_KEY = "key";
   private static final String OBJECT_BASE_VALUE = "value";
 
-  private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS);
+  private MuleConfiguration muleConfiguration;
+  private JavaObjectSerializer javaObjectSerializer;
   private PartitionedPersistentObjectStore<Serializable> os;
   private int numberOfPartitions = 3;
 
   @Before
   public void setUpMockMuleContext() throws IOException {
     numberOfPartitions = 3;
-    when(mockMuleContext.getConfiguration().getWorkingDirectory()).thenReturn(".");
-    when(mockMuleContext.getExecutionClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
-    os = new TestPartitionedPersistentObjectStore(mockMuleContext);
+    muleConfiguration = mock(MuleConfiguration.class);
+    when(muleConfiguration.getWorkingDirectory()).thenReturn(".");
+    javaObjectSerializer = new JavaObjectSerializer(this.getClass().getClassLoader());
+    os = new TestPartitionedPersistentObjectStore(muleConfiguration, javaObjectSerializer);
     File objectStorePersistDir = new File(PartitionedPersistentObjectStore.OBJECT_STORE_DIR);
     if (objectStorePersistDir.exists()) {
       FileUtils.deleteDirectory(objectStorePersistDir);
     }
-
-    addJavaSerializerToMockMuleContext(mockMuleContext);
-    when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
   }
 
   @Test
@@ -116,7 +116,8 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     os.clear(partitionName);
     os.store(key, value, partitionName);
 
-    PartitionedPersistentObjectStore newOS = new PartitionedPersistentObjectStore<>(mockMuleContext);
+    PartitionedPersistentObjectStore newOS =
+        new PartitionedPersistentObjectStore<>(muleConfiguration, javaObjectSerializer);
 
     newOS.open(partitionName);
     Serializable retrieve = newOS.retrieve(key, partitionName);
@@ -137,7 +138,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
   }
 
   private File getPartitionDirectory(String partitionName) {
-    String workingDirectory = mockMuleContext.getConfiguration().getWorkingDirectory();
+    String workingDirectory = muleConfiguration.getWorkingDirectory();
     String path = workingDirectory + separator + OBJECT_STORE_DIR + separator + partitionName;
     return new File(path);
   }
@@ -145,14 +146,6 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
   @Test
   public void allowsAnyPartitionName() throws Exception {
     os.open("asdfsadfsa#$%@#$@#$@$%$#&8ASDFWER!!");
-  }
-
-  @Test
-  public void muleContextAwareValueGetsDeserialized() throws Exception {
-    os.open();
-    os.store("key", new DeserializableValue(mockMuleContext));
-    DeserializableValue value = (DeserializableValue) os.retrieve("key");
-    assertNotNull(value.getMuleContext());
   }
 
   private void closePartitions() throws ObjectStoreException {
@@ -217,27 +210,10 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
     return "partition" + i;
   }
 
-  public static class DeserializableValue implements DeserializationPostInitialisable, Serializable {
-
-    private transient MuleContext muleContext;
-
-    public DeserializableValue(MuleContext muleContext) {
-      this.muleContext = muleContext;
-    }
-
-    public void initAfterDeserialisation(MuleContext muleContext) {
-      this.muleContext = muleContext;
-    }
-
-    public MuleContext getMuleContext() {
-      return muleContext;
-    }
-  }
-
   private static class TestPartitionedPersistentObjectStore extends PartitionedPersistentObjectStore<Serializable> {
 
-    public TestPartitionedPersistentObjectStore(MuleContext mockMuleContext) {
-      super(mockMuleContext);
+    public TestPartitionedPersistentObjectStore(MuleConfiguration muleConfiguration, ObjectSerializer serializer) {
+      super(muleConfiguration, serializer);
     }
 
     @Override
