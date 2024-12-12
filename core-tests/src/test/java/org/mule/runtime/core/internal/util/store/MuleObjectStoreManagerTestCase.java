@@ -6,29 +6,30 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Optional.of;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
-import io.qameta.allure.Issue;
+import static java.lang.Thread.currentThread;
+import static java.util.Optional.of;
+
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.PartitionableObjectStore;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.internal.store.PartitionedInMemoryObjectStore;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -38,16 +39,18 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
 
+import java.io.Serializable;
+import java.util.NoSuchElementException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.Serializable;
-import java.util.NoSuchElementException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
@@ -74,8 +77,13 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     schedulerService = new SimpleUnitTestSupportSchedulerService();
     muleContext = mock(MuleContextWithRegistry.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+    when(muleConfiguration.getWorkingDirectory()).thenReturn(tempWorkDir.getRoot().getAbsolutePath());
+    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+
+    when(muleContext.getExecutionClassLoader()).thenReturn(this.getClass().getClassLoader());
+
     Registry registry = mock(Registry.class);
-    createRegistryAndBaseStore(muleConfiguration, new JavaObjectSerializer(this.getClass().getClassLoader()), registry);
+    createRegistryAndBaseStore(muleContext, registry);
     when(muleContext.getSchedulerBaseConfig())
         .thenReturn(config().withPrefix(MuleObjectStoreManagerTestCase.class.getName() + "#" + name.getMethodName()));
 
@@ -105,6 +113,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     when(muleContext.isPrimaryPollingInstance()).thenReturn(true);
     expireDelayLatch = new CountDownLatch(1);
 
+    addJavaSerializerToMockMuleContext(muleContext);
     storeManager.initialise();
 
     storeManager.createObjectStore(TEST_PARTITION_NAME + "_1", ObjectStoreSettings.builder()
@@ -133,6 +142,7 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     when(muleContext.isPrimaryPollingInstance()).thenReturn(false);
     expireDelayLatch = new CountDownLatch(1);
 
+    addJavaSerializerToMockMuleContext(muleContext);
     storeManager.initialise();
 
     storeManager.createObjectStore(TEST_PARTITION_NAME + "_1", ObjectStoreSettings.builder()
@@ -223,6 +233,8 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
 
   private ObjectStorePartition<Serializable> createStorePartition(String partitionName, boolean isPersistent)
       throws InitialisationException {
+    addJavaSerializerToMockMuleContext(muleContext);
+
     storeManager.initialise();
 
     ObjectStorePartition<Serializable> store =
@@ -237,9 +249,9 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     return store;
   }
 
-  private void createRegistryAndBaseStore(MuleConfiguration muleConfiguration, ObjectSerializer serializer, Registry registry) {
+  private void createRegistryAndBaseStore(MuleContextWithRegistry muleContext, Registry registry) {
     when(registry.lookupByName(BASE_PERSISTENT_OBJECT_STORE_KEY))
-        .thenReturn(of(createPersistentPartitionableObjectStore(muleConfiguration, serializer)));
+        .thenReturn(of(createPersistentPartitionableObjectStore(muleContext)));
     when(registry.lookupByName(BASE_IN_MEMORY_OBJECT_STORE_KEY)).thenReturn(of(createTransientPartitionableObjectStore()));
   }
 
@@ -255,9 +267,8 @@ public class MuleObjectStoreManagerTestCase extends AbstractMuleTestCase {
     };
   }
 
-  private PartitionableObjectStore<?> createPersistentPartitionableObjectStore(MuleConfiguration muleConfiguration,
-                                                                               ObjectSerializer serializer) {
-    return new PartitionedPersistentObjectStore(muleConfiguration, serializer) {
+  private PartitionableObjectStore<?> createPersistentPartitionableObjectStore(MuleContext muleContext) {
+    return new PartitionedPersistentObjectStore(muleContext) {
 
       @Override
       public void expire(long entryTTL, int maxEntries, String partitionName) throws ObjectStoreException {
