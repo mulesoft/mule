@@ -215,11 +215,9 @@ public class DefaultFlowBuilder implements Builder {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
             flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);
 
-      exceptionListener.ifPresent(el -> {
-        if (el instanceof GlobalErrorHandler) {
-          ((GlobalErrorHandler) el).addComponentReference(DefaultComponentLocation.from(getName()));
-        }
-      });
+      if (this.getExceptionListener() instanceof GlobalErrorHandler) {
+        ((GlobalErrorHandler) this.getExceptionListener()).addComponentReference(DefaultComponentLocation.from(getName()));
+      }
     }
 
     @Override
