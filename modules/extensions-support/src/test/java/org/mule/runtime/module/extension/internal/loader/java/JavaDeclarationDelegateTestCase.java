@@ -453,13 +453,10 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     OperationDeclaration operation = getOperation(declarer.getDeclaration(), "withParameterWithMetadataKeyId");
     java.util.Optional<MetadataKeyIdModelProperty> metadataKeyIdModelProperty =
         operation.getModelProperty(MetadataKeyIdModelProperty.class);
-    if (isJavaVersionAtLeast(JAVA_17)) {
-      assertThat(metadataKeyIdModelProperty.isPresent(), is(false));
-    } else {
-      assertThat(metadataKeyIdModelProperty.isPresent(), is(true));
-      assertThat(metadataKeyIdModelProperty.get().getCategoryName().isPresent(), is(false));
-      assertThat(metadataKeyIdModelProperty.get().getParameterName(), is("someMetadataKeyId"));
-    }
+
+    assertThat(metadataKeyIdModelProperty.isPresent(), is(true));
+    assertThat(metadataKeyIdModelProperty.get().getCategoryName().isPresent(), is(false));
+    assertThat(metadataKeyIdModelProperty.get().getParameterName(), is("someMetadataKeyId"));
   }
 
   private SourceDeclaration getSourceDeclarationWithName(String sourceName) {
