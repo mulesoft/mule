@@ -12,8 +12,6 @@ import static java.io.File.pathSeparatorChar;
 import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
 
-import static org.apache.commons.lang3.JavaVersion.JAVA_11;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
@@ -22,7 +20,6 @@ import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -51,25 +48,6 @@ public final class JreExplorer {
    * @param services  will store the services defined via SPI found on the environment. Non null.
    */
   public static void exploreJdk(final Set<String> packages, Set<String> resources, List<ExportedService> services) {
-    if (isJavaVersionAtMost(JAVA_11)) {
-      List<String> jdkPaths = new ArrayList<>();
-
-      // These are present in JDK 8
-      addJdkPath(jdkPaths, "sun.boot.class.path");
-      addJdkPath(jdkPaths, "java.ext.dirs");
-
-      // These is present in JDK 9, 10, 11
-      addJdkPath(jdkPaths, "sun.boot.library.path");
-
-      if (jdkPaths.isEmpty()) {
-        LOGGER.warn("No JDK path/dir system property found. Defaulting to the whole classpath."
-            + " This may cause classloading issues in some plugins.");
-        jdkPaths.add(getProperty("java.class.path"));
-      }
-
-      explorePaths(jdkPaths, packages, resources, services);
-    }
-
     exploreJdkModules(packages);
   }
 
