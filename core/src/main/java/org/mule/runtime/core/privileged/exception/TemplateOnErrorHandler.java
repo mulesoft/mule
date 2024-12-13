@@ -624,10 +624,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         StringBuilder fullFailingComponentLocationUpToTxOwnerBuilder = new StringBuilder();
         for (FlowStackElement element : event.getFlowCallStack().getElements()) {
           String location = getFlowStackElementLocation(element);
-          // fullFailingComponentLocationUpToTxOwner = location + "/" + fullFailingComponentLocationUpToTxOwner;
           fullFailingComponentLocationUpToTxOwnerBuilder.insert(0, location + "/");
           if (location.startsWith(transactionLocation)) {
-            // Stack element of the flow containing the transaction owner is found, processing is finished
+            // Stack element of the flow containing the transaction owner found, processing is finished
             break;
           }
         }
