@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.serverNotificationManagerNotEnabled;
 
-import org.mule.runtime.core.api.MuleContext;
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 
 import java.util.function.Predicate;
 
@@ -25,27 +26,30 @@ import javax.inject.Inject;
  */
 public class DefaultNotificationListenerRegistry implements NotificationListenerRegistry {
 
-  @Inject
-  private MuleContext context;
+  private ServerNotificationManager notificationManager;
 
   @Override
   public <N extends Notification> void registerListener(NotificationListener<N> listener) {
-    requireNonNull(context.getNotificationManager(), serverNotificationManagerNotEnabled().getMessage());
-    context.getNotificationManager().addListener(listener);
+    requireNonNull(notificationManager, serverNotificationManagerNotEnabled().getMessage());
+    notificationManager.addListener(listener);
   }
 
   @Override
   public <N extends Notification> void registerListener(NotificationListener<N> listener, Predicate<N> selector) {
-    requireNonNull(context.getNotificationManager(), serverNotificationManagerNotEnabled().getMessage());
+    requireNonNull(notificationManager, serverNotificationManagerNotEnabled().getMessage());
     requireNonNull(selector);
-    context.getNotificationManager().addListenerSubscription(listener, selector);
+    notificationManager.addListenerSubscription(listener, selector);
   }
 
   @Override
   public <N extends Notification> void unregisterListener(NotificationListener<N> listener) {
-    if (context.getNotificationManager() != null) {
-      context.getNotificationManager().removeListener(listener);
+    if (notificationManager != null) {
+      notificationManager.removeListener(listener);
     }
   }
 
+  @Inject
+  public void setNotificationManager(ServerNotificationManager notificationManager) {
+    this.notificationManager = notificationManager;
+  }
 }
