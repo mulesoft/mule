@@ -116,12 +116,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
     @Override
     public void applyLifecycle(Object o) throws LifecycleException {
-      // Initialization already done when the spring context is first refreshed
-      // try {
-      // o = getMuleContext().get().getInjector().inject(o);
-      // } catch (MuleException e) {
-      // throw new LifecycleException(e, o);
-      // }
       if (o instanceof Transformer) {
         String name = ((Transformer) o).getName();
         if (isNamedBean(name)) {
