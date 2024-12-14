@@ -36,7 +36,6 @@ import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.processor.MessageProcessors;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.util.List;
 import java.util.Optional;
@@ -216,7 +215,7 @@ public class DefaultFlowBuilder implements Builder {
             flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);
 
       if (this.getExceptionListener() instanceof GlobalErrorHandler) {
-        ((GlobalErrorHandler) this.getExceptionListener()).addComponentReference(DefaultComponentLocation.from(getName()));
+        ((GlobalErrorHandler) this.getExceptionListener()).addComponentReference(getName());
       }
     }
 
