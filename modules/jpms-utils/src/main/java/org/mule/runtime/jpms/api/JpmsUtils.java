@@ -173,7 +173,7 @@ public final class JpmsUtils {
         .filter(module -> {
           final String moduleName = module.getName();
 
-          if (JAVA_MAJOR_VERSION >= 21) {
+          if (JAVA_MAJOR_VERSION >= 25) {
             return moduleName.startsWith("java.");
           } else {
             // Original intention is to only expose standard java modules...
