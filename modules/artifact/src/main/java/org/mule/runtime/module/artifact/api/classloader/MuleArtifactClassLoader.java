@@ -16,9 +16,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
-import static org.apache.commons.lang3.JavaVersion.JAVA_11;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
@@ -90,7 +88,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
                                                                             + "-?" + NO_SPACES + "?"
                                                                             // type
                                                                             + "\\." + NO_SPACES);
-  private static final boolean IS_JAVA_VERSION_AT_MOST_11 = isJavaVersionAtMost(JAVA_11);
 
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 

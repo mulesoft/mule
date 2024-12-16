@@ -8,7 +8,6 @@ package org.mule.test.module.tls;
 
 import static java.util.Collections.emptyMap;
 import static javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm;
-import static org.apache.commons.lang3.SystemUtils.IS_JAVA_1_8;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -19,7 +18,6 @@ import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
