@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ROUTER;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SUB_FLOW;
@@ -555,20 +556,24 @@ public class MessageProcessors {
             final FluxSinkRecorderToReactorSinkAdapter<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRefAdapter =
                 new FluxSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef);
 
-            final Flux<Either<MessagingException, CoreEvent>> upstream = Flux.from(eventChildCtxPub)
-                .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
-                                                                       completeParentIfEmpty, propagateErrors))
-                .transform(processor)
-                // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
-                // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
-                .map(event -> right(MessagingException.class, event));
+            final Function<Publisher<CoreEvent>, Publisher<Either<MessagingException, CoreEvent>>> upstreamTransform =
+                pub -> Flux.from(pub)
+                    .doOnNext(eventChildCtx -> childContextResponseHandler(eventChildCtx, errorSwitchSinkSinkRefAdapter,
+                                                                           completeParentIfEmpty, propagateErrors))
+                    .transform(processor)
+                    // This Either here is used to propagate errors. If the error is sent directly through the merged with Flux,
+                    // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
+                    .map(event -> right(MessagingException.class, event));
 
-            return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
-                                                        completeSuccessEitherIfNeeded(),
-                                                        errorSwitchSinkSinkRef::error,
-                                                        errorSwitchSinkSinkRef::complete)
-                                                            .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
-                                                                .andThen(MessageProcessors::toParentContext));
+            return Flux.from(subscribeFluxOnPublisherSubscription(identity(), Flux.from(eventChildCtxPub),
+                                                                  upstreamTransform,
+                                                                  completeSuccessEitherIfNeeded(),
+                                                                  errorSwitchSinkSinkRef::error,
+                                                                  errorSwitchSinkSinkRef::complete)
+                                                                      .apply(errorSwitchSinkSinkRef.flux()))
+                .map(RxUtils
+                    .<MessagingException>propagateErrorResponseMapper()
+                    .andThen(MessageProcessors::toParentContext));
           }
         });
   }
