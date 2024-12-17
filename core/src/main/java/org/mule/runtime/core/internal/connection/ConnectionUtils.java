@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connection;
 
 import static java.lang.Integer.MAX_VALUE;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -53,7 +54,7 @@ public final class ConnectionUtils {
    */
   public static <C> C connect(ConnectionProvider<C> delegate) throws ConnectionException {
     try {
-      return delegate.connect();
+      return requireNonNull(delegate.connect(), delegate.getClass().getName() + "#connect() returned null.");
     } catch (ConnectionException ce) {
       throw ce;
     } catch (Exception e) {

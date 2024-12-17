@@ -6,34 +6,37 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.mockito.Mockito.spy;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.Injector;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
-public class DefaultConnectionProviderWrapperTestCase extends AbstractMuleContextTestCase {
+public class DefaultConnectionProviderWrapperTestCase extends AbstractMuleTestCase {
 
   private static final String ERROR_MESSAGE = "BOOM ><";
 
   @Rule
-  public ExpectedException exception = ExpectedException.none();
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private ConnectionProvider<Object> connectionProvider;
@@ -48,10 +51,8 @@ public class DefaultConnectionProviderWrapperTestCase extends AbstractMuleContex
 
   @Before
   public void before() throws Exception {
-    muleContext = spy(muleContext);
-    when(muleContext.getInjector()).thenReturn(injector);
     when(connectionProvider.connect()).thenReturn(connection);
-    wrapper = new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext);
+    wrapper = new DefaultConnectionProviderWrapper<>(connectionProvider, injector);
   }
 
   @Test
@@ -70,11 +71,10 @@ public class DefaultConnectionProviderWrapperTestCase extends AbstractMuleContex
 
   @Test
   public void alwaysThrowConnectionException() throws ConnectionException {
-    exception.expect(ConnectionException.class);
-    exception.expectCause(instanceOf(NullPointerException.class));
-    exception.expectMessage(ERROR_MESSAGE);
-    wrapper = new DefaultConnectionProviderWrapper(new TestProvider(), muleContext);
-    wrapper.connect();
+    wrapper = new DefaultConnectionProviderWrapper(new TestProvider(), injector);
+    var thrown = assertThrows(ConnectionException.class, () -> wrapper.connect());
+    assertThat(thrown.getCause(), instanceOf(NullPointerException.class));
+    assertThat(thrown.getMessage(), containsString(ERROR_MESSAGE));
   }
 
   private class TestProvider implements ConnectionProvider {
