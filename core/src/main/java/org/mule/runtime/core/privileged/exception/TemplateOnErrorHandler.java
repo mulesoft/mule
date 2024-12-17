@@ -210,12 +210,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   @Override
-  public synchronized void initialise() throws InitialisationException {
-    this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
-    super.initialise();
-  }
-
-  @Override
   public Consumer<Exception> router(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> publisherPostProcessor,
                                     Consumer<CoreEvent> continueCallback,
                                     Consumer<Throwable> propagateCallback) {
@@ -355,6 +349,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
+    this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
     this.location = this.getLocation();
     Optional<ProcessingStrategy> processingStrategy;
     if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
