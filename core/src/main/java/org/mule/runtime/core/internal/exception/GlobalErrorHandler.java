@@ -126,4 +126,16 @@ public class GlobalErrorHandler extends ErrorHandler {
             .addGlobalErrorHandlerComponentReference(location));
   }
 
+  /**
+   * Keeps track of all the top level components referencing this global error handler.
+   *
+   * @param name name of the top level component referencing this global error handler.
+   */
+  public void addComponentReference(String name) {
+    this.getExceptionListeners().stream()
+        .filter(TemplateOnErrorHandler.class::isInstance)
+        .forEach(exceptionListener -> ((TemplateOnErrorHandler) exceptionListener)
+            .addGlobalErrorHandlerComponentReference(name));
+  }
+
 }
