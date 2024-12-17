@@ -10,11 +10,13 @@ import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.c
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
 import static org.mule.runtime.core.internal.util.LocationUtils.globalLocation;
@@ -30,6 +32,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -40,12 +43,16 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
@@ -56,6 +63,7 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
+import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.transaction.TransactionAdapter;
@@ -80,7 +88,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -114,6 +121,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Inject
   private InternalProfilingService profilingService;
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> rollbackProducer;
 
   @Inject
   private ComponentTracerFactory<CoreEvent> componentTracerFactory;
@@ -129,7 +137,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private String errorHandlerLocation;
   private boolean isLocalErrorHandlerLocation;
   private final Set<String> componentsReferencingGlobalErrorHandler = new HashSet<>();
-  private final Map<String, Integer> failingComponentHandled = new HashMap<>();
+  private final Map<String, FailingComponentHandle> failingComponentHandled = new HashMap<>();
 
   private Optional<ProcessingStrategy> ownedProcessingStrategy;
 
@@ -145,6 +153,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   public void addGlobalErrorHandlerComponentReference(ComponentLocation location) {
     componentsReferencingGlobalErrorHandler.add(location.getLocation());
+  }
+
+  public void addGlobalErrorHandlerComponentReference(String name) {
+    componentsReferencingGlobalErrorHandler.add(name);
   }
 
   private final class OnErrorHandlerFluxObjectFactory
@@ -220,6 +232,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   public synchronized void initialise() throws InitialisationException {
     componentTracer = componentTracerFactory.fromComponent(TemplateOnErrorHandler.this);
     errorMetrics = errorMetricsFactory.create(meterProvider.getMeterBuilder(MULE_RUNTIME_ERROR_METRICS).build());
+    this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
     super.initialise();
   }
 
@@ -270,11 +283,21 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   private BiConsumer<Throwable, Object> onRoutingError() {
-    return (me, event) -> {
+    return (me, obj) -> {
       try {
         logger.error("Exception during exception strategy execution");
         getExceptionListener().resolveAndLogException(me);
-        if (isOwnedTransaction(getException((CoreEvent) event))) {
+        boolean rollback = false;
+        if (obj instanceof CoreEvent) {
+          rollback = isOwnedTransaction((CoreEvent) obj, getException((CoreEvent) obj));
+        } else if (obj instanceof Either) {
+          if (((Either) obj).getLeft() instanceof MessagingException) {
+            MessagingException exception = (MessagingException) ((Either) obj).getLeft();
+            rollback = isOwnedTransaction(exception.getEvent(), exception);
+          }
+        }
+        if (rollback) {
+          profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
@@ -555,16 +578,27 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
    */
   public abstract TemplateOnErrorHandler duplicateFor(ComponentLocation location);
 
-  private boolean isTransactionInGlobalErrorHandler(TransactionAdapter transaction) {
-    String transactionLocation = transaction.getComponentLocation().get().getLocation();
-    return flowLocation.filter(transactionLocation::equals).isPresent();
+  private static class FailingComponentHandle {
+
+    private final int timesToHandleBeforeReachingTxOwner;
+    private int timesHandled;
+
+    FailingComponentHandle(int timesToHandleBeforeReachingTxOwner) {
+      this.timesToHandleBeforeReachingTxOwner = timesToHandleBeforeReachingTxOwner;
+      timesHandled = 1;
+    }
+
+    boolean isHandled() {
+      return timesHandled == timesToHandleBeforeReachingTxOwner;
+    }
+
+    void handle() {
+      timesHandled++;
+    }
+
   }
 
-  protected boolean isOwnedTransaction() {
-    return isOwnedTransaction(null);
-  }
-
-  protected boolean isOwnedTransaction(Exception exception) {
+  protected boolean isOwnedTransaction(CoreEvent event, Exception exception) {
     Transaction transaction = TransactionCoordination.getInstance().getTransaction();
     if (transaction == null || !(transaction instanceof TransactionAdapter)
         || !((TransactionAdapter) transaction).getComponentLocation().isPresent()) {
@@ -579,47 +613,90 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     }
 
     if (fromGlobalErrorHandler && exception != null) {
-      String transactionLocation = txAdapter.getComponentLocation().get().getLocation();
-      if (transactionLocation.endsWith("/source")) {
+      String tempTransactionLocation = txAdapter.getComponentLocation().get().getLocation();
+      if (tempTransactionLocation.endsWith("/source")) {
         // Set the flow as the location, as flows are the owners of transactions started by sources
-        transactionLocation = transactionLocation.substring(0, transactionLocation.lastIndexOf('/'));
+        tempTransactionLocation = tempTransactionLocation.substring(0, tempTransactionLocation.lastIndexOf('/'));
       }
-
-      String failingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
+      final String transactionLocation = tempTransactionLocation;
 
       if (!componentsReferencingGlobalErrorHandler.contains(transactionLocation)) {
         return false;
       }
 
-      // TODO W-17239370 - there is a corner case when the failing component is within a component that references this handler
-      // and within a subflow, and the transaction owner also references this handler and is outside of the subflow. In that case
-      // we can't properly determine in which execution of this handler the transaction should be rolled back, and it gets rolled
-      // back prematurely in the first execution.
-      String finalTransactionLocation = transactionLocation;
-      Set<String> referencesContainingFailingComponentUpToTxOwner =
-          componentsReferencingGlobalErrorHandler.stream().filter(c -> c.startsWith(finalTransactionLocation))
-              .filter(failingComponentLocation::startsWith).collect(Collectors.toSet());
-      if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
-        // The failing component is nested within more than one component that reference this handler:
-        // transactionOwnerWithThisHandler-componentWithThisHandler-...-failingComponent
-        int timesToHandleBeforeReachingTxOwner = referencesContainingFailingComponentUpToTxOwner.size() - 1;
-        Integer timesHandled = failingComponentHandled.putIfAbsent(failingComponentLocation, 1);
-        if (timesHandled != null) {
-          if (timesHandled < timesToHandleBeforeReachingTxOwner) {
-            failingComponentHandled.put(failingComponentLocation, timesHandled + 1);
-          } else {
-            failingComponentHandled.remove(failingComponentLocation);
-            return true;
-          }
+      String localFailingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
+      String failingComponentHandledKey = transactionLocation + localFailingComponentLocation;
+      FailingComponentHandle failingComponentHandle = null;
+      if (failingComponentHandled.get(failingComponentHandledKey) != null) {
+        if (getFlowStackElementLocation(event.getFlowCallStack().peek()).endsWith(localFailingComponentLocation)) {
+          // There was an on-error-continue in the middle of the global on-error-propagate handlers, process handle logic from
+          // scratch
+          failingComponentHandled.remove(failingComponentHandledKey);
+        } else {
+          failingComponentHandle = failingComponentHandled.get(failingComponentHandledKey);
+        }
+      }
+
+      if (failingComponentHandle != null) {
+        failingComponentHandle.handle();
+        if (failingComponentHandle.isHandled()) {
+          failingComponentHandled.remove(failingComponentHandledKey);
+          return true;
         }
 
         return false;
-      }
+      } else {
+        StringBuilder fullFailingComponentLocationUpToTxOwnerBuilder = new StringBuilder();
+        for (FlowStackElement element : event.getFlowCallStack().getElements()) {
+          String location = getFlowStackElementLocation(element);
+          fullFailingComponentLocationUpToTxOwnerBuilder.insert(0, location + "/");
+          if (location.startsWith(transactionLocation)) {
+            // Stack element of the flow containing the transaction owner found, processing is finished
+            break;
+          }
+        }
+        String fullFailingComponentLocationUpToTxOwner = fullFailingComponentLocationUpToTxOwnerBuilder.toString();
 
-      return true;
+        String transactionOwnerFlow = getFlow(transactionLocation);
+        Set<String> referencesContainingFailingComponentUpToTxOwner =
+            componentsReferencingGlobalErrorHandler.stream().map(this::normalizeRef)
+                .filter(fullFailingComponentLocationUpToTxOwner::contains)
+                .filter(ref -> !getFlow(ref).equals(transactionOwnerFlow) || ref.startsWith(transactionLocation))
+                .collect(toSet());
+        if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
+          // The failing component is nested within more than one component that reference this handler:
+          // transactionOwnerWithThisHandler-componentWithThisHandler-...-failingComponent
+          failingComponentHandled.put(failingComponentHandledKey,
+                                      new FailingComponentHandle(referencesContainingFailingComponentUpToTxOwner.size()));
+
+          return false;
+        }
+
+        return true;
+      }
     }
 
     return isOwnedTransactionByLocalErrorHandler(txAdapter);
+  }
+
+  private String getFlowStackElementLocation(FlowStackElement element) {
+    return element.getProcessorPath().split("@")[0].trim();
+  }
+
+  /**
+   * @param location location from which to extract the {@link java.util.concurrent.Flow} location.
+   * @return the {@link java.util.concurrent.Flow} part of the given {@code location}.
+   */
+  private String getFlow(String location) {
+    return location.substring(0, location.indexOf('/') + 1);
+  }
+
+  /**
+   * @param reference component reference to {@link GlobalErrorHandler} to normalize.
+   * @return normalized component reference.
+   */
+  private String normalizeRef(String reference) {
+    return reference.endsWith("/") ? reference : reference + "/";
   }
 
   private boolean isOwnedTransactionByLocalErrorHandler(TransactionAdapter transaction) {
