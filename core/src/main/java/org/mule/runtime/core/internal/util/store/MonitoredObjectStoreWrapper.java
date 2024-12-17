@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
+
 import static java.lang.System.currentTimeMillis;
 import static java.util.Comparator.comparing;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
 
-import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -29,7 +28,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 import java.util.List;
@@ -235,7 +233,8 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     }
 
     if (expirationInterval <= 0) {
-      throw new IllegalArgumentException(propertyHasInvalidValue("expirationInterval", new Long(expirationInterval)).toString());
+      throw new IllegalArgumentException(propertyHasInvalidValue("expirationInterval", Long.valueOf(expirationInterval))
+          .toString());
     }
 
     if (scheduler == null) {
@@ -245,7 +244,7 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
     }
   }
 
-  public static class StoredObject<T> implements Serializable, DeserializationPostInitialisable {
+  public static class StoredObject<T> implements Serializable {
 
     private static final long serialVersionUID = 8656763235928199259L;
     final private T item;
@@ -271,23 +270,6 @@ public class MonitoredObjectStoreWrapper<T extends Serializable> extends Templat
       return key;
     }
 
-    /**
-     * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
-     * This will get invoked after the object has been deserialized passing in the current MuleContext.
-     *
-     * @param muleContext the current muleContext instance
-     * @throws MuleException if there is an error initializing
-     */
-    @SuppressWarnings({"unused"})
-    private void initAfterDeserialisation(MuleContext muleContext) throws MuleException {
-      if (item instanceof DeserializationPostInitialisable) {
-        try {
-          DeserializationPostInitialisable.Implementation.init(item, muleContext);
-        } catch (Exception e) {
-          throw new DefaultMuleException(e);
-        }
-      }
-    }
   }
 
 }

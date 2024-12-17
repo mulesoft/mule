@@ -360,7 +360,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return the {@link ObjectSerializer} to use on the test's {@link MuleContext}
    */
   protected ObjectSerializer getObjectSerializer() {
-    return new JavaObjectSerializer();
+    return new JavaObjectSerializer(this.getClass().getClassLoader());
   }
 
   protected ClassLoader getExecutionClassLoader() {
@@ -503,7 +503,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
       return;
     }
 
-    Set<String> schedulersOnInitNames = schedulersOnInit.stream().map(s -> s.getName()).collect(toSet());
+    Set<String> schedulersOnInitNames = schedulersOnInit.stream().map(SchedulerView::getName).collect(toSet());
     schedulersOnInit = emptyList();
     try {
       assertThat(muleContext.getSchedulerService().getSchedulers().stream()

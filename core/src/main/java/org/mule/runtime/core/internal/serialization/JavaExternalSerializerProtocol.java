@@ -7,9 +7,10 @@
 package org.mule.runtime.core.internal.serialization;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
 import static java.util.Objects.requireNonNull;
+
+import static org.apache.commons.io.IOUtils.toByteArray;
 
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.serialization.SerializationProtocol;
@@ -26,6 +27,12 @@ import java.io.Serializable;
  * will come from serializing objects that do not implement {@link Serializable}
  */
 public class JavaExternalSerializerProtocol extends AbstractSerializationProtocol {
+
+  private final ClassLoader executionClassLoader;
+
+  public JavaExternalSerializerProtocol(ClassLoader executionClassLoader) {
+    this.executionClassLoader = requireNonNull(executionClassLoader);
+  }
 
   /**
    * {@inheritDoc}
@@ -71,13 +78,7 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
     requireNonNull(inputStream, "Cannot deserialize a null stream");
     requireNonNull(classLoader, "Cannot deserialize with a null classloader");
 
-    return (T) SerializationUtils.deserialize(inputStream, classLoader, muleContext);
-  }
-
-  @Override
-  protected <T> T postInitialize(T object) {
-    // does nothing since SerializationUtils already does this on its own
-    return object;
+    return (T) SerializationUtils.deserialize(inputStream, classLoader);
   }
 
   private void validateForSerialization(Object object) {
@@ -85,5 +86,10 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
       throw new SerializationException(String.format("Was expecting a Serializable type. %s was found instead",
                                                      object.getClass().getName()));
     }
+  }
+
+  @Override
+  protected ClassLoader getExecutionClassLoader() {
+    return executionClassLoader;
   }
 }
