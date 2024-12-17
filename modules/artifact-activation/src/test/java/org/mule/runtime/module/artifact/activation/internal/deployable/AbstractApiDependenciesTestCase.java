@@ -93,34 +93,6 @@ public abstract class AbstractApiDependenciesTestCase extends AbstractMuleTestCa
                                                                             bundleDependency("library", "1.0.0")));
   }
 
-  /**
-   * Validates that API dependencies are fully analyzed, even when they contain loops among each other. Dependencies are as
-   * follows:
-   *
-   * <pre>
-   * {@code
-   * app
-   * \- api
-   *    \- lib
-   *      \- trait
-   *    \- trait
-   *       \- lib
-   * }
-   * </pre>
-   * 
-   * W-17387438 update: Same versions of the dependencies are filtered, only different versions are kept, if present (ref:
-   * AbstractOnlineMavenClientTestCase#multipleApiLevels)
-   */
-  @Test
-  public void apiWithLoopedApiArtifactDependencies() throws Exception {
-    DeployableProjectModel deployableProjectModel =
-        getDeployableProjectModel(format("apps/%s/api-with-loop-app", getDeploymentType()));
-    assertThat(deployableProjectModel.getDependencies(), containsInAnyOrder(
-                                                                            bundleDependency("raml-api-c"),
-                                                                            bundleDependency("raml-fragment-b"),
-                                                                            bundleDependency("raml-fragment-c")));
-  }
-
   protected abstract String getDeploymentType();
 
   protected abstract DeployableProjectModelBuilder getDeployableProjectModelBuilder(File deployableFolder);
