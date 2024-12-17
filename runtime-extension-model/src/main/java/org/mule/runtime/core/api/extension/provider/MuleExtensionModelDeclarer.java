@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
@@ -76,17 +74,17 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SERIALIZER;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.MULE_ABSTRACT_RECONNECTION_STRATEGY_QNAME;
 import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoErrorMapping;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.ERROR_HANDLER;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.FLOW;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.OBJECT_STORE;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.ON_ERROR;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.SERIALIZER;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.SUB_FLOW;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -138,7 +136,7 @@ import org.mule.runtime.extension.api.property.NoRedeliveryPolicyModelProperty;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
-import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
+import org.mule.sdk.api.stereotype.MuleStereotypes;
 
 import java.util.Map;
 

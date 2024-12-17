@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.config;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENCODING_SYSTEM_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
@@ -29,9 +28,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -39,7 +36,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.FatalException;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -47,7 +43,6 @@ import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.NetworkUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,8 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 
@@ -69,7 +62,7 @@ import org.slf4j.Logger;
  * MULE-13121 Cleanup MuleConfiguration removing redundant config in Mule 4
  */
 @NoExtend
-public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent, Initialisable {
+public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
 
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
@@ -206,12 +199,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    * @since 4.5.0
    */
   private ArtifactCoordinates artifactCoordinates;
-
-  /**
-   * Mule Registry to initialize this configuration
-   */
-  @Inject
-  private Registry registry;
 
   private DynamicConfigExpiration dynamicConfigExpiration =
       DynamicConfigExpiration.getDefault();
@@ -859,26 +846,4 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     return true;
   }
 
-  @Override
-  public void initialise() throws InitialisationException {
-    initialiseAndValidateDefaultErrorHandler();
-  }
-
-  private void initialiseAndValidateDefaultErrorHandler() throws InitialisationException {
-    String defaultErrorHandler = getDefaultErrorHandlerName();
-    if (defaultErrorHandler != null) {
-      FlowExceptionHandler messagingExceptionHandler = registry.<FlowExceptionHandler>lookupByName(defaultErrorHandler)
-          .orElseThrow(() -> new InitialisationException(createStaticMessage(format("No global error handler defined with name '%s'.",
-                                                                                    defaultErrorHandler)),
-                                                         this));
-      if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {
-        MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =
-            (MessagingExceptionHandlerAcceptor) messagingExceptionHandler;
-        if (!messagingExceptionHandlerAcceptor.acceptsAll()) {
-          throw new InitialisationException(createStaticMessage("Default exception strategy must not have expression attribute. It must accept any message."),
-                                            this);
-        }
-      }
-    }
-  }
 }
