@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
 
 /**
@@ -28,7 +30,8 @@ public final class InjectionUtils {
    */
   public static <T> T getInjectionTarget(T target) {
     while (target instanceof InjectionTargetDecorator) {
-      target = ((InjectionTargetDecorator<T>) target).getDelegate();
+      target = requireNonNull(((InjectionTargetDecorator<T>) target).getDelegate(),
+                              "`delegate` of " + target.toString() + " is `null`");
     }
 
     return target;

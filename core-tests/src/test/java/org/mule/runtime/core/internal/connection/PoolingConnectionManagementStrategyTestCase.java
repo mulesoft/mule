@@ -24,8 +24,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,7 +53,6 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import io.qameta.allure.Issue;
 import org.slf4j.LoggerFactory;
 
 import org.junit.After;
@@ -63,6 +62,8 @@ import org.junit.Test;
 
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Issue;
 
 public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase {
 
@@ -252,7 +253,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   public void initializationDoesNotFailWhenEncounteringConnectionException() throws ConnectionException {
     ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenReturn(new Object()).thenThrow(ConnectionException.class).thenReturn(new Object());
-    this.connectionProvider = spy(new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext));
+    this.connectionProvider = spy(new DefaultConnectionProviderWrapper<>(connectionProvider, injector));
     poolingProfile = new PoolingProfile(3, -1, DEFAULT_MAX_POOL_WAIT, DEFAULT_POOL_EXHAUSTED_ACTION, INITIALISE_ALL);
     initStrategy();
     verifyConnections(3);
@@ -337,7 +338,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
     when(connectionProvider.validate(any())).thenReturn(ConnectionValidationResult.success());
-    this.connectionProvider = spy(new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext));
+    this.connectionProvider = spy(new DefaultConnectionProviderWrapper<>(connectionProvider, injector));
   }
 
   private void initStrategy() {

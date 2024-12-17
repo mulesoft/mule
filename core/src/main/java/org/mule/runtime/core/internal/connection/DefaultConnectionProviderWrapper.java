@@ -14,7 +14,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 
@@ -28,17 +28,17 @@ import java.util.Optional;
  */
 public class DefaultConnectionProviderWrapper<C> extends AbstractConnectionProviderWrapper<C> {
 
-  private final MuleContext muleContext;
+  private final Injector injector;
 
   /**
    * Creates a new instance
    *
-   * @param delegate    the {@link ConnectionProvider} to be wrapped
-   * @param muleContext the owning {@link MuleContext}
+   * @param delegate the {@link ConnectionProvider} to be wrapped
+   * @param injector the owning context injector
    */
-  public DefaultConnectionProviderWrapper(ConnectionProvider<C> delegate, MuleContext muleContext) {
+  public DefaultConnectionProviderWrapper(ConnectionProvider<C> delegate, Injector injector) {
     super(delegate);
-    this.muleContext = muleContext;
+    this.injector = injector;
   }
 
   /**
@@ -52,7 +52,7 @@ public class DefaultConnectionProviderWrapper<C> extends AbstractConnectionProvi
   public C connect() throws ConnectionException {
     C connection = super.connect();
     try {
-      muleContext.getInjector().inject(connection);
+      injector.inject(connection);
     } catch (MuleException e) {
       throw new ConnectionException("Could not initialise connection", e);
     }
