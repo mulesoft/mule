@@ -1,4 +1,18 @@
-{ 
+{
+  "4.6.11": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::addGlobalErrorHandlerComponentReference(org.mule.runtime.api.component.location.ComponentLocation)",
+            "justification": "W-12671835: Fix transaction ownership in global error handling"
+          }
+        ]
+      }
+    }
+  },
   "4.6.10": {
     "revapi": {
       "differences": {
