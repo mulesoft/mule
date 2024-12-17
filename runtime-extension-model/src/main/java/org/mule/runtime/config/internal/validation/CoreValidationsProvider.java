@@ -82,10 +82,12 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new ErrorHandlerOnErrorTypeNonPropertyValue(),
                                                           new ErrorHandlerOnErrorTypeExists(featureFlaggingService,
                                                                                             ignoreParamsWithProperties),
+                                                          new DefaultErrorHandlerPointsToExistingErrorHandler(ignoreParamsWithProperties),
                                                           // --
 
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
+                                                          new DefaultObjectSerializerPointsToExistingSerializer(ignoreParamsWithProperties),
                                                           new NumberParameterWithinRange(ignoreParamsWithProperties),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
                                                           new ExpressionsInRequiredExpressionsParamsNonPropertyValue(),
