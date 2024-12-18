@@ -173,14 +173,15 @@ public final class JpmsUtils {
         .filter(module -> {
           final String moduleName = module.getName();
 
-          // Original intention is to only expose standard java modules...
-          return moduleName.startsWith("java.")
-              // TODO W-16374984:
-              // ... but because we need to keep compatibility with Java 8, older versions of some libraries use internal JDK
-              // modules packages:
-              // * caffeine 2.x still uses sun.misc.Unsafe. Ref: https://github.com/ben-manes/caffeine/issues/273
-              // * obgenesis SunReflectionFactoryHelper, used by Mockito
-              || moduleName.startsWith("jdk.");
+          if (JAVA_MAJOR_VERSION >= 25) {
+            return moduleName.startsWith("java.");
+          } else {
+            // Original intention is to only expose standard java modules...
+            return moduleName.startsWith("java.")
+                // ... however, the DB and SOAP Engine connectors, along with DataWeave, rely on an outdated version
+                // of Caffeine (2.x) which introduces a dependency on sun.misc.unsafe, requiring jdk.* modules to be accessible.
+                || moduleName.startsWith("jdk.");
+          }
         })
         .forEach(module -> packages.addAll(module.getPackages()));
   }
