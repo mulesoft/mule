@@ -6,14 +6,18 @@
  */
 package org.mule.functional.util.http;
 
+import static java.util.Collections.list;
+
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.util.IOUtils;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.sun.net.httpserver.HttpExchange;
 
-import java.util.Set;
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class HttpMessage {
 
@@ -22,15 +26,17 @@ public class HttpMessage {
   private MultiMap queryParams;
   private Multimap<String, String> headers = ImmutableMultimap.<String, String>builder().build();
 
-  public HttpMessage(HttpExchange httpExchange) {
-    this.body = IOUtils.toByteArray(httpExchange.getRequestBody());
+  public HttpMessage(HttpServletRequest request) throws IOException {
+    this.body = IOUtils.toByteArray(request.getInputStream());
     ImmutableMultimap.Builder<String, String> headersBuilder = ImmutableMultimap.builder();
-    Set<String> headerNames = httpExchange.getRequestHeaders().keySet();
-    headerNames.stream()
-        .forEach(headerName -> headersBuilder.putAll(headerName, httpExchange.getRequestHeaders().get(headerName)));
+    Enumeration<String> headerNames = request.getHeaderNames();
+    while (headerNames.hasMoreElements()) {
+      String headerName = headerNames.nextElement();
+      headersBuilder.putAll(headerName, list(request.getHeaders(headerName)));
+    }
     this.headers = headersBuilder.build();
-    uri = httpExchange.getRequestURI().getPath();
-    queryParams = queryToMap(httpExchange.getRequestURI().getQuery());
+    uri = request.getRequestURI();
+    queryParams = queryToMap(request.getQueryString());
   }
 
   public byte[] getBody() {
