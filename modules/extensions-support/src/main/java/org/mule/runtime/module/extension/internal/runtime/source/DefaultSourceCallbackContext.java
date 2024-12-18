@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
+import static org.slf4j.LoggerFactory.getLogger;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -35,6 +36,7 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.NullTransa
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
+import org.slf4j.Logger;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +52,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
 
   private static final TransactionHandle NULL_TRANSACTION_HANDLE = new NullTransactionHandle();
   private static final TransactionHandle DEFAULT_TRANSACTION_HANDLE = new DefaultTransactionHandle();
+  private static final Logger LOGGER = getLogger(DefaultSourceCallbackContext.class);
 
   private final SourceCallbackAdapter sourceCallback;
   private final Map<String, Object> variables = new SmallMap<>();
@@ -105,6 +108,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
         transactionHandle = DEFAULT_TRANSACTION_HANDLE;
       }
     } catch (Exception e) {
+      LOGGER.warn("Connection could not be bound", e);
       releaseConnection();
       throw e;
     }

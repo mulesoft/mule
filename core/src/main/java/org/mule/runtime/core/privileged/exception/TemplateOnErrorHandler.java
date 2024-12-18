@@ -14,11 +14,14 @@ import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_GLOBAL_ERROR_HANDLER_IMPROVEMENTS_PROPERTY;
 import static org.mule.runtime.core.api.exception.WildcardErrorTypeMatcher.WILDCARD_TOKEN;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+
+import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
 import static org.mule.runtime.core.internal.util.LocationUtils.globalLocation;
@@ -52,12 +55,16 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
+import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.DisjunctiveErrorTypeMatcher;
@@ -121,6 +128,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Inject
   private ConfigurationProperties configurationProperties;
+
+  @Inject
+  private ProfilingService profilingService;
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> rollbackProducer;
 
   protected Optional<String> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
@@ -239,11 +250,21 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
   private BiConsumer<Throwable, Object> onRoutingError() {
-    return (me, event) -> {
+    return (me, obj) -> {
       try {
         logger.error("Exception during exception strategy execution");
         resolveAndLogException(me);
-        if (isOwnedTransaction(getException((CoreEvent) event))) {
+        boolean rollback = false;
+        if (obj instanceof CoreEvent) {
+          rollback = isOwnedTransaction(getException((CoreEvent) obj));
+        } else if (obj instanceof Either) {
+          if (((Either) obj).getLeft() instanceof MessagingException) {
+            MessagingException exception = (MessagingException) ((Either) obj).getLeft();
+            rollback = isOwnedTransaction(exception);
+          }
+        }
+        if (rollback) {
+          profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
@@ -328,6 +349,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   protected void doInitialise() throws InitialisationException {
     super.doInitialise();
+    this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
     this.location = this.getLocation();
     Optional<ProcessingStrategy> processingStrategy;
     if (fromGlobalErrorHandler && reuseGlobalErrorHandler()) {
