@@ -6,32 +6,27 @@
  */
 package org.mule.runtime.module.artifact.api.serializer;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lifecycle.Initialisable;
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.serialization.JavaExternalSerializerProtocol;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.protocol.CustomJavaSerializationProtocol;
 
 @NoInstantiate
-public final class ArtifactObjectSerializer implements ObjectSerializer, Initialisable, MuleContextAware {
+public final class ArtifactObjectSerializer implements ObjectSerializer {
 
   private volatile JavaExternalSerializerProtocol javaExternalSerializerProtocol;
   private volatile CustomJavaSerializationProtocol javaInternalSerializerProtocol;
-  private MuleContext muleContext;
 
-  public ArtifactObjectSerializer(ClassLoaderRepository classLoaderRepository) {
-    checkArgument(classLoaderRepository != null, "ClassLoaderRepository cannot be null");
+  public ArtifactObjectSerializer(ClassLoaderRepository classLoaderRepository, ClassLoader executionClassLoader) {
+    requireNonNull(classLoaderRepository, "ClassLoaderRepository cannot be null");
+    requireNonNull(executionClassLoader, "executionClassLoader cannot be null");
 
-    javaExternalSerializerProtocol = new JavaExternalSerializerProtocol();
-    javaInternalSerializerProtocol = new CustomJavaSerializationProtocol(classLoaderRepository);
+    javaExternalSerializerProtocol = new JavaExternalSerializerProtocol(executionClassLoader);
+    javaInternalSerializerProtocol = new CustomJavaSerializationProtocol(classLoaderRepository, executionClassLoader);
   }
 
   @Override
@@ -44,20 +39,4 @@ public final class ArtifactObjectSerializer implements ObjectSerializer, Initial
     return javaExternalSerializerProtocol;
   }
 
-  @Override
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
-    javaExternalSerializerProtocol.setMuleContext(context);
-    javaInternalSerializerProtocol.setMuleContext(context);
-  }
-
-  @Override
-  public void initialise() throws InitialisationException {
-    try {
-      muleContext.getInjector().inject(javaInternalSerializerProtocol);
-      muleContext.getInjector().inject(javaExternalSerializerProtocol);
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
-  }
 }

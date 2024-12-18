@@ -36,6 +36,7 @@ import java.io.Serializable;
 public class CustomJavaSerializationProtocol extends AbstractSerializationProtocol {
 
   private final ClassLoaderRepository classLoaderRepository;
+  private final ClassLoader executionClassLoader;
 
   /**
    * Creates a new serialization protocol to serialize/deserialize classes provided by any class loader defined in the provided
@@ -44,9 +45,12 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    *
    */
-  public CustomJavaSerializationProtocol(ClassLoaderRepository classLoaderRepository) {
+  public CustomJavaSerializationProtocol(ClassLoaderRepository classLoaderRepository, ClassLoader executionClassLoader) {
     requireNonNull(classLoaderRepository, "artifactClassLoaderRepository cannot be null");
+    requireNonNull(executionClassLoader, "executionClassLoader cannot be null");
+
     this.classLoaderRepository = classLoaderRepository;
+    this.executionClassLoader = executionClassLoader;
   }
 
   /**
@@ -95,5 +99,10 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
       throw new SerializationException(format("Was expecting a Serializable type. %s was found instead",
                                               object.getClass().getName()));
     }
+  }
+
+  @Override
+  public ClassLoader getExecutionClassLoader() {
+    return executionClassLoader;
   }
 }

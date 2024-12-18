@@ -129,7 +129,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
   @Override
   protected ObjectSerializer getObjectSerializer() {
-    return new ArtifactObjectSerializer(classLoaderRepository);
+    return new ArtifactObjectSerializer(classLoaderRepository, this.getClass().getClassLoader());
   }
 
   /**
