@@ -1,4 +1,18 @@
 {
+  "4.8.3": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::addGlobalErrorHandlerComponentReference(java.lang.String)",
+            "justification": "W-17239370: Transactions prematurely rolled back"
+          }
+        ]
+      }
+    }
+  },
   "4.8.2": {
     "revapi": {
       "differences": {
