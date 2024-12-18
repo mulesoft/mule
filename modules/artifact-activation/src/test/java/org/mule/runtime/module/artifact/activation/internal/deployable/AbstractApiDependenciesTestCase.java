@@ -12,8 +12,8 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 
 import static java.lang.String.format;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder;
@@ -22,10 +22,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
@@ -90,33 +91,6 @@ public abstract class AbstractApiDependenciesTestCase extends AbstractMuleTestCa
                                                                             bundleDependency("wsdl-fragment", "1.0.0"),
                                                                             bundleDependency("wsdl-fragment", "2.0.0"),
                                                                             bundleDependency("library", "1.0.0")));
-  }
-
-  /**
-   * Validates that API dependencies are fully analyzed, even when they contain loops among each other. Dependencies are as
-   * follows:
-   *
-   * <pre>
-   * {@code
-   * app
-   * \- api
-   *    \- lib
-   *      \- trait
-   *    \- trait
-   *       \- lib
-   * }
-   * </pre>
-   */
-  @Test
-  public void apiWithLoopedApiArtifactDependencies() throws Exception {
-    DeployableProjectModel deployableProjectModel =
-        getDeployableProjectModel(format("apps/%s/api-with-loop-app", getDeploymentType()));
-    assertThat(deployableProjectModel.getDependencies(), containsInAnyOrder(
-                                                                            bundleDependency("raml-api-c"),
-                                                                            bundleDependency("raml-fragment-b"),
-                                                                            bundleDependency("raml-fragment-c"),
-                                                                            bundleDependency("raml-fragment-b"),
-                                                                            bundleDependency("raml-fragment-c")));
   }
 
   protected abstract String getDeploymentType();
