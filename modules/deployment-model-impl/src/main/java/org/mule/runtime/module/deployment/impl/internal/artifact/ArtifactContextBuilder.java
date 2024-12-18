@@ -520,7 +520,8 @@ public class ArtifactContextBuilder {
           muleContextBuilder = new DomainMuleContextBuilder(artifactName);
         }
         muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
-        ArtifactObjectSerializer objectSerializer = new ArtifactObjectSerializer(classLoaderRepository);
+        ArtifactObjectSerializer objectSerializer =
+            new ArtifactObjectSerializer(classLoaderRepository, this.executionClassLoader);
         muleContextBuilder.setObjectSerializer(objectSerializer);
         muleContextBuilder.setDeploymentProperties(properties);
         muleContextBuilder.setArtifactCoordinates(artifactCoordinates);

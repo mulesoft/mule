@@ -6,21 +6,20 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
+import static org.mule.runtime.core.api.util.FileUtils.openDirectory;
+
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.util.FileUtils.openDirectory;
-import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -30,18 +29,19 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase {
 
   @Rule
-  public TemporaryFolder objectStoreFolder = new TemporaryFolder();
+  public MockitoRule rule = MockitoJUnit.rule();
 
-  private MuleContext muleContext = mockMuleContext();
+  @Rule
+  public TemporaryFolder objectStoreFolder = new TemporaryFolder();
 
   @Mock
   private MuleConfiguration muleConfiguration;
@@ -52,12 +52,10 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
 
   @Before
   public void setUp() throws Exception {
-    when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     workingDirectory = objectStoreFolder.getRoot().getParentFile();
     when(muleConfiguration.getWorkingDirectory()).thenReturn(workingDirectory.getPath());
-    addJavaSerializerToMockMuleContext(muleContext);
-    partition = new PersistentObjectStorePartition(muleContext, "test", objectStoreFolder.getRoot());
+    partition = new PersistentObjectStorePartition(muleConfiguration, new JavaObjectSerializer(this.getClass().getClassLoader()),
+                                                   "test", objectStoreFolder.getRoot());
     partition.open();
   }
 

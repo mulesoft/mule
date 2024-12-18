@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.serialization;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,20 +15,6 @@ import org.apache.commons.io.input.ClassLoaderObjectInputStream;
 import org.apache.commons.lang3.SerializationException;
 
 public class SerializationUtils {
-
-  public static Object deserialize(InputStream inputStream, MuleContext muleContext) {
-    if (muleContext == null) {
-      throw new IllegalArgumentException("The MuleContext must not be null");
-    }
-    return deserialize(inputStream, muleContext.getExecutionClassLoader(), muleContext);
-  }
-
-  public static Object deserialize(byte[] objectData, MuleContext muleContext) {
-    if (muleContext == null) {
-      throw new IllegalArgumentException("The MuleContext must not be null");
-    }
-    return deserialize(objectData, muleContext.getExecutionClassLoader(), muleContext);
-  }
 
   /**
    * <p>
@@ -54,7 +37,7 @@ public class SerializationUtils {
    * @throws IllegalArgumentException                        if <code>inputStream</code> is <code>null</code>
    * @throws org.apache.commons.lang3.SerializationException (runtime) if the serialization fails
    */
-  public static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext) {
+  public static Object deserialize(InputStream inputStream, ClassLoader cl) {
     if (inputStream == null) {
       throw new IllegalArgumentException("The InputStream must not be null");
     }
@@ -65,11 +48,7 @@ public class SerializationUtils {
     try {
       // stream closed in the finally
       in = new ClassLoaderObjectInputStream(cl, inputStream);
-      Object obj = in.readObject();
-      if (obj instanceof DeserializationPostInitialisable) {
-        DeserializationPostInitialisable.Implementation.init(obj, muleContext);
-      }
-      return obj;
+      return in.readObject();
     } catch (ClassNotFoundException ex) {
       throw new SerializationException(ex);
     } catch (IOException ex) {
@@ -98,11 +77,11 @@ public class SerializationUtils {
    * @throws IllegalArgumentException if <code>objectData</code> is <code>null</code>
    * @throws SerializationException   (runtime) if the serialization fails
    */
-  private static Object deserialize(byte[] objectData, ClassLoader cl, MuleContext muleContext) {
+  public static Object deserialize(byte[] objectData, ClassLoader cl) {
     if (objectData == null) {
       throw new IllegalArgumentException("The byte[] must not be null");
     }
     ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
-    return deserialize(bais, cl, muleContext);
+    return deserialize(bais, cl);
   }
 }

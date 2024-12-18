@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
+import static org.mule.test.allure.AllureConstants.OauthFeature.SDK_OAUTH_SUPPORT;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.test.allure.AllureConstants.OauthFeature.SDK_OAUTH_SUPPORT;
 
 import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
@@ -27,10 +27,10 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
-
-import org.junit.Test;
 
 @Issue("W-14391247")
 @Feature(SDK_OAUTH_SUPPORT)
@@ -39,6 +39,8 @@ public class ClientCredentialsConnectionProviderWrapperTestCase {
   @Test
   public void listenerIsUnRegisteredOnStop() throws MuleException {
     ConnectionProvider delegate = mock(ConnectionProvider.class);
+    when(delegate.connect()).thenReturn(new Object());
+
     ClientCredentialsConfig oauthConfig = mock(ClientCredentialsConfig.class);
     ClientCredentialsGrantType type = new ClientCredentialsGrantType("http://accessToken",
                                                                      "#[accessToken]",

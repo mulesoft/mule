@@ -6,11 +6,10 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
@@ -19,16 +18,14 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
-import org.mule.runtime.api.notification.IntegerAction;
-import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -37,8 +34,6 @@ import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
-import org.mule.runtime.core.api.context.notification.MuleContextNotification;
-import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.CraftedExtensionModelLoader;
@@ -55,7 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Rule;
 
@@ -94,7 +88,8 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     builders.add(configurationBuilder);
     builders.add(testServicesConfigurationBuilder);
     builders.add(new TestPolicyProviderConfigurationBuilder());
-    builders.add(new TestNotificationListenerRegistryConfigurationBuilder());
+    final Latch contextStartedLatch = new Latch();
+    builders.add(new TestNotificationListenerRegistryConfigurationBuilder(contextStartedLatch));
     MuleContextBuilder contextBuilder = MuleContextBuilder.builder(APP);
     final DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
     muleConfiguration.setId(AbstractConfigurationFailuresTestCase.class.getSimpleName());
@@ -104,27 +99,9 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     contextBuilder.setExecutionClassLoader(new ClassLoader(currentThread().getContextClassLoader()) {});
     MuleContextWithRegistry muleContext =
         (MuleContextWithRegistry) muleContextFactory.createMuleContext(builders, contextBuilder);
-    final AtomicReference<Latch> contextStartedLatch = new AtomicReference<>();
-    contextStartedLatch.set(new Latch());
-    NotificationListenerRegistry notificationListenerRegistry =
-        muleContext.getRegistry().get(NotificationListenerRegistry.REGISTRY_KEY);
-    notificationListenerRegistry.registerListener(new MuleContextNotificationListener<MuleContextNotification>() {
-
-      @Override
-      public boolean isBlocking() {
-        return false;
-      }
-
-      @Override
-      public void onNotification(MuleContextNotification notification) {
-        if (new IntegerAction(CONTEXT_STARTED).equals(notification.getAction())) {
-          contextStartedLatch.get().countDown();
-        }
-      }
-    });
     muleContext.start();
     try {
-      assertThat(contextStartedLatch.get().await(20, SECONDS), is(true));
+      assertThat(contextStartedLatch.await(20, SECONDS), is(true));
     } finally {
       muleContext.stop();
       muleContext.dispose();

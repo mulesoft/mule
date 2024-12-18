@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
+import static org.mule.runtime.config.internal.validation.DefaultErrorHandlerPointsToExistingErrorHandler.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.internal.validation.FlowRefPointsToExistingFlow.FLOW_REF_IDENTIFIER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
@@ -44,6 +45,9 @@ public class ReferenceParametersStereotypesValidations extends AbstractReference
     return missing ->
     // flow-ref is already validated by FlowRefPointsToExistingFlow
     !missing.getComponent().getIdentifier().equals(FLOW_REF_IDENTIFIER)
+        // configuration.defaultErrorHandler-ref is already validated by DefaultErrorHandlerPointsToExistingErrorHandler
+        // configuration.defaultObjectSerializer-ref is already validated by DefaultObjectSerializerPointsToExistingSerializer
+        && !missing.getComponent().getIdentifier().equals(CONFIGURATION_IDENTIFIER)
         && missing.getAllowedStereotypes().stream()
             .noneMatch(st -> st.isAssignableTo(CONFIG)
                 || st.isAssignableTo(APP_CONFIG));

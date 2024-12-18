@@ -23,6 +23,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 
@@ -49,6 +50,8 @@ public class SourceConnectionManagerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws ConnectionException {
+    when(connectionProvider.connect()).thenReturn(new Object());
+
     when(configurationInstance.getValue()).thenReturn(configurationObject);
     connectionManager = new DefaultConnectionManager(muleContext);
     connectionManager.bind(configurationObject, connectionProvider);

@@ -100,7 +100,7 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
         }
 
         Scheduler retryScheduler = schedulerService.ioScheduler();
-        RetryPolicyTemplate retryTemplate = connectionManager.getRetryTemplateFor(provider);
+        RetryPolicyTemplate retryTemplate = (RetryPolicyTemplate) connectionManager.getRetryTemplateFor(provider);
         ReconnectionConfig reconnectionConfig = connectionManager.getReconnectionConfigFor(provider);
         final Latch latch = new Latch();
         RetryCallback retryCallback = new RetryCallback() {

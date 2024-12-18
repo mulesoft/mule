@@ -11,7 +11,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.queue.Queue;
-import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 
@@ -79,9 +78,9 @@ public class TransactionAwareQueueStore implements Queue {
     try {
       if (transactionContextProvider.isTransactional()) {
         Serializable item = transactionContextProvider.getTransactionalContext().poll(queue, timeout);
-        return postProcessIfNeeded(item);
+        return item;
       } else {
-        return postProcessIfNeeded(queue.poll(timeout));
+        return queue.poll(timeout);
       }
     } catch (InterruptedException iex) {
       if (!muleContext.isStopping()) {
@@ -96,9 +95,9 @@ public class TransactionAwareQueueStore implements Queue {
   public Serializable peek() throws InterruptedException {
     if (transactionContextProvider.isTransactional()) {
       Serializable item = transactionContextProvider.getTransactionalContext().peek(queue);
-      return postProcessIfNeeded(item);
+      return item;
     } else {
-      return postProcessIfNeeded(queue.peek());
+      return queue.peek();
     }
   }
 
@@ -119,20 +118,5 @@ public class TransactionAwareQueueStore implements Queue {
   @Override
   public String getName() {
     return queue.getName();
-  }
-
-  /**
-   * Note -- this must handle null items
-   */
-  private Serializable postProcessIfNeeded(Serializable item) {
-    try {
-      if (item instanceof DeserializationPostInitialisable) {
-        DeserializationPostInitialisable.Implementation.init(item, muleContext);
-      }
-      return item;
-    } catch (Exception e) {
-      LOGGER.warn("Unable to deserialize message", e);
-      return null;
-    }
   }
 }

@@ -1,4 +1,24 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
+            "justification": "W-17454020: Remove DeserializationPostInitialisable"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+            "justification": "W-17454020: Remove DeserializationPostInitialisable"
+          }
+        ]
+      }
+    }
+  },
   "4.9.0": {
     "revapi": {
       "differences": {

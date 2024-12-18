@@ -11,6 +11,7 @@ import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTar
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -258,8 +259,8 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
    */
   @Override
   public <T> T inject(T object) {
-    object = getInjectionTarget(object);
     try {
+      object = getInjectionTarget(requireNonNull(object));
       return initialiseObject((ConfigurableApplicationContext) applicationContext, EMPTY, object);
     } catch (LifecycleException e) {
       throw new MuleRuntimeException(e);

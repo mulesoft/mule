@@ -86,7 +86,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
   public <C> void bind(Object owner, ConnectionProvider<C> connectionProvider) {
     assertNotStopping(muleContext, "Mule is shutting down... cannot bind new connections");
 
-    connectionProvider = new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext);
+    connectionProvider = new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext.getInjector());
     ConnectionManagementStrategy<C> managementStrategy =
         managementStrategyFactory.getStrategy(connectionProvider, featureFlaggingService);
 

@@ -77,7 +77,7 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
     classLoaderRepository = mock(ClassLoaderRepository.class);
     when(classLoaderRepository.getId(getClass().getClassLoader())).thenReturn(empty());
     when(classLoaderRepository.getId(null)).thenReturn(empty());
-    serializationProtocol = new CustomJavaSerializationProtocol(classLoaderRepository);
+    serializationProtocol = new CustomJavaSerializationProtocol(classLoaderRepository, this.getClass().getClassLoader());
 
     initialiseIfNeeded(serializationProtocol, true, muleContext);
   }
