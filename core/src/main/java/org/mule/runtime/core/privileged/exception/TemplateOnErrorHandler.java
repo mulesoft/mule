@@ -10,11 +10,13 @@ import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.c
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
 import static org.mule.runtime.core.internal.util.LocationUtils.globalLocation;
@@ -41,6 +43,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -48,6 +51,8 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.notification.ErrorHandlerNotification;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import org.mule.runtime.api.profiling.ProfilingDataProducer;
+import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
@@ -59,6 +64,7 @@ import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
@@ -108,6 +114,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Inject
   private ConfigurationProperties configurationProperties;
+
+  @Inject
+  private InternalProfilingService profilingService;
+  private ProfilingDataProducer<TransactionProfilingEventContext, Object> rollbackProducer;
 
   @Inject
   private ComponentTracerFactory<CoreEvent> componentTracerFactory;
@@ -211,6 +221,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   @Override
   public synchronized void initialise() throws InitialisationException {
     componentTracer = componentTracerFactory.fromComponent(TemplateOnErrorHandler.this);
+    this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
     super.initialise();
   }
 
@@ -255,11 +266,21 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   private BiConsumer<Throwable, Object> onRoutingError() {
-    return (me, event) -> {
+    return (me, obj) -> {
       try {
         logger.error("Exception during exception strategy execution");
         getExceptionListener().resolveAndLogException(me);
-        if (isOwnedTransaction((CoreEvent) event, getException((CoreEvent) event))) {
+        boolean rollback = false;
+        if (obj instanceof CoreEvent) {
+          rollback = isOwnedTransaction((CoreEvent) obj, getException((CoreEvent) obj));
+        } else if (obj instanceof Either) {
+          if (((Either) obj).getLeft() instanceof MessagingException) {
+            MessagingException exception = (MessagingException) ((Either) obj).getLeft();
+            rollback = isOwnedTransaction(exception.getEvent(), exception);
+          }
+        }
+        if (rollback) {
+          profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
           TransactionCoordination.getInstance().rollbackCurrentTransaction();
         }
       } catch (Exception ex) {
