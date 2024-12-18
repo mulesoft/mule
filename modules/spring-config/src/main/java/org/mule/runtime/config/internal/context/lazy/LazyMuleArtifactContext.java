@@ -60,7 +60,6 @@ import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
-import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
@@ -366,7 +365,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         } else {
           try {
             object = getMuleContext().getInjector().inject(object);
-          } catch (IllegalDependencyInjectionException e) {
+          } catch (MuleException e) {
             throw new LifecycleException(e, object);
           }
           getMuleRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);

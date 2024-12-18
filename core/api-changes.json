@@ -47,22 +47,6 @@
         "differences": [
           {
             "ignore": true,
-            "code": "java.method.exception.runtimeAdded",
-            "old": "method <T> T org.mule.runtime.core.api.Injector::inject(T) throws org.mule.runtime.api.exception.MuleException",
-            "new": "method <T> T org.mule.runtime.core.api.Injector::inject(T) throws org.mule.runtime.core.api.registry.IllegalDependencyInjectionException",
-            "exception": "org.mule.runtime.core.api.registry.IllegalDependencyInjectionException",
-            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-          },
-          {
-            "ignore": true,
-            "code": "java.method.exception.checkedRemoved",
-            "old": "method <T> T org.mule.runtime.core.api.Injector::inject(T) throws org.mule.runtime.api.exception.MuleException",
-            "new": "method <T> T org.mule.runtime.core.api.Injector::inject(T) throws org.mule.runtime.core.api.registry.IllegalDependencyInjectionException",
-            "exception": "org.mule.runtime.api.exception.MuleException",
-            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-          },
-          {
-            "ignore": true,
             "code": "java.class.removed",
             "old": "class org.mule.runtime.core.privileged.component.ComponentAdditionalInterceptor",
             "justification": "W-17331120: Reuse generated dynamic classes `withAnnotations` if available"

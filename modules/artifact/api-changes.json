@@ -23,59 +23,6 @@
     "revapi": {
       "differences": {
         "differences": [
-{
-  "ignore": true,
-  "code": "java.method.removed",
-  "old": "method void org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
-  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-  /*  "package": "org.mule.runtime.module.artifact.api.serializer",
-  "classQualifiedName": "org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer",
-  "classSimpleName": "ArtifactObjectSerializer",
-  "methodName": "setMuleContext",
-  "elementKind": "method",
-  "oldArchive": "org.mule.runtime:mule-module-artifact:jar:4.8.0",
-  "oldArchiveRole": "primary",
-  "breaksVersioningRules": "true",
-  */
-
-},
-{
-  "ignore": true,
-  "code": "java.method.removed",
-  "old": "method void org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer::initialise() throws org.mule.runtime.api.lifecycle.InitialisationException",
-  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-  /*  "package": "org.mule.runtime.module.artifact.api.serializer",
-  "classQualifiedName": "org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer",
-  "classSimpleName": "ArtifactObjectSerializer",
-  "methodName": "initialise",
-  "elementKind": "method",
-  "oldArchive": "org.mule.runtime:mule-module-artifact:jar:4.8.0",
-  "oldArchiveRole": "primary",
-  "breaksVersioningRules": "true",
-  */
-
-},
-{
-  "ignore": true,
-  "code": "java.annotation.added",
-  "old": "method void org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
-  "new": "method void org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
-  "annotation": "@javax.inject.Inject",
-  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-  /*  "annotationType": "javax.inject.Inject",
-  "package": "org.mule.runtime.module.artifact.api.serializer",
-  "classQualifiedName": "org.mule.runtime.module.artifact.api.serializer.ArtifactObjectSerializer",
-  "classSimpleName": "ArtifactObjectSerializer",
-  "methodName": "setMuleContext",
-  "elementKind": "method",
-  "oldArchive": "org.mule.runtime:mule-module-artifact:jar:4.8.0",
-  "oldArchiveRole": "primary",
-  "newArchive": "org.mule.runtime:mule-module-artifact:jar:4.9.0-SNAPSHOT",
-  "newArchiveRole": "primary",
-  "breaksVersioningRules": "true",
-  */
-
-},
           {
             "ignore": true,
             "code": "java.method.removed",
