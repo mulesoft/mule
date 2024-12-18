@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * Component capable of injecting dependencies into a given object
@@ -22,7 +22,7 @@ public interface Injector {
    *
    * @param object the object on which dependencies are to be injected on
    * @return the injected object or a proxy to it
-   * @throws IllegalDependencyInjectionException
+   * @throws MuleException
    */
-  <T> T inject(T object) throws IllegalDependencyInjectionException;
+  <T> T inject(T object) throws MuleException;
 }

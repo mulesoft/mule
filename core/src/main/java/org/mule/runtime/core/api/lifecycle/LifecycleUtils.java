@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
-
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
@@ -26,7 +25,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -105,7 +103,7 @@ public class LifecycleUtils {
     if (inject) {
       try {
         muleContext.getInjector().inject(object);
-      } catch (IllegalDependencyInjectionException e) {
+      } catch (MuleException e) {
         I18nMessage message =
             createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase",
                                        object.getClass().getName()));

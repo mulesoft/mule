@@ -18,11 +18,11 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.api.connectivity.UnsupportedConnectivityTestingObjectException;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.ObjectNotFoundException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -67,7 +67,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
       try {
         muleContext.getInjector().inject(connectivityTestingStrategy);
-      } catch (IllegalDependencyInjectionException e) {
+      } catch (MuleException e) {
         throw new InitialisationException(createStaticMessage("Could not initialise connectivity testing strategy of type "
             + connectivityTestingStrategy.getClass().getName()),
                                           e,

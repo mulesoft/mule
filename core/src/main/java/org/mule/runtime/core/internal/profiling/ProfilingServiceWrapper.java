@@ -28,11 +28,10 @@ import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
-import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
+import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.function.Function;
 
@@ -128,7 +127,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
     try {
       muleContext.getInjector().inject(profilingService);
-    } catch (IllegalDependencyInjectionException e) {
+    } catch (MuleException e) {
       throw new MuleRuntimeException(e);
     }
 
