@@ -53,7 +53,11 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
   }
 
   protected void registerConstantBeanDefinition(String serviceId, Object impl) {
-    registerBeanDefinition(serviceId, getConstantObjectBeanDefinition(impl));
+    registerConstantBeanDefinition(serviceId, impl, false);
+  }
+
+  protected void registerConstantBeanDefinition(String serviceId, Object impl, boolean inject) {
+    registerBeanDefinition(serviceId, getConstantObjectBeanDefinition(impl, inject));
   }
 
   protected void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
@@ -65,7 +69,7 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
   }
 
   protected boolean isServiceRuntimeProvided(final CustomService<?> customService) {
-    return customService.getServiceImpl().map(impl -> impl instanceof Service).orElse(false)
+    return customService.getServiceImpl().map(Service.class::isInstance).orElse(false)
         || customService.getServiceClass().map(Service.class::isAssignableFrom).orElse(false);
   }
 
@@ -95,13 +99,13 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
                 .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
           }
 
-          beanDefinition = getConstantObjectBeanDefinition(servImpl);
+          beanDefinition = getConstantObjectBeanDefinition(servImpl, true);
         } else {
           beanDefinition =
-              getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator));
+              getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator), true);
         }
       } else {
-        beanDefinition = getConstantObjectBeanDefinition(servImpl);
+        beanDefinition = getConstantObjectBeanDefinition(servImpl, true);
       }
     } else {
       throw new IllegalStateException("A custom service must define a service class or instance");
@@ -115,7 +119,14 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
   }
 
   protected static BeanDefinition getConstantObjectBeanDefinition(Object impl) {
-    return getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgValue(impl).getBeanDefinition();
+    return getConstantObjectBeanDefinition(impl, false);
+  }
+
+  protected static BeanDefinition getConstantObjectBeanDefinition(Object impl, boolean inject) {
+    return getBeanDefinitionBuilder(ConstantFactoryBean.class)
+        .addConstructorArgValue(impl)
+        .addConstructorArgValue(inject)
+        .getBeanDefinition();
   }
 
   protected static BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType) {

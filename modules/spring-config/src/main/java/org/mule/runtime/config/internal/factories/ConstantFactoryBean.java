@@ -7,9 +7,9 @@
 package org.mule.runtime.config.internal.factories;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -33,10 +33,16 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
   @Inject
   private MuleContext muleContext;
   private final T value;
+  private final boolean inject;
 
   public ConstantFactoryBean(T value) {
+    this(value, false);
+  }
+
+  public ConstantFactoryBean(T value, boolean inject) {
     checkArgument(value != null, "value cannot be null");
     this.value = value;
+    this.inject = inject;
   }
 
   @Override
@@ -45,7 +51,7 @@ public class ConstantFactoryBean<T> extends AbstractComponent implements Factory
       ((Component) value).setAnnotations(getAnnotations());
     }
 
-    if (!(value instanceof Initialisable)) {
+    if (inject) {
       muleContext.getInjector().inject(value);
     }
 

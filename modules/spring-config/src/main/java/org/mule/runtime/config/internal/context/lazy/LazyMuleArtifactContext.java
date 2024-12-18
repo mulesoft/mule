@@ -39,6 +39,7 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -362,6 +363,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         if (object instanceof MessageProcessorChain) {
           // When created it will be initialized
         } else {
+          try {
+            object = getMuleContext().getInjector().inject(object);
+          } catch (MuleException e) {
+            throw new LifecycleException(e, object);
+          }
           getMuleRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
         }
       } catch (MuleException e) {
