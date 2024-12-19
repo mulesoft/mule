@@ -6,26 +6,30 @@
  */
 package org.mule.runtime.core.internal.transformer.encryption;
 
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.security.EncryptionStrategy;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.security.CryptoFailureException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
+import org.mule.runtime.core.api.security.EncryptionStrategy;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
+import javax.inject.Inject;
+
 /**
  * <code>EncryptionTransformer</code> will transform an array of bytes or string into an encrypted array of bytes
  *
  */
-public abstract class AbstractEncryptionTransformer extends AbstractTransformer implements MuleContextAware {
+public abstract class AbstractEncryptionTransformer extends AbstractTransformer {
+
+  private SecurityManager securityManager;
 
   private EncryptionStrategy strategy = null;
   private String strategyName = null;
@@ -79,12 +83,12 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer 
   @Override
   public void initialise() throws InitialisationException {
     if (strategyName != null) {
-      if (muleContext.getSecurityManager() == null) {
+      if (securityManager == null) {
         if (strategy == null) {
           throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
         }
       } else {
-        strategy = muleContext.getSecurityManager().getEncryptionStrategy(strategyName);
+        strategy = securityManager.getEncryptionStrategy(strategyName);
       }
     }
     if (strategy == null) {
@@ -108,6 +112,11 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer 
 
   public void setStrategyName(String strategyName) {
     this.strategyName = strategyName;
+  }
+
+  @Inject
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
   }
 
 }

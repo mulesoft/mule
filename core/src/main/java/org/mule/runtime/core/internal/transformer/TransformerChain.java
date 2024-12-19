@@ -10,6 +10,8 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCurrentEventForTransformer;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -21,6 +23,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -30,10 +33,17 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * A referencable chain of transformers that can be used as a single transformer
  */
 public final class TransformerChain extends AbstractTransformer {
+
+  private MuleContext muleContext;
+
+  @Inject
+  private MuleConfiguration muleConfiguration;
 
   private final List<Transformer> transformers;
 
@@ -88,7 +98,7 @@ public final class TransformerChain extends AbstractTransformer {
     Message message;
     if (src instanceof Message) {
       message = (Message) src;
-    } else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform()) {
+    } else if (muleConfiguration.isAutoWrapMessageAwareTransform()) {
       message = of(src);
     } else {
       throw new TransformerException(noCurrentEventForTransformer(), this);
@@ -129,7 +139,7 @@ public final class TransformerChain extends AbstractTransformer {
    */
   private Object checkReturnClass(Object object) throws TransformerException {
     try {
-      TransformerUtils.checkTransformerReturnClass(this, object);
+      checkTransformerReturnClass(this, object);
     } catch (TransformerException e) {
       throw new TransformerException(createStaticMessage(e.getMessage()), this);
     }
@@ -137,19 +147,14 @@ public final class TransformerChain extends AbstractTransformer {
     return object;
   }
 
-  @Override
-  public void initialise() throws InitialisationException {
-    for (Transformer transformer : transformers) {
-      transformer.initialise();
-    }
+  @Inject
+  public void setMuleContext(MuleContext context) {
+    this.muleContext = context;
   }
 
   @Override
-  public void setMuleContext(MuleContext muleContext) {
-    super.setMuleContext(muleContext);
-    for (Transformer transformer : transformers) {
-      transformer.setMuleContext(muleContext);
-    }
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(transformers, muleContext);
   }
 
   @Override

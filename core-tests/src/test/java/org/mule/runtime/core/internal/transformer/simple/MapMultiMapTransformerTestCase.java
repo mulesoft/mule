@@ -23,7 +23,7 @@ public class MapMultiMapTransformerTestCase extends AbstractTransformerTestCase 
 
   @Override
   public Transformer getTransformer() throws Exception {
-    return new MapToMultiMap();
+    return configureTransformer(new MapToMultiMap());
   }
 
   @Override

@@ -13,14 +13,14 @@ public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedOb
 
   @Override
   public Transformer getTransformer() throws Exception {
-    ObjectToByteArray transformer = new ObjectToByteArray();
+    ObjectToByteArray transformer = configureTransformer(new ObjectToByteArray());
     transformer.setObjectSerializer(objectSerializer);
     return transformer;
   }
 
   @Override
   public Transformer getRoundTripTransformer() throws Exception {
-    ByteArrayToObject transformer = new ByteArrayToObject();
+    ByteArrayToObject transformer = configureTransformer(new ByteArrayToObject());
     transformer.setObjectSerializer(objectSerializer);
     return transformer;
   }

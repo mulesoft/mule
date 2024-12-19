@@ -11,7 +11,6 @@ import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.internal.routing.ForeachRouter.MAP_NOT_SUPPORTED_MESSAGE;
@@ -24,6 +23,7 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ScopeFeature.SCOPE;
 import static org.mule.test.allure.AllureConstants.ScopeFeature.ForeachStory.FOR_EACH;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -378,7 +378,7 @@ public class ForeachTestCase extends AbstractForeachTestCase {
     Message transformedMessage = muleContext.getTransformationService()
         .transform(event.getMessage(), DataType.builder()
             .type(String.class)
-            .charset(getDefaultEncoding(muleContext.getConfiguration()))
+            .charset(defaultCharset())
             .build());
     String payload = (String) transformedMessage.getPayload().getValue();
     return payload;
@@ -474,7 +474,8 @@ public class ForeachTestCase extends AbstractForeachTestCase {
     process(simpleForeach, in);
 
     List<Integer> sequences = processedEvents.stream()
-        .map(e -> e.getItemSequenceInfo().map(i -> i.getPosition()).orElse(-1))
+        .map(e -> e.getItemSequenceInfo()
+            .map(ItemSequenceInfo::getPosition).orElse(-1))
         .collect(toList());
 
     assertThat(ERR_INVALID_ITEM_SEQUENCE, sequences, is(asList(0, 1, 2, 3)));

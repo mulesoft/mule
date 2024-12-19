@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static java.nio.charset.Charset.defaultCharset;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +36,9 @@ public class ByteArrayToInputStreamCompositeTransformersTestCase extends Abstrac
   @Before
   public void doSetUp() throws Exception {
     ObjectToOutputHandler objectToOutputHandler = new ObjectToOutputHandler();
+    objectToOutputHandler.setArtifactEncoding(() -> defaultCharset());
     ObjectToInputStream objectToInputStream = new ObjectToInputStream();
+    objectToInputStream.setArtifactEncoding(() -> defaultCharset());
     transformer = new CompositeConverter(objectToOutputHandler, objectToInputStream);
   }
 

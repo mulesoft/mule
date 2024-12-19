@@ -16,6 +16,7 @@ import static org.apache.commons.lang3.SystemUtils.JAVA_VM_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VENDOR;
 
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 
@@ -23,6 +24,8 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -231,7 +234,8 @@ public class SystemUtils {
    *         <li>{@code Charset.defaultCharset()}</li>
    *         </ul>
    * 
-   * @deprecated Use {@link #getDefaultEncoding(MuleConfiguration)} instead.
+   * @deprecated since 4.10, {@link Inject @Inject} an {@link ArtifactEncoding} and call
+   *             {@link ArtifactEncoding#getDefaultEncoding()} instead.
    */
   @Deprecated
   public static Charset getDefaultEncoding(MuleContext muleContext) {
@@ -245,7 +249,10 @@ public class SystemUtils {
    *         <li>The value of the system property 'mule.encoding'</li>
    *         <li>{@code Charset.defaultCharset()}</li>
    *         </ul>
+   * @deprecated since 4.10, {@link Inject @Inject} an {@link ArtifactEncoding} and call
+   *             {@link ArtifactEncoding#getDefaultEncoding()} instead.
    */
+  @Deprecated
   public static Charset getDefaultEncoding(MuleConfiguration configuration) {
     if (configuration != null && configuration.getDefaultEncoding() != null) {
       return Charset.forName(configuration.getDefaultEncoding());
