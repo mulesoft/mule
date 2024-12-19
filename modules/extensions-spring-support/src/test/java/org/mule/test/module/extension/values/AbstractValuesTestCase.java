@@ -7,17 +7,18 @@
 package org.mule.test.module.extension.values;
 
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
+import static org.mule.tck.junit4.matcher.value.ValueResultSuccessMatcher.isSuccess;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.ValueProvidersStory.VALUE_PROVIDERS_SERVICE;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsIterableContaining.hasItems;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.api.value.ResolvingFailure;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.api.value.ValueResult;
@@ -78,24 +79,18 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
   Set<Value> getValuesFromSource(String flowName, String parameterName) throws Exception {
     ValueResult valueResult =
         valueProviderService.getValues(Location.builder().globalName(flowName).addSourcePart().build(), parameterName);
-    if (valueResult.getFailure().isPresent()) {
-      ResolvingFailure resolvingFailure = valueResult.getFailure().get();
-      throw new ValueResolvingException(resolvingFailure.getMessage(), resolvingFailure.getFailureCode());
-    }
-    return valueResult
-        .getValues();
+
+    assertThat(valueResult, isSuccess());
+    return valueResult.getValues();
   }
 
   Set<Value> getValuesFromSource(String flowName, String parameterName, String targetSelector) throws Exception {
     ValueResult valueResult =
         valueProviderService.getFieldValues(Location.builder().globalName(flowName).addSourcePart().build(), parameterName,
                                             targetSelector);
-    if (valueResult.getFailure().isPresent()) {
-      ResolvingFailure resolvingFailure = valueResult.getFailure().get();
-      throw new ValueResolvingException(resolvingFailure.getMessage(), resolvingFailure.getFailureCode());
-    }
-    return valueResult
-        .getValues();
+
+    assertThat(valueResult, isSuccess());
+    return valueResult.getValues();
   }
 
   Set<Value> getValues(String flowName, String parameterName) throws Exception {
@@ -153,10 +148,7 @@ public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestC
   }
 
   private Set<Value> checkResultAndRetrieveValues(ValueResult values) throws ValueResolvingException {
-    if (!values.isSuccess()) {
-      ResolvingFailure resolvingFailure = values.getFailure().get();
-      throw new ValueResolvingException(resolvingFailure.getMessage(), resolvingFailure.getFailureCode());
-    }
+    assertThat(values, isSuccess());
     return values.getValues();
   }
 

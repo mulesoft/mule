@@ -6,10 +6,16 @@
  */
 package org.mule.runtime.core.internal.streaming.object.test;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.insecure;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.mule.runtime.api.streaming.object.CursorIterator;
+import org.mule.runtime.core.api.streaming.iterator.Consumer;
+import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
+import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,13 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.mule.runtime.api.streaming.object.CursorIterator;
-import org.mule.runtime.core.api.streaming.iterator.Consumer;
-import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
-import org.mule.runtime.core.api.streaming.iterator.StreamingIterator;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-public abstract class AbstractObjectStreamingTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractObjectStreamingTestCase extends AbstractMuleTestCase {
 
   protected final List<Object> data;
 
@@ -36,7 +36,7 @@ public abstract class AbstractObjectStreamingTestCase extends AbstractMuleContex
   }
 
   protected Object createDataInstance() {
-    return randomAlphabetic(10);
+    return insecure().nextAlphabetic(10);
   }
 
   protected <T> StreamingIterator<T> toStreamingIterator(List<T> data) {

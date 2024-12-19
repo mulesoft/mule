@@ -9,13 +9,14 @@ package org.mule.functional.util.http;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.util.LinkedList;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
 /**
  * Simple HTTP server implementation for testing purposes.
@@ -26,7 +27,7 @@ public class SimpleHttpServer {
 
   public static final String DEFAULT_RESPONSE = "This is the response";
   private final int port;
-  private HttpServer server;
+  private Server server;
   private final LinkedList<HttpMessage> httpRequests = new LinkedList<>();
   private int statusCode = 200;
   private long responseDelay = -1;
@@ -58,13 +59,12 @@ public class SimpleHttpServer {
    * @return {@code this}
    */
   public SimpleHttpServer start() {
+    server = new Server(port);
+    server.setHandler(new TestHandler());
     try {
-      server = HttpServer.create(new InetSocketAddress(port), 0);
-      server.createContext("/", new TestHandler());
-      server.setExecutor(null);
       server.start();
       return this;
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -74,17 +74,18 @@ public class SimpleHttpServer {
    */
   public void stop() {
     try {
-      server.stop(0);
+      server.stop();
     } catch (Exception e) {
       // nothing to do.
     }
   }
 
-  class TestHandler implements HttpHandler {
+  class TestHandler extends AbstractHandler {
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-      httpRequests.addLast(new HttpMessage(exchange));
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+      httpRequests.addLast(new HttpMessage(request));
 
       if (responseDelay > 0) {
         try {
@@ -95,11 +96,11 @@ public class SimpleHttpServer {
         }
       }
 
-      String response = DEFAULT_RESPONSE;
-      exchange.sendResponseHeaders(statusCode, response.length());
-      OutputStream os = exchange.getResponseBody();
-      os.write(response.getBytes());
-      os.close();
+      String responseBody = DEFAULT_RESPONSE;
+      response.setStatus(statusCode);
+      response.setContentType("text/plain");
+      response.getWriter().write(responseBody);
+      baseRequest.setHandled(true);
     }
   }
 

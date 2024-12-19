@@ -8,10 +8,11 @@ package org.mule.runtime.core.internal.lifecycle;
 
 import static com.google.common.cache.CacheBuilder.newBuilder;
 
+import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
+
 import java.util.Map;
 import java.util.Optional;
 
-import org.mule.runtime.core.internal.lifecycle.phases.LifecyclePhase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,8 +68,6 @@ public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
         }
         return false;
       }
-    }
-    if (isFinalPhase(phase) && (initialPhaseLifecycleClass.isAssignableFrom(object.getClass()))) {
       return processedObjects.containsKey(object);
     }
     processedObjects.put(object, object);

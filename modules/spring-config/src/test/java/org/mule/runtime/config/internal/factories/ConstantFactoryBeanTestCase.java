@@ -8,10 +8,11 @@ package org.mule.runtime.config.internal.factories;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -19,14 +20,18 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 @SmallTest
 public class ConstantFactoryBeanTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(extraInterfaces = {MuleContextAware.class})
   private Object value;
@@ -36,7 +41,7 @@ public class ConstantFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    factoryBean = new ConstantFactoryBean<>(value);
+    factoryBean = new ConstantFactoryBean<>(value, true);
     when(muleContext.getInjector()).thenReturn(injector);
     factoryBean.setMuleContext(muleContext);
   }

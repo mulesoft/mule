@@ -79,7 +79,7 @@ public abstract class AbstractArtifactClassLoaderConfigurationAssembler {
 
     final List<URL> dependenciesArtifactsUrls =
         loadUrls(getProjectFolder(), bundleDependencies, classLoaderConfigurationBuilder);
-    dependenciesArtifactsUrls.forEach(classLoaderConfigurationBuilder::containing);
+    classLoaderConfigurationBuilder.containing(dependenciesArtifactsUrls);
 
     if (shouldPopulateLocalPackages()) {
       populateLocalPackages(classLoaderConfigurationBuilder);
