@@ -9,15 +9,18 @@ package org.mule.runtime.config.internal.factories;
 import static java.util.Collections.emptyList;
 
 import org.mule.runtime.api.component.AbstractComponent;
+import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.construct.Flow.Builder;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.List;
 
@@ -28,8 +31,7 @@ import org.springframework.beans.factory.FactoryBean;
  * 
  * @since 4.0
  */
-public class DefaultFlowFactoryBean extends AbstractComponent
-    implements FactoryBean<Flow>, MuleContextAware {
+public class DefaultFlowFactoryBean extends AbstractComponent implements FactoryBean<Flow> {
 
   private String name;
   private MuleContext muleContext;
@@ -39,6 +41,7 @@ public class DefaultFlowFactoryBean extends AbstractComponent
   private FlowExceptionHandler exceptionListener;
   private ProcessingStrategyFactory processingStrategyFactory;
   private Integer maxConcurrency;
+  private FeatureFlaggingService featureFlaggingService;
 
   @Override
   public Flow getObject() throws Exception {
@@ -60,10 +63,11 @@ public class DefaultFlowFactoryBean extends AbstractComponent
       flowBuilder.maxConcurrency(maxConcurrency.intValue());
     }
 
-    final DefaultFlow build = (DefaultFlow) flowBuilder.build();
+    final DefaultFlow flow = (DefaultFlow) flowBuilder.build();
 
-    build.setAnnotations(getAnnotations());
-    return build;
+    flow.setAnnotations(getAnnotations());
+    flow.setFeatureFlaggingService(featureFlaggingService);
+    return flow;
   }
 
   @Override
@@ -92,9 +96,14 @@ public class DefaultFlowFactoryBean extends AbstractComponent
   }
 
 
-  @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+    try {
+      this.featureFlaggingService =
+          ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(FeatureFlaggingService.class);
+    } catch (RegistrationException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
 
@@ -150,4 +159,5 @@ public class DefaultFlowFactoryBean extends AbstractComponent
   public void setMaxConcurrency(Integer maxConcurrency) {
     this.maxConcurrency = maxConcurrency;
   }
+
 }

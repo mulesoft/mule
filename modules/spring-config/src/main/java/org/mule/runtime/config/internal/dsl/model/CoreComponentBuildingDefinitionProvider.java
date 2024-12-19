@@ -12,6 +12,15 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_EL
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.ERROR_MAPPING_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.context.notification.AnySelector.ANY_SELECTOR;
@@ -39,15 +48,6 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.ERROR_MAPPING_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 
