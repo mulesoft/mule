@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.transformer;
 
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
@@ -30,7 +31,7 @@ public class NullResultTestCase extends AbstractTransformerTestCase {
 
   @Override
   public Transformer getTransformer() throws Exception {
-    return transformer;
+    return configureTransformer(transformer);
   }
 
   @Override

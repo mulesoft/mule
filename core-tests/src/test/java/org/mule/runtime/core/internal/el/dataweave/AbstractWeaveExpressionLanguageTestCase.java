@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Optional.of;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +32,9 @@ public abstract class AbstractWeaveExpressionLanguageTestCase extends AbstractMu
     weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
     when(registry.lookupByType(DefaultExpressionLanguageFactoryService.class)).thenReturn(of(weaveExpressionExecutor));
     expressionLanguage =
-        new DataWeaveExpressionLanguageAdaptor(muleContext, registry, weaveExpressionExecutor, getFeatureFlaggingService());
+        new DataWeaveExpressionLanguageAdaptor(muleContext, registry, muleContext.getConfiguration(),
+                                               () -> defaultCharset(),
+                                               weaveExpressionExecutor, getFeatureFlaggingService());
     expressionLanguage.initialise();
   }
 

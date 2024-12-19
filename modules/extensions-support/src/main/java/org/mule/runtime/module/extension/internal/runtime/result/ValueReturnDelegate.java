@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.result;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.EventedResult;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -24,8 +24,8 @@ public final class ValueReturnDelegate extends AbstractReturnDelegate {
   /**
    * {@inheritDoc}
    */
-  public ValueReturnDelegate(ComponentModel componentModel, MuleContext muleContext) {
-    super(componentModel, muleContext);
+  public ValueReturnDelegate(ComponentModel componentModel, ArtifactEncoding artifactEncoding) {
+    super(componentModel, artifactEncoding);
   }
 
   /**

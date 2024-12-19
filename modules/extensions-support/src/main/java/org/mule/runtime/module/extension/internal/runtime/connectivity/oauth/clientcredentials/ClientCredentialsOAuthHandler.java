@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cl
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
 
 import static java.lang.String.format;
@@ -18,6 +17,7 @@ import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
 import org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.oauth.client.api.listener.ClientCredentialsListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -27,6 +27,8 @@ import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdap
 
 import java.util.List;
 import java.util.Objects;
+
+import javax.inject.Inject;
 
 /**
  * {@link OAuthHandler} implementation for the client credentials grant type
@@ -129,7 +131,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
 
     dancerBuilder
         .name(config.getOwnerConfigName())
-        .encoding(getDefaultEncoding(muleContext))
+        .encoding(artifactEncoding.getDefaultEncoding())
         .clientCredentials(config.getClientId(), config.getClientSecret())
         .tokenUrl(config.getTokenUrl())
         .responseExpiresInExpr(grantType.getExpirationRegex())

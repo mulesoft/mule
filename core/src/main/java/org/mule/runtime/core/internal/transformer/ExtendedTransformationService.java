@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.transformer;
 
 import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
 
 import static java.util.Arrays.asList;
@@ -17,8 +16,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.DefaultTransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
@@ -40,11 +37,6 @@ public class ExtendedTransformationService extends DefaultTransformationService 
   private static final Logger logger = LoggerFactory.getLogger(ExtendedTransformationService.class);
 
   private DataTypeConversionResolver dataTypeConversionResolver;
-
-  @Inject
-  public ExtendedTransformationService(MuleContext muleContext) {
-    super(muleContext);
-  }
 
   /**
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
@@ -212,7 +204,8 @@ public class ExtendedTransformationService extends DefaultTransformationService 
     DataType original = message.getPayload().getDataType();
     MediaType mimeType = ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
     Charset encoding = transformed.getMediaType().getCharset()
-        .orElse(message.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
+        .orElse(message.getPayload().getDataType().getMediaType().getCharset()
+            .orElse(getArtifactEncoding().getDefaultEncoding()));
 
     return DataType.builder().mediaType(mimeType).charset(encoding).build().getMediaType();
   }

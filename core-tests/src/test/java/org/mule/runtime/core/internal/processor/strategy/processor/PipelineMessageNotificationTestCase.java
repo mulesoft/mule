@@ -27,8 +27,9 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -77,9 +78,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -94,9 +93,6 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
   private final String pipelineName = "testPipeline";
 
   private EventContext context;
-
-  @Rule
-  public ExpectedException thrown = none();
 
   public PipelineMessageNotificationTestCase(Mode mode) {
     super(mode);
@@ -114,7 +110,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     notificationFirer = getNotificationDispatcher(muleContext);
     when(muleContext.getDefaultErrorHandler(empty())).thenReturn(new ErrorHandlerFactory().createDefault(notificationFirer));
     mockErrorTypeLocator();
-    when(muleContext.getTransformationService()).thenReturn(new ExtendedTransformationService(muleContext));
+    when(muleContext.getTransformationService()).thenReturn(new ExtendedTransformationService());
   }
 
   private void mockErrorTypeLocator() {
@@ -181,28 +177,29 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
 
     event = CoreEvent.builder(context).message(of("request")).build();
 
-    thrown.expect(instanceOf(MessagingException.class));
-    thrown.expectCause(instanceOf(IllegalStateException.class));
-    try {
-      process(pipeline, event);
-    } finally {
-      switch (mode) {
-        case BLOCKING:
-          new PollingProber().check(new JUnitLambdaProbe(() -> {
-            verifyException();
-            return true;
-          }));
-          break;
-        case NON_BLOCKING:
-          new PollingProber().check(new JUnitLambdaProbe(() -> {
-            verifyException();
-            return true;
-          }));
-          break;
-        default:
-          fail();
+    var thrown = assertThrows(MessagingException.class, () -> {
+      try {
+        process(pipeline, event);
+      } finally {
+        switch (mode) {
+          case BLOCKING:
+            new PollingProber().check(new JUnitLambdaProbe(() -> {
+              verifyException();
+              return true;
+            }));
+            break;
+          case NON_BLOCKING:
+            new PollingProber().check(new JUnitLambdaProbe(() -> {
+              verifyException();
+              return true;
+            }));
+            break;
+          default:
+            fail();
+        }
       }
-    }
+    });
+    assertThat(thrown.getCause(), instanceOf(IllegalStateException.class));
   }
 
   private void verifySucess() {

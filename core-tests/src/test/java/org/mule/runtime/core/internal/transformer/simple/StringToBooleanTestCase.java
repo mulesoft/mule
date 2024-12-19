@@ -6,20 +6,30 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static java.nio.charset.Charset.defaultCharset;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.stream.Stream;
 
+import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
 public class StringToBooleanTestCase extends AbstractMuleTestCase {
 
-  private StringToBoolean transformer = new StringToBoolean();
+  private StringToBoolean transformer;
+
+  @Before
+  public void setUp() {
+    transformer = new StringToBoolean();
+    transformer.setArtifactEncoding(() -> defaultCharset());
+  }
 
   @Test
   public void validTransforms() {

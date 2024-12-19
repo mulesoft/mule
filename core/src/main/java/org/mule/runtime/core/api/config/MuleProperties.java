@@ -255,6 +255,8 @@ public class MuleProperties {
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
   public static final String OBJECT_NOTIFICATION_HANDLER = "_muleNotificationHandler";
 
+  public static final String OBJECT_ARTIFACT_ENCODING = "_muleArtifactEncoding";
+
   /**
    * Specifies whether mule should process messages synchronously, i.e. that a mule-model can only process one message at a time,
    * or asynchronously. The default value is 'false'.

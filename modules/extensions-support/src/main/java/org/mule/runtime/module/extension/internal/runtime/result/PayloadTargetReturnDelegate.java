@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.result;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.meta.model.ComponentModel;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 
@@ -30,8 +30,8 @@ public final class PayloadTargetReturnDelegate extends AbstractReturnDelegate {
    */
   public PayloadTargetReturnDelegate(String target,
                                      ComponentModel componentModel,
-                                     MuleContext muleContext) {
-    super(componentModel, muleContext);
+                                     ArtifactEncoding artifactEncoding) {
+    super(componentModel, artifactEncoding);
     this.target = target;
   }
 

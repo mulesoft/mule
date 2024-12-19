@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.transformer;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -16,8 +15,6 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-
-import javax.inject.Inject;
 
 /**
  * Composes many converters to behave as a single one.
@@ -122,14 +119,6 @@ public final class CompositeConverter implements Converter {
   }
 
   @Override
-  @Inject
-  public void setMuleContext(MuleContext context) {
-    for (Converter converter : chain) {
-      converter.setMuleContext(context);
-    }
-  }
-
-  @Override
   public void setName(String name) {
     throw new UnsupportedOperationException("Cannot change composite converter name");
   }
@@ -181,4 +170,5 @@ public final class CompositeConverter implements Converter {
   public int hashCode() {
     return Objects.hash(this.getConverters(), this.getName());
   }
+
 }
