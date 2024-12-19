@@ -6,6 +6,444 @@
           {
             "ignore": true,
             "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<T, V> java.util.function.Function<T, R>::andThen(java.util.function.Function<? super R, ? extends V>) @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<V, R> java.util.function.Function<T, R>::compose(java.util.function.Function<? super V, ? extends T>) @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.api.component.AbstractComponent::getAnnotation(javax.xml.namespace.QName) @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Map<javax.xml.namespace.QName, java.lang.Object> org.mule.runtime.api.component.AbstractComponent::getAnnotations() @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.api.component.AbstractComponent::getDslSource() @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.component.ComponentIdentifier org.mule.runtime.api.component.AbstractComponent::getIdentifier() @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.component.location.ComponentLocation org.mule.runtime.api.component.AbstractComponent::getLocation() @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.api.component.AbstractComponent::getRepresentation() @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.component.location.Location org.mule.runtime.api.component.AbstractComponent::getRootContainerLocation() @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> java.util.function.Function<T, T> java.util.function.Function<T, R>::identity() @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.component.location.Location org.mule.runtime.api.component.AbstractComponent::initRootContainerName() @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.event.CoreEvent org.mule.runtime.core.api.transformer.AbstractTransformer::process(org.mule.runtime.core.api.event.CoreEvent) throws org.mule.runtime.api.exception.MuleException",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.api.component.AbstractComponent::setAnnotations(java.util.Map<javax.xml.namespace.QName, java.lang.Object>) @ org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerInheritsFromClass",
+            "old": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "new": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "new": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "interface": "org.mule.runtime.api.component.Component",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "new": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "interface": "org.mule.runtime.core.api.processor.Processor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "new": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "interface": "org.mule.runtime.core.api.processor.ReactiveProcessor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "new": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "interface": "java.util.function.Function<org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>>",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<T, V> java.util.function.Function<T, R>::andThen(java.util.function.Function<? super R, ? extends V>) @ org.mule.runtime.core.api.transformer.Converter",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<V, R> java.util.function.Function<T, R>::compose(java.util.function.Function<? super V, ? extends T>) @ org.mule.runtime.core.api.transformer.Converter",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType org.mule.runtime.core.api.transformer.Converter::getProcessingType()",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> java.util.function.Function<T, T> java.util.function.Function<T, R>::identity() @ org.mule.runtime.core.api.transformer.Converter",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.Converter",
+            "new": "interface org.mule.runtime.core.api.transformer.Converter",
+            "interface": "org.mule.runtime.core.api.processor.Processor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.Converter",
+            "new": "interface org.mule.runtime.core.api.transformer.Converter",
+            "interface": "org.mule.runtime.core.api.processor.ReactiveProcessor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.Converter",
+            "new": "interface org.mule.runtime.core.api.transformer.Converter",
+            "interface": "java.util.function.Function<org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>>",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<T, V> java.util.function.Function<T, R>::andThen(java.util.function.Function<? super R, ? extends V>) @ org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<V, R> java.util.function.Function<T, R>::compose(java.util.function.Function<? super V, ? extends T>) @ org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> java.util.function.Function<T, T> java.util.function.Function<T, R>::identity() @ org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "new": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "interface": "org.mule.runtime.core.api.processor.Processor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "new": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "interface": "org.mule.runtime.core.api.processor.ReactiveProcessor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "new": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "interface": "java.util.function.Function<org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>>",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.transformer.MessageTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<T, V> java.util.function.Function<T, R>::andThen(java.util.function.Function<? super R, ? extends V>) @ org.mule.runtime.core.api.transformer.Transformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<V, R> java.util.function.Function<T, R>::compose(java.util.function.Function<? super V, ? extends T>) @ org.mule.runtime.core.api.transformer.Transformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType org.mule.runtime.core.api.transformer.Transformer::getProcessingType()",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> java.util.function.Function<T, T> java.util.function.Function<T, R>::identity() @ org.mule.runtime.core.api.transformer.Transformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.Transformer",
+            "new": "interface org.mule.runtime.core.api.transformer.Transformer",
+            "interface": "org.mule.runtime.core.api.processor.Processor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.Transformer",
+            "new": "interface org.mule.runtime.core.api.transformer.Transformer",
+            "interface": "org.mule.runtime.core.api.processor.ReactiveProcessor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.Transformer",
+            "new": "interface org.mule.runtime.core.api.transformer.Transformer",
+            "interface": "java.util.function.Function<org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>>",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<T, V> java.util.function.Function<T, R>::andThen(java.util.function.Function<? super R, ? extends V>) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <V> java.util.function.Function<V, R> java.util.function.Function<T, R>::compose(java.util.function.Function<? super V, ? extends T>) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.api.component.AbstractComponent::getAnnotation(javax.xml.namespace.QName) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Map<javax.xml.namespace.QName, java.lang.Object> org.mule.runtime.api.component.AbstractComponent::getAnnotations() @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.api.component.AbstractComponent::getDslSource() @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.component.ComponentIdentifier org.mule.runtime.api.component.AbstractComponent::getIdentifier() @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.component.location.ComponentLocation org.mule.runtime.api.component.AbstractComponent::getLocation() @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.api.component.AbstractComponent::getRepresentation() @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.component.location.Location org.mule.runtime.api.component.AbstractComponent::getRootContainerLocation() @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> java.util.function.Function<T, T> java.util.function.Function<T, R>::identity() @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.api.component.AbstractComponent::setAnnotations(java.util.Map<javax.xml.namespace.QName, java.lang.Object>) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerInheritsFromClass",
+            "old": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "new": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "new": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "interface": "org.mule.runtime.api.component.Component",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "new": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "interface": "org.mule.runtime.core.api.processor.Processor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "new": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "interface": "org.mule.runtime.core.api.processor.ReactiveProcessor",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "new": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "interface": "java.util.function.Function<org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>, org.reactivestreams.Publisher<org.mule.runtime.core.api.event.CoreEvent>>",
+            "justification": "W-17466198: Make Transformers not be Processors anymore"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
             "old": "field org.mule.runtime.api.lifecycle.Initialisable.PHASE_NAME @ org.mule.runtime.core.api.config.DefaultMuleConfiguration",
             "justification": "W-17454026: Move the Default Error Handler validation to the ast validations"
           },

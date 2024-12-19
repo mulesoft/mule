@@ -6,39 +6,41 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.transformer.CompositeConverter;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import io.qameta.allure.Issue;
+import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Issue;
+
 @Issue("MULE-19279")
-public class ByteArrayToInputStreamCompositeTransformersTestCase extends AbstractMuleContextTestCase {
+public class ByteArrayToInputStreamCompositeTransformersTestCase extends AbstractMuleTestCase {
 
   private CompositeConverter transformer;
   private String testMessage = "Hello ե���:��";
 
-  @Override
-  protected void doSetUp() throws Exception {
-    Converter objectToOutputHandler = new ObjectToOutputHandler();
-    Converter objectToInputStream = new ObjectToInputStream();
+  @Before
+  public void doSetUp() throws Exception {
+    ObjectToOutputHandler objectToOutputHandler = new ObjectToOutputHandler();
+    ObjectToInputStream objectToInputStream = new ObjectToInputStream();
     transformer = new CompositeConverter(objectToOutputHandler, objectToInputStream);
-    transformer.setMuleContext(muleContext);
   }
 
   @Test
   public void testTransformByteArrayUTF16() throws TransformerException, IOException {
-    assertTrue(InputStream.class.isAssignableFrom(transformer.transform(testMessage.getBytes("UTF-16")).getClass()));
+    assertThat(transformer.transform(testMessage.getBytes("UTF-16")), instanceOf(InputStream.class));
     assertTrue(compare(new ByteArrayInputStream(testMessage.getBytes("UTF-16")),
                        (InputStream) transformer.transform(testMessage.getBytes("UTF-16"))));
   }

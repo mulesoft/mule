@@ -7,23 +7,22 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.transformer.simple.SerialisedObjectTransformersTestCase;
 
 public class ObjectByteArrayTransformersWithObjectsTestCase extends SerialisedObjectTransformersTestCase {
 
   @Override
   public Transformer getTransformer() throws Exception {
-    ObjectToByteArray transfromer = new ObjectToByteArray();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
-    return transfromer;
+    ObjectToByteArray transformer = new ObjectToByteArray();
+    transformer.setObjectSerializer(objectSerializer);
+    return transformer;
   }
 
   @Override
   public Transformer getRoundTripTransformer() throws Exception {
-    ByteArrayToObject transfromer = new ByteArrayToObject();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
-    return transfromer;
+    ByteArrayToObject transformer = new ByteArrayToObject();
+    transformer.setObjectSerializer(objectSerializer);
+    return transformer;
   }
 
 }

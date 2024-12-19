@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
-import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -195,13 +194,7 @@ public class ExtendedTransformationService extends DefaultTransformationService 
 
   private Message transformMessage(final Message message, final CoreEvent event, final Transformer transformer)
       throws MessageTransformerException, TransformerException {
-    Object result;
-
-    if (transformer instanceof MessageTransformer) {
-      result = ((MessageTransformer) transformer).transform(message, event);
-    } else {
-      result = transformer.transform(message);
-    }
+    Object result = transformer.transform(message);
 
     if (result instanceof Message) {
       return (Message) result;

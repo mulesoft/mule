@@ -15,18 +15,14 @@ import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
 
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.internal.transformer.TransformerUtils;
 
 import java.io.InputStream;
@@ -45,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * <code>AbstractTransformer</code> is a base class for all transformers. Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer extends AbstractComponent implements Transformer {
+public abstract class AbstractTransformer implements Transformer {
 
   protected MuleContext muleContext;
 
@@ -81,21 +77,6 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
    */
   public AbstractTransformer() {
     super();
-  }
-
-  @Override
-  public CoreEvent process(CoreEvent event) throws MuleException {
-    if (event != null && event.getMessage() != null) {
-      try {
-        return CoreEvent.builder(event)
-            .message(((ExtendedTransformationService) muleContext.getTransformationService())
-                .applyTransformers(event.getMessage(), event, this))
-            .build();
-      } catch (Exception e) {
-        throw new MessageTransformerException(this, e, event.getMessage());
-      }
-    }
-    return event;
   }
 
   /**

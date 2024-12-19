@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.TO_STRING_TRANSFORMER_TRANSFORM_ITERATOR_ELEMENTS;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
@@ -38,7 +38,6 @@ public class ObjectToStringWithRepeatableIteratorTestCase extends AbstractTransf
   @Override
   public Transformer getTransformer() throws Exception {
     final ObjectToString objectToString = new ObjectToString();
-    initialiseIfNeeded(objectToString, muleContext);
     objectToString.setFeatureFlags(featureFlaggingService);
     return objectToString;
   }

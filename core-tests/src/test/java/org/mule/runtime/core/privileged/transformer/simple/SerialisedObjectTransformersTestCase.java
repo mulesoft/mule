@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.privileged.transformer.simple;
 
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.core.internal.transformer.simple.SerializableToByteArray;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
@@ -15,22 +16,31 @@ import org.mule.tck.testmodels.fruit.Orange;
 
 import org.apache.commons.lang3.SerializationUtils;
 
+import org.junit.Before;
+
 public class SerialisedObjectTransformersTestCase extends AbstractTransformerTestCase {
 
-  private Orange testObject = new Orange(new Integer(4), new Double(14.3), "nice!");
+  protected ObjectSerializer objectSerializer;
+
+  private Orange testObject = new Orange(Integer.valueOf(4), Double.valueOf(14.3), "nice!");
+
+  @Before
+  public void setUp() throws Exception {
+    objectSerializer = new JavaObjectSerializer(this.getClass().getClassLoader());
+  }
 
   @Override
   public Transformer getTransformer() throws Exception {
-    SerializableToByteArray transfromer = new SerializableToByteArray();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
-    return transfromer;
+    SerializableToByteArray transformer = new SerializableToByteArray();
+    transformer.setObjectSerializer(objectSerializer);
+    return transformer;
   }
 
   @Override
   public Transformer getRoundTripTransformer() throws Exception {
-    ByteArrayToSerializable transfromer = new ByteArrayToSerializable();
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(String.valueOf(transfromer.hashCode()), transfromer);
-    return transfromer;
+    ByteArrayToSerializable transformer = new ByteArrayToSerializable();
+    transformer.setObjectSerializer(objectSerializer);
+    return transformer;
   }
 
   @Override
