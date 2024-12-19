@@ -34,6 +34,7 @@ import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
@@ -45,8 +46,6 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +78,6 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
   private volatile FlowConstructStatistics statistics;
   protected FlowStoppedPersistenceListener flowStoppedPersistenceListener;
 
-  @Inject
   private FeatureFlaggingService featureFlaggingService;
 
   /**
@@ -112,10 +110,10 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
         doInitialise();
       });
     } catch (InitialisationException e) {
-      safely(() -> dispose());
+      safely((CheckedRunnable) this::dispose);
       throw e;
     } catch (MuleException e) {
-      safely(() -> dispose());
+      safely((CheckedRunnable) this::dispose);
       throw new InitialisationException(e, this);
     }
   }
@@ -307,5 +305,9 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
     if (flowStoppedPersistenceListener != null) {
       flowStoppedPersistenceListener.doNotPersist();
     }
+  }
+
+  public void setFeatureFlaggingService(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
   }
 }
