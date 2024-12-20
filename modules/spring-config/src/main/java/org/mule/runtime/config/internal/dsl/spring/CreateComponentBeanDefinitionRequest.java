@@ -16,14 +16,17 @@ import java.util.function.Consumer;
 public class CreateComponentBeanDefinitionRequest extends CreateBeanDefinitionRequest {
 
   private final Consumer<ComponentAst> nestedComponentParamProcessor;
+  private final boolean parentMapType;
 
   public CreateComponentBeanDefinitionRequest(List<ComponentAst> componentHierarchy,
                                               ComponentAst component,
                                               List<SpringComponentModel> paramsModels,
                                               ComponentBuildingDefinition componentBuildingDefinition,
-                                              Consumer<ComponentAst> nestedComponentParamProcessor) {
+                                              Consumer<ComponentAst> nestedComponentParamProcessor,
+                                              boolean parentMapType) {
     super(componentHierarchy, component, paramsModels, componentBuildingDefinition, component.getIdentifier());
     this.nestedComponentParamProcessor = nestedComponentParamProcessor;
+    this.parentMapType = parentMapType;
   }
 
   @Override
@@ -33,6 +36,10 @@ public class CreateComponentBeanDefinitionRequest extends CreateBeanDefinitionRe
 
   public Consumer<ComponentAst> getNestedComponentParamProcessor() {
     return nestedComponentParamProcessor;
+  }
+
+  public boolean isParentMapType() {
+    return parentMapType;
   }
 
   @Override
