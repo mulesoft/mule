@@ -68,6 +68,7 @@ import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -242,6 +243,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private NotificationDispatcher notificationDispatcher;
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   @Inject
   private Optional<TransactionManager> transactionManager;
@@ -894,13 +898,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected ReturnDelegate getTargetReturnDelegate() {
     if (isSanitizedPayload(sanitize(targetValue))) {
-      return new PayloadTargetReturnDelegate(target, componentModel, muleContext);
+      return new PayloadTargetReturnDelegate(target, componentModel, artifactEncoding);
     }
-    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, muleContext, streamingManager);
+    return new TargetReturnDelegate(target, targetValue, componentModel, expressionManager, artifactEncoding,
+                                    streamingManager);
   }
 
   protected ValueReturnDelegate getValueReturnDelegate() {
-    return new ValueReturnDelegate(componentModel, muleContext);
+    return new ValueReturnDelegate(componentModel, artifactEncoding);
   }
 
   protected boolean isTargetPresent() {

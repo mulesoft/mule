@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.privileged.processor.simple;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+
 import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -51,6 +52,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   @Inject
   FeatureFlaggingService featureFlaggingService;
+
+  private ArtifactEncoding artifactEncoding;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -106,9 +109,9 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   private Charset getEncoding(Object src) {
     if (src instanceof Message) {
       return ((Message) src).getPayload().getDataType().getMediaType().getCharset()
-          .orElse(getDefaultEncoding(muleContext));
+          .orElse(artifactEncoding.getDefaultEncoding());
     } else {
-      return getDefaultEncoding(muleContext);
+      return artifactEncoding.getDefaultEncoding();
     }
   }
 
@@ -158,5 +161,10 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   @Inject
   public void setExpressionManager(ExtendedExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+  }
+
+  @Inject
+  public void setArtifactEncoding(ArtifactEncoding artifactEncoding) {
+    this.artifactEncoding = artifactEncoding;
   }
 }

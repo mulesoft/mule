@@ -9,19 +9,23 @@ package org.mule.tck.core.transformer;
 import static org.mule.runtime.api.message.Message.of;
 
 import static java.lang.String.format;
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
+import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 
 import java.io.InputStream;
@@ -29,7 +33,12 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-public abstract class AbstractTransformerTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase {
+
+  /**
+   * Convenient test message for unit testing.
+   */
+  public static final String TEST_MESSAGE = "Test Message";
 
   // Remove tabs and line breaks in the passed String; this makes comparison of XML
   // fragments easier
@@ -88,8 +97,11 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
       Transformer trans = this.getTransformer();
       Transformer trans2 = this.getRoundTripTransformer();
       Message message = of(getTestData());
-      message = new ExtendedTransformationService(muleContext).applyTransformers(message, null,
-                                                                                 asList(trans, trans2));
+      final ExtendedTransformationService extendedTransformationService = new ExtendedTransformationService();
+      extendedTransformationService.setDataTypeConversionResolver(mock(DataTypeConversionResolver.class));
+      extendedTransformationService.setArtifactEncoding(() -> defaultCharset());
+      message = extendedTransformationService.applyTransformers(message, null,
+                                                                asList(trans, trans2));
       Object result = message.getPayload().getValue();
       this.compareRoundtripResults(this.getTestData(), result);
     }
@@ -112,6 +124,13 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
   public abstract Transformer getTransformer() throws Exception;
 
   public abstract Transformer getRoundTripTransformer() throws Exception;
+
+  protected final <T extends Transformer> T configureTransformer(T transformer) {
+    if (transformer instanceof AbstractTransformer t) {
+      t.setArtifactEncoding(() -> defaultCharset());
+    }
+    return transformer;
+  }
 
   public abstract Object getTestData();
 

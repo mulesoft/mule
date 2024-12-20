@@ -11,6 +11,7 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.singletonMap;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -37,6 +38,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.internal.transformer.simple.SerializableToByteArray;
@@ -62,8 +64,11 @@ import io.qameta.allure.Issue;
 @Feature(MULE_EVENT)
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
+  private JavaObjectSerializer objectSerializer;
+
   @Before
   public void setUp() {
+    objectSerializer = new JavaObjectSerializer(this.getClass().getClassLoader());
     currentMuleContext.set(muleContext);
   }
 
@@ -77,7 +82,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(testEvent());
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
-    trans.setObjectSerializer(muleContext.getObjectSerializer());
+    trans.setArtifactEncoding(() -> defaultCharset());
+    trans.setObjectSerializer(objectSerializer);
     PrivilegedEvent deserialized = (PrivilegedEvent) trans.transform(serialized);
 
     // Assert that deserialized event is not null
@@ -86,7 +92,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   private Transformer createSerializableToByteArrayTransformer() {
     SerializableToByteArray transformer = new SerializableToByteArray();
-    transformer.setObjectSerializer(muleContext.getObjectSerializer());
+    transformer.setArtifactEncoding(() -> defaultCharset());
+    transformer.setObjectSerializer(objectSerializer);
 
     return transformer;
   }
@@ -105,7 +112,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     muleContext = createMuleContext();
     muleContext.start();
     ByteArrayToObject trans = new ByteArrayToObject();
-    trans.setObjectSerializer(muleContext.getObjectSerializer());
+    trans.setArtifactEncoding(() -> defaultCharset());
+    trans.setObjectSerializer(objectSerializer);
 
     // Recreate and register artifacts (this would happen if using any kind of static config e.g. XML)
     createAndRegisterTransformersEndpointBuilderService();
@@ -131,8 +139,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     }
     PrivilegedEvent testEvent = this.<PrivilegedEvent.Builder>getEventBuilder()
         .message(of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
-    byte[] serializedEvent = muleContext.getObjectSerializer().getExternalProtocol().serialize(testEvent);
-    testEvent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(serializedEvent);
+    byte[] serializedEvent = objectSerializer.getExternalProtocol().serialize(testEvent);
+    testEvent = objectSerializer.getExternalProtocol().deserialize(serializedEvent);
 
     assertArrayEquals((byte[]) testEvent.getMessage().getPayload().getValue(), payload.toString().getBytes());
   }
@@ -392,7 +400,8 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
-    trans.setObjectSerializer(muleContext.getObjectSerializer());
+    trans.setArtifactEncoding(() -> defaultCharset());
+    trans.setObjectSerializer(objectSerializer);
     CoreEvent deserialized = (CoreEvent) trans.transform(serialized);
 
     assertThat(deserialized.getSecurityContext().getAuthentication().getPrincipal(),

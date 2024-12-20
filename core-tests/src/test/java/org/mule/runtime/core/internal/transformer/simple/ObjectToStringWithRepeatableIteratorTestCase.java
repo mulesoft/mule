@@ -37,7 +37,7 @@ public class ObjectToStringWithRepeatableIteratorTestCase extends AbstractTransf
 
   @Override
   public Transformer getTransformer() throws Exception {
-    final ObjectToString objectToString = new ObjectToString();
+    final ObjectToString objectToString = configureTransformer(new ObjectToString());
     objectToString.setFeatureFlags(featureFlaggingService);
     return objectToString;
   }

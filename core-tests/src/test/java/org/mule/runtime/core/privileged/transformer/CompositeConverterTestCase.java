@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Every.everyItem;
@@ -22,14 +23,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.internal.transformer.CompositeConverter;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -56,7 +56,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
   public void getSourceDataTypes() {
     DataType[] dataTypes = new DataType[] {DataType.STRING};
     Converter converter = mock(Converter.class);
-    when(converter.getSourceDataTypes()).thenReturn(Arrays.asList(dataTypes));
+    when(converter.getSourceDataTypes()).thenReturn(asList(dataTypes));
     CompositeConverter chain = new CompositeConverter(converter);
 
     assertThat(DataType.STRING, equalTo(chain.getSourceDataTypes().get(0)));
@@ -145,8 +145,8 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
   @Test
   public void equalsReturnsTrueOnCompositeConvertersWithSameNameAndSameTransformationChain() {
-    Converter byteArrayToObjectConverter = new ByteArrayToObject();
-    Converter inputStreamToByteArrayConverter = new InputStreamToByteArray();
+    Converter byteArrayToObjectConverter = configureTransformer(new ByteArrayToObject());
+    Converter inputStreamToByteArrayConverter = configureTransformer(new InputStreamToByteArray());
     CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter);
     CompositeConverter compositeConverterB = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter);
 
@@ -156,8 +156,8 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
   @Test
   public void equalsReturnsFalseOnCompositeConvertersWithDifferentTransformationChain() {
-    Converter byteArrayToObjectConverter = new ByteArrayToObject();
-    Converter inputStreamToByteArrayConverter = new InputStreamToByteArray();
+    Converter byteArrayToObjectConverter = configureTransformer(new ByteArrayToObject());
+    Converter inputStreamToByteArrayConverter = configureTransformer(new InputStreamToByteArray());
     CompositeConverter compositeConverterA = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter);
     CompositeConverter compositeConverterB = new CompositeConverter(inputStreamToByteArrayConverter, byteArrayToObjectConverter);
 
@@ -166,11 +166,11 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
   @Test
   public void hashCodeForCompositeConvertersChangesWithDifferentTransformationChain() {
-    Converter byteArrayToObjectConverter = new ByteArrayToObject();
-    Converter inputStreamToByteArrayConverter = new InputStreamToByteArray();
+    Converter byteArrayToObjectConverter = configureTransformer(new ByteArrayToObject());
+    Converter inputStreamToByteArrayConverter = configureTransformer(new InputStreamToByteArray());
 
-    Converter byteArrayToObjectConverter2 = new ByteArrayToObject();
-    Converter inputStreamToByteArrayConverter2 = new InputStreamToByteArray();
+    Converter byteArrayToObjectConverter2 = configureTransformer(new ByteArrayToObject());
+    Converter inputStreamToByteArrayConverter2 = configureTransformer(new InputStreamToByteArray());
 
     int hashCodeConverterA = new CompositeConverter(byteArrayToObjectConverter, inputStreamToByteArrayConverter).hashCode();
 
@@ -178,6 +178,13 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     int hashCodeConverterAnotherClone =
         new CompositeConverter(byteArrayToObjectConverter2, inputStreamToByteArrayConverter2).hashCode();
 
-    assertThat(Arrays.asList(hashCodeConverterAClone, hashCodeConverterAnotherClone), everyItem(equalTo(hashCodeConverterA)));
+    assertThat(asList(hashCodeConverterAClone, hashCodeConverterAnotherClone), everyItem(equalTo(hashCodeConverterA)));
+  }
+
+  protected final <T extends Converter> T configureTransformer(T transformer) {
+    if (transformer instanceof AbstractTransformer t) {
+      t.setArtifactEncoding(() -> UTF_8);
+    }
+    return transformer;
   }
 }

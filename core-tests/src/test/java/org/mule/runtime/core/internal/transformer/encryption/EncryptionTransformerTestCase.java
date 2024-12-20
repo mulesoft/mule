@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.transformer.encryption;
 
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -16,6 +17,8 @@ import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
+import org.junit.Before;
+
 public class EncryptionTransformerTestCase extends AbstractTransformerTestCase {
 
   private static final String TEST_DATA =
@@ -23,11 +26,10 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase {
 
   private PasswordBasedEncryptionStrategy strat;
 
-  @Override
-  protected void doSetUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     strat = new PasswordBasedEncryptionStrategy();
     strat.setPassword("mule");
-    strat.initialise();
   }
 
   @Override
@@ -46,27 +48,19 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase {
   }
 
   @Override
-  public Transformer getTransformer() {
+  public Transformer getTransformer() throws InitialisationException {
     EncryptionTransformer transformer = new EncryptionTransformer();
     transformer.setStrategy(strat);
-    try {
-      transformer.initialise();
-    } catch (InitialisationException e) {
-      fail(e.getMessage());
-    }
-    return transformer;
+    transformer.initialise();
+    return configureTransformer(transformer);
   }
 
   @Override
-  public Transformer getRoundTripTransformer() {
+  public Transformer getRoundTripTransformer() throws InitialisationException {
     DecryptionTransformer transformer = new DecryptionTransformer();
     transformer.setStrategy(strat);
-    try {
-      transformer.initialise();
-    } catch (InitialisationException e) {
-      fail(e.getMessage());
-    }
-    return transformer;
+    transformer.initialise();
+    return configureTransformer(transformer);
   }
 
   @Override

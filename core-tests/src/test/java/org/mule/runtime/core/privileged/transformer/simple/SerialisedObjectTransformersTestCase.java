@@ -31,14 +31,14 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
 
   @Override
   public Transformer getTransformer() throws Exception {
-    SerializableToByteArray transformer = new SerializableToByteArray();
+    SerializableToByteArray transformer = configureTransformer(new SerializableToByteArray());
     transformer.setObjectSerializer(objectSerializer);
     return transformer;
   }
 
   @Override
   public Transformer getRoundTripTransformer() throws Exception {
-    ByteArrayToSerializable transformer = new ByteArrayToSerializable();
+    ByteArrayToSerializable transformer = configureTransformer(new ByteArrayToSerializable());
     transformer.setObjectSerializer(objectSerializer);
     return transformer;
   }

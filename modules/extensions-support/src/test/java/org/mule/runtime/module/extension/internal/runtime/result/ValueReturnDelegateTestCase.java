@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.result;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -24,7 +24,7 @@ public class ValueReturnDelegateTestCase extends ValueReturnDelegateContractTest
 
   @Override
   protected ReturnDelegate createReturnDelegate() throws InitialisationException {
-    return new ValueReturnDelegate(componentModel, muleContext);
+    return new ValueReturnDelegate(componentModel, artifactEncoding);
   }
 
   @Override

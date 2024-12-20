@@ -8,13 +8,13 @@ package org.mule.runtime.module.extension.internal.runtime.client;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isPagedOperation;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findSource;
@@ -27,6 +27,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -137,6 +138,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private MuleConfiguration muleConfiguration;
 
   @Inject
+  private ArtifactEncoding artifactEncoding;
+
+  @Inject
   private Optional<TransactionManager> transactionManager;
 
   private ExecutorService cacheShutdownExecutor;
@@ -240,6 +244,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   componentTracerFactory,
                                   muleContext,
                                   muleConfiguration,
+                                  artifactEncoding,
                                   notificationDispatcher,
                                   transactionManager.orElse(null));
 
