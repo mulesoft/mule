@@ -117,6 +117,11 @@ public final class BufferedCursorStream extends AbstractCursorStream {
     }
   }
 
+  @Override
+  public int available() throws IOException {
+    return localBuffer.remaining() + streamBuffer.available();
+  }
+
   private int assureDataInLocalBuffer(int len) {
     if (len <= localBuffer.remaining()) {
       return toIntExact(len);
