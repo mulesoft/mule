@@ -34,4 +34,9 @@ public class CreateComponentBeanDefinitionRequest extends CreateBeanDefinitionRe
   public Consumer<ComponentAst> getNestedComponentParamProcessor() {
     return nestedComponentParamProcessor;
   }
+
+  @Override
+  public String toString() {
+    return "component request for `" + getComponent().toString();
+  }
 }

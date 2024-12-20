@@ -25,4 +25,9 @@ class SimpleTypeBeanParamDefinitionCreator extends SimpleTypeBeanBaseDefinitionC
     return true;
   }
 
+  @Override
+  protected boolean isExpressionValue(CreateParamBeanDefinitionRequest request) {
+    return request.getParam().getValue().isLeft();
+  }
+
 }
