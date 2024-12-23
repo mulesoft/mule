@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.config.api.dsl.model;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.COLLECTION;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.MAP;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
@@ -18,11 +21,16 @@ import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Registry with all {@link ComponentBuildingDefinition} that where discovered in the classpath.
@@ -35,7 +43,7 @@ import java.util.function.Consumer;
 @Deprecated
 public final class ComponentBuildingDefinitionRegistry {
 
-  private final Map<ComponentIdentifier, ComponentBuildingDefinition<?>> builderDefinitionsMap = new HashMap<>();
+  private final Map<ComponentIdentifier, Deque<ComponentBuildingDefinition<?>>> builderDefinitionsMap = new HashMap<>();
   private final Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = new HashMap<>();
 
   /**
@@ -44,7 +52,11 @@ public final class ComponentBuildingDefinitionRegistry {
    * @param builderDefinition definition to be added in the registry
    */
   public void register(ComponentBuildingDefinition<?> builderDefinition) {
-    builderDefinitionsMap.put(builderDefinition.getComponentIdentifier(), builderDefinition);
+    builderDefinitionsMap.computeIfAbsent(builderDefinition.getComponentIdentifier(),
+                                          // Use a stack structure so the order is consistent across executions
+                                          // and keep the behavior that the last element to be added takes precedence
+                                          k -> new ArrayDeque<>())
+        .push(builderDefinition);
     wrapperIdentifierAndTypeMap.putAll(getWrapperIdentifierAndTypeMap(builderDefinition));
   }
 
@@ -55,7 +67,30 @@ public final class ComponentBuildingDefinitionRegistry {
    * @return the definition to build the component
    */
   public Optional<ComponentBuildingDefinition<?>> getBuildingDefinition(ComponentIdentifier identifier) {
-    return ofNullable(builderDefinitionsMap.get(identifier));
+    final Deque<ComponentBuildingDefinition<?>> definitions = builderDefinitionsMap.get(identifier);
+    return definitions == null
+        ? empty()
+        : ofNullable(definitions.peek());
+  }
+
+  /**
+   * Lookups a {@code ComponentBuildingDefinition} for a certain configuration component and a certain condition.
+   *
+   * @param identifier the component identifier
+   * @param condition  how to determine which of the available definitions to use
+   * @return the definition to build the component
+   */
+  public Optional<ComponentBuildingDefinition<?>> getBuildingDefinition(ComponentIdentifier identifier,
+                                                                        Predicate<ComponentBuildingDefinition<?>> condition) {
+    Collection<ComponentBuildingDefinition<?>> buildingDefinitions = builderDefinitionsMap.get(identifier);
+    if (buildingDefinitions == null) {
+      buildingDefinitions = emptyList();
+    }
+
+    return buildingDefinitions
+        .stream()
+        .filter(condition)
+        .findFirst();
   }
 
   /**
@@ -109,7 +144,7 @@ public final class ComponentBuildingDefinitionRegistry {
     Consumer<AttributeDefinition> collectWrappersConsumer =
         attributeDefinition -> attributeDefinition.accept(wrapperIdentifiersCollector);
     buildingDefinition.getSetterParameterDefinitions().stream()
-        .map(setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition())
+        .map(SetterAttributeDefinition::getAttributeDefinition)
         .forEach(collectWrappersConsumer);
     buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
     return wrapperIdentifierAndTypeMap;
