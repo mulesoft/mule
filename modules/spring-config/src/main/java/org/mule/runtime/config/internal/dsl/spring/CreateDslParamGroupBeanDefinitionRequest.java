@@ -49,11 +49,4 @@ public class CreateDslParamGroupBeanDefinitionRequest extends CreateBeanDefiniti
   public ComponentParameterAst getParameter(String parameterName) {
     return paramOwnerComponent.getParameter(paramGroupModel.getName(), parameterName);
   }
-
-  @Override
-  public String toString() {
-    return "DSL param group request for `"
-        + getParamGroupModel().getName() + "` in component `"
-        + getParamOwnerComponent().toString();
-  }
 }
