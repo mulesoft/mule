@@ -6,12 +6,15 @@
  */
 package org.mule.tck.core.transformer;
 
+import static org.mule.runtime.api.message.Message.of;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.api.message.Message.of;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -85,8 +88,8 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
       Transformer trans = this.getTransformer();
       Transformer trans2 = this.getRoundTripTransformer();
       Message message = of(getTestData());
-      message = ((ExtendedTransformationService) muleContext.getTransformationService()).applyTransformers(message, null,
-                                                                                                           asList(trans, trans2));
+      message = new ExtendedTransformationService(muleContext).applyTransformers(message, null,
+                                                                                 asList(trans, trans2));
       Object result = message.getPayload().getValue();
       this.compareRoundtripResults(this.getTestData(), result);
     }

@@ -7,27 +7,23 @@
 package org.mule.runtime.core.privileged.transformer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.Every.everyItem;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Every.everyItem;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.api.message.Message;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.internal.transformer.CompositeConverter;
-import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.internal.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -133,17 +129,6 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void setMuleContext() {
-    MuleContext mockMuleContext = mock(MuleContext.class);
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-
-    compositeConverter.setMuleContext(mockMuleContext);
-
-    verify(mockConverterA, atLeastOnce()).setMuleContext(mockMuleContext);
-    verify(mockConverterB, atLeastOnce()).setMuleContext(mockMuleContext);
-  }
-
-  @Test
   public void transform() throws Exception {
     doReturn("MyOutput1").when(mockConverterA).transform(any());
     doReturn(DataType.builder().charset(UTF_8).build()).when(mockConverterA).getReturnDataType();
@@ -156,22 +141,6 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     verify(mockConverterA, times(1)).transform("MyInput");
     verify(mockConverterB, times(1)).transform("MyOutput1", UTF_8);
     assertThat("MyOutput2", equalTo(output));
-  }
-
-  @Test
-  public void appliesTransformerChainOnMessage() throws Exception {
-    CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-    MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    compositeConverter.setMuleContext(muleContext);
-    final CoreEvent event = testEvent();
-    ExtendedTransformationService transformationService = mock(ExtendedTransformationService.class);
-    doReturn(mock(Message.class)).when(transformationService).applyTransformers(any(), eq(event), eq(compositeConverter));
-    doReturn(transformationService).when(muleContext).getTransformationService();
-
-    compositeConverter.process(event);
-
-    verify(transformationService, times(1)).applyTransformers(eq(testEvent().getMessage()), eq(testEvent()),
-                                                              eq(compositeConverter));
   }
 
   @Test

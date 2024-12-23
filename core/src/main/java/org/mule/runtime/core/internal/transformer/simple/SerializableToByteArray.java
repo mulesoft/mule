@@ -8,9 +8,11 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -21,6 +23,8 @@ import java.nio.charset.Charset;
  * be serialised. This is useful for transports such as TCP where the message headers would normally be lost.
  */
 public class SerializableToByteArray extends AbstractTransformer implements DiscoverableTransformer {
+
+  private ObjectSerializer objectSerializer;
 
   /**
    * Give core transformers a slightly higher priority
@@ -41,7 +45,7 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
      */
 
     try {
-      return muleContext.getObjectSerializer().getExternalProtocol().serialize(src);
+      return objectSerializer.getExternalProtocol().serialize(src);
     } catch (Exception e) {
       throw new TransformerException(this, e);
     }
@@ -56,4 +60,15 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
   public void setPriorityWeighting(int priorityWeighting) {
     this.priorityWeighting = priorityWeighting;
   }
+
+  public void setObjectSerializer(ObjectSerializer objectSerializer) {
+    this.objectSerializer = objectSerializer;
+  }
+
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
+    setObjectSerializer(muleContext.getObjectSerializer());
+  }
+
 }
