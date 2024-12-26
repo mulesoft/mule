@@ -189,6 +189,8 @@ public abstract class AbstractOSController {
     Executor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
+    File workingDirectory = new File(muleBin).getParentFile();
+    executor.setWorkingDirectory(workingDirectory);
 
     setStreamHandler(executor, streamHandler);
     return doExecution(executor, commandLine, newEnv);
