@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
  * Object that sends an HTTP/2 request, and returns the response. Notice it must be started to be used and stopped to be disposed
  * properly. Blocking and non-blocking options are available to execute requests.
  *
- * @since 4.5
+ * @since 4.10
  */
 public interface Http2Client {
 

@@ -14,7 +14,7 @@ import java.io.IOException;
  * Represents an HTTP/2 Server. Notice it should be started to be bound, stopped to be unbound and finally disposed to release all
  * related components.
  *
- * @since 4.5
+ * @since 4.10
  */
 public interface Http2Server {
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.http2.api.server;
 
-import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.net.InetSocketAddress;
 
