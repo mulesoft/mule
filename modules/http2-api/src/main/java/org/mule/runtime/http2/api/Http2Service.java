@@ -16,7 +16,7 @@ import org.mule.runtime.http2.api.client.Http2Client;
 /**
  * Provides HTTP/2 server and client factories.
  *
- * @since 4.5
+ * @since 4.10
  */
 @NoImplement
 public interface Http2Service extends Service {

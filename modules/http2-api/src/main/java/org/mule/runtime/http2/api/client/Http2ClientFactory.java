@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 /**
  * Factory object for {@link Http2Client}.
  *
- * @since 4.5
+ * @since 4.10
  */
 @NoImplement
 public interface Http2ClientFactory {
