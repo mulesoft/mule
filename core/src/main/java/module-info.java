@@ -342,7 +342,8 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.processor.interceptor to
       org.mule.runtime.spring.config,
-      spring.beans;
+      spring.beans,
+      kryo.shaded;
   exports org.mule.runtime.core.internal.processor.strategy to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support;
