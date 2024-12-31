@@ -11,8 +11,6 @@ import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptio
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -95,44 +93,37 @@ public class ClassUtils {
       }
     }
 
-    Class<?> clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
-      try {
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return cl != null ? cl.loadClass(className) : null;
+    Class<?> clazz = null;
 
+    try {
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      clazz = cl != null ? cl.loadClass(className) : null;
+    } catch (ClassNotFoundException e) {
+      // Nothing to do.
+    }
+
+    if (clazz == null) {
+      try {
+        clazz = Class.forName(className);
+      } catch (ClassNotFoundException e) {
+        // Nothing to do.
+      }
+    }
+
+    if (clazz == null) {
+      try {
+        clazz = ClassUtils.class.getClassLoader().loadClass(className);
       } catch (ClassNotFoundException e) {
         return null;
       }
-    });
-
-    if (clazz == null) {
-      clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
-        try {
-          return Class.forName(className);
-        } catch (ClassNotFoundException e) {
-          return null;
-        }
-      });
     }
 
     if (clazz == null) {
-      clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
-        try {
-          return ClassUtils.class.getClassLoader().loadClass(className);
-        } catch (ClassNotFoundException e) {
-          return null;
-        }
-      });
-    }
-
-    if (clazz == null) {
-      clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
-        try {
-          return callingClass.getClassLoader().loadClass(className);
-        } catch (ClassNotFoundException e) {
-          return null;
-        }
-      });
+      try {
+        clazz = callingClass.getClassLoader().loadClass(className);
+      } catch (ClassNotFoundException e) {
+        // Nothing to do.
+      }
     }
 
     if (clazz == null) {

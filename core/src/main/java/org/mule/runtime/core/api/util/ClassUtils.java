@@ -40,7 +40,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -124,18 +123,15 @@ public class ClassUtils {
    * @return A URL pointing to the resource to load or null if the resource is not found
    */
   public static URL getResource(final String resourceName, final Class<?> callingClass) {
-    URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
-      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      return cl != null ? cl.getResource(resourceName) : null;
-    });
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    URL url = cl != null ? cl.getResource(resourceName) : null;
 
     if (url == null) {
-      url = AccessController
-          .doPrivileged((PrivilegedAction<URL>) () -> ClassUtils.class.getClassLoader().getResource(resourceName));
+      url = ClassUtils.class.getClassLoader().getResource(resourceName);
     }
 
     if (url == null) {
-      url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> callingClass.getClassLoader().getResource(resourceName));
+      url = callingClass.getClassLoader().getResource(resourceName);
     }
 
     return url;
@@ -150,8 +146,7 @@ public class ClassUtils {
    * @return the {@link URL} pointing to the resource.
    */
   public static URL getResourceOrFail(final String resourceName, ClassLoader classLoader, boolean tryAbsolutePath) {
-    URL url = AccessController
-        .doPrivileged((PrivilegedAction<URL>) () -> classLoader != null ? classLoader.getResource(resourceName) : null);
+    URL url = classLoader != null ? classLoader.getResource(resourceName) : null;
     if (url != null) {
       return url;
     }
@@ -219,33 +214,28 @@ public class ClassUtils {
     checkArgument(!isEmpty(resourceName), "ResourceName cannot be empty");
     checkArgument(fallbackClassLoader != null, "FallbackClassLoader cannot be null");
 
-    Enumeration<URL> enumeration = AccessController.doPrivileged((PrivilegedAction<Enumeration<URL>>) () -> {
-      try {
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return cl != null ? cl.getResources(resourceName) : null;
-      } catch (IOException e) {
-        return null;
-      }
-    });
-
-    if (enumeration == null) {
-      enumeration = AccessController.doPrivileged((PrivilegedAction<Enumeration<URL>>) () -> {
-        try {
-          return ClassUtils.class.getClassLoader().getResources(resourceName);
-        } catch (IOException e) {
-          return null;
-        }
-      });
+    Enumeration<URL> enumeration = null;
+    try {
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      enumeration = cl != null ? cl.getResources(resourceName) : null;
+    } catch (IOException e) {
+      // Nothing to do.
     }
 
     if (enumeration == null) {
-      enumeration = AccessController.doPrivileged((PrivilegedAction<Enumeration<URL>>) () -> {
-        try {
-          return fallbackClassLoader.getResources(resourceName);
-        } catch (IOException e) {
-          return null;
-        }
-      });
+      try {
+        enumeration = ClassUtils.class.getClassLoader().getResources(resourceName);
+      } catch (IOException e) {
+        // Nothing to do.
+      }
+    }
+
+    if (enumeration == null) {
+      try {
+        enumeration = fallbackClassLoader.getResources(resourceName);
+      } catch (IOException e) {
+        // Nothing to do.
+      }
     }
 
     return enumeration;
@@ -297,44 +287,37 @@ public class ClassUtils {
       }
     }
 
-    Class<?> clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
-      try {
-        final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return cl != null ? cl.loadClass(className) : null;
+    Class<?> clazz = null;
+    try {
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      clazz = cl != null ? cl.loadClass(className) : null;
 
+    } catch (ClassNotFoundException e) {
+      return null;
+    }
+
+    if (clazz == null) {
+      try {
+        clazz = Class.forName(className);
+      } catch (ClassNotFoundException e) {
+        // Nothing to do.
+      }
+    }
+
+    if (clazz == null) {
+      try {
+        clazz = ClassUtils.class.getClassLoader().loadClass(className);
       } catch (ClassNotFoundException e) {
         return null;
       }
-    });
-
-    if (clazz == null) {
-      clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
-        try {
-          return Class.forName(className);
-        } catch (ClassNotFoundException e) {
-          return null;
-        }
-      });
     }
 
     if (clazz == null) {
-      clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
-        try {
-          return ClassUtils.class.getClassLoader().loadClass(className);
-        } catch (ClassNotFoundException e) {
-          return null;
-        }
-      });
-    }
-
-    if (clazz == null) {
-      clazz = AccessController.doPrivileged((PrivilegedAction<Class<?>>) () -> {
-        try {
-          return callingClass.getClassLoader().loadClass(className);
-        } catch (ClassNotFoundException e) {
-          return null;
-        }
-      });
+      try {
+        clazz = callingClass.getClassLoader().loadClass(className);
+      } catch (ClassNotFoundException e) {
+        return null;
+      }
     }
 
     if (clazz == null) {

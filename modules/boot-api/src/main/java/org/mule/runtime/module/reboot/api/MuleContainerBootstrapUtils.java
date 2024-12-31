@@ -12,8 +12,6 @@ import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_HOME
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 /**
  * @deprecated use org.mule.runtime.core.internal.util.MuleContainerUtils instead.
@@ -121,19 +119,18 @@ public final class MuleContainerBootstrapUtils {
    * @see org.mule.runtime.core.api.util.ClassUtils#getResource
    */
   public static URL getResource(final String resourceName, final Class<?> callingClass) {
-    URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
-      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      return cl != null ? cl.getResource(resourceName) : null;
-    });
+    URL url = null;
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    url = cl != null ? cl.getResource(resourceName) : null;
+
 
     if (url == null) {
-      url = AccessController
-          .doPrivileged((PrivilegedAction<URL>) () -> MuleContainerBootstrapUtils.class.getClassLoader()
-              .getResource(resourceName));
+      url = MuleContainerBootstrapUtils.class.getClassLoader()
+          .getResource(resourceName);
     }
 
     if (url == null) {
-      url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> callingClass.getClassLoader().getResource(resourceName));
+      url = callingClass.getClassLoader().getResource(resourceName);
     }
 
     return url;

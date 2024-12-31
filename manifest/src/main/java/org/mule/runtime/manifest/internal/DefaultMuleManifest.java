@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.SortedMap;
@@ -154,7 +152,7 @@ public class DefaultMuleManifest implements MuleManifest {
       try {
         // We want to load the MANIFEST.MF from the mule-core jar. Sine we
         // don't know the version we're using we have to search for the jar on the classpath
-        URL url = AccessController.doPrivileged(new UrlPrivilegedAction());
+        URL url = new UrlPrivilegedAction().run();
 
         if (url != null) {
           URLConnection urlConnection = url.openConnection();
@@ -179,12 +177,11 @@ public class DefaultMuleManifest implements MuleManifest {
     return get().getManifest().getMainAttributes().getValue(new Attributes.Name(name));
   }
 
-  static class UrlPrivilegedAction implements PrivilegedAction<URL> {
+  static class UrlPrivilegedAction {
 
     private static final Pattern EMBEDDED_JAR_PATTERN = compile("mule[^-]*-[^-]*-embedded");
     private static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";
 
-    @Override
     public URL run() {
       URL result = null;
       try {
