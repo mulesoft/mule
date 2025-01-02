@@ -6,9 +6,11 @@
  */
 package org.mule.test.some.extension;
 
-import static java.math.BigDecimal.valueOf;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
+import static java.math.BigDecimal.valueOf;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.metadata.TypedValue;
@@ -24,7 +26,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ import org.slf4j.Logger;
  */
 public class SomeOps {
 
-  private final Logger LOGGER = getLogger(SomeOps.class);
+  private static final Logger LOGGER = getLogger(SomeOps.class);
 
   public void someOp(@Connection String conn, @Config ParameterGroupConfig ext) {}
 
