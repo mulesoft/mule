@@ -52,12 +52,9 @@ public class DeploymentPropertiesUtils {
   public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties,
                                                        String fileName)
       throws IOException {
-    File file = new File(getExecutionFolder(), artifactName);
-    String workingDirectory = file.getAbsolutePath();
-    String deploymentPropertiesPath = workingDirectory + separator + DEPLOYMENT_PROPERTIES_DIRECTORY;
-
     Properties properties = deploymentProperties.orElse(new Properties());
 
+    String deploymentPropertiesPath = getDeploymentPropertiesPath(artifactName);
     initDeploymentPropertiesDirectory(deploymentPropertiesPath);
     persistDeploymentPropertiesFile(deploymentPropertiesPath, properties, fileName);
 
