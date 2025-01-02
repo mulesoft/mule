@@ -291,11 +291,11 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Description("Tries to execute an operation with a TypedValue parameter")
   public void operationWithTypedValueParameter() throws Throwable {
     final String message = "Hello from ExtensionClient";
-    OperationParameters params = builder().configName(HEISENBERG_CONFIG)
-        .addParameter("message", new TypedValue<>(message, STRING))
-        .build();
 
-    Result<Object, Object> result = doExecute(HEISENBERG_EXT_NAME, "echoStaticMessage", params);
+    Map<String, Object> params = new HashMap<>();
+    params.put("message", new TypedValue<>(message, STRING));
+
+    Result<Object, Object> result = doExecute(HEISENBERG_EXT_NAME, "echoStaticMessage", empty(), params, false, false);
     assertThat(result.getOutput(), is(message));
   }
 }
