@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.tracer.impl;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.EventTracer;
@@ -32,25 +35,25 @@ public class CoreEventComponentTracerFactory implements ComponentTracerFactory<C
   @Override
   public ComponentTracer<CoreEvent> fromComponent(Component component) {
     InitialSpanInfo initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(component);
-    return new CoreEventComponentTracer(initialSpanInfo, coreEventTracer);
+    return new CoreEventComponentTracer(initialSpanInfo, empty(), coreEventTracer);
   }
 
   @Override
   public ComponentTracer<CoreEvent> fromComponent(Component component, ComponentTracer<?> parentComponentTracer) {
     InitialSpanInfo initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(component);
-    return new CoreEventComponentTracer(initialSpanInfo, coreEventTracer, parentComponentTracer);
+    return new CoreEventComponentTracer(initialSpanInfo, empty(), coreEventTracer, parentComponentTracer);
   }
 
   @Override
   public ComponentTracer<CoreEvent> fromComponent(Component component, String suffix) {
     InitialSpanInfo initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(component, suffix);
-    return new CoreEventComponentTracer(initialSpanInfo, coreEventTracer);
+    return new CoreEventComponentTracer(initialSpanInfo, empty(), coreEventTracer);
   }
 
   @Override
   public ComponentTracer<CoreEvent> fromComponent(Component component, String overriddenName, String suffix) {
     InitialSpanInfo initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(component, overriddenName, suffix);
-    return new CoreEventComponentTracer(initialSpanInfo, coreEventTracer);
+    return new CoreEventComponentTracer(initialSpanInfo, of(overriddenName), coreEventTracer);
   }
 
 }

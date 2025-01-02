@@ -5,6 +5,15 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.field.visibilityReduced",
+            "old": "field org.mule.runtime.core.api.retry.policy.ConnectNotifier.logger",
+            "new": "field org.mule.runtime.core.api.retry.policy.ConnectNotifier.logger",
+            "oldVisibility": "protected",
+            "newVisibility": "private",
+            "justification": "tests perf"
+          },
+          {
+            "ignore": true,
             "code": "java.field.removedWithConstant",
             "old": "field org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME @ org.mule.runtime.core.api.transformer.AbstractTransformer",
             "justification": "W-17466198: Make Transformers not be Processors anymore"

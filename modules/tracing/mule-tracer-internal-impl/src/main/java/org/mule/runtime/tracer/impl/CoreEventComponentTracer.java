@@ -6,18 +6,17 @@
  */
 package org.mule.runtime.tracer.impl;
 
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.condition.NotNullSpanAssertion.getNotNullSpanTracingCondition;
+
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
-import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
-
 import java.util.Optional;
-
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.condition.NotNullSpanAssertion.getNotNullSpanTracingCondition;
 
 /**
  * Default implementation of a {@link ComponentTracer}. It uses a {@link CoreEvent} as the
@@ -34,18 +33,20 @@ public class CoreEventComponentTracer implements ComponentTracer<CoreEvent> {
   private final Assertion parentComponentSpanAssertion;
   private final Assertion componentSpanAssertion;
 
-  public CoreEventComponentTracer(InitialSpanInfo initialSpanInfo, EventTracer<CoreEvent> coreEventTracer) {
+  public CoreEventComponentTracer(InitialSpanInfo initialSpanInfo, Optional<String> spanNameOverride,
+                                  EventTracer<CoreEvent> coreEventTracer) {
     this.initialSpanInfo = initialSpanInfo;
     this.coreEventTracer = coreEventTracer;
     this.parentComponentSpanAssertion = getNotNullSpanTracingCondition();
-    this.componentSpanAssertion = new SpanNameAssertion(initialSpanInfo.getName());
+    this.componentSpanAssertion = new SpanNameAssertion(spanNameOverride.orElseGet(initialSpanInfo::getName));
   }
 
-  public CoreEventComponentTracer(InitialSpanInfo initialSpanInfo, EventTracer<CoreEvent> coreEventTracer,
+  public CoreEventComponentTracer(InitialSpanInfo initialSpanInfo, Optional<String> spanNameOverride,
+                                  EventTracer<CoreEvent> coreEventTracer,
                                   ComponentTracer<?> parentComponentTracer) {
     this.initialSpanInfo = initialSpanInfo;
     this.coreEventTracer = coreEventTracer;
-    this.componentSpanAssertion = new SpanNameAssertion(initialSpanInfo.getName());
+    this.componentSpanAssertion = new SpanNameAssertion(spanNameOverride.orElseGet(initialSpanInfo::getName));
     this.parentComponentSpanAssertion = parentComponentTracer.getComponentSpanAssertion();
   }
 
