@@ -12,6 +12,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -62,7 +63,7 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
     TypeSafeTransformer typeSafeTransformer = new TypeSafeTransformer(transformationService);
     resolver = context -> {
       Object resolvedValue = valueResolverDelegate.resolve(context);
-      return isInstance(expectedType, resolvedValue)
+      return isTypeSafe(resolvedValue)
           ? (T) resolvedValue
           : typeSafeTransformer.transform(resolvedValue, DataType.fromObject(resolvedValue), DataType.fromType(expectedType));
     };
@@ -70,6 +71,16 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
     if (!valueResolverDelegate.isDynamic() && !InputStream.class.isAssignableFrom(expectedType)) {
       resolver = new CachedResolver(resolver);
     }
+  }
+
+  private boolean isTypeSafe(Object resolvedValue) {
+    if (isInstance(expectedType, resolvedValue)) {
+      return true;
+    } else if (resolvedValue instanceof TypedValue) {
+      return isInstance(expectedType, ((TypedValue) resolvedValue).getValue());
+    }
+
+    return false;
   }
 
   public void setTransformationService(TransformationService transformationService) {
