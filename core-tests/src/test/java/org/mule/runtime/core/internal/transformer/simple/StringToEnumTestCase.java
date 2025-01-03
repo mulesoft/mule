@@ -7,28 +7,34 @@
 package org.mule.runtime.core.internal.transformer.simple;
 
 import static java.lang.String.format;
+import static java.nio.charset.Charset.defaultCharset;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
+
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class StringToEnumTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   enum TestEnum {
     A, B
   }
 
-  private StringToEnum transformer = new StringToEnum(TestEnum.class);
+  private StringToEnum transformer;
+
+  @Before
+  public void setUp() {
+    transformer = new StringToEnum(TestEnum.class);
+    transformer.setArtifactEncoding(() -> defaultCharset());
+  }
 
   @Test
   public void transform() throws Exception {
@@ -39,16 +45,13 @@ public class StringToEnumTestCase extends AbstractMuleTestCase {
 
   @Test
   public void illegalValue() throws Exception {
-    expectedException.expect(TransformerException.class);
-    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
-
-    transformer.transform("NOT ENUM VALUE");
+    var thrown = assertThrows(TransformerException.class, () -> transformer.transform("NOT ENUM VALUE"));
+    assertThat(thrown.getCause(), instanceOf(IllegalArgumentException.class));
   }
 
   @Test
   public void nullClass() {
-    expectedException.expect(IllegalArgumentException.class);
-    new StringToEnum(null);
+    assertThrows(IllegalArgumentException.class, () -> new StringToEnum(null));
   }
 
   @Test

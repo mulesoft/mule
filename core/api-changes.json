@@ -5,6 +5,103 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.DefaultTransformationService",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.core.api.transformer.AbstractTransformer.muleContext",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "new": "class org.mule.runtime.core.api.transformer.AbstractTransformer",
+            "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.Converter",
+            "new": "interface org.mule.runtime.core.api.transformer.Converter",
+            "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "new": "interface org.mule.runtime.core.api.transformer.DiscoverableTransformer",
+            "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.api.transformer.Transformer",
+            "new": "interface org.mule.runtime.core.api.transformer.Transformer",
+            "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "new": "class org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+            "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter void org.mule.runtime.core.privileged.el.DataWeaveArtifactContext::<init>(===org.mule.runtime.core.api.MuleContext===, org.mule.runtime.api.artifact.Registry)",
+            "new": "parameter void org.mule.runtime.core.privileged.el.DataWeaveArtifactContext::<init>(===org.mule.runtime.core.api.config.MuleConfiguration===, org.mule.runtime.api.artifact.Registry)",
+            "parameterIndex": "0",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "class org.mule.runtime.core.privileged.el.DataWeaveArtifactContext",
+            "new": "class org.mule.runtime.core.privileged.el.DataWeaveArtifactContext",
+            "annotation": "@org.mule.api.annotation.NoInstantiate",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.numberOfParametersChanged",
+            "old": "method void org.mule.runtime.core.privileged.el.MuleInstanceContext::<init>(org.mule.runtime.core.api.MuleContext)",
+            "new": "method void org.mule.runtime.core.privileged.el.MuleInstanceContext::<init>(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.config.MuleConfiguration)",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "class org.mule.runtime.core.privileged.el.MuleInstanceContext",
+            "new": "class org.mule.runtime.core.privileged.el.MuleInstanceContext",
+            "annotation": "@org.mule.api.annotation.NoInstantiate",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "class org.mule.runtime.core.privileged.el.ServerContext",
+            "new": "class org.mule.runtime.core.privileged.el.ServerContext",
+            "annotation": "@org.mule.api.annotation.NoInstantiate",
+            "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
+          },
+          {
+            "ignore": true,
             "code": "java.field.removedWithConstant",
             "old": "field org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME @ org.mule.runtime.core.api.transformer.AbstractTransformer",
             "justification": "W-17466198: Make Transformers not be Processors anymore"

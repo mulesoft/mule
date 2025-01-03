@@ -6,25 +6,29 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static java.nio.charset.Charset.defaultCharset;
+
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 
+import org.junit.Before;
 import org.junit.Test;
 
-public class LocalDateToDateTestCase extends AbstractMuleContextTestCase {
+public class LocalDateToDateTestCase extends AbstractMuleTestCase {
 
   private LocalDateToDate transformer;
 
-  @Override
-  protected void doSetUp() throws Exception {
+  @Before
+  public void doSetUp() throws Exception {
     transformer = new LocalDateToDate();
-    transformer.setMuleContext(muleContext);
+    transformer.setArtifactEncoding(() -> defaultCharset());
   }
 
   @Test

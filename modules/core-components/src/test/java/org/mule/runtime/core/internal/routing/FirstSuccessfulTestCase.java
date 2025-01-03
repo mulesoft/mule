@@ -7,17 +7,17 @@
 package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.FirstSuccessfulStory.FIRST_SUCCESSFUL;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.rules.ExpectedException.none;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -36,9 +36,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.processor.ContextPropagationChecker;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -48,9 +46,6 @@ import io.qameta.allure.Story;
 public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   private static final String EXCEPTION_SEEN = "EXCEPTION WAS SEEN";
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   public FirstSuccessfulTestCase() {
     setStartContext(true);
@@ -77,8 +72,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     fs.initialise();
-    expectedException.expect(NullPointerException.class);
-    fs.process(testEvent());
+    assertThrows(NullPointerException.class, () -> fs.process(testEvent()));
   }
 
   @Test
@@ -95,7 +89,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     fs.setAnnotations(getAppleFlowComponentLocationAnnotations());
     final FlowConstruct flow = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     when(flow.getMuleContext()).thenReturn(muleContext);
-    when(((Component) flow).getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
+    when(flow.getLocation()).thenReturn(TEST_CONNECTOR_LOCATION);
     fs.setMuleContext(muleContext);
     muleContext.getInjector().inject(fs);
     fs.setRoutes(asList(processors));
@@ -135,7 +129,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         Message transformedMessage = muleContext.getTransformationService()
             .transform(event.getMessage(), DataType.builder()
                 .type(String.class)
-                .charset(getDefaultEncoding(muleContext.getConfiguration()))
+                .charset(defaultCharset())
                 .build());
         String payload = (String) transformedMessage.getPayload().getValue();
         if (payload.indexOf(rejectIfMatches) >= 0) {
