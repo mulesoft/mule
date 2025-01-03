@@ -13,6 +13,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
@@ -362,6 +363,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureErrorAndRollbackTxWhenTimeout();
       configureEnableXmlSdkReset();
       configureHonourPersistedFlowState();
+      configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate();
     }
   }
 
@@ -1597,8 +1599,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                 minMuleVersion("4.8.0"));
   }
 
+
   private static Predicate<FeatureContext> minMuleVersion(String version) {
     return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
   }
+
+  private static void configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry
+        .registerFeatureFlag(DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE,
+                             featureContext -> false);
+  }
+
 }

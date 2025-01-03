@@ -8,22 +8,34 @@ package org.mule.runtime.core.privileged.context.notification;
 
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.core.api.context.notification.ServerNotificationConfigurationChangeListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 
 /**
  * Optimized to make a quick decision on a particular class of messages.
  */
-public final class OptimisedNotificationHandler implements ServerNotificationHandler {
+public final class OptimisedNotificationHandler
+    implements ServerNotificationHandler, ServerNotificationConfigurationChangeListener {
 
   private ServerNotificationHandler delegate;
   private Class<? extends Notification> type;
   private boolean dynamic = false;
   private volatile Boolean enabled = null;
+  private Class<? extends Notification> resolutionNotFnClass;
+
 
   public OptimisedNotificationHandler(ServerNotificationHandler delegate, Class<? extends Notification> type) {
+    this(delegate, type, false);
+  }
+
+  public OptimisedNotificationHandler(ServerNotificationHandler delegate, Class<? extends Notification> type,
+                                      boolean disableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate) {
     this.delegate = delegate;
     this.type = type;
     dynamic = delegate.isNotificationDynamic();
+    if (!disableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate) {
+      delegate.registerServerNotificationConfigurationChangeListener(this);
+    }
   }
 
   @Override
@@ -48,7 +60,7 @@ public final class OptimisedNotificationHandler implements ServerNotificationHan
   public boolean isNotificationEnabled(Class<? extends Notification> notfnClass) {
     if ((!dynamic) && type.isAssignableFrom(notfnClass)) {
       if (enabled == null) {
-        enabled = delegate.isNotificationEnabled(notfnClass);
+        resolveEnabled(notfnClass);
       }
 
       return enabled;
@@ -57,10 +69,22 @@ public final class OptimisedNotificationHandler implements ServerNotificationHan
     }
   }
 
+  private synchronized void resolveEnabled(Class<? extends Notification> notfnClass) {
+    enabled = delegate.isNotificationEnabled(notfnClass);
+    resolutionNotFnClass = notfnClass;
+  }
+
   @Override
   public void fireNotification(Notification notification) {
     if (isNotificationEnabled(notification.getClass())) {
       delegate.fireNotification(notification);
+    }
+  }
+
+  @Override
+  public synchronized void onServerNotificationConfigurationChange() {
+    if (resolutionNotFnClass != null) {
+      enabled = delegate.isNotificationEnabled(resolutionNotFnClass);
     }
   }
 }
