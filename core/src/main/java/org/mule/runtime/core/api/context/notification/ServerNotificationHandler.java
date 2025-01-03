@@ -38,4 +38,16 @@ public interface ServerNotificationHandler {
    */
   boolean isNotificationEnabled(Class<? extends Notification> notfnClass);
 
+  /**
+   * Registers a listener to handle modifications to the server notification configuration.
+   * <p>
+   * This default implementation does nothing and can be overridden by implementing classes to provide specific functionality.
+   * </p>
+   *
+   * @param serverNotificationConfigurationChangeListener the listener to be registered
+   */
+  default void registerServerNotificationConfigurationChangeListener(ServerNotificationConfigurationChangeListener serverNotificationConfigurationChangeListener) {
+    // Nothing to do.
+  }
+
 }

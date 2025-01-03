@@ -137,7 +137,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase {
     registerDefaultEvents();
     registerDefaultListeners();
     manager.setNotificationDynamic(true);
-    OptimisedNotificationHandler decision = new OptimisedNotificationHandler(manager, Event2.class);
+    OptimisedNotificationHandler decision = new OptimisedNotificationHandler(manager, Event2.class, false);
     assertTrue(decision.isNotificationEnabled(Event2.class));
     manager.disableType(Event2.class);
     assertFalse(decision.isNotificationEnabled(Event2.class));
@@ -151,6 +151,30 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase {
     registerDefaultEvents();
     registerDefaultListeners();
     OptimisedNotificationHandler decision = new OptimisedNotificationHandler(manager, Event2.class);
+    assertTrue(decision.isNotificationEnabled(Event2.class));
+    manager.disableType(Event2.class);
+    assertTrue(decision.isNotificationEnabled(Event2.class));
+  }
+
+  @Test
+  @Issue("W-16828516")
+  public void testDynamicSetAfterOptimizedNotificationCreated() throws ClassNotFoundException {
+    registerDefaultEvents();
+    registerDefaultListeners();
+    OptimisedNotificationHandler decision = new OptimisedNotificationHandler(manager, Event2.class);
+    manager.setNotificationDynamic(true);
+    assertTrue(decision.isNotificationEnabled(Event2.class));
+    manager.disableType(Event2.class);
+    assertFalse(decision.isNotificationEnabled(Event2.class));
+  }
+
+  @Test
+  @Issue("W-16828516")
+  public void testDynamicSetAfterOptimizedNotificationCreatedKillSwitch() throws Exception {
+    registerDefaultEvents();
+    registerDefaultListeners();
+    OptimisedNotificationHandler decision = new OptimisedNotificationHandler(manager, Event2.class, true);
+    manager.setNotificationDynamic(true);
     assertTrue(decision.isNotificationEnabled(Event2.class));
     manager.disableType(Event2.class);
     assertTrue(decision.isNotificationEnabled(Event2.class));

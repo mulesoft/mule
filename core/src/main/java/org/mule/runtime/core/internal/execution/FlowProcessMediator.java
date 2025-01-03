@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static org.mule.runtime.api.component.execution.CompletableCallback.always;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -44,6 +45,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.SourceRemoteConnectionException;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -143,6 +145,9 @@ public class FlowProcessMediator implements Initialisable {
   private EventContextService eventContextService;
 
   @Inject
+  private FeatureFlaggingService featureFlaggingService;
+
+  @Inject
   private InternalProfilingService profilingService;
 
   private final PolicyManager policyManager;
@@ -168,7 +173,9 @@ public class FlowProcessMediator implements Initialisable {
   public void initialise() throws InitialisationException {
     this.coreEventTracer = profilingService.getCoreEventTracer();
     this.notificationHelper =
-        new NotificationHelper(notificationManager, ConnectorMessageNotification.class, false);
+        new NotificationHelper(notificationManager, ConnectorMessageNotification.class, false,
+                               featureFlaggingService
+                                   .isEnabled(DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE));
 
     sourceResponseGenerateErrorType = errorTypeRepository.getErrorType(SOURCE_RESPONSE_GENERATE)
         .orElseThrow(createInitialisationExceptionFor(SOURCE_RESPONSE_GENERATE));

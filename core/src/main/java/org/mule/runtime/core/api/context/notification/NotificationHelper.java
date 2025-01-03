@@ -28,6 +28,7 @@ public final class NotificationHelper {
   private final Class<? extends Notification> notificationClass;
   private final boolean dynamicNotifications;
   private final ServerNotificationHandler defaultNotificationHandler;
+  private final boolean disableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate;
 
   /**
    * Creates a new {@link NotificationHelper} that emits instances of {@code notificationClass} class.
@@ -41,9 +42,28 @@ public final class NotificationHelper {
    */
   public NotificationHelper(ServerNotificationHandler defaultNotificationHandler,
                             Class<? extends Notification> notificationClass, boolean dynamicNotifications) {
+    this(defaultNotificationHandler, notificationClass, dynamicNotifications, false);
+  }
+
+  /**
+   * Creates a new {@link NotificationHelper} that emits instances of {@code notificationClass} class.
+   *
+   * @param defaultNotificationHandler The {@link ServerNotificationHandler} to be used on notifications which don't relate to a
+   *                                   {@link CoreEvent}
+   * @param notificationClass          The {@link Class} of the notifications to be fired by this helper
+   * @param dynamicNotifications       If {@code true}, notifications will be fired directly to a
+   *                                   {@link ServerNotificationHandler} responsible to decide to emit it or not. If {@code false}
+   *                                   the notification will be checked to be enable or not at creation time
+   * @param
+   */
+  public NotificationHelper(ServerNotificationHandler defaultNotificationHandler,
+                            Class<? extends Notification> notificationClass, boolean dynamicNotifications,
+                            boolean disableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate) {
     this.notificationClass = notificationClass;
     this.dynamicNotifications = dynamicNotifications;
     this.defaultNotificationHandler = adaptNotificationHandler(defaultNotificationHandler);
+    this.disableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate =
+        disableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate;
   }
 
   /**
@@ -86,7 +106,8 @@ public final class NotificationHelper {
 
   private ServerNotificationHandler adaptNotificationHandler(ServerNotificationHandler serverNotificationHandler) {
     return dynamicNotifications ? serverNotificationHandler
-        : new OptimisedNotificationHandler(serverNotificationHandler, notificationClass);
+        : new OptimisedNotificationHandler(serverNotificationHandler, notificationClass,
+                                           disableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate);
   }
 
 }
