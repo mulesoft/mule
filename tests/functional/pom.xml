@@ -34,8 +34,9 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-artifact-ast-serialization</artifactId> 
-            <scope>provided</scope>
+            <artifactId>mule-artifact-ast-serialization</artifactId>
+            <!-- Set to compile scope temporarily, to check if all tests would pass -->
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

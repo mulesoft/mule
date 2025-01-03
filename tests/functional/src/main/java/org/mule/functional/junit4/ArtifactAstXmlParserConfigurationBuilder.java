@@ -14,7 +14,8 @@ import static org.mule.runtime.config.api.ArtifactContextFactory.createArtifactC
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 
-import static java.lang.Boolean.getBoolean;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -184,7 +185,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
                                                        muleContext.getConfiguration(),
                                                        expressionLanguageMetadataService);
 
-      if (getBoolean(SERIALIZE_DESERIALIZE_AST_PROPERTY)) {
+      if (parseBoolean(getProperty(SERIALIZE_DESERIALIZE_AST_PROPERTY, "true"))) {
         return serializeAndDeserialize(ast);
       } else {
         return ast;
