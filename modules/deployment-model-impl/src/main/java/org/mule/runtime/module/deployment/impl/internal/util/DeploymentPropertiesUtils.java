@@ -74,6 +74,14 @@ public class DeploymentPropertiesUtils {
     return getPersistedProperties(artifactName, DEPLOYMENT_PROPERTIES_FILE_NAME);
   }
 
+  public static Optional<Properties> getPersistedFlowDeploymentProperties(String artifactName) {
+    return getPersistedProperties(artifactName, FLOWS_DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  public static Optional<Properties> getPersistedArtifactStatusDeploymentProperties(String artifactName) {
+    return getPersistedProperties(artifactName, ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
   private static String getDeploymentPropertiesPath(String artifactName) {
     File file = new File(getExecutionFolder(), artifactName);
     String workingDirectory = file.getAbsolutePath();
