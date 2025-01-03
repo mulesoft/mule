@@ -63,7 +63,6 @@ import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.api.notification.PollingSourceItemNotification;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.CorrelationIdGenerator;
-import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.NotificationHelper;
@@ -106,7 +105,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -165,14 +163,6 @@ public class FlowProcessMediator implements Initialisable {
   private final List<SourceInterceptor> sourceInterceptors = new LinkedList<>();
   private Optional<CorrelationIdGenerator> correlationIdGenerator;
   private EventTracer<CoreEvent> coreEventTracer;
-
-  private static final AtomicBoolean areFeatureFlagsConfigured = new AtomicBoolean();
-
-  static {
-    if (!areFeatureFlagsConfigured.getAndSet(true)) {
-      configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate();
-    }
-  }
 
   public FlowProcessMediator(PolicyManager policyManager, PhaseResultNotifier phaseResultNotifier) {
     this.policyManager = policyManager;
@@ -733,12 +723,5 @@ public class FlowProcessMediator implements Initialisable {
     public DefaultFlowProcessMediatorContext copy() {
       return this;
     }
-  }
-
-  private static void configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry
-        .registerFeatureFlag(DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE,
-                             featureContext -> false);
   }
 }
