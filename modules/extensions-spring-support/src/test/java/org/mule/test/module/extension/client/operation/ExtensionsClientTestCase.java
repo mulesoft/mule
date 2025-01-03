@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.client.operation;
 
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
 import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
@@ -21,6 +22,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
@@ -30,6 +32,8 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.util.IOUtils;
@@ -55,6 +59,7 @@ import javax.inject.Inject;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -279,5 +284,18 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Description("Tries to execute an operation that takes a long time")
   public void longOperation() throws Throwable {
     assertThat(doExecute(VEGAN, "longDigest", empty(), emptyMap(), false, false), not(nullValue()));
+  }
+
+  @Test
+  @Issue("W-17524906")
+  @Description("Tries to execute an operation with a TypedValue parameter")
+  public void operationWithTypedValueParameter() throws Throwable {
+    final String message = "Hello from ExtensionClient";
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("message", new TypedValue<>(message, STRING));
+
+    Result<Object, Object> result = doExecute(HEISENBERG_EXT_NAME, "echoStaticMessage", empty(), params, false, false);
+    assertThat(result.getOutput(), is(message));
   }
 }

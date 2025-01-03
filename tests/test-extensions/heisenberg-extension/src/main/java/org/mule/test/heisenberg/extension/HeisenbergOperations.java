@@ -316,8 +316,8 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(TEXT_PLAIN)
-  public String echoStaticMessage(@Expression(NOT_SUPPORTED) String message) {
-    return message;
+  public String echoStaticMessage(@Expression(NOT_SUPPORTED) TypedValue<String> message) {
+    return message.getValue();
   }
 
   @MediaType(TEXT_PLAIN)
