@@ -16,8 +16,7 @@ module org.mule.boot.tanuki {
 
   requires org.mule.boot.api;
 
-  // Tanuki wrapper
-  requires wrapper;
+  requires org.tanukisoftware.wrapper;
   requires org.apache.commons.cli;
 
 }
