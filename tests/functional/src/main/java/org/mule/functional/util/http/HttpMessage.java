@@ -11,13 +11,13 @@ import static java.util.Collections.list;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.util.IOUtils;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
-
 import java.io.IOException;
 import java.util.Enumeration;
 
-import javax.servlet.http.HttpServletRequest;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class HttpMessage {
 
