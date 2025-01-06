@@ -402,7 +402,7 @@ public class DependencyResolver implements AutoCloseable {
     muleApisOptDependencyUrls.addAll(log4jUrls);
     log4jUrls.forEach(optDependencyUrls::remove);
 
-    return new ContainerDependencies(new ArrayList<>(muleApisOptDependencyUrls), new ArrayList<>(muleApisDependencyUrls),
+    return new ContainerDependencies(new ArrayList<>(muleApisDependencyUrls), new ArrayList<>(muleApisOptDependencyUrls),
                                      new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls));
   }
 
