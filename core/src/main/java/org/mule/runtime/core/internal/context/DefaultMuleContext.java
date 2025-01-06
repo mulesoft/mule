@@ -185,7 +185,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
-import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.metrics.api.MeterProvider;
 
 import java.util.Collection;
 import java.util.List;

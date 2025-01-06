@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
-import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
+import static org.mule.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.management.stats.ResetOnQueryCounter;
-import org.mule.runtime.metrics.api.MeterProvider;
-import org.mule.runtime.metrics.api.meter.Meter;
+import org.mule.metrics.api.MeterProvider;
+import org.mule.metrics.api.meter.Meter;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -255,29 +255,29 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
     // Register the declared private flows.
     meter.counterBuilder(RECEIVED_EVENTS_NAME)
         .withValueSupplier(receivedEvents::get)
-        .withAddOperation((delta, context) -> receivedEvents.addAndGet(delta))
-        .withIncrementAndGetOperation(context -> receivedEvents.incrementAndGet())
+        .withConsumerForAddOperation((delta, context) -> receivedEvents.addAndGet(delta))
+        .withSupplierForIncrementAndGetOperation(receivedEvents::incrementAndGet)
         .withDescription(RECEIVED_EVENTS_DESCRIPTION).build();
 
     // Register the dispatched messages counter
     meter.counterBuilder(DISPATCHED_MESSAGES_NAME)
         .withValueSupplier(dispatchedMessages::get)
-        .withAddOperation((delta, context) -> dispatchedMessages.addAndGet(delta))
-        .withIncrementAndGetOperation(context -> dispatchedMessages.incrementAndGet())
+        .withConsumerForAddOperation((delta, context) -> dispatchedMessages.addAndGet(delta))
+        .withSupplierForIncrementAndGetOperation(dispatchedMessages::incrementAndGet)
         .withDescription(DISPATCHED_MESSAGES_DESCRIPTION).build();
 
     // Register the execution errors counter
     meter.counterBuilder(EXECUTION_ERRORS_NAME)
         .withValueSupplier(executionError::get)
-        .withAddOperation((delta, context) -> executionError.addAndGet(delta))
-        .withIncrementAndGetOperation(context -> executionError.incrementAndGet())
+        .withConsumerForAddOperation((delta, context) -> executionError.addAndGet(delta))
+        .withSupplierForIncrementAndGetOperation(executionError::incrementAndGet)
         .withDescription(EXECUTION_ERRORS_DESCRIPTION).build();
 
     // Register the fatal errors counter
     meter.counterBuilder(FATAL_ERRORS_NAME)
         .withValueSupplier(fatalError::get)
-        .withAddOperation((delta, context) -> fatalError.addAndGet(delta))
-        .withIncrementAndGetOperation(context -> fatalError.incrementAndGet())
+        .withConsumerForAddOperation((delta, context) -> fatalError.addAndGet(delta))
+        .withSupplierForIncrementAndGetOperation(fatalError::incrementAndGet)
         .withDescription(FATAL_ERRORS_DESCRIPTION).build();
 
   }

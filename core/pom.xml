@@ -106,14 +106,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule</groupId>
             <artifactId>mule-metrics-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.0-rc1</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule</groupId>
             <artifactId>mule-metrics-exporter-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.0-rc1</version>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

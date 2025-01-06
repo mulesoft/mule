@@ -91,7 +91,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.AbstractExecutableComponent;
-import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.error.ErrorMetrics;
 import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.EventTracer;

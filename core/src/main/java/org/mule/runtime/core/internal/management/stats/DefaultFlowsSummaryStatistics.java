@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
-import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
+import static org.mule.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
 
 import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
-import org.mule.runtime.metrics.api.meter.Meter;
+import org.mule.metrics.api.meter.Meter;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -161,45 +161,45 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
     // Register the declared private flows.
     meter.counterBuilder(DECLARED_PRIVATE_FLOWS_APP_NAME)
         .withValueSupplier(() -> (long) declaredPrivateFlows.get())
-        .withAddOperation((value, context) -> declaredPrivateFlows.addAndGet(value.intValue()))
-        .withIncrementAndGetOperation(stringStringMap -> (long) declaredPrivateFlows.incrementAndGet())
+        .withConsumerForAddOperation((value, context) -> declaredPrivateFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) declaredPrivateFlows.incrementAndGet())
         .withDescription(DECLARED_PRIVATE_FLOWS_APP_DESCRIPTION).build();
 
 
     // Register the active private flows.
     meter.counterBuilder(ACTIVE_PRIVATE_FLOWS_APP_NAME)
         .withValueSupplier(() -> (long) activePrivateFlows.get())
-        .withAddOperation((value, context) -> activePrivateFlows.addAndGet(value.intValue()))
-        .withIncrementAndGetOperation(stringStringMap -> (long) activePrivateFlows.incrementAndGet())
+        .withConsumerForAddOperation((value, context) -> activePrivateFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) activePrivateFlows.incrementAndGet())
         .withDescription(ACTIVE_PRIVATE_FLOWS_APP_DESCRIPTION).build();
 
     // Register the declared trigger flows.
     meter.counterBuilder(DECLARED_TRIGGER_FLOWS_APP_NAME)
         .withValueSupplier(() -> (long) declaredTriggerFlows.get())
-        .withAddOperation((value, context) -> declaredTriggerFlows.addAndGet(value.intValue()))
-        .withIncrementAndGetOperation(stringStringMap -> (long) declaredTriggerFlows.incrementAndGet())
+        .withConsumerForAddOperation((value, context) -> declaredTriggerFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) declaredTriggerFlows.incrementAndGet())
         .withDescription(DECLARED_TRIGGER_FLOWS_APP_DESCRIPTION).build();
 
 
     // Register the active trigger flows.
     meter.counterBuilder(ACTIVE_TRIGGER_FLOWS_NAME)
         .withValueSupplier(() -> (long) activeTriggerFlows.get())
-        .withAddOperation((value, context) -> activeTriggerFlows.addAndGet(value.intValue()))
-        .withIncrementAndGetOperation(stringStringMap -> (long) activeTriggerFlows.incrementAndGet())
+        .withConsumerForAddOperation((value, context) -> activeTriggerFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) activeTriggerFlows.incrementAndGet())
         .withDescription(ACTIVE_TRIGGER_FLOWS_DESCRIPTION).build();
 
     // Register the declared apikit flows.
     meter.counterBuilder(DECLARED_APIKIT_FLOWS_APP_NAME)
         .withValueSupplier(() -> (long) declaredApikitFlows.get())
-        .withAddOperation((value, context) -> declaredApikitFlows.addAndGet(value.intValue()))
-        .withIncrementAndGetOperation(stringStringMap -> (long) declaredApikitFlows.incrementAndGet())
+        .withConsumerForAddOperation((value, context) -> declaredApikitFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) declaredApikitFlows.incrementAndGet())
         .withDescription(DECLARED_APIKIT_FLOWS_APP_DESCRIPTION).build();
 
     // Register the active apikit flows.
     meter.counterBuilder(ACTIVE_APIKIT_FLOWS_APP_NAME)
         .withValueSupplier(() -> (long) activeApikitFlows.get())
-        .withAddOperation((value, context) -> activeApikitFlows.addAndGet(value.intValue()))
-        .withIncrementAndGetOperation(stringStringMap -> (long) activeApikitFlows.incrementAndGet())
+        .withConsumerForAddOperation((value, context) -> activeApikitFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) activeApikitFlows.incrementAndGet())
         .withDescription(ACTIVE_APIKIT_FLOWS_APP_DESCRIPTION).build();
   }
 

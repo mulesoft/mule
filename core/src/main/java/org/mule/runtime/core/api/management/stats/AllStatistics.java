@@ -21,7 +21,7 @@ import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
-import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.metrics.api.MeterProvider;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -62,7 +62,6 @@ module org.mule.runtime.core {
   requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.manifest;
 
-  requires org.mule.runtime.metrics.api;
   requires org.mule.runtime.tracer.api;
   requires org.mule.runtime.tracer.customization.api;
   requires org.mule.runtime.tracer.exporter.api;
@@ -100,8 +99,9 @@ module org.mule.runtime.core {
   // InvalidTransactionException extends java.rmi.RemoteException
   requires java.rmi;
   requires java.transaction;
+    requires org.mule.metrics.api;
 
-  exports org.mule.runtime.core.api;
+    exports org.mule.runtime.core.api;
   exports org.mule.runtime.core.api.artifact;
   exports org.mule.runtime.core.api.component;
   exports org.mule.runtime.core.api.connection.util;

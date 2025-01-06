@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.api.management.stats;
 
-import org.mule.runtime.metrics.api.MeterProvider;
-import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
+import org.mule.metrics.api.MeterProvider;
+import org.mule.metrics.api.meter.builder.MeterBuilder;
 
-import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
+import static org.mule.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
 
 /**
  * An {@link MeterProvider} associated to an artifact id.
@@ -27,6 +27,11 @@ public class ArtifactMeterProvider implements MeterProvider {
   @Override
   public MeterBuilder getMeterBuilder(String meterName) {
     return meterProvider.getMeterBuilder(meterName).withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId);
+  }
+
+  @Override
+  public void close() {
+    // Nothing to do.
   }
 
   public String getArtifactId() {

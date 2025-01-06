@@ -69,7 +69,7 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.error.ErrorMetrics;
 import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.component.ComponentTracer;

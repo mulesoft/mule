@@ -38,10 +38,6 @@ module org.mule.runtime.spring.config {
   requires org.mule.runtime.featureManagement;
   requires org.mule.runtime.memory.management;
   requires org.mule.runtime.metadata.support;
-  requires org.mule.runtime.metrics.api;
-  requires org.mule.runtime.metrics.exporter.api;
-  requires org.mule.runtime.metrics.exporter.impl;
-  requires org.mule.runtime.metrics.internal.impl;
   requires org.mule.runtime.properties.config;
   requires org.mule.runtime.service;
   requires org.mule.runtime.tracer.api;
@@ -74,8 +70,9 @@ module org.mule.runtime.spring.config {
   // Spring JNDI support
   requires java.naming;
   requires java.transaction;
+    requires org.mule.metrics.api;
 
-  exports org.mule.runtime.config.api;
+    exports org.mule.runtime.config.api;
   exports org.mule.runtime.config.api.dsl;
   exports org.mule.runtime.config.api.dsl.artifact;
   exports org.mule.runtime.config.api.dsl.model;
