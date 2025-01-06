@@ -516,7 +516,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
     resolveSnapshotVersionsToTimestampedFromClassPath(containerMuleUrls, context.getClassPathURLs());
 
-    return new ContainerDependencies(containerMuleApisOptUrls, containerMuleApisUrls, containerOptUrls, containerMuleUrls);
+    return new ContainerDependencies(containerMuleApisUrls, containerMuleApisOptUrls, containerOptUrls, containerMuleUrls);
   }
 
   /**
