@@ -297,6 +297,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = NOTIFICATION_HANDLER_ARGUMENT_RESOLVER;
       } else if (RetryPolicyTemplate.class.equals(parameterType)) {
         argumentResolver = RETRY_POLICY_TEMPLATE_ARGUMENT_RESOLVER;
+      } else if (org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate.class.equals(parameterType)) {
+        argumentResolver = RETRY_POLICY_TEMPLATE_ARGUMENT_RESOLVER;
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }
