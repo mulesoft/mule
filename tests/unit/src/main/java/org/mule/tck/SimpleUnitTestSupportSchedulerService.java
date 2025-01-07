@@ -6,10 +6,11 @@
  */
 package org.mule.tck;
 
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.synchronizedList;
 import static java.util.Collections.unmodifiableList;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 
+import java.lang.StackWalker.StackFrame;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
@@ -156,35 +158,28 @@ public class SimpleUnitTestSupportSchedulerService implements SchedulerService, 
   }
 
   private String resolveSchedulerCreationLocation() {
-    int i = 0;
-    final StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-    StackTraceElement ste = stackTrace[i++];
-    // We have to go deep enough, right before the mockito call
-    while (skip(ste) && i < stackTrace.length) {
-      ste = stackTrace[i++];
-    }
+    return StackWalker.getInstance().walk(frames -> {
+      final StackFrame ste = frames
+          .filter(frame -> !skip(frame.getClassName()))
+          .findFirst()
+          .get();
 
-    if (skip(ste)) {
-      ste = stackTrace[3];
-    } else {
-      ste = stackTrace[i - 1];
-    }
-
-    return ste.getClassName() + "." + ste.getMethodName() + ":" + ste.getLineNumber();
+      return ste.getClassName() + "." + ste.getMethodName() + ":" + ste.getLineNumber();
+    });
   }
 
-  private boolean skip(StackTraceElement ste) {
-    return ste.getClassName().startsWith(SimpleUnitTestSupportSchedulerService.class.getName())
-        || ste.getClassName().startsWith("org.mule.runtime.core.api.util.ClassUtils")
-        || ste.getClassName().startsWith("org.mule.runtime.core.api.util.ExceptionUtils")
-        || ste.getClassName().startsWith("org.mule.runtime.container.internal.MetadataInvocationHandler")
-        || ste.getClassName().startsWith("org.mule.runtime.config.internal.InjectParamsFromContextServiceProxy")
-        || ste.getClassName().startsWith("org.mockito")
-        || ste.getClassName().startsWith("java.lang.reflect.")
-        || ste.getClassName().startsWith("sun.reflect.")
-        || ste.getClassName().startsWith("jdk.internal.reflect.")
-        || ste.getClassName().contains("$Proxy")
-        || ste.getClassName().contains("$$Enhancer");
+  private boolean skip(String className) {
+    return className.startsWith(SimpleUnitTestSupportSchedulerService.class.getName())
+        || className.startsWith("org.mule.runtime.core.api.util.ClassUtils")
+        || className.startsWith("org.mule.runtime.core.api.util.ExceptionUtils")
+        || className.startsWith("org.mule.runtime.container.internal.MetadataInvocationHandler")
+        || className.startsWith("org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy")
+        || className.startsWith("org.mockito")
+        || className.startsWith("java.lang.reflect.")
+        || className.startsWith("sun.reflect.")
+        || className.startsWith("jdk.internal.reflect.")
+        || className.contains("$Proxy")
+        || className.contains("$$Enhancer");
   }
 
   @Override
