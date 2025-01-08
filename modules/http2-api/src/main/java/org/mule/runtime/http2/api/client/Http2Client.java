@@ -34,13 +34,13 @@ public interface Http2Client {
   void stop();
 
   /**
-   * Same as {@link #sendAsync(Http2Request, Http2RequestOptions)} but using default options.
+   * Same as {@link #send(Http2Request, Http2RequestOptions)} but using default options.
    *
    * @param request the {@link Http2Request} to send
    * @return a {@link CompletableFuture} that will complete once the {@link Http2Response} is available or an error occurred
    */
-  default CompletableFuture<Http2Response> sendAsync(Http2Request request) {
-    return sendAsync(request, Http2RequestOptions.builder().build());
+  default CompletableFuture<Http2Response> send(Http2Request request) {
+    return send(request, Http2RequestOptions.builder().build());
   }
 
   /**
@@ -56,5 +56,5 @@ public interface Http2Client {
    * @param options the {@link Http2RequestOptions} to use
    * @return a {@link CompletableFuture} that will complete once the {@link Http2Response} is available
    */
-  CompletableFuture<Http2Response> sendAsync(Http2Request request, Http2RequestOptions options);
+  CompletableFuture<Http2Response> send(Http2Request request, Http2RequestOptions options);
 }
