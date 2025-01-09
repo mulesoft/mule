@@ -21,6 +21,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.DeployableArtifact
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedArtifactStatusDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
@@ -772,9 +773,11 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
-    Properties finalDeploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), empty());
-    assertThat(finalDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
-    assertThat(finalDeploymentProperties.get(COMPONENT_NAME), is(COMPONENT_CLASS));
+
+    Optional<Properties> finalDeploymentProperties = getPersistedDeploymentProperties(dummyDomainApp1FileBuilder.getId());
+    assertThat(finalDeploymentProperties.isPresent(), is(true));
+    assertThat(finalDeploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    assertThat(finalDeploymentProperties.get().get(COMPONENT_NAME), is(COMPONENT_CLASS));
   }
 
   @Test

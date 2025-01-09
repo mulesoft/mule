@@ -30,6 +30,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -274,7 +275,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
     for (String zip : zips) {
       try {
         // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
-        applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
+        final String artifactName = removeEndIgnoreCase(zip, JAR_FILE_SUFFIX);
+        Optional<Properties> deploymentProperties = getPersistedDeploymentProperties(artifactName);
+        applicationArchiveDeployer.deployPackagedArtifact(zip, deploymentProperties);
       } catch (Exception e) {
         // Ignore and continue
       }
