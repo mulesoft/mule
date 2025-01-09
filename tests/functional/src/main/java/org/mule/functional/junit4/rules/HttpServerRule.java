@@ -6,9 +6,10 @@
  */
 package org.mule.functional.junit4.rules;
 
+import static org.mule.functional.util.http.SimpleHttpServer.createServer;
+
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
-import static org.mule.functional.util.http.SimpleHttpServer.createServer;
 
 import org.mule.functional.util.http.SimpleHttpServer;
 import org.mule.tck.junit4.rule.FreePortFinder;
@@ -19,7 +20,10 @@ import org.junit.rules.ExternalResource;
  * JUnit rule to create an HTTP server
  *
  * @since 4.0
+ * 
+ * @deprecated since 4.10 use WireMock instead
  */
+@Deprecated
 public class HttpServerRule extends ExternalResource {
 
   private final String portSystemPropertyKey;

@@ -11,12 +11,12 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Simple HTTP server implementation for testing purposes.
