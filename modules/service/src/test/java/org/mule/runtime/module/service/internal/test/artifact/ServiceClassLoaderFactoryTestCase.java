@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.api.artifact.IServiceClassLoaderFactory;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -40,7 +40,7 @@ public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
   @Rule
   public TemporaryFolder serviceFolder = new TemporaryFolder();
-  private final ServiceClassLoaderFactory factory = serviceClassLoaderFactory();
+  private final IServiceClassLoaderFactory factory = serviceClassLoaderFactory();
   private ServiceDescriptor descriptor;
 
   @Before

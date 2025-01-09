@@ -238,7 +238,7 @@ public class DependencyResolver implements AutoCloseable {
       throws DependencyCollectionException, DependencyResolutionException {
     try {
       final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
-      final String version = this.getClass().getPackage().getImplementationVersion();
+      final String version = getImplementationVersion();
       ArtifactDescriptorResult pom =
           readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-apis-split-loader-bom",
                                                      "pom", version));
@@ -247,6 +247,10 @@ public class DependencyResolver implements AutoCloseable {
     } catch (ArtifactDescriptorException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  protected String getImplementationVersion() {
+    return this.getClass().getPackage().getImplementationVersion();
   }
 
   /**
@@ -402,7 +406,7 @@ public class DependencyResolver implements AutoCloseable {
     muleApisOptDependencyUrls.addAll(log4jUrls);
     log4jUrls.forEach(optDependencyUrls::remove);
 
-    return new ContainerDependencies(new ArrayList<>(muleApisOptDependencyUrls), new ArrayList<>(muleApisDependencyUrls),
+    return new ContainerDependencies(new ArrayList<>(muleApisDependencyUrls), new ArrayList<>(muleApisOptDependencyUrls),
                                      new ArrayList<>(optDependencyUrls), new ArrayList<>(muleDependencyUrls));
   }
 

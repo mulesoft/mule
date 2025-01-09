@@ -65,4 +65,12 @@ public class CreateParamBeanDefinitionRequest extends CreateBeanDefinitionReques
         .findFirst()
         .orElse(null);
   }
+
+  @Override
+  public String toString() {
+    return "param request for `"
+        + getParam().getGroupModel().getName() + "."
+        + getParam().getModel().getName() + "` in component `"
+        + getParamOwnerComponent().toString();
+  }
 }
