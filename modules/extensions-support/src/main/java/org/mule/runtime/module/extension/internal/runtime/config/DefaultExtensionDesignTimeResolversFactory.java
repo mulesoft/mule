@@ -225,7 +225,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
 
     Map<String, ParameterModel> paramModels =
         parameterizedModel.getAllParameterModels().stream()
-            .collect(toMap((Function<? super ParameterModel, ? extends String>) ParameterModel::getName, identity()));
+            .collect(toMap(ParameterModel::getName, identity()));
 
     ResolverSet typeSafeResolverSet = new ResolverSet(muleContext);
     typeUnsafeResolverSet.getResolvers().forEach((paramName, resolver) -> {
