@@ -43,7 +43,7 @@ module org.mule.runtime.extensions.xml.support {
   requires org.apache.commons.lang3;
   requires org.jgrapht.core;
   requires net.bytebuddy;
-  requires vibur.object.pool;
+  requires org.vibur.objectpool;
 
   provides org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor with
       org.mule.runtime.extension.internal.ast.MacroExpansionAstPostProcessor;

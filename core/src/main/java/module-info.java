@@ -90,7 +90,7 @@ module org.mule.runtime.core {
   requires net.bytebuddy;
   requires org.reflections;
   requires uuid;
-  requires vibur.object.pool;
+  requires org.vibur.objectpool;
 
   requires jakarta.activation;
   requires transitive jakarta.jms.api;
