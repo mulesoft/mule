@@ -10,7 +10,8 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.ReflectionUtils.getAllMethods;
+import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
@@ -18,6 +19,7 @@ import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -81,6 +83,39 @@ public class DefaultServiceRegistry implements ServiceRegistry {
                                                 dependencyType.getName()),
                                          e);
       }
+    }
+    for (Method method : getAllMethods(serviceProvider.getClass(), withAnnotation(Inject.class))) {
+      if (method.getParameters().length == 1) {
+        try {
+          Class<?> dependencyType = method.getParameterTypes()[0];
+
+          boolean asOptional = false;
+          if (dependencyType.equals(Optional.class)) {
+            Type type = ((ParameterizedType) (method.getGenericParameterTypes()[0])).getActualTypeArguments()[0];
+            if (type instanceof ParameterizedType) {
+              dependencyType = (Class<?>) ((ParameterizedType) type).getRawType();
+            } else {
+              dependencyType = (Class<?>) type;
+            }
+            asOptional = true;
+          }
+
+          Object dependency = resolveObjectToInject(dependencyType, asOptional);
+          if (dependency != null) {
+            method.invoke(serviceProvider, dependency);
+          } else if (!asOptional) {
+            throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s#%s' of service provider '%s'",
+                                                    method.getDeclaringClass().getName(),
+                                                    method.getName(),
+                                                    serviceProvider.getServiceDefinition().getServiceClass().getName()));
+          }
+        } catch (Exception e) {
+          throw new RuntimeException(format("Could not inject dependency on method %s of type %s", method.getName(),
+                                            serviceProvider.getClass().getName()),
+                                     e);
+        }
+      }
+
     }
   }
 

@@ -66,6 +66,7 @@ import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificati
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificationListener;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -115,6 +116,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
   private MuleContext muleContext;
   private LazyValue<String> serverId = new LazyValue<>(() -> muleContext.getId());
   private LazyValue<SchedulerService> schedulerService = new LazyValue<>(() -> muleContext.getSchedulerService());
+  private final Set<ServerNotificationConfigurationChangeListener> modificationListeners = new HashSet<>();
 
   public ServerNotificationManager() {}
 
@@ -144,24 +146,29 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
   public void addInterfaceToType(Class<? extends NotificationListener> iface,
                                  Class<? extends Notification> event) {
     configuration.addInterfaceToType(iface, event);
+    notifyIfDynamic();
   }
 
   public void setInterfaceToTypes(Map<Class<? extends NotificationListener>, Set<Class<? extends Notification>>> interfaceToEvents)
       throws ClassNotFoundException {
     configuration.addAllInterfaceToTypes(interfaceToEvents);
+    notifyIfDynamic();
   }
 
   public void addListenerSubscriptionPair(ListenerSubscriptionPair pair) {
     configuration.addListenerSubscriptionPair(pair);
+    notifyIfDynamic();
   }
 
   public void addListener(NotificationListener<?> listener) {
     configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener));
+    notifyIfDynamic();
   }
 
   public <N extends Notification> void addListenerSubscription(NotificationListener<N> listener,
                                                                Predicate<N> selector) {
     configuration.addListenerSubscriptionPair(new ListenerSubscriptionPair(listener, selector));
+    notifyIfDynamic();
   }
 
   /**
@@ -169,19 +176,29 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
    */
   public void removeListener(NotificationListener<?> listener) {
     configuration.removeListener(listener);
+    notifyIfDynamic();
   }
 
   public void disableInterface(Class<? extends NotificationListener> iface) {
     configuration.disableInterface(iface);
+    notifyIfDynamic();
   }
 
   public void setDisabledInterfaces(Collection<Class<? extends NotificationListener>> interfaces)
       throws ClassNotFoundException {
     configuration.disabledAllInterfaces(interfaces);
+    notifyIfDynamic();
+  }
+
+  private void notifyIfDynamic() {
+    if (dynamic) {
+      modificationListeners.forEach(ServerNotificationConfigurationChangeListener::onServerNotificationConfigurationChange);
+    }
   }
 
   public void disableType(Class<? extends Notification> type) {
     configuration.disableType(type);
+    notifyIfDynamic();
   }
 
   @Override
@@ -340,5 +357,10 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
   @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Override
+  public void registerServerNotificationConfigurationChangeListener(ServerNotificationConfigurationChangeListener serverNotificationConfigurationChangeListener) {
+    modificationListeners.add(serverNotificationConfigurationChangeListener);
   }
 }
