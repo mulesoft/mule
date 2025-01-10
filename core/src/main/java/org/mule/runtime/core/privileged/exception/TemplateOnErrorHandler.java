@@ -637,7 +637,11 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         String transactionOwnerFlow = getFlow(transactionLocation);
         Set<String> referencesContainingFailingComponentUpToTxOwner =
             componentsReferencingGlobalErrorHandler.stream().map(this::normalizeRef)
-                .filter(fullFailingComponentLocationUpToTxOwner::contains)
+                // If the flow of the global error handler reference component is not the same as the one of the failing component
+                // location, then it's been called as a flow-ref
+                .filter(ref -> getFlow(ref).equals(getFlow(fullFailingComponentLocationUpToTxOwner))
+                    ? fullFailingComponentLocationUpToTxOwner.contains(ref)
+                    : fullFailingComponentLocationUpToTxOwner.contains(normalizeFlowRef(ref)))
                 .filter(ref -> !getFlow(ref).equals(transactionOwnerFlow) || ref.startsWith(transactionLocation))
                 .collect(toSet());
         if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
@@ -674,6 +678,14 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
    */
   private String normalizeRef(String reference) {
     return reference.endsWith("/") ? reference : reference + "/";
+  }
+
+  /**
+   * @param reference component reference to {@link GlobalErrorHandler} of a component called with a flow-ref.
+   * @return normalized component reference.
+   */
+  private String normalizeFlowRef(String reference) {
+    return "/" + reference;
   }
 
   private boolean isOwnedTransactionByLocalErrorHandler(TransactionAdapter transaction) {
