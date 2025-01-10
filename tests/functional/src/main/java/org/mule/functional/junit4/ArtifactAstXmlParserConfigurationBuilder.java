@@ -203,7 +203,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
         .deserialize(inputStream, name -> artifactAst.dependencies().stream()
             .filter(x -> x.getName().equals(name))
             .findFirst()
-            .orElse(null));
+            .orElse(null), artifactAst.getParent().orElse(null));
 
     return deserializedArtifactAst;
   }
