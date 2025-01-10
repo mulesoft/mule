@@ -58,6 +58,7 @@ module org.mule.runtime.spring.config {
 
   requires reactor.core;
 
+  requires org.apache.commons.beanutils;
   requires org.apache.commons.lang3;
   requires com.github.benmanes.caffeine;
   requires com.google.common;
