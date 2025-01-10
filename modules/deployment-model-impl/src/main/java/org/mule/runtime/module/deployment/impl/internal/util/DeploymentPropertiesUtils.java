@@ -11,6 +11,8 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 
 import static java.io.File.separator;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -37,9 +39,8 @@ public class DeploymentPropertiesUtils {
 
   /**
    * This method resolves the deploymentProperties for a new deploy/redeploy considering the new deployment properties passed by
-   * the user as parameter and the deployment properties persisted in a previous deploy. In case no new deployment properties are
-   * passed, the previous persisted properties are returned. Otherwise, the new deployment properties are used and persisted in
-   * .mule/app/deployment-properties/<fileName>.
+   * the user as parameter and the deployment properties persisted in a previous deploy. The new deployment properties are used
+   * and persisted in .mule/app/deployment-properties/<fileName>.
    *
    * @param artifactName         name of the artifact.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
@@ -51,18 +52,40 @@ public class DeploymentPropertiesUtils {
   public static Properties resolveDeploymentProperties(String artifactName, Optional<Properties> deploymentProperties,
                                                        String fileName)
       throws IOException {
+    Properties properties = deploymentProperties.orElse(new Properties());
+
+    String deploymentPropertiesPath = getDeploymentPropertiesPath(artifactName);
+    initDeploymentPropertiesDirectory(deploymentPropertiesPath);
+    persistDeploymentPropertiesFile(deploymentPropertiesPath, properties, fileName);
+
+    return properties;
+  }
+
+  public static Optional<Properties> getPersistedProperties(String artifactName, String fileName) {
+    try {
+      String deploymentPropertiesPath = getDeploymentPropertiesPath(artifactName);
+      return of(getDeploymentProperties(deploymentPropertiesPath, fileName));
+    } catch (IOException e) {
+      return empty();
+    }
+  }
+
+  public static Optional<Properties> getPersistedDeploymentProperties(String artifactName) {
+    return getPersistedProperties(artifactName, DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  public static Optional<Properties> getPersistedFlowDeploymentProperties(String artifactName) {
+    return getPersistedProperties(artifactName, FLOWS_DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  public static Optional<Properties> getPersistedArtifactStatusDeploymentProperties(String artifactName) {
+    return getPersistedProperties(artifactName, ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  private static String getDeploymentPropertiesPath(String artifactName) {
     File file = new File(getExecutionFolder(), artifactName);
     String workingDirectory = file.getAbsolutePath();
-    String deploymentPropertiesPath = workingDirectory + separator + DEPLOYMENT_PROPERTIES_DIRECTORY;
-
-    if (!deploymentProperties.isPresent()) {
-      return getDeploymentProperties(deploymentPropertiesPath, fileName);
-    }
-
-    initDeploymentPropertiesDirectory(deploymentPropertiesPath);
-    persistDeploymentPropertiesFile(deploymentPropertiesPath, deploymentProperties.get(), fileName);
-
-    return deploymentProperties.get();
+    return workingDirectory + separator + DEPLOYMENT_PROPERTIES_DIRECTORY;
   }
 
   /**

@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICAT
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.ParallelDeploymentDirectoryWatcher.MAX_APPS_IN_PARALLEL_DEPLOYMENT;
@@ -312,7 +313,8 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void redeployDomain(String domainName) {
-    redeployDomain(domainName, empty());
+    Optional<Properties> deploymentProperties = getPersistedDeploymentProperties(domainName);
+    redeployDomain(domainName, deploymentProperties);
   }
 
   private void redeployDomain(String domainName, Optional<Properties> deploymentProperties) {
