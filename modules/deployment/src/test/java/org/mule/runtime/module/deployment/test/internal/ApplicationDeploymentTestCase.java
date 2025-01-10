@@ -399,6 +399,26 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                                      FLOW_PROPERTY_NAME_VALUE_ON_REDEPLOY);
   }
 
+  @Test
+  @Story(DEPLOYMENT_SUCCESS)
+  public void deployAndRedeployAppRemovingDeploymentProperties() throws Exception {
+    Properties deploymentProperties = new Properties();
+    deploymentProperties.put(FLOW_PROPERTY_NAME, FLOW_PROPERTY_NAME_VALUE);
+    startDeployment();
+
+    // The first run of the directory watcher will deploy the domain 'default', needed for the app.
+    triggerDirectoryWatcher();
+    deployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder.getArtifactFile().toURI(), deploymentProperties,
+                                      (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
+                                          .equals(FLOW_PROPERTY_NAME_VALUE));
+
+    // Redeploys with empty deployment properties (removes the property)
+    deploymentProperties.clear();
+    redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder
+        .getId(), deploymentProperties,
+                                        (registry) -> !registry.lookupByName(FLOW_PROPERTY_NAME).isPresent());
+  }
+
   private void stopAppAndVerifyDeploymentAndAppStatusProperties(String artifactName, String deploymentPropertyValue)
       throws IOException {
     Application app = findApp(dummyAppDescriptorWithPropsFileBuilder.getId(), 1);
