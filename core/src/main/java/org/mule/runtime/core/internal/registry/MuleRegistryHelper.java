@@ -98,7 +98,7 @@ public class MuleRegistryHelper implements MuleRegistry {
    */
   @Override
   public void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException {
-    registry.registerObject(getName(flowConstruct), flowConstruct);
+    registry.registerObject(flowConstruct.getName(), flowConstruct);
   }
 
   /**
