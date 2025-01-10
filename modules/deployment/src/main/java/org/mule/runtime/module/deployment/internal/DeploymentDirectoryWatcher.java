@@ -10,6 +10,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICAT
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 
@@ -28,6 +29,8 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
@@ -56,6 +59,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -243,7 +248,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployPackedApps(String[] zips) {
     for (String zip : zips) {
       try {
-        applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
+        final String artifactName = removeEndIgnoreCase(zip, JAR_FILE_SUFFIX);
+        Optional<Properties> deploymentProperties = getPersistedDeploymentProperties(artifactName);
+        applicationArchiveDeployer.deployPackagedArtifact(zip, deploymentProperties);
       } catch (Exception e) {
         // Ignore and continue
       }
@@ -253,7 +260,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployExplodedApps(String[] apps) {
     for (String addedApp : apps) {
       try {
-        applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
+        Optional<Properties> deploymentProperties = getPersistedDeploymentProperties(addedApp);
+        applicationArchiveDeployer.deployExplodedArtifact(addedApp, deploymentProperties);
       } catch (DeploymentException e) {
         // Ignore and continue
       }
