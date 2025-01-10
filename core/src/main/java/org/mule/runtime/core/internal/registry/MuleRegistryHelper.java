@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import static org.mule.runtime.core.internal.util.BeanUtils.getName;
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -98,7 +96,7 @@ public class MuleRegistryHelper implements MuleRegistry {
    */
   @Override
   public void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException {
-    registry.registerObject(getName(flowConstruct), flowConstruct);
+    registry.registerObject(flowConstruct.getName(), flowConstruct);
   }
 
   /**
