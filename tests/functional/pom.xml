@@ -37,6 +37,14 @@
             <artifactId>mule-artifact-ast-serialization</artifactId>
             <!-- Set to compile scope temporarily, to check if all tests would pass -->
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- Excluding because otherwise some ArtifactFunctionalTestCases were incorrectly assuming xerces was a
+                    dependency of the plugin -->
+                    <groupId>org.mule.apache</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
