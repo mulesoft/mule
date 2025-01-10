@@ -412,7 +412,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
                                       (registry) -> registry.lookupByName(FLOW_PROPERTY_NAME).get()
                                           .equals(FLOW_PROPERTY_NAME_VALUE));
 
-    // Redeploys without deployment properties (remains the same, as it takes the deployment properties from the persisted file)
+    // Redeploys with empty deployment properties (removes the property)
     deploymentProperties.clear();
     redeployAndVerifyPropertyInRegistry(dummyAppDescriptorWithPropsFileBuilder
         .getId(), deploymentProperties,
