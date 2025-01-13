@@ -12,6 +12,11 @@ import static java.lang.String.valueOf;
 
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
 
+import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
+import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
+import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
+import org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,10 +30,6 @@ import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
-import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
-import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
-import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
-import org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources;
 
 /**
  * A {@link SpanExporter} that captures Open Telemetry exported spans.
@@ -136,6 +137,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
         return attributes;
       }
 
+      @Override
       public List<CapturedEventData> getEvents() {
         return spanData.getEvents().stream().map(
                                                  OpenTelemetryCapturedEventDataWrapper::new)
@@ -165,7 +167,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
       @Override
       public String getStatusAsString() {
-        return spanData.getStatus().getStatusCode().toString();
+        return spanData.getStatus().getStatusCode().name();
       }
 
       @Override
