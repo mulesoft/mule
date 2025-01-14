@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.maven;
 
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.deployable.MuleProjectStructure;
@@ -26,8 +27,11 @@ public class MavenRefreshDeployableProjectModelBuilder extends MavenDeployablePr
                                                    boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
                                                    List<BundleDependency> deployableBundleDependencies,
                                                    Set<BundleDescriptor> sharedDeployableBundleDescriptors,
-                                                   Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
-    super(projectStructure.getProjectFolder().toFile(), exportAllResourcesAndPackagesIfEmptyLoaderDescriptor);
+                                                   Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies,
+                                                   MavenConfiguration mavenConfiguration) {
+    super(projectStructure.getProjectFolder().toFile(),
+          mavenConfiguration != null ? mavenConfiguration : DEFAULT_MAVEN_CONFIGURATION.get(),
+          exportAllResourcesAndPackagesIfEmptyLoaderDescriptor, false);
 
     this.projectStructure = projectStructure;
     this.deployableArtifactCoordinates = deployableArtifactCoordinates;
