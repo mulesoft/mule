@@ -15,12 +15,14 @@ import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.collection.IsEmptyIterable.emptyIterable;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -264,16 +266,16 @@ public class SpanTestHierarchy {
 
   private void assertAttributes(CapturedExportedSpan actualSpan, SpanNode expectedNode) {
     expectedNode.getAttributesThatShouldMatch()
-        .forEach((key, value) -> assertThat(
-                                            "Actual attribute \"" + key + "\" for: " + expectedNode.spanName
-                                                + " is not the expected one",
-                                            actualSpan.getAttributes().get(key), equalTo(value)));
+        .forEach((key, value) -> assertThat("Actual attribute \"" + key + "\" for: " + expectedNode.spanName
+            + " is not the expected one",
+                                            actualSpan.getAttributes(),
+                                            hasEntry(is(key), equalTo(value))));
     expectedNode.getAttributesThatShouldExist().forEach(attribute -> assertThat(
                                                                                 "Actual attribute \"" + attribute + "\" for: "
                                                                                     + expectedNode.spanName
                                                                                     + " does not exist",
-                                                                                actualSpan.getAttributes().get(attribute),
-                                                                                notNullValue()));
+                                                                                actualSpan.getAttributes(),
+                                                                                hasEntry(is(attribute), notNullValue())));
   }
 
   private void assertException(CapturedExportedSpan actualSpan, SpanNode expectedNode) {
@@ -363,7 +365,7 @@ public class SpanTestHierarchy {
           .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME)).collect(toList());
       if (exceptionEventMatcher == null) {
         assertThat(format("Unexpected exception events found for Span: [%s]", actualSpan),
-                   exceptionEvents.size(), equalTo(0));
+                   exceptionEvents, emptyIterable());
         assertThat(actualSpan.getStatusAsString(), in(status != null ? singleton(status) : asList(UNSET_STATUS, OK_STATUS)));
       } else {
         assertThat(format("Expected exception events for Span: [%s] where not match", actualSpan), exceptionEvents,
