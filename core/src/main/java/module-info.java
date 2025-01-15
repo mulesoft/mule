@@ -81,7 +81,6 @@ module org.mule.runtime.core {
   requires com.github.benmanes.caffeine;
   requires com.google.common;
   requires com.google.gson;
-  requires commons.beanutils;
   requires org.apache.commons.collections4;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
@@ -90,7 +89,7 @@ module org.mule.runtime.core {
   requires net.bytebuddy;
   requires org.reflections;
   requires uuid;
-  requires vibur.object.pool;
+  requires org.vibur.objectpool;
 
   requires jakarta.activation;
   requires transitive jakarta.jms.api;

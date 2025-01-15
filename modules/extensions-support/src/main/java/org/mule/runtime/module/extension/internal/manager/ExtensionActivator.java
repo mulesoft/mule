@@ -11,7 +11,6 @@ import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.internal.util.BeanUtils.getName;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static org.mule.runtime.module.extension.internal.lifecycle.ExtensionOnMuleContextDisposedNotificationListener.registerLifecycleListenerForOnContextDisposed;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
@@ -82,7 +81,7 @@ public final class ExtensionActivator implements Startable, Stoppable {
           if (enumTypes.add(enumClass)) {
             try {
               StringToEnum stringToEnum = new StringToEnum(enumClass);
-              registerObject(muleContext, getName(stringToEnum), stringToEnum);
+              registerObject(muleContext, stringToEnum.getName(), stringToEnum);
             } catch (MuleException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum "
                   + enumClass.getName()), e);

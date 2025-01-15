@@ -67,6 +67,7 @@ import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
+import org.mule.runtime.extension.api.property.ImplicitConfigNameModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
@@ -297,6 +298,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
                             extension1ConfigurationProvider);
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     registerConfigurationProvider();
+    final Optional<ImplicitConfigNameModelProperty> implicitConfigName =
+        of(new ImplicitConfigNameModelProperty(extension1ConfigurationModel.getName()));
+    when(extension1OperationModel.getModelProperty(ImplicitConfigNameModelProperty.class))
+        .thenReturn(implicitConfigName);
 
     Optional<ConfigurationInstance> configInstance =
         extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
@@ -320,6 +325,11 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
       joinerLatch.countDown();
       return null;
     });
+    final Optional<ImplicitConfigNameModelProperty> implicitConfigName =
+        of(new ImplicitConfigNameModelProperty(extension1ConfigurationModel.getName()));
+    when(extension1OperationModel.getModelProperty(ImplicitConfigNameModelProperty.class))
+        .thenReturn(implicitConfigName);
+
     Optional<ConfigurationInstance> configurationInstance = extensionsManager.getConfiguration(extensionModel1,
                                                                                                extension1OperationModel,
                                                                                                event);

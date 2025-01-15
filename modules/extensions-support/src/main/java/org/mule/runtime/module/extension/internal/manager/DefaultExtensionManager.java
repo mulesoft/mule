@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getJdkVersion;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigurationForComponent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -43,6 +42,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.util.version.JdkVersionUtils.JdkVersion;
+import org.mule.runtime.extension.api.property.ImplicitConfigNameModelProperty;
+import org.mule.runtime.extension.api.property.ManyImplicitConfigsModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
@@ -217,17 +218,22 @@ public final class DefaultExtensionManager implements ExtensionManager, Initiali
     }
 
     Optional<ConfigurationModel> configurationModel =
-        selectImplicitConfigurationModel(extensionModel, getConfigurationForComponent(extensionModel,
-                                                                                      componentModel));
+        componentModel.getModelProperty(ImplicitConfigNameModelProperty.class)
+            .flatMap(mp -> extensionModel.getConfigurationModel(mp.getImplicitConfigName()));;
 
     return configurationModel.map(c -> createImplicitConfiguration(extensionModel, c, muleEvent));
   }
 
   @Override
   public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel, ComponentModel componentModel) {
-    Set<ConfigurationModel> configurationsForComponent = getConfigurationForComponent(extensionModel, componentModel);
+    if (componentModel.getModelProperty(ManyImplicitConfigsModelProperty.class).isPresent()) {
+      throw new IllegalStateException(format("No configuration can be inferred for extension '%s'", extensionModel.getName()));
+    }
+
     Optional<ConfigurationModel> extensionConfigurationModel =
-        selectImplicitConfigurationModel(extensionModel, configurationsForComponent);
+        componentModel.getModelProperty(ImplicitConfigNameModelProperty.class)
+            .flatMap(mp -> extensionModel.getConfigurationModel(mp.getImplicitConfigName()));;
+
     if (!extensionConfigurationModel.isPresent() && requiresConfig(extensionModel, componentModel)) {
       throw new NoConfigRefFoundException(extensionModel, componentModel);
     }

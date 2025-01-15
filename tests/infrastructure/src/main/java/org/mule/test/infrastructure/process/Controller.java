@@ -273,6 +273,12 @@ public class Controller {
     }
   }
 
+  public void verifyLicenseDetails(String path) {
+    if (0 != osSpecificController.runSync(null, "--verifyLicenseDetails", path, "-M-client")) {
+      throw new MuleControllerException("Could not validate license " + path);
+    }
+  }
+
   protected boolean isDeployed(String appName) {
     return new File(appsDir, appName + ANCHOR_SUFFIX).exists();
   }
