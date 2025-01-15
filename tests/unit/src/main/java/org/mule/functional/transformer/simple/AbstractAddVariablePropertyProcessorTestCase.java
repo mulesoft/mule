@@ -6,25 +6,26 @@
  */
 package org.mule.functional.transformer.simple;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
+import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
+import static java.nio.charset.Charset.defaultCharset;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
@@ -35,7 +36,6 @@ import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -49,6 +49,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -81,6 +82,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
 
     addVariableProcessor.setExpressionManager(muleContext.getExpressionManager());
     addVariableProcessor.setStreamingManager(streamingManager);
+    addVariableProcessor.setArtifactEncoding(() -> defaultCharset());
 
     message = of("");
     event = createTestEvent(message);
@@ -113,7 +115,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     event = addVariableProcessor.process(event);
 
     verifyAdded(event, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
-    assertThat(getVariableDataType(event, PLAIN_STRING_KEY), like(String.class, ANY, getDefaultEncoding(muleContext)));
+    assertThat(getVariableDataType(event, PLAIN_STRING_KEY), like(String.class, ANY, defaultCharset()));
   }
 
   @Test
@@ -125,7 +127,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
 
     verifyAdded(event, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
     assertThat(getVariableDataType(event, PLAIN_STRING_KEY),
-               like(String.class, APPLICATION_JAVA, getDefaultEncoding(muleContext)));
+               like(String.class, APPLICATION_JAVA, defaultCharset()));
   }
 
   @Test
@@ -136,7 +138,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     event = addVariableProcessor.process(event);
 
     verifyAdded(event, PLAIN_STRING_VALUE, PLAIN_STRING_VALUE);
-    assertThat(getVariableDataType(event, PLAIN_STRING_VALUE), like(String.class, ANY, getDefaultEncoding(muleContext)));
+    assertThat(getVariableDataType(event, PLAIN_STRING_VALUE), like(String.class, ANY, defaultCharset()));
   }
 
   @Test
@@ -161,7 +163,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
 
     verifyAdded(event, PLAIN_STRING_KEY, PLAIN_STRING_VALUE);
     assertThat(getVariableDataType(event, PLAIN_STRING_KEY),
-               like(String.class, APPLICATION_XML, getDefaultEncoding(muleContext)));
+               like(String.class, APPLICATION_XML, defaultCharset()));
   }
 
   protected abstract DataType getVariableDataType(CoreEvent event, String key);

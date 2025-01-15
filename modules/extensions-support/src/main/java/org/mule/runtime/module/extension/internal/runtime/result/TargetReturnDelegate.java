@@ -10,11 +10,11 @@ import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContex
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -45,9 +45,9 @@ public final class TargetReturnDelegate extends AbstractReturnDelegate {
                               String targetValue,
                               ComponentModel componentModel,
                               ExpressionManager expressionManager,
-                              MuleContext muleContext,
+                              ArtifactEncoding artifactEncoding,
                               StreamingManager streamingManager) {
-    super(componentModel, muleContext);
+    super(componentModel, artifactEncoding);
     this.expressionManager = expressionManager;
     this.target = target;
     this.targetValue = expressionManager.compile(targetValue, getTargetBindingContext(of("")));

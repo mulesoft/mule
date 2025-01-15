@@ -22,6 +22,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -56,6 +57,7 @@ public class MuleSampleDataService implements SampleDataService {
   private ConfigurationComponentLocator componentLocator;
   private ExtensionManager extensionManager;
   private MuleContext muleContext;
+  private ArtifactEncoding artifactEncoding;
   private StreamingManager streamingManager;
   private ConnectionManager connectionManager;
 
@@ -112,6 +114,7 @@ public class MuleSampleDataService implements SampleDataService {
                                                                                 new ResolvingComponent(extensionName,
                                                                                                        componentName),
                                                                                 muleContext,
+                                                                                artifactEncoding,
                                                                                 new ReflectionCache(),
                                                                                 streamingManager);
 
@@ -162,6 +165,11 @@ public class MuleSampleDataService implements SampleDataService {
   @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Inject
+  public void setArtifactEncoding(ArtifactEncoding artifactEncoding) {
+    this.artifactEncoding = artifactEncoding;
   }
 
   @Inject

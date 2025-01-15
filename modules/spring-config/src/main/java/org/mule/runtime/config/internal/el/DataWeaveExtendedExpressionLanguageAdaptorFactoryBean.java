@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.el;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.core.api.MuleContext;
@@ -29,11 +30,16 @@ public class DataWeaveExtendedExpressionLanguageAdaptorFactoryBean implements Fa
   private MuleContext muleContext;
 
   @Inject
+  private ArtifactEncoding artifactEncoding;
+
+  @Inject
   private Registry registry;
 
   @Override
   public ExtendedExpressionLanguageAdaptor getObject() throws Exception {
-    return new DataWeaveExpressionLanguageAdaptor(muleContext, registry, dwExpressionLanguageFactory, featureFlaggingService);
+    return new DataWeaveExpressionLanguageAdaptor(muleContext, registry,
+                                                  muleContext.getConfiguration(), artifactEncoding,
+                                                  dwExpressionLanguageFactory, featureFlaggingService);
   }
 
   @Override

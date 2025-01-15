@@ -17,6 +17,8 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 
+import javax.inject.Inject;
+
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String to a byte array. If <code>Message</code> is
  * configured as a source type on this transformer by calling {@link #setAcceptMuleMessage(boolean)} then the {@link Message} will
@@ -65,10 +67,9 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
     this.objectSerializer = objectSerializer;
   }
 
-  @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
-    super.setMuleContext(context);
-    setObjectSerializer(muleContext.getObjectSerializer());
+    setObjectSerializer(context.getObjectSerializer());
   }
 
 }

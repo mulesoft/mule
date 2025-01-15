@@ -12,11 +12,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.IdempotentMessageValidator.IDEMPOTENT_MESSAGE_VALIDATOR;
 
+import static java.nio.charset.Charset.defaultCharset;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.rules.ExpectedException.none;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -42,11 +44,11 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 import org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService;
 
+import java.nio.charset.Charset;
+
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -74,9 +76,6 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     idempotent.dispose();
   }
 
-  @Rule
-  public ExpectedException expected = none();
-
   @Test
   public void idempotentReceiver() throws Exception {
 
@@ -84,21 +83,20 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     when(contextA.getCorrelationId()).thenReturn("1");
 
     Message okMessage = InternalMessage.builder().value("OK").build();
-    CoreEvent event = CoreEvent.builder(contextA).message(okMessage).build();
+    CoreEvent baseEvent = CoreEvent.builder(contextA).message(okMessage).build();
 
     initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
-    CoreEvent processedEvent = idempotent.process(event);
-    assertThat(processedEvent, sameInstance(event));
+    CoreEvent processedEvent = idempotent.process(baseEvent);
+    assertThat(processedEvent, sameInstance(baseEvent));
 
     final BaseEventContext contextB = mock(BaseEventContext.class);
     when(contextB.getCorrelationId()).thenReturn("1");
 
     // This will not process, because the ID is a duplicate
-    event = CoreEvent.builder(contextB).message(okMessage).build();
+    var event = CoreEvent.builder(contextB).message(okMessage).build();
 
-    expected.expect(ValidationException.class);
-    processedEvent = idempotent.process(event);
+    assertThrows(ValidationException.class, () -> idempotent.process(event));
   }
 
   @Test
@@ -107,65 +105,65 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     final BaseEventContext context = mock(BaseEventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
     Message okMessage = of("OK");
-    CoreEvent event = CoreEvent.builder(context).message(okMessage).build();
+    CoreEvent baseEevent = CoreEvent.builder(context).message(okMessage).build();
 
     // Set MEL expression to hash value
     idempotent.setIdExpression(melExpression);
 
     initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
-    CoreEvent processedEvent = idempotent.process(event);
+    CoreEvent processedEvent = idempotent.process(baseEevent);
     assertThat(processedEvent, is(notNullValue()));
     assertThat(idempotent.getObjectStore().retrieve("OK"), is("1"));
 
     // This will not process, because the message is a duplicate
     okMessage = of("OK");
-    event = CoreEvent.builder(context).message(okMessage).build();
+    var event = CoreEvent.builder(context).message(okMessage).build();
 
-    expected.expect(ValidationException.class);
-    processedEvent = idempotent.process(event);
+    assertThrows(ValidationException.class, () -> idempotent.process(event));
   }
 
   @Test
   public void testIdCheckWithDW() throws Exception {
-    String dwExpression = "%dw 2.0\n" +
-        "output application/text\n" +
-        "---\n" +
-        "payload ++ ' World'";
+    String dwExpression = """
+        %dw 2.0
+        output application/text
+        ---
+        payload ++ ' World'""";
     final BaseEventContext context = mock(BaseEventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
     Message okMessage = of("Hello");
-    CoreEvent event = CoreEvent.builder(context).message(okMessage).build();
+    CoreEvent baseEvent = CoreEvent.builder(context).message(okMessage).build();
 
     // Set DW expression to hash value
     idempotent.setIdExpression(dwExpression);
 
     initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
-    CoreEvent processedEvent = idempotent.process(event);
+    CoreEvent processedEvent = idempotent.process(baseEvent);
     assertThat(processedEvent, is(notNullValue()));
     assertThat(idempotent.getObjectStore().retrieve("Hello World"), is("1"));
 
     // This will not process, because the message is a duplicate
     okMessage = of("Hello");
-    event = CoreEvent.builder(context).message(okMessage).build();
+    var event = CoreEvent.builder(context).message(okMessage).build();
 
-    expected.expect(ValidationException.class);
-    processedEvent = idempotent.process(event);
+    assertThrows(ValidationException.class, () -> idempotent.process(event));
   }
 
   @Test
   public void testIdCheckWithHash() throws Exception {
-    String dwHashExpression = "%dw 2.0\n" +
-        "output text/plain\n" +
-        "import dw::Crypto\n" +
-        "---\n" +
-        "Crypto::hashWith(payload,'SHA-256')";
+    String dwHashExpression = """
+        %dw 2.0
+        output text/plain
+        import dw::Crypto
+        ---
+        Crypto::hashWith(payload,'SHA-256')""";
     String payload = "payload to be hashed";
     final BaseEventContext context = mock(BaseEventContext.class);
     when(context.getCorrelationId()).thenReturn("1");
     Message message = of(payload);
-    CoreEvent event = CoreEvent.builder(context).message(message).build();
+    CoreEvent baseEvent = CoreEvent.builder(context).message(message).build();
 
     // Set DW expression to hash value
     idempotent.setIdExpression(dwHashExpression);
@@ -173,33 +171,35 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Evaluate DW expression outside MessageValidator
     ExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
+                                               muleContext.getConfiguration(),
+                                               Charset::defaultCharset,
                                                new WeaveDefaultExpressionLanguageFactoryService(null),
                                                getFeatureFlaggingService());
     initialiseIfNeeded(expressionLanguageAdaptor);
-    TypedValue<?> hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
+    TypedValue<?> hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, baseEvent, NULL_BINDING_CONTEXT);
 
     initialiseIfNeeded(idempotent, true, muleContext);
     // This one will process the event on the target endpoint
-    CoreEvent processedEvent = idempotent.process(event);
+    CoreEvent processedEvent = idempotent.process(baseEvent);
     assertThat(processedEvent, is(notNullValue()));
     assertThat(idempotent.getObjectStore()
         .retrieve(IOUtils.toString((ByteArrayBasedCursorStreamProvider) hashedValue.getValue())), is("1"));
 
     // This will not process, because the message is a duplicate
     message = of(payload);
-    event = CoreEvent.builder(context).message(message).build();
+    var event = CoreEvent.builder(context).message(message).build();
 
-    expected.expect(ValidationException.class);
-    processedEvent = idempotent.process(event);
+    assertThrows(ValidationException.class, () -> idempotent.process(event));
   }
 
   @Test
   public void differentIdsShouldBeStored() throws Exception {
-    String dwHashExpression = "%dw 2.0\n" +
-        "output text/plain\n" +
-        "import dw::Crypto\n" +
-        "---\n" +
-        "Crypto::SHA1(payload)";
+    String dwHashExpression = """
+        %dw 2.0
+        output text/plain
+        import dw::Crypto
+        ---
+        Crypto::SHA1(payload)""";
     String payload = "payload to be hashed";
     String otherPayload = "this is another payload to be hashed";
     final BaseEventContext context = mock(BaseEventContext.class);
@@ -213,6 +213,8 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     // Evaluate DW expression outside MessageValidator
     ExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
+                                               muleContext.getConfiguration(),
+                                               Charset::defaultCharset,
                                                new WeaveDefaultExpressionLanguageFactoryService(null),
                                                getFeatureFlaggingService());
     initialiseIfNeeded(expressionLanguageAdaptor);
@@ -236,8 +238,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
   @Test
   public void multipleObjectStoreConfigurationShouldRaiseException() throws Exception {
     idempotent.setPrivateObjectStore(new InMemoryObjectStore<>());
-    expected.expect(InitialisationException.class);
-    idempotent.initialise();
+    assertThrows(InitialisationException.class, () -> idempotent.initialise());
   }
 
   @Test
@@ -256,8 +257,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     initialiseIfNeeded(idempotent, true, muleContext);
     // set rethrow as if FF is enabled
     idempotent.setRethrowEnabled(true);
-    expected.expect(ObjectStoreException.class);
-    idempotent.process(event);
+    assertThrows(ObjectStoreException.class, () -> idempotent.process(event));
   }
 
   @Test
@@ -276,8 +276,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
     initialiseIfNeeded(idempotent, true, muleContext);
     // set rethrow as if FF is disabled
     idempotent.setRethrowEnabled(false);
-    expected.expect(DuplicateMessageException.class);
-    idempotent.process(event);
+    assertThrows(DuplicateMessageException.class, () -> idempotent.process(event));
   }
 
   @Test

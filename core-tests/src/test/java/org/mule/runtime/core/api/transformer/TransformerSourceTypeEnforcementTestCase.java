@@ -6,55 +6,35 @@
  */
 package org.mule.runtime.core.api.transformer;
 
+import static java.nio.charset.Charset.defaultCharset;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import com.google.common.base.Charsets;
-
 import java.nio.charset.Charset;
 
-import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
 public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCase {
 
-  private MuleContext muleContext = mock(MuleContext.class);
-  private MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
-
-  @Before
-  public void setUp() throws Exception {
-    when(muleConfiguration.getDefaultEncoding()).thenReturn(Charsets.UTF_8.name());
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-  }
-
   @Test
   public void rejectsBadInputIfEnforcementOn() throws TransformerException {
     AbstractTransformer transformer = createDummyTransformer(true);
 
-    try {
-      transformer.transform("TEST");
-      fail("Transformation should fail because source type is not supported");
-    } catch (TransformerException expected) {
-    }
+    assertThrows(TransformerException.class, () -> transformer.transform("TEST"));
   }
 
   @Test
   public void rejectsBadInputUsingDefaultEnforcement() throws TransformerException {
     AbstractTransformer transformer = createDummyTransformer(true);
 
-    try {
-      transformer.transform("TEST");
-      fail("Transformation should fail because source type is not supported");
-    } catch (TransformerException expected) {
-    }
+    assertThrows(TransformerException.class, () -> transformer.transform("TEST"));
   }
 
   @Test
@@ -62,8 +42,6 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
     AbstractTransformer transformer = createDummyTransformer(true);
     transformer.sourceTypes.add(DataType.STRING);
     transformer.setReturnDataType(DataType.STRING);
-
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
     Object result = transformer.transform("TEST");
     assertEquals("TRANSFORMED", result);
@@ -79,7 +57,7 @@ public class TransformerSourceTypeEnforcementTestCase extends AbstractMuleTestCa
     };
 
     result.sourceTypes.add(DataType.BYTE_ARRAY);
-    result.setMuleContext(muleContext);
+    result.setArtifactEncoding(() -> defaultCharset());
     result.setIgnoreBadInput(ignoreBadInput);
 
     return result;

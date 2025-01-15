@@ -30,7 +30,7 @@ module org.mule.runtime.extensions.support {
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.artifact.ast;
-  requires org.mule.runtime.core;
+  requires transitive org.mule.runtime.core;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.errors;
   requires org.mule.runtime.extension.model;
