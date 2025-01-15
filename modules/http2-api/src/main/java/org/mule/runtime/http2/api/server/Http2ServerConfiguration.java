@@ -8,11 +8,14 @@ package org.mule.runtime.http2.api.server;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
+import org.mule.runtime.api.tls.TlsContextFactory;
+
 import java.net.InetSocketAddress;
 
 public class Http2ServerConfiguration {
 
   private InetSocketAddress serverAddress;
+  private TlsContextFactory tlsContextFactory;
 
   public static Builder builder() {
     return new Builder();
@@ -22,6 +25,10 @@ public class Http2ServerConfiguration {
 
   public InetSocketAddress getServerAddress() {
     return serverAddress;
+  }
+
+  public TlsContextFactory getTlsContextFactory() {
+    return tlsContextFactory;
   }
 
   public static class Builder {
@@ -34,6 +41,11 @@ public class Http2ServerConfiguration {
 
     public Builder withServerAddress(InetSocketAddress socketAddress) {
       product.serverAddress = socketAddress;
+      return this;
+    }
+
+    public Builder withTlsContextFactory(TlsContextFactory tlsContextFactory) {
+      product.tlsContextFactory = tlsContextFactory;
       return this;
     }
 
