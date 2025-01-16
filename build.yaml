@@ -4,7 +4,7 @@ upstreamProjects:
   Mule-runtime/mule-api/1.6.10,
   Mule-runtime/mule-extensions-api/1.6.10,
   Mule-runtime/mule-artifact-ast/1.2.10,
-  Mule-runtime/mule-properties-api/1.2.10,
+  Mule-runtime/mule-properties-api/1.2.11,
   DataWeave/data-weave/support/2.6.x,
   Mule-runtime/mule-maven-client/2.1.10
 # Comment public setting to get oldMuleArtifact 4.2.1 from private repo till we move them to the public Repo
