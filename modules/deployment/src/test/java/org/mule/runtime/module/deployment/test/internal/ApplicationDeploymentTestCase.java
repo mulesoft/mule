@@ -28,6 +28,9 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedArtifactStatusDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
@@ -418,13 +421,16 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     Application app = findApp(dummyAppDescriptorWithPropsFileBuilder.getId(), 1);
     app.stop();
 
-    Properties artifactStatusDeploymentProperties =
-        resolveArtifactStatusDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), empty());
-    assertThat(artifactStatusDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+    Optional<Properties> artifactStatusDeploymentProperties =
+        getPersistedArtifactStatusDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId());
+    assertThat(artifactStatusDeploymentProperties.isPresent(), is(true));
+    assertThat(artifactStatusDeploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
 
-    Properties updatedDeploymentProperties = resolveDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId(), empty());
-    assertThat(updatedDeploymentProperties.get(FLOW_PROPERTY_NAME), is(deploymentPropertyValue));
-    assertThat(updatedDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    Optional<Properties> updatedDeploymentProperties =
+        getPersistedDeploymentProperties(dummyAppDescriptorWithPropsFileBuilder.getId());
+    assertThat(updatedDeploymentProperties.isPresent(), is(true));
+    assertThat(updatedDeploymentProperties.get().get(FLOW_PROPERTY_NAME), is(deploymentPropertyValue));
+    assertThat(updatedDeploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Issue("MULE-16688")
@@ -483,9 +489,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     app.stop();
 
     assertThat(app.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
 
   @Issue("MULE-19040")
@@ -497,8 +504,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertThat(app.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(app);
 
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   /**
@@ -929,14 +937,16 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     app.stop();
     assertStatus(app, STOPPED);
 
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
 
     deploymentService.undeploy(app);
 
-    deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Issue("MULE-19040")
@@ -950,9 +960,10 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     restartServer();
 
     assertAppDeploymentAndStatus(emptyAppFileBuilder, CREATED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
   }
 
   @Issue("MULE-19040")
@@ -968,9 +979,11 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     assertDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     final Application app_2 = findApp(emptyAppFileBuilder.getId(), 1);
     assertStatus(app_2, CREATED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
 
     app_2.start();
     assertStatus(app_2, STARTED);
@@ -986,8 +999,9 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     restartServer();
 
     assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
@@ -995,17 +1009,19 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     final Application app = deployApplication(emptyAppFileBuilder);
     app.stop();
     assertStatus(app, STOPPED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(notNullValue()));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is("false"));
 
     reset(applicationDeploymentListener);
 
     redeploy(deploymentService, emptyAppFileBuilder.getId());
 
     assertAppDeploymentAndStatus(emptyAppFileBuilder, STARTED);
-    deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
@@ -1822,11 +1838,12 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     assertDeploymentFailure(applicationDeploymentListener, dummyFlowErrorAppDescriptorFileBuilder.getId());
 
-    Properties flowDeploymentProperties =
-        resolveFlowDeploymentProperties(dummyFlowErrorAppDescriptorFileBuilder.getId(), empty());
-    assertThat(flowDeploymentProperties, is(notNullValue()));
+    Optional<Properties> flowDeploymentProperties =
+        getPersistedFlowDeploymentProperties(dummyFlowErrorAppDescriptorFileBuilder.getId());
+    assertThat(flowDeploymentProperties.isPresent(), is(true));
+
     for (int i = 1; i < 4; i++) {
-      Object mustStartFlow = flowDeploymentProperties.get("test" + i + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY);
+      Object mustStartFlow = flowDeploymentProperties.get().get("test" + i + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY);
       if (mustStartFlow != null) {
         assertThat(mustStartFlow, is("true"));
       }

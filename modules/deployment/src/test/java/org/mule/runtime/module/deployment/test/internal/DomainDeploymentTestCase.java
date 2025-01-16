@@ -711,8 +711,11 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertDomainRedeploymentSuccess(dummyDomainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+
+
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyAppFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
@@ -739,10 +742,12 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertUndeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
     assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
+
     // no deberia ser dummyDomainFileBuilder?
-    Properties artifactStatusDeploymentProperties =
-        resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
-    assertThat(artifactStatusDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    Optional<Properties> artifactStatusDeploymentProperties =
+        getPersistedArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId());
+    assertThat(artifactStatusDeploymentProperties.isPresent(), is(true));
+    assertThat(artifactStatusDeploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
@@ -1267,8 +1272,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     domain.stop();
 
     deploymentService.undeploy(domain);
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
@@ -1305,8 +1311,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertThat(domain.getArtifactContext().getRegistry().lookupByName(ARTIFACT_STOPPED_LISTENER), is(notNullValue()));
     deploymentService.undeploy(domain);
 
-    Properties deploymentProperties = resolveArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    Optional<Properties> deploymentProperties = getPersistedArtifactStatusDeploymentProperties(emptyDomainFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Test
@@ -1542,9 +1549,10 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyDomainApp1FileBuilder.getId());
     assertStatus(dummyDomainApp1FileBuilder.getId(), CREATED);
 
-    Properties deploymentProperties =
-        resolveArtifactStatusDeploymentProperties(dummyDomainApp1FileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    Optional<Properties> deploymentProperties =
+        getPersistedArtifactStatusDeploymentProperties(dummyDomainApp1FileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
   }
 
   @Ignore("MULE-6926: flaky test")
