@@ -24,12 +24,15 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
-import javax.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Common logic to create and persist a file containing deployment properties for each app/domain deployed/redeployed.
  */
 public class DeploymentPropertiesUtils {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DeploymentPropertiesUtils.class);
 
   private static final String DEPLOYMENT_PROPERTIES_FILE_NAME = "deployment.properties";
 
@@ -63,6 +66,7 @@ public class DeploymentPropertiesUtils {
       String deploymentPropertiesPath = getDeploymentPropertiesPath(artifactName);
       return of(getDeploymentProperties(deploymentPropertiesPath, fileName));
     } catch (IOException e) {
+      LOGGER.error("Failed to load persisted deployment property for artifact " + artifactName, e);
       return empty();
     }
   }
