@@ -279,7 +279,7 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void redeploy(String artifactName) {
-    redeploy(artifactName, empty());
+    redeploy(artifactName, getPersistedDeploymentProperties(artifactName));
   }
 
   @Override
