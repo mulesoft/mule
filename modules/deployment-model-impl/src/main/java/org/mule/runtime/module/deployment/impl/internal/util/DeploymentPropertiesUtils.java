@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Common logic to create and persist a file containing deployment properties for each app/domain deployed/redeployed.
  */
@@ -45,7 +47,6 @@ public class DeploymentPropertiesUtils {
    * @param artifactName         name of the artifact.
    * @param deploymentProperties deployment properties set in the new deploy/redeploy as parameters.
    * @param fileName             name of the file where the deployment properties are persisted.
-   *
    * @return deployment properties
    * @throws IOException
    */
@@ -53,11 +54,7 @@ public class DeploymentPropertiesUtils {
                                                        String fileName)
       throws IOException {
     Properties properties = deploymentProperties.orElse(new Properties());
-
-    String deploymentPropertiesPath = getDeploymentPropertiesPath(artifactName);
-    initDeploymentPropertiesDirectory(deploymentPropertiesPath);
-    persistDeploymentPropertiesFile(deploymentPropertiesPath, properties, fileName);
-
+    setPersistedProperties(artifactName, properties, fileName);
     return properties;
   }
 
@@ -82,6 +79,27 @@ public class DeploymentPropertiesUtils {
     return getPersistedProperties(artifactName, ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME);
   }
 
+  public static void setPersistedProperties(String artifactName, Properties properties, String fileName) throws IOException {
+    String deploymentPropertiesPath = getDeploymentPropertiesPath(artifactName);
+    initDeploymentPropertiesDirectory(deploymentPropertiesPath);
+    persistDeploymentPropertiesFile(deploymentPropertiesPath, properties, fileName);
+  }
+
+  public static void setPersistedDeploymentProperties(String artifactName, Properties properties)
+      throws IOException {
+    setPersistedProperties(artifactName, properties, DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  public static void setPersistedFlowDeploymentProperties(String artifactName, Properties properties)
+      throws IOException {
+    setPersistedProperties(artifactName, properties, FLOWS_DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
+  public static void setPersistedArtifactStatusDeploymentProperties(String artifactName, Properties properties)
+      throws IOException {
+    setPersistedProperties(artifactName, properties, ARTIFACT_STATUS_DEPLOYMENT_PROPERTIES_FILE_NAME);
+  }
+
   private static String getDeploymentPropertiesPath(String artifactName) {
     File file = new File(getExecutionFolder(), artifactName);
     String workingDirectory = file.getAbsolutePath();
@@ -94,7 +112,6 @@ public class DeploymentPropertiesUtils {
    *
    * @param deploymentPropertiesPath the path where the deployment properties are located
    * @return deployment properties
-   *
    * @throws IOException
    */
   private static Properties getDeploymentProperties(String deploymentPropertiesPath, String fileName) throws IOException {

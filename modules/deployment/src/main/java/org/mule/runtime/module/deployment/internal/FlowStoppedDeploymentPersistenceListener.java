@@ -10,11 +10,15 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.setPersistedFlowDeploymentProperties;
 
 import org.mule.runtime.core.internal.context.FlowStoppedPersistenceListener;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,10 +51,9 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
   @Override
   public void onStart() {
     try {
-      Properties properties = resolveFlowDeploymentProperties(appName, empty());
+      Properties properties = getPersistedFlowDeploymentProperties(appName).orElse(new Properties());
       properties.setProperty(propertyName, valueOf(true));
-
-      resolveFlowDeploymentProperties(appName, of(properties));
+      setPersistedFlowDeploymentProperties(appName, properties);
     } catch (IOException e) {
       logger.error("FlowStoppedDeploymentListener failed to process notification onStart for flow "
           + flowName, e);
@@ -63,10 +66,9 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
       return;
     }
     try {
-      Properties properties = resolveFlowDeploymentProperties(appName, empty());
+      Properties properties = getPersistedFlowDeploymentProperties(appName).orElse(new Properties());
       properties.setProperty(propertyName, valueOf(false));
-
-      resolveFlowDeploymentProperties(appName, of(properties));
+      setPersistedFlowDeploymentProperties(appName, properties);
     } catch (IOException e) {
       logger.error("FlowStoppedDeploymentListener failed to process notification onStop for flow "
           + flowName, e);
@@ -80,14 +82,8 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
 
   @Override
   public Boolean shouldStart() {
-    Properties deploymentProperties = null;
-    try {
-      deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
-    } catch (IOException e) {
-      logger.error("FlowStoppedDeploymentListener failed to process shouldStart for flow "
-          + flowName, e);
-    }
-    return deploymentProperties != null
-        && parseBoolean(deploymentProperties.getProperty(propertyName, "true"));
+    Optional<Properties> deploymentProperties = getPersistedFlowDeploymentProperties(appName);
+    return deploymentProperties.isPresent()
+        && parseBoolean(deploymentProperties.get().getProperty(propertyName, "true"));
   }
 }
