@@ -10,6 +10,8 @@ import static org.mule.runtime.api.message.Message.of;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.TransfromersStory.TRANSFORMERS;
 
+import static java.nio.charset.Charset.defaultCharset;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -17,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -26,7 +27,6 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -66,15 +66,14 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
   }
 
-  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
   private final DataTypeConversionResolver conversionResolver = mock(DataTypeConversionResolver.class);
   private ExtendedTransformationService transformationService;
 
   @Before
   public void setUp() throws Exception {
-    when(muleContext.getDataTypeConverterResolver()).thenReturn(conversionResolver);
-    this.transformationService = new ExtendedTransformationService(muleContext);
+    this.transformationService = new ExtendedTransformationService();
     transformationService.setDataTypeConversionResolver(conversionResolver);
+    transformationService.setArtifactEncoding(() -> defaultCharset());
   }
 
   private static final DataType dataTypeB = DataType.fromType(B.class);

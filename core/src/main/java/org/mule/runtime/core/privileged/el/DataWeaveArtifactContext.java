@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.privileged.el;
 
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,30 +25,31 @@ import org.apache.commons.collections4.keyvalue.DefaultMapEntry;
  *
  * @since 4.0
  */
+@NoInstantiate
 public class DataWeaveArtifactContext {
 
-  private final MuleContext muleContext;
+  private final MuleConfiguration configuration;
   private final Registry registry;
 
-  public DataWeaveArtifactContext(MuleContext muleContext, Registry registry) {
-    this.muleContext = muleContext;
+  public DataWeaveArtifactContext(MuleConfiguration configuration, Registry registry) {
+    this.configuration = configuration;
     this.registry = registry;
   }
 
   public String getName() {
-    return muleContext.getConfiguration().getId();
+    return configuration.getId();
   }
 
   public String getWorkDir() {
-    return muleContext.getConfiguration().getWorkingDirectory();
+    return configuration.getWorkingDirectory();
   }
 
   public String getEncoding() {
-    return muleContext.getConfiguration().getDefaultEncoding();
+    return configuration.getDefaultEncoding();
   }
 
   public boolean isStandalone() {
-    return muleContext.getConfiguration().isStandalone();
+    return configuration.isStandalone();
   }
 
   public Map<String, Object> getRegistry() {

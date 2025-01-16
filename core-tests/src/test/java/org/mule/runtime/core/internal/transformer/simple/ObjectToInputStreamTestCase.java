@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
-import static org.junit.Assert.assertEquals;
+import static java.nio.charset.Charset.defaultCharset;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -36,43 +41,37 @@ public class ObjectToInputStreamTestCase extends AbstractMuleTestCase {
     objectSerializer = new JavaObjectSerializer(this.getClass().getClassLoader());
 
     transformer = new ObjectToInputStream();
+    transformer.setArtifactEncoding(() -> defaultCharset());
     transformer.setObjectSerializer(objectSerializer);
   }
 
   @Test
   public void testTransformString() throws TransformerException, IOException {
-    assertTrue(InputStream.class.isAssignableFrom(transformer.transform(TEST_MESSAGE).getClass()));
+    assertThat(transformer.transform(TEST_MESSAGE), instanceOf(InputStream.class));
     assertTrue(compare(new ByteArrayInputStream(TEST_MESSAGE.getBytes()), (InputStream) transformer.transform(TEST_MESSAGE)));
   }
 
   @Test
   public void testTransformByteArray() throws TransformerException, IOException {
-    assertTrue(InputStream.class.isAssignableFrom(transformer.transform(TEST_MESSAGE.getBytes()).getClass()));
+    assertThat(transformer.transform(TEST_MESSAGE), instanceOf(InputStream.class));
     assertTrue(compare(new ByteArrayInputStream(TEST_MESSAGE.getBytes()), (InputStream) transformer.transform(TEST_MESSAGE)));
   }
 
   @Test
   public void testTransformInputStream() {
     InputStream inputStream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-    try {
-      assertEquals(inputStream, transformer.transform(inputStream));
-    } catch (Exception e) {
-      assertTrue(e instanceof TransformerException);
-      assertTrue(e.getMessage().contains("does not support source type"));
-    }
+
+    var thrown = assertThrows(TransformerException.class, () -> transformer.transform(inputStream));
+    assertThat(thrown.getMessage(), containsString("does not support source type"));
   }
 
   @Test
-  public void testTransformSerializable() {
+  public void testTransformSerializable() throws TransformerException {
     Apple apple = new Apple();
     InputStream serializedApple =
         new ByteArrayInputStream(objectSerializer.getExternalProtocol().serialize(apple));
-    try {
-      assertTrue(compare(serializedApple, (InputStream) transformer.transform(apple)));
-    } catch (Exception e) {
-      assertTrue(e instanceof TransformerException);
-      assertTrue(e.getMessage().contains("does not support source type"));
-    }
+
+    assertTrue(compare(serializedApple, (InputStream) transformer.transform(apple)));
   }
 
   public static boolean compare(InputStream input1, InputStream input2) {

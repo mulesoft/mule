@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.result;
 
-import static org.apache.commons.io.IOUtils.EOF;
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.messageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.messageIterator;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isJavaCollection;
@@ -23,8 +21,11 @@ import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.get
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getMutableConfigurationStats;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
+import static org.apache.commons.io.IOUtils.EOF;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.message.Message;
@@ -79,7 +80,6 @@ import org.apache.commons.io.input.ProxyInputStream;
  */
 public abstract class AbstractReturnDelegate implements ReturnDelegate {
 
-  protected final MuleContext muleContext;
   private boolean returnsListOfMessages = false;
   private final MediaType defaultMediaType;
   private boolean isSpecialHandling = false;
@@ -90,12 +90,11 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
   /**
    * Creates a new instance
    *
-   * @param componentModel the component which produces the return value
-   * @param muleContext    the {@link MuleContext} of the owning application
+   * @param componentModel   the component which produces the return value
+   * @param artifactEncoding the provider for the default encoding of the application
    */
-  protected AbstractReturnDelegate(ComponentModel componentModel, MuleContext muleContext) {
-    if (componentModel instanceof HasOutputModel) {
-      HasOutputModel hasOutputModel = (HasOutputModel) componentModel;
+  protected AbstractReturnDelegate(ComponentModel componentModel, ArtifactEncoding artifactEncoding) {
+    if (componentModel instanceof HasOutputModel hasOutputModel) {
       returnsListOfMessages = returnsListOfMessages(hasOutputModel);
 
       MetadataType outputType = hasOutputModel.getOutput().getType();
@@ -109,9 +108,7 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       }
     }
 
-    this.muleContext = muleContext;
-
-    defaultEncoding = getDefaultEncoding(muleContext);
+    defaultEncoding = artifactEncoding.getDefaultEncoding();
     defaultMediaType = getDefaultMediaType(componentModel);
   }
 
@@ -133,8 +130,7 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
 
     ComponentLocation originatingLocation = operationContext.getComponent().getLocation();
 
-    if (value instanceof Result) {
-      Result resultValue = (Result) value;
+    if (value instanceof Result resultValue) {
       if (resultValue.getOutput() instanceof InputStream) {
         ConnectionHandler connectionHandler = (ConnectionHandler) operationContext.getVariable(CONNECTION_PARAM);
         if (connectionHandler != null && supportsStreaming(operationContext.getComponentModel())) {

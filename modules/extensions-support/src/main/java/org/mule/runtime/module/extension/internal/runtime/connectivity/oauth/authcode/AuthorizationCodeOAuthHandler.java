@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.au
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
@@ -30,6 +29,7 @@ import org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -71,6 +71,9 @@ import org.reactivestreams.Publisher;
 public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCodeOAuthDancer> {
 
   private static final String DANCE_CALLBACK_EVENT_KEY = "event";
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   @Inject
   private Registry registry;
@@ -169,7 +172,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
 
     dancerBuilder
         .name(config.getOwnerConfigName())
-        .encoding(getDefaultEncoding(muleContext))
+        .encoding(artifactEncoding.getDefaultEncoding())
         .clientCredentials(config.getConsumerKey(), config.getConsumerSecret())
         .tokenUrl(config.getAccessTokenUrl())
         .responseExpiresInExpr(grantType.getExpirationRegex())

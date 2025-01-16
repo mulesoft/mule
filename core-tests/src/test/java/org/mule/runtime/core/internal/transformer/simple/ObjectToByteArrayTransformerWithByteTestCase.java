@@ -15,7 +15,7 @@ public class ObjectToByteArrayTransformerWithByteTestCase extends SerialisedObje
 
   @Override
   public Transformer getTransformer() throws Exception {
-    return new ObjectToByteArray();
+    return configureTransformer(new ObjectToByteArray());
   }
 
   @Override

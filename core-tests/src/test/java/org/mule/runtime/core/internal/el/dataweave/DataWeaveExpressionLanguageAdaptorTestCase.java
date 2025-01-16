@@ -41,6 +41,7 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
+import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
@@ -92,6 +93,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.security.DefaultMuleCredentials;
@@ -474,6 +476,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void expressionExecutorIsNotDisposedWhenAlreadyDisposed() throws MuleException {
     DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               mock(MuleConfiguration.class, RETURNS_DEEP_STUBS),
+                                               () -> defaultCharset(),
                                                genericExpressionLanguageService, getFeatureFlaggingService());
     ExpressionLanguage mockedExpressionLanguage = mock(ExpressionLanguage.class);
     when(genericExpressionLanguageService.create(any())).thenReturn(mockedExpressionLanguage);
@@ -488,6 +492,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void payloadExpressionShouldNotBeEvaluate() throws MuleException {
     DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               mock(MuleConfiguration.class, RETURNS_DEEP_STUBS),
+                                               () -> defaultCharset(),
                                                genericExpressionLanguageService, getFeatureFlaggingService());
     expressionLanguageAdaptor.initialise();
     expressionLanguageAdaptor.evaluate("#[payload]", testEvent(), bindingContext);
@@ -499,6 +505,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void evaluateNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
     DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               mock(MuleConfiguration.class, RETURNS_DEEP_STUBS),
+                                               () -> defaultCharset(),
                                                genericExpressionLanguageService, getFeatureFlaggingService());
 
     expressionLanguageAdaptor.initialise();
@@ -511,6 +519,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void evaluateWithDataTypeNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
     DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               mock(MuleConfiguration.class, RETURNS_DEEP_STUBS),
+                                               () -> defaultCharset(),
                                                genericExpressionLanguageService, getFeatureFlaggingService());
 
     expressionLanguageAdaptor.initialise();
@@ -523,6 +533,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void evaluateNoLocationNoEventWithDataTypeDoesntInstantiateExtraBindingContexts() throws InitialisationException {
     DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               mock(MuleConfiguration.class, RETURNS_DEEP_STUBS),
+                                               () -> defaultCharset(),
                                                genericExpressionLanguageService, getFeatureFlaggingService());
 
     expressionLanguageAdaptor.initialise();
@@ -535,6 +547,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void evaluateNoLocationNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
     DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               mock(MuleConfiguration.class, RETURNS_DEEP_STUBS),
+                                               () -> defaultCharset(),
                                                genericExpressionLanguageService, getFeatureFlaggingService());
 
     expressionLanguageAdaptor.initialise();
@@ -547,6 +561,8 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void evaluateLogExpressionNoLocationNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
     DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
         new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               mock(MuleConfiguration.class, RETURNS_DEEP_STUBS),
+                                               () -> defaultCharset(),
                                                genericExpressionLanguageService, getFeatureFlaggingService());
 
     expressionLanguageAdaptor.initialise();

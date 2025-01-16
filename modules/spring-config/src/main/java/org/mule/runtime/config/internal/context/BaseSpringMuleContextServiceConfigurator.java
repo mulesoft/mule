@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.context;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_ENCODING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
@@ -94,6 +95,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   void createArtifactServices() {
     FeatureFlaggingService featureFlaggingService = originalRegistry.lookupObject(FEATURE_FLAGGING_SERVICE_KEY);
     registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
+    registerConstantBeanDefinition(OBJECT_ARTIFACT_ENCODING, originalRegistry.lookupObject(OBJECT_ARTIFACT_ENCODING));
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
 

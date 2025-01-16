@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.result;
 
+import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import org.mule.runtime.api.message.Message;
@@ -28,10 +29,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import io.qameta.allure.Issue;
 import org.apache.commons.io.IOUtils;
+
 import org.junit.After;
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
@@ -41,7 +44,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   @Override
   protected ReturnDelegate createReturnDelegate() {
     return new TargetReturnDelegate(TARGET, "#[message]", componentModel, muleContext.getExpressionManager(),
-                                    muleContext, streamingManager);
+                                    artifactEncoding, streamingManager);
   }
 
   @After
@@ -77,7 +80,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
     when(componentModel.supportsStreaming()).thenReturn(true);
 
     delegate = new TargetReturnDelegate(TARGET, "#[payload.token]", componentModel, muleContext.getExpressionManager(),
-                                        muleContext, streamingManager);
+                                        artifactEncoding, streamingManager);
 
     MediaType mediaType = APPLICATION_JSON.withCharset(Charset.defaultCharset());
     Result<Object, Object> value = Result.builder()

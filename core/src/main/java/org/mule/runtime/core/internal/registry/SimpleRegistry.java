@@ -10,6 +10,7 @@ import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGIN
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_ENCODING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -37,6 +38,7 @@ import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.config.DefaultArtifactEncoding;
 import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.NullLifecycleInterceptor;
@@ -103,6 +105,8 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       defaultEntries.put(OBJECT_REGISTRY, new DefaultRegistry(getMuleContext()));
       defaultEntries.put("_muleContextProcessor", new MuleContextProcessor(getMuleContext()));
       defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) getMuleContext()).getNotificationManager());
+      defaultEntries.put(OBJECT_ARTIFACT_ENCODING,
+                         new DefaultArtifactEncoding(getMuleContext().getConfiguration().getDefaultEncoding()));
       defaultEntries.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
     }
 

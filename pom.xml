@@ -770,5 +770,38 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <!-- Enabling this profile will make it so that all FunctionalTestCases that parse an AST will do a serialization and
+                 deserialization round trip, allowing to spot bugs in that process. The tests will take longer to complete -->
+            <id>ast-serialization-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <mule.test.serializeDeserializeAst>true</mule.test.serializeDeserializeAst>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mule.runtime</groupId>
+                    <artifactId>mule-artifact-ast-serialization</artifactId>
+                    <scope>test</scope>
+                    <exclusions>
+                        <exclusion>
+                            <!-- Excluding because otherwise some ArtifactFunctionalTestCases were incorrectly assuming xerces was a
+                            dependency of the plugin -->
+                            <groupId>org.mule.apache</groupId>
+                            <artifactId>xercesImpl</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 </project>

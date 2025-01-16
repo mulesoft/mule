@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toMap;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -31,6 +32,7 @@ import org.mule.runtime.oauth.api.OAuthService;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -65,6 +67,9 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
   @Inject
   protected MuleExpressionLanguage expressionEvaluator;
 
+  @Inject
+  protected ArtifactEncoding artifactEncoding;
+
   // TODO: MULE-10837 this should be a plain old @Inject
   protected LazyValue<OAuthService> oauthService;
 
@@ -80,7 +85,7 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
 
   protected Map<String, String> getParameterExtractors(Map<Field, String> extractors) {
     return extractors.entrySet().stream()
-        .collect(toMap(entry -> entry.getKey().getName(), entry -> entry.getValue()));
+        .collect(toMap(entry -> entry.getKey().getName(), Entry::getValue));
   }
 
   @Override

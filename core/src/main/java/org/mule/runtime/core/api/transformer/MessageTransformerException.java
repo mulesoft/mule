@@ -10,7 +10,7 @@ import org.mule.runtime.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.DefaultTransformationService;
+import org.mule.runtime.core.internal.transformer.DefaultTransformationService;
 
 /**
  * An exception that occurred while transforming a message, thrown by {@link DefaultTransformationService}.

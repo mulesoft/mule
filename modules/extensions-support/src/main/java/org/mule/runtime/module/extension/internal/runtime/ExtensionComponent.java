@@ -33,6 +33,7 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -180,6 +181,9 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   protected Optional<MuleMetadataService> metadataService;
 
   protected ConfigurationComponentLocator componentLocator;
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   @Inject
   protected ReflectionCache reflectionCache;
@@ -596,6 +600,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                              componentModel,
                                                                              this,
                                                                              muleContext,
+                                                                             artifactEncoding,
                                                                              reflectionCache,
                                                                              streamingManager);
         }
