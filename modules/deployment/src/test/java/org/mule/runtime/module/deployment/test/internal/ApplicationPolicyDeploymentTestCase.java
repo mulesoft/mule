@@ -42,6 +42,8 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.IS_POLICY_REORDER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.DefaultApplicationPolicyInstance.IS_SILENT_DEPLOY_PARAMETER_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
@@ -107,6 +109,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -550,13 +553,16 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.removePolicy(applicationFileBuilder.getId(), FOO_POLICY_ID);
 
-    Properties deploymentProperties = resolveDeploymentProperties(applicationFileBuilder.getId(), empty());
-    assertThat(deploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
+    Optional<Properties> deploymentProperties = getPersistedDeploymentProperties(applicationFileBuilder.getId());
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
 
-    Properties flowDeploymentProperties = resolveFlowDeploymentProperties(applicationFileBuilder.getId(), empty());
+    Optional<Properties> flowDeploymentProperties = getPersistedFlowDeploymentProperties(applicationFileBuilder.getId());
+    assertThat(flowDeploymentProperties.isPresent(), is(true));
+
     final Application app = findApp(applicationFileBuilder.getId(), 1);
     for (Flow flow : app.getArtifactContext().getRegistry().lookupAllByType(Flow.class)) {
-      assertThat(flowDeploymentProperties.get(flow.getName() + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY), is("true"));
+      assertThat(flowDeploymentProperties.get().get(flow.getName() + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY), is("true"));
     }
     assertStatus(app, STARTED);
   }
