@@ -33,6 +33,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_PERSISTED_FLOW_STATE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.NTLM_AVOID_SEND_PAYLOAD_ON_TYPE_1;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
@@ -364,6 +365,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnableXmlSdkReset();
       configureHonourPersistedFlowState();
       configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate();
+      configureNtlmAvoidSendPayloadOnType1();
     }
   }
 
@@ -1599,6 +1601,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                 minMuleVersion("4.8.0"));
   }
 
+  private static void configureNtlmAvoidSendPayloadOnType1() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry
+      .registerFeatureFlag(NTLM_AVOID_SEND_PAYLOAD_ON_TYPE_1, minMuleVersion("4.9.0"));
+  }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
     return featureContext -> featureContext.getArtifactMinMuleVersion()
