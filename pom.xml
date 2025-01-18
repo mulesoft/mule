@@ -169,7 +169,7 @@
         <commonsExecVersion>1.3</commonsExecVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.2.11-SNAPSHOT</mulePropertiesApiVersion>
+        <mulePropertiesApiVersion>1.2.12-SNAPSHOT</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.6.11-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.6.11-SNAPSHOT</muleHttpPolicyApiVersion>
