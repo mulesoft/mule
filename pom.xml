@@ -167,7 +167,7 @@
         <muleBomVersion>4.8.3-SNAPSHOT</muleBomVersion>
         <muleMavenClientBomVersion>2.3.3-SNAPSHOT</muleMavenClientBomVersion>
 
-        <weaveVersion>2.8.3-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.8.1</weaveVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
 
         <!-- Mule Snapshot Dependencies -->
