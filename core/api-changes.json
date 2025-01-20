@@ -1,4 +1,45 @@
 {
+  "4.8.4": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::addGlobalErrorHandlerComponentReference(java.lang.String)",
+            "justification": "W-17239370: Transactions prematurely rolled back"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.api.context.notification.NotificationHelper::<init>(org.mule.runtime.core.api.context.notification.ServerNotificationHandler, java.lang.Class<? extends org.mule.runtime.api.notification.Notification>, boolean, boolean)",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+
+          },
+          {
+            "ignore": true,
+            "code": "java.class.added",
+            "new": "interface org.mule.runtime.core.api.context.notification.ServerNotificationConfigurationChangeListener",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+
+          },
+          {
+            "ignore": true,
+            "code": "java.method.defaultMethodAddedToInterface",
+            "new": "method void org.mule.runtime.core.api.context.notification.ServerNotificationHandler::registerServerNotificationConfigurationChangeListener(org.mule.runtime.core.api.context.notification.ServerNotificationConfigurationChangeListener)",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.api.context.notification.ServerNotificationManager::registerServerNotificationConfigurationChangeListener(org.mule.runtime.core.api.context.notification.ServerNotificationConfigurationChangeListener)",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+          }
+        ]
+      }
+    }
+  },
   "4.8.3": {
     "revapi": {
       "differences": {

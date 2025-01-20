@@ -1,4 +1,24 @@
 {
+  "4.8.4": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.staticMethodAddedToInterface",
+            "new": "method org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder::forMavenProject(java.io.File, org.mule.maven.client.api.model.MavenConfiguration, boolean, boolean)",
+            "justification": "W-17556970: allow setting a custom Maven configuration for building DeployableProjectModels"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.staticMethodAddedToInterface",
+            "new": "method org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder::forMavenRefreshProject(org.mule.runtime.module.artifact.activation.api.deployable.MuleProjectStructure, org.mule.runtime.api.artifact.ArtifactCoordinates, boolean, java.util.List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>, java.util.Set<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor>, java.util.Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, java.util.List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>>, org.mule.maven.client.api.model.MavenConfiguration)",
+            "justification": "W-17556970: allow setting a custom Maven configuration for building DeployableProjectModels"
+          }
+        ]
+      }
+    }
+  },
   "4.8.3": {
     "revapi": {
       "differences": {
