@@ -1,4 +1,70 @@
 {
+  "4.6.12": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::addGlobalErrorHandlerComponentReference(java.lang.String)",
+            "justification": "W-17239370: Transactions prematurely rolled back"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::addGlobalErrorHandlerComponentReference(org.mule.runtime.api.component.location.ComponentLocation)",
+            "justification": "W-12671835: Fix transaction ownership in global error handling"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler::<init>(org.mule.runtime.core.api.context.notification.ServerNotificationHandler, java.lang.Class<? extends org.mule.runtime.api.notification.Notification>, boolean)",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler::onServerNotificationConfigurationChange()",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+          },
+          {
+            "ignore": true,
+            "code": "java.class.nowImplementsInterface",
+            "old": "class org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler",
+            "new": "class org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler",
+            "interface": "org.mule.runtime.core.api.context.notification.ServerNotificationConfigurationChangeListener",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.api.context.notification.NotificationHelper::<init>(org.mule.runtime.core.api.context.notification.ServerNotificationHandler, java.lang.Class<? extends org.mule.runtime.api.notification.Notification>, boolean, boolean)",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+          },
+          {
+            "ignore": true,
+            "code": "java.class.added",
+            "new": "interface org.mule.runtime.core.api.context.notification.ServerNotificationConfigurationChangeListener",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+          },
+          {
+            "ignore": true,
+            "code": "java.method.defaultMethodAddedToInterface",
+            "new": "method void org.mule.runtime.core.api.context.notification.ServerNotificationHandler::registerServerNotificationConfigurationChangeListener(org.mule.runtime.core.api.context.notification.ServerNotificationConfigurationChangeListener)",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+          },
+          {
+            "ignore": true,
+            "code": "java.method.added",
+            "new": "method void org.mule.runtime.core.api.context.notification.ServerNotificationManager::registerServerNotificationConfigurationChangeListener(org.mule.runtime.core.api.context.notification.ServerNotificationConfigurationChangeListener)",
+            "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."
+          }
+        ]
+      }
+    }
+  },
   "4.6.11": {
     "revapi": {
       "differences": {
