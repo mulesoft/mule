@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-test-extensions-parent</artifactId>
-        <version>4.6.11-SNAPSHOT</version>
+        <version>4.6.12-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-petstore-extension</artifactId>
@@ -20,7 +20,7 @@
         <javaModuleName>org.mule.test.extension.petstore</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
-        <muleSdkCompatibilityApi>0.10.3</muleSdkCompatibilityApi>
+        <muleSdkCompatibilityApi>0.10.4</muleSdkCompatibilityApi>
     </properties>
 
     <dependencies>
