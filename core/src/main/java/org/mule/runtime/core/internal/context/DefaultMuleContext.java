@@ -34,6 +34,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_PERSISTED_FLOW_STATE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.NTLM_AVOID_SEND_PAYLOAD_ON_TYPE_1;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
@@ -51,6 +52,7 @@ import static org.mule.runtime.api.meta.MuleVersion.v4_6_0;
 import static org.mule.runtime.api.meta.MuleVersion.v4_6_1;
 import static org.mule.runtime.api.meta.MuleVersion.v4_7_0;
 import static org.mule.runtime.api.meta.MuleVersion.v4_8_0;
+import static org.mule.runtime.api.meta.MuleVersion.v4_9_0;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ARTIFACT_METER_PROVIDER_KEY;
@@ -374,6 +376,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnforceImportTargetSameType();
       configureHonourPersistedFlowState();
       configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate();
+      configureNtlmAvoidSendPayloadOnType1();
     }
   }
 
@@ -1619,6 +1622,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     featureFlaggingRegistry
         .registerFeatureFlag(DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE,
                              featureContext -> false);
+  }
+
+  private static void configureNtlmAvoidSendPayloadOnType1() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry
+        .registerFeatureFlag(NTLM_AVOID_SEND_PAYLOAD_ON_TYPE_1, minMuleVersion(v4_9_0));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(MuleVersion version) {
