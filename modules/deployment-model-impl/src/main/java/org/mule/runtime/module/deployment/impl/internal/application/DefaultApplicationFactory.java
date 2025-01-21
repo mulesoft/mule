@@ -164,7 +164,9 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, DeployableProjectModel model,
                                                         Optional<Properties> deploymentProperties) {
     String appName = artifactLocation.getName();
-    Map<String, String> properties = deploymentProperties.or(() -> getPersistedDeploymentProperties(appName))
+    Optional<Properties> effectiveProperties =
+        deploymentProperties.isPresent() ? deploymentProperties : getPersistedDeploymentProperties(appName);
+    Map<String, String> properties = effectiveProperties
         .map(dp -> (Map<String, String>) fromProperties(dp))
         .orElse(emptyMap());
     DomainDescriptorResolver domainDescriptorResolver =
