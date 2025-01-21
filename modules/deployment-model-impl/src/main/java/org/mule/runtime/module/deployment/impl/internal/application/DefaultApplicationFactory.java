@@ -11,12 +11,14 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleAppsDir;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Maps.fromProperties;
+import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -34,6 +36,7 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolutionException;
+import org.mule.runtime.module.artifact.activation.api.descriptor.DomainDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
@@ -160,14 +163,15 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
   public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, DeployableProjectModel model,
                                                         Optional<Properties> deploymentProperties) {
-    return deployableArtifactDescriptorFactory
-        .createApplicationDescriptor(model, deploymentProperties.map(dp -> (Map<String, String>) fromProperties(dp))
-            .orElse(emptyMap()),
-                                     (domainName,
-                                      bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor,
-                                                                                  artifactLocation)
-                                                                                      .getDescriptor(),
-                                     getDescriptorCreator());
+    String appName = artifactLocation.getName();
+    Map<String, String> properties = deploymentProperties.or(() -> getPersistedDeploymentProperties(appName))
+        .map(dp -> (Map<String, String>) fromProperties(dp))
+        .orElse(emptyMap());
+    DomainDescriptorResolver domainDescriptorResolver =
+        (domainName, bundleDescriptor) -> getDomainForDescriptor(domainName, bundleDescriptor, artifactLocation).getDescriptor();
+
+    return deployableArtifactDescriptorFactory.createApplicationDescriptor(model, properties, domainDescriptorResolver,
+                                                                           getDescriptorCreator());
   }
 
   private DeployableArtifactDescriptorCreator<ApplicationDescriptor> getDescriptorCreator() {

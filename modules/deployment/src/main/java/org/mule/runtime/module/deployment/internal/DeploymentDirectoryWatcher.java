@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentUtils.deployExplodedDomains;
@@ -29,6 +30,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -57,6 +59,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -271,7 +275,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
     for (String zip : zips) {
       try {
         // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
-        applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
+        final String artifactName = removeEndIgnoreCase(zip, JAR_FILE_SUFFIX);
+        Optional<Properties> deploymentProperties = getPersistedDeploymentProperties(artifactName);
+        applicationArchiveDeployer.deployPackagedArtifact(zip, deploymentProperties);
       } catch (Exception e) {
         // Ignore and continue
       }
@@ -282,7 +288,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
     for (String addedApp : apps) {
       try {
         // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
-        applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
+        Optional<Properties> deploymentProperties = getPersistedDeploymentProperties(addedApp);
+        applicationArchiveDeployer.deployExplodedArtifact(addedApp, deploymentProperties);
       } catch (DeploymentException e) {
         // Ignore and continue
       }

@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
@@ -22,6 +23,7 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowS
 
 import org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener;
 import java.io.File;
+import java.util.Optional;
 import java.util.Properties;
 
 import io.qameta.allure.Description;
@@ -62,9 +64,10 @@ public class FlowStoppedDeploymentPersistenceListenerTestCase {
     createListener();
     flowStoppedDeploymentListener.onStop();
 
-    Properties deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
-    assertThat(deploymentProperties.get(propertyName), is(notNullValue()));
-    assertThat(deploymentProperties.get(propertyName), is("false"));
+    Optional<Properties> deploymentProperties = getPersistedFlowDeploymentProperties(appName);
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(propertyName), is(notNullValue()));
+    assertThat(deploymentProperties.get().get(propertyName), is("false"));
   }
 
   @Test
@@ -75,8 +78,9 @@ public class FlowStoppedDeploymentPersistenceListenerTestCase {
     flowStoppedDeploymentListener.doNotPersist();
     flowStoppedDeploymentListener.onStop();
 
-    Properties deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
-    assertThat(deploymentProperties.get(propertyName), is(nullValue()));
+    Optional<Properties> deploymentProperties = getPersistedFlowDeploymentProperties(appName);
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(propertyName), is(nullValue()));
   }
 
   @Test
@@ -86,9 +90,10 @@ public class FlowStoppedDeploymentPersistenceListenerTestCase {
 
     flowStoppedDeploymentListener.onStart();
 
-    Properties deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
-    assertThat(deploymentProperties.get(propertyName), is(notNullValue()));
-    assertThat(deploymentProperties.get(propertyName), is("true"));
+    Optional<Properties> deploymentProperties = getPersistedFlowDeploymentProperties(appName);
+    assertThat(deploymentProperties.isPresent(), is(true));
+    assertThat(deploymentProperties.get().get(propertyName), is(notNullValue()));
+    assertThat(deploymentProperties.get().get(propertyName), is("true"));
   }
 
   @Test
