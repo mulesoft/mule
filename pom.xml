@@ -186,7 +186,7 @@
         <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
 
-        <muleAnnotationsApiVersion>1.7.4-SNAPSHOT</muleAnnotationsApiVersion>
+        <muleAnnotationsApiVersion>1.7.4-rc1</muleAnnotationsApiVersion>
         <mule.module.maven.plugin.version>1.8.4-SNAPSHOT</mule.module.maven.plugin.version>
         <mule.extensions.maven.plugin.version>1.8.4-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.8.4-SNAPSHOT</mule.app.plugins.maven.plugin.version>
