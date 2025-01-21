@@ -166,7 +166,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.5.1-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.9.0-SNAPSHOT</muleExtensionsApiVersion>
+        <muleExtensionsApiVersion>1.9.1-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.9.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <mulePolicyApiVersion>1.9.0-SNAPSHOT</mulePolicyApiVersion>
