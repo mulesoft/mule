@@ -933,6 +933,8 @@ public interface AllureConstants {
     interface LicenseManagementStory {
 
       String LICENSE_MANAGEMENT = "License Management";
+      String EVALUATION_LICENSE = "Evaluation/trial license (ftp)";
+      String TESTING_MODE_LICENSE = "Testing mode license";
 
     }
 
