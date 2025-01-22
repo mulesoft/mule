@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
+import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
@@ -206,7 +207,21 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     onResponseConsumerList.clear();
 
     state.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED);
-    tryComplete();
+
+    if (result.isLeft()) {
+      // there's an error
+      // Enact on the Timeout exception and error on the child contexts.
+      // forEachChild(...) ensures that it calls the error on its childContexts if there are any.
+      if (result.getLeft() instanceof CompositeRoutingException &&
+          result.getLeft().getMessage().contains("java.util.concurrent.TimeoutException")) {
+        this.forEachChild(ctx -> ctx.error(result.getLeft()));
+      } else if (result.getLeft().getCause() instanceof CompositeRoutingException &&
+          result.getLeft().getCause().getMessage().contains("java.util.concurrent.TimeoutException")) {
+        this.forEachChild(ctx -> ctx.error(result.getLeft().getCause()));
+      }
+    } else {
+      tryComplete();
+    }
   }
 
   protected void tryComplete() {
