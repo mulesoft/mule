@@ -17,18 +17,18 @@ import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
 import org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.oauth.client.api.listener.ClientCredentialsListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
-import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
+import org.mule.runtime.oauth.api.OAuthService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-
-import javax.inject.Inject;
 
 /**
  * {@link OAuthHandler} implementation for the client credentials grant type
@@ -121,11 +121,11 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
     checkArgument(listeners != null, "listeners cannot be null");
 
     OAuthClientCredentialsDancerBuilder dancerBuilder =
-        oauthService.get().clientCredentialsGrantTypeDancerBuilder(lockFactory,
-                                                                   new LazyObjectStoreToMapAdapter(
-                                                                                                   () -> objectStoreLocator
-                                                                                                       .apply(config)),
-                                                                   expressionEvaluator);
+        getOAuthService().get().clientCredentialsGrantTypeDancerBuilder(lockFactory,
+                                                                        new LazyObjectStoreToMapAdapter(
+                                                                                                        () -> objectStoreLocator
+                                                                                                            .apply(config)),
+                                                                        expressionEvaluator);
 
     final ClientCredentialsGrantType grantType = config.getGrantType();
 
@@ -163,8 +163,16 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
     return dancer;
   }
 
-  private Integer generateId(ClientCredentialsConfig config) {
+  protected Integer generateId(ClientCredentialsConfig config) {
     return Objects.hash(config.getOwnerConfigName(), config.getClientId(), config.getClientSecret(), config.getTokenUrl(),
                         config.getScope(), config.getCustomQueryParameters(), config.getCustomHeaders());
+  }
+
+  protected Map<String, ClientCredentialsOAuthDancer> getDancers() {
+    return dancers;
+  }
+
+  protected LazyValue<OAuthService> getOAuthService() {
+    return oauthService;
   }
 }

@@ -51,10 +51,12 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.Laz
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
+import org.mule.runtime.oauth.api.OAuthService;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -79,7 +81,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
   private Registry registry;
 
   // TODO: MULE-10837 this should be a plain old @Inject
-  private LazyValue<HttpService> httpService;
+  protected LazyValue<HttpService> httpService;
 
   private boolean forceInvalidateStatusRetrieval;
 
@@ -162,11 +164,11 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     checkArgument(listeners != null, "listeners cannot be null");
 
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
-        oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockFactory,
-                                                                   new LazyObjectStoreToMapAdapter(
-                                                                                                   () -> objectStoreLocator
-                                                                                                       .apply(config)),
-                                                                   expressionEvaluator);
+        getOAuthService().get().authorizationCodeGrantTypeDancerBuilder(lockFactory,
+                                                                        new LazyObjectStoreToMapAdapter(
+                                                                                                        () -> objectStoreLocator
+                                                                                                            .apply(config)),
+                                                                        expressionEvaluator);
     final AuthorizationCodeGrantType grantType = config.getGrantType();
     final OAuthCallbackConfig callbackConfig = config.getCallbackConfig();
 
@@ -312,5 +314,13 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
   public void initialise() throws InitialisationException {
     super.initialise();
     httpService = new LazyLookup<>(HttpService.class, muleContext);
+  }
+
+  protected Map<String, AuthorizationCodeOAuthDancer> getDancers() {
+    return dancers;
+  }
+
+  protected LazyValue<OAuthService> getOAuthService() {
+    return oauthService;
   }
 }
