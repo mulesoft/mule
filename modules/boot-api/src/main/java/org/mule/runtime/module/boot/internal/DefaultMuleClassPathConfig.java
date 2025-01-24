@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.boot.internal;
 
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -23,9 +24,13 @@ import java.util.List;
  */
 public class DefaultMuleClassPathConfig {
 
+  private static final String JAVA_RUNNING_VERSION = "java.specification.version";
+
   protected static final String MULE_DIR = "/lib/mule";
+  protected static final String MULE_JAVA_SPECIFIC_DIR = "/lib/mule/jdk-%s";
   protected static final String USER_DIR = "/lib/user";
   protected static final String OPT_DIR = "/lib/opt";
+  protected static final String OPT_JAVA_SPECIFIC_DIR = "/lib/opt/jdk-%s";
 
   protected List<URL> muleUrls = new ArrayList<>();
   protected List<URL> optUrls = new ArrayList<>();
@@ -48,6 +53,18 @@ public class DefaultMuleClassPathConfig {
 
     // Add resources paths. This is needed when using jdk 17 which uses module layers instead of classpath with urls.
     addFile(resourceUrls, new File(muleHome, USER_DIR));
+
+    // Support adding extra libs for specific java versions
+    final var javaSpecVersion = getProperty(JAVA_RUNNING_VERSION).split("\\.")[0];
+
+    final var muleJdkSpecificDir = format(MULE_JAVA_SPECIFIC_DIR, javaSpecVersion);
+    if (new File(muleHome, muleJdkSpecificDir).exists()) {
+      addLibraryDirectory(muleUrls, muleHome, muleJdkSpecificDir);
+    }
+    final var optJdkSpecificDir = format(OPT_JAVA_SPECIFIC_DIR, javaSpecVersion);
+    if (new File(muleHome, optJdkSpecificDir).exists()) {
+      addLibraryDirectory(optUrls, muleHome, optJdkSpecificDir);
+    }
   }
 
   protected void addMuleBaseUserLibs(File muleHome, File muleBase) {
