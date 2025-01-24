@@ -217,7 +217,7 @@
         <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
         <muleRevapiExtensionVersion>1.4.0-20250124</muleRevapiExtensionVersion>
         <mule.extensions.maven.plugin.version>1.4.2-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.4.2-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.4.1</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
