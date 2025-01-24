@@ -230,7 +230,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     return dancer;
   }
 
-  private String getExternalCallback(HttpServer httpServer, OAuthCallbackConfig callbackConfig) {
+  protected String getExternalCallback(HttpServer httpServer, OAuthCallbackConfig callbackConfig) {
     return callbackConfig.getExternalCallbackUrl().orElseGet(() -> {
       try {
         return new URL(httpServer.getProtocol().getScheme(),
@@ -247,7 +247,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     });
   }
 
-  private Pair<Optional<Flow>, Optional<Flow>> getListenerFlows(AuthorizationCodeConfig config) {
+  protected Pair<Optional<Flow>, Optional<Flow>> getListenerFlows(AuthorizationCodeConfig config) {
     try {
       return new Pair<>(lookupFlow(config.getBefore()), lookupFlow(config.getAfter()));
     } catch (Exception e) {
@@ -256,11 +256,11 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     }
   }
 
-  private Optional<Flow> lookupFlow(Optional<String> flowName) {
+  protected Optional<Flow> lookupFlow(Optional<String> flowName) {
     return flowName.map(this::lookupFlow);
   }
 
-  private Flow lookupFlow(String flowName) {
+  protected Flow lookupFlow(String flowName) {
     return registry.<Flow>lookupByName(flowName)
         .orElseThrow(() -> new IllegalArgumentException("Flow " + flowName + " doesn't exist"));
   }

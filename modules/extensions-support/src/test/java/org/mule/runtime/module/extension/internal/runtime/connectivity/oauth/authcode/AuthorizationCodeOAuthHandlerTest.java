@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.security.CredentialsPlacement.BASIC
 import static java.nio.charset.Charset.defaultCharset;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -27,14 +28,17 @@ import static org.mockito.Mockito.when;
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.server.ServerAddress;
 import org.mule.runtime.http.api.server.ServerNotFoundException;
 import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
@@ -56,14 +60,15 @@ import org.mockito.MockitoAnnotations;
 
 public class AuthorizationCodeOAuthHandlerTest {
 
+  private static final String CALLBACK_IP = "0.0.0.0";
+  private static final String CALLBACK_PATH = "/callback-path";
+  private static final int CALLBACK_PORT = 80;
+
   @Mock
   private AuthorizationCodeConfig mockConfig;
 
   @Mock
   private AuthorizationCodeOAuthDancer mockDancer;
-
-  @Mock
-  private ResourceOwnerOAuthContext mockContext;
 
   @Mock
   private OAuthAuthorizationCodeDancerBuilder mockDancerBuilder;
@@ -97,6 +102,9 @@ public class AuthorizationCodeOAuthHandlerTest {
 
   @Mock
   private ResourceOwnerOAuthContext mockResourceOwnerOAuthContext;
+
+  @Mock
+  private Registry registry;
 
   @InjectMocks
   private AuthorizationCodeOAuthHandler handler = spy(new AuthorizationCodeOAuthHandler());
@@ -155,7 +163,7 @@ public class AuthorizationCodeOAuthHandlerTest {
     when(mockGrantType.getCredentialsPlacement()).thenReturn(BASIC_AUTH_HEADER);
     when(mockOAuthCallbackConfig.getListenerConfig()).thenReturn("listener-config");
     when(mockOAuthCallbackConfig.getExternalCallbackUrl()).thenReturn(Optional.of("callback/url"));
-    when(mockOAuthCallbackConfig.getCallbackPath()).thenReturn("callback-path");
+    when(mockOAuthCallbackConfig.getCallbackPath()).thenReturn(CALLBACK_PATH);
     when(mockOAuthCallbackConfig.getLocalAuthorizePath()).thenReturn("local-auth-path");
 
     handler.getDancers().put("configName", mockDancer);
@@ -186,6 +194,45 @@ public class AuthorizationCodeOAuthHandlerTest {
         .when(mockHttpServerFactory).lookup(anyString());
 
     handler.register(mockConfig, listeners);
+  }
+
+  @Test(expected = MuleRuntimeException.class)
+  public void testGetListenerFlowsThrowsMuleRuntimeException() {
+    doThrow(new IllegalArgumentException("not found")).when(handler).lookupFlow(Optional.ofNullable(any()));
+
+    handler.getListenerFlows(mockConfig);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testLookupFlow() {
+    when(registry.lookupByName(anyString())).thenReturn(Optional.empty());
+    handler.lookupFlow("invalid-flow");
+  }
+
+  @Test
+  public void testGetExternalCallback() {
+    ServerAddress mockServerAddress = mock(ServerAddress.class);
+    when(mockHttpServer.getProtocol()).thenReturn(HttpConstants.Protocol.HTTP);
+    when(mockHttpServer.getServerAddress()).thenReturn(mockServerAddress);
+    when(mockServerAddress.getIp()).thenReturn(CALLBACK_IP);
+    when(mockServerAddress.getPort()).thenReturn(CALLBACK_PORT);
+    when(mockOAuthCallbackConfig.getExternalCallbackUrl()).thenReturn(Optional.empty());
+
+    String callback = handler.getExternalCallback(mockHttpServer, mockOAuthCallbackConfig);
+
+    assertThat(callback, is(HttpConstants.Protocol.HTTP.getScheme() + "://" + CALLBACK_IP + ":" + CALLBACK_PORT + CALLBACK_PATH));
+  }
+
+  @Test(expected = MuleRuntimeException.class)
+  public void testGetExternalCallbackFailure() {
+    ServerAddress mockServerAddress = mock(ServerAddress.class);
+    when(mockHttpServer.getProtocol()).thenReturn(HttpConstants.Protocol.HTTP);
+    when(mockHttpServer.getServerAddress()).thenReturn(mockServerAddress);
+    when(mockServerAddress.getIp()).thenReturn(CALLBACK_IP);
+    when(mockServerAddress.getPort()).thenReturn(-2);
+    when(mockOAuthCallbackConfig.getExternalCallbackUrl()).thenReturn(Optional.empty());
+
+    handler.getExternalCallback(mockHttpServer, mockOAuthCallbackConfig);
   }
 
   @Test
@@ -240,13 +287,32 @@ public class AuthorizationCodeOAuthHandlerTest {
   public void testGetOAuthContextSuccess() throws Exception {
     when(mockDancer.getContextForResourceOwner(anyString())).thenReturn(mockResourceOwnerOAuthContext);
     when(mockResourceOwnerOAuthContext.getAccessToken()).thenReturn("access_token");
-    when(mockContext.getAccessToken()).thenReturn("access-token");
 
     handler.getDancers().put("owner-config", mockDancer);
 
     Optional<ResourceOwnerOAuthContext> context = handler.getOAuthContext(mockConfig);
 
     assertThat(context, notNullValue());
+  }
+
+  @Test
+  public void testGetOAuthContextNullDancer() {
+    when(mockDancer.getContextForResourceOwner(anyString())).thenReturn(mockResourceOwnerOAuthContext);
+
+    Optional<ResourceOwnerOAuthContext> context = handler.getOAuthContext(mockConfig);
+
+    assertThat(context.isPresent(), is(false));
+  }
+
+  @Test
+  public void testGetOAuthContextNullAccessToken() {
+    when(mockDancer.getContextForResourceOwner(anyString())).thenReturn(mockResourceOwnerOAuthContext);
+
+    handler.getDancers().put("owner-config", mockDancer);
+
+    Optional<ResourceOwnerOAuthContext> context = handler.getOAuthContext(mockConfig);
+
+    assertThat(context.isPresent(), is(false));
   }
 }
 
