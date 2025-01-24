@@ -18,8 +18,13 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exc
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class UpdatingClientCredentialsStateTest {
 
@@ -44,7 +49,7 @@ public class UpdatingClientCredentialsStateTest {
   public void testGetAccessTokenWhenNotInvalidated() {
     String accessToken = updatingClientCredentialsState.getAccessToken();
 
-    assertEquals("initialAccessToken", accessToken);
+    assertThat(accessToken, is("initialAccessToken"));
   }
 
   @Test
@@ -63,7 +68,7 @@ public class UpdatingClientCredentialsStateTest {
     when(initialContext.getAccessToken()).thenReturn("newAccessToken");
 
     String accessToken = updatingClientCredentialsState.getAccessToken();
-    assertEquals("newAccessToken", accessToken);
+    assertThat(accessToken, is("newAccessToken"));
   }
 
   @Test(expected = TokenInvalidatedException.class)
@@ -94,7 +99,7 @@ public class UpdatingClientCredentialsStateTest {
     listener.onTokenRefreshed(updatedContext);
 
     verify(onUpdate).accept(updatedContext);
-    assertEquals("updatedAccessToken", updatingClientCredentialsState.getAccessToken());
+    assertThat(updatingClientCredentialsState.getAccessToken(), is("updatedAccessToken"));
   }
 
   @Test
@@ -106,7 +111,7 @@ public class UpdatingClientCredentialsStateTest {
 
   @Test
   public void testGetExpiresIn() {
-    assertNotNull(updatingClientCredentialsState.getExpiresIn());
+    assertThat(updatingClientCredentialsState.getExpiresIn(), is(notNullValue()));
   }
 }
 

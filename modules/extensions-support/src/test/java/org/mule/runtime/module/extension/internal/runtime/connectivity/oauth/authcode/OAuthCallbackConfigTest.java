@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import org.junit.Test;
 
@@ -23,9 +24,11 @@ public class OAuthCallbackConfigTest {
   public void testGetConsumerKey() {
     oAuthConfig = new OAuthCallbackConfig(LISTENER_CONFIG, CALLBACK_PATH, LOCAL_AUTHORIZE_PATH, EXTERNAL_CALLBACK_URL);
 
-    assertEquals(oAuthConfig.getListenerConfig(), LISTENER_CONFIG);
-    assertEquals(oAuthConfig.getCallbackPath(), CALLBACK_PATH);
-    assertEquals(oAuthConfig.getLocalAuthorizePath(), LOCAL_AUTHORIZE_PATH);
-    assertEquals(oAuthConfig.getExternalCallbackUrl().get(), EXTERNAL_CALLBACK_URL);
+
+    assertThat(oAuthConfig.getListenerConfig(), is(LISTENER_CONFIG));
+    assertThat(oAuthConfig.getCallbackPath(), is(CALLBACK_PATH));
+    assertThat(oAuthConfig.getLocalAuthorizePath(), is(LOCAL_AUTHORIZE_PATH));
+    assertThat(oAuthConfig.getExternalCallbackUrl().isPresent(), is(true));
+    assertThat(oAuthConfig.getExternalCallbackUrl().get(), is(EXTERNAL_CALLBACK_URL));
   }
 }
