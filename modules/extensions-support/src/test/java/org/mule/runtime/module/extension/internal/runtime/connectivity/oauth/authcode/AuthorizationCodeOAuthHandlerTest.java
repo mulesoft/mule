@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -26,13 +27,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
+import org.mule.oauth.client.api.AuthorizationCodeRequest;
+import org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.ArtifactEncoding;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.internal.event.InternalEvent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.HttpService;
@@ -174,7 +185,7 @@ public class AuthorizationCodeOAuthHandlerTest {
   }
 
   @Test
-  public void testRegister() throws Exception {
+  public void testRegister() {
     AuthorizationCodeListener listener = mock(AuthorizationCodeListener.class);
     List<AuthorizationCodeListener> listeners = Collections.singletonList(listener);
 
@@ -207,6 +218,41 @@ public class AuthorizationCodeOAuthHandlerTest {
   public void testLookupFlow() {
     when(registry.lookupByName(anyString())).thenReturn(Optional.empty());
     handler.lookupFlow("invalid-flow");
+  }
+
+  @Test
+  public void testBeforeCallback() {
+    Flow mockFlow = mock(Flow.class);
+    AuthorizationCodeRequest mockCodeRequest = mock(AuthorizationCodeRequest.class);
+    CoreEvent mockEvent = mock(CoreEvent.class);
+    doReturn(mockEvent).when(handler).runFlow(mockFlow, mockEvent, mockConfig, "before");
+    doReturn(mockEvent).when(handler).createEvent(any(), any(), any());
+
+    AuthorizationCodeDanceCallbackContext context = handler.beforeCallback(mockConfig, mockFlow).apply(mockCodeRequest);
+
+    assertThat(context, is(notNullValue()));
+    verify(handler, times(1)).runFlow(mockFlow, mockEvent, mockConfig, "before");
+
+    Optional<Object> event = context.getParameter("event");
+    assertThat(event.isPresent(), is(true));
+    assertThat(event.get(), is(mockEvent));
+  }
+
+  @Test
+  public void testAfterCallback() {
+    Flow mockFlow = mock(Flow.class);
+    AuthorizationCodeDanceCallbackContext callbackContext = mock(AuthorizationCodeDanceCallbackContext.class);
+    ResourceOwnerOAuthContext oAuthContext = mock(ResourceOwnerOAuthContext.class);
+    CoreEvent mockEvent = mock(InternalEvent.class);
+    CaseInsensitiveHashMap mockMap = mock(CaseInsensitiveHashMap.class);
+    when(mockEvent.getVariables()).thenReturn(mockMap);
+    when(mockEvent.getParameters()).thenReturn(mockMap);
+    doReturn(mockEvent).when(handler).runFlow(eq(mockFlow), any(), eq(mockConfig), eq("after"));
+    doReturn(mockEvent).when(handler).createEvent(any(), any(), any());
+
+    handler.afterCallback(mockConfig, mockFlow).accept(callbackContext, oAuthContext);
+
+    verify(handler, times(1)).runFlow(eq(mockFlow), any(), eq(mockConfig), eq("after"));
   }
 
   @Test

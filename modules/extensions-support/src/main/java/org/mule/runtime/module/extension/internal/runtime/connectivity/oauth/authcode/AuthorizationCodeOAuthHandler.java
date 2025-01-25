@@ -265,8 +265,8 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
         .orElseThrow(() -> new IllegalArgumentException("Flow " + flowName + " doesn't exist"));
   }
 
-  private Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeCallback(AuthorizationCodeConfig config,
-                                                                                                   Flow flow) {
+  protected Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeCallback(AuthorizationCodeConfig config,
+                                                                                                     Flow flow) {
     return (AuthorizationCodeRequest danceRequest) -> {
       final AuthCodeRequest request = new ImmutableAuthCodeRequest(danceRequest.getResourceOwnerId(),
                                                                    danceRequest.getScopes(),
@@ -278,9 +278,9 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     };
   }
 
-  private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(
-                                                                                                     AuthorizationCodeConfig config,
-                                                                                                     Flow flow) {
+  protected BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(
+                                                                                                       AuthorizationCodeConfig config,
+                                                                                                       Flow flow) {
 
     return (callbackContext, oauthContext) -> {
       AuthorizationCodeState state = toAuthorizationCodeState(config, oauthContext);
@@ -292,12 +292,12 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     };
   }
 
-  private CoreEvent createEvent(Object payload, OAuthConfig config, Flow flow) {
+  protected CoreEvent createEvent(Object payload, OAuthConfig config, Flow flow) {
     return CoreEvent.builder(create(flow, from(config.getOwnerConfigName())))
         .message(Message.builder().value(payload).build()).build();
   }
 
-  private CoreEvent runFlow(Flow flow, CoreEvent event, OAuthConfig config, String callbackType) {
+  protected CoreEvent runFlow(Flow flow, CoreEvent event, OAuthConfig config, String callbackType) {
     final Publisher<CoreEvent> childPublisher =
         processWithChildContext(event, flow, child((BaseEventContext) event.getContext(), of(flow.getLocation())));
     return from(childPublisher)
