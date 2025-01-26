@@ -1,5 +1,5 @@
 upstreamProjects:
-  Mule-runtime/metadata-model-api/support/1.8.x,
+  Mule-runtime/metadata-model-api/1.8.4-DRY-RUN,
   Mule-runtime/mule-profiling-api/support/1.4.x,
   Mule-runtime/mule-api/1.8.4-DRY-RUN,
   Mule-runtime/mule-extensions-api/1.8.4-DRY-RUN,
