@@ -13,6 +13,8 @@ package org.mule.runtime.module.boot.internal;
  */
 public class BootstrapConfigurationException extends Exception {
 
+  private static final long serialVersionUID = 1L;
+
   private final int exitCode;
 
   public BootstrapConfigurationException(int exitCode, Throwable cause) {
