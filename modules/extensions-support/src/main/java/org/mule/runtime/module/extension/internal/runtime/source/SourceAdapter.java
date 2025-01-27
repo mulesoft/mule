@@ -506,7 +506,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
                                                              + "used on fields of type '%s' or '%s'",
                                                          sourceInvokationTarget.get().getClass().getName(), field.getName(),
                                                          field.getType().getName(),
-                                                         Connection.class.getName(),
+                                                         Connection.class.getSimpleName(),
                                                          ConnectionProvider.class.getName(),
                                                          org.mule.sdk.api.connectivity.ConnectionProvider.class.getName()));
       }
