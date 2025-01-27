@@ -499,14 +499,16 @@ public class SourceAdapter implements Lifecycle, Restartable {
   private <T> Optional<FieldSetter<Object, T>> fetchConnectionProviderField() {
     Optional<Field> connectionField = fetchConnectionFieldFromSourceObject(sourceInvokationTarget.get());
     return connectionField.map(field -> {
-      if (!ConnectionProvider.class.equals(field.getType())) {
+      if (!ConnectionProvider.class.equals(field.getType()) &&
+          !org.mule.sdk.api.connectivity.ConnectionProvider.class.equals(field.getType())) {
         throw new IllegalModelDefinitionException(format(
                                                          "Message Source defined on class '%s' has field '%s' of type '%s' annotated with @%s. That annotation can only be "
-                                                             + "used on fields of type '%s'",
+                                                             + "used on fields of type '%s' or '%s'",
                                                          sourceInvokationTarget.get().getClass().getName(), field.getName(),
                                                          field.getType().getName(),
                                                          Connection.class.getName(),
-                                                         ConnectionProvider.class.getName()));
+                                                         ConnectionProvider.class.getName(),
+                                                         org.mule.sdk.api.connectivity.ConnectionProvider.class.getName()));
       }
 
       return new FieldSetter<>(field);

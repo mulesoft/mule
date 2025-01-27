@@ -31,7 +31,6 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
@@ -62,6 +61,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.sdk.api.annotation.notification.Fires;
+import org.mule.sdk.api.connectivity.ConnectionProvider;
 import org.mule.sdk.api.runtime.source.BackPressureContext;
 import org.mule.test.heisenberg.extension.model.Methylamine;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
