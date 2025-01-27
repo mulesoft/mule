@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -212,16 +214,18 @@ abstract class AbstractEventContext implements SpanContextAware, BaseEventContex
     stateCtx.compareAndSet(STATE_RESPONSE_RECEIVED, STATE_RESPONSE_PROCESSED);
 
     if (result.isLeft()) {
+      ExecutorService executorService = newFixedThreadPool(10);
       // there's an error
       // Enact on the Timeout exception and error on the child contexts.
       // forEachChild(...) ensures that it calls the error on its childContexts if there are any.
       if (result.getLeft() instanceof CompositeRoutingException &&
           result.getLeft().getMessage().contains("java.util.concurrent.TimeoutException")) {
-        this.forEachChild(ctx -> ctx.error(result.getLeft()));
+        this.forEachChild(ctx -> executorService.submit(() -> ctx.error(result.getLeft().getCause())));
       } else if (result.getLeft().getCause() instanceof CompositeRoutingException &&
           result.getLeft().getCause().getMessage().contains("java.util.concurrent.TimeoutException")) {
-        this.forEachChild(ctx -> ctx.error(result.getLeft().getCause()));
+        this.forEachChild(ctx -> executorService.submit(() -> ctx.error(result.getLeft().getCause())));
       }
+      executorService.shutdown();
     } else {
       tryComplete();
     }
