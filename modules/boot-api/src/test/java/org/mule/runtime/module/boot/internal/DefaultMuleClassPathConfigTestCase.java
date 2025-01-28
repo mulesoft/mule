@@ -114,16 +114,8 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() {
-    final DefaultMuleClassPathConfig muleClassPathConfig = new DefaultMuleClassPathConfig(muleHome, muleHome);
-
-    containerClassLoader = new AbstractMuleContainerFactory(null, null) {
-
-      @Override
-      protected DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase) {
-        return new DefaultMuleClassPathConfig(muleHome, muleHome);
-      }
-
-    }.createContainerSystemClassLoader(muleHome, muleHome);
+    containerClassLoader = new DefaultMuleContainerFactory(null, null)
+        .createContainerSystemClassLoader(muleHome, muleHome);
 
     try {
       fromMuleModule = containerClassLoader.loadClass("org.test.mule.FromMuleModule");
