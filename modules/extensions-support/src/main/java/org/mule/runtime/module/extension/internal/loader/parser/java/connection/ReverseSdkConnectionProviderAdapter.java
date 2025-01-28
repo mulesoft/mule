@@ -35,8 +35,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 /**
- * The reverse of {@link SdkConnectionProviderAdapter}, adapting a {@code mule-api} {@link org.mule.runtime.api.connection.ConnectionProvider}
- * into a {@code sdk-api} {@link ConnectionProvider}
+ * The reverse of {@link SdkConnectionProviderAdapter}, adapting a {@code mule-api}
+ * {@link org.mule.runtime.api.connection.ConnectionProvider} into a {@code sdk-api} {@link ConnectionProvider}
  * <p>
  * This adapter acts as a decorator which (if needed) propagates the {@link Lifecycle} and {@link MuleContextAware} signals to the
  * delegate. It also considers the case of the delegate being a pooling or cached provider, in which the returned adapter will
