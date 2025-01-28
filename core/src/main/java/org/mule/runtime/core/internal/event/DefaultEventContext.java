@@ -328,7 +328,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.distributedTraceContext = distributedTraceContext;
   }
 
-  private static class ChildEventContext extends AbstractEventContext implements Serializable {
+  public static class ChildEventContext extends AbstractEventContext implements Serializable {
 
     private static final long serialVersionUID = 1054412872901205234L;
     private transient BaseEventContext root;

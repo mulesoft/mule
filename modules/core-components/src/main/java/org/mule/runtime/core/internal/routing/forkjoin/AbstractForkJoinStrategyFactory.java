@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
+import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
@@ -118,6 +119,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                   })
           .doOnNext(listBooleanPair -> {
             if (listBooleanPair.getSecond()) {
+              handleTimeoutExceptionIfPresent(timeoutScheduler, listBooleanPair.getFirst());
               throw propagate(createCompositeRoutingException(listBooleanPair.getFirst().stream()
                   .map(coreEventExceptionPair -> removeOriginalError(coreEventExceptionPair,
                                                                      original.getError()))
@@ -128,6 +130,22 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .doOnNext(mergeVariables(original, resultBuilder))
           .map(createResultEvent(original, resultBuilder));
     };
+  }
+
+  private void handleTimeoutExceptionIfPresent(Scheduler timeoutScheduler,
+                                               List<Pair<CoreEvent, EventProcessingException>> listBooleanPair) {
+    listBooleanPair
+        .forEach(
+                 pair -> {
+                   if (pair.getFirst().getError().isPresent() &&
+                       pair.getFirst().getError().get().getCause() instanceof TimeoutException &&
+                       pair.getFirst().getError().get().getCause().getMessage()
+                           .contains(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX)) {
+                     ((DefaultEventContext.ChildEventContext) pair.getFirst().getContext())
+                         .forEachChild(ctx -> timeoutScheduler
+                             .submit(() -> ctx.error(pair.getFirst().getError().get().getCause())));
+                   }
+                 });
   }
 
   private boolean isOriginalError(Error newError, Optional<Error> originalError) {
