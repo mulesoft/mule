@@ -76,6 +76,7 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
+import org.mule.runtime.module.extension.internal.loader.parser.java.connection.ReverseSdkConnectionProviderAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ReactiveReconnectionCallback;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.SdkReconnectableAdapter;
 import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceWrapper;
@@ -120,7 +121,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
   private final Source source;
   private final Optional<ConfigurationInstance> configurationInstance;
   private final Optional<FieldSetter<Object, Object>> configurationSetter;
-  private final Optional<FieldSetter<Object, ConnectionProvider>> connectionSetter;
+  private final Optional<FieldSetter<Object, Object>> connectionSetter;
   private final SourceCallbackFactory sourceCallbackFactory;
   private final CursorProviderFactory cursorProviderFactory;
   private final ResolverSet nonCallbackParameters;
@@ -467,7 +468,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
       return;
     }
 
-    FieldSetter<Object, ConnectionProvider> setter = connectionSetter.get();
+    FieldSetter<Object, Object> setter = connectionSetter.get();
     ConfigurationInstance config = configurationInstance.orElseThrow(() -> new DefaultMuleException(createStaticMessage(
                                                                                                                         "Message Source on root component '%s' requires a connection but it doesn't point to any configuration. Please review your "
                                                                                                                             + "application",
@@ -483,7 +484,11 @@ public class SourceAdapter implements Lifecycle, Restartable {
                                                                 config.getName())));
     }
 
-    ConnectionProvider<Object> connectionProvider = new SourceConnectionProvider(connectionManager, config);
+    Object connectionProvider = new SourceConnectionProvider(connectionManager, config);
+    if (org.mule.sdk.api.connectivity.ConnectionProvider.class.isAssignableFrom(setter.getField().getType())) {
+      connectionProvider = ReverseSdkConnectionProviderAdapter.from(connectionProvider);
+    }
+
     setter.set(sourceInvokationTarget.get(), connectionProvider);
   }
 
@@ -496,7 +501,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
     return configurationField.map(FieldSetter::new);
   }
 
-  private <T> Optional<FieldSetter<Object, T>> fetchConnectionProviderField() {
+  private Optional<FieldSetter<Object, Object>> fetchConnectionProviderField() {
     Optional<Field> connectionField = fetchConnectionFieldFromSourceObject(sourceInvokationTarget.get());
     return connectionField.map(field -> {
       if (!ConnectionProvider.class.equals(field.getType()) &&
