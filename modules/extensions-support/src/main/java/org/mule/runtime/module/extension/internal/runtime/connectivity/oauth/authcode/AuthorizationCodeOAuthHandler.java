@@ -51,10 +51,12 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.Laz
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
+import org.mule.runtime.oauth.api.OAuthService;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -79,7 +81,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
   private Registry registry;
 
   // TODO: MULE-10837 this should be a plain old @Inject
-  private LazyValue<HttpService> httpService;
+  protected LazyValue<HttpService> httpService;
 
   private boolean forceInvalidateStatusRetrieval;
 
@@ -162,11 +164,11 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     checkArgument(listeners != null, "listeners cannot be null");
 
     OAuthAuthorizationCodeDancerBuilder dancerBuilder =
-        oauthService.get().authorizationCodeGrantTypeDancerBuilder(lockFactory,
-                                                                   new LazyObjectStoreToMapAdapter(
-                                                                                                   () -> objectStoreLocator
-                                                                                                       .apply(config)),
-                                                                   expressionEvaluator);
+        getOAuthService().get().authorizationCodeGrantTypeDancerBuilder(lockFactory,
+                                                                        new LazyObjectStoreToMapAdapter(
+                                                                                                        () -> objectStoreLocator
+                                                                                                            .apply(config)),
+                                                                        expressionEvaluator);
     final AuthorizationCodeGrantType grantType = config.getGrantType();
     final OAuthCallbackConfig callbackConfig = config.getCallbackConfig();
 
@@ -228,7 +230,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     return dancer;
   }
 
-  private String getExternalCallback(HttpServer httpServer, OAuthCallbackConfig callbackConfig) {
+  protected String getExternalCallback(HttpServer httpServer, OAuthCallbackConfig callbackConfig) {
     return callbackConfig.getExternalCallbackUrl().orElseGet(() -> {
       try {
         return new URL(httpServer.getProtocol().getScheme(),
@@ -245,7 +247,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     });
   }
 
-  private Pair<Optional<Flow>, Optional<Flow>> getListenerFlows(AuthorizationCodeConfig config) {
+  protected Pair<Optional<Flow>, Optional<Flow>> getListenerFlows(AuthorizationCodeConfig config) {
     try {
       return new Pair<>(lookupFlow(config.getBefore()), lookupFlow(config.getAfter()));
     } catch (Exception e) {
@@ -254,17 +256,17 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     }
   }
 
-  private Optional<Flow> lookupFlow(Optional<String> flowName) {
+  protected Optional<Flow> lookupFlow(Optional<String> flowName) {
     return flowName.map(this::lookupFlow);
   }
 
-  private Flow lookupFlow(String flowName) {
+  protected Flow lookupFlow(String flowName) {
     return registry.<Flow>lookupByName(flowName)
         .orElseThrow(() -> new IllegalArgumentException("Flow " + flowName + " doesn't exist"));
   }
 
-  private Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeCallback(AuthorizationCodeConfig config,
-                                                                                                   Flow flow) {
+  protected Function<AuthorizationCodeRequest, AuthorizationCodeDanceCallbackContext> beforeCallback(AuthorizationCodeConfig config,
+                                                                                                     Flow flow) {
     return (AuthorizationCodeRequest danceRequest) -> {
       final AuthCodeRequest request = new ImmutableAuthCodeRequest(danceRequest.getResourceOwnerId(),
                                                                    danceRequest.getScopes(),
@@ -276,9 +278,9 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     };
   }
 
-  private BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(
-                                                                                                     AuthorizationCodeConfig config,
-                                                                                                     Flow flow) {
+  protected BiConsumer<AuthorizationCodeDanceCallbackContext, ResourceOwnerOAuthContext> afterCallback(
+                                                                                                       AuthorizationCodeConfig config,
+                                                                                                       Flow flow) {
 
     return (callbackContext, oauthContext) -> {
       AuthorizationCodeState state = toAuthorizationCodeState(config, oauthContext);
@@ -290,12 +292,12 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
     };
   }
 
-  private CoreEvent createEvent(Object payload, OAuthConfig config, Flow flow) {
+  protected CoreEvent createEvent(Object payload, OAuthConfig config, Flow flow) {
     return CoreEvent.builder(create(flow, from(config.getOwnerConfigName())))
         .message(Message.builder().value(payload).build()).build();
   }
 
-  private CoreEvent runFlow(Flow flow, CoreEvent event, OAuthConfig config, String callbackType) {
+  protected CoreEvent runFlow(Flow flow, CoreEvent event, OAuthConfig config, String callbackType) {
     final Publisher<CoreEvent> childPublisher =
         processWithChildContext(event, flow, child((BaseEventContext) event.getContext(), of(flow.getLocation())));
     return from(childPublisher)
@@ -312,5 +314,13 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
   public void initialise() throws InitialisationException {
     super.initialise();
     httpService = new LazyLookup<>(HttpService.class, muleContext);
+  }
+
+  protected Map<String, AuthorizationCodeOAuthDancer> getDancers() {
+    return dancers;
+  }
+
+  protected LazyValue<OAuthService> getOAuthService() {
+    return oauthService;
   }
 }
