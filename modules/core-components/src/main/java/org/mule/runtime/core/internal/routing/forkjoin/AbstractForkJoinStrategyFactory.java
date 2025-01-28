@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.routing.forkjoin;
 
-import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
@@ -31,7 +30,6 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -54,7 +52,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -122,31 +119,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                   })
           .doOnNext(listBooleanPair -> {
             if (listBooleanPair.getSecond()) {
-              handleTimeoutExceptionIfPresent(listBooleanPair);
-              // listBooleanPair.getFirst().get(0)
-              // .getFirst()
-              // listBooleanPair.getFirst()
-              // .forEach(
-              // pair -> {
-              // if (pair.getFirst().getError().isPresent()) {
-              // ((DefaultEventContext.ChildEventContext) pair.getFirst().getContext())
-              // .forEachChild(
-              // childCtx -> childCtx.error(
-              // new MessagingException(pair
-              // .getFirst(),
-              // pair.getFirst()
-              // .getError()
-              // .get()
-              // .getCause())));
-              // }
-              // else {
-              // ((DefaultEventContext.ChildEventContext) pair.getFirst().getContext())
-              // .forEachChild(
-              // childCtx -> childCtx.success(pair.getFirst()));
-              // // ((DefaultEventContext.ChildEventContext) pair.getFirst().getContext()).success(
-              // // pair.getFirst());
-              // }
-              // });
+              handleTimeoutExceptionIfPresent(timeoutScheduler, listBooleanPair.getFirst());
               throw propagate(createCompositeRoutingException(listBooleanPair.getFirst().stream()
                   .map(coreEventExceptionPair -> removeOriginalError(coreEventExceptionPair,
                                                                      original.getError()))
@@ -159,21 +132,20 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     };
   }
 
-  private void handleTimeoutExceptionIfPresent(Pair<List<Pair<CoreEvent, EventProcessingException>>, Boolean> listBooleanPair) {
-    ExecutorService executorService = newFixedThreadPool(50);
-    listBooleanPair.getFirst()
+  private void handleTimeoutExceptionIfPresent(Scheduler timeoutScheduler,
+                                               List<Pair<CoreEvent, EventProcessingException>> listBooleanPair) {
+    listBooleanPair
         .forEach(
                  pair -> {
                    if (pair.getFirst().getError().isPresent() &&
-                       listBooleanPair.getFirst().get(0).getFirst().getError().get().getCause() instanceof TimeoutException &&
-                       listBooleanPair.getFirst().get(0).getFirst().getError().get().getCause().getMessage()
-                           .contains("Timeout while processing route/part")) {
+                       pair.getFirst().getError().get().getCause() instanceof TimeoutException &&
+                       pair.getFirst().getError().get().getCause().getMessage()
+                           .contains(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX)) {
                      ((DefaultEventContext.ChildEventContext) pair.getFirst().getContext())
-                         .forEachChild(ctx -> executorService
-                             .submit(() -> ctx.error(listBooleanPair.getFirst().get(0).getFirst().getError().get().getCause())));
+                         .forEachChild(ctx -> timeoutScheduler
+                             .submit(() -> ctx.error(pair.getFirst().getError().get().getCause())));
                    }
                  });
-    executorService.shutdown();
   }
 
   private boolean isOriginalError(Error newError, Optional<Error> originalError) {
