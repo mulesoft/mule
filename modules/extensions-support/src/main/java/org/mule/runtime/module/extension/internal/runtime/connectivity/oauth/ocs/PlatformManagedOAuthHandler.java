@@ -19,16 +19,19 @@ import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
+import org.mule.runtime.oauth.api.OAuthService;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder;
 import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -131,11 +134,11 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
     checkArgument(listeners != null, "listeners cannot be null");
 
     OAuthPlatformManagedDancerBuilder dancerBuilder =
-        oauthService.get().platformManagedOAuthDancerBuilder(lockFactory,
-                                                             new LazyObjectStoreToMapAdapter(
-                                                                                             () -> objectStoreLocator
-                                                                                                 .apply(config)),
-                                                             expressionEvaluator);
+        getOAuthService().get().platformManagedOAuthDancerBuilder(lockFactory,
+                                                                  new LazyObjectStoreToMapAdapter(
+                                                                                                  () -> objectStoreLocator
+                                                                                                      .apply(config)),
+                                                                  expressionEvaluator);
 
     final PlatformManagedOAuthGrantType grantType = config.getGrantType();
 
@@ -173,5 +176,13 @@ public class PlatformManagedOAuthHandler extends OAuthHandler<PlatformManagedOAu
   protected Function<OAuthConfig, ObjectStore> buildObjectStoreLocator() {
     return config -> objectStoreManager.getOrCreateObjectStore(config.getOwnerConfigName() + "-OCS-tokenStore",
                                                                unmanagedTransient());
+  }
+
+  protected Map<String, PlatformManagedOAuthDancer> getDancers() {
+    return dancers;
+  }
+
+  protected LazyValue<OAuthService> getOAuthService() {
+    return oauthService;
   }
 }
