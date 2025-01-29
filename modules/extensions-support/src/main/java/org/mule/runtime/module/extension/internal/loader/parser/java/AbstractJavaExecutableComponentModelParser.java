@@ -109,7 +109,8 @@ abstract class AbstractJavaExecutableComponentModelParser extends AbstractJavaMo
   private Type resolveConnectionType(ExtensionParameter connectionParameter) {
     Type connectionType = connectionParameter.getType();
 
-    if (connectionType.getTypeName().startsWith(ConnectionProvider.class.getName())) {
+    if (connectionType.getTypeName().startsWith(ConnectionProvider.class.getName())
+        || connectionType.getTypeName().startsWith(org.mule.sdk.api.connectivity.ConnectionProvider.class.getName())) {
       List<TypeGeneric> generics = connectionType.getGenerics();
       if (generics.size() == 0) {
         throw new IllegalOperationModelDefinitionException(format(
