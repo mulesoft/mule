@@ -6,13 +6,13 @@
     <parent>
         <groupId>org.mule</groupId>
         <artifactId>mule-plugin-mgmt-parent-pom</artifactId>
-        <version>4.8.4-SNAPSHOT</version>
+        <version>4.8.5-SNAPSHOT</version>
     </parent>
 
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.8.4-SNAPSHOT</version>
+    <version>4.8.5-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
@@ -164,20 +164,20 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.8.4-SNAPSHOT</muleBomVersion>
-        <muleMavenClientBomVersion>2.3.4-SNAPSHOT</muleMavenClientBomVersion>
+        <muleBomVersion>4.8.5-SNAPSHOT</muleBomVersion>
+        <muleMavenClientBomVersion>2.3.5-SNAPSHOT</muleMavenClientBomVersion>
 
-        <weaveVersion>2.8.3-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.8.2</weaveVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.4.4-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.8.4-SNAPSHOT</muleExtensionsApiVersion>
+        <mulePropertiesApiVersion>1.4.5-SNAPSHOT</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.8.5-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
-        <muleHttpPolicyApiVersion>1.8.4-SNAPSHOT</muleHttpPolicyApiVersion>
-        <mulePolicyApiVersion>1.8.4-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.8.4-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.8.4-SNAPSHOT</muleMetadataModelVersion>
+        <muleHttpPolicyApiVersion>1.8.5-SNAPSHOT</muleHttpPolicyApiVersion>
+        <mulePolicyApiVersion>1.8.5-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.8.5-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.8.5-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
@@ -186,16 +186,16 @@
         <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
 
-        <muleAnnotationsApiVersion>1.7.4-SNAPSHOT</muleAnnotationsApiVersion>
-        <mule.module.maven.plugin.version>1.8.4-SNAPSHOT</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.8.4-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.8.4-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleAnnotationsApiVersion>1.7.5-SNAPSHOT</muleAnnotationsApiVersion>
+        <mule.module.maven.plugin.version>1.8.5-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.8.5-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.8.5-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <awaitilityVersion>3.0.0</awaitilityVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
-        <oldMuleArtifactVersion>4.8.3</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.8.4-rc1</oldMuleArtifactVersion>
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
