@@ -12,7 +12,6 @@
     <name>Mule Artifact Module</name>
 
     <properties>
-        <surefire.additional.jacoco.args>,excludes=mypackage.MyClass</surefire.additional.jacoco.args>
         <!-- open internal required stuff from org.mule.runtime.core to the test infrastructure -->
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
@@ -33,6 +32,13 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>mypackage.MyClass</excludes>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
