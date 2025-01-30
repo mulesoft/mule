@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
-import org.mule.runtime.core.internal.event.InternalEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
