@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.event;
 
+import static java.util.Collections.emptyMap;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
@@ -188,7 +190,25 @@ public interface PrivilegedEvent extends CoreEvent {
    * @return new builder instance.
    */
   static Builder builder(CoreEvent event) {
-    return new DefaultEventBuilder((InternalEvent) event);
+    return builder(event, false);
+  }
+
+  /**
+   * Create new {@link Builder} based on an existing {@link CoreEvent} instance. The existing {@link EventContext} is conserved.
+   *
+   * @param event       existing event to use as a template to create builder instance
+   * @param shallowCopy do not copy internals of the based component.
+   *
+   * @return new builder instance.
+   */
+  static Builder builder(CoreEvent event, boolean shallowCopy) {
+    DefaultEventBuilder defaultEventBuilder = new DefaultEventBuilder((InternalEvent) event);
+
+    if (shallowCopy) {
+      defaultEventBuilder.internalParameters(emptyMap());
+    }
+
+    return defaultEventBuilder;
   }
 
   /**
