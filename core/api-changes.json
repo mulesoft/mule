@@ -5,6 +5,12 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.staticMethodAddedToInterface",
+            "new": "method org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent::builder(org.mule.runtime.core.api.event.CoreEvent, boolean)",
+            "justification": "Used only internally. Necessary for W-17671126"
+          },
+          {
+            "ignore": true,
             "code": "java.method.added",
             "new": "method void org.mule.runtime.core.api.context.notification.NotificationHelper::<init>(org.mule.runtime.core.api.context.notification.ServerNotificationHandler, java.lang.Class<? extends org.mule.runtime.api.notification.Notification>, boolean, boolean)",
             "justification": "W-16828516: Race condition that affects monitoring. Everything has a default."

@@ -6,14 +6,23 @@
  */
 package org.mule.runtime.core.privileged.event;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.builder;
+
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
+
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.privileged.event.PrivilegedEvent.builder;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.event.DefaultEventBuilder;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -26,6 +35,26 @@ public class PrivilegedEventTestCase extends AbstractMuleTestCase {
   public void whenNoLoggingVariableIsAddedThenTheMapIsNotCreated() throws MuleException {
     PrivilegedEvent event = builder(testEvent()).build();
     assertThat(event.getLoggingVariables(), is(empty()));
+  }
+
+  @Test
+  public void whenBuilderIsUsedWhenShallowCopyInternalParametersAreRemoved() throws MuleException {
+    InternalEvent internalEvent = ((DefaultEventBuilder) getEventBuilder())
+        .internalParameters(singletonMap("key1", "value1"))
+        .message(of(TEST_PAYLOAD)).build();
+
+    PrivilegedEvent event = builder(internalEvent, true).build();
+    assertThat(((InternalEvent) event).getInternalParameters(), is(anEmptyMap()));
+  }
+
+  @Test
+  public void whenBuilderIsNotUsedWhenShallowCopyInternalParametersAreCopied() throws MuleException {
+    InternalEvent internalEvent = ((DefaultEventBuilder) getEventBuilder())
+        .internalParameters(singletonMap("key1", "value1"))
+        .message(of(TEST_PAYLOAD)).build();
+
+    PrivilegedEvent event = builder(internalEvent, false).build();
+    assertThat(((InternalEvent) event).getInternalParameters(), hasEntry("key1", "value1"));
   }
 
   @Test
