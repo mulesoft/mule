@@ -85,8 +85,10 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   @Test
   public void createDeployableProjectModelForAnEmptyDeploymentMustFail() throws Exception {
     expected.expect(ArtifactActivationException.class);
-    expected.expectCause(hasMessage(containsString("src/main/mule cannot be empty")));
-    getDeployableProjectModel(deploymentTypePrefix + "/empty-app");
+    String expectedString = "src" + File.separator + "main" + File.separator + "mule cannot be empty";
+    expected.expectCause(hasMessage(containsString(expectedString)));
+    String deployablePath = deploymentTypePrefix + File.separator + "empty-app";
+    getDeployableProjectModel(deployablePath);
   }
 
   @Test
