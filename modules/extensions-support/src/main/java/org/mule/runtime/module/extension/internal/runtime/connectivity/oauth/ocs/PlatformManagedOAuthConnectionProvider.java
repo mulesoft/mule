@@ -185,7 +185,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
     disposeIfNeeded(getRetryPolicyTemplate(), LOGGER);
   }
 
-  private void initialiseDelegate() throws MuleException {
+  protected void initialiseDelegate() throws MuleException {
     initialiseIfNeeded(delegate, true, muleContext);
     try {
       startIfNeeded(delegate);
@@ -197,7 +197,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
     oauthStateFieldSetter = getOAuthStateSetter(delegateForInjection);
   }
 
-  private ConnectionProvider<C> createDelegate(PlatformManagedConnectionDescriptor descriptor) throws MuleException {
+  protected ConnectionProvider<C> createDelegate(PlatformManagedConnectionDescriptor descriptor) throws MuleException {
     Class<?> connectionProviderDelegateClass =
         getImplementingType(oauthConfig.getDelegateConnectionProviderModel())
             .orElseThrow(() -> new IllegalStateException("Delegate connection provider must have an implementing type."));
@@ -387,7 +387,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
     delegatePoolingListener.onReturn(connection);
   }
 
-  private PoolingListener<C> getDelegatePoolingListener() {
+  protected PoolingListener<C> getDelegatePoolingListener() {
     if (unwrappedDelegate instanceof PoolingListener) {
       return new PoolingListener<C>() {
 

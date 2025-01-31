@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cl
 import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
 import static org.mule.test.allure.AllureConstants.OauthFeature.SDK_OAUTH_SUPPORT;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -17,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
@@ -32,29 +35,17 @@ import org.junit.Test;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
-@Issue("W-14391247")
 @Feature(SDK_OAUTH_SUPPORT)
 public class ClientCredentialsConnectionProviderWrapperTestCase {
 
-  @Test
-  public void listenerIsUnRegisteredOnStop() throws MuleException {
-    ConnectionProvider delegate = mock(ConnectionProvider.class);
-    when(delegate.connect()).thenReturn(new Object());
+  private ClientCredentialsOAuthHandler oauthHandler;
+  private ClientCredentialsGrantType type;
+  private ClientCredentialsConnectionProviderWrapper wrapper;
 
-    ClientCredentialsConfig oauthConfig = mock(ClientCredentialsConfig.class);
-    ClientCredentialsGrantType type = new ClientCredentialsGrantType("http://accessToken",
-                                                                     "#[accessToken]",
-                                                                     ".*",
-                                                                     null,
-                                                                     BODY);
-    when(oauthConfig.getGrantType()).thenReturn(type);
-    Map<Field, String> callbackValues = new HashMap<>();
-    ClientCredentialsOAuthHandler oauthHandler = mock(ClientCredentialsOAuthHandler.class);
-    when(oauthHandler.getOAuthContext(any())).thenReturn(mock(ResourceOwnerOAuthContext.class));
-    ReconnectionConfig reconnectionConfig = mock(ReconnectionConfig.class);
-    ClientCredentialsConnectionProviderWrapper wrapper =
-        new TestClientCredentialsConnectionProviderWrapper(delegate, oauthConfig, callbackValues, oauthHandler,
-                                                           reconnectionConfig);
+  @Test
+  @Issue("W-14391247")
+  public void listenerIsUnRegisteredOnStop() throws MuleException {
+    setupCommonMocks();
     ClientCredentialsOAuthDancer dancer = mock(ClientCredentialsOAuthDancer.class);
     when(oauthHandler.register(any())).thenReturn(dancer);
 
@@ -63,6 +54,46 @@ public class ClientCredentialsConnectionProviderWrapperTestCase {
     verify(dancer, times(1)).addListener(any());
     wrapper.stop();
     verify(dancer, times(1)).removeListener(any());
+  }
+
+  @Test
+  public void refreshTokenCallsOauthHandler() throws MuleException {
+    setupCommonMocks();
+    wrapper.refreshToken("id1");
+    verify(oauthHandler, times(1)).refreshToken(any());
+  }
+
+  @Test
+  public void invalidateCallsOauthHandler() throws MuleException {
+    setupCommonMocks();
+    wrapper.invalidate("id1");
+    verify(oauthHandler, times(1)).invalidate(any());
+  }
+
+  @Test
+  public void getOAuthGrantType() throws MuleException {
+    setupCommonMocks();
+    assertThat(wrapper.getGrantType(), is(type));
+  }
+
+  private void setupCommonMocks() throws ConnectionException {
+    ConnectionProvider delegate = mock(ConnectionProvider.class);
+    when(delegate.connect()).thenReturn(new Object());
+
+    ClientCredentialsConfig oauthConfig = mock(ClientCredentialsConfig.class);
+    this.type = new ClientCredentialsGrantType("http://accessToken",
+                                               "#[accessToken]",
+                                               ".*",
+                                               null,
+                                               BODY);
+    when(oauthConfig.getGrantType()).thenReturn(type);
+    Map<Field, String> callbackValues = new HashMap<>();
+    this.oauthHandler = mock(ClientCredentialsOAuthHandler.class);
+    when(oauthHandler.getOAuthContext(any())).thenReturn(mock(ResourceOwnerOAuthContext.class));
+    ReconnectionConfig reconnectionConfig = mock(ReconnectionConfig.class);
+    this.wrapper =
+        new TestClientCredentialsConnectionProviderWrapper(delegate, oauthConfig, callbackValues, oauthHandler,
+                                                           reconnectionConfig);
   }
 
   private class TestClientCredentialsConnectionProviderWrapper extends ClientCredentialsConnectionProviderWrapper {
