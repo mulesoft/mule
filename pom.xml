@@ -162,7 +162,7 @@
         <muleBomVersion>4.9.0-rc4</muleBomVersion>
         <muleMavenClientBomVersion>2.4.0-rc4</muleMavenClientBomVersion>
 
-        <weaveVersion>2.9.0-rc5</weaveVersion>
+        <weaveVersion>2.9.0</weaveVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.5.0-rc4</mulePropertiesApiVersion>
