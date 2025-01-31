@@ -22,6 +22,7 @@ import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -34,6 +35,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.event.AbstractEventContext;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
@@ -137,13 +139,16 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     listBooleanPair
         .forEach(
                  pair -> {
-                   if (pair.getFirst().getError().isPresent() &&
-                       pair.getFirst().getError().get().getCause() instanceof TimeoutException &&
-                       pair.getFirst().getError().get().getCause().getMessage()
+                   final Optional<Error> error = pair.getFirst().getError();
+                   if (error.isPresent() &&
+                       error.get().getCause() instanceof TimeoutException &&
+                       error.get().getCause().getMessage()
                            .contains(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX)) {
-                     ((DefaultEventContext.ChildEventContext) pair.getFirst().getContext())
-                         .forEachChild(ctx -> timeoutScheduler
-                             .submit(() -> ctx.error(pair.getFirst().getError().get().getCause())));
+                     EventContext context = pair.getFirst().getContext();
+                     if (context instanceof AbstractEventContext) {
+                       ((AbstractEventContext) context).forEachChild(ctx -> timeoutScheduler
+                           .submit(() -> ctx.error(error.get().getCause())));
+                     }
                    }
                  });
   }
