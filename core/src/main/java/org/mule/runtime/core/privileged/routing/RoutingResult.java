@@ -7,9 +7,12 @@
 package org.mule.runtime.core.privileged.routing;
 
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Pair;
@@ -18,6 +21,7 @@ import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +37,7 @@ public final class RoutingResult {
 
   private final Map<String, Message> successfulRoutesResultMap;
   private final Map<String, Error> failedRoutesErrorMap;
-  private Map<String, Pair<Error, EventProcessingException>> failedRoutesErrorWithExceptionMap;
+  private Map<String, Pair<Error, MuleException>> failedRoutesErrorWithExceptionMap;
 
   public RoutingResult(Map<String, Message> successfulRoutesResultMap, Map<String, Error> failedRoutesErrorMap) {
     this.successfulRoutesResultMap = unmodifiableMap(successfulRoutesResultMap);
@@ -42,13 +46,17 @@ public final class RoutingResult {
   }
 
   public static RoutingResult routingResultWithException(Map<String, Message> successfulRoutesResultMap,
-                                                         Map<String, Pair<Error, EventProcessingException>> failedRoutesErrorWithExceptionMap) {
+                                                         Map<String, Pair<Error, EventProcessingException>> errorMap) {
     RoutingResult routingResult = new RoutingResult(successfulRoutesResultMap, emptyMap());
+    Map<String, Pair<Error, MuleException>> failedRoutesErrorWithExceptionMap = errorMap.entrySet().stream()
+        .collect(Collectors
+            .toMap(Entry::getKey,
+                   pair -> new Pair<>(pair.getValue().getFirst(), getRootMuleException(pair.getValue().getSecond()))));
     routingResult.setFailedRoutesErrorWithExceptionMap(failedRoutesErrorWithExceptionMap);
     return routingResult;
   }
 
-  private void setFailedRoutesErrorWithExceptionMap(Map<String, Pair<Error, EventProcessingException>> failedRoutesErrorWithExceptionMap) {
+  private void setFailedRoutesErrorWithExceptionMap(Map<String, Pair<Error, MuleException>> failedRoutesErrorWithExceptionMap) {
     this.failedRoutesErrorWithExceptionMap = failedRoutesErrorWithExceptionMap;
   }
 
@@ -59,13 +67,13 @@ public final class RoutingResult {
   public Map<String, Error> getFailures() {
     if (!failedRoutesErrorWithExceptionMap.isEmpty()) {
       return failedRoutesErrorWithExceptionMap.entrySet().stream()
-          .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue().getFirst()));
+          .collect(Collectors.toMap(Entry::getKey, pair -> pair.getValue().getFirst()));
     } else {
       return failedRoutesErrorMap;
     }
   }
 
-  public Map<String, Pair<Error, EventProcessingException>> getFailuresWithExceptionInfo() {
+  public Map<String, Pair<Error, MuleException>> getFailuresWithExceptionInfo() {
     return failedRoutesErrorWithExceptionMap;
   }
 
