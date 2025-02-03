@@ -491,7 +491,8 @@ public class DependencyResolver implements AutoCloseable {
         || groupId.equals("com.mulesoft.mule.runtime")
         || groupId.equals("com.mulesoft.mule.runtime.boot")
         || groupId.equals("com.mulesoft.mule.runtime.modules")
-        || groupId.equals("com.mulesoft.anypoint");
+        || groupId.equals("com.mulesoft.anypoint")
+        || groupId.equals("com.mulesoft.connectivity");
   }
 
   /**
