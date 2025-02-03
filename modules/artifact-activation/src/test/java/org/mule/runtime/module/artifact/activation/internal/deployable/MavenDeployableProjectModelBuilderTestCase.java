@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import static org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder.forMavenProject;
+import static org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModelBuilder.forMavenRefreshProject;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.SupportedJavaVersions.JAVA_VERSIONS_IN_DEPLOYABLE_ARTIFACT;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
@@ -90,6 +92,47 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
   @Test
   public void createBasicDeployableProjectModel() throws Exception {
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel(deploymentTypePrefix + "/basic");
+    validateBasicProjectModel(deployableProjectModel);
+  }
+
+  @Test
+  public void forMavenProjectTest() throws URISyntaxException {
+    DeployableProjectModel deployableProjectModel =
+        forMavenProject(getDeployableFolder(deploymentTypePrefix + "/basic"), false, false).build();
+    validateBasicProjectModel(deployableProjectModel);
+  }
+
+  @Test
+  public void forMavenProjectWithNullMavenConfigTest() throws URISyntaxException {
+    DeployableProjectModel deployableProjectModel =
+        forMavenProject(getDeployableFolder(deploymentTypePrefix + "/basic"), null, false, false).build();
+    validateBasicProjectModel(deployableProjectModel);
+  }
+
+  @Test
+  public void forMavenRefreshProjectTest() throws URISyntaxException {
+    DeployableProjectModel deployableProjectModel =
+        forMavenProject(getDeployableFolder(deploymentTypePrefix + "/basic"), null, false, false).build();
+    DeployableProjectModel refreshedDeployableProjectModel =
+        forMavenRefreshProject(deployableProjectModel.getProjectStructure().get(), deployableProjectModel.getDescriptor(), false,
+                               deployableProjectModel.getDependencies(), deployableProjectModel.getSharedLibraries(),
+                               deployableProjectModel.getAdditionalPluginDependencies()).build();
+    validateBasicProjectModel(refreshedDeployableProjectModel);
+  }
+
+  @Test
+  public void forMavenRefreshProjectWithNullMavenConfigTest() throws URISyntaxException {
+    DeployableProjectModel deployableProjectModel =
+        forMavenProject(getDeployableFolder(deploymentTypePrefix + "/basic"), null, false, false).build();
+    DeployableProjectModel refreshedDeployableProjectModel =
+        forMavenRefreshProject(deployableProjectModel.getProjectStructure().get(), deployableProjectModel.getDescriptor(), false,
+                               deployableProjectModel.getDependencies(), deployableProjectModel.getSharedLibraries(),
+                               deployableProjectModel.getAdditionalPluginDependencies(), null).build();
+    validateBasicProjectModel(refreshedDeployableProjectModel);
+  }
+
+  private void validateBasicProjectModel(DeployableProjectModel deployableProjectModel) {
+    deployableProjectModel.validate();
 
     assertThat(deployableProjectModel.getPackages(), contains("org.test"));
     assertThat(deployableProjectModel.getResources(),

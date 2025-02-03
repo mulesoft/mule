@@ -12,6 +12,8 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZ
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedArtifactStatusDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
@@ -120,15 +122,9 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
   }
 
   public Boolean isStatePersisted(String flowName, String appName) {
-    Properties deploymentProperties = null;
-    try {
-      deploymentProperties = resolveFlowDeploymentProperties(appName, empty());
-    } catch (IOException e) {
-      logger.error("FlowStoppedDeploymentListener failed to process isStatePersisted for flow "
-          + flowName, e);
-    }
-    return deploymentProperties != null
-        && deploymentProperties.getProperty(flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY) != null;
+    Optional<Properties> deploymentProperties = getPersistedFlowDeploymentProperties(appName);
+    return deploymentProperties.isPresent()
+        && deploymentProperties.get().getProperty(flowName + "_" + START_FLOW_ON_DEPLOYMENT_PROPERTY) != null;
   }
 
   /**
@@ -212,15 +208,9 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
    * deployment.
    */
   private Boolean shouldStartArtifactAccordingToPersistedStatus(T artifact) {
-    Properties artifactStatusProperties = null;
-    try {
-      artifactStatusProperties = resolveArtifactStatusDeploymentProperties(artifact.getArtifactName(), empty());
-    } catch (IOException e) {
-      logger.error("Failed to load deployment property for artifact "
-          + artifact.getArtifactName(), e);
-    }
-    return artifactStatusProperties != null
-        && parseBoolean(artifactStatusProperties.getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
+    Optional<Properties> artifactStatusProperties = getPersistedArtifactStatusDeploymentProperties(artifact.getArtifactName());
+    return artifactStatusProperties.isPresent()
+        && parseBoolean(artifactStatusProperties.get().getProperty(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY, "true"));
   }
 
   @Override

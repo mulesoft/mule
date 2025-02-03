@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
@@ -35,29 +36,60 @@ public interface DeployableProjectModelBuilder {
    *
    * @since 4.8
    */
-  public static DeployableProjectModelBuilder forMuleProject(File projectFolder, Optional<MuleDeployableModel> model) {
+  static DeployableProjectModelBuilder forMuleProject(File projectFolder, Optional<MuleDeployableModel> model) {
     return new MuleDeployableProjectModelBuilder(projectFolder, model);
   }
 
-  public static DeployableProjectModelBuilder forMavenProject(File projectFolder,
-                                                              boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
-                                                              boolean includeTestDependencies) {
+  static DeployableProjectModelBuilder forMavenProject(File projectFolder,
+                                                       boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                       boolean includeTestDependencies) {
     return new MavenDeployableProjectModelBuilder(projectFolder, exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
                                                   includeTestDependencies);
   }
 
-  public static DeployableProjectModelBuilder forMavenRefreshProject(MuleProjectStructure projectStructure,
-                                                                     ArtifactCoordinates deployableArtifactCoordinates,
-                                                                     boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
-                                                                     List<BundleDependency> deployableBundleDependencies,
-                                                                     Set<BundleDescriptor> sharedDeployableBundleDescriptors,
-                                                                     Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
+  static DeployableProjectModelBuilder forMavenProject(File projectFolder,
+                                                       MavenConfiguration mavenConfiguration,
+                                                       boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                       boolean includeTestDependencies) {
+    if (mavenConfiguration == null) {
+      return new MavenDeployableProjectModelBuilder(projectFolder, exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                    includeTestDependencies);
+    } else {
+      return new MavenDeployableProjectModelBuilder(projectFolder, mavenConfiguration,
+                                                    exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                    includeTestDependencies);
+    }
+  }
+
+  static DeployableProjectModelBuilder forMavenRefreshProject(MuleProjectStructure projectStructure,
+                                                              ArtifactCoordinates deployableArtifactCoordinates,
+                                                              boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                              List<BundleDependency> deployableBundleDependencies,
+                                                              Set<BundleDescriptor> sharedDeployableBundleDescriptors,
+                                                              Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies) {
     return new MavenRefreshDeployableProjectModelBuilder(projectStructure,
                                                          deployableArtifactCoordinates,
                                                          exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
                                                          deployableBundleDependencies,
                                                          sharedDeployableBundleDescriptors,
-                                                         additionalPluginDependencies);
+                                                         additionalPluginDependencies,
+                                                         null);
+  }
+
+  static DeployableProjectModelBuilder forMavenRefreshProject(MuleProjectStructure projectStructure,
+                                                              ArtifactCoordinates deployableArtifactCoordinates,
+                                                              boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                              List<BundleDependency> deployableBundleDependencies,
+                                                              Set<BundleDescriptor> sharedDeployableBundleDescriptors,
+                                                              Map<BundleDescriptor, List<BundleDependency>> additionalPluginDependencies,
+                                                              MavenConfiguration mavenConfiguration) {
+    return new MavenRefreshDeployableProjectModelBuilder(projectStructure,
+                                                         deployableArtifactCoordinates,
+                                                         exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                         deployableBundleDependencies,
+                                                         sharedDeployableBundleDescriptors,
+                                                         additionalPluginDependencies,
+                                                         mavenConfiguration);
   }
 
   /**
