@@ -147,7 +147,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                      EventContext context = pair.getFirst().getContext();
                      if (context instanceof AbstractEventContext) {
                        ((AbstractEventContext) context).forEachChild(ctx -> timeoutScheduler
-                           .submit(() -> ctx.error(error.get().getCause())));
+                           .submit(() -> ctx.error(new MessagingException(pair.getFirst(), error.get().getCause()))));
                      }
                    }
                  });
