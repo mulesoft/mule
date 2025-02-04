@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.version;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -63,6 +64,11 @@ public class VersionRangeTestCase extends AbstractMuleTestCase {
   @Test
   public void higherExcludesAbove() {
     assertRangeContainsVersion(new VersionRange("(,2.0.0]"), "3.0.0", false);
+  }
+
+  @Test
+  public void invalidRange() {
+    assertThrows(IllegalArgumentException.class, () -> new VersionRange("saraza"));
   }
 
   private void assertRangeContainsVersion(final VersionRange range, String version, boolean expected) {
