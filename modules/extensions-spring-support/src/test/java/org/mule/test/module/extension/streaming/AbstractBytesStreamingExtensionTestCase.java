@@ -12,12 +12,14 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+import static java.util.Collections.singletonList;
 
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.exception.MuleException;
@@ -26,6 +28,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -140,6 +143,17 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   public void consumeGeneratedCursorAndCloseIt() throws Exception {
     Object value = flowRunner("consumeGeneratedStream").withPayload(data).run().getMessage().getPayload().getValue();
     assertThat(value, is(data));
+  }
+
+  @Test
+  public void getDelayedStream() throws Exception {
+    try {
+      Object value =
+          flowRunner("getDelayedStream").withPayload(singletonList(data)).run().getMessage().getPayload().getValue();
+      fail("Should have thrown an exception");
+    } catch (Exception e) {
+
+    }
   }
 
   @Test
@@ -400,6 +414,15 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
       assertThat(event.getMessage().getPayload().getValue(), not(instanceOf(CursorStreamProvider.class)));
+      return event;
+    }
+  }
+
+  public static class AssertPayloadIsIteratorProvider implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(event.getMessage().getPayload().getValue(), instanceOf(CursorIteratorProvider.class));
       return event;
     }
   }
