@@ -112,6 +112,16 @@ public class DrStrangeOperations {
     return objects;
   }
 
+  public PagingProvider<MysticConnection, String> delayedSayMagicWords(@Content List<String> values,
+                                                                       int fetchSize, int delay) {
+    try {
+      Thread.sleep(delay);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    return sayMagicWords(values, fetchSize);
+  }
+
   public PagingProvider<MysticConnection, String> sayMagicWords(@Content List<String> values,
                                                                 int fetchSize) {
     final AtomicInteger index = new AtomicInteger(0);
