@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 
 import org.junit.Test;
 
-public class OAuthObjectStoreConfigTest {
+public class OAuthObjectStoreConfigTestCase {
 
   @Test
   public void testObjectStoreNameInitialization() {

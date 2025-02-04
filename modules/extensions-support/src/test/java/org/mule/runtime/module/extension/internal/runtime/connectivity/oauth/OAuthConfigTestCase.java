@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-public class OAuthConfigTest {
+public class OAuthConfigTestCase {
 
   private TestOAuthConfig testOAuthConfig;
 

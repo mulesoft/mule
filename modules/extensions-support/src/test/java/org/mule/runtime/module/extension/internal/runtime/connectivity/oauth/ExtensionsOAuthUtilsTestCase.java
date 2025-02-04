@@ -26,7 +26,7 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.aut
 
 import org.junit.Test;
 
-public class ExtensionsOAuthUtilsTest {
+public class ExtensionsOAuthUtilsTestCase {
 
   @Test
   public void testToAuthorizationCodeState() {

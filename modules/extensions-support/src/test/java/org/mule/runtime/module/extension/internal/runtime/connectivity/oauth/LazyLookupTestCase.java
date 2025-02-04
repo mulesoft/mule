@@ -19,7 +19,7 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import org.junit.Test;
 
-public class LazyLookupTest {
+public class LazyLookupTestCase {
 
   @Test
   public void testSuccessfulLookup() throws RegistrationException {

@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class UnauthorizeOperationExecutorTest {
+public class UnauthorizeOperationExecutorTestCase {
 
   private UnauthorizeOperationExecutor executor;
 

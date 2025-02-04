@@ -44,7 +44,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class ClientCredentialsOAuthHandlerTest {
+public class ClientCredentialsOAuthHandlerTestCase {
 
   @Mock
   private ClientCredentialsConfig mockConfig;

@@ -43,7 +43,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class PlatformManagedOAuthConnectionProviderTest {
+public class PlatformManagedOAuthConnectionProviderTestCase {
 
   @Mock
   private PlatformManagedOAuthConfig mockOAuthConfig;

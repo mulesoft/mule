@@ -59,7 +59,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class PlatformManagedOAuthConnectionProviderObjectBuilderTest {
+public class PlatformManagedOAuthConnectionProviderObjectBuilderTestCase {
 
   private PlatformManagedOAuthConnectionProviderObjectBuilder<Object> builder;
 

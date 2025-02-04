@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
 
-public class ClientCredentialsConfigTest {
+public class ClientCredentialsConfigTestCase {
 
   private static final String OWNER_CONFIG_NAME = "ownerConfig";
   private static final String CLIENT_ID = "testClientId";

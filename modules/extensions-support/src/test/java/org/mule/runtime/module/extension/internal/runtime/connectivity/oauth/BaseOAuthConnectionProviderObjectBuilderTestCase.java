@@ -47,7 +47,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class BaseOAuthConnectionProviderObjectBuilderTest {
+public class BaseOAuthConnectionProviderObjectBuilderTestCase {
 
   private TestOAuthConnectionProviderObjectBuilder builder;
   private ConnectionProviderModel providerModel;

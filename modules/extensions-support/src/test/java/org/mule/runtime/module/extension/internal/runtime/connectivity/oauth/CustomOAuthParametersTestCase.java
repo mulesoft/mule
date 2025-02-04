@@ -14,7 +14,7 @@ import org.mule.runtime.api.util.MultiMap;
 
 import org.junit.Test;
 
-public class CustomOAuthParametersTest {
+public class CustomOAuthParametersTestCase {
 
   @Test
   public void testGetQueryParams() {

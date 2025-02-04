@@ -4,9 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
+package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_CLIENT_CREDENTIALS_GROUP_NAME;
+import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.CALLBACK_PATH_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.EXTERNAL_CALLBACK_URL_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.LISTENER_CONFIG_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.LOCAL_AUTHORIZE_PATH_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_AUTHORIZATION_CODE_GROUP_NAME;
+import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_CALLBACK_GROUP_NAME;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -26,20 +31,16 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
-import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
-import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
+import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
-import org.mule.runtime.extension.api.security.CredentialsPlacement;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,10 +49,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class ClientCredentialsConnectionProviderObjectBuilderTest {
+public class AuthorizationCodeConnectionProviderObjectBuilderTestCase {
 
-
-  private ClientCredentialsConnectionProviderObjectBuilder<Object> builder;
+  private AuthorizationCodeConnectionProviderObjectBuilder<Object> builder;
 
   @Mock
   private ResolverSet resolverSet;
@@ -69,10 +69,10 @@ public class ClientCredentialsConnectionProviderObjectBuilderTest {
   private ReconnectionConfig reconnectionConfig;
 
   @Mock
-  private ClientCredentialsOAuthHandler clientCredentialsHandler;
+  private AuthorizationCodeOAuthHandler authorizationCodeOAuthHandler;
 
   @Mock
-  private ClientCredentialsGrantType grantType;
+  private AuthorizationCodeGrantType grantType;
 
   @Mock
   private ExtensionModel extensionModel;
@@ -90,9 +90,6 @@ public class ClientCredentialsConnectionProviderObjectBuilderTest {
   private ValueResolvingContext valueResolvingContext;
 
   @Mock
-  private CoreEvent event;
-
-  @Mock
   private ConnectionProviderFactory connectionProviderFactory;
 
   @Mock
@@ -106,13 +103,13 @@ public class ClientCredentialsConnectionProviderObjectBuilderTest {
         .thenReturn(Optional.of(new ConnectionProviderFactoryModelProperty(connectionProviderFactory)));
     when(connectionProviderFactory.newInstance()).thenReturn(connectionProvider);
 
-    builder = new ClientCredentialsConnectionProviderObjectBuilder<>(
+    builder = new AuthorizationCodeConnectionProviderObjectBuilder<>(
                                                                      providerModel,
                                                                      resolverSet,
                                                                      poolingProfile,
                                                                      reconnectionConfig,
                                                                      grantType,
-                                                                     clientCredentialsHandler,
+                                                                     authorizationCodeOAuthHandler,
                                                                      extensionModel,
                                                                      expressionManager,
                                                                      muleContext);
@@ -122,47 +119,43 @@ public class ClientCredentialsConnectionProviderObjectBuilderTest {
   public void testDoBuild() throws Exception {
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
 
-    when(resolverSetResult.get(OAUTH_CLIENT_CREDENTIALS_GROUP_NAME))
-        .thenReturn(Collections.singletonMap("client_id", "testClientId"));
+    Map<String, Object> configMap = Map.of(LISTENER_CONFIG_PARAMETER_NAME, "", CALLBACK_PATH_PARAMETER_NAME, "path",
+                                           LOCAL_AUTHORIZE_PATH_PARAMETER_NAME, "path", EXTERNAL_CALLBACK_URL_PARAMETER_NAME, "");
+    when(resolverSetResult.get(OAUTH_CALLBACK_GROUP_NAME)).thenReturn(configMap);
+    when(resolverSetResult.get(OAUTH_AUTHORIZATION_CODE_GROUP_NAME)).thenReturn(mock(Map.class));
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-    when(muleConfiguration.getDefaultEncoding()).thenReturn("encoding");
-    when(grantType.getCredentialsPlacement()).thenReturn(CredentialsPlacement.BASIC_AUTH_HEADER);
+
 
     ConnectionProvider<Object> provider = builder.doBuild(resolverSetResult);
 
     assertThat(provider, is(notNullValue()));
-    assertThat(provider, isA(ClientCredentialsConnectionProviderWrapper.class));
+    assertThat(provider, isA(AuthorizationCodeConnectionProviderWrapper.class));
   }
 
   @Test
   public void testBuild() throws Exception {
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
-
-    Map<String, String> expectedParams = new HashMap<>();
-    expectedParams.put("client_id", "testClientId");
-    expectedParams.put("client_secret", "testClientSecret");
-
-    when(resolverSet.resolve(valueResolvingContext)).thenReturn(resolverSetResult);
-    when(resolverSet.getResolvers()).thenReturn(Collections.singletonMap(OAUTH_CLIENT_CREDENTIALS_GROUP_NAME, valueResolver));
-
-    when(valueResolver.resolve(any())).thenReturn(expectedParams);
-
-    when(resolverSetResult.get(OAUTH_CLIENT_CREDENTIALS_GROUP_NAME)).thenReturn(expectedParams);
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleConfiguration.getDefaultEncoding()).thenReturn("encoding");
-    when(grantType.getCredentialsPlacement()).thenReturn(CredentialsPlacement.BASIC_AUTH_HEADER);
+    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+    when(resolverSet.resolve(valueResolvingContext)).thenReturn(resolverSetResult);
+    Map<String, Object> configMap = Map.of(LISTENER_CONFIG_PARAMETER_NAME, "", CALLBACK_PATH_PARAMETER_NAME, "path",
+                                           LOCAL_AUTHORIZE_PATH_PARAMETER_NAME, "path", EXTERNAL_CALLBACK_URL_PARAMETER_NAME, "");
+    when(valueResolver.resolve(any())).thenReturn(configMap);
+    when(resolverSet.getResolvers())
+        .thenReturn(Map.of(OAUTH_AUTHORIZATION_CODE_GROUP_NAME, valueResolver, OAUTH_CALLBACK_GROUP_NAME, valueResolver));
+
 
     Pair<ConnectionProvider<Object>, ResolverSetResult> result = builder.build(valueResolvingContext);
 
     assertThat(result, is(notNullValue()));
     assertThat(result.getFirst(), is(notNullValue()));
-    assertThat(result.getFirst(), isA(ClientCredentialsConnectionProviderWrapper.class));
+    assertThat(result.getFirst(), isA(AuthorizationCodeConnectionProviderWrapper.class));
     assertThat(result.getSecond(), is(resolverSetResult));
   }
 
   class TestConnectionProvider implements ConnectionProvider {
 
-    ClientCredentialsState clientCredentialsState;
+    AuthorizationCodeState authorizationCodeState;
 
     @Override
     public Object connect() throws ConnectionException {
@@ -180,4 +173,3 @@ public class ClientCredentialsConnectionProviderObjectBuilderTest {
     }
   }
 }
-
