@@ -4,12 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.dsl.model.internal.config;
+package org.mule.runtime.config.internal.model.dsl.properties;
 
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_YAML_STORY;
-
-import static java.lang.Thread.currentThread;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
@@ -17,26 +15,21 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
-import org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ResourceProvider;
 import org.mule.runtime.properties.internal.ConfigurationPropertiesException;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import org.yaml.snakeyaml.parser.ParserException;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.yaml.snakeyaml.parser.ParserException;
 
 @Feature(CONFIGURATION_PROPERTIES)
 @Story(COMPONENT_CONFIGURATION_YAML_STORY)
-public class YamlConfigurationPropertiesComponentTestCase extends AbstractMuleTestCase {
+public class YamlConfigurationPropertiesComponentTestCase {
 
   @Rule
   public ExpectedException expectedException = none();
@@ -46,7 +39,7 @@ public class YamlConfigurationPropertiesComponentTestCase extends AbstractMuleTe
 
   @Before
   public void setUp() {
-    externalResourceProvider = new ClassLoaderResourceProvider(currentThread().getContextClassLoader());
+    externalResourceProvider = uri -> this.getClass().getClassLoader().getResourceAsStream(uri);
   }
 
   @Description("Validates the values obtained for the different types in the properties")
