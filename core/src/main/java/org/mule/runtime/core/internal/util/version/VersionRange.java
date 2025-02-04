@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.vdurmont.semver4j.Semver;
+import com.vdurmont.semver4j.Semver.SemverType;
+
+import org.apache.commons.lang3.StringUtils;
+
 public class VersionRange {
 
   public static final String VERSION_RANGE = "([\\[(])([^,\\[\\]()]*),([^,\\[\\]()]*)([\\])])";
@@ -31,7 +36,7 @@ public class VersionRange {
       throw new IllegalArgumentException("Version range doesn't match pattern: " + VALID_VERSION_RANGES.pattern());
     }
 
-    List<VersionRange> versions = new ArrayList<VersionRange>();
+    List<VersionRange> versions = new ArrayList<>();
 
     Matcher m = VERSION_RANGES.matcher(versionsString);
     while (m.find()) {
@@ -75,6 +80,32 @@ public class VersionRange {
 
   public boolean isUpperBoundInclusive() {
     return isUpperBoundInclusive;
+  }
+
+  public boolean contains(String version) {
+    Semver current = new Semver(version, SemverType.LOOSE);
+
+    final boolean minWithin;
+    if (StringUtils.isBlank(getLowerVersion())) {
+      minWithin = true;
+    } else {
+      final Semver minMuleVersion = new Semver(getLowerVersion(), SemverType.LOOSE);
+      minWithin = isLowerBoundInclusive()
+          ? minMuleVersion.isLowerThanOrEqualTo(current)
+          : minMuleVersion.isLowerThan(current);
+    }
+
+    final boolean maxWithin;
+    if (StringUtils.isBlank(getUpperVersion())) {
+      maxWithin = true;
+    } else {
+      final Semver maxMuleVersion = new Semver(getUpperVersion(), SemverType.LOOSE);
+      maxWithin = isUpperBoundInclusive()
+          ? maxMuleVersion.isGreaterThanOrEqualTo(current)
+          : maxMuleVersion.isGreaterThan(current);
+    }
+
+    return minWithin && maxWithin;
   }
 
   @Override
