@@ -85,7 +85,8 @@ public class AuthorizationCodeConnectionProviderWrapperTestCase {
     when(oauthHandler.getOAuthContext(any())).thenReturn(Optional.ofNullable(mock(ResourceOwnerOAuthContext.class)));
     ReconnectionConfig reconnectionConfig = mock(ReconnectionConfig.class);
     this.wrapper =
-        new AuthorizationCodeConnectionProviderWrapperTestCase.TestAuthorizationCodeConnectionProviderWrapper(delegate, oauthConfig,
+        new AuthorizationCodeConnectionProviderWrapperTestCase.TestAuthorizationCodeConnectionProviderWrapper(delegate,
+                                                                                                              oauthConfig,
                                                                                                               callbackValues,
                                                                                                               oauthHandler,
                                                                                                               reconnectionConfig);
