@@ -104,7 +104,6 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
    *
    * @param methodInvoker The {@link MethodInvoker} to use
    * @return a new application specific proxy
-   * @throws ContractClassUnavailableException
    */
   public Service forApplication(MethodInvoker methodInvoker) {
     return proxy(assembly, new LazyServiceProxyApplicationDecorator(assembly, serviceRegistry, service, methodInvoker));
