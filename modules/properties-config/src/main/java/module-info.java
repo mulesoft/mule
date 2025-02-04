@@ -20,6 +20,8 @@ module org.mule.runtime.properties.config {
   requires org.mule.runtime.core;
 
   requires com.google.common;
+  requires org.yaml.snakeyaml;
+  requires org.vibur.objectpool;
 
   // QName used to process annotations from Mule DSL
   requires java.xml;
@@ -49,5 +51,7 @@ module org.mule.runtime.properties.config {
 
   opens org.mule.runtime.config.internal.model.dsl.config to
       spring.core;
+  exports org.mule.runtime.config.internal.model.dsl.properties to
+      org.mule.runtime.spring.config;
 
 }

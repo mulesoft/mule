@@ -26,6 +26,11 @@
             <artifactId>mule-properties-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-properties-config</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

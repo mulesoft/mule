@@ -15,7 +15,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
-import org.mule.runtime.properties.api.DefaultConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.function.UnaryOperator;
