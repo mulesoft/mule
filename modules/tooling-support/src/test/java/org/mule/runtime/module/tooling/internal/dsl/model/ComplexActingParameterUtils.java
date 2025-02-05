@@ -4,7 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.dsl.model;
+package org.mule.runtime.module.tooling.internal.dsl.model;
+
+import static org.mule.runtime.module.tooling.internal.dsl.model.DeclarationUtils.modifyParameter;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -13,10 +15,13 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.config.dsl.model.ComplexActingParameter;
+import org.mule.runtime.config.dsl.model.InnerPojo;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -80,7 +85,9 @@ public class ComplexActingParameterUtils {
    * {@link ComplexActingParameter}. Then it changes every field of the {@link ComplexActingParameter} and executes the consumer
    * for each new value.
    */
-  static void forAllComplexActingParameterChanges(String componentLocation,
+  static void forAllComplexActingParameterChanges(
+                                                  ArtifactDeclaration app,
+                                                  String componentLocation,
                                                   String complexActingParameterName,
                                                   CheckedConsumer<ComplexActingParameter> newValueConsumer) {
 
@@ -100,34 +107,61 @@ public class ComplexActingParameterUtils {
                                                                                        defaultComplexList,
                                                                                        defaultComplexMap);
 
-    newValueConsumer.accept(originalComplexActingParameter);
-    newValueConsumer.accept(originalComplexActingParameter.copy().setIntParam(1));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setStringParam("one"));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setListParam(asList("one", "two", "four")));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setMapParam(ImmutableMap.of("2", "two",
-                                                                                              "3", "three")));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter);
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setIntParam(1));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setStringParam("one"));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setListParam(asList("one", "two", "four")));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setMapParam(
+                                                                       ImmutableMap.of("2", "two",
+                                                                                       "3", "three")));
 
     InnerPojo innerPojoChangedInt = new InnerPojo(1, defaultString, defaultList, defaultMap);
     InnerPojo innerPojoChangedString = new InnerPojo(defaultInt, "one", defaultList, defaultMap);
     InnerPojo innerPojoChangedList = new InnerPojo(defaultInt, defaultString, asList("one", "two", "four"), defaultMap);
-    InnerPojo innerPojoChangedMap = new InnerPojo(defaultInt, defaultString, defaultList, ImmutableMap.of("0", "two",
-                                                                                                          "1", "three"));
+    InnerPojo innerPojoChangedMap =
+        new InnerPojo(defaultInt, defaultString, defaultList, ImmutableMap.of("0", "two", "1", "three"));
 
-    newValueConsumer.accept(originalComplexActingParameter.copy().setInnerPojoParam(innerPojoChangedInt));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setInnerPojoParam(innerPojoChangedString));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setInnerPojoParam(innerPojoChangedList));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setInnerPojoParam(innerPojoChangedMap));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setInnerPojoParam(innerPojoChangedInt));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setInnerPojoParam(innerPojoChangedString));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setInnerPojoParam(innerPojoChangedList));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setInnerPojoParam(innerPojoChangedMap));
 
-    newValueConsumer.accept(originalComplexActingParameter.copy().setComplexListParam(singletonList(innerPojoChangedInt)));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setComplexListParam(singletonList(innerPojoChangedString)));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setComplexListParam(singletonList(innerPojoChangedList)));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setComplexListParam(singletonList(innerPojoChangedMap)));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setComplexListParam(singletonList(innerPojoChangedInt)));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setComplexListParam(singletonList(innerPojoChangedString)));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setComplexListParam(singletonList(innerPojoChangedList)));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setComplexListParam(singletonList(innerPojoChangedMap)));
 
-    newValueConsumer.accept(originalComplexActingParameter.copy().setComplexMapParam(ImmutableMap.of("0", innerPojoChangedInt)));
-    newValueConsumer
-        .accept(originalComplexActingParameter.copy().setComplexMapParam(ImmutableMap.of("0", innerPojoChangedString)));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setComplexMapParam(ImmutableMap.of("0", innerPojoChangedList)));
-    newValueConsumer.accept(originalComplexActingParameter.copy().setComplexMapParam(ImmutableMap.of("0", innerPojoChangedMap)));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setComplexMapParam(ImmutableMap.of("0", innerPojoChangedInt)));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setComplexMapParam(ImmutableMap.of("0", innerPojoChangedString)));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setComplexMapParam(ImmutableMap.of("0", innerPojoChangedList)));
+    modifyAndConsume(app, componentLocation, complexActingParameterName, newValueConsumer,
+                     originalComplexActingParameter.copy().setComplexMapParam(ImmutableMap.of("0", innerPojoChangedMap)));
+  }
+
+  private static void modifyAndConsume(ArtifactDeclaration app,
+                                       String componentLocation,
+                                       String complexActingParameterName,
+                                       Consumer<ComplexActingParameter> newValueConsumer,
+                                       ComplexActingParameter complexActingParameter) {
+    modifyParameter(app, componentLocation, complexActingParameterName,
+                    p -> p.setValue(declareComplexActingParameter(complexActingParameter)));
+    newValueConsumer.accept(complexActingParameter);
   }
 
   private static ParameterValue declareInnerPojo(InnerPojo innerPojo) {
