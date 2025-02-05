@@ -46,17 +46,18 @@ public final class RoutingResult {
   }
 
   public static RoutingResult routingResultWithException(Map<String, Message> successfulRoutesResultMap,
-                                                         Map<String, Pair<Error, EventProcessingException>> errorMap) {
+                                                         Map<String, Pair<Error, EventProcessingException>> failedRoutesErrorWithExceptionMap) {
     RoutingResult routingResult = new RoutingResult(successfulRoutesResultMap, emptyMap());
-    Map<String, Pair<Error, MuleException>> failedRoutesErrorWithExceptionMap = errorMap.entrySet().stream()
-        .collect(Collectors
-            .toMap(Entry::getKey,
-                   pair -> new Pair<>(pair.getValue().getFirst(), getRootMuleException(pair.getValue().getSecond()))));
-    routingResult.setFailedRoutesErrorWithExceptionMap(failedRoutesErrorWithExceptionMap);
+    Map<String, Pair<Error, MuleException>> failedRoutesErrorWithMuleExceptionMap =
+        failedRoutesErrorWithExceptionMap.entrySet().stream()
+            .collect(Collectors
+                .toMap(Entry::getKey,
+                       pair -> new Pair<>(pair.getValue().getFirst(), getRootMuleException(pair.getValue().getSecond()))));
+    routingResult.setFailedRoutesErrorWithMuleExceptionMap(failedRoutesErrorWithMuleExceptionMap);
     return routingResult;
   }
 
-  private void setFailedRoutesErrorWithExceptionMap(Map<String, Pair<Error, MuleException>> failedRoutesErrorWithExceptionMap) {
+  private void setFailedRoutesErrorWithMuleExceptionMap(Map<String, Pair<Error, MuleException>> failedRoutesErrorWithExceptionMap) {
     this.failedRoutesErrorWithExceptionMap = failedRoutesErrorWithExceptionMap;
   }
 
