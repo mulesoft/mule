@@ -30,7 +30,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-public class AuthorizationCodeConnectionProviderWrapperTest {
+public class AuthorizationCodeConnectionProviderWrapperTestCase {
 
   private AuthorizationCodeOAuthHandler oauthHandler;
   private AuthorizationCodeGrantType type;
@@ -85,10 +85,11 @@ public class AuthorizationCodeConnectionProviderWrapperTest {
     when(oauthHandler.getOAuthContext(any())).thenReturn(Optional.ofNullable(mock(ResourceOwnerOAuthContext.class)));
     ReconnectionConfig reconnectionConfig = mock(ReconnectionConfig.class);
     this.wrapper =
-        new AuthorizationCodeConnectionProviderWrapperTest.TestAuthorizationCodeConnectionProviderWrapper(delegate, oauthConfig,
-                                                                                                          callbackValues,
-                                                                                                          oauthHandler,
-                                                                                                          reconnectionConfig);
+        new AuthorizationCodeConnectionProviderWrapperTestCase.TestAuthorizationCodeConnectionProviderWrapper(delegate,
+                                                                                                              oauthConfig,
+                                                                                                              callbackValues,
+                                                                                                              oauthHandler,
+                                                                                                              reconnectionConfig);
   }
 
   private class TestAuthorizationCodeConnectionProviderWrapper extends AuthorizationCodeConnectionProviderWrapper {

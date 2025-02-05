@@ -10,6 +10,8 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
@@ -108,40 +110,33 @@ public class LazyServiceAssembly implements ServiceAssembly {
     @Override
     public ServiceAssembly build() throws ServiceResolutionError {
       try {
-        return new LazyServiceAssembly(name, artifactClassLoader, serviceProviderSupplier, resolveContract());
+        return new LazyServiceAssembly(name, artifactClassLoader, serviceProviderSupplier, contractClassName);
       } catch (Exception e) {
         throw new ServiceResolutionError("Could not load service " + name, e);
       }
     }
 
-    private Class<? extends Service> resolveContract() {
-      try {
-        return loadClass(contractClassName, FileSystemServiceProviderDiscoverer.class);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
-    }
   }
 
 
   private final String name;
   private final LazyValue<ClassLoader> classLoader;
   private final LazyValue<ServiceProvider> serviceProvider;
-  private final Class<? extends Service> serviceContract;
+  private final String contractClassName;
 
   private LazyServiceAssembly(String name,
                               Supplier<ClassLoader> classLoader,
                               Supplier<ServiceProvider> serviceProvider,
-                              Class<? extends Service> satisfiedContract) {
+                              String contractClassName) {
     checkArgument(!isBlank(name), "name cannot be blank");
-    checkArgument(classLoader != null, "Classloader cannot be null");
-    checkArgument(serviceProvider != null, "ServiceProvider supplier cannot be null");
-    checkArgument(satisfiedContract != null, "satisfied contract cannot be null");
+    requireNonNull(classLoader, "Classloader cannot be null");
+    requireNonNull(serviceProvider, "ServiceProvider supplier cannot be null");
+    requireNonNull(contractClassName, "satisfied contract cannot be null");
 
     this.name = name;
     this.classLoader = lazy(classLoader);
     this.serviceProvider = lazy(serviceProvider);
-    this.serviceContract = satisfiedContract;
+    this.contractClassName = contractClassName;
   }
 
   @Override
@@ -161,7 +156,15 @@ public class LazyServiceAssembly implements ServiceAssembly {
 
   @Override
   public Class<? extends Service> getServiceContract() {
-    return serviceContract;
+    return resolveContract();
+  }
+
+  private Class<? extends Service> resolveContract() {
+    try {
+      return loadClass(contractClassName, FileSystemServiceProviderDiscoverer.class);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private <T> LazyValue<T> lazy(Supplier<T> supplier) {

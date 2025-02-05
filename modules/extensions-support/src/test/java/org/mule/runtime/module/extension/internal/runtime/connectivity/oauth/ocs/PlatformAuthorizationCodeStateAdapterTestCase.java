@@ -24,7 +24,7 @@ import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.oauth.api.PlatformManagedConnectionDescriptor;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
 
-public class PlatformAuthorizationCodeStateAdapterTest {
+public class PlatformAuthorizationCodeStateAdapterTestCase {
 
   @Mock
   private PlatformManagedOAuthDancer dancer;
