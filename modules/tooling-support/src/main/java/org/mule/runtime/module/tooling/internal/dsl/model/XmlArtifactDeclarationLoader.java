@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model;
+package org.mule.runtime.module.tooling.internal.dsl.model;
 
 import static java.lang.Class.forName;
 import static java.lang.System.getProperty;
@@ -13,7 +13,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.config.internal.dsl.declaration.AstXmlArtifactDeclarationLoader;
+import org.mule.runtime.module.tooling.internal.dsl.declaration.AstXmlArtifactDeclarationLoader;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;

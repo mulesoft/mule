@@ -4,10 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model;
+package org.mule.runtime.module.tooling.internal.dsl.model;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.config.internal.dsl.model.DefaultXmlDslElementModelConverter;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import org.w3c.dom.Document;

@@ -15,11 +15,13 @@ module org.mule.runtime.tooling.support {
   requires org.mule.runtime.api;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
+  requires org.mule.runtime.artifact.ast.xmlParser;
   requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.container;
   requires org.mule.runtime.core;
   requires org.mule.runtime.deployment.model;
   requires org.mule.runtime.deployment.model.impl;
+  requires org.mule.runtime.extension.model;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.extensions.support;
   requires org.mule.runtime.global.config;
@@ -30,6 +32,7 @@ module org.mule.runtime.tooling.support {
   requires org.mule.runtime.metadata.model.api;
   requires org.mule.runtime.metadata.model.java;
   requires org.mule.runtime.metadata.support;
+  requires org.mule.runtime.properties.config;
   requires org.mule.runtime.repository;
   requires org.mule.runtime.spring.config;
   requires org.mule.sdk.api;
@@ -48,5 +51,10 @@ module org.mule.runtime.tooling.support {
 
   opens org.mule.runtime.module.tooling.internal.config to
       spring.core;
+
+  provides org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer
+      with org.mule.runtime.module.tooling.internal.dsl.model.DefaultArtifactDeclarationXmlSerializer;
+  provides org.mule.runtime.config.api.dsl.model.DslElementModelFactory
+      with org.mule.runtime.module.tooling.internal.dsl.model.DefaultDslElementModelFactory;
 
 }

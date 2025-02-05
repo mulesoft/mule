@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.model;
+package org.mule.runtime.module.tooling.internal.dsl.model;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -25,7 +25,6 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -58,9 +57,10 @@ public class DefaultArtifactDeclarationXmlSerializer implements ArtifactDeclarat
   private static final String XSI_W3_URL = "http://www.w3.org/2001/XMLSchema-instance";
   private static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation";
   private static final String XMLNS = "xmlns";
-  private final DslResolvingContext context;
+  private DslResolvingContext context;
 
-  public DefaultArtifactDeclarationXmlSerializer(DslResolvingContext context) {
+  @Override
+  public void setContext(DslResolvingContext context) {
     this.context = context;
   }
 

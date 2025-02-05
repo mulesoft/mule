@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.declaration;
+package org.mule.runtime.module.tooling.internal.dsl.declaration;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.Component.NS_MULE_DOCUMENTATION;
@@ -96,10 +96,10 @@ import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.XmlArtifactDeclarationLoader;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.module.tooling.internal.dsl.model.XmlArtifactDeclarationLoader;
 
 import java.io.InputStream;
 import java.util.ArrayList;

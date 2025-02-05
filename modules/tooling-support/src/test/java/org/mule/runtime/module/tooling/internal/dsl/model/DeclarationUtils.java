@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.dsl.model;
+package org.mule.runtime.module.tooling.internal.dsl.model;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;

@@ -18,6 +18,8 @@
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
             --add-modules=net.bytebuddy.agent
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.value.cache=org.mule.runtime.tooling.support
+            --add-exports=org.mule.runtime.metadata.support/org.mule.runtime.metadata.internal=org.mule.runtime.tooling.support
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
@@ -29,6 +31,24 @@
     </properties>
 
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.value.cache=org.mule.runtime.tooling.support</arg>
+                                <arg>--add-exports=org.mule.runtime.metadata.support/org.mule.runtime.metadata.internal=org.mule.runtime.tooling.support</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <profiles>
         <profile>
             <id>no-large-tests</id>
@@ -99,6 +119,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

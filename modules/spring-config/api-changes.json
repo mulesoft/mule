@@ -1,4 +1,30 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory",
+            "justification": "W-17774312: Move ArtifactDeclaration uses from spring-config to tooling-support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+            "justification": "W-17774312: Move ArtifactDeclaration uses from spring-config to tooling-support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter",
+            "justification": "W-17774312: Move ArtifactDeclaration uses from spring-config to tooling-support"
+          }
+        ]
+      }
+    }
+  },
   "4.7.0": {
     "revapi": {
       "differences": {

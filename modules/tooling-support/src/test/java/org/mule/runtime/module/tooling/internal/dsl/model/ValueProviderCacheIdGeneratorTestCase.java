@@ -6,18 +6,20 @@
  */
 package org.mule.runtime.module.tooling.internal.dsl.model;
 
+import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
+import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
+import static org.mule.runtime.module.tooling.internal.dsl.model.ComplexActingParameterUtils.forAllComplexActingParameterChanges;
+import static org.mule.runtime.module.tooling.internal.dsl.model.DeclarationUtils.modifyParameter;
+import static org.mule.runtime.module.tooling.internal.dsl.model.DeclarationUtils.removeParameter;
+
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
-import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
-import static org.mule.runtime.config.dsl.model.ComplexActingParameterUtils.forAllComplexActingParameterChanges;
-import static org.mule.runtime.config.dsl.model.DeclarationUtils.modifyParameter;
-import static org.mule.runtime.config.dsl.model.DeclarationUtils.removeParameter;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.parameter.ActingParameterModel;
@@ -33,14 +35,14 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.metadata.internal.cache.ComponentAstBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.ComponentBasedValueProviderCacheIdGenerator;
 import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.metadata.internal.cache.DslElementBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
+import org.mule.runtime.metadata.internal.cache.ComponentAstBasedValueProviderCacheIdGenerator;
+import org.mule.runtime.metadata.internal.cache.DslElementBasedValueProviderCacheIdGenerator;
 
 import java.util.HashMap;
 import java.util.LinkedList;
