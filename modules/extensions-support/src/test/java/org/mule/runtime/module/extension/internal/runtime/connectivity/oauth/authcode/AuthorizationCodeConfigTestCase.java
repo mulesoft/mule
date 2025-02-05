@@ -21,7 +21,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AuthorizationCodeConfigTest {
+public class AuthorizationCodeConfigTestCase {
 
   private static final String OWNER_CONFIG_NAME = "ownerConfig";
   private static final String CONSUMER_KEY = "consumerKey";

@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 
 import org.junit.Test;
 
-public class OAuthCallbackConfigTest {
+public class OAuthCallbackConfigTestCase {
 
   private OAuthCallbackConfig oAuthConfig;
 

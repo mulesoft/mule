@@ -24,7 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class PlatformClientCredentialsOAuthStateAdapterTest {
+public class PlatformClientCredentialsOAuthStateAdapterTestCase {
 
   @Mock
   private PlatformManagedOAuthDancer dancer;
