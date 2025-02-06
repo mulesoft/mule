@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.service.internal.discoverer;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.core.api.Injector;
@@ -16,6 +19,8 @@ import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+
+import org.slf4j.Logger;
 
 /**
  * Resolves {@link Service} instances given a set of {@link ServiceProvider} instances.
@@ -29,6 +34,8 @@ import java.util.function.BiFunction;
  * In case of a missing dependency, the resolution will fail and the container should not start.
  */
 public class ReflectionServiceResolver implements ServiceResolver {
+
+  private static final Logger LOGGER = getLogger(ReflectionServiceResolver.class);
 
   private final ServiceRegistry serviceRegistry;
   private final Injector containerInjector;
@@ -46,11 +53,22 @@ public class ReflectionServiceResolver implements ServiceResolver {
   public List<Service> resolveServices(List<ServiceAssembly> assemblies) {
     List<Service> services = new ArrayList<>(assemblies.size());
     for (ServiceAssembly assembly : assemblies) {
-      Service service = serviceWrapper.apply(LazyServiceProxy.from(assembly, serviceRegistry, containerInjector),
-                                             assembly);
+      try {
+        Service service = serviceWrapper.apply(LazyServiceProxy.from(assembly, serviceRegistry, containerInjector),
+                                               assembly);
 
-      serviceRegistry.register(service, assembly.getServiceContract());
-      services.add(service);
+        serviceRegistry.register(service, assembly.getServiceContract());
+        services.add(service);
+      } catch (MuleRuntimeException e) {
+        if (e.getCause() instanceof ClassNotFoundException) {
+          // Do not halt startup for this,
+          // Let it fail when the contract api is used by a deployed app
+          LOGGER.debug("Contract class not available for service {}", assembly.getName());
+          LOGGER.debug("Exception was:", e.getCause());
+        } else {
+          throw e;
+        }
+      }
     }
 
     return services;

@@ -32,18 +32,14 @@ import org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.ArtifactEncoding;
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.event.InternalEvent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.http.api.HttpConstants;
 import org.mule.runtime.http.api.HttpService;
@@ -69,7 +65,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class AuthorizationCodeOAuthHandlerTest {
+public class AuthorizationCodeOAuthHandlerTestCase {
 
   private static final String CALLBACK_IP = "0.0.0.0";
   private static final String CALLBACK_PATH = "/callback-path";

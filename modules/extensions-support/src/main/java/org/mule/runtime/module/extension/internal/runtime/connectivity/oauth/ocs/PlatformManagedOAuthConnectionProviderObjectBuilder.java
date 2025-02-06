@@ -86,7 +86,7 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
     return new Pair<>(provider, resolverSetResult);
   }
 
-  private Pair<ConnectionProviderModel, OAuthGrantType> getDelegateOAuthConnectionProviderModel(ConfigurationModel configurationModel) {
+  protected Pair<ConnectionProviderModel, OAuthGrantType> getDelegateOAuthConnectionProviderModel(ConfigurationModel configurationModel) {
     Reference<Pair<ConnectionProviderModel, OAuthGrantType>> authCodePair = new Reference<>();
     Reference<Pair<ConnectionProviderModel, OAuthGrantType>> clientCredentialsPair = new Reference<>();
 
