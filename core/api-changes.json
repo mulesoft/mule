@@ -5,6 +5,15 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.field.visibilityReduced",
+            "old": "field org.mule.runtime.core.api.retry.policy.ConnectNotifier.logger",
+            "new": "field org.mule.runtime.core.api.retry.policy.ConnectNotifier.logger",
+            "oldVisibility": "protected",
+            "newVisibility": "private",
+            "justification": "tests perf"
+          },
+          {
+            "ignore": true,
             "code": "java.class.removed",
             "old": "class org.mule.runtime.core.api.DefaultTransformationService",
             "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"

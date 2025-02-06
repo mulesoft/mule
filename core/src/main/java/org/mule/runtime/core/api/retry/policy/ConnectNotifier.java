@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class ConnectNotifier implements RetryNotifier {
 
-  protected transient final Logger logger = LoggerFactory.getLogger(ConnectNotifier.class);
+  private static final Logger logger = LoggerFactory.getLogger(ConnectNotifier.class);
 
   @Override
   public void onSuccess(RetryContext context) {
