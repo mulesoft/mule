@@ -926,6 +926,15 @@ public interface AllureConstants {
 
   }
 
+  interface FipsFeature {
+
+    String FIPS = "Fips";
+
+    interface Fips1403Story {
+
+      String FIPS_140_3_STORY = "Fips 140 3 Compliance";
+    }
+  }
   interface LicenseFeature {
 
     String LICENSE = "License";
