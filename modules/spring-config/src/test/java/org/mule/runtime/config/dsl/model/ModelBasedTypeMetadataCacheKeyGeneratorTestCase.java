@@ -9,8 +9,8 @@ package org.mule.runtime.config.dsl.model;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.forExtension;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
-import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_CACHE;
 
@@ -30,6 +30,9 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
+import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.metadata.api.cache.MetadataCacheId;
@@ -63,11 +66,11 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
 
   @Test
   public void operationsWithSameOutputType() throws Exception {
-    MetadataCacheId keyParts = getIdForComponentOutputMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentOutputMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
-
-    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, is(otherKeyParts));
@@ -76,11 +79,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithDifferentOutputTypeResolvers() throws Exception {
     mockTypeResolversInformationModelPropertyWithOutputType(operation, "category", "resolverName");
-    MetadataCacheId keyParts = getIdForComponentOutputMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentOutputMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockTypeResolversInformationModelPropertyWithOutputType(anotherOperation, "category", "anotherResolverName");
-    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -89,11 +93,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithOutputStaticTypeAgainstDynamicType() throws Exception {
     mockTypeResolversInformationModelPropertyWithOutputType(operation, "category", "resolverName");
-    MetadataCacheId keyParts = getIdForComponentOutputMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentOutputMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     removeTypeResolversInformationModelPropertyfromMock(anotherOperation);
-    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -102,11 +107,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithDifferentOutputResolversCategory() throws Exception {
     mockTypeResolversInformationModelPropertyWithOutputType(operation, "category", "resolverName");
-    MetadataCacheId keyParts = getIdForComponentOutputMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentOutputMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockTypeResolversInformationModelPropertyWithOutputType(anotherOperation, "anotherCategory", "resolverName");
-    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -114,11 +120,11 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
 
   @Test
   public void operationsWithSameAttributesType() throws Exception {
-    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
-
-    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, is(otherKeyParts));
@@ -127,11 +133,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithDifferentAttributesTypeResolvers() throws Exception {
     mockTypeResolversInformationModelPropertyWithAttributeType(operation, "category", "resolverName");
-    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockTypeResolversInformationModelPropertyWithAttributeType(anotherOperation, "category", "anotherResolverName");
-    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -140,11 +147,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithAttributeStaticTypeAgainstDynamicType() throws Exception {
     removeTypeResolversInformationModelPropertyfromMock(operation);
-    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockTypeResolversInformationModelPropertyWithAttributeType(anotherOperation, "category", "anotherResolverName");
-    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -153,11 +161,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithDifferentAttributesResolversCategory() throws Exception {
     mockTypeResolversInformationModelPropertyWithAttributeType(operation, "category", "resolverName");
-    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockTypeResolversInformationModelPropertyWithAttributeType(anotherOperation, "anotherCategory", "resolverName");
-    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -168,7 +177,8 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     Map<String, String> parameterResolversNames = new HashMap<>();
     parameterResolversNames.put(CONTENT_NAME, CONTENT_NAME);
     mockTypeResolversInformationModelPropertyWithInputTypes(operation, "category", parameterResolversNames);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
     LOGGER.debug(keyParts.toString());
 
     assertThat(keyParts.getParts(), hasSize(6));
@@ -181,7 +191,8 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsOutputHashIdStructure() throws Exception {
     mockTypeResolversInformationModelPropertyWithOutputType(operation, "category", "outputResolverName");
-    MetadataCacheId keyParts = getIdForComponentOutputMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentOutputMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     assertThat(keyParts.getParts(), hasSize(6));
@@ -194,7 +205,8 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsOutputAttributesHashIdStructure() throws Exception {
     mockTypeResolversInformationModelPropertyWithAttributeType(operation, "category", "outputAttributesResolverName");
-    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     assertThat(keyParts.getParts(), hasSize(6));
@@ -210,14 +222,17 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     parameterResolversNames.put(LIST_NAME, LIST_NAME);
     parameterResolversNames.put(CONTENT_NAME, CONTENT_NAME);
     mockTypeResolversInformationModelPropertyWithInputTypes(operation, "category", parameterResolversNames);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, LIST_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(keyParts.toString());
 
     Map<String, String> anotherParameterResolversNames = new HashMap<>();
     anotherParameterResolversNames.put(LIST_NAME, LIST_NAME);
     anotherParameterResolversNames.put(ANOTHER_CONTENT_NAME, CONTENT_NAME);
     mockTypeResolversInformationModelPropertyWithInputTypes(anotherOperation, "category", anotherParameterResolversNames);
-    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION, LIST_NAME);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentInputMetadata(loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase"),
+                                       getBaseApp(), ANOTHER_OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, is(otherKeyParts));
@@ -230,7 +245,9 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     parameterResolversNames.put(CONTENT_NAME, CONTENT_NAME);
 
     mockTypeResolversInformationModelPropertyWithInputTypes(operation, "category", parameterResolversNames);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(),
+                                                              OPERATION_LOCATION, CONTENT_NAME);
     LOGGER.debug(keyParts.toString());
 
     Map<String, String> anotherParameterResolversNames = new HashMap<>();
@@ -238,7 +255,8 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     parameterResolversNames.put(ANOTHER_CONTENT_NAME, "changed");
     mockTypeResolversInformationModelPropertyWithInputTypes(anotherOperation, "category", anotherParameterResolversNames);
     MetadataCacheId otherKeyParts =
-        getIdForComponentInputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION, ANOTHER_CONTENT_NAME);
+        getIdForComponentInputMetadata(loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase"), getBaseApp(),
+                                       ANOTHER_OPERATION_LOCATION, ANOTHER_CONTENT_NAME);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -251,12 +269,14 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     parameterResolversNames.put(CONTENT_NAME, CONTENT_NAME);
 
     mockTypeResolversInformationModelPropertyWithInputTypes(operation, "category", parameterResolversNames);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(),
+                                                              OPERATION_LOCATION, CONTENT_NAME);
     LOGGER.debug(keyParts.toString());
 
     removeTypeResolversInformationModelPropertyfromMock(anotherOperation);
     MetadataCacheId otherKeyParts =
-        getIdForComponentInputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION, ANOTHER_CONTENT_NAME);
+        getIdForComponentInputMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION, ANOTHER_CONTENT_NAME);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -269,11 +289,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     parameterResolversNames.put(CONTENT_NAME, CONTENT_NAME);
 
     mockTypeResolversInformationModelPropertyWithInputTypes(operation, "category", parameterResolversNames);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, LIST_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(keyParts.toString());
 
     mockTypeResolversInformationModelPropertyWithInputTypes(anotherOperation, "anotherCategory", parameterResolversNames);
-    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION, LIST_NAME);
+    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -282,11 +303,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithDifferentStaticOutputTypes() throws Exception {
     removeTypeResolversInformationModelPropertyfromMock(operation);
-    MetadataCacheId keyParts = getIdForComponentOutputMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentOutputMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     removeTypeResolversInformationModelPropertyfromMock(anotherOperation);
-    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentOutputMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -295,11 +317,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithDifferentStaticAttributeTypes() throws Exception {
     removeTypeResolversInformationModelPropertyfromMock(operation);
-    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     removeTypeResolversInformationModelPropertyfromMock(anotherOperation);
-    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -308,11 +331,12 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationsWithDifferentStaticInputTypes() throws Exception {
     removeTypeResolversInformationModelPropertyfromMock(operation);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, LIST_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(keyParts.toString());
 
     removeTypeResolversInformationModelPropertyfromMock(anotherOperation);
-    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION, LIST_NAME);
+    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -321,10 +345,11 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationWithStaticOutputAndInputTypes() throws Exception {
     removeTypeResolversInformationModelPropertyfromMock(operation);
-    MetadataCacheId keyParts = getIdForComponentOutputMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentOutputMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
-    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(getBaseApp(), ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForComponentAttributesMetadata(app, getBaseApp(), ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -333,10 +358,11 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
   @Test
   public void operationWithStaticInputTypes() throws Exception {
     removeTypeResolversInformationModelPropertyfromMock(operation);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, LIST_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(keyParts.toString());
 
-    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
+    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -348,10 +374,11 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     parameterResolversNames.put(LIST_NAME, LIST_NAME);
     parameterResolversNames.put(CONTENT_NAME, LIST_NAME);
     mockTypeResolversInformationModelPropertyWithInputTypes(operation, "category", parameterResolversNames);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, LIST_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(keyParts.toString());
 
-    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
+    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, is(otherKeyParts));
@@ -363,10 +390,11 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     parameterResolversNames.put(LIST_NAME, LIST_NAME);
     parameterResolversNames.put(CONTENT_NAME, CONTENT_NAME);
     mockTypeResolversInformationModelPropertyWithInputTypes(operation, "category", parameterResolversNames);
-    MetadataCacheId keyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, LIST_NAME);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId keyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(keyParts.toString());
 
-    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
+    MetadataCacheId otherKeyParts = getIdForComponentInputMetadata(app, getBaseApp(), OPERATION_LOCATION, CONTENT_NAME);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -447,16 +475,19 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
     final String extensionOperationLocation = OPERATION_LOCATION;
     final String newExtensionOperationLocation = newFlowName + "/processors/0";
 
-    MetadataCacheId oldHash = getIdForComponentOutputMetadata(baseApp, extensionOperationLocation);
-    MetadataCacheId newHash = getIdForComponentOutputMetadata(app, newExtensionOperationLocation);
+    final var ast = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    final var modifiedAst = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase_2");
+
+    MetadataCacheId oldHash = getIdForComponentOutputMetadata(ast, baseApp, extensionOperationLocation);
+    MetadataCacheId newHash = getIdForComponentOutputMetadata(modifiedAst, app, newExtensionOperationLocation);
 
     assertThat(oldHash, is(not(newHash)));
 
     // Without config reference
     final String configlessProcessorLocation = CONFIGLESS_FLOW + "/processors/0";
 
-    oldHash = getIdForComponentOutputMetadata(baseApp, configlessProcessorLocation);
-    newHash = getIdForComponentOutputMetadata(app, configlessProcessorLocation);
+    oldHash = getIdForComponentOutputMetadata(ast, baseApp, configlessProcessorLocation);
+    newHash = getIdForComponentOutputMetadata(modifiedAst, app, configlessProcessorLocation);
 
     assertThat(oldHash, is(not(newHash)));
   }
@@ -475,29 +506,44 @@ public class ModelBasedTypeMetadataCacheKeyGeneratorTestCase extends AbstractMet
                                               parameterResolversNames, "anotherOperationKeysResolver");
 
     ArtifactDeclaration baseApp = getBaseApp();
-    MetadataCacheId operationOutputMetadataCacheId = getIdForComponentOutputMetadata(baseApp, OPERATION_LOCATION);
+    final var app = loadApplicationModel("ModelBasedTypeMetadataCacheKeyGeneratorTestCase");
+    MetadataCacheId operationOutputMetadataCacheId = getIdForComponentOutputMetadata(app, baseApp, OPERATION_LOCATION);
     LOGGER.debug(operationOutputMetadataCacheId.toString());
 
-    MetadataCacheId operationListInputMetadataCacheId = getIdForComponentInputMetadata(baseApp, OPERATION_LOCATION, LIST_NAME);
+    MetadataCacheId operationListInputMetadataCacheId =
+        getIdForComponentInputMetadata(app, baseApp, OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(operationListInputMetadataCacheId.toString());
 
-    MetadataCacheId operationAttributesMetadataCacheId = getIdForComponentAttributesMetadata(baseApp, OPERATION_LOCATION);
+    MetadataCacheId operationAttributesMetadataCacheId =
+        getIdForComponentAttributesMetadata(app, baseApp, OPERATION_LOCATION);
     LOGGER.debug(operationAttributesMetadataCacheId.toString());
 
-    MetadataCacheId anotherOperationOutputMetadataCacheId = getIdForComponentOutputMetadata(baseApp, ANOTHER_OPERATION_LOCATION);
+    MetadataCacheId anotherOperationOutputMetadataCacheId =
+        getIdForComponentOutputMetadata(app, baseApp, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(anotherOperationOutputMetadataCacheId.toString());
 
     MetadataCacheId anotherOperationListInputMetadataCacheId =
-        getIdForComponentInputMetadata(baseApp, ANOTHER_OPERATION_LOCATION, LIST_NAME);
+        getIdForComponentInputMetadata(app, baseApp, ANOTHER_OPERATION_LOCATION, LIST_NAME);
     LOGGER.debug(anotherOperationListInputMetadataCacheId.toString());
 
     MetadataCacheId anotherOperationAttributesMetadataCacheId =
-        getIdForComponentAttributesMetadata(baseApp, ANOTHER_OPERATION_LOCATION);
+        getIdForComponentAttributesMetadata(app, baseApp, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(anotherOperationAttributesMetadataCacheId.toString());
 
     assertThat(operationOutputMetadataCacheId, is(anotherOperationOutputMetadataCacheId));
     assertThat(operationListInputMetadataCacheId, is(anotherOperationListInputMetadataCacheId));
     assertThat(operationAttributesMetadataCacheId, is(anotherOperationAttributesMetadataCacheId));
+  }
+
+  protected ArtifactAst loadApplicationModel(String astName) throws Exception {
+    ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
+    ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
+        .deserialize(this.getClass().getResourceAsStream("/asts/" + astName + ".ast"),
+                     name -> extensions.stream()
+                         .filter(x -> x.getName().equals(name))
+                         .findFirst()
+                         .orElse(null));
+    return deserializedArtifactAst;
   }
 
   private ArtifactDeclaration getBaseApp() {

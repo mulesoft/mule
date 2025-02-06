@@ -10,8 +10,8 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
-import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_CACHE;
 
@@ -60,6 +60,8 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
+import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
@@ -68,6 +70,7 @@ import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -118,14 +121,14 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   @Test
   public void idempotentHashCalculation() throws Exception {
     ArtifactDeclaration app = getBaseApp();
-    ArtifactAst applicationModel = loadApplicationModel(app);
+    ArtifactAst applicationModel = serializeAndDeserialize("idempotentHashCalculation_1.ast");
     Map<String, MetadataCacheId> hashByLocation = new HashMap<>();
 
     applicationModel.topLevelComponentsStream()
         .forEach(component -> {
           try {
             hashByLocation.put(component.getLocation().getLocation(),
-                               getIdForComponentMetadata(app, component.getLocation().getLocation()));
+                               getIdForComponentMetadata(applicationModel, app, component.getLocation().getLocation()));
           } catch (Exception e) {
             throw new RuntimeException(e);
           }
@@ -134,14 +137,15 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     LOGGER.debug(hashByLocation.toString());
 
     ArtifactDeclaration reloadedApp = getBaseApp();
-    ArtifactAst reload = loadApplicationModel(app);
+    ArtifactAst reload = serializeAndDeserialize("idempotentHashCalculation_2.ast");
 
     reload.topLevelComponentsStream()
         .forEach(component -> {
           try {
             String location = component.getLocation().getLocation();
             MetadataCacheId previousHash = hashByLocation.get(location);
-            assertThat(previousHash, is(getIdForComponentMetadata(reloadedApp, component.getLocation().getLocation())));
+            assertThat(previousHash, is(getIdForComponentMetadata(reload, reloadedApp,
+                                                                  component.getLocation().getLocation())));
           } catch (Exception e) {
             throw new RuntimeException(e);
           }
@@ -151,13 +155,16 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   @Test
   public void configurationParameterModifiesHash() throws Exception {
     ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId cacheId = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId cacheId = getIdForComponentMetadata(serializeAndDeserialize("configurationParameterModifiesGlobalHash_1.ast"),
+                                                        declaration, OPERATION_LOCATION);
     LOGGER.debug(cacheId.toString());
 
     ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0)).getParameterGroups().get(0)
         .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentMetadata(serializeAndDeserialize("configurationParameterModifiesGlobalHash_2.ast"), declaration,
+                                  OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(cacheId, not(otherKeyParts));
   }
@@ -165,13 +172,16 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   @Test
   public void configurationParameterModifiesGlobalHash() throws Exception {
     ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId cacheId = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId cacheId = getIdForGlobalMetadata(serializeAndDeserialize("configurationParameterModifiesGlobalHash_1.ast"),
+                                                     declaration, OPERATION_LOCATION);
     LOGGER.debug(cacheId.toString());
 
     ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0)).getParameterGroups().get(0)
         .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
 
-    MetadataCacheId otherKeyParts = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForGlobalMetadata(serializeAndDeserialize("configurationParameterModifiesGlobalHash_2.ast"), declaration,
+                               OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(cacheId, not(otherKeyParts));
   }
@@ -179,7 +189,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   @Test
   public void operationParameterDoesNotModifyHash() throws Exception {
     ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId keyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId keyParts = getIdForComponentMetadata(serializeAndDeserialize("operationParameterDoesNotModifyHash_1.ast"),
+                                                         declaration, OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
@@ -190,7 +201,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     operationDeclaration.getParameterGroups().get(0)
         .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentMetadata(serializeAndDeserialize("operationParameterDoesNotModifyHash_2.ast"), declaration,
+                                  OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(keyParts, is(otherKeyParts));
   }
@@ -198,7 +211,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   @Test
   public void operationParameterDoesNotModifyGlobal() throws Exception {
     ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId keyParts = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId keyParts = getIdForGlobalMetadata(serializeAndDeserialize("operationParameterDoesNotModifyGlobal_1.ast"),
+                                                      declaration, OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
@@ -208,14 +222,16 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     operationDeclaration.getParameterGroups().get(0)
         .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
 
-    MetadataCacheId otherKeyParts = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForGlobalMetadata(serializeAndDeserialize("operationParameterDoesNotModifyGlobal_2.ast"),
+                                                           declaration, OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(keyParts, is(otherKeyParts));
   }
 
   @Test
   public void metadataKeyModifiesHash() throws Exception {
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    MetadataCacheId keyParts =
+        getIdForComponentMetadata(serializeAndDeserialize("metadataKeyModifiesHash_1.ast"), getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     ArtifactDeclaration declaration = getBaseApp();
@@ -225,12 +241,14 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentMetadata(serializeAndDeserialize("metadataKeyModifiesHash_2.ast"), declaration, OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     metadataKeyPartParam.setValue(ParameterSimpleValue.of("Document"));
 
-    MetadataCacheId finalKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId finalKeyParts =
+        getIdForComponentMetadata(serializeAndDeserialize("metadataKeyModifiesHash_3.ast"), declaration, OPERATION_LOCATION);
     LOGGER.debug(finalKeyParts.toString());
 
     assertThat(otherKeyParts, not(keyParts));
@@ -247,7 +265,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
 
-    MetadataCacheId id = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId id = getIdForGlobalMetadata(serializeAndDeserialize("metadataCategoryModifiesGlobalHash_1.ast"), declaration,
+                                                OPERATION_LOCATION);
     LOGGER.debug(id.toString());
 
     when(operation.getModelProperty(MetadataKeyIdModelProperty.class))
@@ -255,7 +274,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
                                                       METADATA_KEY_PART_1,
                                                       "OTHER_CATEGORY")));
 
-    MetadataCacheId otherId = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherId = getIdForGlobalMetadata(serializeAndDeserialize("metadataCategoryModifiesGlobalHash_2.ast"),
+                                                     declaration, OPERATION_LOCATION);
     LOGGER.debug(id.toString());
 
     assertThat(id, not(otherId));
@@ -267,13 +287,17 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, null);
 
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    MetadataCacheId keyParts =
+        getIdForComponentMetadata(serializeAndDeserialize("configurationParametersAsRequireForMetadataModifiesHash_2.ast"),
+                                  getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockRequiredForMetadataModelProperty(configuration, asList(behaviourParameter.getName()));
     mockRequiredForMetadataModelProperty(connectionProvider, null);
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentMetadata(serializeAndDeserialize("configurationParametersAsRequireForMetadataModifiesHash_2.ast"),
+                                  getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -283,8 +307,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   @Test
   @Issue("MULE-18601")
   public void configurationNestedParamsCountedTwiceForHash() throws Exception {
-
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("configurationNestedParamsCountedTwiceForHash_1.ast");
+    MetadataCacheId keyParts = getIdForComponentMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     assertThat(keyParts.getParts(), hasSize(3));
@@ -305,36 +329,37 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void connectionParametersAsRequireForMetadataModifiesHash() throws Exception {
-
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, null);
 
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("connectionParametersAsRequireForMetadataModifiesHash_1.ast");
+    MetadataCacheId keyParts = getIdForComponentMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, asList(behaviourParameter.getName()));
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var modifiedApp = serializeAndDeserialize("connectionParametersAsRequireForMetadataModifiesHash_2.ast");
+    MetadataCacheId otherKeyParts = getIdForComponentMetadata(modifiedApp, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
-
   }
 
   @Test
   public void differencesInRequiredParametersForMetadataYieldsDifferentHashes() throws Exception {
-
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, asList(contentParameter.getName()));
 
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("differencesInRequiredParametersForMetadataYieldsDifferentHashes_1.ast");
+    MetadataCacheId keyParts = getIdForComponentMetadata(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, asList(behaviourParameter.getName()));
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var modifiedApp = serializeAndDeserialize("differencesInRequiredParametersForMetadataYieldsDifferentHashes_2.ast");
+    MetadataCacheId otherKeyParts = getIdForComponentMetadata(modifiedApp, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -343,7 +368,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void metadataKeyCacheIdForConfigModelShouldIncludeConnectionParameters() throws Exception {
-    MetadataCacheId keyParts = getIdForMetadataKeys(getBaseApp(), MY_CONFIG);
+    final var app = serializeAndDeserialize("metadataKeyCacheIdForConfigModelShouldIncludeConnectionParameters_1.ast");
+    MetadataCacheId keyParts = getIdForMetadataKeys(app, getBaseApp(), MY_CONFIG);
     LOGGER.debug(keyParts.toString());
 
     ArtifactDeclaration declaration = getBaseApp();
@@ -354,7 +380,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     // Change the value of a connection parameter that is required for metadata
     connectionElementDeclaration.getParameterGroups().get(0).getParameter("otherName").get().setValue(plain("changed"));
 
-    MetadataCacheId otherKeyParts = getIdForMetadataKeys(declaration, MY_CONFIG);
+    final var modifiedApp = serializeAndDeserialize("metadataKeyCacheIdForConfigModelShouldIncludeConnectionParameters_2.ast");
+    MetadataCacheId otherKeyParts = getIdForMetadataKeys(modifiedApp, declaration, MY_CONFIG);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(otherKeyParts, not(is(keyParts)));
@@ -362,7 +389,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void metadataKeyDoesNotModifyKeyHash() throws Exception {
-    MetadataCacheId keyParts = getIdForMetadataKeys(getBaseApp(), OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("metadataKeyDoesNotModifyKeyHash_1.ast");
+    MetadataCacheId keyParts = getIdForMetadataKeys(app, getBaseApp(), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     ArtifactDeclaration declaration = getBaseApp();
@@ -372,12 +400,14 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
 
-    MetadataCacheId otherKeyParts = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var modifiedApp = serializeAndDeserialize("metadataKeyDoesNotModifyKeyHash_2.ast");
+    MetadataCacheId otherKeyParts = getIdForMetadataKeys(modifiedApp, declaration, OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     metadataKeyPartParam.setValue(ParameterSimpleValue.of("Document"));
 
-    MetadataCacheId finalKeyParts = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var modifiedApp2 = serializeAndDeserialize("metadataKeyDoesNotModifyKeyHash_3.ast");
+    MetadataCacheId finalKeyParts = getIdForMetadataKeys(modifiedApp2, declaration, OPERATION_LOCATION);
     LOGGER.debug(finalKeyParts.toString());
 
     assertThat(otherKeyParts, is(keyParts));
@@ -398,12 +428,14 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
     keyGroup.addParameter(newParam(METADATA_KEY_PART_2, "8080"));
 
-    MetadataCacheId twoLevelParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("multiLevelMetadataKeyModifiesHash_1.ast");
+    MetadataCacheId twoLevelParts = getIdForComponentMetadata(app, declaration, OPERATION_LOCATION);
     LOGGER.debug(twoLevelParts.toString());
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    final var modifiedApp = serializeAndDeserialize("multiLevelMetadataKeyModifiesHash_2.ast");
+    MetadataCacheId otherKeyParts = getIdForComponentMetadata(modifiedApp, declaration, OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(otherKeyParts, not(twoLevelParts));
@@ -427,11 +459,13 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
 
-    MetadataCacheId original = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("multiLevelPartValueModifiesHash_1.ast");
+    MetadataCacheId original = getIdForComponentMetadata(app, declaration, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
     partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    final var modifiedApp = serializeAndDeserialize("multiLevelPartValueModifiesHash_2.ast");
+    MetadataCacheId newHash = getIdForComponentMetadata(modifiedApp, declaration, OPERATION_LOCATION);
     LOGGER.debug(newHash.toString());
     LOGGER.debug(newHash.toString());
 
@@ -456,11 +490,13 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
 
-    MetadataCacheId original = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("multiLevelPartValueDoesNotModifyHashForKeys_1.ast");
+    MetadataCacheId original = getIdForMetadataKeys(app, declaration, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
     partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var modifiedApp = serializeAndDeserialize("multiLevelPartValueDoesNotModifyHashForKeys_2.ast");
+    MetadataCacheId newHash = getIdForMetadataKeys(modifiedApp, declaration, OPERATION_LOCATION);
     LOGGER.debug(newHash.toString());
 
     assertThat(original, is(newHash));
@@ -481,11 +517,13 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     keyGroup.addParameter(partTwo);
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
 
-    MetadataCacheId original = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("multiLevelPartValueDoesNotModifyGlobalId_1.ast");
+    MetadataCacheId original = getIdForGlobalMetadata(app, declaration, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
     partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    final var modifiedApp = serializeAndDeserialize("multiLevelPartValueDoesNotModifyGlobalId_2.ast");
+    MetadataCacheId newHash = getIdForGlobalMetadata(modifiedApp, declaration, OPERATION_LOCATION);
     LOGGER.debug(newHash.toString());
 
     assertThat(original, is(newHash));
@@ -512,7 +550,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
 
-    MetadataCacheId original = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("metadataKeyHashIdStructure_1.ast");
+    MetadataCacheId original = getIdForMetadataKeys(app, declaration, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
     assertThat(original.getParts(), hasSize(6));
@@ -543,11 +582,13 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
 
-    MetadataCacheId original = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("partialFetchingMultiLevelPartValueModifiesHashForKeys_1.ast");
+    MetadataCacheId original = getIdForMetadataKeys(app, declaration, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
     partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var modiifiedApp = serializeAndDeserialize("partialFetchingMultiLevelPartValueModifiesHashForKeys_2.ast");
+    MetadataCacheId newHash = getIdForMetadataKeys(modiifiedApp, declaration, OPERATION_LOCATION);
     LOGGER.debug(newHash.toString());
 
     assertThat(original, not(newHash));
@@ -574,10 +615,14 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     ParameterElementDeclaration anotherOperationMetadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
     anotherOperationDeclaration.getParameterGroups().get(0).addParameter(anotherOperationMetadataKeyPartParam);
 
-    MetadataCacheId operationKeysParts = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var app =
+        serializeAndDeserialize("sameSimpleMetadataKeyWithSameResolverOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationKeysParts = getIdForMetadataKeys(app, declaration, OPERATION_LOCATION);
     LOGGER.debug(operationKeysParts.toString());
 
-    MetadataCacheId anotherOperationKeysParts = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var modifiedApp =
+        serializeAndDeserialize("sameSimpleMetadataKeyWithSameResolverOnDifferentOperationsGeneratesSameHashForKeys_2.ast");
+    MetadataCacheId anotherOperationKeysParts = getIdForMetadataKeys(modifiedApp, declaration, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(anotherOperationKeysParts.toString());
 
     assertThat(anotherOperationKeysParts, is(operationKeysParts));
@@ -612,8 +657,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
 
-    MetadataCacheId operationHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
-    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("multilevelPartsWithSameValuesOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationHash = getIdForMetadataKeys(app, declaration, OPERATION_LOCATION);
+    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(app, declaration, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(operationHash.toString());
     LOGGER.debug(anotherOperationHash.toString());
 
@@ -654,8 +700,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
     anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
 
-    MetadataCacheId operationHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
-    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var app =
+        serializeAndDeserialize("multilevelPartsWithDifferentValuesOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationHash = getIdForMetadataKeys(app, declaration, OPERATION_LOCATION);
+    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(app, declaration, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(operationHash.toString());
     LOGGER.debug(anotherOperationHash.toString());
 
@@ -699,8 +747,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
     anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
 
-    MetadataCacheId operationHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
-    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var app = serializeAndDeserialize("partialFetchingWithSameValuesOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationHash = getIdForMetadataKeys(app, declaration, OPERATION_LOCATION);
+    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(app, declaration, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(operationHash.toString());
     LOGGER.debug(anotherOperationHash.toString());
 
@@ -740,8 +789,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     keyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
     anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
 
-    MetadataCacheId operationHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
-    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var app =
+        serializeAndDeserialize("partialFetchingWithDifferentValuesOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationHash = getIdForMetadataKeys(app, declaration, OPERATION_LOCATION);
+    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(app, declaration, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(operationHash.toString());
     LOGGER.debug(anotherOperationHash.toString());
 
@@ -945,6 +996,18 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     when(metadataKeyId.getType()).thenReturn(TYPE_LOADER.load(String.class));
 
     return metadataKeyId;
+  }
+
+  private ArtifactAst serializeAndDeserialize(String astFileName) throws IOException {
+    ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
+
+    ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
+        .deserialize(this.getClass().getResourceAsStream("/asts/" + astFileName), name -> extensions.stream()
+            .filter(x -> x.getName().equals(name))
+            .findFirst()
+            .orElse(null));
+
+    return deserializedArtifactAst;
   }
 
 }

@@ -46,6 +46,12 @@
             --add-exports=org.mule.runtime.artifact.ast.dependency.graph/org.mule.runtime.ast.graph.internal=org.mule.runtime.spring.config
             --add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.dsl.model=ALL-UNNAMED
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.store=ALL-UNNAMED
+            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.builder=ALL-UNNAMED
+            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.builder.adapter=ALL-UNNAMED
+            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.dsl=ALL-UNNAMED
+            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=ALL-UNNAMED
+            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.model=ALL-UNNAMED
+            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.param=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el.function=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.processor.strategy=ALL-UNNAMED
             ${surefire.test.unit.open.args}
@@ -249,6 +255,11 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-dwb-api</artifactId> 
             <scope>test</scope>             
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-artifact-ast-serialization</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.dom4j</groupId>
