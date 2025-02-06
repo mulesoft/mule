@@ -5,6 +5,13 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.returnTypeTypeParametersChanged",
+            "old": "method java.util.Map<java.lang.String, org.mule.runtime.api.util.Pair<org.mule.runtime.api.message.Error, org.mule.runtime.core.privileged.exception.EventProcessingException>> org.mule.runtime.core.privileged.routing.RoutingResult::getFailuresWithExceptionInfo()",
+            "new": "method java.util.Map<java.lang.String, org.mule.runtime.api.util.Pair<org.mule.runtime.api.message.Error, org.mule.runtime.api.exception.MuleException>> org.mule.runtime.core.privileged.routing.RoutingResult::getFailuresWithExceptionInfo()",
+            "justification": "W-16629236: Cannot convert MessagingException to JSON using DW"
+          },
+          {
+            "ignore": true,
             "code": "java.class.removed",
             "old": "class org.mule.runtime.core.api.DefaultTransformationService",
             "justification": "W-17472621: Add a registry object to query the default encoding of the deployed app"
