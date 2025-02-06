@@ -7,27 +7,24 @@
 package org.mule.runtime.module.boot.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
-import static org.mule.runtime.module.boot.internal.AbstractMuleContainerFactory.APP_COMMAND_LINE_OPTION;
-import static org.mule.runtime.module.boot.internal.AbstractMuleContainerFactory.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
+import static org.mule.runtime.module.boot.internal.DefaultMuleContainerFactory.APP_COMMAND_LINE_OPTION;
+import static org.mule.runtime.module.boot.internal.DefaultMuleContainerFactory.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
 
 import static java.lang.System.clearProperty;
 import static java.lang.System.getProperty;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.module.boot.api.MuleContainer;
 import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.size.SmallTest;
 
-import java.io.File;
 import java.io.IOException;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class MuleContainerFactoryTestCase {
@@ -35,9 +32,6 @@ public class MuleContainerFactoryTestCase {
   private static final String APP_NAME = "testApp";
 
   private String[] commandLineOptions = {};
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Test
   public void setsMuleDeployApplicationsPropertyWhenAppOptionIsUsed() throws Exception {
@@ -58,9 +52,7 @@ public class MuleContainerFactoryTestCase {
     testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, APP_NAME, () -> {
       commandLineOptions = new String[] {"-" + APP_COMMAND_LINE_OPTION, APP_NAME};
 
-      expectedException.expect(IllegalArgumentException.class);
-      expectedException.expectMessage(INVALID_DEPLOY_APP_CONFIGURATION_ERROR);
-      createMuleContainer();
+      assertThrows(INVALID_DEPLOY_APP_CONFIGURATION_ERROR, IllegalArgumentException.class, () -> createMuleContainer());
     });
   }
 
@@ -94,12 +86,7 @@ public class MuleContainerFactoryTestCase {
   }
 
   private MuleContainer createMuleContainer() throws Exception {
-    return new AbstractMuleContainerFactory(null, null) {
-
-      @Override
-      protected DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase) {
-        return null;
-      }
+    return new DefaultMuleContainerFactory(null, null) {
 
       @Override
       MuleContainer createMuleContainer() throws IOException, Exception {

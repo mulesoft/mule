@@ -57,8 +57,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    authCodeStateSetter =
-        getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
+    authCodeStateSetter = resolveOauthStateSetter(oauthConfig);
     dance = Once.of(this::updateAuthState);
     this.forceInvalidateStatusRetrievalSupplier = forceInvalidateStatusRetrievalSupplier;
   }
@@ -110,5 +109,9 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
   public void start() throws MuleException {
     dancer = oauthHandler.register(oauthConfig);
     super.start();
+  }
+
+  protected FieldSetter<Object, Object> resolveOauthStateSetter(AuthorizationCodeConfig oauthConfig) {
+    return getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
   }
 }

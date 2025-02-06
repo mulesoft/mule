@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @since 4.6
  */
-public abstract class AbstractMuleContainerFactory implements MuleContainerFactory {
+public class DefaultMuleContainerFactory implements MuleContainerFactory {
 
   public static final String[][] CLI_OPTIONS = {
       {"builder", "true", "Configuration Builder Type"},
@@ -53,7 +53,7 @@ public abstract class AbstractMuleContainerFactory implements MuleContainerFacto
   private final String muleHomeDirectoryPropertyName;
   private final String muleBaseDirectoryPropertyName;
 
-  public AbstractMuleContainerFactory(String muleHomeDirectoryPropertyName, String muleBaseDirectoryPropertyName) {
+  public DefaultMuleContainerFactory(String muleHomeDirectoryPropertyName, String muleBaseDirectoryPropertyName) {
     this.muleHomeDirectoryPropertyName = muleHomeDirectoryPropertyName;
     this.muleBaseDirectoryPropertyName = muleBaseDirectoryPropertyName;
   }
@@ -95,7 +95,9 @@ public abstract class AbstractMuleContainerFactory implements MuleContainerFacto
    * @param muleBase The location of the MULE_BASE directory.
    * @return The set of JAR Urls located under Mule home folder.
    */
-  protected abstract DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase);
+  private DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase) {
+    return new DefaultMuleClassPathConfig(muleHome, muleBase);
+  }
 
   ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
     DefaultMuleClassPathConfig config = createMuleClassPathConfig(muleHome, muleBase);

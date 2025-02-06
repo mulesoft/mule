@@ -177,7 +177,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
                                    (String) map.get(EXTERNAL_CALLBACK_URL_PARAMETER_NAME));
   }
 
-  private AuthorizationCodeConfig getInitialOAuthConfig() throws MuleException {
+  protected AuthorizationCodeConfig getInitialOAuthConfig() throws MuleException {
     CoreEvent initialiserEvent = null;
     ValueResolvingContext ctxForConfig = null;
     ValueResolvingContext ctxForCallback = null;

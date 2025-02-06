@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,7 +51,14 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   private static final String REFRESH_TOKEN = "myRefreshToken";
   private static final String NEW_TOKEN = "newToken";
   private static final String NEW_REFRESH_TOKEN = "newRefresh";
-  private static final String RESOURCE_OWNER_ID = "id";
+  private static final String RESOURCE_OWNER_ID = "exp";
+  private static final String EXPIRES_IN = "expires_in";
+  private static final String STATE = "state";
+  private static final String CONSUMER_KEY = "key";
+  private static final String CONSUMER_SECRET = "secret";
+  private static final String EXTERNAL_CALLBACK_URL = "externalCallbackUrl";
+  private static final String ACCESS_TOKEN_URL = "accesstokenurl";
+  private static final String AUTHORIZATION_URL = "AuthorizationUrl";
 
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
@@ -68,23 +74,32 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   @Mock
   private ResourceOwnerOAuthContext refreshedContext;
 
+  @Mock
+  private OAuthCallbackConfig mockOAuthCallbackConfig;
+
   @Before
   public void before() {
     oAuthConfig = new AuthorizationCodeConfig("configName",
                                               empty(),
                                               new CustomOAuthParameters(),
                                               emptyMap(),
-                                              new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
-                                              mock(OAuthCallbackConfig.class),
-                                              "key", "secret", "url", "url", "scope", RESOURCE_OWNER_ID, null, null);
+                                              new AuthorizationCodeGrantType(ACCESS_TOKEN_URL, AUTHORIZATION_URL, "#[s]", "reg",
+                                                                             "#[x]", "sd"),
+                                              new OAuthCallbackConfig("", "", "", EXTERNAL_CALLBACK_URL),
+                                              CONSUMER_KEY, CONSUMER_SECRET, AUTHORIZATION_URL, ACCESS_TOKEN_URL, "scope",
+                                              RESOURCE_OWNER_ID, null,
+                                              null);
 
     when(initialContext.getAccessToken()).thenReturn(ACCESS_TOKEN);
     when(initialContext.getRefreshToken()).thenReturn(REFRESH_TOKEN);
     when(initialContext.getResourceOwnerId()).thenReturn(RESOURCE_OWNER_ID);
+    when(initialContext.getExpiresIn()).thenReturn(EXPIRES_IN);
+    when(initialContext.getState()).thenReturn(STATE);
 
     when(refreshedContext.getAccessToken()).thenReturn(NEW_TOKEN);
     when(refreshedContext.getRefreshToken()).thenReturn(NEW_REFRESH_TOKEN);
     when(refreshedContext.getResourceOwnerId()).thenReturn(RESOURCE_OWNER_ID);
+    when(refreshedContext.getExpiresIn()).thenReturn(EXPIRES_IN);
   }
 
   @Test
@@ -101,6 +116,13 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
 
     assertThat(state.getAccessToken(), equalTo(ACCESS_TOKEN));
     assertThat(state.getRefreshToken().get(), equalTo(REFRESH_TOKEN));
+    assertThat(state.getExternalCallbackUrl().get(), equalTo(EXTERNAL_CALLBACK_URL));
+    assertThat(state.getState().get(), equalTo(STATE));
+    assertThat(state.getExpiresIn().get(), equalTo(EXPIRES_IN));
+    assertThat(state.getConsumerKey(), equalTo("key"));
+    assertThat(state.getConsumerSecret(), equalTo("secret"));
+    assertThat(state.getAuthorizationUrl(), equalTo(AUTHORIZATION_URL));
+    assertThat(state.getAccessTokenUrl(), equalTo(ACCESS_TOKEN_URL));
 
     AuthorizationCodeListener listener = listenerCaptor.getValue();
     assertTokenRefreshed(newContext, state, listener);

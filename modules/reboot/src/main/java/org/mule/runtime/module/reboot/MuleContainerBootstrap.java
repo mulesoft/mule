@@ -11,11 +11,11 @@ import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_HOME
 import static org.mule.runtime.module.boot.internal.MuleContainerWrapperProvider.getMuleContainerWrapper;
 
 import org.mule.runtime.module.boot.internal.BootModuleLayerValidationBootstrapConfigurer;
+import org.mule.runtime.module.boot.internal.DefaultMuleContainerFactory;
 import org.mule.runtime.module.boot.internal.MuleContainerFactory;
 import org.mule.runtime.module.boot.internal.MuleContainerWrapper;
 import org.mule.runtime.module.boot.internal.MuleLog4jConfigurer;
 import org.mule.runtime.module.boot.internal.SLF4JBridgeHandlerBootstrapConfigurer;
-import org.mule.runtime.module.reboot.internal.CEMuleContainerFactory;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -36,7 +36,7 @@ public class MuleContainerBootstrap {
 
   public static void main(String[] args) {
     MuleContainerFactory muleContainerFactory =
-        new CEMuleContainerFactory(MULE_HOME_DIRECTORY_PROPERTY, MULE_BASE_DIRECTORY_PROPERTY);
+        new DefaultMuleContainerFactory(MULE_HOME_DIRECTORY_PROPERTY, MULE_BASE_DIRECTORY_PROPERTY);
     MuleContainerWrapper muleContainerWrapper = getMuleContainerWrapper();
 
     CommandLine commandLine;
