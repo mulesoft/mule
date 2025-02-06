@@ -10,9 +10,9 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -146,13 +146,26 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   }
 
   @Test
-  public void getDelayedStream() throws Exception {
+  public void scatterGatherWithTimeout() throws Exception {
     try {
-      Object value =
-          flowRunner("getDelayedStream").withPayload(singletonList(data)).run().getMessage().getPayload().getValue();
-      fail("Should have thrown an exception");
+      flowRunner("scatterGatherWithTimeout")
+          .keepStreamsOpen()
+          .withPayload(singletonList(data))
+          .run();
     } catch (Exception e) {
+      assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(0));
+    }
+  }
 
+  @Test
+  public void scatterGatherWithoutTimeout() throws Exception {
+    try {
+      flowRunner("scatterGatherWithoutTimeout")
+          .keepStreamsOpen()
+          .withPayload(singletonList(data))
+          .run();
+      assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), greaterThan(1));
+    } catch (Exception e) {
     }
   }
 

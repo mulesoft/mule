@@ -219,7 +219,7 @@
         <set-payload value="#[java!org::mule::test::module::extension::streaming::AbstractBytesStreamingExtensionTestCase::addSpell(payload)]"/>
     </sub-flow>
 
-    <flow name="getDelayedStream">
+    <flow name="scatterGatherWithTimeout">
         <scatter-gather timeout="1000">
             <route>
                 <logger level="INFO" message="Executing Route 1"/>
@@ -232,4 +232,17 @@
         </scatter-gather>
     </flow>
 
+
+    <flow name="scatterGatherWithoutTimeout">
+        <scatter-gather timeout="2000">
+            <route>
+                <logger level="INFO" message="Executing Route 1"/>
+            </route>
+            <route>
+                <marvel:delayed-say-magic-words fetchSize="1" delay="1000" config-ref="drStrange" />
+                <flow-ref name="assertPayloadIsIteratorProvider"/>
+                <marvel:read-object-stream/>
+            </route>
+        </scatter-gather>
+    </flow>
 </mule>
