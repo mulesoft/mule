@@ -4,89 +4,96 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.properties;
+package org.mule.runtime.config.internal.model.dsl.properties;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import static java.lang.Math.max;
+import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.regex.Pattern.compile;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.internal.dsl.model.properties.DefaultConfigurationProperty;
-import org.mule.runtime.core.api.exception.ResourceNotFoundException;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 import org.mule.runtime.properties.internal.ConfigurationPropertiesException;
+import org.mule.runtime.properties.internal.DefaultConfigurationProperty;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
+import org.vibur.objectpool.ConcurrentPool;
+import org.vibur.objectpool.PoolService;
+import org.vibur.objectpool.util.ConcurrentLinkedQueueCollection;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.parser.ParserException;
 
 /**
  * Artifact attributes configuration. This class represents a single configuration-attributes element from the configuration.
  *
- * @since 4.0
- *
- * @deprecated since 4.4, use org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProvider
- *             instead.
+ * @since 1.0
  */
-@Deprecated
-public class DefaultConfigurationPropertiesProvider
-    extends AbstractComponent
-    implements org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider, Initialisable {
+public class DefaultConfigurationPropertiesProvider extends AbstractComponent
+    implements ConfigurationPropertiesProvider, Initialisable {
 
-  protected static final String PROPERTIES_EXTENSION = ".properties";
-  protected static final String YAML_EXTENSION = ".yaml";
+  private static final Pattern SPACE_AFTER_COLON_PATTERN = compile("[^:]*: ");
+  private static final String PROPERTIES_EXTENSION = ".properties";
+  private static final String YAML_EXTENSION = ".yaml";
   protected static final String UNKNOWN = "unknown";
 
-  protected final Map<String, org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty> configurationAttributes =
-      new HashMap<>();
-  protected String fileLocation;
-  protected String encoding;
-  protected ResourceProvider resourceProvider;
+  private static final PoolService<Yaml> YAML_POOL =
+      new ConcurrentPool<>(new ConcurrentLinkedQueueCollection<>(), new YamlFactory(), 1,
+                           max(1, getRuntime().availableProcessors() / 2), false);
 
-  public DefaultConfigurationPropertiesProvider(String fileLocation, String encoding,
-                                                org.mule.runtime.config.api.dsl.model.ResourceProvider resourceProvider) {
+  protected final Map<String, ConfigurationProperty> configurationAttributes = new HashMap<>();
+  protected final String fileLocation;
+  private final String encoding;
+  private final ResourceProvider resourceProvider;
+
+  public DefaultConfigurationPropertiesProvider(String fileLocation, String encoding, ResourceProvider resourceProvider) {
     this.fileLocation = fileLocation;
     this.resourceProvider = resourceProvider;
     this.encoding = encoding;
   }
 
-  public DefaultConfigurationPropertiesProvider(String fileLocation,
-                                                org.mule.runtime.config.api.dsl.model.ResourceProvider resourceProvider) {
+  public DefaultConfigurationPropertiesProvider(String fileLocation, ResourceProvider resourceProvider) {
     this(fileLocation, null, resourceProvider);
   }
 
   @Override
-  public Optional<org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
     return ofNullable(configurationAttributes.get(configurationAttributeKey));
   }
 
   @Override
   public String getDescription() {
     ComponentLocation location = (ComponentLocation) getAnnotation(LOCATION_KEY);
-    return format("<configuration-properties file=\"%s\"> - file: %s, line number: %s", fileLocation,
+    return format("<" + getIdentifier().toString() + " file=\"%s\"> - file: %s, line number: %s", fileLocation,
                   location.getFileName().orElse(UNKNOWN),
-                  location.getLineInFile().map(String::valueOf).orElse("unknown"));
-
+                  location.getLine().orElse(-1));
   }
 
   protected InputStream getResourceInputStream(String file) throws IOException {
     return resourceProvider.getResourceAsStream(file);
   }
 
-  protected InputStreamReader getResourceInputStreamReader(String file) throws IOException {
+  private InputStreamReader getResourceInputStreamReader(String file) throws IOException {
     InputStream in = getResourceInputStream(file);
     return encoding != null ? new InputStreamReader(in, encoding) : new InputStreamReader(in);
   }
@@ -99,7 +106,7 @@ public class DefaultConfigurationPropertiesProvider
                                                  this);
     }
 
-    try (InputStreamReader is = getResourceInputStreamReader(fileLocation)) {
+    try (Reader is = new BufferedReader(getResourceInputStreamReader(fileLocation))) {
       if (is == null) {
         throw new ConfigurationPropertiesException(createStaticMessage(format("Couldn't find configuration properties file %s neither on classpath or in file system",
                                                                               fileLocation)),
@@ -107,7 +114,7 @@ public class DefaultConfigurationPropertiesProvider
       }
 
       readAttributesFromFile(is);
-    } catch (ConfigurationPropertiesException | ResourceNotFoundException e) {
+    } catch (ConfigurationPropertiesException e) {
       throw e;
     } catch (Exception e) {
       throw new ConfigurationPropertiesException(createStaticMessage("Couldn't read from file "
@@ -115,32 +122,32 @@ public class DefaultConfigurationPropertiesProvider
     }
   }
 
-  protected void readAttributesFromFile(InputStreamReader is) throws IOException {
+  private void readAttributesFromFile(Reader is) throws IOException {
     if (fileLocation.endsWith(PROPERTIES_EXTENSION)) {
       Properties properties = new Properties();
       properties.load(is);
-      properties.keySet().stream().map(key -> {
-        String rawValue = (String) properties.get(key);
-        rawValue = createValue((String) key, rawValue);
-        return new DefaultConfigurationProperty(this, (String) key, rawValue);
-      }).forEach(configurationAttribute -> {
-        configurationAttributes.put(configurationAttribute.getKey(), configurationAttribute);
-      });
+      properties.keySet().stream()
+          .map(key -> new DefaultConfigurationProperty(of(this), (String) key,
+                                                       createValue((String) key, (String) properties.get(key))))
+          .forEach(configurationAttribute -> configurationAttributes.put(configurationAttribute.getKey(),
+                                                                         configurationAttribute));
     } else {
-      Yaml yaml = new Yaml();
-      Iterable<Object> yamlObjects = yaml.loadAll(is);
+      final Yaml yaml = YAML_POOL.take();
       try {
-        yamlObjects.forEach(yamlObject -> {
-          createAttributesFromYamlObject(null, null, yamlObject);
-        });
-      } catch (ParserException e) {
-        throw new ConfigurationPropertiesException(createStaticMessage("Error while parsing YAML configuration file. Check that all quotes are correctly closed."),
-                                                   this, e);
+        Iterable<Object> yamlObjects = yaml.loadAll(is);
+        try {
+          yamlObjects.forEach(yamlObject -> createAttributesFromYamlObject(null, null, yamlObject));
+        } catch (ParserException e) {
+          throw new ConfigurationPropertiesException(createStaticMessage("Error while parsing YAML configuration file. Check that all quotes are correctly closed."),
+                                                     this, e);
+        }
+      } finally {
+        YAML_POOL.restore(yaml);
       }
     }
   }
 
-  protected void createAttributesFromYamlObject(String parentPath, Object parentYamlObject, Object yamlObject) {
+  private void createAttributesFromYamlObject(String parentPath, Object parentYamlObject, Object yamlObject) {
     if (yamlObject instanceof List) {
       List list = (List) yamlObject;
       if (list.get(0) instanceof Map) {
@@ -172,7 +179,7 @@ public class DefaultConfigurationPropertiesProvider
                                                    this);
       }
       if (parentPath == null) {
-        if (((String) yamlObject).matches(".*:[^ ].*")) {
+        if (!SPACE_AFTER_COLON_PATTERN.matcher((String) yamlObject).matches()) {
           throw new ConfigurationPropertiesException(createStaticMessage(format("YAML configuration properties must have space after ':' character. Offending line is: %s",
                                                                                 yamlObject)),
                                                      this);
@@ -187,7 +194,7 @@ public class DefaultConfigurationPropertiesProvider
     }
   }
 
-  protected String createKey(String parentKey, String key) {
+  private String createKey(String parentKey, String key) {
     if (parentKey == null) {
       return key;
     }
@@ -196,5 +203,10 @@ public class DefaultConfigurationPropertiesProvider
 
   protected String createValue(String key, String value) {
     return value;
+  }
+
+  @Override
+  public String toString() {
+    return getDescription();
   }
 }
