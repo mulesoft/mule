@@ -10,6 +10,7 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 /**
@@ -24,19 +25,19 @@ public class SimpleDataType implements DataType {
 
   private static final long serialVersionUID = -4590745924720880358L;
 
-  protected final Class<?> type;
+  protected final WeakReference<Class<?>> type;
   protected final MediaType mimeType;
   protected final boolean streamType;
 
   protected SimpleDataType(Class<?> type, MediaType mimeType, boolean streamType) {
-    this.type = type;
+    this.type = new WeakReference<>(type);
     this.mimeType = mimeType;
     this.streamType = streamType;
   }
 
   @Override
   public Class<?> getType() {
-    return type;
+    return type.get();
   }
 
   @Override
@@ -145,7 +146,8 @@ public class SimpleDataType implements DataType {
 
   @Override
   public String toString() {
-    return "SimpleDataType{" + "type=" + (type == null ? null : type.getName()) + ", mimeType='" + mimeType + '\'' + '}';
+    return "SimpleDataType{" + "type=" + (type.get() == null ? null : type.get()).getName()
+        + ", mimeType='" + mimeType + '\'' + '}';
   }
 
   @Override
