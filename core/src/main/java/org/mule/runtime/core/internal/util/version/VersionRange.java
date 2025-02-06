@@ -6,10 +6,17 @@
  */
 package org.mule.runtime.core.internal.util.version;
 
+import static java.util.regex.Pattern.compile;
+
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.vdurmont.semver4j.Semver;
 
 public class VersionRange {
 
@@ -23,15 +30,15 @@ public class VersionRange {
    * pattern for extracting a ranges of versions. example: [1.5.0_11,1.6),[1.6.0_15,1.7),[1.7.0,] G1: [1.5.0_11,1.6) G2: [ G3:
    * 1.5.0_11 G4: 1.6 G5: ) G6: [1.6.0_15,1.7),[1.7.0,]
    */
-  public static final Pattern VERSION_RANGES = Pattern.compile("(" + VERSION_RANGE + "),?");
-  public static final Pattern VALID_VERSION_RANGES = Pattern.compile("^(?:" + VERSION_RANGE + ",?)+$");
+  public static final Pattern VERSION_RANGES = compile("(" + VERSION_RANGE + "),?");
+  public static final Pattern VALID_VERSION_RANGES = compile("^(?:" + VERSION_RANGE + ",?)+$");
 
   public static List<VersionRange> createVersionRanges(String versionsString) {
     if (!VALID_VERSION_RANGES.matcher(versionsString).matches()) {
       throw new IllegalArgumentException("Version range doesn't match pattern: " + VALID_VERSION_RANGES.pattern());
     }
 
-    List<VersionRange> versions = new ArrayList<VersionRange>();
+    List<VersionRange> versions = new ArrayList<>();
 
     Matcher m = VERSION_RANGES.matcher(versionsString);
     while (m.find()) {
@@ -75,6 +82,32 @@ public class VersionRange {
 
   public boolean isUpperBoundInclusive() {
     return isUpperBoundInclusive;
+  }
+
+  public boolean contains(String version) {
+    Semver current = new Semver(version, LOOSE);
+
+    final boolean minWithin;
+    if (isBlank(getLowerVersion())) {
+      minWithin = true;
+    } else {
+      final Semver minMuleVersion = new Semver(getLowerVersion(), LOOSE);
+      minWithin = isLowerBoundInclusive()
+          ? minMuleVersion.isLowerThanOrEqualTo(current)
+          : minMuleVersion.isLowerThan(current);
+    }
+
+    final boolean maxWithin;
+    if (isBlank(getUpperVersion())) {
+      maxWithin = true;
+    } else {
+      final Semver maxMuleVersion = new Semver(getUpperVersion(), LOOSE);
+      maxWithin = isUpperBoundInclusive()
+          ? maxMuleVersion.isGreaterThanOrEqualTo(current)
+          : maxMuleVersion.isGreaterThan(current);
+    }
+
+    return minWithin && maxWithin;
   }
 
   @Override
