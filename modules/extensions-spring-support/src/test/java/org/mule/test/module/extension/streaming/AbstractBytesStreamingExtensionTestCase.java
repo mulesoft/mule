@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -420,6 +421,15 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
       assertThat(event.getMessage().getPayload().getValue(), instanceOf(CursorStreamProvider.class));
+      return event;
+    }
+  }
+
+  public static class AssertPayloadIsIteratorProvider implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(event.getMessage().getPayload().getValue(), instanceOf(CursorIteratorProvider.class));
       return event;
     }
   }
