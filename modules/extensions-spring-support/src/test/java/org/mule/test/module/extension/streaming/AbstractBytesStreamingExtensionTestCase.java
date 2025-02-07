@@ -11,9 +11,10 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -21,6 +22,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
+import org.junit.Test.None;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -355,27 +357,21 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   @Issue("W-16941297")
   @Description("Call scatter gather containing route to invoke delayed-say-magic-words operation")
   public void scatterGatherWithTimeout() throws Exception {
-    try {
-      flowRunner("scatterGatherWithTimeout")
-          .keepStreamsOpen()
-          .withPayload(singletonList(data))
-          .run();
-    } catch (Exception e) {
-      assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(0));
-    }
+    assertThrows(Exception.class, () -> flowRunner("scatterGatherWithTimeout")
+        .keepStreamsOpen()
+        .withPayload(singletonList(data))
+        .run());
+    assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(0));
   }
 
-  @Test
+  @Test(expected = None.class)
   @Issue("W-16941297")
   public void scatterGatherWithGreaterTimeout() throws Exception {
-    try {
-      flowRunner("scatterGatherWithGreaterTimeout")
-          .keepStreamsOpen()
-          .withPayload(singletonList(data))
-          .run();
-      assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), greaterThan(1));
-    } catch (Exception e) {
-    }
+    flowRunner("scatterGatherWithGreaterTimeout")
+        .keepStreamsOpen()
+        .withPayload(singletonList(data))
+        .run();
+    assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), greaterThanOrEqualTo(1));
   }
 
   private ParameterModel getStreamingStrategyParameterModel(Supplier<ParameterizedModel> model) {
