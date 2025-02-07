@@ -90,6 +90,7 @@ module org.mule.runtime.core {
   requires org.reflections;
   requires uuid;
   requires org.vibur.objectpool;
+  requires semver4j;
 
   requires jakarta.activation;
   requires transitive jakarta.jms.api;
@@ -520,6 +521,7 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.util.version to
       org.mule.runtime.extensions.support,
+      com.mulesoft.mule.runtime.license,
       com.mulesoft.anypoint.gw.core;
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
