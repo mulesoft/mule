@@ -356,9 +356,9 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   public void scatterGatherWithTimeout() throws Exception {
     try {
       flowRunner("scatterGatherWithTimeout")
-              .keepStreamsOpen()
-              .withPayload(singletonList(data))
-              .run();
+          .keepStreamsOpen()
+          .withPayload(singletonList(data))
+          .run();
     } catch (Exception e) {
       assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(0));
     }
@@ -369,9 +369,9 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   public void scatterGatherWithGreaterTimeout() throws Exception {
     try {
       flowRunner("scatterGatherWithGreaterTimeout")
-              .keepStreamsOpen()
-              .withPayload(singletonList(data))
-              .run();
+          .keepStreamsOpen()
+          .withPayload(singletonList(data))
+          .run();
       assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), greaterThan(1));
     } catch (Exception e) {
     }
