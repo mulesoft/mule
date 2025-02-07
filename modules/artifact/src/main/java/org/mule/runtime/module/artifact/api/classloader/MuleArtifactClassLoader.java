@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,6 +64,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);
+
+  private static final ConcurrentMap<String, Class<?>> HTTP_CLASSES_CACHE = new ConcurrentHashMap<>();
 
   private static final String DB_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/module/artifact/classloader/JdbcResourceReleaser.class";
@@ -271,6 +275,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    if (name.startsWith("org.mule.extension.http")) {
+      return loadHttpClass(name, resolve);
+    }
     Class<?> clazz = super.loadClass(name, resolve);
     if (!shouldReleaseJdbcReferences && Driver.class.isAssignableFrom(clazz) &&
         !(clazz.equals(Driver.class) || clazz.isInterface() || isAbstract(clazz.getModifiers()))) {
@@ -287,6 +294,22 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     if (!shouldReleaseGroovyReferences && name.startsWith("org.codehaus.groovy")) {
       shouldReleaseGroovyReferences = true;
     }
+    return clazz;
+  }
+
+  /**
+   * Loads and caches an HTTP class.
+   */
+  private Class<?> loadHttpClass(String name, boolean resolve) throws ClassNotFoundException {
+    // check if cache exists
+    Class<?> cached = HTTP_CLASSES_CACHE.get(name);
+    if (cached != null) {
+      return cached;
+    }
+    // if not, load it
+    Class<?> clazz = super.loadClass(name, resolve);
+    // cache it
+    HTTP_CLASSES_CACHE.putIfAbsent(name, clazz);
     return clazz;
   }
 
