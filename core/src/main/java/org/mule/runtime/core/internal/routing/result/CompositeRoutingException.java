@@ -21,7 +21,6 @@ import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
@@ -66,7 +65,7 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   @Override
   public String getDetailedMessage() {
-    Map<String, Pair<Error, EventProcessingException>> detailedFailures = getDetailedFailures();
+    Map<String, Pair<Error, MuleException>> detailedFailures = getDetailedFailures();
 
     if (detailedFailures.isEmpty()) {
       return getLegacyDetailedMessage();
@@ -76,8 +75,8 @@ public final class CompositeRoutingException extends MuleException implements Co
       builder.append(super.getDetailedMessage());
       // get detailed information about exceptions that make up composite exception
       builder.append(lineSeparator()).append(MESSAGE_SUB_TITLE).append(lineSeparator());
-      for (Entry<String, Pair<Error, EventProcessingException>> entry : detailedFailures.entrySet()) {
-        MuleException muleException = getRootMuleException(entry.getValue().getSecond());
+      for (Entry<String, Pair<Error, MuleException>> entry : detailedFailures.entrySet()) {
+        MuleException muleException = entry.getValue().getSecond();
         Throwable exception = entry.getValue().getFirst().getCause();
         appendMessageForExceptions(builder, entry.getKey(), exception, muleException);
       }
@@ -107,13 +106,13 @@ public final class CompositeRoutingException extends MuleException implements Co
     }
   }
 
-  private Map<String, Pair<Error, EventProcessingException>> getDetailedFailures() {
+  private Map<String, Pair<Error, MuleException>> getDetailedFailures() {
     Method getDetailedFailuresMethod = null;
-    Map<String, Pair<Error, EventProcessingException>> detailedFailures = emptyMap();
+    Map<String, Pair<Error, MuleException>> detailedFailures = emptyMap();
     try {
       getDetailedFailuresMethod = RoutingResult.class.getMethod("getFailuresWithExceptionInfo");
       detailedFailures =
-          (Map<String, Pair<Error, EventProcessingException>>) getDetailedFailuresMethod.invoke(routingResult);
+          (Map<String, Pair<Error, MuleException>>) getDetailedFailuresMethod.invoke(routingResult);
     } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
       LOGGER.warn("Invalid Invocation, Expected method {} doesn't exist", getDetailedFailuresMethod.getName());
     }
