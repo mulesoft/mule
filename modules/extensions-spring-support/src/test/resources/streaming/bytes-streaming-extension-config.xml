@@ -8,6 +8,7 @@
                http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
 
     <object name="assertPayloadIsStreamProvider" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertPayloadIsStreamProvider"/>
+    <object name="assertPayloadIsIteratorProvider" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertPayloadIsIteratorProvider"/>
     <object name="assertPayloadIsNotStreamProvider" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertPayloadIsNotStreamProvider"/>
     <object name="assertVariableStreamProviderIsOpen" class="org.mule.test.module.extension.streaming.AbstractBytesStreamingExtensionTestCase$AssertVariableStreamProviderIsOpen"/>
 
@@ -217,5 +218,31 @@
     <sub-flow name="castSpell">
         <set-payload value="#[java!org::mule::test::module::extension::streaming::AbstractBytesStreamingExtensionTestCase::addSpell(payload)]"/>
     </sub-flow>
+
+    <flow name="scatterGatherWithTimeout">
+        <scatter-gather timeout="1000">
+            <route>
+                <logger level="INFO" message="Executing Route 1"/>
+            </route>
+            <route>
+                <marvel:delayed-say-magic-words fetchSize="1" delay="2000" config-ref="drStrange" />
+                <flow-ref name="assertPayloadIsIteratorProvider"/>
+                <marvel:read-object-stream/>
+            </route>
+        </scatter-gather>
+    </flow>
+
+    <flow name="scatterGatherWithGreaterTimeout">
+        <scatter-gather timeout="2000">
+            <route>
+                <logger level="INFO" message="Executing Route 1"/>
+            </route>
+            <route>
+                <marvel:delayed-say-magic-words fetchSize="1" delay="1000" config-ref="drStrange" />
+                <flow-ref name="assertPayloadIsIteratorProvider"/>
+                <marvel:read-object-stream/>
+            </route>
+        </scatter-gather>
+    </flow>
 
 </mule>
