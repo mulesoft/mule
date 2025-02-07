@@ -76,6 +76,8 @@ public final class JpmsUtils {
   private static final Set<String> REQUIRED_ADD_MODULES =
       new HashSet<>(asList("java.se",
                            "org.mule.boot.tanuki",
+                           "org.mule.runtime.boot.log4j",
+                           "org.mule.runtime.logging",
                            MULE_JPMS_UTILS_MODULE_NAME,
                            "com.fasterxml.jackson.core",
                            "org.apache.commons.codec"));
