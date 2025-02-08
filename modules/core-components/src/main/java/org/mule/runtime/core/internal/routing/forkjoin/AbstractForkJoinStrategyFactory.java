@@ -22,6 +22,7 @@ import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -34,6 +35,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.event.AbstractEventContext;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
@@ -118,6 +120,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                   })
           .doOnNext(listBooleanPair -> {
             if (listBooleanPair.getSecond()) {
+              handleTimeoutExceptionIfPresent(timeoutScheduler, listBooleanPair.getFirst());
               throw propagate(createCompositeRoutingException(listBooleanPair.getFirst().stream()
                   .map(coreEventExceptionPair -> removeOriginalError(coreEventExceptionPair,
                                                                      original.getError()))
@@ -128,6 +131,25 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .doOnNext(mergeVariables(original, resultBuilder))
           .map(createResultEvent(original, resultBuilder));
     };
+  }
+
+  private void handleTimeoutExceptionIfPresent(Scheduler timeoutScheduler,
+                                               List<Pair<CoreEvent, EventProcessingException>> listBooleanPair) {
+    listBooleanPair
+        .forEach(
+                 pair -> {
+                   final Optional<Error> error = pair.getFirst().getError();
+                   if (error.isPresent() &&
+                       error.get().getCause() instanceof TimeoutException &&
+                       error.get().getCause().getMessage()
+                           .contains(TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX)) {
+                     EventContext context = pair.getFirst().getContext();
+                     if (context instanceof AbstractEventContext) {
+                       ((AbstractEventContext) context).forEachChild(ctx -> timeoutScheduler
+                           .submit(() -> ctx.error(new MessagingException(pair.getFirst(), error.get().getCause()))));
+                     }
+                   }
+                 });
   }
 
   private boolean isOriginalError(Error newError, Optional<Error> originalError) {

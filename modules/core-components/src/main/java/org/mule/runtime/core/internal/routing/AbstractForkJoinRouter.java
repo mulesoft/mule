@@ -119,7 +119,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     if (targetValue != null) {
       targetValueExpression = compile(targetValue, expressionManager);
     }
-    timeoutScheduler = schedulerService.cpuLightScheduler(SchedulerConfig.config()
+    timeoutScheduler = schedulerService.ioScheduler(SchedulerConfig.config()
         .withName(this.getClass().getName() + ".timeoutScheduler - " + getLocation().getLocation()));
     timeoutErrorType = errorTypeRepository.getErrorType(TIMEOUT).get();
     maxConcurrency = maxConcurrency != null ? maxConcurrency : getDefaultMaxConcurrency();

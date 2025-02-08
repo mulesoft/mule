@@ -43,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -110,6 +112,17 @@ public class DrStrangeOperations {
     }
 
     return objects;
+  }
+
+  public PagingProvider<MysticConnection, String> delayedSayMagicWords(@Content List<String> values,
+                                                                       int fetchSize, int delay) {
+    try {
+      CountDownLatch latch = new CountDownLatch(1);
+      latch.await(delay, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    return sayMagicWords(values, fetchSize);
   }
 
   public PagingProvider<MysticConnection, String> sayMagicWords(@Content List<String> values,

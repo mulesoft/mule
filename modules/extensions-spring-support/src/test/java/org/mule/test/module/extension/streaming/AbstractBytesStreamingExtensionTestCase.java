@@ -6,12 +6,15 @@
  */
 package org.mule.test.module.extension.streaming;
 
+import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
@@ -19,6 +22,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
+import org.junit.Test.None;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -26,6 +30,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -348,6 +353,27 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     assertThat(IOUtils.toString((InputStream) value), is(data));
   }
 
+  @Test
+  @Issue("W-16941297")
+  @Description("Call scatter gather containing route to invoke delayed-say-magic-words operation")
+  public void scatterGatherWithTimeout() throws Exception {
+    assertThrows(Exception.class, () -> flowRunner("scatterGatherWithTimeout")
+        .keepStreamsOpen()
+        .withPayload(singletonList(data))
+        .run());
+    assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), is(0));
+  }
+
+  @Test(expected = None.class)
+  @Issue("W-16941297")
+  public void scatterGatherWithGreaterTimeout() throws Exception {
+    flowRunner("scatterGatherWithGreaterTimeout")
+        .keepStreamsOpen()
+        .withPayload(singletonList(data))
+        .run();
+    assertThat(streamingManager.getStreamingStatistics().getOpenCursorsCount(), greaterThanOrEqualTo(1));
+  }
+
   private ParameterModel getStreamingStrategyParameterModel(Supplier<ParameterizedModel> model) {
     return model.get().getAllParameterModels().stream()
         .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
@@ -391,6 +417,15 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
       assertThat(event.getMessage().getPayload().getValue(), instanceOf(CursorStreamProvider.class));
+      return event;
+    }
+  }
+
+  public static class AssertPayloadIsIteratorProvider implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(event.getMessage().getPayload().getValue(), instanceOf(CursorIteratorProvider.class));
       return event;
     }
   }
