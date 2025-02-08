@@ -39,7 +39,12 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Needed by the SLF4JBridgeHandlerBootstrapConfigurer, but also to make the logging modules available from the boot layer -->
+        <!-- Needed by the SLF4JBridgeHandlerBootstrapConfigurer, -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+        <!-- but also to make the logging modules available from the boot layer -->
         <dependency>
             <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-logging</artifactId>

@@ -24,14 +24,16 @@ module org.mule.boot.api {
       com.mulesoft.mule.boot,
       com.mulesoft.mule.runtime.plugin; // container layer!
 
-  // Needed by the MuleLog4jConfigurer
-  requires org.mule.runtime.boot.log4j;
-
   // Needed by the BootModuleLayerValidationBootstrapConfigurer and for creating the container ClassLoader
   requires org.mule.runtime.jpms.utils;
 
-  // Needed by the SLF4JBridgeHandlerBootstrapConfigurer, but also to make the logging modules available from the boot layer
-  requires org.mule.runtime.logging;
+  // Needed by the MuleLog4jConfigurer
+  requires static org.mule.runtime.boot.log4j;
+
+  // Needed by the SLF4JBridgeHandlerBootstrapConfigurer,
+  requires jul.to.slf4j;
+  // but also to make the logging modules available from the boot layer
+  requires static org.mule.runtime.logging;
 
   requires org.apache.commons.cli;
 
