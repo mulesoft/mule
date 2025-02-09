@@ -164,7 +164,7 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.8.5-SNAPSHOT</muleBomVersion>
+        <muleBomVersion>4.8.5-rc1</muleBomVersion>
         <muleMavenClientBomVersion>2.3.5-rc1</muleMavenClientBomVersion>
 
         <weaveVersion>2.8.2</weaveVersion>
