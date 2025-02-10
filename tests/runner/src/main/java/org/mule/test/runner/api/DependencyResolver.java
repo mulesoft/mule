@@ -238,7 +238,13 @@ public class DependencyResolver implements AutoCloseable {
       throws DependencyCollectionException, DependencyResolutionException {
     try {
       final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
-      final String version = this.getClass().getPackage().getImplementationVersion();
+      // final String version = this.getClass().getPackage().getImplementationVersion();
+      /*
+       * @TODO Do uncomment the above line and remove the version hardcoding from the following line as corresponding version will
+       * get published along with the integration pipeline, Being a dev runtime, NO corresponding distributions and apis split
+       * loader bom will be available
+       **/
+      final String version = "4.8.0";
       ArtifactDescriptorResult pom =
           readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-apis-split-loader-bom",
                                                      "pom", version));
