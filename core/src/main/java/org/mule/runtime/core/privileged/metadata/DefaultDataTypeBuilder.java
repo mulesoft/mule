@@ -58,6 +58,12 @@ public class DefaultDataTypeBuilder
   private static ConcurrentHashMap<String, ProxyIndicator> proxyClassCache = new ConcurrentHashMap<>();
   private static ConcurrentHashMap<String, ProxyIndicator> dynamicClassCache = new ConcurrentHashMap<>();
 
+  /**
+   * W-16205376: Since this cache only sets its values to weak and not its keys, entries will only be cleaned up as part of
+   * Caffeine's routine maintenance. This implies that some references to class loaders will be kept until the cache is used
+   * again. Ex: after an application is undeployed, a DataType cache entry could maintain a reference to the
+   * MuleApplicationClassLoader until the application is redeployed.
+   */
   private static LoadingCache<DefaultDataTypeBuilder, DataType> dataTypeCache =
       newBuilder().weakValues().build(key -> key.doBuild());
 
