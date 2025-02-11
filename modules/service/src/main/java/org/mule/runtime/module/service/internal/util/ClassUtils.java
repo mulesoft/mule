@@ -188,7 +188,6 @@ public class ClassUtils {
     }
 
     // try the arguments as given
-    // Constructor ctor = clazz.getConstructor(args);
     Constructor<?> ctor = getConstructor(clazz, args);
 
     if (ctor == null) {

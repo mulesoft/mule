@@ -147,7 +147,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
     return services
         .values()
         .stream()
-        .filter(s -> serviceInterface.isInstance(s))
+        .filter(serviceInterface::isInstance)
         .map(s -> (S) s)
         .findAny();
   }
