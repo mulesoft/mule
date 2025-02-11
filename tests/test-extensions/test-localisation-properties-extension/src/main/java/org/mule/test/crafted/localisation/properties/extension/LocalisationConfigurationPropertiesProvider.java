@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.properties.DefaultConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 

@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.api.properties.DefaultConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ResourceProvider;
 import org.mule.runtime.properties.internal.ConfigurationPropertiesException;
 
@@ -109,4 +110,23 @@ public class YamlConfigurationPropertiesComponentTestCase {
     configurationComponent.initialise();
   }
 
+  @Description("Config file needs to have yaml or properties as file type extension")
+  @Test
+  public void invalidFiletypeThrowsException() throws InitialisationException {
+    configurationComponent = new DefaultConfigurationPropertiesProvider("file.txt", externalResourceProvider);
+    expectedException
+        .expectMessage("Configuration properties file file.txt must end with yaml or properties extension");
+    expectedException.expect(ConfigurationPropertiesException.class);
+    configurationComponent.initialise();
+  }
+
+  @Description("Config file should be readable")
+  @Test
+  public void invalidFileLocationThrowsException() throws InitialisationException {
+    configurationComponent = new DefaultConfigurationPropertiesProvider("file.yaml", externalResourceProvider);
+    expectedException
+        .expectMessage("Couldn't read from file file.yaml: null");
+    expectedException.expect(ConfigurationPropertiesException.class);
+    configurationComponent.initialise();
+  }
 }

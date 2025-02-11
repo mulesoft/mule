@@ -18,7 +18,7 @@ import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
-import org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProvider;
+import org.mule.runtime.config.api.properties.DefaultConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ResourceProvider;
 import org.mule.runtime.properties.internal.ConfigurationPropertiesException;
 import org.mule.tck.junit4.AbstractMuleTestCase;

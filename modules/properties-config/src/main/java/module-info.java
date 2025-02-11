@@ -51,7 +51,4 @@ module org.mule.runtime.properties.config {
 
   opens org.mule.runtime.config.internal.model.dsl.config to
       spring.core;
-  exports org.mule.runtime.config.internal.model.dsl.properties to
-      org.mule.runtime.spring.config;
-
 }

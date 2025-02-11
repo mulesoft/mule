@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.model.dsl.properties;
+package org.mule.runtime.config.api.properties;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
@@ -20,6 +20,7 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.config.internal.model.dsl.properties.YamlFactory;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
@@ -84,7 +85,9 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
   @Override
   public String getDescription() {
     ComponentLocation location = (ComponentLocation) getAnnotation(LOCATION_KEY);
-    return format("<" + getIdentifier().toString() + " file=\"%s\"> - file: %s, line number: %s", fileLocation,
+    return format("<%s file=\"%s\"> - file: %s, line number: %s",
+                  getIdentifier().toString(),
+                  fileLocation,
                   location.getFileName().orElse(UNKNOWN),
                   location.getLine().orElse(-1));
   }
@@ -107,12 +110,6 @@ public class DefaultConfigurationPropertiesProvider extends AbstractComponent
     }
 
     try (Reader is = new BufferedReader(getResourceInputStreamReader(fileLocation))) {
-      if (is == null) {
-        throw new ConfigurationPropertiesException(createStaticMessage(format("Couldn't find configuration properties file %s neither on classpath or in file system",
-                                                                              fileLocation)),
-                                                   this);
-      }
-
       readAttributesFromFile(is);
     } catch (ConfigurationPropertiesException e) {
       throw e;

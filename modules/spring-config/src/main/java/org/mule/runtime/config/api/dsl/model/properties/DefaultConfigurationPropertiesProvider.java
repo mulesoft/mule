@@ -38,8 +38,7 @@ import org.yaml.snakeyaml.parser.ParserException;
  *
  * @since 4.0
  *
- * @deprecated since 4.4, use org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProvider
- *             instead.
+ * @deprecated since 4.4, use org.mule.runtime.config.api.properties.DefaultConfigurationPropertiesProvider instead.
  */
 @Deprecated
 public class DefaultConfigurationPropertiesProvider
