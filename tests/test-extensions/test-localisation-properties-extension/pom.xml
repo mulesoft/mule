@@ -30,7 +30,7 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-properties-config</artifactId>
             <version>4.10.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
