@@ -7,16 +7,22 @@
 package org.mule.runtime.module.service.api.artifact;
 
 import org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFactory;
+import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.internal.DefaultMuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 public interface IServiceClassLoaderFactory
     extends ArtifactClassLoaderFactory<ServiceDescriptor>, ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> {
 
-  @Deprecated
+  @Deprecated(since = "4.10.0")
+  /**
+   * @deprecated use {@link #create(String, ArtifactDescriptor, MuleContainerClassLoaderWrapper)} or
+   *             {@link #create(String, ServiceDescriptor, ArtifactClassLoader)} instead.
+   */
   ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
                              ClassLoaderLookupPolicy lookupPolicy)
       throws ArtifactClassloaderCreationException;

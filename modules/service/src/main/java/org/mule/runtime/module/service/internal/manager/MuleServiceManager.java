@@ -76,7 +76,8 @@ public class MuleServiceManager implements ServiceManager {
    */
   @Override
   public void stop() throws MuleException {
-    Service schedulerService = null, httpService = null;
+    Service schedulerService = null;
+    Service httpService = null;
     for (Service service : services) {
       if (service.getName().equals(SCHEDULER_SERVICE_ARTIFACT_ID)) {
         schedulerService = service;
