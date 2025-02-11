@@ -109,22 +109,14 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DelayedSayMagicWordsType" substitutionGroup="mule:abstract-operator" name="delayed-say-magic-words"></xs:element>
-  <xs:complexType name="DelayedSayMagicWordsType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetRelicsType" substitutionGroup="mule:abstract-operator" name="get-relics"></xs:element>
+  <xs:complexType name="GetRelicsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
-          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="values"></xs:element>
         </xs:sequence>
-        <xs:attribute type="mule:expressionInt" use="required" name="fetchSize"></xs:attribute>
-        <xs:attribute type="mule:expressionInt" use="required" name="delay"></xs:attribute>
-        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
-          <xs:annotation>
-            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
@@ -143,14 +135,23 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetRelicsType" substitutionGroup="mule:abstract-operator" name="get-relics"></xs:element>
-  <xs:complexType name="GetRelicsType">
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="LatchedSayMagicWordsType" substitutionGroup="mule:abstract-operator" name="latched-say-magic-words"></xs:element>
+  <xs:complexType name="LatchedSayMagicWordsType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
           <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="values"></xs:element>
         </xs:sequence>
+        <xs:attribute type="mule:expressionInt" use="required" name="fetchSize"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="latch"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="providerClosedLatch"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
         <xs:attribute type="xs:string" use="optional" name="config-ref">
           <xs:annotation>
             <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>

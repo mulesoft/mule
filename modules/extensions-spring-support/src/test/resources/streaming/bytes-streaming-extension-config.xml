@@ -220,27 +220,13 @@
     </sub-flow>
 
     <flow name="scatterGatherWithTimeout">
-        <scatter-gather timeout="1000">
+        <scatter-gather timeout="100">
             <route>
                 <logger level="INFO" message="Executing Route 1"/>
             </route>
             <route>
-                <marvel:delayed-say-magic-words fetchSize="1" delay="2000" config-ref="drStrange" />
+                <marvel:latched-say-magic-words fetchSize="1" latch="#[vars.latch]" providerClosedLatch="#[vars.providerClosedLatch]" config-ref="drStrange" />
                 <flow-ref name="assertPayloadIsIteratorProvider"/>
-                <marvel:read-object-stream/>
-            </route>
-        </scatter-gather>
-    </flow>
-
-    <flow name="scatterGatherWithGreaterTimeout">
-        <scatter-gather timeout="2000">
-            <route>
-                <logger level="INFO" message="Executing Route 1"/>
-            </route>
-            <route>
-                <marvel:delayed-say-magic-words fetchSize="1" delay="1000" config-ref="drStrange" />
-                <flow-ref name="assertPayloadIsIteratorProvider"/>
-                <marvel:read-object-stream/>
             </route>
         </scatter-gather>
     </flow>

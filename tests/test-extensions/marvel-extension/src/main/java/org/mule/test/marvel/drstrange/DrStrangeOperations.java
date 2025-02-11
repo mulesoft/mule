@@ -34,6 +34,7 @@ import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 import org.mule.sdk.api.annotation.param.stereotype.ComponentId;
+import org.mule.sdk.api.runtime.operation.FlowListener;
 import org.mule.test.marvel.model.Relic;
 
 import java.io.ByteArrayInputStream;
@@ -44,7 +45,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
@@ -114,45 +114,65 @@ public class DrStrangeOperations {
     return objects;
   }
 
-  public PagingProvider<MysticConnection, String> delayedSayMagicWords(@Content List<String> values,
-                                                                       int fetchSize, int delay) {
-    try {
-      CountDownLatch latch = new CountDownLatch(1);
-      latch.await(delay, TimeUnit.MILLISECONDS);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
+  /**
+   * Generates a streaming result ({@link PagingProvider} in this case) but only after a certain {@code latch} is counted down.
+   *
+   * @param values              The values to generate the streaming result with.
+   * @param fetchSize           The size of the pages.
+   * @param latch               The {@link CountDownLatch} to wait on before producing the first page (can be used to simulate a
+   *                            controlled delay).
+   * @param providerClosedLatch A {@link CountDownLatch} to be counted down when the returned {@link PagingProvider} is closed.
+   * @param flowListener        An implicit parameter, used to register callbacks for closing the stream when owning context
+   *                            finishes.
+   * @return A paginated result from the given {@code values}.
+   */
+  public PagingProvider<MysticConnection, String> latchedSayMagicWords(@Content List<String> values, int fetchSize,
+                                                                       Object latch, Object providerClosedLatch,
+                                                                       FlowListener flowListener) {
+    if (!(latch instanceof CountDownLatch)) {
+      throw new IllegalArgumentException("`latch` must be a CountDownLatch");
     }
-    return sayMagicWords(values, fetchSize);
+
+    if (!(providerClosedLatch instanceof CountDownLatch)) {
+      throw new IllegalArgumentException("`providerClosedLatch` must be a CountDownLatch");
+    }
+
+    return new SimplePagingProviderFromList(values, fetchSize) {
+
+      @Override
+      public List<String> getPage(MysticConnection connection) {
+        if (index.get() == 0) {
+          // These are needed because the disposal of the streaming state of the root event context will happen before this
+          // PagingProvider is registered (due to the timeout).
+          // The first page is fetched before the registration with the streaming state (see PagingResultTransformer).
+          flowListener.onComplete(() -> this.close(connection));
+          flowListener.onError(e -> this.close(connection));
+          try {
+            // Artificial delay on first page
+            ((CountDownLatch) latch).await();
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+        }
+        return super.getPage(connection);
+      }
+
+      @Override
+      public void close(MysticConnection connection) {
+        // Counts down on the latch, notifying the stream was closed
+        ((CountDownLatch) providerClosedLatch).countDown();
+      }
+    };
   }
 
   public PagingProvider<MysticConnection, String> sayMagicWords(@Content List<String> values,
                                                                 int fetchSize) {
-    final AtomicInteger index = new AtomicInteger(0);
-
-    return new PagingProvider<MysticConnection, String>() {
+    return new SimplePagingProviderFromList(values, fetchSize) {
 
       private int timesClosed = 0;
 
       @Override
-      public List<String> getPage(MysticConnection connection) {
-        final int i = index.get();
-        if (i >= values.size()) {
-          return emptyList();
-        }
-
-        List<String> words = values.subList(i, i + fetchSize);
-        index.addAndGet(fetchSize);
-
-        return words;
-      }
-
-      @Override
-      public java.util.Optional<Integer> getTotalResults(MysticConnection connection) {
-        return of(values.size());
-      }
-
-      @Override
-      public void close(MysticConnection connection) throws MuleException {
+      public void close(MysticConnection connection) {
         timesClosed++;
         if (timesClosed > 1) {
           throw new RuntimeException("Expected to be closed only once but was called twice");
@@ -228,5 +248,40 @@ public class DrStrangeOperations {
                        (error, previous) -> {
                          callback.error(error);
                        });
+  }
+
+  private static class SimplePagingProviderFromList implements PagingProvider<MysticConnection, String> {
+
+    private final List<String> values;
+    protected final AtomicInteger index = new AtomicInteger(0);
+    private final int fetchSize;
+
+    private SimplePagingProviderFromList(List<String> values, int fetchSize) {
+      this.values = values;
+      this.fetchSize = fetchSize;
+    }
+
+    @Override
+    public List<String> getPage(MysticConnection connection) {
+      final int i = index.get();
+      if (i >= values.size()) {
+        return emptyList();
+      }
+
+      List<String> words = values.subList(i, i + fetchSize);
+      index.addAndGet(fetchSize);
+
+      return words;
+    }
+
+    @Override
+    public java.util.Optional<Integer> getTotalResults(MysticConnection connection) {
+      return of(values.size());
+    }
+
+    @Override
+    public void close(MysticConnection connection) {
+      // This version does nothing
+    }
   }
 }
