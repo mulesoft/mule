@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.model.dsl.properties;
+package org.mule.runtime.config.api.properties;
 
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_YAML_STORY;
@@ -15,7 +15,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.api.properties.DefaultConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ResourceProvider;
 import org.mule.runtime.properties.internal.ConfigurationPropertiesException;
 
