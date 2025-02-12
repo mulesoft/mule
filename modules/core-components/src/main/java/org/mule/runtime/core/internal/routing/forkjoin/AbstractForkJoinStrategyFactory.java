@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
@@ -34,6 +35,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.event.AbstractEventContext;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
@@ -46,7 +48,9 @@ import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
 import java.time.Duration;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,6 +58,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -183,8 +188,8 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                                            // publisher is cancelled, so the inner MessageProcessorChains never
                                                            // finishes and the child context is never completed, hence we have to
                                                            // complete it manually on timeout
-                                                           .doOnSuccess(childContext::success)
-                                                           .doOnError(childContext::error),
+                                                           .doOnSuccess(completeRecursively(childContext,
+                                                                                            BaseEventContext::error)),
                                                        timeoutScheduler)
                                               .map(coreEvent -> new Pair<CoreEvent, EventProcessingException>(
                                                                                                               ((DefaultEventBuilder) CoreEvent
@@ -195,6 +200,25 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                               .onErrorResume(MessagingException.class,
                                                              me -> getPublisher(delayErrors,
                                                                                 me));
+    };
+  }
+
+  private Consumer<CoreEvent> completeRecursively(BaseEventContext eventContext,
+                                                  BiConsumer<BaseEventContext, MessagingException> forEachChild) {
+    return some -> {
+      // Tracks the child contexts first and then completes them, that way we are not retaining the read lock all the time.
+      Deque<BaseEventContext> allContexts = new ArrayDeque<>();
+      allContexts.push(eventContext);
+      ((AbstractEventContext) eventContext).forEachChild(allContexts::push);
+
+      while (!allContexts.isEmpty()) {
+        BaseEventContext ctx = allContexts.pop();
+        // Some context may already be terminated, as the children can propagate the termination up to their parents.
+        if (!ctx.isTerminated()) {
+          // It is important to swap the context so it has the right flow stack among other things.
+          forEachChild.accept(ctx, new MessagingException(quickCopy(ctx, some), some.getError().get().getCause()));
+        }
+      }
     };
   }
 

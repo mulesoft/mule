@@ -220,7 +220,7 @@
     </sub-flow>
 
     <flow name="scatterGatherWithTimeout">
-        <scatter-gather timeout="100">
+        <scatter-gather timeout="1000">
             <route>
                 <logger level="INFO" message="Executing Route 1"/>
             </route>
@@ -229,6 +229,41 @@
                 <flow-ref name="assertPayloadIsIteratorProvider"/>
             </route>
         </scatter-gather>
+    </flow>
+
+    <flow name="scatterGatherWithTimeoutFlowRef">
+        <scatter-gather timeout="1000">
+            <route>
+                <logger level="INFO" message="Executing Route 1"/>
+            </route>
+            <route>
+                <flow-ref name="nestedLatchedSayMagicWords"/>
+            </route>
+        </scatter-gather>
+    </flow>
+
+    <flow name="scatterGatherWithNestedRoute">
+        <scatter-gather timeout="1000">
+            <route>
+                <logger level="INFO" message="Executing Route 1"/>
+            </route>
+            <route>
+                <scatter-gather>
+                    <route>
+                        <logger level="INFO" message="Executing Route 1"/>
+                    </route>
+                    <route>
+                        <marvel:latched-say-magic-words fetchSize="1" latch="#[vars.latch]" providerClosedLatch="#[vars.providerClosedLatch]" config-ref="drStrange" />
+                        <flow-ref name="assertPayloadIsIteratorProvider"/>
+                    </route>
+                </scatter-gather>
+            </route>
+        </scatter-gather>
+    </flow>
+
+    <flow name="nestedLatchedSayMagicWords">
+        <marvel:latched-say-magic-words fetchSize="1" latch="#[vars.latch]" providerClosedLatch="#[vars.providerClosedLatch]" config-ref="drStrange" />
+        <flow-ref name="assertPayloadIsIteratorProvider"/>
     </flow>
 
 </mule>

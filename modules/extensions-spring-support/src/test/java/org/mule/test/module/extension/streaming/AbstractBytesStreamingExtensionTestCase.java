@@ -17,6 +17,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
 import static java.util.Collections.singletonList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -48,10 +49,12 @@ import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.exception.MessagingException;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -59,6 +62,8 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -74,6 +79,7 @@ import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
+@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
@@ -370,9 +376,46 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   @Issue("W-16941297")
   @Description("A Scatter Gather router will time out while an operation is still executing. The operation then finishes and generates a stream which should eventually be closed.")
   public void whenScatterGatherTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
+    runScatterGatherFlowAndAssertNoContextLeaked("scatterGatherWithTimeout");
+  }
+
+  @Test
+  @Issue("W-16941297")
+  @Description("A Scatter Gather router will time out while an operation inside a referenced flow is still executing. The operation then finishes and generates a stream which should eventually be closed.")
+  public void whenScatterGatherWithFlowRefTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
+    runScatterGatherFlowAndAssertNoContextLeaked("scatterGatherWithTimeoutFlowRef");
+  }
+
+  @Test
+  @Issue("W-16941297")
+  @Description("A Scatter Gather router will time out while an operation inside another nested Scatter Gather is still executing. The operation then finishes and generates a stream which should eventually be closed.")
+  public void whenScatterGatherWithNestedTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
+    runScatterGatherFlowAndAssertNoContextLeaked("scatterGatherWithNestedRoute");
+  }
+
+  @Test
+  @Issue("W-16941297")
+  public void scatterGatherTimeoutStress() throws InterruptedException {
+    whenScatterGatherTimesOutThenStreamsAreNotLeaked();
+    ExecutorService executorService = Executors.newFixedThreadPool(3);
+    for (int i = 0; i < 3; i++) {
+      executorService.submit(() -> {
+        try {
+          this.whenScatterGatherTimesOutThenStreamsAreNotLeaked();
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      });
+    }
+    executorService.shutdown();
+    whenScatterGatherTimesOutThenStreamsAreNotLeaked();
+    whenScatterGatherTimesOutThenStreamsAreNotLeaked();
+  }
+
+  private void runScatterGatherFlowAndAssertNoContextLeaked(String flowName) throws InterruptedException {
     CountDownLatch sgTimedOutLatch = new CountDownLatch(1);
     CountDownLatch pagingProviderClosedLatch = new CountDownLatch(1);
-    MessagingException e = assertThrows(MessagingException.class, () -> flowRunner("scatterGatherWithTimeout")
+    MessagingException e = assertThrows(MessagingException.class, () -> flowRunner(flowName)
         .withPayload(singletonList(data))
         .withVariable("latch", sgTimedOutLatch)
         .withVariable("providerClosedLatch", pagingProviderClosedLatch)
@@ -388,7 +431,7 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     sgTimedOutLatch.countDown();
 
     // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty())));
+    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty()).atMostIn(20, SECONDS)));
 
     // And wait until the paging provider is closed
     pagingProviderClosedLatch.await();
