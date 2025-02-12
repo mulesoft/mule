@@ -52,7 +52,7 @@ import reactor.core.publisher.MonoSink;
  *
  * @since 4.0
  */
-public abstract class AbstractEventContext implements SpanContextAware, BaseEventContext {
+abstract class AbstractEventContext implements SpanContextAware, BaseEventContext {
 
   private static final int STATE_READY = 0;
   private static final int STATE_RESPONSE_RECEIVED = 1;
