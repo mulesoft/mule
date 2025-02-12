@@ -71,14 +71,16 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
       ownPolicyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(ownResolvedPluginDescriptors
               .toArray(new ArtifactPluginDescriptor[ownResolvedPluginDescriptors.size()]))
-          .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
+          .setParentClassLoader(policyTemplateClassLoaderBuilderFactory.getPolicyParentClassloader())
+          .setArtifactDescriptor(descriptor).build();
 
       // This classloader needs to be created after ownPolicyClassLoader so its inner classloaders override the entries in the
       // ClassLoaderRepository for the application
       policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(resolvedPolicyPluginsDescriptors
               .toArray(new ArtifactPluginDescriptor[resolvedPolicyPluginsDescriptors.size()]))
-          .setParentClassLoader(application.getRegionClassLoader()).setArtifactDescriptor(descriptor).build();
+          .setParentClassLoader(policyTemplateClassLoaderBuilderFactory.getPolicyParentClassloader())
+          .setArtifactDescriptor(descriptor).build();
     } catch (Exception e) {
       throw new PolicyTemplateCreationException(createPolicyTemplateCreationErrorMessage(descriptor.getName()), e);
     }

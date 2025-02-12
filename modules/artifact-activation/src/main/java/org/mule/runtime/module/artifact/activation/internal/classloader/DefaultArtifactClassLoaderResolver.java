@@ -493,4 +493,7 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                        pluginDescriptorResolver());
   }
 
+  public MuleDeployableArtifactClassLoader getDefaultDomainClassloader() {
+    return defaultDomainClassloader;
+  }
 }

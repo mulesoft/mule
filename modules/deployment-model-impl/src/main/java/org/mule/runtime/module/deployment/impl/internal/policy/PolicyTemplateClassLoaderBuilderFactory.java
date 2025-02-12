@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 /**
  * Creates instances of {@link PolicyTemplateClassLoaderBuilder}
@@ -19,4 +20,6 @@ public interface PolicyTemplateClassLoaderBuilderFactory {
    * @return a new builder instance.
    */
   PolicyTemplateClassLoaderBuilder createArtifactClassLoaderBuilder();
+
+  ArtifactClassLoader getPolicyParentClassloader();
 }

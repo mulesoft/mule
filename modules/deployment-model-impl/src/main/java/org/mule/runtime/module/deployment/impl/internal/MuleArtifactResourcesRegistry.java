@@ -281,11 +281,14 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
         DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory();
 
+    DefaultArtifactClassLoaderResolver defaultArtifactClassLoaderResolver =
+        new DefaultArtifactClassLoaderResolver(containerClassLoader,
+                                               moduleRepository,
+                                               new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name)));
+
     ArtifactClassLoaderResolver artifactClassLoaderResolver =
         new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,
-                                                         new DefaultArtifactClassLoaderResolver(containerClassLoader,
-                                                                                                moduleRepository,
-                                                                                                new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name))));
+                                                         defaultArtifactClassLoaderResolver);
 
     pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactClassLoaderResolver);
     applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
@@ -318,7 +321,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
-        new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
+        new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory,
+                                                               defaultArtifactClassLoaderResolver.getDefaultDomainClassloader());
 
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
                                                        deployableArtifactDescriptorFactory,
