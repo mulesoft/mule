@@ -220,7 +220,7 @@
         </surefire.slf4j.module.args>
 
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
-        <mule.maven.plugin.version>4.4.0-SNAPSHOT</mule.maven.plugin.version>
+        <mule.maven.plugin.version>4.4.0</mule.maven.plugin.version>
     </properties>
 
     <dependencyManagement>
