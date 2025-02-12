@@ -79,7 +79,6 @@ import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
-@RunnerDelegateTo(FlakinessDetectorTestRunner.class)
 public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractStreamingExtensionTestCase {
 
   private static final String BARGAIN_SPELL = "dormammu i've come to bargain";
@@ -398,7 +397,7 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   public void scatterGatherTimeoutStress() throws InterruptedException {
     whenScatterGatherTimesOutThenStreamsAreNotLeaked();
     ExecutorService executorService = Executors.newFixedThreadPool(3);
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 50; i++) {
       executorService.submit(() -> {
         try {
           this.whenScatterGatherTimesOutThenStreamsAreNotLeaked();
