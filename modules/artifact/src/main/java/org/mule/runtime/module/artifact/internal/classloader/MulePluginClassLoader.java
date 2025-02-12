@@ -49,4 +49,30 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader implements Wi
   public Set<ClassLoader> getAttachedClassLoaders() {
     return attachedClassLoaders;
   }
+
+  @Override
+  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    try {
+      Class<?> localClass = findLocalClass(name);
+      Class<?> superClass = super.loadClass(name, resolve);
+      if (isPolicyClassLoader() && isDomainClassLoader(superClass.getClassLoader())) {
+        if (localClass != null) {
+          return localClass;
+        }
+      }
+    } catch (ClassNotFoundException e) {
+
+    }
+    return super.loadClass(name, resolve);
+  }
+
+  private boolean isPolicyClassLoader() {
+    String artifactId = getArtifactId();
+    return artifactId != null && artifactId.contains("/policy/");
+  }
+
+  private boolean isDomainClassLoader(ClassLoader classLoader) {
+    String artifactId = getArtifactId();
+    return artifactId != null && artifactId.contains("/domain/") && !artifactId.contains("/policy/");
+  }
 }
