@@ -179,6 +179,10 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                           childContext))
                                               .timeout(timeout,
                                                        onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair)
+                                                           // When the timeout happens, the subscription to the original
+                                                           // publisher is cancelled, so the inner MessageProcessorChains never
+                                                           // finishes and the child context is never completed, hence we have to
+                                                           // complete it manually on timeout
                                                            .doOnSuccess(childContext::success)
                                                            .doOnError(childContext::error),
                                                        timeoutScheduler)
