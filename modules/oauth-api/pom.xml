@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.9.1-SNAPSHOT</version>
+        <version>4.9.1-rc1</version>
     </parent>
     <artifactId>mule-service-oauth-api</artifactId>
     <description>Mule service that provides OAuth authentication support</description>
