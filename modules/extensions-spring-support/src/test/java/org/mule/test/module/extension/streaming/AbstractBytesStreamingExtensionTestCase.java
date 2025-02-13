@@ -29,7 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.isA;
-import static org.junit.Assert.assertThrows;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.exception.ComposedErrorException;
@@ -49,12 +49,10 @@ import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.privileged.exception.MessagingException;
-import org.mule.tck.junit4.FlakinessDetectorTestRunner;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -76,6 +74,7 @@ import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
@@ -130,6 +129,9 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
 
   @Rule
   public SystemProperty configName;
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   public AbstractBytesStreamingExtensionTestCase(String configName) {
     this.configName = new SystemProperty("configName", configName);
@@ -374,34 +376,34 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   @Test
   @Issue("W-16941297")
   @Description("A Scatter Gather router will time out while an operation is still executing. The operation then finishes and generates a stream which should eventually be closed.")
-  public void whenScatterGatherTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
+  public void whenScatterGatherTimesOutThenStreamsAreNotLeaked() throws Exception {
     runScatterGatherFlowAndAssertNoContextLeaked("scatterGatherWithTimeout");
   }
 
   @Test
   @Issue("W-16941297")
   @Description("A Scatter Gather router will time out while an operation inside a referenced flow is still executing. The operation then finishes and generates a stream which should eventually be closed.")
-  public void whenScatterGatherWithFlowRefTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
+  public void whenScatterGatherWithFlowRefTimesOutThenStreamsAreNotLeaked() throws Exception {
     runScatterGatherFlowAndAssertNoContextLeaked("scatterGatherWithTimeoutFlowRef");
   }
 
   @Test
   @Issue("W-16941297")
   @Description("A Scatter Gather router will time out while an operation inside another nested Scatter Gather is still executing. The operation then finishes and generates a stream which should eventually be closed.")
-  public void whenScatterGatherWithNestedTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
+  public void whenScatterGatherWithNestedTimesOutThenStreamsAreNotLeaked() throws Exception {
     runScatterGatherFlowAndAssertNoContextLeaked("scatterGatherWithNestedRoute");
   }
 
   @Test
   @Issue("W-16941297")
-  public void scatterGatherTimeoutStress() throws InterruptedException {
+  public void scatterGatherTimeoutStress() throws Exception {
     whenScatterGatherTimesOutThenStreamsAreNotLeaked();
     ExecutorService executorService = Executors.newFixedThreadPool(3);
     for (int i = 0; i < 50; i++) {
       executorService.submit(() -> {
         try {
           this.whenScatterGatherTimesOutThenStreamsAreNotLeaked();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
           throw new RuntimeException(e);
         }
       });
@@ -411,20 +413,20 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     whenScatterGatherTimesOutThenStreamsAreNotLeaked();
   }
 
-  private void runScatterGatherFlowAndAssertNoContextLeaked(String flowName) throws InterruptedException {
+  private void runScatterGatherFlowAndAssertNoContextLeaked(String flowName) throws Exception {
     CountDownLatch sgTimedOutLatch = new CountDownLatch(1);
     CountDownLatch pagingProviderClosedLatch = new CountDownLatch(1);
-    MessagingException e = assertThrows(MessagingException.class, () -> flowRunner(flowName)
+
+    // Execution must end with timeout
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(allOf(isA(ComposedErrorException.class),
+                                        hasMessage(containsString("Route 1: java.util.concurrent.TimeoutException: "
+                                            + "Timeout while processing route/part: '1'"))));
+    flowRunner(flowName)
         .withPayload(singletonList(data))
         .withVariable("latch", sgTimedOutLatch)
         .withVariable("providerClosedLatch", pagingProviderClosedLatch)
-        .run());
-
-    // Control test that the execution really ended with timeout
-    assertThat(e,
-               hasCause(allOf(isA(ComposedErrorException.class),
-                              hasMessage(containsString("Route 1: java.util.concurrent.TimeoutException: "
-                                  + "Timeout while processing route/part: '1'")))));
+        .run();
 
     // If we are here it means the Scatter Gather has already timed out, so now we allow the operation to proceed
     sgTimedOutLatch.countDown();
