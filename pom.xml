@@ -177,7 +177,7 @@
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
         <licenseYear>2023</licenseYear>
 
-        <muleAnnotationsApiVersion>1.8.1-SNAPSHOT</muleAnnotationsApiVersion>
+        <muleAnnotationsApiVersion>1.8.1-rc1</muleAnnotationsApiVersion>
         <mule.module.maven.plugin.version>1.9.1-SNAPSHOT</mule.module.maven.plugin.version>
         <mule.extensions.maven.plugin.version>1.9.1-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.9.1-SNAPSHOT</mule.app.plugins.maven.plugin.version>
