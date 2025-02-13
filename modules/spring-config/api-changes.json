@@ -1,19 +1,4 @@
 {
-  "4.4.1": {
-    "revapi": {
-      "ignore": [
-        {
-          "code": "java.method.added",
-          "new": "method java.util.Optional<org.mule.runtime.dsl.api.component.ComponentBuildingDefinition<?>> org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry::getBuildingDefinition(org.mule.runtime.api.component.ComponentIdentifier, java.util.function.Predicate<org.mule.runtime.dsl.api.component.ComponentBuildingDefinition<?>>)",
-          "package": "org.mule.runtime.config.api.dsl.model",
-          "classSimpleName": "ComponentBuildingDefinitionRegistry",
-          "methodName": "getBuildingDefinition",
-          "elementKind": "method",
-		  "justification": "W-17484538: Disambiguate colliding componentIds in ComponentBuildingDefinitionRegistry"
-        }
-      ]
-    }
-  },
   "4.4.0": {
     "revapi": {
       "ignore": [

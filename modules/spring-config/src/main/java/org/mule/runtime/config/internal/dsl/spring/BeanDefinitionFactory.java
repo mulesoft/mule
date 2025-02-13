@@ -64,8 +64,6 @@ import org.mule.runtime.config.internal.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.dsl.api.component.TypeDefinition.MapEntryType;
-import org.mule.runtime.dsl.api.component.TypeDefinitionVisitor;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 
 import java.util.ArrayList;
@@ -210,8 +208,7 @@ public class BeanDefinitionFactory {
     resolveComponentBeanDefinition(springComponentModels, componentHierarchy, component,
                                    paramsModels, registry, componentLocator,
                                    nestedComp -> resolveComponent(springComponentModels, nestedHierarchy, nestedComp,
-                                                                  registry, componentLocator),
-                                   false);
+                                                                  registry, componentLocator));
   }
 
   private List<SpringComponentModel> resolveParameterGroup(Map<ComponentAst, SpringComponentModel> springComponentModels,
@@ -278,21 +275,20 @@ public class BeanDefinitionFactory {
     AtomicReference<SpringComponentModel> model = new AtomicReference<>();
     param.getModel().getType().accept(new MetadataTypeVisitor() {
 
-      protected void visitMultipleChildren(List<Object> values, boolean mapType) {
+      protected void visitMultipleChildren(List<Object> values) {
         final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentHierarchy);
         updatedHierarchy.add(paramOwnerComponent);
 
         if (values != null) {
           values.stream()
-              .filter(ComponentAst.class::isInstance)
+              .filter(child -> child instanceof ComponentAst)
               .forEach(child -> resolveComponentBeanDefinition(springComponentModels, updatedHierarchy, (ComponentAst) child,
                                                                emptyList(),
                                                                registry, componentLocator,
                                                                nestedComp -> resolveComponent(springComponentModels,
                                                                                               updatedHierarchy,
                                                                                               nestedComp, registry,
-                                                                                              componentLocator),
-                                                               mapType));
+                                                                                              componentLocator)));
         }
 
         resolveComponentBeanDefinitionComplexParam(springComponentModels, updatedHierarchy, paramOwnerComponent, param,
@@ -306,7 +302,7 @@ public class BeanDefinitionFactory {
       public void visitArrayType(ArrayType arrayType) {
         final Object complexValue = param.getValue().getRight();
         if (complexValue instanceof List) {
-          visitMultipleChildren((List) complexValue, false);
+          visitMultipleChildren((List) complexValue);
         } else {
           // references to a list defined elsewhere
           resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
@@ -321,7 +317,7 @@ public class BeanDefinitionFactory {
 
         if (isMap(objectType)) {
           if (complexValue instanceof List) {
-            visitMultipleChildren((List) complexValue, true);
+            visitMultipleChildren((List) complexValue);
           } else {
             // references to a map defined elsewhere
             resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
@@ -336,6 +332,7 @@ public class BeanDefinitionFactory {
 
         if (complexValue instanceof ComponentAst) {
           final ComponentAst child = (ComponentAst) complexValue;
+
           List<SpringComponentModel> childParamsModels = new ArrayList<>();
 
           child.getModel(ParameterizedModel.class)
@@ -406,48 +403,19 @@ public class BeanDefinitionFactory {
                                                                         List<SpringComponentModel> paramsModels,
                                                                         BeanDefinitionRegistry registry,
                                                                         SpringConfigurationComponentLocator componentLocator,
-                                                                        Consumer<ComponentAst> nestedComponentParamProcessor,
-                                                                        boolean parentMapType) {
+                                                                        Consumer<ComponentAst> nestedComponentParamProcessor) {
     Optional<ComponentBuildingDefinition<?>> buildingDefinitionOptional =
-        componentBuildingDefinitionRegistry.getBuildingDefinition(component.getIdentifier(), bd -> {
-          final IsMapEntryTypeVisitor isMapEntryTypeVisitor = new IsMapEntryTypeVisitor();
-          bd.getTypeDefinition().visit(isMapEntryTypeVisitor);
-          return parentMapType == isMapEntryTypeVisitor.isMapType();
-        });
+        componentBuildingDefinitionRegistry.getBuildingDefinition(component.getIdentifier());
     if (buildingDefinitionOptional.isPresent() || customBuildersComponentIdentifiers.contains(component.getIdentifier())) {
       final CreateComponentBeanDefinitionRequest request =
           new CreateComponentBeanDefinitionRequest(componentHierarchy, component, paramsModels,
-                                                   buildingDefinitionOptional.orElse(null), nestedComponentParamProcessor,
-                                                   parentMapType);
+                                                   buildingDefinitionOptional.orElse(null), nestedComponentParamProcessor);
 
       this.componentProcessor.processRequest(springComponentModels, request);
       handleSpringComponentModel(request.getSpringComponentModel(), springComponentModels, registry, componentLocator);
       return of(request.getSpringComponentModel());
     } else {
       return empty();
-    }
-  }
-
-  private static final class IsMapEntryTypeVisitor implements TypeDefinitionVisitor {
-
-    private boolean mapType;
-
-    @Override
-    public void onType(Class<?> type) {}
-
-    @Override
-    public void onMapType(MapEntryType mapEntryType) {
-      this.mapType = true;
-    }
-
-    @Override
-    public void onConfigurationAttribute(String groupName, String attributeName, Class<?> enforcedClass) {}
-
-    @Override
-    public void onConfigurationAttribute(String attributeName, Class<?> enforcedClass) {}
-
-    public boolean isMapType() {
-      return mapType;
     }
   }
 
