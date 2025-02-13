@@ -1,0 +1,15 @@
+number: "34843"
+float: "2392.00"
+date: "2001-01-23"
+lines: |
+    458 Walkman Dr.
+    Suite #292
+list:
+  - one
+  - two
+  - three
+complex:
+  prop0: value0
+  complex2:
+    prop1: value1
+    prop2: value2

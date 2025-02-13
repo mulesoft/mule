@@ -26,6 +26,15 @@
             <artifactId>mule-properties-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.vibur</groupId>
+            <artifactId>vibur-object-pool</artifactId>
+        </dependency>
+
         <!-- Unit tests -->
         <dependency>
             <groupId>org.mule.tests</groupId>
