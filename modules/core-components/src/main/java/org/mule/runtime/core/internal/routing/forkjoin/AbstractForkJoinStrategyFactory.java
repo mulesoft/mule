@@ -7,13 +7,12 @@
 package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Long.MAX_VALUE;
-import static java.util.Optional.empty;
+import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -35,22 +34,18 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.internal.event.AbstractEventContext;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
 import java.time.Duration;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,7 +53,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -79,6 +73,10 @@ import reactor.core.scheduler.Schedulers;
  * </ul>
  */
 public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrategyFactory {
+
+  // TODO W-17814249: Remove kill switch
+  private static final boolean COMPLETE_CHILDREN_ON_TIMEOUT =
+      parseBoolean(getProperty("mule.forkJoin.completeChildContextsOnTimeout", "true"));
 
   public static final String TIMEOUT_EXCEPTION_DESCRIPTION = "Route Timeout";
   public static final String TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX = "Timeout while processing route/part:";
@@ -177,56 +175,33 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
           .transform(pair.getRoute());
+      route = applyProcessingStrategy(processingStrategy, route, maxConcurrency);
 
-      BaseEventContext childContext = newChildContext(pair.getEvent(), empty());
-      return from(processWithChildContext(pair.getEvent(),
-                                          applyProcessingStrategy(processingStrategy, route, maxConcurrency),
-                                          childContext))
-                                              .timeout(timeout,
-                                                       onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair)
-                                                           // When the timeout happens, the subscription to the original
-                                                           // publisher is cancelled, so the inner MessageProcessorChains never
-                                                           // finishes and the child context is never completed, hence we have to
-                                                           // complete it manually on timeout
-                                                           .doOnSuccess(completeRecursively(childContext,
-                                                                                            BaseEventContext::error)),
-                                                       timeoutScheduler)
-                                              .map(coreEvent -> new Pair<CoreEvent, EventProcessingException>(
-                                                                                                              ((DefaultEventBuilder) CoreEvent
-                                                                                                                  .builder(coreEvent))
-                                                                                                                      .removeInternalParameter(ERROR_HANDLER_CONTEXT)
-                                                                                                                      .build(),
-                                                                                                              null))
-                                              .onErrorResume(MessagingException.class,
-                                                             me -> getPublisher(delayErrors,
-                                                                                me));
+      // TODO W-17814249: Remove kill switch
+      RoutePairPublisherAssemblyHelper routePairPublisherAssemblyHelper = COMPLETE_CHILDREN_ON_TIMEOUT
+          ? new DefaultRoutePairPublisherAssemblyHelper(pair.getEvent(), route)
+          : new LegacyRoutePairPublisherAssemblyHelper(pair.getEvent(), route);
+
+      return from(routePairPublisherAssemblyHelper.getPublisherOnChildContext())
+          .timeout(timeout,
+                   routePairPublisherAssemblyHelper
+                       .decorateTimeoutPublisher(onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair)),
+                   timeoutScheduler)
+          .map(this::eventToPair)
+          .onErrorResume(MessagingException.class, me -> getPublisher(delayErrors, me));
     };
   }
 
-  private Consumer<CoreEvent> completeRecursively(BaseEventContext eventContext,
-                                                  BiConsumer<BaseEventContext, MessagingException> forEachChild) {
-    return some -> {
-      // Tracks the child contexts first and then completes them, that way we are not retaining the read lock all the time.
-      Deque<BaseEventContext> allContexts = new ArrayDeque<>();
-      allContexts.push(eventContext);
-      ((AbstractEventContext) eventContext).forEachChild(allContexts::push);
-
-      while (!allContexts.isEmpty()) {
-        BaseEventContext ctx = allContexts.pop();
-        // Some context may already be terminated, as the children can propagate the termination up to their parents.
-        if (!ctx.isTerminated()) {
-          // It is important to swap the context so it has the right flow stack among other things.
-          forEachChild.accept(ctx, new MessagingException(quickCopy(ctx, some), some.getError().get().getCause()));
-        }
-      }
-    };
+  private Pair<CoreEvent, EventProcessingException> eventToPair(CoreEvent coreEvent) {
+    return new Pair<>(((DefaultEventBuilder) CoreEvent.builder(coreEvent))
+        .removeInternalParameter(ERROR_HANDLER_CONTEXT)
+        .build(), null);
   }
 
   private Publisher<Pair<CoreEvent, EventProcessingException>> getPublisher(boolean delayErrors, EventProcessingException me) {
     Pair<CoreEvent, EventProcessingException> pair = new Pair<>(me.getEvent(), me);
     return delayErrors ? just(pair) : error(me);
   }
-
 
   private Mono<CoreEvent> onTimeout(ProcessingStrategy processingStrategy, boolean delayErrors, ErrorType timeoutErrorType,
                                     RoutingPair pair) {
