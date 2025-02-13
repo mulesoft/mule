@@ -20,6 +20,8 @@ module org.mule.runtime.properties.config {
   requires org.mule.runtime.core;
 
   requires com.google.common;
+  requires org.yaml.snakeyaml;
+  requires org.vibur.objectpool;
 
   // QName used to process annotations from Mule DSL
   requires java.xml;
@@ -29,6 +31,9 @@ module org.mule.runtime.properties.config {
 
   provides org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory with
       org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProviderFactory;
+
+  provides org.mule.runtime.properties.api.DefaultConfigurationPropertiesProviderFactory with
+    org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProviderImplFactory;
 
   exports org.mule.runtime.config.internal.model.dsl to
       org.mule.runtime.metrics.exporter.configuration.impl,
