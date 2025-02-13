@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
-
 import org.mule.runtime.ast.api.ComponentParameterAst;
 
 /**
@@ -25,16 +23,6 @@ class SimpleTypeBeanParamDefinitionCreator extends SimpleTypeBeanBaseDefinitionC
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type,
                                       (String) param.getValue().mapLeft(expr -> "#[" + expr + "]").getValue().orElse(null));
     return true;
-  }
-
-  @Override
-  protected boolean isExpressionValue(CreateParamBeanDefinitionRequest request) {
-    return request.getParam().getValue().isLeft();
-  }
-
-  @Override
-  protected boolean isContentParam(CreateParamBeanDefinitionRequest request) {
-    return isContent(request.getParam().getModel());
   }
 
 }
