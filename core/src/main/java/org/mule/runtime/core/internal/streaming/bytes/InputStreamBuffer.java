@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -36,4 +38,12 @@ public interface InputStreamBuffer {
    * Releases all the resources held by this buffer
    */
   void close();
+
+  /**
+   * @return an estimate of the number of bytes that can be read (might be {@code 0}) from this buffer without blocking or
+   *         {@code 0} when it reaches the end of the input stream.
+   * @throws IOException if an I/O error occurs.
+   * @see InputStream#available()
+   */
+  int available() throws IOException;
 }
