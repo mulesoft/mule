@@ -6,11 +6,8 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
@@ -44,12 +41,8 @@ abstract class BeanDefinitionCreator<R extends CreateBeanDefinitionRequest> {
    * @param request
    */
   public final void processRequest(Map<ComponentAst, SpringComponentModel> springComponentModels, R request) {
-    try {
-      if (handleRequest(springComponentModels, request)) {
-        return;
-      }
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Exception processing " + request.toString()), e);
+    if (handleRequest(springComponentModels, request)) {
+      return;
     }
     if (next != null) {
       next.processRequest(springComponentModels, request);

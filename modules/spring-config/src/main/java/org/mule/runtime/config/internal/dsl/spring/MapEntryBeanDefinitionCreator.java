@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.config.internal.dsl.processor.ObjectTypeVisitor.DEFAULT_COLLECTION_TYPE;
 import static org.mule.runtime.dsl.api.component.DslSimpleType.SIMPLE_TYPE_VALUE_PARAMETER_NAME;
-
-import static java.util.stream.Collectors.toCollection;
-
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.ast.api.ComponentAst;
@@ -63,16 +61,11 @@ class MapEntryBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponen
   @Override
   boolean handleRequest(Map<ComponentAst, SpringComponentModel> springComponentModels,
                         CreateComponentBeanDefinitionRequest request) {
-    if (!request.isParentMapType()) {
-      return false;
-    }
-
     ComponentAst component = request.getComponent();
     Class<?> type = request.getSpringComponentModel().getType();
     if (!(MapEntryType.class.isAssignableFrom(type))) {
       return false;
     }
-
     ComponentBuildingDefinition componentBuildingDefinition = request.getComponentBuildingDefinition();
     request.getSpringComponentModel().setType(type);
     final String key = component.getParameter(DEFAULT_GROUP_NAME, ENTRY_TYPE_KEY_PARAMETER_NAME).getResolvedRawValue();
