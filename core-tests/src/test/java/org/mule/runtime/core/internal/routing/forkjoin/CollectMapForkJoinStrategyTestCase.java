@@ -56,9 +56,10 @@ public class CollectMapForkJoinStrategyTestCase extends AbstractForkJoinStrategy
   protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
                                             long timeout) {
     boolean isDetailedLogEnabled = Boolean.parseBoolean(detailedCompositeRoutingExceptionLog.getValue());
-    return new CollectMapForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
-                                                                          scheduler,
-                                                                          timeoutErrorType, isDetailedLogEnabled);
+    return new CollectMapForkJoinStrategyFactory(getFeatureFlaggingService())
+        .createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
+                                scheduler,
+                                timeoutErrorType, isDetailedLogEnabled);
   }
 
   @Test
