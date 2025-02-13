@@ -9,10 +9,10 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Long.MAX_VALUE;
-import static java.util.Optional.empty;
+import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -73,6 +73,10 @@ import reactor.core.scheduler.Schedulers;
  * </ul>
  */
 public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrategyFactory {
+
+  // TODO W-17814249: Remove kill switch
+  private static final boolean COMPLETE_CHILDREN_ON_TIMEOUT =
+      parseBoolean(getProperty("mule.forkJoin.completeChildContextsOnTimeout", "true"));
 
   public static final String TIMEOUT_EXCEPTION_DESCRIPTION = "Route Timeout";
   public static final String TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX = "Timeout while processing route/part:";
@@ -171,29 +175,33 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
           .transform(pair.getRoute());
-      return from(processWithChildContextDontComplete(pair.getEvent(),
-                                                      applyProcessingStrategy(processingStrategy, route, maxConcurrency),
-                                                      empty()))
-                                                          .timeout(timeout,
-                                                                   onTimeout(processingStrategy, delayErrors, timeoutErrorType,
-                                                                             pair),
-                                                                   timeoutScheduler)
-                                                          .map(coreEvent -> new Pair<CoreEvent, EventProcessingException>(
-                                                                                                                          ((DefaultEventBuilder) CoreEvent
-                                                                                                                              .builder(coreEvent))
-                                                                                                                                  .removeInternalParameter(ERROR_HANDLER_CONTEXT)
-                                                                                                                                  .build(),
-                                                                                                                          null))
-                                                          .onErrorResume(MessagingException.class,
-                                                                         me -> getPublisher(delayErrors, me));
+      route = applyProcessingStrategy(processingStrategy, route, maxConcurrency);
+
+      // TODO W-17814249: Remove kill switch
+      RoutePairPublisherAssemblyHelper routePairPublisherAssemblyHelper = COMPLETE_CHILDREN_ON_TIMEOUT
+          ? new DefaultRoutePairPublisherAssemblyHelper(pair.getEvent(), route)
+          : new LegacyRoutePairPublisherAssemblyHelper(pair.getEvent(), route);
+
+      return from(routePairPublisherAssemblyHelper.getPublisherOnChildContext())
+          .timeout(timeout,
+                   routePairPublisherAssemblyHelper
+                       .decorateTimeoutPublisher(onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair)),
+                   timeoutScheduler)
+          .map(this::eventToPair)
+          .onErrorResume(MessagingException.class, me -> getPublisher(delayErrors, me));
     };
+  }
+
+  private Pair<CoreEvent, EventProcessingException> eventToPair(CoreEvent coreEvent) {
+    return new Pair<>(((DefaultEventBuilder) CoreEvent.builder(coreEvent))
+        .removeInternalParameter(ERROR_HANDLER_CONTEXT)
+        .build(), null);
   }
 
   private Publisher<Pair<CoreEvent, EventProcessingException>> getPublisher(boolean delayErrors, EventProcessingException me) {
     Pair<CoreEvent, EventProcessingException> pair = new Pair<>(me.getEvent(), me);
     return delayErrors ? just(pair) : error(me);
   }
-
 
   private Mono<CoreEvent> onTimeout(ProcessingStrategy processingStrategy, boolean delayErrors, ErrorType timeoutErrorType,
                                     RoutingPair pair) {
