@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import org.junit.Before;
 import org.junit.Test;
 import java.lang.module.Configuration;
+import java.lang.module.ModuleFinder;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -39,7 +40,14 @@ public class ModuleLayerGraphTestCase {
     ModuleLayer secondParent =
         defineModulesWithOneLoader(Configuration.empty(), emptyList(), new URLClassLoader(new URL[] {}))
             .layer();
-    ModuleLayer layer = defineModulesWithOneLoader(Configuration.resolveAndBind(null, ImmutableList.of(parent.configuration(), secondParent.configuration()), null, ImmutableList.of("module 1", "module 2")), ImmutableList.of(parent, secondParent), new URLClassLoader(new URL[] {})).layer();
+    ModuleLayer layer = defineModulesWithOneLoader(
+                                                   Configuration.resolveAndBind(mock(ModuleFinder.class),
+                                                                                ImmutableList.of(parent.configuration(),
+                                                                                                 secondParent.configuration()),
+                                                                                mock(ModuleFinder.class),
+                                                                                ImmutableList.of("module 1", "module 2")),
+                                                   ImmutableList.of(parent, secondParent), new URLClassLoader(new URL[] {}))
+                                                       .layer();
 
     /*
      * Module module1 = mock(Module.class); Module module2 = mock(Module.class); Module module3 = mock(Module.class); Module
