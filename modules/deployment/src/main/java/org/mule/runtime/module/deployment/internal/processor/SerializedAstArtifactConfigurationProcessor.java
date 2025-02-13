@@ -18,6 +18,8 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
 import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
