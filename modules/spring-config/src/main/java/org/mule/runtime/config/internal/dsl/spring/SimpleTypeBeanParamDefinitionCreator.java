@@ -41,11 +41,6 @@ class SimpleTypeBeanParamDefinitionCreator extends SimpleTypeBeanBaseDefinitionC
     return true;
   }
 
-  @Override
-  protected boolean isExpressionValue(CreateParamBeanDefinitionRequest request) {
-    return request.getParam().getValue().isLeft();
-  }
-
   static Object resolveParamValue(final ComponentParameterAst param, boolean disableTrimWhitespaces,
                                   boolean disablePojoCdataTrimWhitespaces) {
     return param.getValue()
