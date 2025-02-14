@@ -64,7 +64,7 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory implements ISe
    * @deprecated since 4.6, use {@link #create(String, ServiceDescriptor, MuleContainerClassLoaderWrapper)}.
    */
   @Override
-  @Deprecated
+  @Deprecated(since = "4.6")
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
                                     ClassLoaderLookupPolicy lookupPolicy)
       throws ArtifactClassloaderCreationException {
@@ -79,7 +79,7 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory implements ISe
                                        ClassLoaderLookupPolicy lookupPolicy) {
     URL[] classLoaderConfigurationUrls = descriptor.getClassLoaderConfiguration().getUrls();
 
-    LOGGER.debug(" >> Creating ModuleLayer for service: '" + artifactId + "'...");
+    LOGGER.debug(" >> Creating ModuleLayer for service: '{}'...", artifactId);
     ModuleLayer artifactLayer = createModuleLayer(classLoaderConfigurationUrls, parent,
                                                   parentLayer, true, true);
 
@@ -103,13 +103,13 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory implements ISe
         new MuleServiceClassLoader(artifactId, descriptor, new URL[0], artifactLayer.findLoader(serviceModuleName), lookupPolicy);
 
     ModuleLayerGraph.setModuleLayerId(artifactLayer, artifactId);
-    artifactLayer.parents().stream().filter(parentLayer -> !parentLayer.equals(boot())).findFirst()
-        .ifPresent(parentLayer -> ModuleLayerGraph.setModuleLayerId(parentLayer, CONTAINER_LAYER_NAME));
+    artifactLayer.parents().stream().filter(parentArtifactLayer -> !parentArtifactLayer.equals(boot())).findFirst()
+        .ifPresent(parentArtifactLayer -> ModuleLayerGraph.setModuleLayerId(parentArtifactLayer, CONTAINER_LAYER_NAME));
 
     ModuleLayerGraph graph = new ModuleLayerGraph(artifactLayer);
     serviceClassLoader.setModuleLayerInformationSupplier(graph);
-    if (parent instanceof ArtifactClassLoader) {
-      ((ArtifactClassLoader) parent).setModuleLayerInformationSupplier(graph);
+    if (parent instanceof ArtifactClassLoader parentArtifactClassLoader) {
+      parentArtifactClassLoader.setModuleLayerInformationSupplier(graph);
     }
     return serviceClassLoader;
   }

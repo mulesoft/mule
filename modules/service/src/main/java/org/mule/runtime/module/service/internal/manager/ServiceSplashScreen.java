@@ -7,6 +7,7 @@
 package org.mule.runtime.module.service.internal.manager;
 
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.addAll;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
@@ -16,7 +17,7 @@ import org.mule.runtime.core.internal.util.splash.SplashScreen;
  *
  * @since 4.1
  */
-final class ServiceSplashScreen extends SplashScreen {
+public final class ServiceSplashScreen extends SplashScreen {
 
   private final String serviceDescription;
   private final String splash;
@@ -31,8 +32,6 @@ final class ServiceSplashScreen extends SplashScreen {
     header.add("Started " + serviceDescription);
     header.add("");
 
-    for (String splashMessageLine : splash.split(lineSeparator())) {
-      header.add(splashMessageLine);
-    }
+    addAll(header, splash.split(lineSeparator()));
   }
 }

@@ -1,4 +1,48 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::<init>()",
+            "new": "method void org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::<init>()",
+            "annotation": "@java.lang.Deprecated(since = \"4.6\")",
+            "attribute": "since",
+            "justification": "W-17808679: Fix code smells from services module"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory::create(java.lang.String, org.mule.runtime.module.service.api.artifact.ServiceDescriptor, java.lang.ClassLoader, org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy) throws org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassloaderCreationException",
+            "annotation": "@java.lang.Deprecated(since = \"4.6\")",
+            "attribute": "since",
+            "justification": "W-17808679: Fix code smells from services module"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.visibilityReduced",
+            "old": "method void org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider::<init>()",
+            "new": "method void org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider::<init>()",
+            "oldVisibility": "public",
+            "newVisibility": "private",
+            "justification": "W-17808679: Fix code smells from services module"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.visibilityReduced",
+            "old": "method void org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader::<init>()",
+            "new": "method void org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader::<init>()",
+            "oldVisibility": "public",
+            "newVisibility": "private",
+            "justification": "W-17808679: Fix code smells from services module"
+          }
+        ]
+      }
+    }
+  },
   "4.9.0": {
     "revapi": {
       "differences": {

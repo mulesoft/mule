@@ -14,8 +14,6 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
 
 /**
  * Describes how to create a {@link Service} instance.
