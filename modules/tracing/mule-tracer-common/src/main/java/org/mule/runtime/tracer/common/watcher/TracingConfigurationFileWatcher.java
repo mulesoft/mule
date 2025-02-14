@@ -8,9 +8,18 @@ package org.mule.runtime.tracer.common.watcher;
 
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
@@ -20,47 +29,45 @@ import org.slf4j.Logger;
 public class TracingConfigurationFileWatcher extends Thread {
 
   private static final Logger LOGGER = getLogger(TracingConfigurationFileWatcher.class);
-  public final long DEFAULT_DELAY = Long
-      .getLong(MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY,
-               60000l);
-  private final String filename;
+  public final long DEFAULT_DELAY =
+      Long.getLong(MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY, 60000l);
   private final Runnable doOnChange;
+  private final File file;
+  private final WatchService watchService;
 
   protected long delay = DEFAULT_DELAY;
-  private final File file;
-  private long lastModified;
-  private boolean warnedAlready;
 
   public TracingConfigurationFileWatcher(String filename, Runnable doOnChange) {
-    super("FileSpanExporterConfigurationWatcher");
-    this.filename = filename;
+    super("TracingConfigurationFileWatcher");
     this.file = new File(filename);
     this.doOnChange = doOnChange;
-    this.lastModified = file.lastModified();
+
+    try {
+      this.watchService = FileSystems.getDefault().newWatchService();
+      file.toPath().getParent().register(watchService, ENTRY_MODIFY);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
     this.setDaemon(true);
   }
 
-  protected void checkAndConfigure() {
-    boolean fileExists;
-    try {
-      fileExists = file.exists();
-    } catch (SecurityException var4) {
-      LOGGER.warn("The tracing config file " + filename + " was possibly removed.");
-      this.interrupt();
+  protected void checkAndConfigure() throws InterruptedException {
+    WatchKey key = watchService.poll(delay, TimeUnit.MILLISECONDS);
+    if (key == null) {
       return;
     }
 
-    if (fileExists) {
-      long fileLastMod = file.lastModified();
-      if (fileLastMod > lastModified) {
-        this.lastModified = fileLastMod;
-        this.doOnChange();
-        this.warnedAlready = false;
+    for (WatchEvent<?> event : key.pollEvents()) {
+      if (ENTRY_MODIFY.equals(event.kind())) {
+        Path changedFile = (Path) event.context();
+        if (changedFile.equals(file.toPath().getFileName())) {
+          this.doOnChange();
+        }
       }
-    } else if (!this.warnedAlready) {
-      LOGGER.warn("Configuration for file exporter was not found. It was possibly removed.");
-      this.warnedAlready = true;
     }
+
+    key.reset();
   }
 
   @Override
@@ -68,9 +75,14 @@ public class TracingConfigurationFileWatcher extends Thread {
     while (!interrupted()) {
       try {
         checkAndConfigure();
-        sleep(delay);
-      } catch (InterruptedException var2) {
+      } catch (InterruptedException ignored) {
         return;
+      } finally {
+        try {
+          watchService.close();
+        } catch (IOException e) {
+          LOGGER.error("Error while closing watch service", e);
+        }
       }
     }
   }
