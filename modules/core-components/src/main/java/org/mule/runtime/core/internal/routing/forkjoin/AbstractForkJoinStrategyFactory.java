@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.core.internal.routing.forkjoin;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.Long.MAX_VALUE;
-import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -22,6 +21,7 @@ import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -57,6 +57,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
@@ -74,20 +76,20 @@ import reactor.core.scheduler.Schedulers;
  */
 public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrategyFactory {
 
-  // TODO W-17814249: Remove kill switch
-  private static final boolean COMPLETE_CHILDREN_ON_TIMEOUT =
-      parseBoolean(getProperty("mule.forkJoin.completeChildContextsOnTimeout", "true"));
-
   public static final String TIMEOUT_EXCEPTION_DESCRIPTION = "Route Timeout";
   public static final String TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX = "Timeout while processing route/part:";
   private final boolean mergeVariables;
+  private final boolean completeChildContextsOnTimeout;
 
-  public AbstractForkJoinStrategyFactory() {
-    this(true);
+  @Inject
+  public AbstractForkJoinStrategyFactory(FeatureFlaggingService featureFlaggingService) {
+    this(true, featureFlaggingService);
   }
 
-  public AbstractForkJoinStrategyFactory(boolean mergeVariables) {
+  public AbstractForkJoinStrategyFactory(boolean mergeVariables, FeatureFlaggingService featureFlaggingService) {
     this.mergeVariables = mergeVariables;
+    this.completeChildContextsOnTimeout =
+        featureFlaggingService != null && featureFlaggingService.isEnabled(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT);
   }
 
   @Override
@@ -177,8 +179,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .transform(pair.getRoute());
       route = applyProcessingStrategy(processingStrategy, route, maxConcurrency);
 
-      // TODO W-17814249: Remove kill switch
-      RoutePairPublisherAssemblyHelper routePairPublisherAssemblyHelper = COMPLETE_CHILDREN_ON_TIMEOUT
+      RoutePairPublisherAssemblyHelper routePairPublisherAssemblyHelper = completeChildContextsOnTimeout
           ? new DefaultRoutePairPublisherAssemblyHelper(pair.getEvent(), route)
           : new LegacyRoutePairPublisherAssemblyHelper(pair.getEvent(), route);
 

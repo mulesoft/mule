@@ -102,7 +102,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
 
   @Override
   protected ForkJoinStrategyFactory getDefaultForkJoinStrategyFactory() {
-    return new CollectMapForkJoinStrategyFactory();
+    return new CollectMapForkJoinStrategyFactory(featureFlaggingService);
   }
 
   /**
