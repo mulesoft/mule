@@ -1,4 +1,16 @@
 {
+  "4.9.2": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Optional<org.mule.runtime.dsl.api.component.ComponentBuildingDefinition<?>> org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry::getBuildingDefinition(org.mule.runtime.api.component.ComponentIdentifier, java.util.function.Predicate<org.mule.runtime.dsl.api.component.ComponentBuildingDefinition<?>>)",
+          "justification": "Reverting W-17484538"
+        }
+      ]
+    }
+  },
   "4.9.1": {
     "revapi": {
       "ignore": [
