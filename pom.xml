@@ -176,7 +176,7 @@
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.8.4</muleHttpPolicyApiVersion>
         <mulePolicyApiVersion>1.8.4</mulePolicyApiVersion>
-        <muleApiVersion>1.8.4</muleApiVersion>
+        <muleApiVersion>1.8.5</muleApiVersion>
         <muleMetadataModelVersion>1.8.4</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
