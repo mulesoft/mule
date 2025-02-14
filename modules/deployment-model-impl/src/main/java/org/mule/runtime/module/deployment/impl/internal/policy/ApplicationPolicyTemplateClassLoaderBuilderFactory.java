@@ -20,7 +20,7 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
 
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
-  private final MuleDeployableArtifactClassLoader defaultDomainClassLoader;
+  private final ArtifactClassLoader containerClassLoader;
 
   /**
    * Creates a new factory instance
@@ -31,11 +31,11 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
    */
   public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
                                                             RegionPluginClassLoadersFactory pluginClassLoadersFactory,
-                                                            MuleDeployableArtifactClassLoader defaultDomainClassLoader) {
+                                                            ArtifactClassLoader containerClassLoader) {
 
     this.artifactClassLoaderFactory = artifactClassLoaderFactory;
     this.pluginClassLoadersFactory = pluginClassLoadersFactory;
-    this.defaultDomainClassLoader = defaultDomainClassLoader;
+    this.containerClassLoader = containerClassLoader;
   }
 
   public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
@@ -51,6 +51,6 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
 
   @Override
   public ArtifactClassLoader getPolicyParentClassloader() {
-    return defaultDomainClassLoader;
+    return containerClassLoader;
   }
 }

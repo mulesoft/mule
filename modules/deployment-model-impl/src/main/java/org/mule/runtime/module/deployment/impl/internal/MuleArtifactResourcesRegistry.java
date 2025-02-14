@@ -322,7 +322,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
         new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory,
-                                                               defaultArtifactClassLoaderResolver.getDefaultDomainClassloader());
+                                                               containerClassLoader);
 
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
                                                        deployableArtifactDescriptorFactory,
