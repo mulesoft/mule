@@ -8,7 +8,6 @@ package org.mule.test.module.extension.streaming;
 
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT_PROPERTY;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
@@ -49,9 +48,6 @@ import org.junit.Test;
 public class ScatterGatherTimeoutDontCompleteWithBytesStreamingExtensionTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static final String DATA = insecure().nextAlphabetic(2048);
-
-  @ClassRule
-  public static SystemProperty DISABLE_FEATURE = new SystemProperty(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT_PROPERTY, "false");
 
   @ClassRule
   public static SystemProperty CONFIG_NAME = new SystemProperty("configName", "drStrange");

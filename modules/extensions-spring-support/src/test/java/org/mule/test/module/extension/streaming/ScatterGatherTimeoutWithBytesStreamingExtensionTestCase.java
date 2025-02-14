@@ -8,6 +8,7 @@ package org.mule.test.module.extension.streaming;
 
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT_PROPERTY;
 import static org.mule.tck.junit4.matcher.Eventually.eventually;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
@@ -53,6 +54,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -62,6 +64,9 @@ import org.junit.runners.Parameterized.Parameters;
 @Story(BYTES_STREAMING)
 @RunnerDelegateTo(Parameterized.class)
 public class ScatterGatherTimeoutWithBytesStreamingExtensionTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @ClassRule
+  public static SystemProperty ENABLE_FEATURE = new SystemProperty(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT_PROPERTY, "true");
 
   private static final String DATA = insecure().nextAlphabetic(2048);
 
