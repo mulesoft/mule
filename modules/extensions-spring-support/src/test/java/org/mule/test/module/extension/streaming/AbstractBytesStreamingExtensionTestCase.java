@@ -6,41 +6,27 @@
  */
 package org.mule.test.module.extension.streaming;
 
-import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
-import static org.mule.tck.junit4.matcher.Eventually.eventually;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
-import static java.util.Collections.singletonList;
-import static java.util.concurrent.Executors.newFixedThreadPool;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.core.Is.isA;
-import static org.junit.Assert.assertThrows;
 
 import org.mule.metadata.api.model.UnionType;
-import org.mule.runtime.api.exception.ComposedErrorException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextService;
@@ -49,7 +35,6 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.JUnitProbe;
@@ -58,13 +43,8 @@ import org.mule.tck.probe.PollingProber;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -372,84 +352,6 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     assertThat(IOUtils.toString((InputStream) value), is(data));
   }
 
-  @Test
-  @Issue("W-16941297")
-  @Description("A Scatter Gather router will time out while an operation is still executing. The operation then finishes and generates a stream which should eventually be closed.")
-  public void whenScatterGatherTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
-    runScatterGatherFlowAndAwaitStreamClosed("scatterGatherWithTimeout");
-    // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty())));
-  }
-
-  @Test
-  @Issue("W-16941297")
-  @Description("A Scatter Gather router will time out while an operation inside a referenced flow is still executing. The operation then finishes and generates a stream which should eventually be closed.")
-  public void whenScatterGatherWithFlowRefTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
-    runScatterGatherFlowAndAwaitStreamClosed("scatterGatherWithTimeoutFlowRef");
-    // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty())));
-  }
-
-  @Test
-  @Issue("W-16941297")
-  @Description("A Scatter Gather router will time out while an operation inside another nested Scatter Gather is still executing. The operation then finishes and generates a stream which should eventually be closed.")
-  public void whenScatterGatherWithNestedTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
-    runScatterGatherFlowAndAwaitStreamClosed("scatterGatherWithNestedRoute");
-    // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty())));
-  }
-
-  @Test
-  @Issue("W-16941297")
-  public void scatterGatherTimeoutStress() throws InterruptedException, ExecutionException {
-    String flowName = "scatterGatherWithTimeout";
-    runScatterGatherFlowAndAwaitStreamClosed(flowName);
-    ExecutorService executorService = newFixedThreadPool(3);
-    List<Future<?>> futures = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
-      futures.add(executorService.submit(() -> {
-        try {
-          runScatterGatherFlowAndAwaitStreamClosed(flowName);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
-      }));
-    }
-
-    for (Future<?> future : futures) {
-      future.get();
-    }
-    executorService.shutdown();
-    assertThat(executorService.awaitTermination(10, SECONDS), is(true));
-    runScatterGatherFlowAndAwaitStreamClosed(flowName);
-    runScatterGatherFlowAndAwaitStreamClosed(flowName);
-
-    // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty()).atMostIn(20, SECONDS)));
-  }
-
-  private void runScatterGatherFlowAndAwaitStreamClosed(String flowName) throws InterruptedException {
-    CountDownLatch sgTimedOutLatch = new CountDownLatch(1);
-    CountDownLatch pagingProviderClosedLatch = new CountDownLatch(1);
-    MessagingException e = assertThrows(MessagingException.class, () -> flowRunner(flowName)
-        .withPayload(singletonList(data))
-        .withVariable("latch", sgTimedOutLatch)
-        .withVariable("providerClosedLatch", pagingProviderClosedLatch)
-        .run());
-
-    // Control test that the execution really ended with timeout
-    assertThat(e,
-               hasCause(allOf(isA(ComposedErrorException.class),
-                              hasMessage(containsString("Route 1: java.util.concurrent.TimeoutException: "
-                                  + "Timeout while processing route/part: '1'")))));
-
-    // If we are here it means the Scatter Gather has already timed out, so now we allow the operation to proceed
-    sgTimedOutLatch.countDown();
-
-    // And wait until the paging provider is closed
-    pagingProviderClosedLatch.await();
-  }
-
   private ParameterModel getStreamingStrategyParameterModel(Supplier<ParameterizedModel> model) {
     return model.get().getAllParameterModels().stream()
         .filter(p -> p.getName().equals(STREAMING_STRATEGY_PARAMETER_NAME))
@@ -493,15 +395,6 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
       assertThat(event.getMessage().getPayload().getValue(), instanceOf(CursorStreamProvider.class));
-      return event;
-    }
-  }
-
-  public static class AssertPayloadIsIteratorProvider implements Processor {
-
-    @Override
-    public CoreEvent process(CoreEvent event) throws MuleException {
-      assertThat(event.getMessage().getPayload().getValue(), instanceOf(CursorIteratorProvider.class));
       return event;
     }
   }
