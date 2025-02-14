@@ -8,6 +8,7 @@ package org.mule.runtime.module.service.internal.test.discoverer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.mockito.Mockito.mock;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -63,6 +65,11 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
     final InjectableServiceProviderWithSetter serviceProvider = new InjectableServiceProviderWithSetter();
     serviceRegistry.inject(serviceProvider);
     assertThat(serviceProvider.fooService, is(service));
+  }
+
+  @Test
+  public void defaultInstance() {
+    assertThat(ServiceRegistry.create(), instanceOf(DefaultServiceRegistry.class));
   }
 
   public interface FooService extends Service {
