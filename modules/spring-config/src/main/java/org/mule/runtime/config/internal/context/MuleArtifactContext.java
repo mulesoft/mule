@@ -363,7 +363,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   protected void doRegisterErrors(final ArtifactAst artifactAst) {
-    final ErrorTypeRepository errorTypeRepository = artifactAst.getErrorTypeRepository();
+    final ErrorTypeRepository errorTypeRepository = artifactAst.enrichedErrorTypeRepository();
     final ErrorTypeLocator errorTypeLocator =
         createDefaultErrorTypeLocator(errorTypeRepository, ofNullable(featureFlaggingService));
 

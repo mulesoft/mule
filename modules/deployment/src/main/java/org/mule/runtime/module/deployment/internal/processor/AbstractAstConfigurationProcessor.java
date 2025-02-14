@@ -50,9 +50,6 @@ abstract class AbstractAstConfigurationProcessor implements ArtifactConfiguratio
         .forEach(configurationBuilder::addServiceConfigurator);
     configurationBuilder.configure(artifactContextConfiguration.getMuleContext());
 
-    artifactAst.postConfigurationEnrichment();
-
-    // This has to be done after enriching models
     return configurationBuilder.createArtifactContext();
   }
 
