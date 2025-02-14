@@ -52,27 +52,38 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader implements Wi
 
   @Override
   protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-    try {
-      Class<?> localClass = findLocalClass(name);
-      Class<?> superClass = super.loadClass(name, resolve);
-      if (isPolicyClassLoader() && isDomainClassLoader(superClass.getClassLoader())) {
-        if (localClass != null) {
-          return localClass;
-        }
-      }
-    } catch (ClassNotFoundException e) {
+    Class<?> localClass = findLocalClass(name);
+    Class<?> superClass = super.loadClass(name, resolve);
 
+    if (localClass == null && superClass == null) {
+      throw new ClassNotFoundException(name);
     }
-    return super.loadClass(name, resolve);
+
+    if (localClass == null) {
+      return superClass;
+    }
+
+    if (superClass == null) {
+      return localClass;
+    }
+
+
+    if (localClass == superClass) {
+      return superClass;
+    }
+
+    if (isFromDomain(superClass.getClassLoader())) {
+      return localClass;
+    } else {
+      return superClass; // Return superClass if not from domain
+    }
   }
 
-  private boolean isPolicyClassLoader() {
-    String artifactId = getArtifactId();
-    return artifactId != null && artifactId.contains("/policy/");
+  private boolean isFromDomain(ClassLoader classLoader) {
+    String classLoaderString = classLoader.toString();
+    return classLoaderString.contains("/domain/")
+        && !classLoaderString.contains("/app/") && !classLoaderString.contains("/policy/");
+
   }
 
-  private boolean isDomainClassLoader(ClassLoader classLoader) {
-    String artifactId = getArtifactId();
-    return artifactId != null && artifactId.contains("/domain/") && !artifactId.contains("/policy/");
-  }
 }
