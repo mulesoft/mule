@@ -115,4 +115,9 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
     assertThat(contractModel.getServiceProviderClassName(), equalTo(PROVIDER_CLASS_NAME));
     assertThat(contractModel.getContractClassName(), equalTo(SERVICE_API_CLASS_NAME));
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void createServiceDescriptorWithoutArtifactDirectory() {
+    serviceDescriptorFactory.create(new File("foo"), empty());
+  }
 }
