@@ -1338,7 +1338,6 @@
               }
             }
           },
-          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
