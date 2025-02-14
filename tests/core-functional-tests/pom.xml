@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.4.0-20250124</version>
+        <version>4.4.0-20250213</version>
     </parent>
     <artifactId>mule-module-core-functional-tests</artifactId>
     <packaging>jar</packaging>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-tooling-support</artifactId>
-            <version>4.4.0-20250124</version>
+            <version>4.4.0-20250213</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
