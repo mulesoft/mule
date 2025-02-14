@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
@@ -17,6 +18,8 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Function;
+
+import javax.inject.Inject;
 
 /**
  * {@link ForkJoinStrategy} that:
@@ -32,6 +35,11 @@ import java.util.function.Function;
  * </ul>
  */
 public class CollectMapForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory {
+
+  @Inject
+  public CollectMapForkJoinStrategyFactory(FeatureFlaggingService featureFlaggingService) {
+    super(featureFlaggingService);
+  }
 
   @Override
   protected Function<List<CoreEvent>, CoreEvent> createResultEvent(CoreEvent original,

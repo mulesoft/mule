@@ -17,6 +17,7 @@ import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 /**
@@ -41,12 +43,13 @@ import javax.xml.namespace.QName;
  */
 public class CollectListForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory implements Component {
 
-  public CollectListForkJoinStrategyFactory() {
-    super();
+  @Inject
+  public CollectListForkJoinStrategyFactory(FeatureFlaggingService featureFlaggingService) {
+    super(featureFlaggingService);
   }
 
-  public CollectListForkJoinStrategyFactory(boolean mergeVariables) {
-    super(mergeVariables);
+  public CollectListForkJoinStrategyFactory(boolean mergeVariables, FeatureFlaggingService featureFlaggingService) {
+    super(mergeVariables, featureFlaggingService);
   }
 
   @Override
