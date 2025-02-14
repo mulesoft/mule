@@ -50,7 +50,7 @@ class DefaultRoutePairPublisherAssemblyHelper implements RoutePairPublisherAssem
   @Override
   public Publisher<CoreEvent> decorateTimeoutPublisher(Publisher<CoreEvent> timeoutPublisher) {
     // When the timeout happens, the subscription to the original publisher is cancelled, so the inner MessageProcessorChains
-    // never finishes and the child contexts are never completed, hence we have to complete them manually on timeout
+    // never finish and the child contexts are never completed, hence we have to complete them manually on timeout
     return Mono.from(timeoutPublisher)
         .doOnSuccess(completeRecursively(childContext, BaseEventContext::error));
   }
@@ -59,6 +59,8 @@ class DefaultRoutePairPublisherAssemblyHelper implements RoutePairPublisherAssem
                                                   BiConsumer<BaseEventContext, MessagingException> forEachChild) {
     return some -> {
       // Tracks the child contexts first and then completes them, that way we are not retaining the read lock all the time.
+      // We use a stack so we iterate them in reverse order, so that child contexts are always visited before their respective
+      // parents. This assumes forEachChild visits on a parent-first strategy (which is currently the case).
       Deque<BaseEventContext> allContexts = new ArrayDeque<>();
       allContexts.push(eventContext);
       ((AbstractEventContext) eventContext).forEachChild(allContexts::push);
