@@ -67,7 +67,7 @@ public class ScatterGatherTimeoutWithBytesStreamingExtensionTestCase extends Abs
   private static final String DATA = randomAlphabetic(2048);
 
   @ClassRule
-  public static SystemProperty DISABLE_FEATURE = new SystemProperty(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT_PROPERTY, "false");
+  public static SystemProperty DISABLE_FEATURE = new SystemProperty(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT_PROPERTY, "true");
 
   @Inject
   private EventContextService eventContextService;
@@ -166,18 +166,19 @@ public class ScatterGatherTimeoutWithBytesStreamingExtensionTestCase extends Abs
     expectedException.expectCause(allOf(isA(ComposedErrorException.class),
                                         hasMessage(containsString("Route 1: java.util.concurrent.TimeoutException: "
                                             + "Timeout while processing route/part: '1'"))));
+    try {
+      flowRunner(flowName)
+          .withPayload(singletonList(DATA))
+          .withVariable("latch", sgTimedOutLatch)
+          .withVariable("providerClosedLatch", pagingProviderClosedLatch)
+          .run();
+    } finally {
+      // If we are here it means the Scatter Gather has already timed out, so now we allow the operation to proceed
+      sgTimedOutLatch.countDown();
 
-    flowRunner(flowName)
-        .withPayload(singletonList(DATA))
-        .withVariable("latch", sgTimedOutLatch)
-        .withVariable("providerClosedLatch", pagingProviderClosedLatch)
-        .run();
-
-    // If we are here it means the Scatter Gather has already timed out, so now we allow the operation to proceed
-    sgTimedOutLatch.countDown();
-
-    // And wait until the paging provider is closed
-    pagingProviderClosedLatch.await();
+      // And wait until the paging provider is closed
+      pagingProviderClosedLatch.await();
+    }
   }
 
 
