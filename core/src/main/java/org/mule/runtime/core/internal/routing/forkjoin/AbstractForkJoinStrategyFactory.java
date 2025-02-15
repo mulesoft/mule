@@ -8,19 +8,20 @@
 package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static java.time.Duration.ofMillis;
-import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT;
+
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.defer;
 import static reactor.core.publisher.Mono.error;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
@@ -55,6 +56,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
@@ -75,13 +78,17 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   public static final String TIMEOUT_EXCEPTION_DESCRIPTION = "Route Timeout";
   public static final String TIMEOUT_EXCEPTION_DETAILED_DESCRIPTION_PREFIX = "Timeout while processing route/part:";
   private final boolean mergeVariables;
+  private final boolean completeChildContextsOnTimeout;
 
-  public AbstractForkJoinStrategyFactory() {
-    this(true);
+  @Inject
+  public AbstractForkJoinStrategyFactory(FeatureFlaggingService featureFlaggingService) {
+    this(true, featureFlaggingService);
   }
 
-  public AbstractForkJoinStrategyFactory(boolean mergeVariables) {
+  public AbstractForkJoinStrategyFactory(boolean mergeVariables, FeatureFlaggingService featureFlaggingService) {
     this.mergeVariables = mergeVariables;
+    this.completeChildContextsOnTimeout =
+        featureFlaggingService != null && featureFlaggingService.isEnabled(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT);
   }
 
   @Override
@@ -161,29 +168,32 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
           .transform(pair.getRoute());
-      return from(processWithChildContextDontComplete(pair.getEvent(),
-                                                      applyProcessingStrategy(processingStrategy, route, maxConcurrency),
-                                                      empty()))
-                                                          .timeout(ofMillis(timeout),
-                                                                   onTimeout(processingStrategy, delayErrors, timeoutErrorType,
-                                                                             pair),
-                                                                   timeoutScheduler)
-                                                          .map(coreEvent -> new Pair<CoreEvent, EventProcessingException>(
-                                                                                                                          ((DefaultEventBuilder) CoreEvent
-                                                                                                                              .builder(coreEvent))
-                                                                                                                                  .removeInternalParameter(ERROR_HANDLER_CONTEXT)
-                                                                                                                                  .build(),
-                                                                                                                          null))
-                                                          .onErrorResume(MessagingException.class,
-                                                                         me -> getPublisher(delayErrors, me));
+      route = applyProcessingStrategy(processingStrategy, route, maxConcurrency);
+
+      RoutePairPublisherAssemblyHelper routePairPublisherAssemblyHelper = completeChildContextsOnTimeout
+          ? new DefaultRoutePairPublisherAssemblyHelper(pair.getEvent(), route)
+          : new LegacyRoutePairPublisherAssemblyHelper(pair.getEvent(), route);
+
+      return from(routePairPublisherAssemblyHelper.getPublisherOnChildContext())
+          .timeout(ofMillis(timeout),
+                   routePairPublisherAssemblyHelper
+                       .decorateTimeoutPublisher(onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair)),
+                   timeoutScheduler)
+          .map(this::eventToPair)
+          .onErrorResume(MessagingException.class, me -> getPublisher(delayErrors, me));
     };
+  }
+
+  private Pair<CoreEvent, EventProcessingException> eventToPair(CoreEvent coreEvent) {
+    return new Pair<>(((DefaultEventBuilder) CoreEvent.builder(coreEvent))
+        .removeInternalParameter(ERROR_HANDLER_CONTEXT)
+        .build(), null);
   }
 
   private Publisher<Pair<CoreEvent, EventProcessingException>> getPublisher(boolean delayErrors, EventProcessingException me) {
     Pair<CoreEvent, EventProcessingException> pair = new Pair<>(me.getEvent(), me);
     return delayErrors ? just(pair) : error(me);
   }
-
 
   private Mono<CoreEvent> onTimeout(ProcessingStrategy processingStrategy, boolean delayErrors, ErrorType timeoutErrorType,
                                     RoutingPair pair) {

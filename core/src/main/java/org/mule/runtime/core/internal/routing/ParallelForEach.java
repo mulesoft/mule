@@ -118,7 +118,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
 
   @Override
   protected ForkJoinStrategyFactory getDefaultForkJoinStrategyFactory() {
-    return new CollectListForkJoinStrategyFactory(false);
+    return new CollectListForkJoinStrategyFactory(false, featureFlaggingService);
   }
 
   /**
