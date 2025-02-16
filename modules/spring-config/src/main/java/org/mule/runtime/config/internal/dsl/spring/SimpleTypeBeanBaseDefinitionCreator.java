@@ -31,24 +31,12 @@ abstract class SimpleTypeBeanBaseDefinitionCreator<R extends CreateBeanDefinitio
                                         R createBeanDefinitionRequest) {
     Class<?> type = createBeanDefinitionRequest.getSpringComponentModel().getType();
 
-    if (isSimpleType(type)
-        // Expressions are String, which are simple values for the spring bean definitions
-        || isExpressionValue(createBeanDefinitionRequest)
-        // Content params are texts within the body
-        || isContentParam(createBeanDefinitionRequest)) {
-      createBeanDefinitionRequest.getSpringComponentModel().setType(type);
-      return doHandleRequest(createBeanDefinitionRequest, type);
+    if (!isSimpleType(type)) {
+      return false;
     }
 
-    return false;
-  }
-
-  protected boolean isExpressionValue(R request) {
-    return false;
-  }
-
-  protected boolean isContentParam(R request) {
-    return false;
+    createBeanDefinitionRequest.getSpringComponentModel().setType(type);
+    return doHandleRequest(createBeanDefinitionRequest, type);
   }
 
   protected abstract boolean doHandleRequest(R createBeanDefinitionRequest, Class<?> type);
