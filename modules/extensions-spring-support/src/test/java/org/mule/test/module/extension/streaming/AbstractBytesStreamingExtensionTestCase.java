@@ -6,18 +6,20 @@
  */
 package org.mule.test.module.extension.streaming;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.metadata.api.model.UnionType;
 import org.mule.runtime.api.exception.MuleException;
@@ -49,13 +51,13 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.junit.Rule;
-import org.junit.Test;
-
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
@@ -107,6 +109,9 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
 
   @Rule
   public SystemProperty configName;
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   public AbstractBytesStreamingExtensionTestCase(String configName) {
     this.configName = new SystemProperty("configName", configName);

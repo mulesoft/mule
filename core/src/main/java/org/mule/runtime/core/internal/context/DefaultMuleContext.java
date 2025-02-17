@@ -27,6 +27,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EX
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
@@ -366,6 +367,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureHonourPersistedFlowState();
       configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate();
       configureNtlmAvoidSendPayloadOnType1();
+      configureForkJoinCompleteChildrenOnTimeout();
     }
   }
 
@@ -1605,6 +1607,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry
         .registerFeatureFlag(NTLM_AVOID_SEND_PAYLOAD_ON_TYPE_1, minMuleVersion("4.9.0"));
+  }
+
+  private static void configureForkJoinCompleteChildrenOnTimeout() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry
+        .registerFeatureFlag(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT, minMuleVersion("4.10.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
