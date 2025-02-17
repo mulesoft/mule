@@ -54,7 +54,6 @@ abstract class AbstractAstConfigurationProcessor implements ArtifactConfiguratio
                                                                                    .getParentArtifactContext());
 
     configurationBuilder.configure(artifactContextConfiguration.getMuleContext());
-
     return configurationBuilder.createArtifactContext();
   }
 
