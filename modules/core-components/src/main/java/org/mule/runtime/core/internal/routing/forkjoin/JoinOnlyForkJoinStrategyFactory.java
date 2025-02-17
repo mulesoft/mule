@@ -8,12 +8,15 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 
 import java.util.List;
 import java.util.function.Function;
+
+import javax.inject.Inject;
 
 /**
  * {@link ForkJoinStrategy} that:
@@ -26,6 +29,11 @@ import java.util.function.Function;
  * </ul>
  */
 public class JoinOnlyForkJoinStrategyFactory extends AbstractForkJoinStrategyFactory {
+
+  @Inject
+  public JoinOnlyForkJoinStrategyFactory(FeatureFlaggingService featureFlaggingService) {
+    super(featureFlaggingService);
+  }
 
   @Override
   protected Function<List<CoreEvent>, CoreEvent> createResultEvent(CoreEvent original,

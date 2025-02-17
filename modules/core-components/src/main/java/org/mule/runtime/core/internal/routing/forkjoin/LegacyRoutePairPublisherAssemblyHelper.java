@@ -10,6 +10,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 
 import static java.util.Optional.empty;
 
+import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
@@ -19,8 +20,10 @@ import org.reactivestreams.Publisher;
  * Implementation of {@link RoutePairPublisherAssemblyHelper} which does not complete the child contexts on timeout.
  * <p>
  * Exists as a fallback for the kill switch COMPLETE_CHILDREN_ON_TIMEOUT.
+ *
+ * @implNote This implementation can be removed once the {@link MuleRuntimeFeature#FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT} feature
+ *           flag is removed
  */
-// TODO W-17814249: Remove once the kill switch is removed
 class LegacyRoutePairPublisherAssemblyHelper implements RoutePairPublisherAssemblyHelper {
 
   private final Publisher<CoreEvent> publisherWithChildContext;
