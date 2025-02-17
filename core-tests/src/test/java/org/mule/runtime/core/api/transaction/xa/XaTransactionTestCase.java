@@ -18,6 +18,7 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.transaction.XaTransaction;
@@ -125,5 +126,30 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
     final InOrder inOrder = inOrder(mockTransactionManager);
     inOrder.verify(mockTransactionManager).setTransactionTimeout(timeoutSecs);
     inOrder.verify(mockTransactionManager).begin();
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void beginWithoutTransactionManager() throws TransactionException {
+    new XaTransaction("appName", null, notificationDispatcher).begin();
+  }
+
+  @Test
+  public void commitTransaction() throws Exception {
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    xaTransaction.begin();
+    xaTransaction.commit();
+    verify(mockTransactionManager).commit();
+  }
+
+  @Test
+  public void rollbackTransaction() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    xaTransaction.rollback();
+    verify(mockTransactionManager).rollback();
   }
 }

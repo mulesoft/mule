@@ -49,6 +49,8 @@ import org.slf4j.Logger;
 public class XaTransaction extends AbstractTransaction {
 
   private static final Logger LOGGER = getLogger(XaTransaction.class);
+  private static final String TX_MANAGER_CLASS = "javax.transaction.TransactionManager";
+  private static final String TX_MANAGER_NAME = "Transaction Manager";
 
   /**
    * The inner JTA transaction
@@ -70,7 +72,7 @@ public class XaTransaction extends AbstractTransaction {
   /**
    * @deprecated since 4.3.0. Use {@link #XaTransaction(String, TransactionManager, NotificationDispatcher)} instead
    */
-  @Deprecated
+  @Deprecated(since = "4.3.0")
   public XaTransaction(MuleContext muleContext) {
     super(muleContext);
     this.txManager = muleContext.getTransactionManager();
@@ -79,8 +81,7 @@ public class XaTransaction extends AbstractTransaction {
   @Override
   protected void doBegin() throws TransactionException {
     if (txManager == null) {
-      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
-          .getMessage());
+      throw new IllegalStateException(objectNotRegistered(TX_MANAGER_CLASS, TX_MANAGER_NAME).getMessage());
     }
 
     try {
@@ -176,7 +177,6 @@ public class XaTransaction extends AbstractTransaction {
        * of execution from the current transaction. There's no JTA API-way to do that after the call, so the thread's transaction
        * is subject to manual recovery process. Instead TransactionManager or UserTransaction must be used.
        */
-      // delistResources();
       txManager.rollback();
     } catch (Exception e) {
       throw new TransactionRollbackException(e);
@@ -251,16 +251,15 @@ public class XaTransaction extends AbstractTransaction {
     resources.put(normalizedKey, resource);
 
     if (key == null) {
-      LOGGER.error("Key for bound resource " + resource + " is null");
+      LOGGER.error("Key for bound resource {} is null", resource);
     }
 
-    if (resource instanceof MuleXaObject) {
-      MuleXaObject xaObject = (MuleXaObject) resource;
+    if (resource instanceof MuleXaObject xaObject) {
       xaObject.enlist();
-    } else if (resource instanceof XAResource) {
-      enlistResource((XAResource) resource);
+    } else if (resource instanceof XAResource xaResource) {
+      enlistResource(xaResource);
     } else {
-      LOGGER.error("Bound resource " + resource + " is neither a MuleXaObject nor XAResource");
+      LOGGER.error("Bound resource {} is neither a MuleXaObject nor XAResource", resource);
     }
   }
 
@@ -313,8 +312,7 @@ public class XaTransaction extends AbstractTransaction {
   @Override
   public void resume() throws TransactionException {
     if (txManager == null) {
-      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
-          .getMessage());
+      throw new IllegalStateException(objectNotRegistered(TX_MANAGER_CLASS, TX_MANAGER_NAME).getMessage());
     }
     try {
       txManager.resume(transaction);
@@ -326,8 +324,7 @@ public class XaTransaction extends AbstractTransaction {
   @Override
   public Transaction suspend() throws TransactionException {
     if (txManager == null) {
-      throw new IllegalStateException(objectNotRegistered("javax.transaction.TransactionManager", "Transaction Manager")
-          .getMessage());
+      throw new IllegalStateException(objectNotRegistered(TX_MANAGER_CLASS, TX_MANAGER_NAME).getMessage());
     }
     try {
       transaction = txManager.suspend();
@@ -338,15 +335,14 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   protected synchronized void delistResources() {
-    for (Object o : resources.entrySet()) {
-      Map.Entry entry = (Map.Entry) o;
-      final Object xaObject = entry.getValue();
-      if (xaObject instanceof MuleXaObject) {
+    for (Map.Entry<ResourceKey, Object> entry : resources.entrySet()) {
+      final Object value = entry.getValue();
+      if (value instanceof MuleXaObject xaObject) {
         // there is need for reuse object
         try {
-          ((MuleXaObject) xaObject).delist();
+          xaObject.delist();
         } catch (Exception e) {
-          LOGGER.error("Failed to delist resource " + xaObject, e);
+          LOGGER.error("Failed to delist resource {}", xaObject, e);
         }
       }
     }
@@ -354,15 +350,14 @@ public class XaTransaction extends AbstractTransaction {
 
   protected synchronized void closeResources() {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), toString());
+      LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), this);
     }
 
-    Iterator i = resources.entrySet().iterator();
+    Iterator<Map.Entry<ResourceKey, Object>> i = resources.entrySet().iterator();
     while (i.hasNext()) {
-      Map.Entry entry = (Map.Entry) i.next();
+      Map.Entry<ResourceKey, Object> entry = i.next();
       final Object value = entry.getValue();
-      if (value instanceof MuleXaObject) {
-        MuleXaObject xaObject = (MuleXaObject) value;
+      if (value instanceof MuleXaObject xaObject) {
         if (!xaObject.isReuseObject()) {
           if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("About to close resource {}...", xaObject);
@@ -392,15 +387,15 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   private ResourceKey getResourceEntry(Object resourceFactory) {
-    resourceFactory = (resourceFactory instanceof XaResourceFactoryHolder
-        ? ((XaResourceFactoryHolder) resourceFactory).getHoldObject()
+    resourceFactory = (resourceFactory instanceof XaResourceFactoryHolder xaResourceFactory
+        ? xaResourceFactory.getHoldObject()
         : resourceFactory);
     return new ResourceKey(resourceFactory, null);
   }
 
   private ResourceKey getResourceEntry(Object resourceFactory, Object resource) {
-    resourceFactory = (resourceFactory instanceof XaResourceFactoryHolder
-        ? ((XaResourceFactoryHolder) resourceFactory).getHoldObject()
+    resourceFactory = (resourceFactory instanceof XaResourceFactoryHolder xaResourceFactory
+        ? xaResourceFactory.getHoldObject()
         : resourceFactory);
     return new ResourceKey(resourceFactory, resource);
   }
@@ -429,10 +424,6 @@ public class XaTransaction extends AbstractTransaction {
       return resourceFactory;
     }
 
-    public Object getResource() {
-      return resource;
-    }
-
     @Override
     public int hashCode() {
       return Objects.hashCode(resourceFactory);
@@ -441,7 +432,7 @@ public class XaTransaction extends AbstractTransaction {
     @Override
     public boolean equals(Object obj) {
       // we use this class internally only so are sure obj is always a ResourceEntry
-      return resourceFactory.equals(((ResourceKey) obj).getResourceFactory());
+      return obj instanceof ResourceKey other ? resourceFactory.equals(other.getResourceFactory()) : false;
     }
   }
 }
