@@ -64,7 +64,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     txStatusMappings = unmodifiableMap(txStatusMappings);
   }
 
-  @Deprecated
+  @Deprecated(since = "4.4")
   protected AbstractSingleResourceTransaction(MuleContext muleContext) {
     super(muleContext);
   }

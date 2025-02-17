@@ -155,13 +155,10 @@ public final class MuleTransactionConfig implements TransactionConfig, MuleConte
     }
 
     switch (action) {
-      case ACTION_ALWAYS_BEGIN:
-      case ACTION_ALWAYS_JOIN:
-      case ACTION_BEGIN_OR_JOIN:
+      case ACTION_ALWAYS_BEGIN, ACTION_ALWAYS_JOIN, ACTION_BEGIN_OR_JOIN:
         return true;
 
-      case ACTION_JOIN_IF_POSSIBLE:
-      case ACTION_INDIFFERENT:
+      case ACTION_JOIN_IF_POSSIBLE, ACTION_INDIFFERENT:
         return TransactionCoordination.getInstance().getTransaction() != null;
 
       default:
