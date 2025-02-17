@@ -174,7 +174,7 @@
         <muleMavenClientTest>1.6.1-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.4.1-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.4.0-20250217</muleApiVersion>
-        <muleMetadataModelVersion>1.4.1-SNAPSHOT</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.4.0-20250217</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
