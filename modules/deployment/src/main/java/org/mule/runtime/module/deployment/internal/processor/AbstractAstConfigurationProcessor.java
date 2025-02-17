@@ -49,7 +49,6 @@ abstract class AbstractAstConfigurationProcessor implements ArtifactConfiguratio
     artifactContextConfiguration.getServiceConfigurators().stream()
         .forEach(configurationBuilder::addServiceConfigurator);
     configurationBuilder.configure(artifactContextConfiguration.getMuleContext());
-
     return configurationBuilder.createArtifactContext();
   }
 
