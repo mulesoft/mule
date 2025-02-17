@@ -9,6 +9,7 @@ package org.mule.test.module.extension.streaming;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.tck.junit4.matcher.Eventually.eventually;
+import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
 import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
@@ -35,6 +36,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.exception.MessagingException;
+import org.mule.tck.junit4.matcher.FunctionExpressionMatcher;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -91,7 +93,8 @@ public class ScatterGatherTimeoutWithBytesStreamingExtensionTestCase extends Abs
   public void whenScatterGatherTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
     runScatterGatherFlowAndAwaitStreamClosed("scatterGatherWithTimeout");
     // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty())));
+    assertThat(eventContextService,
+               is(eventually(expressionMatches(EventContextService::getCurrentlyActiveFlowStacks, empty()))));
   }
 
   @Test
@@ -100,7 +103,8 @@ public class ScatterGatherTimeoutWithBytesStreamingExtensionTestCase extends Abs
   public void whenScatterGatherWithCollectListTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
     runScatterGatherFlowAndAwaitStreamClosed("scatterGatherWithTimeoutCollectList");
     // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty())));
+    assertThat(eventContextService,
+               is(eventually(expressionMatches(EventContextService::getCurrentlyActiveFlowStacks, empty()))));
   }
 
   @Test
@@ -109,7 +113,8 @@ public class ScatterGatherTimeoutWithBytesStreamingExtensionTestCase extends Abs
   public void whenScatterGatherWithFlowRefTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
     runScatterGatherFlowAndAwaitStreamClosed("scatterGatherWithTimeoutFlowRef");
     // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty())));
+    assertThat(eventContextService,
+               is(eventually(expressionMatches(EventContextService::getCurrentlyActiveFlowStacks, empty()))));
   }
 
   @Test
@@ -118,7 +123,8 @@ public class ScatterGatherTimeoutWithBytesStreamingExtensionTestCase extends Abs
   public void whenScatterGatherWithNestedTimesOutThenStreamsAreNotLeaked() throws InterruptedException {
     runScatterGatherFlowAndAwaitStreamClosed("scatterGatherWithNestedRoute");
     // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty())));
+    assertThat(eventContextService,
+               is(eventually(expressionMatches(EventContextService::getCurrentlyActiveFlowStacks, empty()))));
   }
 
   @Test
@@ -147,7 +153,8 @@ public class ScatterGatherTimeoutWithBytesStreamingExtensionTestCase extends Abs
     runScatterGatherFlowAndAwaitStreamClosed(flowName);
 
     // Check that no EventContexts are leaked
-    assertThat(eventContextService.getCurrentlyActiveFlowStacks(), is(eventually(empty()).atMostIn(20, SECONDS)));
+    assertThat(eventContextService, is(eventually(expressionMatches(EventContextService::getCurrentlyActiveFlowStacks, empty()))
+        .atMostIn(20, SECONDS)));
   }
 
   private void runScatterGatherFlowAndAwaitStreamClosed(String flowName) throws InterruptedException {
