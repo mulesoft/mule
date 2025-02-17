@@ -111,8 +111,8 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
       return from(routingPairs)
           .map(addSequence(count))
           .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeoutDuration,
-                                              timeoutScheduler, reactorTimeoutScheduler,
-                                              timeoutErrorType),
+                                              reactorTimeoutScheduler,
+                                              timeoutErrorType, timeoutBlockingScheduler),
                              maxConcurrency)
           .reduce(new Pair<List<Pair<CoreEvent, EventProcessingException>>, Boolean>(new ArrayList<>(), false),
                   (listBooleanPair, coreEventExceptionPair) -> {
@@ -172,9 +172,9 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                                                                                        int maxConcurrency,
                                                                                                        boolean delayErrors,
                                                                                                        Duration timeout,
-                                                                                                       Scheduler timeoutScheduler,
                                                                                                        reactor.core.scheduler.Scheduler reactorTimeoutScheduler,
-                                                                                                       ErrorType timeoutErrorType) {
+                                                                                                       ErrorType timeoutErrorType,
+                                                                                                       Scheduler timeoutBlockingScheduler) {
 
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
@@ -182,7 +182,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
       route = applyProcessingStrategy(processingStrategy, route, maxConcurrency);
 
       RoutePairPublisherAssemblyHelper routePairPublisherAssemblyHelper = completeChildContextsOnTimeout
-          ? new DefaultRoutePairPublisherAssemblyHelper(pair.getEvent(), route, timeoutScheduler)
+          ? new DefaultRoutePairPublisherAssemblyHelper(pair.getEvent(), route, timeoutBlockingScheduler)
           : new LegacyRoutePairPublisherAssemblyHelper(pair.getEvent(), route);
 
       return from(routePairPublisherAssemblyHelper.getPublisherOnChildContext())
