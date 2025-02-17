@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceClassLoaderFactoryProvider {
 
+  private ServiceClassLoaderFactoryProvider() {}
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceClassLoaderFactoryProvider.class);
 
   public static ClassLoaderConfigurationLoader serviceClassLoaderConfigurationLoader() {
@@ -32,6 +34,7 @@ public class ServiceClassLoaderFactoryProvider {
 
   private static boolean withinModularizedContainer = ServiceClassLoaderFactoryProvider.class.getModule().isNamed();
 
+  @Deprecated(since = "4.9")
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
     if (classloaderContainerJpmsModuleLayer()
         // Only if the container is modularized it makes sense to load services as module layers

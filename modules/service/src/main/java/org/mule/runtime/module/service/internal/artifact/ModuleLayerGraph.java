@@ -58,9 +58,7 @@ public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
       return;
     } else {
       String name = ids.getOrDefault(layer, Integer.toString(this.nodes.size()));
-      if (!ids.containsKey(layer)) {
-        ids.put(layer, name);
-      }
+      ids.computeIfAbsent(layer, key -> name);
     }
     for (ModuleLayer parent : layer.parents()) {
       if (!this.nodes.containsKey(parent)) {
@@ -169,21 +167,7 @@ public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
                                   Set<ModuleLayer> printParentsOf) {
     // We get the position for every node's parents.
     List<List<Integer>> positionOfParents = new ArrayList<>();
-    int current = 0;
-    for (ModuleLayer moduleLayer : moduleLayers) {
-      List<Integer> pos = new ArrayList<>();
-      positionOfParents.add(pos);
-      if (!printParentsOf.contains(moduleLayer)) {
-        continue;
-      }
-      for (ModuleLayer parent : moduleLayer.parents()) {
-        if (!isFilteredLayer(parent)) {
-          pos.add(current);
-          current++;
-        }
-      }
-    }
-    int totalParents = current;
+    int totalParents = parentInfo(moduleLayers, printParentsOf, positionOfParents);
     if (totalParents == 0) {
       // if there are no parents, there is nothing to be done
       return;
@@ -212,6 +196,28 @@ public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
     }
     stringBuilder.append(lineSeparator());
 
+    addArrowsString(stringBuilder, totalParents, frameSize);
+  }
+
+  private int parentInfo(List<ModuleLayer> moduleLayers, Set<ModuleLayer> printParentsOf, List<List<Integer>> positionOfParents) {
+    int current = 0;
+    for (ModuleLayer moduleLayer : moduleLayers) {
+      List<Integer> pos = new ArrayList<>();
+      positionOfParents.add(pos);
+      if (!printParentsOf.contains(moduleLayer)) {
+        continue;
+      }
+      for (ModuleLayer parent : moduleLayer.parents()) {
+        if (!isFilteredLayer(parent)) {
+          pos.add(current);
+          current++;
+        }
+      }
+    }
+    return current;
+  }
+
+  private void addArrowsString(StringBuilder stringBuilder, int totalParents, int frameSize) {
     for (int i = 0; i < totalParents; i++) {
       stringBuilder.append(repeat(" ", frameSize / 2));
       stringBuilder.append("|");
@@ -255,9 +261,8 @@ public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
     for (int i = 0; i <= max; i++) {
       result.add(new HashSet<>());
     }
-    for (ModuleLayer layer : levelToPrint.keySet()) {
-      result.get(levelToPrint.get(layer)).add(layer);
-    }
+
+    levelToPrint.forEach((layer, value) -> result.get(value).add(layer));
     return result;
   }
 
@@ -273,7 +278,7 @@ public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
       ModuleLayer layer = queue.pollFirst();
       stringBuilder.append(ids.get(layer));
       stringBuilder.append(": ");
-      if (layer.modules().size() > 0) {
+      if (!layer.modules().isEmpty()) {
         stringBuilder.append(layer.modules().stream().map(Module::getName).collect(joining(", ")));
       } else {
         stringBuilder.append("(Empty Layer)");
@@ -291,7 +296,6 @@ public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
 
   protected boolean isFilteredLayer(ModuleLayer layer) {
     return layer.equals(ModuleLayer.boot());
-    // return false;
   }
 
   private void sortLayersByDepth(List<ModuleLayer> moduleLayers, Set<ModuleLayer> processedInThisLevel,

@@ -23,7 +23,7 @@ public interface ServiceRegistry {
   /**
    * @return an implementation of {@link ServiceRegistry} that does dependency injection between the registered services.
    */
-  public static ServiceRegistry create() {
+  static ServiceRegistry create() {
     return new DefaultServiceRegistry();
   }
 
