@@ -95,6 +95,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   @Override
   public ForkJoinStrategy createForkJoinStrategy(ProcessingStrategy processingStrategy, int maxConcurrency, boolean delayErrors,
                                                  long timeout, Scheduler timeoutScheduler, ErrorType timeoutErrorType,
+                                                 Scheduler timeoutBlockingScheduler,
                                                  boolean isDetailedLogEnabled) {
     Duration timeoutDuration;
     if (timeout == Long.MAX_VALUE) {
@@ -111,7 +112,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
           .map(addSequence(count))
           .flatMapSequential(processRoutePair(processingStrategy, maxConcurrency, delayErrors, timeoutDuration,
                                               reactorTimeoutScheduler,
-                                              timeoutErrorType),
+                                              timeoutErrorType, timeoutBlockingScheduler),
                              maxConcurrency)
           .reduce(new Pair<List<Pair<CoreEvent, EventProcessingException>>, Boolean>(new ArrayList<>(), false),
                   (listBooleanPair, coreEventExceptionPair) -> {
@@ -171,8 +172,9 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                                                                                        int maxConcurrency,
                                                                                                        boolean delayErrors,
                                                                                                        Duration timeout,
-                                                                                                       reactor.core.scheduler.Scheduler timeoutScheduler,
-                                                                                                       ErrorType timeoutErrorType) {
+                                                                                                       reactor.core.scheduler.Scheduler reactorTimeoutScheduler,
+                                                                                                       ErrorType timeoutErrorType,
+                                                                                                       Scheduler timeoutBlockingScheduler) {
 
     return pair -> {
       ReactiveProcessor route = publisher -> from(publisher)
@@ -180,14 +182,14 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
       route = applyProcessingStrategy(processingStrategy, route, maxConcurrency);
 
       RoutePairPublisherAssemblyHelper routePairPublisherAssemblyHelper = completeChildContextsOnTimeout
-          ? new DefaultRoutePairPublisherAssemblyHelper(pair.getEvent(), route)
+          ? new DefaultRoutePairPublisherAssemblyHelper(pair.getEvent(), route, timeoutBlockingScheduler)
           : new LegacyRoutePairPublisherAssemblyHelper(pair.getEvent(), route);
 
       return from(routePairPublisherAssemblyHelper.getPublisherOnChildContext())
           .timeout(timeout,
                    routePairPublisherAssemblyHelper
                        .decorateTimeoutPublisher(onTimeout(processingStrategy, delayErrors, timeoutErrorType, pair)),
-                   timeoutScheduler)
+                   reactorTimeoutScheduler)
           .map(this::eventToPair)
           .onErrorResume(MessagingException.class, me -> getPublisher(delayErrors, me));
     };

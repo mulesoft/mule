@@ -59,7 +59,7 @@ public class CollectMapForkJoinStrategyTestCase extends AbstractForkJoinStrategy
     return new CollectMapForkJoinStrategyFactory(getFeatureFlaggingService())
         .createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
                                 scheduler,
-                                timeoutErrorType, isDetailedLogEnabled);
+                                timeoutErrorType, scheduler, isDetailedLogEnabled);
   }
 
   @Test
