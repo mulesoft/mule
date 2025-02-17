@@ -12,6 +12,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 
 import static java.util.Optional.empty;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.event.AbstractEventContext;
@@ -34,12 +35,14 @@ class DefaultRoutePairPublisherAssemblyHelper implements RoutePairPublisherAssem
 
   private final Publisher<CoreEvent> publisherWithChildContext;
   private final BaseEventContext childContext;
+  private final Scheduler completionScheduler;
 
-  DefaultRoutePairPublisherAssemblyHelper(CoreEvent routeEvent, ReactiveProcessor chain) {
+  DefaultRoutePairPublisherAssemblyHelper(CoreEvent routeEvent, ReactiveProcessor chain, Scheduler completionScheduler) {
     // This sequence is equivalent to processWithChildContextDontComplete (used in the legacy version), only this way we can keep
     // track of the child context, which we will need later on.
     this.childContext = newChildContext(routeEvent, empty());
     this.publisherWithChildContext = processWithChildContext(routeEvent, chain, childContext);
+    this.completionScheduler = completionScheduler;
   }
 
   @Override
@@ -58,21 +61,23 @@ class DefaultRoutePairPublisherAssemblyHelper implements RoutePairPublisherAssem
   private Consumer<CoreEvent> completeRecursively(BaseEventContext eventContext,
                                                   BiConsumer<BaseEventContext, MessagingException> forEachChild) {
     return some -> {
-      // Tracks the child contexts first and then completes them, that way we are not retaining the read lock all the time.
-      // We use a stack so we iterate them in reverse order, so that child contexts are always visited before their respective
-      // parents. This assumes forEachChild visits on a parent-first strategy (which is currently the case).
-      Deque<BaseEventContext> allContexts = new ArrayDeque<>();
-      allContexts.push(eventContext);
-      ((AbstractEventContext) eventContext).forEachChild(allContexts::push);
+      completionScheduler.submit(() -> {
+        // Tracks the child contexts first and then completes them, that way we are not retaining the read lock all the time.
+        // We use a stack so we iterate them in reverse order, so that child contexts are always visited before their respective
+        // parents. This assumes forEachChild visits on a parent-first strategy (which is currently the case).
+        Deque<BaseEventContext> allContexts = new ArrayDeque<>();
+        allContexts.push(eventContext);
+        ((AbstractEventContext) eventContext).forEachChild(allContexts::push);
 
-      while (!allContexts.isEmpty()) {
-        BaseEventContext ctx = allContexts.pop();
-        // Some context may already be terminated, as the children can propagate the termination up to their parents.
-        if (!ctx.isTerminated()) {
-          // It is important to swap the context so it has the right flow stack among other things.
-          forEachChild.accept(ctx, new MessagingException(quickCopy(ctx, some), some.getError().get().getCause()));
+        while (!allContexts.isEmpty()) {
+          BaseEventContext ctx = allContexts.pop();
+          // Some context may already be terminated, as the children can propagate the termination up to their parents.
+          if (!ctx.isTerminated()) {
+            // It is important to swap the context so it has the right flow stack among other things.
+            forEachChild.accept(ctx, new MessagingException(quickCopy(ctx, some), some.getError().get().getCause()));
+          }
         }
-      }
+      });
     };
   }
 }
