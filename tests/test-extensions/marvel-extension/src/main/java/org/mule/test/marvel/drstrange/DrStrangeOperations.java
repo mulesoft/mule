@@ -145,8 +145,8 @@ public class DrStrangeOperations {
           // These are needed because the disposal of the streaming state of the root event context will happen before this
           // PagingProvider is registered (due to the timeout).
           // The first page is fetched before the registration with the streaming state (see PagingResultTransformer).
-          flowListener.onComplete(() -> this.close(connection));
-          flowListener.onError(e -> this.close(connection));
+          flowListener.onComplete(() -> closeProviderBlocking(connection));
+          flowListener.onError(e -> closeProviderBlocking(connection));
           try {
             // Artificial delay on first page
             ((CountDownLatch) latch).await();
@@ -161,6 +161,17 @@ public class DrStrangeOperations {
       public void close(MysticConnection connection) {
         // Counts down on the latch, notifying the stream was closed
         ((CountDownLatch) providerClosedLatch).countDown();
+      }
+
+      private void closeProviderBlocking(MysticConnection connection) {
+        try {
+          // We wait on the latch here too, to simulate situations in which the closing will not finish until the inflight
+          // operation is finished
+          ((CountDownLatch) latch).await();
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+        this.close(connection);
       }
     };
   }
