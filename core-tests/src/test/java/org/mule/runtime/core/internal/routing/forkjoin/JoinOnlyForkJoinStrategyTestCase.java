@@ -59,7 +59,7 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
     return new JoinOnlyForkJoinStrategyFactory(getFeatureFlaggingService())
         .createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
                                 scheduler,
-                                timeoutErrorType, isDetailedLogEnabled);
+                                timeoutErrorType, scheduler, isDetailedLogEnabled);
   }
 
   @Test

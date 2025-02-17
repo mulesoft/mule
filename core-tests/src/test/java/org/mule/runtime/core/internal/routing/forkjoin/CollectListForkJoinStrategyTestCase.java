@@ -61,7 +61,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
     return new CollectListForkJoinStrategyFactory(getFeatureFlaggingService())
         .createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
                                 scheduler,
-                                timeoutErrorType, isDetailedLogEnabled);
+                                timeoutErrorType, scheduler, isDetailedLogEnabled);
   }
 
   @Test
@@ -91,7 +91,7 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
     boolean isDetailedLogEnabled = Boolean.parseBoolean(detailedCompositeRoutingExceptionLog.getValue());
     strategy = new CollectListForkJoinStrategyFactory(false, getFeatureFlaggingService())
         .createForkJoinStrategy(processingStrategy, 1, true, 50, scheduler,
-                                timeoutErrorType, isDetailedLogEnabled);
+                                timeoutErrorType, scheduler, isDetailedLogEnabled);
     final String beforeVarName = "before";
     final String beforeVarValue = "beforeValue";
     final String beforeVar2Name = "before2";
