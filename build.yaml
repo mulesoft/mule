@@ -3,7 +3,7 @@ upstreamProjects:
   Mule-runtime/mule-profiling-api/support/1.0.x,
   Mule-runtime/mule-api/1.4.0-MARCH-2025,
   Mule-runtime/mule-extensions-api/support/1.4.x,
-  Mule-runtime/mule-artifact-ast/support/1.0.x,
+  Mule-runtime/mule-artifact-ast/1.0.0-MARCH-2025,
   Mule-runtime/mule-properties-api/1.0.0-MARCH-2025,
   DataWeave/data-weave/support/2.4.0,
   Mule-runtime/mule-maven-client/support/1.6.x
