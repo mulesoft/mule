@@ -17,12 +17,10 @@ public abstract class AbstractTransactionContext {
   protected long timeout;
   protected int status;
   private boolean readOnly;
-  private boolean suspended;
   protected boolean finished;
 
-  public AbstractTransactionContext() {
+  protected AbstractTransactionContext() {
     status = Status.STATUS_NO_TRANSACTION;
-    suspended = false;
     finished = false;
     readOnly = true;
   }
@@ -31,9 +29,6 @@ public abstract class AbstractTransactionContext {
     StringBuilder sb = new StringBuilder();
     sb.append(id).append("[");
     sb.append(getStatusString());
-    if (suspended) {
-      sb.append(", suspended");
-    }
     if (readOnly) {
       sb.append(", readonly");
     }
@@ -83,4 +78,8 @@ public abstract class AbstractTransactionContext {
   public abstract void doCommit() throws ResourceManagerException;
 
   public abstract void doRollback() throws ResourceManagerException;
+
+  public void setStatus(int status) {
+    this.status = status;
+  }
 }
