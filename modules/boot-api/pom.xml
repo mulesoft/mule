@@ -6,7 +6,7 @@
     <parent>
         <artifactId>mule-modules</artifactId>
         <groupId>org.mule.runtime</groupId>
-        <version>4.6.14-SNAPSHOT</version>
+        <version>4.6.15-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-module-boot-api</artifactId>
