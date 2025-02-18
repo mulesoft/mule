@@ -11,8 +11,6 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -21,14 +19,11 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.slf4j.Logger;
 
 /**
  *
  */
 public class UnixController extends AbstractOSController {
-
-  private static final Logger logger = getLogger(UnixController.class);
 
   public UnixController(String muleHome, int timeout) {
     super(muleHome, timeout);
@@ -76,9 +71,7 @@ public class UnixController extends AbstractOSController {
     executor.setStreamHandler(streamHandler);
 
     if (this.doExecution(executor, new CommandLine(this.muleBin).addArgument(STATUS_CMD), newEnv) == 0) {
-      String status = outputStream.toString();
-      logger.info("[Status] " + status);
-      Matcher matcher = STATUS_LABELS_PATTERN.matcher(status);
+      Matcher matcher = STATUS_LABELS_PATTERN.matcher(outputStream.toString());
       if (matcher.find() && !isEmpty(matcher.group(STATUS_WRAPPER_GROUP_NAME))
           && !isEmpty(matcher.group(STATUS_JAVA_GROUP_NAME))) {
         return MuleProcessStatus.valueOf(format("%s_%s", matcher.group(STATUS_WRAPPER_GROUP_NAME),
