@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
@@ -81,6 +82,53 @@ public class SingleResourceTxTestCase {
     assertThat(transaction.supports("Jelou", "uorld"), is(false));
     assertThat(transaction.supports(transaction, "world"), is(false));
     assertThat(transaction.supports("hello", transaction), is(false));
+  }
+
+  @Test
+  public void hasBegun() throws TransactionException {
+    AbstractTransaction transaction = new TestTransaction("test", mock(NotificationDispatcher.class));
+    assertThat(transaction.isBegun(), is(false));
+    transaction.bindResource("hello", "world");
+    assertThat(transaction.isBegun(), is(false));
+    try {
+      transaction.begin();
+      assertThat(transaction.isBegun(), is(true));
+    } finally {
+      // to stop having tx binded, which would affect following tests
+      transaction.rollback();
+    }
+  }
+
+  @Test
+  public void hasBeenRolledBack() throws TransactionException {
+    AbstractTransaction transaction = new TestTransaction("test", mock(NotificationDispatcher.class));
+    assertThat(transaction.isRolledBack(), is(false));
+    transaction.bindResource("hello", "world");
+    assertThat(transaction.isRolledBack(), is(false));
+    transaction.rollback();
+    assertThat(transaction.isRolledBack(), is(true));
+  }
+
+  @Test
+  public void hasBeenCommitted() throws TransactionException {
+    AbstractTransaction transaction = new TestTransaction("test", mock(NotificationDispatcher.class));
+    assertThat(transaction.isCommitted(), is(false));
+    transaction.bindResource("hello", "world");
+    assertThat(transaction.isCommitted(), is(false));
+    transaction.commit();
+    assertThat(transaction.isCommitted(), is(true));
+  }
+
+  @Test(expected = IllegalTransactionStateException.class)
+  public void suspendNotSupported() throws TransactionException {
+    AbstractTransaction transaction = new TestTransaction("test", null);
+    transaction.suspend();
+  }
+
+  @Test(expected = IllegalTransactionStateException.class)
+  public void resumeNotSupported() throws TransactionException {
+    AbstractTransaction transaction = new TestTransaction("test", null);
+    transaction.resume();
   }
 
   private static class TestTransaction extends AbstractSingleResourceTransaction {
