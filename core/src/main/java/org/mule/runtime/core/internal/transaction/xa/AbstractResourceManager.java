@@ -18,6 +18,8 @@ import javax.transaction.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.lang.Thread.currentThread;
+
 /**
  * This code is based on code coming from the <a href="http://jakarta.apache.org/commons/transaction/">commons-transaction</a>
  * project.
@@ -62,7 +64,6 @@ public abstract class AbstractResourceManager {
     operationMode = OPERATION_MODE_STARTING;
     doStart();
     recover();
-    // sync();
     operationMode = OPERATION_MODE_STARTED;
     if (dirty) {
       logger.warn("Started ResourceManager, but in dirty mode only (Recovery of pending transactions failed)");
@@ -87,7 +88,7 @@ public abstract class AbstractResourceManager {
     return stop(mode, getDefaultTransactionTimeout() * DEFAULT_COMMIT_TIMEOUT_FACTOR);
   }
 
-  public synchronized boolean stop(int mode, long timeOut) throws ResourceManagerSystemException {
+  public synchronized boolean stop(int mode, long timeOut) {
     logger.info("Stopping ResourceManager");
     operationMode = OPERATION_MODE_STOPPING;
     boolean success = shutdown(mode, timeOut);
@@ -107,7 +108,6 @@ public abstract class AbstractResourceManager {
         return waitForAllTxToStop(timeoutMSecs);
       case SHUTDOWN_MODE_ROLLBACK:
         throw new UnsupportedOperationException();
-      // return rollBackOrForward();
       case SHUTDOWN_MODE_KILL:
         return true;
       default:
@@ -137,12 +137,12 @@ public abstract class AbstractResourceManager {
 
     synchronized (context) {
       if (logger.isDebugEnabled()) {
-        logger.debug("Beginning transaction " + context);
+        logger.debug("Beginning transaction {}", context);
       }
       doBegin(context);
       context.status = Status.STATUS_ACTIVE;
       if (logger.isDebugEnabled()) {
-        logger.debug("Began transaction " + context);
+        logger.debug("Began transaction {}", context);
       }
     }
     globalTransactions.add(context);
@@ -152,19 +152,13 @@ public abstract class AbstractResourceManager {
     assureReady();
     synchronized (context) {
       if (logger.isDebugEnabled()) {
-        logger.debug("Rolling back transaction " + context);
+        logger.debug("Rolling back transaction {}", context);
       }
       try {
         context.status = Status.STATUS_ROLLING_BACK;
         doRollback(context);
         context.status = Status.STATUS_ROLLEDBACK;
-      } catch (Error e) {
-        setDirty(context, e);
-        throw e;
-      } catch (RuntimeException e) {
-        setDirty(context, e);
-        throw e;
-      } catch (ResourceManagerSystemException e) {
+      } catch (Error | RuntimeException | ResourceManagerSystemException e) {
         setDirty(context, e);
         throw e;
       } finally {
@@ -174,7 +168,7 @@ public abstract class AbstractResourceManager {
         context.notifyFinish();
       }
       if (logger.isDebugEnabled()) {
-        logger.debug("Rolled back transaction " + context);
+        logger.debug("Rolled back transaction {}", context);
       }
     }
   }
@@ -190,19 +184,13 @@ public abstract class AbstractResourceManager {
     }
     synchronized (context) {
       if (logger.isDebugEnabled()) {
-        logger.debug("Committing transaction " + context);
+        logger.debug("Committing transaction {}", context);
       }
       try {
         context.status = Status.STATUS_COMMITTING;
         doCommit(context);
         context.status = Status.STATUS_COMMITTED;
-      } catch (Error e) {
-        setDirty(context, e);
-        throw e;
-      } catch (RuntimeException e) {
-        setDirty(context, e);
-        throw e;
-      } catch (ResourceManagerSystemException e) {
+      } catch (Error | RuntimeException | ResourceManagerSystemException e) {
         setDirty(context, e);
         throw e;
       } catch (ResourceManagerException e) {
@@ -250,25 +238,26 @@ public abstract class AbstractResourceManager {
 
       synchronized (context) {
         if (!context.finished) {
-          logger.info("Waiting for tx " + context + " to finish for " + remainingTimeout + " milli seconds");
+          logger.info("Waiting for tx {} to finish for {} milli seconds", context, remainingTimeout);
         }
         while (!context.finished && remainingTimeout > 0) {
           try {
             context.wait(remainingTimeout);
           } catch (InterruptedException e) {
+            currentThread().interrupt();
             return false;
           }
           remainingTimeout = startTime - System.currentTimeMillis() + timeoutMSecs;
         }
         if (context.finished) {
-          logger.info("Tx " + context + " finished");
+          logger.info("Tx {} finished", context);
         } else {
-          logger.warn("Tx " + context + " failed to finish in given time");
+          logger.warn("Tx {} failed to finish in given time", context);
         }
       }
     }
 
-    return (globalTransactions.size() == 0);
+    return globalTransactions.isEmpty();
   }
 
   /**
