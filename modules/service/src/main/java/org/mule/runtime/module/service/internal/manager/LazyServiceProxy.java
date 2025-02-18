@@ -187,9 +187,9 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
         LOGGER.warn(format("Service '%s' was not stopped properly: %s", assembly.getName(), e.getMessage()), e);
       }
 
-      if (assembly.getClassLoader() instanceof DisposableClassLoader) {
+      if (assembly.getClassLoader() instanceof DisposableClassLoader disposableClassLoader) {
         try {
-          ((DisposableClassLoader) assembly.getClassLoader()).dispose();
+          disposableClassLoader.dispose();
         } catch (Exception e) {
           LOGGER
               .warn(format("Service '%s' class loader was not stopped properly: %s", assembly.getName(), e.getMessage()),

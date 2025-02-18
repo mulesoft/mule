@@ -71,6 +71,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   private long timeout = Long.MAX_VALUE;
   private Integer maxConcurrency;
   private Scheduler timeoutScheduler;
+  private Scheduler timeoutBlockingScheduler;
   private ErrorType timeoutErrorType;
   private String target;
   private String targetValue = "#[payload]";
@@ -121,6 +122,8 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     }
     timeoutScheduler = schedulerService.cpuLightScheduler(SchedulerConfig.config()
         .withName(this.getClass().getName() + ".timeoutScheduler - " + getLocation().getLocation()));
+    timeoutBlockingScheduler = schedulerService.ioScheduler(SchedulerConfig.config()
+        .withName(this.getClass().getName() + ".timeoutBlockingScheduler - " + getLocation().getLocation()));
     timeoutErrorType = errorTypeRepository.getErrorType(TIMEOUT).get();
     maxConcurrency = maxConcurrency != null ? maxConcurrency : getDefaultMaxConcurrency();
     forkJoinStrategyFactory = forkJoinStrategyFactory != null ? forkJoinStrategyFactory : getDefaultForkJoinStrategyFactory();
@@ -129,6 +132,7 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     forkJoinStrategy =
         forkJoinStrategyFactory.createForkJoinStrategy(resolveProcessingStrategy(), maxConcurrency,
                                                        isDelayErrors(), timeout, timeoutScheduler, timeoutErrorType,
+                                                       timeoutBlockingScheduler,
                                                        isDetailedCompositeRoutingExceptionLogEnabled);
   }
 
@@ -142,6 +146,9 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
   public void dispose() {
     if (timeoutScheduler != null) {
       timeoutScheduler.stop();
+    }
+    if (timeoutBlockingScheduler != null) {
+      timeoutBlockingScheduler.stop();
     }
     super.dispose();
   }

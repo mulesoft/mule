@@ -29,6 +29,8 @@ import org.apache.commons.io.IOUtils;
  */
 public class MuleServiceModelLoader {
 
+  private MuleServiceModelLoader() {}
+
   public static MuleServiceModel loadServiceModel(ClassLoader serviceClassLoader) {
     try (InputStream stream =
         serviceClassLoader.getResourceAsStream(MULE_ARTIFACT_PATH_INSIDE_JAR + "/" + MULE_ARTIFACT_JSON_DESCRIPTOR)) {
