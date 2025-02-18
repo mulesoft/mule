@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.core.api.transaction.xa;
 
-import static org.mockito.Mockito.*;
 import static org.mule.runtime.core.api.transaction.Transaction.STATUS_NO_TRANSACTION;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.MuleXaObject;
