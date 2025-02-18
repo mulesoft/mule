@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.container.IsolatedPolicyClassLoader;
+import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
@@ -41,6 +42,9 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final LicenseValidator licenseValidator;
+
+
+  FilteringContainerClassLoader containerClassLoader;
 
   /**
    * Creates a new factory
@@ -72,7 +76,9 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
       ownPolicyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(ownResolvedPluginDescriptors
               .toArray(new ArtifactPluginDescriptor[ownResolvedPluginDescriptors.size()]))
-          .setParentClassLoader(IsolatedPolicyClassLoader.getInstance()).setArtifactDescriptor(descriptor).build();
+          .setParentClassLoader(IsolatedPolicyClassLoader
+              .getInstance(policyTemplateClassLoaderBuilderFactory.getFilteringContainerClassLoader()))
+          .setArtifactDescriptor(descriptor).build();
 
 
       // This classloader needs to be created after ownPolicyClassLoader so its inner classloaders override the entries in the
@@ -80,7 +86,9 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
       policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(resolvedPolicyPluginsDescriptors
               .toArray(new ArtifactPluginDescriptor[resolvedPolicyPluginsDescriptors.size()]))
-          .setParentClassLoader(IsolatedPolicyClassLoader.getInstance()).setArtifactDescriptor(descriptor).build();
+          .setParentClassLoader(IsolatedPolicyClassLoader
+              .getInstance(policyTemplateClassLoaderBuilderFactory.getFilteringContainerClassLoader()))
+          .setArtifactDescriptor(descriptor).build();
     } catch (Exception e) {
       throw new PolicyTemplateCreationException(createPolicyTemplateCreationErrorMessage(descriptor.getName()), e);
     }
