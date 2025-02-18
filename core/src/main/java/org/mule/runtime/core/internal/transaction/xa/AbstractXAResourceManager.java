@@ -41,7 +41,7 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
 
   protected abstract int doPrepare(T context) throws ResourceManagerException;
 
-  T getTransactionalResource(Xid xid) {
+  public T getTransactionalResource(Xid xid) {
     T context = getActiveTransactionalResource(xid);
     if (context != null) {
       return context;
@@ -50,27 +50,27 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
     }
   }
 
-  T getActiveTransactionalResource(Xid xid) {
+  public T getActiveTransactionalResource(Xid xid) {
     return activeContexts.get(xid);
   }
 
-  T getSuspendedTransactionalResource(Xid xid) {
+  public T getSuspendedTransactionalResource(Xid xid) {
     return suspendedContexts.get(xid);
   }
 
-  void addActiveTransactionalResource(Xid xid, T context) {
+  public void addActiveTransactionalResource(Xid xid, T context) {
     activeContexts.put(xid, context);
   }
 
-  void addSuspendedTransactionalResource(Xid xid, T context) {
+  public void addSuspendedTransactionalResource(Xid xid, T context) {
     suspendedContexts.put(xid, context);
   }
 
-  void removeActiveTransactionalResource(Xid xid) {
+  public void removeActiveTransactionalResource(Xid xid) {
     activeContexts.remove(xid);
   }
 
-  void removeSuspendedTransactionalResource(Xid xid) {
+  public void removeSuspendedTransactionalResource(Xid xid) {
     suspendedContexts.remove(xid);
   }
 }
