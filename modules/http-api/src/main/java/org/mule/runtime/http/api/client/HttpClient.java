@@ -11,6 +11,7 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.http.api.domain.sse.ServerSentEvent;
 import org.mule.runtime.http.api.ws.WebSocket;
 
 import java.io.IOException;
@@ -18,6 +19,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
+
+import org.reactivestreams.Publisher;
 
 /**
  * Object that sends an HTTP request, and returns the response. Notice it must be started to be used and stopped to be disposed
@@ -165,5 +168,11 @@ public interface HttpClient {
                                                      String socketId,
                                                      WebSocketCallback callback) {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
+
+  default Publisher<ServerSentEvent> consumeServerSentEvents(HttpRequest request,
+                                                             HttpRequestOptions requestOptions,
+                                                             String streamId) {
+    throw new UnsupportedOperationException("Server-sent Events are not supported");
   }
 }
