@@ -8,6 +8,7 @@ package org.mule.runtime.container;
 
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.net.URL;
@@ -19,21 +20,21 @@ public class IsolatedPolicyClassLoader extends MuleDeployableArtifactClassLoader
 
   private IsolatedPolicyClassLoader(String artifactId,
                                     DeployableArtifactDescriptor artifactDescriptor,
-                                    FilteringContainerClassLoader containerClassLoader) {
-    super(artifactId, artifactDescriptor, new URL[0], containerClassLoader, containerClassLoader.getClassLoaderLookupPolicy());
+                                    RegionClassLoader regionClassLoader) {
+    super(artifactId, artifactDescriptor, new URL[0], regionClassLoader, regionClassLoader.getClassLoaderLookupPolicy());
   }
 
-  public static IsolatedPolicyClassLoader getInstance(FilteringContainerClassLoader containerClassLoader) {
+  public static IsolatedPolicyClassLoader getInstance(RegionClassLoader regionClassLoader) {
     if (INSTANCE == null) {
       synchronized (IsolatedPolicyClassLoader.class) {
         if (INSTANCE == null) {
-          if (containerClassLoader == null) {
-            throw new IllegalStateException("Container Classloader is not set yet, cannot create IsolatedPolicyClassLoader Instance");
+          if (regionClassLoader == null) {
+            throw new IllegalStateException("regionClassLoader is not set yet, cannot create IsolatedPolicyClassLoader Instance");
           }
           INSTANCE = new IsolatedPolicyClassLoader(
                                                    "isolated-policy-classloader",
                                                    new DeployableArtifactDescriptor("isolated-policy-descriptor"),
-                                                   containerClassLoader);
+                                                   regionClassLoader);
         }
       }
     }
