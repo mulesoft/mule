@@ -13,7 +13,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.properties.api.DefaultConfigurationPropertiesProvider;
@@ -27,6 +29,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.stubbing.Answer;
 import org.yaml.snakeyaml.parser.ParserException;
 
 @Feature(CONFIGURATION_PROPERTIES)
@@ -44,6 +47,8 @@ public class YamlConfigurationPropertiesComponentTestCase {
   @Before
   public void setUp() {
     externalResourceProvider = uri -> this.getClass().getClassLoader().getResourceAsStream(uri);
+    when(defaultConfigurationPropertiesProvider.createValueHelper(anyString(), anyString()))
+        .thenAnswer((Answer<String>) invocation -> invocation.getArgument(1));
   }
 
   @Description("Validates the values obtained for the different types in the properties")

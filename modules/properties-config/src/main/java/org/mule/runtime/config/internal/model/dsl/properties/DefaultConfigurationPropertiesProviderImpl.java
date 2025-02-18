@@ -122,7 +122,7 @@ public class DefaultConfigurationPropertiesProviderImpl
       Properties properties = new Properties();
       properties.load(is);
       properties.keySet().stream()
-          .map(key -> new DefaultConfigurationProperty(of(this), (String) key,
+          .map(key -> new DefaultConfigurationProperty(of(defaultConfigurationPropertiesProvider), (String) key,
                                                        createValue((String) key, (String) properties.get(key))))
           .forEach(configurationAttribute -> configurationAttributes.put(configurationAttribute.getKey(),
                                                                          configurationAttribute));
@@ -156,7 +156,8 @@ public class DefaultConfigurationPropertiesProviderImpl
         String[] values = new String[list.size()];
         list.toArray(values);
         String value = join(",", list);
-        configurationAttributes.put(parentPath, new DefaultConfigurationProperty(this, parentPath, value));
+        configurationAttributes.put(parentPath,
+                                    new DefaultConfigurationProperty(defaultConfigurationPropertiesProvider, parentPath, value));
       }
     } else if (yamlObject instanceof Map) {
       if (parentYamlObject instanceof List) {
@@ -185,7 +186,8 @@ public class DefaultConfigurationPropertiesProviderImpl
         }
       }
       String resultObject = createValue(parentPath, (String) yamlObject);
-      configurationAttributes.put(parentPath, new DefaultConfigurationProperty(this, parentPath, resultObject));
+      configurationAttributes
+          .put(parentPath, new DefaultConfigurationProperty(defaultConfigurationPropertiesProvider, parentPath, resultObject));
     }
   }
 
@@ -197,7 +199,7 @@ public class DefaultConfigurationPropertiesProviderImpl
   }
 
   protected String createValue(String key, String value) {
-    return value;
+    return defaultConfigurationPropertiesProvider.createValueHelper(key, value);
   }
 
   @Override
