@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
-import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 
 import static java.lang.Boolean.TRUE;
 
@@ -40,16 +39,6 @@ class SimpleTypeBeanParamDefinitionCreator extends SimpleTypeBeanBaseDefinitionC
     this.setConvertibleBeanDefinition(createBeanDefinitionRequest, type,
                                       (String) resolveParamValue(param, disableTrimWhitespaces, disablePojoCdataTrimWhitespaces));
     return true;
-  }
-
-  @Override
-  protected boolean isExpressionValue(CreateParamBeanDefinitionRequest request) {
-    return request.getParam().getValue().isLeft();
-  }
-
-  @Override
-  protected boolean isContentParam(CreateParamBeanDefinitionRequest request) {
-    return isContent(request.getParam().getModel());
   }
 
   static Object resolveParamValue(final ComponentParameterAst param, boolean disableTrimWhitespaces,
