@@ -33,4 +33,5 @@ module org.mule.runtime.container {
       org.mule.runtime.service,
       org.mule.runtime.spring.config,
       org.mule.test.runner;
+  exports org.mule.runtime.container;
 }
