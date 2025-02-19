@@ -23,6 +23,7 @@ module org.mule.runtime.http.api {
   exports org.mule.runtime.http.api.client;
   exports org.mule.runtime.http.api.client.auth;
   exports org.mule.runtime.http.api.client.proxy;
+  exports org.mule.runtime.http.api.client.sse;
   exports org.mule.runtime.http.api.client.ws;
   exports org.mule.runtime.http.api.domain;
   exports org.mule.runtime.http.api.domain.entity;
