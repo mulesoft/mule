@@ -88,6 +88,7 @@ public class ArtifactAstInRegistryTestCase extends AbstractMuleTestCase {
     when(artifactAst.getArtifactName()).thenReturn("my mock ast");
     when(artifactAst.getArtifactType()).thenReturn(APPLICATION);
     when(artifactAst.getErrorTypeRepository()).thenReturn(MULE_CORE_ERROR_TYPE_REPOSITORY);
+    when(artifactAst.enrichedErrorTypeRepository()).thenReturn(MULE_CORE_ERROR_TYPE_REPOSITORY);
     ArtifactAstConfigurationBuilder artifactAstConfigurationBuilder = new ArtifactAstConfigurationBuilder(artifactAst,
                                                                                                           singletonMap(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY,
                                                                                                                        addArtifactAstToRegistry
