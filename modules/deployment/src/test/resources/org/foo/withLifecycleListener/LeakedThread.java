@@ -8,8 +8,6 @@ package org.foo.withLifecycleListener;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.slf4j.Logger;
-
 /**
  * Thread for testing purposes. The idea is to retain the Thread's Context ClassLoader until the Thread is terminated.
  */
