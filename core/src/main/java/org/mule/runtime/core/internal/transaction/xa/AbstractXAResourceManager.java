@@ -19,7 +19,7 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
   private Map<Xid, T> suspendedContexts = new ConcurrentHashMap<>();
   private Map<Xid, T> activeContexts = new ConcurrentHashMap<>();
 
-  public AbstractXAResourceManager() {
+  protected AbstractXAResourceManager() {
     super();
   }
 
@@ -27,13 +27,13 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
     assureReady();
     synchronized (context) {
       if (logger.isDebugEnabled()) {
-        logger.debug("Preparing transaction " + context);
+        logger.debug("Preparing transaction {}", context);
       }
       context.status = Status.STATUS_PREPARING;
       int status = doPrepare(context);
       context.status = Status.STATUS_PREPARED;
       if (logger.isDebugEnabled()) {
-        logger.debug("Prepared transaction " + context);
+        logger.debug("Prepared transaction {}", context);
       }
       return status;
     }

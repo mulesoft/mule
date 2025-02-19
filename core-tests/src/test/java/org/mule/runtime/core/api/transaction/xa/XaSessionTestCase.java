@@ -6,10 +6,18 @@
  */
 package org.mule.runtime.core.api.transaction.xa;
 
-import static javax.transaction.xa.XAResource.*;
+import static javax.transaction.xa.XAResource.TMFAIL;
+import static javax.transaction.xa.XAResource.TMNOFLAGS;
+import static javax.transaction.xa.XAResource.TMRESUME;
+import static javax.transaction.xa.XAResource.TMSUCCESS;
+import static javax.transaction.xa.XAResource.TMSUSPEND;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.internal.transaction.xa.AbstractXAResourceManager;
 import org.mule.runtime.core.internal.transaction.xa.AbstractXaTransactionContext;
