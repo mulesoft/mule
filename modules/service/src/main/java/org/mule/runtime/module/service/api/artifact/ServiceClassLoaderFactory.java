@@ -18,14 +18,14 @@ import org.mule.runtime.module.artifact.api.classloader.exception.ArtifactClassl
  * @deprecated from 4.9 use {@link ServiceModuleLayerFactory}
  */
 // TODO W-12780081 - remove usages of deprecated creation metho
-@Deprecated
+@Deprecated(since = "4.9")
 public class ServiceClassLoaderFactory
     implements IServiceClassLoaderFactory {
 
   /**
    * @deprecated from 4.6 use {@link ServiceClassLoaderFactoryProvider} instead.
    */
-  @Deprecated
+  @Deprecated(since = "4.6")
   public ServiceClassLoaderFactory() {
     // Nothing to do
   }
@@ -36,7 +36,7 @@ public class ServiceClassLoaderFactory
    * @deprecated since 4.6, use {@link #create(String, ServiceDescriptor, MuleContainerClassLoaderWrapper)}.
    */
   @Override
-  @Deprecated
+  @Deprecated(since = "4.6")
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
                                     ClassLoaderLookupPolicy lookupPolicy)
       throws ArtifactClassloaderCreationException {

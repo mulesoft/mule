@@ -58,9 +58,10 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
   protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
                                             long timeout) {
     boolean isDetailedLogEnabled = Boolean.parseBoolean(detailedCompositeRoutingExceptionLog.getValue());
-    return new CollectListForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
-                                                                           scheduler,
-                                                                           timeoutErrorType, isDetailedLogEnabled);
+    return new CollectListForkJoinStrategyFactory(getFeatureFlaggingService())
+        .createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
+                                scheduler,
+                                timeoutErrorType, scheduler, isDetailedLogEnabled);
   }
 
   @Test
@@ -88,8 +89,9 @@ public class CollectListForkJoinStrategyTestCase extends AbstractForkJoinStrateg
   @Description("Checks that variables are not merged if set as it")
   public void flowVarsNotMerged() throws Throwable {
     boolean isDetailedLogEnabled = Boolean.parseBoolean(detailedCompositeRoutingExceptionLog.getValue());
-    strategy = new CollectListForkJoinStrategyFactory(false).createForkJoinStrategy(processingStrategy, 1, true, 50, scheduler,
-                                                                                    timeoutErrorType, isDetailedLogEnabled);
+    strategy = new CollectListForkJoinStrategyFactory(false, getFeatureFlaggingService())
+        .createForkJoinStrategy(processingStrategy, 1, true, 50, scheduler,
+                                timeoutErrorType, scheduler, isDetailedLogEnabled);
     final String beforeVarName = "before";
     final String beforeVarValue = "beforeValue";
     final String beforeVar2Name = "before2";

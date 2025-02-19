@@ -56,9 +56,10 @@ public class JoinOnlyForkJoinStrategyTestCase extends AbstractForkJoinStrategyTe
   protected ForkJoinStrategy createStrategy(ProcessingStrategy processingStrategy, int concurrency, boolean delayErrors,
                                             long timeout) {
     boolean isDetailedLogEnabled = Boolean.parseBoolean(detailedCompositeRoutingExceptionLog.getValue());
-    return new JoinOnlyForkJoinStrategyFactory().createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
-                                                                        scheduler,
-                                                                        timeoutErrorType, isDetailedLogEnabled);
+    return new JoinOnlyForkJoinStrategyFactory(getFeatureFlaggingService())
+        .createForkJoinStrategy(processingStrategy, concurrency, delayErrors, timeout,
+                                scheduler,
+                                timeoutErrorType, scheduler, isDetailedLogEnabled);
   }
 
   @Test
