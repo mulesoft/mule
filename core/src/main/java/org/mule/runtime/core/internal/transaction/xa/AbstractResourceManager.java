@@ -158,7 +158,7 @@ public abstract class AbstractResourceManager {
         context.status = Status.STATUS_ROLLING_BACK;
         doRollback(context);
         context.status = Status.STATUS_ROLLEDBACK;
-      } catch (Error | RuntimeException | ResourceManagerSystemException e) {
+      } catch (Exception e) {
         setDirty(context, e);
         throw e;
       } finally {
@@ -190,12 +190,12 @@ public abstract class AbstractResourceManager {
         context.status = Status.STATUS_COMMITTING;
         doCommit(context);
         context.status = Status.STATUS_COMMITTED;
-      } catch (Error | RuntimeException | ResourceManagerSystemException e) {
-        setDirty(context, e);
-        throw e;
       } catch (ResourceManagerException e) {
         logger.warn("Could not commit tx " + context + ", rolling back instead", e);
         doRollback(context);
+      } catch (Exception e) {
+        setDirty(context, e);
+        throw e;
       } finally {
         globalTransactions.remove(context);
         context.finalCleanUp();

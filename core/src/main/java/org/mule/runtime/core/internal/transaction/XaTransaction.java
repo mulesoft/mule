@@ -432,7 +432,7 @@ public class XaTransaction extends AbstractTransaction {
     @Override
     public boolean equals(Object obj) {
       // we use this class internally only so are sure obj is always a ResourceEntry
-      return obj instanceof ResourceKey other ? resourceFactory.equals(other.getResourceFactory()) : false;
+      return obj instanceof ResourceKey other && resourceFactory.equals(other.getResourceFactory());
     }
   }
 }
