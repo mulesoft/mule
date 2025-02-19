@@ -32,7 +32,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
   private final AbstractXAResourceManager<T> resourceManager;
   private T localContext;
 
-  public DefaultXASession(AbstractXAResourceManager<T> resourceManager) {
+  protected DefaultXASession(AbstractXAResourceManager<T> resourceManager) {
     this.localContext = null;
     this.localXid = null;
     this.resourceManager = requireNonNull(resourceManager);
@@ -52,15 +52,29 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
 
   @Override
   public boolean isSameRM(XAResource xares) throws XAException {
-    return xares instanceof DefaultXASession && ((DefaultXASession) xares).getResourceManager().equals(resourceManager);
+    return xares instanceof DefaultXASession defaultXASession && defaultXASession.getResourceManager().equals(resourceManager);
+  }
+
+  private String flagsToString(int flags) {
+    if (flags == TMNOFLAGS) {
+      return "starts";
+    } else if (flags == TMJOIN) {
+      return "joins";
+    } else if (flags == TMRESUME) {
+      return "resumes";
+    } else if (flags == TMSUSPEND) {
+      return "suspends";
+    } else if (flags == TMFAIL) {
+      return "fails";
+    } else {
+      return "ends";
+    }
   }
 
   @Override
   public void start(Xid xid, int flags) throws XAException {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(new StringBuilder(128).append("Thread ").append(currentThread())
-          .append(flags == TMNOFLAGS ? " starts" : flags == TMJOIN ? " joins" : " resumes")
-          .append(" work on behalf of transaction branch ").append(xid).toString());
+      LOGGER.debug("Thread {} {} work on behalf of transaction branch {}", currentThread(), flagsToString(flags), xid);
     }
     // A local transaction is already begun
     if (this.localContext != null) {
@@ -71,6 +85,14 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
       throw new XAException(XAException.XAER_PROTO);
     }
     switch (flags) {
+      case TMRESUME:
+        localContext = resourceManager.getSuspendedTransactionalResource(xid);
+        if (localContext == null) {
+          throw new XAException(XAException.XAER_NOTA);
+        }
+        // TODO: resume context
+        resourceManager.removeSuspendedTransactionalResource(xid);
+        break;
       // a new transaction
       case TMNOFLAGS:
       case TMJOIN:
@@ -84,14 +106,6 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
           throw (XAException) new XAException(e.getMessage()).initCause(e);
         }
         break;
-      case TMRESUME:
-        localContext = resourceManager.getSuspendedTransactionalResource(xid);
-        if (localContext == null) {
-          throw new XAException(XAException.XAER_NOTA);
-        }
-        // TODO: resume context
-        resourceManager.removeSuspendedTransactionalResource(xid);
-        break;
     }
     localXid = xid;
     resourceManager.addActiveTransactionalResource(localXid, localContext);
@@ -100,9 +114,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
   @Override
   public void end(Xid xid, int flags) throws XAException {
     if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(new StringBuilder(128).append("Thread ").append(currentThread())
-          .append(flags == TMSUSPEND ? " suspends" : flags == TMFAIL ? " fails" : " ends")
-          .append(" work on behalf of transaction branch ").append(xid).toString());
+      LOGGER.debug("Thread {} {} work on behalf of transaction branch {}", currentThread(), flagsToString(flags), xid);
     }
     // No transaction is already begun
     if (localContext == null) {
@@ -231,7 +243,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
 
   @Override
   public boolean setTransactionTimeout(int timeout) throws XAException {
-    resourceManager.setDefaultTransactionTimeout(timeout * 1000);
+    resourceManager.setDefaultTransactionTimeout(((long) timeout) * 1000);
     return false;
   }
 
@@ -264,6 +276,6 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
    * @param xid transaction identifier
    * @return the new transaction context
    */
-  abstract protected T createTransactionContext(Xid xid);
+  protected abstract T createTransactionContext(Xid xid);
 
 }

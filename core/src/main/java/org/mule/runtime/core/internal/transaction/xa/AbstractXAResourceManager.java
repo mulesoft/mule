@@ -19,7 +19,7 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
   private Map<Xid, T> suspendedContexts = new ConcurrentHashMap<>();
   private Map<Xid, T> activeContexts = new ConcurrentHashMap<>();
 
-  public AbstractXAResourceManager() {
+  protected AbstractXAResourceManager() {
     super();
   }
 
@@ -27,13 +27,13 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
     assureReady();
     synchronized (context) {
       if (logger.isDebugEnabled()) {
-        logger.debug("Preparing transaction " + context);
+        logger.debug("Preparing transaction {}", context);
       }
       context.status = Status.STATUS_PREPARING;
       int status = doPrepare(context);
       context.status = Status.STATUS_PREPARED;
       if (logger.isDebugEnabled()) {
-        logger.debug("Prepared transaction " + context);
+        logger.debug("Prepared transaction {}", context);
       }
       return status;
     }
@@ -41,7 +41,7 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
 
   protected abstract int doPrepare(T context) throws ResourceManagerException;
 
-  T getTransactionalResource(Xid xid) {
+  public T getTransactionalResource(Xid xid) {
     T context = getActiveTransactionalResource(xid);
     if (context != null) {
       return context;
@@ -50,27 +50,27 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
     }
   }
 
-  T getActiveTransactionalResource(Xid xid) {
+  public T getActiveTransactionalResource(Xid xid) {
     return activeContexts.get(xid);
   }
 
-  T getSuspendedTransactionalResource(Xid xid) {
+  public T getSuspendedTransactionalResource(Xid xid) {
     return suspendedContexts.get(xid);
   }
 
-  void addActiveTransactionalResource(Xid xid, T context) {
+  public void addActiveTransactionalResource(Xid xid, T context) {
     activeContexts.put(xid, context);
   }
 
-  void addSuspendedTransactionalResource(Xid xid, T context) {
+  public void addSuspendedTransactionalResource(Xid xid, T context) {
     suspendedContexts.put(xid, context);
   }
 
-  void removeActiveTransactionalResource(Xid xid) {
+  public void removeActiveTransactionalResource(Xid xid) {
     activeContexts.remove(xid);
   }
 
-  void removeSuspendedTransactionalResource(Xid xid) {
+  public void removeSuspendedTransactionalResource(Xid xid) {
     suspendedContexts.remove(xid);
   }
 }

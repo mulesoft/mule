@@ -102,8 +102,7 @@ public class DelegateTransaction extends AbstractTransaction {
   @Override
   public void bindResource(Object key, Object resource) throws TransactionException {
     if (!(this.delegate instanceof NullTransaction)) {
-      throw new TransactionException(CoreMessages
-          .createStaticMessage("Single resource transaction has already a resource bound"));
+      throw new TransactionException(createStaticMessage("Single resource transaction has already a resource bound"));
     }
 
     this.unbindTransaction();
