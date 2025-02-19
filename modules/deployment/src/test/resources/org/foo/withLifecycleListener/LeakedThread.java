@@ -6,8 +6,6 @@
  */
 package org.foo.withLifecycleListener;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
@@ -17,26 +15,17 @@ import org.slf4j.Logger;
  */
 public class LeakedThread extends Thread {
 
-  private static Logger LOGGER = getLogger(LeakedThread.class);
-
   private final CountDownLatch latch = new CountDownLatch(1);
 
   public void run() {
-    LOGGER.error("[EZE] LeakedThread.run - Started");
     try {
-      LOGGER.error("[EZE] LeakedThread.run - Waiting");
       latch.await();
-      LOGGER.error("[EZE] LeakedThread.run - Notified");
-      return;
     } catch (InterruptedException e) {
-      LOGGER.error("[EZE] LeakedThread.run - Thread interrupted");
-      // does nothing (keeps waiting)
+      // does nothing
     }
   }
 
   public void stopPlease() {
-    LOGGER.error("[EZE] LeakedThread.stopPlease");
     latch.countDown();
-    LOGGER.error("[EZE] LeakedThread.stopPlease - Notified");
   }
 }
