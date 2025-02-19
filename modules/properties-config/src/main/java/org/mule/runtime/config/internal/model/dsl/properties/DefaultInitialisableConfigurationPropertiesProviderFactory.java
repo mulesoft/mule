@@ -12,16 +12,17 @@ import org.mule.runtime.properties.api.InitialisableConfigurationPropertiesProvi
 import org.mule.runtime.properties.api.ResourceProvider;
 
 /**
- * Builds the provider for DefaultConfigurationPropertiesProviderImpl.
+ * Builds the provider for DefaultInitialisableConfigurationPropertiesProvider.
  *
  */
-public final class DefaultConfigurationPropertiesProviderImplFactory implements DefaultConfigurationPropertiesProviderFactory {
+public final class DefaultInitialisableConfigurationPropertiesProviderFactory
+    implements DefaultConfigurationPropertiesProviderFactory {
 
   @Override
   public InitialisableConfigurationPropertiesProvider createProvider(String fileLocation, String encoding,
                                                                      ResourceProvider resourceProvider,
                                                                      DefaultConfigurationPropertiesProvider defaultConfigurationPropertiesProvider) {
-    return new DefaultConfigurationPropertiesProviderImpl(fileLocation, encoding, resourceProvider,
-                                                          defaultConfigurationPropertiesProvider);
+    return new DefaultInitialisableConfigurationPropertiesProvider(fileLocation, encoding, resourceProvider,
+                                                                   defaultConfigurationPropertiesProvider);
   }
 }

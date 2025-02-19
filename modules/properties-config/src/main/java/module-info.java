@@ -5,6 +5,8 @@
  * LICENSE.txt file.
  */
 
+import org.mule.runtime.config.internal.model.dsl.properties.DefaultInitialisableConfigurationPropertiesProviderFactory;
+
 /**
  * Properties Config.
  *
@@ -33,7 +35,7 @@ module org.mule.runtime.properties.config {
       org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProviderFactory;
 
   provides org.mule.runtime.properties.api.DefaultConfigurationPropertiesProviderFactory with
-    org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProviderImplFactory;
+      org.mule.runtime.config.internal.model.dsl.properties.DefaultInitialisableConfigurationPropertiesProviderFactory;
 
   exports org.mule.runtime.config.internal.model.dsl to
       org.mule.runtime.metrics.exporter.configuration.impl,

@@ -44,7 +44,7 @@ import org.vibur.objectpool.util.ConcurrentLinkedQueueCollection;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.parser.ParserException;
 
-public class DefaultConfigurationPropertiesProviderImpl
+public class DefaultInitialisableConfigurationPropertiesProvider
     implements InitialisableConfigurationPropertiesProvider {
 
   private static final Pattern SPACE_AFTER_COLON_PATTERN = compile("[^:]*: ");
@@ -62,16 +62,17 @@ public class DefaultConfigurationPropertiesProviderImpl
   private final ResourceProvider resourceProvider;
   private final DefaultConfigurationPropertiesProvider defaultConfigurationPropertiesProvider;
 
-  public DefaultConfigurationPropertiesProviderImpl(String fileLocation, String encoding, ResourceProvider resourceProvider,
-                                                    DefaultConfigurationPropertiesProvider defaultConfigurationPropertiesProvider) {
+  public DefaultInitialisableConfigurationPropertiesProvider(String fileLocation, String encoding,
+                                                             ResourceProvider resourceProvider,
+                                                             DefaultConfigurationPropertiesProvider defaultConfigurationPropertiesProvider) {
     this.fileLocation = fileLocation;
     this.resourceProvider = resourceProvider;
     this.encoding = encoding;
     this.defaultConfigurationPropertiesProvider = defaultConfigurationPropertiesProvider;
   }
 
-  public DefaultConfigurationPropertiesProviderImpl(String fileLocation, ResourceProvider resourceProvider,
-                                                    DefaultConfigurationPropertiesProvider defaultConfigurationPropertiesProvider) {
+  public DefaultInitialisableConfigurationPropertiesProvider(String fileLocation, ResourceProvider resourceProvider,
+                                                             DefaultConfigurationPropertiesProvider defaultConfigurationPropertiesProvider) {
     this(fileLocation, null, resourceProvider, defaultConfigurationPropertiesProvider);
   }
 
