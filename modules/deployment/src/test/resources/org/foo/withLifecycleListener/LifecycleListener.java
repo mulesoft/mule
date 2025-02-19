@@ -23,11 +23,15 @@ public class LifecycleListener implements ArtifactLifecycleListener {
 
   @Override
   public void onArtifactDisposal(ArtifactDisposalContext disposalContext) {
+    LOGGER.error("[EZE] LifecycleListener.onArtifactDisposal");
     assertThisClassIsLoadedWithExtensionClassLoader(disposalContext);
+    LOGGER.error("[EZE] LifecycleListener.onArtifactDisposal - Class loaded with Extension ClassLoader");
 
     // With this we make sure the ClassLoaders are still usable inside the listener code.
     callArtifactDisposalCallback(disposalContext);
+    LOGGER.error("[EZE] LifecycleListener.onArtifactDisposal - Callback executed");
     assertClassCanBeLoadedWith(disposalContext.getExtensionClassLoader(), "org.foo.withLifecycleListener.LeakedThread");
+    LOGGER.error("[EZE] LifecycleListener.onArtifactDisposal - Class loaded with Extension ClassLoader");
 
     // If one of the avobe failed, the exception will make it skip the disposal code, and the associated test will fail.
 
@@ -37,9 +41,13 @@ public class LifecycleListener implements ArtifactLifecycleListener {
       .filter(LeakedThread.class::isInstance)
       .map(LeakedThread.class::cast)
       .forEach(t -> {
+        LOGGER.error("[EZE] LifecycleListener.onArtifactDisposal - Stopping thread {}", t.getName());
         t.stopPlease();
+        LOGGER.error("[EZE] LifecycleListener.onArtifactDisposal - Thread {} stopped", t.getName());
         try {
+          LOGGER.error("[EZE] LifecycleListener.onArtifactDisposal - Joining thread {}", t.getName());
           t.join();
+          LOGGER.error("[EZE] LifecycleListener.onArtifactDisposal - Thread {} joined", t.getName());
         } catch (InterruptedException e) {
           // Does nothing
         }
