@@ -6,25 +6,30 @@
  */
 package org.mule.runtime.core.api.transaction.xa;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.mule.runtime.core.api.transaction.Transaction.STATUS_NO_TRANSACTION;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
+import org.mule.runtime.api.tx.MuleXaObject;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.internal.transaction.XaTransaction;
 import org.mule.runtime.core.internal.transaction.xa.XaResourceFactoryHolder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 
@@ -91,11 +96,11 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     xaTransaction.begin();
 
-    assertFalse(xaTransaction.isRollbackOnly());
-    assertFalse(xaTransaction.isRollbackOnly());
-    assertTrue(xaTransaction.isRollbackOnly());
-    assertTrue(xaTransaction.isRollbackOnly());
-    assertTrue(xaTransaction.isRollbackOnly());
+    assertThat(xaTransaction.isRollbackOnly(), is(false));
+    assertThat(xaTransaction.isRollbackOnly(), is(false));
+    assertThat(xaTransaction.isRollbackOnly(), is(true));
+    assertThat(xaTransaction.isRollbackOnly(), is(true));
+    assertThat(xaTransaction.isRollbackOnly(), is(true));
   }
 
   @Test
@@ -126,4 +131,200 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
     inOrder.verify(mockTransactionManager).setTransactionTimeout(timeoutSecs);
     inOrder.verify(mockTransactionManager).begin();
   }
+
+  @Test(expected = IllegalStateException.class)
+  public void beginWithoutTransactionManager() throws TransactionException {
+    new XaTransaction("appName", null, notificationDispatcher).begin();
+  }
+
+  @Test
+  public void commitTransaction() throws Exception {
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    xaTransaction.begin();
+    xaTransaction.commit();
+    verify(mockTransactionManager).commit();
+  }
+
+  @Test
+  public void rollbackTransaction() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    xaTransaction.rollback();
+    verify(mockTransactionManager).rollback();
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void rollbackOnlyError() {
+    XaTransaction xaTransaction = new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    xaTransaction.setRollbackOnly();
+  }
+
+  @Test
+  public void rollbackOnly() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    xaTransaction.setRollbackOnly();
+    verify(tx).setRollbackOnly();
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void rollbackOnlyFailingInTx() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    doThrow(SystemException.class).when(tx).setRollbackOnly();
+    xaTransaction.setRollbackOnly();
+  }
+
+  @Test
+  public void noTxStatus() throws TransactionStatusException {
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    assertThat(xaTransaction.getStatus(), is(STATUS_NO_TRANSACTION));
+  }
+
+  @Test(expected = TransactionStatusException.class)
+  public void getStatusFailing() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    when(tx.getStatus()).thenThrow(SystemException.class);
+    xaTransaction.getStatus();
+  }
+
+  @Test
+  public void delistResource() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    XAResource resource = mock(XAResource.class);
+    xaTransaction.delistResource(resource, 10);
+    verify(tx).delistResource(resource, 10);
+  }
+
+  @Test(expected = TransactionException.class)
+  public void delistResourceFailing() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    XAResource resource = mock(XAResource.class);
+    doThrow(SystemException.class).when(tx).delistResource(resource, 10);
+    xaTransaction.delistResource(resource, 10);
+  }
+
+  @Test(expected = TransactionException.class)
+  public void delistResourceNoTx() throws Exception {
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    XAResource resource = mock(XAResource.class);
+    xaTransaction.delistResource(resource, 10);
+  }
+
+  @Test
+  public void stringTest() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    when(tx.toString()).thenReturn("test");
+    xaTransaction.begin();
+    assertThat(xaTransaction.toString(), is("test"));
+  }
+
+  @Test
+  public void isXa() throws Exception {
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    assertThat(xaTransaction.isXA(), is(true));
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void resumeWithoutManager() throws Exception {
+    XaTransaction xaTransaction = new XaTransaction("appName", null, notificationDispatcher);
+    xaTransaction.resume();
+  }
+
+  @Test
+  public void resume() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    xaTransaction.resume();
+    verify(mockTransactionManager).resume(tx);
+  }
+
+  @Test(expected = TransactionException.class)
+  public void resumeWithError() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    doThrow(SystemException.class).when(mockTransactionManager).resume(any());
+    xaTransaction.begin();
+    xaTransaction.resume();
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void suspendWithoutManager() throws Exception {
+    XaTransaction xaTransaction = new XaTransaction("appName", null, notificationDispatcher);
+    xaTransaction.suspend();
+  }
+
+  @Test
+  public void suspend() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    xaTransaction.suspend();
+    verify(mockTransactionManager).suspend();
+  }
+
+  @Test(expected = TransactionException.class)
+  public void suspendWithError() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    when(mockTransactionManager.suspend()).thenThrow(SystemException.class);
+    xaTransaction.begin();
+    xaTransaction.suspend();
+  }
+
+  @Test
+  public void bindAndDelist() throws Exception {
+    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    XaTransaction xaTransaction =
+        new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
+    when(mockTransactionManager.getTransaction()).thenReturn(tx);
+    xaTransaction.begin();
+    XAResource resource = mock(XAResource.class);
+    MuleXaObject muleResource = mock(MuleXaObject.class);
+    when(mockXaResourceFactoryHolder1.getHoldObject()).thenReturn(resource);
+    xaTransaction.bindResource(mockXaResourceFactoryHolder1, resource);
+    xaTransaction.bindResource(mockXaResourceFactoryHolder1, muleResource);
+    xaTransaction.commit();
+    verify(muleResource).delist();
+    verify(muleResource).close();
+  }
+
+
 }
