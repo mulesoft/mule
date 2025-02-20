@@ -56,7 +56,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected final NotificationDispatcher notificationFirer;
   protected boolean rollbackAfterTimeout;
 
-  @Deprecated
+  @Deprecated(since = "4.4.0")
   protected AbstractTransaction(MuleContext muleContext) {
     this.muleContext = muleContext;
     try {
