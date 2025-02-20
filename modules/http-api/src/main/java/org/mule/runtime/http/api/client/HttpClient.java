@@ -8,7 +8,7 @@ package org.mule.runtime.http.api.client;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.runtime.http.api.client.sse.EventSource;
+import org.mule.runtime.http.api.client.sse.ServerSentEventSource;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -177,7 +177,7 @@ public interface HttpClient {
     throw new UnsupportedOperationException("Server-sent Events are not supported");
   }
 
-  default EventSource sseSource(String url) {
+  default ServerSentEventSource sseSource(String url) {
     throw new UnsupportedOperationException("Server-sent Events are not supported");
   }
 }
