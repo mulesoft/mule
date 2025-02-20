@@ -6,5 +6,9 @@
  */
 package org.mule.runtime.http.api.client.sse;
 
-public interface EventSource {
+public interface ServerSentEventSource {
+
+  void connect();
+
+  void addListener(ServerSentEventListener listener);
 }
