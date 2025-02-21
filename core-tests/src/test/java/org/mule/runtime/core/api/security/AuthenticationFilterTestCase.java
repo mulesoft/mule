@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AbstractAuthenticationFilterTestCase {
+public class AuthenticationFilterTestCase {
 
   private TestAuthenticationFilter filter;
   private CoreEvent mockEvent;

@@ -34,7 +34,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AbstractSecurityFilterTestCase {
+public class SecurityFilterTestCase {
 
   @Mock
   private SecurityManager securityManager;

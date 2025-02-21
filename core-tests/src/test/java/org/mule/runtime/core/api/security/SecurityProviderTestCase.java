@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AbstractSecurityProviderTestCase {
+public class SecurityProviderTestCase {
 
   private AbstractSecurityProvider securityProvider;
 
