@@ -704,9 +704,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   }
 
   public List<ConfigurationExtension> getExtensions() {
-    if (extensions == null) {
-      return emptyList();
-    }
     return unmodifiableList(extensions);
   }
 
