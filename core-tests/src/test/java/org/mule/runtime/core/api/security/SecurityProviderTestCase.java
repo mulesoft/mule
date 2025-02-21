@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AbstractSecurityProviderTestCase {
+public class SecurityProviderTestCase {
 
   private AbstractSecurityProvider securityProvider;
 
@@ -91,5 +91,14 @@ public class AbstractSecurityProviderTestCase {
 
     assertThat(securityContext, is(mockSecurityContext));
     verify(mockSecurityContextFactory).create(mockAuthentication);
+  }
+
+  @Test
+  public void testInitialiseWithCreateSecurityContext()
+      throws InitialisationException {
+    securityProvider.setSecurityContextFactory(mockSecurityContextFactory);
+
+    securityProvider.initialise();
+    assertThat(securityProvider.getSecurityContextFactory(), is(mockSecurityContextFactory));
   }
 }

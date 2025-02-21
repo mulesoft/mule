@@ -54,6 +54,14 @@ public class DefaultMuleCredentialsTestCase {
   }
 
   @Test
+  public void testGetTokenNoRoles() {
+    char[] password = {'p', 'a', 's', 's'};
+    DefaultMuleCredentials credentials = new DefaultMuleCredentials("user", password, null);
+
+    assertThat(credentials.getToken(), is("user::pass::"));
+  }
+
+  @Test
   public void testPasswordCloning() {
     char[] password = {'s', 'e', 'c', 'r', 'e', 't'};
     DefaultMuleCredentials credentials = new DefaultMuleCredentials("user", password);
