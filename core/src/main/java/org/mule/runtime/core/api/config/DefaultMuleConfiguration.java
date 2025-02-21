@@ -18,7 +18,6 @@ import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleH
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -64,7 +63,7 @@ import org.slf4j.Logger;
 @NoExtend
 public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextAware, InternalComponent {
 
-  protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
+  protected static final Logger LOGGER = getLogger(DefaultMuleConfiguration.class);
 
   private MuleVersion minMuleVersion;
 
@@ -222,7 +221,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       try {
         domainId = NetworkUtils.getLocalHost().getHostName();
       } catch (UnknownHostException e) {
-        logger.warn("Unable to obtain hostname", e);
+        LOGGER.warn("Unable to obtain hostname", e);
         domainId = "org.mule.runtime.core";
       }
     }
@@ -314,7 +313,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         defaultProcessingStrategyFactory = (ProcessingStrategyFactory) instantiateClass(p);
       }
     } catch (Throwable e) {
-      logger.warn("Unable to instantiate ProcessingStrategyFactory '" + p + "', default will be used instead.");
+      LOGGER.warn("Unable to instantiate ProcessingStrategyFactory '{}', default will be used instead.", p);
     }
   }
 
@@ -323,7 +322,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
    *         {@code false} otherwise.
    * @deprecated
    */
-  @Deprecated
+  @Deprecated(since = "4.7.0")
   public static boolean isFlowTrace() {
     return false;
   }
@@ -338,7 +337,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * @deprecated this is a leftover from Mule 3
    */
-  @Deprecated
+  @Deprecated(since = "4.4.0")
   public void setDefaultSynchronousEndpoints(boolean synchronous) {
     // Nothing to do
   }
@@ -454,7 +453,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * @deprecated this is a leftover from Mule 3
    */
-  @Deprecated
+  @Deprecated(since = "4.4.0")
   public void setSystemModelType(String systemModelType) {
     if (verifyContextNotStarted()) {
       this.systemModelType = systemModelType;
@@ -464,7 +463,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * @deprecated this is a leftover from Mule 3
    */
-  @Deprecated
+  @Deprecated(since = "4.4.0")
   public void setClientMode(boolean clientMode) {
     if (verifyContextNotStarted()) {
       this.clientMode = clientMode;
@@ -495,7 +494,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * @deprecated this is a leftover from Mule 3
    */
-  @Deprecated
+  @Deprecated(since = "4.4.0")
   public void setCacheMessageAsBytes(boolean cacheMessageAsBytes) {
     if (verifyContextNotStarted()) {
       this.cacheMessageAsBytes = cacheMessageAsBytes;
@@ -510,7 +509,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * @deprecated this is a leftover from Mule 3
    */
-  @Deprecated
+  @Deprecated(since = "4.4.0")
   public void setEnableStreaming(boolean enableStreaming) {
     if (verifyContextNotStarted()) {
       this.enableStreaming = enableStreaming;
@@ -525,12 +524,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * @deprecated Since 4.4 this is a no-op.
    */
-  @Deprecated
+  @Deprecated(since = "4.4.0")
   public void setLazyInit(boolean lazyInit) {}
 
   protected boolean verifyContextNotInitialized() {
     if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME)) {
-      logger.warn("Cannot modify MuleConfiguration once the MuleContext has been initialized.  Modification will be ignored.");
+      LOGGER.warn("Cannot modify MuleConfiguration once the MuleContext has been initialized.  Modification will be ignored.");
       return false;
     } else {
       return true;
@@ -539,7 +538,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   protected boolean verifyContextNotStarted() {
     if (muleContext != null && muleContext.getLifecycleManager().isPhaseComplete(Startable.PHASE_NAME)) {
-      logger.warn("Cannot modify MuleConfiguration once the MuleContext has been started.  Modification will be ignored.");
+      LOGGER.warn("Cannot modify MuleConfiguration once the MuleContext has been started.  Modification will be ignored.");
       return false;
     } else {
       return true;
@@ -750,7 +749,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + responseTimeout;
-    result = prime * result + new Long(shutdownTimeout).hashCode();
+    result = prime * result + ((Long) shutdownTimeout).hashCode();
     result = prime * result + ((systemModelType == null) ? 0 : systemModelType.hashCode());
     result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
     result = prime * result + (containerMode ? 1231 : 1237);
@@ -836,11 +835,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     if (maxQueueTransactionFilesSizeInMegabytes != other.maxQueueTransactionFilesSizeInMegabytes) {
       return false;
     }
-    if (inheritIterableRepeatability != other.inheritIterableRepeatability) {
-      return false;
-    }
-
-    return true;
+    return inheritIterableRepeatability == other.inheritIterableRepeatability;
   }
 
 }
