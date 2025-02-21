@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.api.config.i18n;
 
+import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authDeniedOnEndpoint;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authEndpointMustSendOrReceive;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authFailedForUser;
@@ -17,37 +20,58 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.authNoSecurityP
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authSecurityManagerNotSet;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authSetButNoContext;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authTypeNotRecognised;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotRenameInboundScopeProperty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotSetObjectOnceItHasBeenSet;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotSetPropertyOnObjectWithParamType;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotUseTxAndRemoteSync;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.commitTxButNoResource;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.componentCausedErrorIs;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.componentNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.configNotFoundUsage;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.configurationBuilderError;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.configurationBuilderSuccess;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.connectorWithProtocolNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.containerAlreadyRegistered;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.correlationTimedOut;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.couldNotDetermineDestinationComponentFromEndpoint;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.couldNotRegisterNewScheduler;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cryptoFailure;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.descriptorAlreadyExists;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.encryptionStrategyNotSet;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.endpointIsMalformed;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorInvokingMessageProcessorAsynchronously;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorReadingStream;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.eventProcessingFailedFor;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.eventTypeNotRecognised;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.exceptionOnConnectorNoExceptionListener;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.exceptionStackIs;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEnricherNotRegistered;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionFinalVariableCannotBeAssignedValue;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionInvalidForProperty;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionMalformed;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionResultWasNull;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionReturnedNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToClone;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToConvertStringUsingEncoding;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreateEndpointFromLocation;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreateManagerInstance;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToDispose;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToFindEntrypointForComponent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToGetPooledObject;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInitSecurityProvider;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvoke;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToInvokeRestService;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToLoad;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToLoadTransformer;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToProcessExtractorFunction;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToReadAttachment;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToReadFromStore;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToReadPayload;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
@@ -59,38 +83,90 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedtoRegiste
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.headerMalformedValueIs;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.illegalMIMEType;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.inboundMessageAttachmentsImmutable;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.inboundMessagePropertiesImmutable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.interruptedQueuingEventFor;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.interruptedWaitingForPaused;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.invocationSuccessfulCantSetError;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.lifecycleMethodCannotBeStatic;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.lifecycleMethodCannotThrowChecked;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.lifecycleMethodNotVoidOrHasParams;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.lifecyclePhaseNotRecognised;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.managerAlreadyStarted;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.messageIsOfType;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.messageRejectedByFilter;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.minMuleVersionNotMet;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.modelDeprecated;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.nestedRetry;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCatchAllEndpointSet;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noComponentForEndpoint;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCorrelationId;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCurrentEventForTransformer;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEndpointsForRouter;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEntryPointFoundForNoArgsMethod;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEntryPointFoundForNoArgsMethodUsingResolver;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEntryPointFoundWithArgs;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noEntryPointFoundWithArgsUsingResolver;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noMatchingMethodsOnObjectCalledUsingResolver;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noMatchingMethodsOnObjectReturning;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noMatchingMethodsOnObjectReturningUsingResolver;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.noMuleTransactionAvailable;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noOutboundRouterSetOn;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.none;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.normalShutdown;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.notConnectedYet;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.notSerializableWatermark;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.notificationListenerSubscriptionAlreadyRegistered;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.nullWatermark;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectAlreadyExists;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectAlreadyRegistered;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectDoesNotImplementInterface;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectFailedToInitialise;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectHasMoreThanOnePostConstructAnnotation;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectHasMoreThanOnePreDestroyAnnotation;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotFound;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotOfCorrectType;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectStoreNotFound;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.pollSourceReturnedNull;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.productInformation;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertiesNotSet;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertiesOrNotSet;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyDoesNotExistOnObject;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyIsNotSetOnEvent;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyIsNotSupportedType;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyNotSerializableWasDropped;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.proxyPoolTimedOut;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.reconnectStrategyFailed;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManagerDirty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManagerNotReady;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManagerNotStarted;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.responseTimedOutWaitingForId;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.retryPolicyExhausted;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.rollbackTxButNoResource;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.schemeCannotChangeForRouter;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.serverShutdownAt;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.serverWasUpForDuration;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.servicesDeprecated;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.sessionPropertyNotSerializableWarning;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.sessionValueIsMalformed;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.shutdownNormally;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.streamingComponentMustHaveOneEndpoint;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.streamingEndpointsDoNotSupportTransformers;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.streamingEndpointsMustBeUsedWithStreamingModel;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.streamingFailedForEndpoint;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.streamingFailedNoStream;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.streamingNotSupported;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.templateCausedMalformedEndpoint;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.tooManyAcceptableMethodsOnObjectForTypes;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.tooManyAcceptableMethodsOnObjectUsingResolverForTypes;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.tooManyMatchingMethodsOnObjectUsingResolverWhichReturn;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.tooManyMatchingMethodsOnObjectWhichReturn;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionAvailableButActionIs;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCanOnlyBindToResources;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotReadState;
@@ -103,18 +179,30 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionRoll
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformFailed;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformFailedBeforeFilter;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformFailedFrom;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformHasMultipleMatches;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformUnexpectedType;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformerInvalidReturnType;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformerMapBeanClassNotSet;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformerNotImplementDiscoverable;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.unexpectedMIMEType;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.uniqueIdNotSupportedByAdapter;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.valueIsInvalidFor;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.versionNotSet;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.watermarkRequiresSynchronousProcessing;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.wrongMessageSource;
 
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.junit.Test;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
+import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.util.Date;
 
 public class MessagesTestCase {
+
+  private static final Processor TEST_PROCESSOR = event -> event;
 
   @Test
   public void versionNotSetMessage() {
@@ -734,6 +822,511 @@ public class MessagesTestCase {
     assertThat(message.getMessage(), is("Failed to convert a string using the The Object encoding"));
   }
 
+  @Test
+  public void propertyHasInvalidValueMessage() {
+    I18nMessage message = propertyHasInvalidValue("The Property", "The Object");
+    assertThat(message.getMessage(), is("Property \"The Property\" has an incorrect or unsupported value \"The Object\""));
+  }
+
+  @Test
+  public void schemeCannotChangeForRouterMessage() {
+    I18nMessage message = schemeCannotChangeForRouter("The Scheme 1", "The Scheme 2");
+    assertThat(message.getMessage(),
+               is("Scheme of the endpoint cannot be changed at runtime for this type router. Old scheme was \"The Scheme 1\" new scheme is \"The Scheme 2\""));
+  }
+
+  @Test
+  public void templateCausedMalformedEndpointMessage() {
+    I18nMessage message = templateCausedMalformedEndpoint("The Uri", "The new Uri");
+    assertThat(message.getMessage(), is("Template Endpoint \"The Uri\" resolved into a Malformed endpoint \"The new Uri\""));
+  }
+
+  @Test
+  public void couldNotDetermineDestinationComponentFromEndpointMessage() {
+    I18nMessage message = couldNotDetermineDestinationComponentFromEndpoint("The Object");
+    assertThat(message.getMessage(), is("Could not determine Destination component from endpoint \"The Object\""));
+  }
+
+  @Test
+  public void sessionValueIsMalformedMessage() {
+    I18nMessage message = sessionValueIsMalformed("The Object");
+    assertThat(message.getMessage(), is("Session variable \"The Object\" is malfomed and cannot be read"));
+  }
+
+  @Test
+  public void streamingFailedNoStreamMessage() {
+    I18nMessage message = streamingFailedNoStream();
+    assertThat(message.getMessage(), is("Streaming failed. Could not get output stream"));
+  }
+
+  @Test
+  public void failedToReadAttachmentMessage() {
+    I18nMessage message = failedToReadAttachment("The Object");
+    assertThat(message.getMessage(), is("Failed to read attachment \"The Object\""));
+  }
+
+  @Test
+  public void failedToInitSecurityProviderMessage() {
+    I18nMessage message = failedToInitSecurityProvider("The Object");
+    assertThat(message.getMessage(), is("Failed to initialize security provider \"The Object\""));
+  }
+
+  @Test
+  public void streamingNotSupportedMessage() {
+    I18nMessage message = streamingNotSupported("The Object");
+    assertThat(message.getMessage(), is("Streaming is not supported by the \"The Object\" transport"));
+  }
+
+  @Test
+  public void streamingComponentMustHaveOneEndpointMessage() {
+    I18nMessage message = streamingComponentMustHaveOneEndpoint("The Object");
+    assertThat(message.getMessage(),
+               is("Streaming Component \"The Object\" must have exactly one endpoint on the outbound router"));
+  }
+
+  @Test
+  public void streamingFailedForEndpointMessage() {
+    I18nMessage message = streamingFailedForEndpoint("The Object");
+    assertThat(message.getMessage(), is("Streaming failed for endpoint \"The Object\""));
+  }
+
+  @Test
+  public void streamingEndpointsDoNotSupportTransformersMessage() {
+    I18nMessage message = streamingEndpointsDoNotSupportTransformers();
+    assertThat(message.getMessage(), is("Streaming endpoints dont currently support transformers"));
+  }
+
+  @Test
+  public void streamingEndpointsMustBeUsedWithStreamingModelMessage() {
+    I18nMessage message = streamingEndpointsMustBeUsedWithStreamingModel();
+    assertThat(message.getMessage(), is("Only Streaming endpoints can be used with the streaming model"));
+  }
+
+  @Test
+  public void tooManyMatchingMethodsOnObjectWhichReturnMessage() {
+    I18nMessage message = tooManyMatchingMethodsOnObjectWhichReturn("The Object", "The return");
+    assertThat(message.getMessage(),
+               is("There are too many matching methods on object \"The return\" with a return type of \"The Object\""));
+  }
+
+  @Test
+  public void noMatchingMethodsOnObjectReturningMessage() {
+    I18nMessage message = noMatchingMethodsOnObjectReturning("The Object", MessagesTestCase.class);
+    assertThat(message.getMessage(),
+               is("There are no matching methods on object \"org.mule.runtime.core.api.config.i18n.MessagesTestCase\" with a return type of \"The Object\""));
+  }
+
+  @Test
+  public void noEntryPointFoundForNoArgsMethodMessage() {
+    I18nMessage message = noEntryPointFoundForNoArgsMethod("The Object", "Method");
+    assertThat(message.getMessage(), is("No-args method \"Method\" not found for object \"The Object\""));
+  }
+
+  @Test
+  public void productInformationMessage() {
+    I18nMessage message = productInformation();
+    assertThat(message.getMessage(),
+               is("\n\n*******************************************************************************\nMule Runtime and Integration Platform\nVersion: 4.10.0-SNAPSHOT\nMuleSoft, Inc. http://www.mulesoft.com\n*******************************************************************************\n\n"));
+  }
+
+  @Test
+  public void errorReadingStreamMessage() {
+    I18nMessage message = errorReadingStream();
+    assertThat(message.getMessage(), is("Could not read InputStream."));
+  }
+
+  @Test
+  public void noEntryPointFoundForNoArgsMethodUsingResolverMessage() {
+    I18nMessage message = noEntryPointFoundForNoArgsMethodUsingResolver("The Object", "Method");
+    assertThat(message.getMessage(), is("No-args method \"Method\" not found for object \"The Object\""));
+  }
+
+  @Test
+  public void noEntryPointFoundWithArgsUsingResolverMessage() {
+    I18nMessage message = noEntryPointFoundWithArgsUsingResolver("The Object", "Args");
+    assertThat(message.getMessage(), is("Could not find entry point on: \"The Object\" with arguments: \"Args\""));
+  }
+
+  @Test
+  public void noMatchingMethodsOnObjectReturningUsingResolverMessage() {
+    I18nMessage message = noMatchingMethodsOnObjectReturningUsingResolver("The Object", MessagesTestCase.class);
+    assertThat(message.getMessage(),
+               is("There are no matching methods on object \"The Object\" with a return type of \"java.lang.Class\""));
+  }
+
+  @Test
+  public void tooManyAcceptableMethodsOnObjectUsingResolverForTypesMessage() {
+    I18nMessage message = tooManyAcceptableMethodsOnObjectUsingResolverForTypes("The Object", "Types", "Methods");
+    assertThat(message.getMessage(),
+               is("Found too many possible methods on object \"The Object\" that accept parameters \"Types\", Methods matched are \"Methods\""));
+  }
+
+  @Test
+  public void tooManyMatchingMethodsOnObjectUsingResolverWhichReturnMessage() {
+    I18nMessage message = tooManyMatchingMethodsOnObjectUsingResolverWhichReturn("The Object", "The return type");
+    assertThat(message.getMessage(),
+               is("There are too many matching methods on object \"The return type\" with a return type of \"The Object\""));
+  }
+
+  @Test
+  public void objectDoesNotImplementInterfaceMessage() {
+    I18nMessage message = objectDoesNotImplementInterface("The Object", Comparable.class);
+    assertThat(message.getMessage(),
+               is("Object \"The Object\" does not implement required interface \"interface java.lang.Comparable\""));
+  }
+
+  @Test
+  public void invocationSuccessfulCantSetErrorMessage() {
+    I18nMessage message = invocationSuccessfulCantSetError();
+    assertThat(message.getMessage(), is("Invocation was successful, cannot set error message"));
+  }
+
+  @Test
+  public void noMatchingMethodsOnObjectCalledUsingResolverMessage() {
+    I18nMessage message = noMatchingMethodsOnObjectCalledUsingResolver("The Object", "The method");
+    assertThat(message.getMessage(), is("Could not find entry point on: \"The Object\" with method name: \"The method\""));
+  }
+
+  @Test
+  public void failedToProcessExtractorFunctionMessage() {
+    I18nMessage message = failedToProcessExtractorFunction("The Object");
+    assertThat(message.getMessage(), is("Failed to process Expression Evaluation \"The Object\""));
+  }
+
+  @Test
+  public void objectAlreadyExistsMessage() {
+    I18nMessage message = objectAlreadyExists("The Object");
+    assertThat(message.getMessage(), is("Object already exists or is already registered: \"The Object\""));
+  }
+
+  @Test
+  public void noMuleTransactionAvailableMessage() {
+    I18nMessage message = noMuleTransactionAvailable();
+    assertThat(message.getMessage(), is("Mule transaction is null, but enlist method is called"));
+  }
+
+  @Test
+  public void objectAlreadyRegisteredMessage() {
+    I18nMessage message = objectAlreadyRegistered("The name", "The Object", "New Object");
+    assertThat(message.getMessage(),
+               is("Object \"The name\" has already been registered in the Registry. Registered object is \"The Object.class java.lang.String\", Object being registered is \"New Object.class java.lang.String\""));
+  }
+
+  @Test
+  public void transformerNotImplementDiscoverableMessage() {
+    I18nMessage message = transformerNotImplementDiscoverable(Transformer.class);
+    assertThat(message.getMessage(),
+               is("Transformer does not implement Discoverable interface, it must do so to be registered via the Registry Bootstrap. Transformer is \"org.mule.runtime.core.api.transformer.Transformer\""));
+  }
+
+  @Test
+  public void transformHasMultipleMatchesMessage() {
+    I18nMessage message = transformHasMultipleMatches(MessagesTestCase.class, String.class, emptyList());
+    assertThat(message.getMessage(),
+               is("There are at least two transformers that are an exact match for source type \"class org.mule.runtime.core.api.config.i18n.MessagesTestCase\" and target type \"class java.lang.String\". Transformers are: \"[]\". Check your transformer use to avoid implicit transformations and choose between the two options."));
+  }
+
+  @Test
+  public void nestedRetryMessage() {
+    I18nMessage message = nestedRetry();
+    assertThat(message.getMessage(), is("Unsupported request for retry in nested lifetime transition."));
+  }
+
+  @Test
+  public void expressionReturnedNullMessage() {
+    I18nMessage message = expressionReturnedNull("The Object");
+    assertThat(message.getMessage(), is("Expression \"The Object\" returned null but a value was required."));
+  }
+
+  @Test
+  public void expressionInvalidForPropertyMessage() {
+    I18nMessage message = expressionInvalidForProperty("Property", "something");
+    assertThat(message.getMessage(),
+               is("You must supply a valid expression for property \"Property\" the invalid expression is \"something\""));
+  }
+
+  @Test
+  public void expressionMalformedMessage() {
+    I18nMessage message = expressionMalformed("#[something]", "eval");
+    assertThat(message.getMessage(),
+               is("Expression \"#[something]\" is malformed for evaluator \"eval\". Please check the documentation for this evaluator."));
+  }
+
+  @Test
+  public void correlationTimedOutMessage() {
+    I18nMessage message = correlationTimedOut("The Object");
+    assertThat(message.getMessage(), is("Correlation timed out while waiting on event group with Id: \"The Object\""));
+  }
+
+  @Test
+  public void transformerInvalidReturnTypeMessage() {
+    I18nMessage message = transformerInvalidReturnType(MessagesTestCase.class, "The Transformer");
+    assertThat(message.getMessage(),
+               is("An invalid return type \"class org.mule.runtime.core.api.config.i18n.MessagesTestCase\" was specified for transformer \"The Transformer\""));
+  }
+
+  @Test
+  public void notConnectedYetMessage() {
+    I18nMessage message = notConnectedYet("The Object");
+    assertThat(message.getMessage(),
+               is("\"The Object\" has not managed to connect yet, cannot process any messages for this object until it has connected"));
+  }
+
+  @Test
+  public void expressionResultWasNullMessage() {
+    I18nMessage message = expressionResultWasNull("The Object");
+    assertThat(message.getMessage(), is("The expression \"The Object\" did not result in a value but a value is required."));
+  }
+
+  @Test
+  public void propertyDoesNotExistOnObjectMessage() {
+    I18nMessage message = propertyDoesNotExistOnObject("The property", "The Object");
+    assertThat(message.getMessage(), is("Property \"The property\" does not exist on object \"The Object\""));
+  }
+
+  @Test
+  public void commitTxButNoResourceMessage() {
+    I18nMessage message = commitTxButNoResource("The Object");
+    assertThat(message.getMessage(), is("Transaction commit attempted, but no resource bound to The Object"));
+  }
+
+  @Test
+  public void rollbackTxButNoResourceMessage() {
+    I18nMessage message = rollbackTxButNoResource("The Object");
+    assertThat(message.getMessage(), is("Transaction rollback attempted, but no resource bound to The Object"));
+  }
+
+  @Test
+  public void propertiesOrNotSetMessage() {
+    I18nMessage message = propertiesOrNotSet("The Object", "Prop");
+    assertThat(message.getMessage(), is("One of the following properties must be set on object \"The Object\", \"Prop\""));
+  }
+
+  @Test
+  public void transformerMapBeanClassNotSetMessage() {
+    I18nMessage message = transformerMapBeanClassNotSet();
+    assertThat(message.getMessage(),
+               is("You either need to set the return class on the MapToBean transformer or set the className property in the map to a fully qualified class name string."));
+  }
+
+  @Test
+  public void lifecyclePhaseNotRecognisedMessage() {
+    I18nMessage message = lifecyclePhaseNotRecognised("The Object");
+    assertThat(message.getMessage(), is("Lifecycle phase not valid {0}"));
+  }
+
+  @Test
+  public void notificationListenerSubscriptionAlreadyRegisteredMessage() {
+    I18nMessage message = notificationListenerSubscriptionAlreadyRegistered(new ListenerSubscriptionPair());
+    assertThat(message.getMessage(),
+               is("The notification listener subscription \"ListenerSubscriptionPair [listener=null, selector=selector(*)]\" has already been registered"));
+  }
+
+  @Test
+  public void errorSchedulingMessageProcessorForAsyncInvocationMessage() {
+    I18nMessage message = errorSchedulingMessageProcessorForAsyncInvocation(TEST_PROCESSOR);
+    assertThat(message.getMessage(), containsString("An exception occurred when scheduling message processor"));
+    assertThat(message.getMessage(), containsString("for asynchronous invocation."));
+  }
+
+  @Test
+  public void errorInvokingMessageProcessorAsynchronouslyMessage() {
+    I18nMessage message = errorInvokingMessageProcessorAsynchronously(TEST_PROCESSOR);
+    assertThat(message.getMessage(), containsString("An exception occurred while invoking message processor"));
+    assertThat(message.getMessage(), containsString("for asynchronously."));
+  }
+
+  @Test
+  public void messageRejectedByFilterMessage() {
+    I18nMessage message = messageRejectedByFilter();
+    assertThat(message.getMessage(), is("Message has been rejected by filter"));
+  }
+
+  @Test
+  public void interruptedWaitingForPausedMessage() {
+    I18nMessage message = interruptedWaitingForPaused("The Object");
+    assertThat(message.getMessage(), is("Interrupted while waiting for paused \"The Object\" to be resumed"));
+  }
+
+  @Test
+  public void objectHasMoreThanOnePostConstructAnnotationMessage() {
+    I18nMessage message = objectHasMoreThanOnePostConstructAnnotation(MessagesTestCase.class);
+    assertThat(message.getMessage(),
+               is("Object \"org.mule.runtime.core.api.config.i18n.MessagesTestCase\" has more than one method with the @PostContruct annotation"));
+  }
+
+  @Test
+  public void objectHasMoreThanOnePreDestroyAnnotationMessage() {
+    I18nMessage message = objectHasMoreThanOnePreDestroyAnnotation(MessagesTestCase.class);
+    assertThat(message.getMessage(),
+               is("Object \"org.mule.runtime.core.api.config.i18n.MessagesTestCase\" has more than one method with the @PreDestroy annotation"));
+  }
+
+  @Test
+  public void lifecycleMethodNotVoidOrHasParamsMessage() throws NoSuchMethodException {
+    I18nMessage message =
+        lifecycleMethodNotVoidOrHasParams(MessagesTestCase.class.getMethod("lifecycleMethodNotVoidOrHasParamsMessage"));
+    assertThat(message.getMessage(),
+               is("Lifecycle method \"lifecycleMethodNotVoidOrHasParamsMessage\" must have a void return type and not accept any parameters"));
+  }
+
+  @Test
+  public void lifecycleMethodCannotBeStaticMessage() throws NoSuchMethodException {
+    I18nMessage message = lifecycleMethodCannotBeStatic(MessagesTestCase.class.getMethod("lifecycleMethodCannotBeStaticMessage"));
+    assertThat(message.getMessage(), is("Lifecycle method \"lifecycleMethodCannotBeStaticMessage\" cannot be static"));
+  }
+
+  @Test
+  public void lifecycleMethodCannotThrowCheckedMessage() throws NoSuchMethodException {
+    I18nMessage message =
+        lifecycleMethodCannotThrowChecked(MessagesTestCase.class.getMethod("lifecycleMethodCannotThrowCheckedMessage"));
+    assertThat(message.getMessage(),
+               is("JSR-250 lifecycle method \"lifecycleMethodCannotThrowCheckedMessage\" cannot throw a checked exception"));
+  }
+
+  @Test
+  public void cannotRenameInboundScopePropertyMessage() {
+    I18nMessage message = cannotRenameInboundScopeProperty("from", "to");
+    assertThat(message.getMessage(),
+               is("Cannot rename inbound-scoped property \"from\" to \"to\" since inbound scope is read-only,  set the scope on the Message Properties Transformer to outbound or invocation"));
+  }
+
+  @Test
+  public void failedToFindEntrypointForComponentMessage() {
+    I18nMessage message = failedToFindEntrypointForComponent("The Object");
+    assertThat(message.getMessage(),
+               is("Failed to find entry point for component, the following resolvers tried but failed: The Object"));
+  }
+
+  @Test
+  public void illegalMIMETypeMessage() {
+    I18nMessage message = illegalMIMEType("The Object");
+    assertThat(message.getMessage(), is("Message contained illegal MIME type \"The Object\""));
+  }
+
+  @Test
+  public void unexpectedMIMETypeMessage() {
+    I18nMessage message = unexpectedMIMEType("the bad", "the good");
+    assertThat(message.getMessage(), is("Message contained MIME type \"the bad\" when \"the good\" was expected"));
+  }
+
+  @Test
+  public void asyncDoesNotSupportTransactionsMessage() {
+    I18nMessage message = asyncDoesNotSupportTransactions();
+    assertThat(message.getMessage(), is("The <async> element cannot be used with transactions"));
+  }
+
+  @Test
+  public void methodWithNumParamsNotFoundOnObjectMessage() {
+    I18nMessage message = methodWithNumParamsNotFoundOnObject("The method", 2, "Object");
+    assertThat(message.getMessage(), is("Single method \"The method\", with \"2\" arguments not found on \"Object\""));
+  }
+
+  @Test
+  public void expressionEnricherNotRegisteredMessage() {
+    I18nMessage message = expressionEnricherNotRegistered("The Object");
+    assertThat(message.getMessage(),
+               is("An Expression Enricher for \"The Object\" is not registered with Mule. Make sure you have the the module for this expression type on your classpath. for example, if you are using an xpath expression you need to have the Mule XML module on your classpath."));
+  }
+
+  @Test
+  public void authorizationDeniedOnEndpointMessage() {
+    I18nMessage message = authorizationDeniedOnEndpoint("The Object");
+    assertThat(message.getMessage(), is("Authorization denied on connector The Object"));
+  }
+
+  @Test
+  public void objectStoreNotFoundMessage() {
+    I18nMessage message = objectStoreNotFound("The Object");
+    assertThat(message.getMessage(), is("The Object Store named \"The Object\" is not registered with Mule."));
+  }
+
+  @Test
+  public void propertyNotSerializableWasDroppedMessage() {
+    I18nMessage message = propertyNotSerializableWasDropped("The Object");
+    assertThat(message.getMessage(),
+               is("The Session Property \"The Object\" is not serializable, it will not be preserved as part of the MuleSession."));
+  }
+
+  @Test
+  public void sessionPropertyNotSerializableWarningMessage() {
+    I18nMessage message = sessionPropertyNotSerializableWarning("The Object");
+    assertThat(message.getMessage(),
+               is("The Session Property \"The Object\" is not serializable and will be lost when MuleSession is serialized or propagated over a transport."));
+  }
+
+  @Test
+  public void expressionFinalVariableCannotBeAssignedValueMessage() {
+    I18nMessage message = expressionFinalVariableCannotBeAssignedValue("The Object");
+    assertThat(message.getMessage(),
+               is("The expression language variable \"The Object\" is final and cannot be assigned a value."));
+  }
+
+  @Test
+  public void inboundMessagePropertiesImmutableMessage() {
+    I18nMessage message = inboundMessagePropertiesImmutable("The Object");
+    assertThat(message.getMessage(),
+               is("The inbound message property \"The Object\" cannot be added, updated or removed because inbound message properties are immutable"));
+  }
+
+  @Test
+  public void inboundMessageAttachmentsImmutableMessage() {
+    I18nMessage message = inboundMessageAttachmentsImmutable("The Object");
+    assertThat(message.getMessage(),
+               is("The inbound message attachment \"The Object\" cannot be added, updated or removed because inbound message attachments are immutable"));
+  }
+
+  @Test
+  public void servicesDeprecatedMessage() {
+    I18nMessage message = servicesDeprecated();
+    assertThat(message.getMessage(),
+               is("Services (SedaService or any custom implementation) are deprecated in Mule 3.4 and will be removed in Mule 4.0. "));
+  }
+
+  @Test
+  public void modelDeprecatedMessage() {
+    I18nMessage message = modelDeprecated();
+    assertThat(message.getMessage(),
+               is("The <model> element is deprecated in Mule 3.4 and will be removed in Mule 4.0.  Flows do not need to be configured inside a <model> element. "));
+  }
+
+  @Test
+  public void watermarkRequiresSynchronousProcessingMessage() {
+    I18nMessage message = watermarkRequiresSynchronousProcessing();
+    assertThat(message.getMessage(), is("Watermarking requires synchronous polling"));
+  }
+
+  @Test
+  public void couldNotRegisterNewSchedulerMessage() {
+    I18nMessage message = couldNotRegisterNewScheduler("The Object");
+    assertThat(message.getMessage(), is("Could not register the scheduler The Object in the registry"));
+  }
+
+  @Test
+  public void pollSourceReturnedNullMessage() {
+    I18nMessage message = pollSourceReturnedNull("The Object");
+    assertThat(message.getMessage(), is("Polling of The Object returned null, the flow will not be invoked."));
+  }
+
+  @Test
+  public void wrongMessageSourceMessage() {
+    I18nMessage message = wrongMessageSource("The Object");
+    assertThat(message.getMessage(),
+               is("The endpoint The Object does not return responses and therefore cant be used for polling."));
+  }
+
+  @Test
+  public void notSerializableWatermarkMessage() {
+    I18nMessage message = notSerializableWatermark("The Object");
+    assertThat(message.getMessage(),
+               is("Value retrieved from event for variable The Object is not serializable and hence cant be saved to the object store"));
+  }
+
+  @Test
+  public void nullWatermarkMessage() {
+    I18nMessage message = nullWatermark();
+    assertThat(message.getMessage(), is("Watermark value will not be updated since poll processor returned no results"));
+  }
 
 
 }
