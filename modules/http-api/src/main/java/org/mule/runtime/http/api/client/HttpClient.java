@@ -8,6 +8,7 @@ package org.mule.runtime.http.api.client;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
+import org.mule.runtime.http.api.client.sse.ServerSentEventSource;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -165,5 +166,9 @@ public interface HttpClient {
                                                      String socketId,
                                                      WebSocketCallback callback) {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
+
+  default ServerSentEventSource sseSource(String url) {
+    throw new UnsupportedOperationException("Server-sent Events are not supported");
   }
 }

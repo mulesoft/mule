@@ -22,6 +22,7 @@ module org.mule.runtime.http.api {
   exports org.mule.runtime.http.api.client;
   exports org.mule.runtime.http.api.client.auth;
   exports org.mule.runtime.http.api.client.proxy;
+  exports org.mule.runtime.http.api.client.sse;
   exports org.mule.runtime.http.api.client.ws;
   exports org.mule.runtime.http.api.domain;
   exports org.mule.runtime.http.api.domain.entity;
@@ -30,13 +31,15 @@ module org.mule.runtime.http.api {
   exports org.mule.runtime.http.api.domain.message.request;
   exports org.mule.runtime.http.api.domain.message.response;
   exports org.mule.runtime.http.api.domain.request;
+  exports org.mule.runtime.http.api.domain.sse;
   exports org.mule.runtime.http.api.exception;
   exports org.mule.runtime.http.api.server;
   exports org.mule.runtime.http.api.server.async;
+  exports org.mule.runtime.http.api.server.sse;
   exports org.mule.runtime.http.api.server.ws;
   exports org.mule.runtime.http.api.utils;
   exports org.mule.runtime.http.api.tcp;
   exports org.mule.runtime.http.api.ws;
   exports org.mule.runtime.http.api.ws.exception;
-  
+
 }
