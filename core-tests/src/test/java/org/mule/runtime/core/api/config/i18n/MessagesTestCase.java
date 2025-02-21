@@ -33,8 +33,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.commitTxButNoRe
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.componentCausedErrorIs;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.componentNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.configNotFoundUsage;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.configurationBuilderError;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.configurationBuilderSuccess;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.connectorWithProtocolNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.containerAlreadyRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.correlationTimedOut;
@@ -192,11 +190,10 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.watermarkRequir
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.wrongMessageSource;
 
 import org.mule.runtime.api.i18n.I18nMessage;
-import org.junit.Test;
-import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.junit.Test;
 
 import java.util.Date;
 
