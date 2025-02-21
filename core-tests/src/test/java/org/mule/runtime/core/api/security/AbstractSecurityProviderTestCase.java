@@ -92,4 +92,13 @@ public class AbstractSecurityProviderTestCase {
     assertThat(securityContext, is(mockSecurityContext));
     verify(mockSecurityContextFactory).create(mockAuthentication);
   }
+
+  @Test
+  public void testInitialiseWithCreateSecurityContext()
+      throws InitialisationException {
+    securityProvider.setSecurityContextFactory(mockSecurityContextFactory);
+
+    securityProvider.initialise();
+    assertThat(securityProvider.getSecurityContextFactory(), is(mockSecurityContextFactory));
+  }
 }
