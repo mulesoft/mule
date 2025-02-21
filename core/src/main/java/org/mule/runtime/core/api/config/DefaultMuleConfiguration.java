@@ -801,13 +801,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     } else if (!encoding.equals(other.encoding)) {
       return false;
     }
-    if (id == null) {
-      if (other.id != null) {
-        return false;
-      }
-    } else if (!id.equals(other.id)) {
-      return false;
-    }
     if (responseTimeout != other.responseTimeout) {
       return false;
     }
@@ -833,6 +826,13 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
       return false;
     }
     if (maxQueueTransactionFilesSizeInMegabytes != other.maxQueueTransactionFilesSizeInMegabytes) {
+      return false;
+    }
+    if (id == null) {
+      if (other.id != null) {
+        return false;
+      }
+    } else if (!id.equals(other.id)) {
       return false;
     }
     return inheritIterableRepeatability == other.inheritIterableRepeatability;
