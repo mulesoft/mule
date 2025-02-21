@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.lazy;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
@@ -43,6 +42,8 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
+import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
 import org.mule.runtime.config.dsl.model.AbstractDslModelTestCase;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
@@ -61,6 +62,7 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -177,8 +179,21 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
                                        emptySet());
   }
 
-  private LazyMuleArtifactContext createLazyMuleArtifactContextStub(MuleContext muleContext) {
-    final ArtifactAst artifactAst = toArtifactast(getArtifactDeclaration(), getExtensions(muleContext.getExtensionManager()));
+  private ArtifactAst loadAst(final String astName, Set<ExtensionModel> extensionModels) throws IOException {
+    ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
+    ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
+        .deserialize(this.getClass().getResourceAsStream("/asts/" + astName + ".ast"),
+                     name -> extensionModels.stream()
+                         .filter(x -> x.getName().equals(name))
+                         .findFirst()
+                         .orElse(null));
+
+    return deserializedArtifactAst;
+  }
+
+  private LazyMuleArtifactContext createLazyMuleArtifactContextStub(MuleContext muleContext) throws IOException {
+    final ArtifactAst artifactAst = loadAst(this.getClass().getSimpleName(), getExtensions(muleContext.getExtensionManager()));
+
     final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
         new DefaultComponentBuildingDefinitionRegistryFactory().create(artifactAst.dependencies(),
                                                                        artifactAst::dependenciesDsl);
