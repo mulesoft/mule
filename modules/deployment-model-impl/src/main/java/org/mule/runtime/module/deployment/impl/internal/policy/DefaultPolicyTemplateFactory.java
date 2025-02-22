@@ -66,7 +66,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   public PolicyTemplate createArtifact(Application application, PolicyTemplateDescriptor descriptor) {
     MuleDeployableArtifactClassLoader ownPolicyClassLoader;
     MuleDeployableArtifactClassLoader policyClassLoader;
-    RegionClassLoader regionClassLoader = null;
+    RegionClassLoader regionClassLoader;
     FilteringContainerClassLoader containerClassLoader =
         policyTemplateClassLoaderBuilderFactory.getFilteringContainerClassLoader();
 
@@ -78,11 +78,11 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
 
     try {
       regionClassLoader = isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) && containerClassLoader != null
-        ? new RegionClassLoader(containerClassLoader.getArtifactId(),
-                                containerClassLoader.getArtifactDescriptor(),
-                                containerClassLoader,
-                                containerClassLoader.getClassLoaderLookupPolicy())
-        : application.getRegionClassLoader();
+          ? new RegionClassLoader(containerClassLoader.getArtifactId(),
+                                  containerClassLoader.getArtifactDescriptor(),
+                                  containerClassLoader,
+                                  containerClassLoader.getClassLoaderLookupPolicy())
+          : application.getRegionClassLoader();
 
       ownPolicyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(ownResolvedPluginDescriptors
