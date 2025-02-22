@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.validateArtifactLicense;
 
 import static java.lang.String.format;
@@ -64,7 +66,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   public PolicyTemplate createArtifact(Application application, PolicyTemplateDescriptor descriptor) {
     MuleDeployableArtifactClassLoader ownPolicyClassLoader;
     MuleDeployableArtifactClassLoader policyClassLoader;
-    RegionClassLoader regionClassLoader;
+    RegionClassLoader regionClassLoader = null;
     FilteringContainerClassLoader containerClassLoader =
         policyTemplateClassLoaderBuilderFactory.getFilteringContainerClassLoader();
 
@@ -75,10 +77,12 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
         pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(descriptor.getPlugins()), false);
 
     try {
-      regionClassLoader = new RegionClassLoader(containerClassLoader.getArtifactId(),
-                                                containerClassLoader.getArtifactDescriptor(),
-                                                containerClassLoader,
-                                                containerClassLoader.getClassLoaderLookupPolicy());
+      regionClassLoader = isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) && containerClassLoader != null
+        ? new RegionClassLoader(containerClassLoader.getArtifactId(),
+                                containerClassLoader.getArtifactDescriptor(),
+                                containerClassLoader,
+                                containerClassLoader.getClassLoaderLookupPolicy())
+        : application.getRegionClassLoader();
 
       ownPolicyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(ownResolvedPluginDescriptors

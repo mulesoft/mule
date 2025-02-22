@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.container;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
@@ -23,22 +25,14 @@ public class IsolatedPolicyClassLoader extends MuleDeployableArtifactClassLoader
     super(artifactId, artifactDescriptor, new URL[0], regionClassLoader, regionClassLoader.getClassLoaderLookupPolicy());
   }
 
-  public static IsolatedPolicyClassLoader getInstance(RegionClassLoader regionClassLoader) {
+  public static synchronized IsolatedPolicyClassLoader getInstance(RegionClassLoader regionClassLoader) {
+    checkArgument(regionClassLoader != null, "regionClassLoader cannot be null");
     if (INSTANCE == null) {
-      synchronized (IsolatedPolicyClassLoader.class) {
-        if (INSTANCE == null) {
-          if (regionClassLoader == null) {
-            throw new IllegalStateException("regionClassLoader is not set yet, cannot create IsolatedPolicyClassLoader Instance");
-          }
-          INSTANCE = new IsolatedPolicyClassLoader(
-                                                   "isolated-policy-classloader",
-                                                   new DeployableArtifactDescriptor("isolated-policy-descriptor"),
-                                                   regionClassLoader);
-        }
-      }
+      INSTANCE = new IsolatedPolicyClassLoader(
+        "isolated-policy-classloader",
+        new DeployableArtifactDescriptor("isolated-policy-descriptor"),
+        regionClassLoader);
     }
     return INSTANCE;
   }
-
-
 }
