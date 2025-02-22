@@ -161,7 +161,7 @@
         <activemqVersion>5.15.15</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
-        <weaveVersion>2.6.13-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.6.13-rc1</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
         <commonsNet.version>3.9.0</commonsNet.version>
         <sshdVersion>2.12.1</sshdVersion>
