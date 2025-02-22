@@ -29,9 +29,9 @@ public class IsolatedPolicyClassLoader extends MuleDeployableArtifactClassLoader
     checkArgument(regionClassLoader != null, "regionClassLoader cannot be null");
     if (INSTANCE == null) {
       INSTANCE = new IsolatedPolicyClassLoader(
-        "isolated-policy-classloader",
-        new DeployableArtifactDescriptor("isolated-policy-descriptor"),
-        regionClassLoader);
+                                               "isolated-policy-classloader",
+                                               new DeployableArtifactDescriptor("isolated-policy-descriptor"),
+                                               regionClassLoader);
     }
     return INSTANCE;
   }
