@@ -916,6 +916,15 @@
             "annotation": "@java.lang.Deprecated(since = \"4.2\")",
             "attribute": "since",
             "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "enum org.mule.runtime.core.api.config.bootstrap.ArtifactType",
+            "new": "enum org.mule.runtime.core.api.config.bootstrap.ArtifactType",
+            "annotation": "@java.lang.Deprecated(since = \"4.9\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
           }
         ]
       }
