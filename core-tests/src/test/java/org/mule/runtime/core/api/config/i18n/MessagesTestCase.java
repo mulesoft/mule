@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.api.config.i18n;
 
-import static java.util.Collections.emptyList;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.asyncDoesNotSupportTransactions;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authDeniedOnEndpoint;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.authEndpointMustSendOrReceive;
@@ -145,7 +141,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManager
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManagerNotReady;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManagerNotStarted;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.responseTimedOutWaitingForId;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.retryPolicyExhausted;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.rollbackTxButNoResource;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.schemeCannotChangeForRouter;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.serverShutdownAt;
@@ -188,6 +183,10 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.valueIsInvalidF
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.versionNotSet;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.watermarkRequiresSynchronousProcessing;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.wrongMessageSource;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static java.util.Collections.emptyList;
 
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
