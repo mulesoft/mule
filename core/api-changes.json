@@ -704,6 +704,29 @@
             "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
             "attribute": "since",
             "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.core.api.config.MuleManifest::getManifestProperty(java.lang.String)",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "class org.mule.runtime.core.api.config.MuleManifest",
+            "new": "class org.mule.runtime.core.api.config.MuleManifest",
+            "annotation": "@java.lang.Deprecated(since = \"4.9.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.exception.checkedRemoved",
+            "old": "method org.mule.runtime.core.api.util.queue.QueueConfiguration org.mule.runtime.core.api.config.QueueProfile::configureQueue(java.lang.String, org.mule.runtime.core.api.util.queue.QueueManager) throws org.mule.runtime.api.lifecycle.InitialisationException",
+            "new": "method org.mule.runtime.core.api.util.queue.QueueConfiguration org.mule.runtime.core.api.config.QueueProfile::configureQueue(java.lang.String, org.mule.runtime.core.api.util.queue.QueueManager)",
+            "exception": "org.mule.runtime.api.lifecycle.InitialisationException",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
           }
         ]
       }
