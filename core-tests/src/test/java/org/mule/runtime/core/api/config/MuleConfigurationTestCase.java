@@ -15,6 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -270,7 +271,7 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
                                                                     new MinimalConfigurationBuilder());
 
     DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
-    assertThat(mutableConfig.getExtension(MuleConfigurationTestCase.class), is(empty()));
+    assertThat(mutableConfig.getExtension(MuleConfigurationTestCase.class), is(nullValue()));
   }
 
   @Test
