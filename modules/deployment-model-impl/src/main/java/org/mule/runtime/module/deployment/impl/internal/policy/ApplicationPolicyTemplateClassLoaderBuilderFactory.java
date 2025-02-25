@@ -8,15 +8,17 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFactory;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
  * Creates {@link PolicyTemplateClassLoaderBuilder} for application artifacts.
  */
 public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements PolicyTemplateClassLoaderBuilderFactory {
 
-  private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
+  private final DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> artifactClassLoaderFactory;
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
   private final FilteringContainerClassLoader containerClassLoader;
 
@@ -27,15 +29,13 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
    *                                   null.
    * @param pluginClassLoadersFactory  creates the class loaders for the plugins included in the application's region. Non null
    */
-  public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
+  public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> artifactClassLoaderFactory,
                                                             RegionPluginClassLoadersFactory pluginClassLoadersFactory) {
 
-    this.artifactClassLoaderFactory = artifactClassLoaderFactory;
-    this.pluginClassLoadersFactory = pluginClassLoadersFactory;
-    this.containerClassLoader = null;
+    this(artifactClassLoaderFactory, pluginClassLoadersFactory, null);
   }
 
-  public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory artifactClassLoaderFactory,
+  public ApplicationPolicyTemplateClassLoaderBuilderFactory(DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> artifactClassLoaderFactory,
                                                             RegionPluginClassLoadersFactory pluginClassLoadersFactory,
                                                             FilteringContainerClassLoader containerClassLoader) {
 
@@ -51,6 +51,6 @@ public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements Polic
 
   @Override
   public FilteringContainerClassLoader getFilteringContainerClassLoader() {
-    return null;
+    return containerClassLoader;
   }
 }

@@ -16,7 +16,7 @@ import java.net.URL;
 
 public class IsolatedPolicyClassLoader extends MuleDeployableArtifactClassLoader {
 
-  private static volatile IsolatedPolicyClassLoader INSTANCE;
+  private static IsolatedPolicyClassLoader instance;
 
 
   private IsolatedPolicyClassLoader(String artifactId,
@@ -27,12 +27,12 @@ public class IsolatedPolicyClassLoader extends MuleDeployableArtifactClassLoader
 
   public static synchronized IsolatedPolicyClassLoader getInstance(RegionClassLoader regionClassLoader) {
     checkArgument(regionClassLoader != null, "regionClassLoader cannot be null");
-    if (INSTANCE == null) {
-      INSTANCE = new IsolatedPolicyClassLoader(
+    if (instance == null) {
+      instance = new IsolatedPolicyClassLoader(
                                                "isolated-policy-classloader",
                                                new DeployableArtifactDescriptor("isolated-policy-descriptor"),
                                                regionClassLoader);
     }
-    return INSTANCE;
+    return instance;
   }
 }
