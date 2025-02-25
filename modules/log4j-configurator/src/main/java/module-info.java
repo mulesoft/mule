@@ -28,10 +28,15 @@ module org.mule.runtime.log4j {
   requires org.apache.commons.lang3;
   requires org.apache.logging.log4j.core;
   requires org.reflections;
-
   requires org.apache.logging.log4j;
+  // Open Telemetry logs
+  requires io.opentelemetry.instrumentation.log4j_appender_2_17;
+  requires io.opentelemetry.api;
+  requires io.opentelemetry.sdk;
+  requires io.opentelemetry.context;
+  requires io.opentelemetry.sdk.logs;
+  requires io.opentelemetry.exporter.logging;
 
-  exports org.mule.runtime.module.log4j.internal to
-      org.mule.runtime.launcher, org.mule.test.infrastructure;
+  exports org.mule.runtime.module.log4j.internal to org.mule.runtime.launcher, org.mule.test.infrastructure;
 
 }

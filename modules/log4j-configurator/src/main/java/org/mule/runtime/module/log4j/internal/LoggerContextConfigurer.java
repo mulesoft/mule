@@ -34,6 +34,12 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.function.Function;
 
+import io.opentelemetry.exporter.logging.SystemOutLogRecordExporter;
+import io.opentelemetry.instrumentation.log4j.appender.v2_17.OpenTelemetryAppender;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.logs.LogRecordProcessor;
+import io.opentelemetry.sdk.logs.SdkLoggerProvider;
+import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Layout;
@@ -79,7 +85,14 @@ final class LoggerContextConfigurer {
   static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
   static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
 
-  protected void update(MuleLoggerContext context) {
+  void update(MuleLoggerContext context) {
+
+    LogRecordProcessor batchLogRecordProcessor = BatchLogRecordProcessor.builder(SystemOutLogRecordExporter.create()).build();
+    OpenTelemetrySdk openTelemetrySdk = OpenTelemetrySdk.builder()
+        .setLoggerProvider(SdkLoggerProvider.builder().addLogRecordProcessor(batchLogRecordProcessor).build()).build();
+    OpenTelemetryAppender openTelemetryAppender = OpenTelemetryAppender.builder().setOpenTelemetry(openTelemetrySdk).build();
+    doAddAppender(context, openTelemetryAppender);
+
     if (!shouldConfigureContext(context)) {
       return;
     }
