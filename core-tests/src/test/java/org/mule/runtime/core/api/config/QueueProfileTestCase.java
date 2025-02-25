@@ -12,13 +12,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.api.config.QueueProfile.newInstanceWithPersistentQueueStore;
 import org.junit.Test;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 
 public class QueueProfileTestCase {
 
   @Test
-  public void nonPersistentQueueProfile() {
+  public void nonPersistentQueueProfile() throws InitialisationException {
     QueueProfile queueProfile = newInstancePersistingToDefaultMemoryQueueStore();
     assertThat(queueProfile.getMaxOutstandingMessages(), is(0));
     QueueConfiguration config = queueProfile.configureQueue("cmp", mock(QueueManager.class));
@@ -27,7 +28,7 @@ public class QueueProfileTestCase {
   }
 
   @Test
-  public void persistentQueueProfile() {
+  public void persistentQueueProfile() throws InitialisationException {
     QueueProfile queueProfile = newInstanceWithPersistentQueueStore();
     assertThat(queueProfile.getMaxOutstandingMessages(), is(0));
     QueueConfiguration config = queueProfile.configureQueue("cmp", mock(QueueManager.class));
@@ -36,7 +37,7 @@ public class QueueProfileTestCase {
   }
 
   @Test
-  public void customQueueProfile() {
+  public void customQueueProfile() throws InitialisationException {
     QueueProfile queueProfile = new QueueProfile(50, true);
     assertThat(queueProfile.getMaxOutstandingMessages(), is(50));
     queueProfile.setMaxOutstandingMessages(100);
