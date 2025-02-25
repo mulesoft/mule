@@ -55,7 +55,7 @@ public final class QueueProfile extends AbstractComponent {
     this.maxOutstandingMessages = maxOutstandingMessages;
   }
 
-  public QueueConfiguration configureQueue(String component, QueueManager queueManager) {
+  public QueueConfiguration configureQueue(String component, QueueManager queueManager) throws InitialisationException {
     QueueConfiguration qc = new DefaultQueueConfiguration(maxOutstandingMessages, persistent);
     queueManager.setQueueConfiguration(component, qc);
     return qc;
