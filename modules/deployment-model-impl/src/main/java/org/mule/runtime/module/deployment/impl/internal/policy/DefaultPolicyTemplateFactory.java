@@ -67,6 +67,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     MuleDeployableArtifactClassLoader ownPolicyClassLoader;
     MuleDeployableArtifactClassLoader policyClassLoader;
     RegionClassLoader regionClassLoader;
+    MuleDeployableArtifactClassLoader parentClassLoader;
     FilteringContainerClassLoader containerClassLoader =
         policyTemplateClassLoaderBuilderFactory.getFilteringContainerClassLoader();
 
@@ -77,18 +78,22 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
         pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(descriptor.getPlugins()), false);
 
     try {
-      regionClassLoader = isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) && containerClassLoader != null
-          ? new RegionClassLoader(containerClassLoader.getArtifactId(),
+      if (isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) && containerClassLoader != null) {
+        regionClassLoader =
+            new RegionClassLoader(containerClassLoader.getArtifactId(),
                                   containerClassLoader.getArtifactDescriptor(),
                                   containerClassLoader,
-                                  containerClassLoader.getClassLoaderLookupPolicy())
-          : application.getRegionClassLoader();
+                                  containerClassLoader.getClassLoaderLookupPolicy());
+        parentClassLoader = IsolatedPolicyClassLoader
+            .getInstance(regionClassLoader);
+      } else {
+        parentClassLoader = application.getRegionClassLoader();
+      }
 
       ownPolicyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(ownResolvedPluginDescriptors
               .toArray(new ArtifactPluginDescriptor[ownResolvedPluginDescriptors.size()]))
-          .setParentClassLoader(IsolatedPolicyClassLoader
-              .getInstance(regionClassLoader))
+          .setParentClassLoader(parentClassLoader)
           .setArtifactDescriptor(descriptor).build();
 
       // This classloader needs to be created after ownPolicyClassLoader so its inner classloaders override the entries in the
@@ -96,8 +101,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
       policyClassLoader = policyTemplateClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
           .addArtifactPluginDescriptors(resolvedPolicyPluginsDescriptors
               .toArray(new ArtifactPluginDescriptor[resolvedPolicyPluginsDescriptors.size()]))
-          .setParentClassLoader(IsolatedPolicyClassLoader
-              .getInstance(regionClassLoader))
+          .setParentClassLoader(parentClassLoader)
           .setArtifactDescriptor(descriptor).build();
     } catch (Exception e) {
       throw new PolicyTemplateCreationException(createPolicyTemplateCreationErrorMessage(descriptor.getName()), e);
