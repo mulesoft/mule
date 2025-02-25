@@ -29,5 +29,6 @@ module org.mule.runtime.logging {
   requires transitive jul.to.slf4j;
   requires transitive java.logging;
   requires transitive org.apache.commons.logging;
+  requires transitive org.apache.log4j;
 
 }
