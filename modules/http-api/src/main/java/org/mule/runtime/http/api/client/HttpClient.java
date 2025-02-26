@@ -168,6 +168,12 @@ public interface HttpClient {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
   }
 
+  /**
+   * Creates a consumer of Server-sent events. The resulting {@link ServerSentEventSource} is not connected automatically.
+   * 
+   * @param url the URL of the server.
+   * @return a non-connected instance of {@link ServerSentEventSource}.
+   */
   default ServerSentEventSource sseSource(String url) {
     throw new UnsupportedOperationException("Server-sent Events are not supported");
   }
