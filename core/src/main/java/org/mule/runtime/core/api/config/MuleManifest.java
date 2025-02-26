@@ -16,7 +16,7 @@ import java.util.jar.Manifest;
  *
  * @deprecated since 4.9, use {@link org.mule.runtime.manifest.api.MuleManifest} instead.
  */
-@Deprecated
+@Deprecated(since = "4.9.0")
 public class MuleManifest {
 
   public static String getProductVersion() {
@@ -84,10 +84,6 @@ public class MuleManifest {
    */
   public static String getRecommendedJdks() {
     return getMuleManifest().getRecommendedJdks();
-  }
-
-  protected static String getManifestProperty(String name) {
-    return getManifest().getMainAttributes().getValue(new Name(name));
   }
 
   // synchronize this method as manifest initialized here.

@@ -613,10 +613,14 @@ public class CoreMessages extends I18nMessageFactory {
    */
   public static I18nMessage productInformation() {
     String notset = CoreMessages.notSet().getMessage();
-    return factory.createMessage(BUNDLE_PATH, 236, defaultString(getMuleManifest().getProductDescription(), notset),
-                                 defaultString(getMuleManifest().getProductVersion(), notset),
-                                 defaultString(getMuleManifest().getVendorName(), notset) + " "
-                                     + defaultString(getMuleManifest().getVendorUrl(), notset));
+    return factory.createMessage(BUNDLE_PATH, 236, strOrDefault(getMuleManifest().getProductDescription(), notset),
+                                 strOrDefault(getMuleManifest().getProductVersion(), notset),
+                                 strOrDefault(getMuleManifest().getVendorName(), notset) + " "
+                                     + strOrDefault(getMuleManifest().getVendorUrl(), notset));
+  }
+
+  private static String strOrDefault(String value, String def) {
+    return value != null ? value : def;
   }
 
   public static I18nMessage noTransformerFoundForMessage(DataType input, DataType output) {
@@ -703,7 +707,7 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage configurationBuilderSuccess(ConfigurationBuilder configurationBuilder, int numResources) {
-    return factory.createMessage(BUNDLE_PATH, 257, configurationBuilder.getClass().getName(), new Integer(numResources));
+    return factory.createMessage(BUNDLE_PATH, 257, configurationBuilder.getClass().getName(), numResources);
   }
 
   public static I18nMessage configurationBuilderSuccess(ConfigurationBuilder configurationBuilder, String resources) {
