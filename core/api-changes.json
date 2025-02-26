@@ -722,14 +722,6 @@
           },
           {
             "ignore": true,
-            "code": "java.method.exception.checkedRemoved",
-            "old": "method org.mule.runtime.core.api.util.queue.QueueConfiguration org.mule.runtime.core.api.config.QueueProfile::configureQueue(java.lang.String, org.mule.runtime.core.api.util.queue.QueueManager) throws org.mule.runtime.api.lifecycle.InitialisationException",
-            "new": "method org.mule.runtime.core.api.util.queue.QueueConfiguration org.mule.runtime.core.api.config.QueueProfile::configureQueue(java.lang.String, org.mule.runtime.core.api.util.queue.QueueManager)",
-            "exception": "org.mule.runtime.api.lifecycle.InitialisationException",
-            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
-          },
-          {
-            "ignore": true,
             "code": "java.annotation.attributeAdded",
             "old": "field org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED",
             "new": "field org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED",
