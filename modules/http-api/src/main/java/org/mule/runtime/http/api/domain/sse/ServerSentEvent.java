@@ -10,6 +10,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Server-sent event.
+ */
 public class ServerSentEvent implements Serializable {
 
   @Serial
@@ -17,28 +20,43 @@ public class ServerSentEvent implements Serializable {
 
   private final String eventName;
   private final String eventData;
+  private final String id;
 
-  public ServerSentEvent(String eventName, String eventData) {
+  public ServerSentEvent(String eventName, String eventData, String id) {
     this.eventName = eventName;
     this.eventData = eventData;
+    this.id = id;
   }
 
+  /**
+   * @return the event name, the topic of the event.
+   */
   public String getEventName() {
     return eventName;
   }
 
+  /**
+   * @return the full data as string. // TODO: Add a method to iterate line-by-line.
+   */
   public String getEventData() {
     return eventData;
   }
 
+  /**
+   * @return event id.
+   */
+  public String getId() {
+    return id;
+  }
+
   @Override
   public String toString() {
-    return "ServerSentEvent [eventName=" + eventName + ", eventData=" + eventData + "]";
+    return "ServerSentEvent [name=" + eventName + ", data=" + eventData + ", id=" + id + "]";
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(eventName) + Objects.hashCode(eventData);
+    return Objects.hashCode(eventName) + Objects.hashCode(eventData) + Objects.hashCode(id);
   }
 
   @Override
@@ -47,6 +65,6 @@ public class ServerSentEvent implements Serializable {
       return false;
     }
     ServerSentEvent that = (ServerSentEvent) o;
-    return Objects.equals(eventName, that.eventName) && Objects.equals(eventData, that.eventData);
+    return Objects.equals(eventName, that.eventName) && Objects.equals(eventData, that.eventData) && Objects.equals(id, that.id);
   }
 }

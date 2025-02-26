@@ -6,7 +6,15 @@
  */
 package org.mule.runtime.http.api.server.sse;
 
+/**
+ * Server-side of client connections.
+ */
 public interface SseClientHandler {
 
-  void handle(SseSender sender);
+  /**
+   * Callback to be invoked when each client is connected.
+   * 
+   * @param sseClient server-side abstraction of a connected client.
+   */
+  void handle(SseClient sseClient);
 }
