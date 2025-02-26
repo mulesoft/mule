@@ -6,9 +6,27 @@
  */
 package org.mule.runtime.http.api.client.sse;
 
+/**
+ * A consumer of server-sent events.
+ */
 public interface ServerSentEventSource {
 
+  // TODO: Reconnection
   void connect();
 
-  void addListener(ServerSentEventListener listener);
+  /**
+   * Registers a {@link ServerSentEventListener listener} for a specific event name (a.k.a. topic, a.k.a. type).
+   * 
+   * @param eventName The event name that the {@link ServerSentEventListener listener} will handle.
+   * @param listener  The event handler.
+   */
+  void register(String eventName, ServerSentEventListener listener);
+
+  /**
+   * Registers a fallback {@link ServerSentEventListener listener} for all the events that aren't handled by any listener
+   * registered with {@link #register(String, ServerSentEventListener)}.
+   * 
+   * @param listener The event handler.
+   */
+  void register(ServerSentEventListener listener);
 }
