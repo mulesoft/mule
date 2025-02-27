@@ -7,11 +7,6 @@
 package org.mule.runtime.config.dsl.model;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
-import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
-import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_CACHE;
 
@@ -48,18 +43,9 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
-import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
-import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
-import org.mule.runtime.app.declaration.api.ConstructElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterGroupElementDeclaration;
-import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
-import org.mule.runtime.app.declaration.api.fluent.ParameterListValue;
-import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
-import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
+import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
@@ -68,6 +54,7 @@ import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -117,15 +104,14 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void idempotentHashCalculation() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
-    ArtifactAst applicationModel = loadApplicationModel(app);
+    ArtifactAst applicationModel = loadAst("idempotentHashCalculation_1.ast");
     Map<String, MetadataCacheId> hashByLocation = new HashMap<>();
 
     applicationModel.topLevelComponentsStream()
         .forEach(component -> {
           try {
             hashByLocation.put(component.getLocation().getLocation(),
-                               getIdForComponentMetadata(app, component.getLocation().getLocation()));
+                               getIdForComponentMetadata(applicationModel, component.getLocation().getLocation()));
           } catch (Exception e) {
             throw new RuntimeException(e);
           }
@@ -133,15 +119,14 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
     LOGGER.debug(hashByLocation.toString());
 
-    ArtifactDeclaration reloadedApp = getBaseApp();
-    ArtifactAst reload = loadApplicationModel(app);
+    ArtifactAst reload = loadAst("idempotentHashCalculation_2.ast");
 
     reload.topLevelComponentsStream()
         .forEach(component -> {
           try {
             String location = component.getLocation().getLocation();
             MetadataCacheId previousHash = hashByLocation.get(location);
-            assertThat(previousHash, is(getIdForComponentMetadata(reloadedApp, component.getLocation().getLocation())));
+            assertThat(previousHash, is(getIdForComponentMetadata(reload, component.getLocation().getLocation())));
           } catch (Exception e) {
             throw new RuntimeException(e);
           }
@@ -150,87 +135,64 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void configurationParameterModifiesHash() throws Exception {
-    ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId cacheId = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId cacheId = getIdForComponentMetadata(loadAst("configurationParameterModifiesGlobalHash_1.ast"),
+                                                        OPERATION_LOCATION);
     LOGGER.debug(cacheId.toString());
 
-    ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0)).getParameterGroups().get(0)
-        .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
-
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentMetadata(loadAst("configurationParameterModifiesGlobalHash_2.ast"), OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(cacheId, not(otherKeyParts));
   }
 
   @Test
   public void configurationParameterModifiesGlobalHash() throws Exception {
-    ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId cacheId = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId cacheId = getIdForGlobalMetadata(loadAst("configurationParameterModifiesGlobalHash_1.ast"),
+                                                     OPERATION_LOCATION);
     LOGGER.debug(cacheId.toString());
 
-    ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0)).getParameterGroups().get(0)
-        .getParameter(BEHAVIOUR_NAME).get().setValue(ParameterSimpleValue.of("otherText"));
-
-    MetadataCacheId otherKeyParts = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForGlobalMetadata(loadAst("configurationParameterModifiesGlobalHash_2.ast"), OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(cacheId, not(otherKeyParts));
   }
 
   @Test
   public void operationParameterDoesNotModifyHash() throws Exception {
-    ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId keyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId keyParts = getIdForComponentMetadata(loadAst("operationParameterDoesNotModifyHash_1.ast"),
+                                                         OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-    operationDeclaration.getParameterGroups().get(0)
-        .getParameter(CONTENT_NAME).get().setValue(ParameterSimpleValue.of("otherValue"));
-
-    operationDeclaration.getParameterGroups().get(0)
-        .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
-
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentMetadata(loadAst("operationParameterDoesNotModifyHash_2.ast"), OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(keyParts, is(otherKeyParts));
   }
 
   @Test
   public void operationParameterDoesNotModifyGlobal() throws Exception {
-    ArtifactDeclaration declaration = getBaseApp();
-    MetadataCacheId keyParts = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId keyParts = getIdForGlobalMetadata(loadAst("operationParameterDoesNotModifyGlobal_1.ast"),
+                                                      OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-    operationDeclaration.getParameterGroups().get(0)
-        .getParameter(CONTENT_NAME).get().setValue(ParameterSimpleValue.of("otherValue"));
-    operationDeclaration.getParameterGroups().get(0)
-        .addParameter(newParam(BEHAVIOUR_NAME, "notKey"));
-
-    MetadataCacheId otherKeyParts = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts = getIdForGlobalMetadata(loadAst("operationParameterDoesNotModifyGlobal_2.ast"),
+                                                           OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
     assertThat(keyParts, is(otherKeyParts));
   }
 
   @Test
   public void metadataKeyModifiesHash() throws Exception {
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    MetadataCacheId keyParts =
+        getIdForComponentMetadata(loadAst("metadataKeyModifiesHash_1.ast"), OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
-    operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
-
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentMetadata(loadAst("metadataKeyModifiesHash_2.ast"), OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
-    metadataKeyPartParam.setValue(ParameterSimpleValue.of("Document"));
-
-    MetadataCacheId finalKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId finalKeyParts =
+        getIdForComponentMetadata(loadAst("metadataKeyModifiesHash_3.ast"), OPERATION_LOCATION);
     LOGGER.debug(finalKeyParts.toString());
 
     assertThat(otherKeyParts, not(keyParts));
@@ -240,14 +202,7 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void metadataCategoryModifiesGlobalHash() throws Exception {
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
-    operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
-
-    MetadataCacheId id = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId id = getIdForGlobalMetadata(loadAst("metadataCategoryModifiesGlobalHash_1.ast"), OPERATION_LOCATION);
     LOGGER.debug(id.toString());
 
     when(operation.getModelProperty(MetadataKeyIdModelProperty.class))
@@ -255,7 +210,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
                                                       METADATA_KEY_PART_1,
                                                       "OTHER_CATEGORY")));
 
-    MetadataCacheId otherId = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    MetadataCacheId otherId = getIdForGlobalMetadata(loadAst("metadataCategoryModifiesGlobalHash_2.ast"),
+                                                     OPERATION_LOCATION);
     LOGGER.debug(id.toString());
 
     assertThat(id, not(otherId));
@@ -263,17 +219,20 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void configurationParametersAsRequireForMetadataModifiesHash() throws Exception {
-
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, null);
 
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    MetadataCacheId keyParts =
+        getIdForComponentMetadata(loadAst("configurationParametersAsRequireForMetadataModifiesHash_2.ast"),
+                                  OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockRequiredForMetadataModelProperty(configuration, asList(behaviourParameter.getName()));
     mockRequiredForMetadataModelProperty(connectionProvider, null);
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    MetadataCacheId otherKeyParts =
+        getIdForComponentMetadata(loadAst("configurationParametersAsRequireForMetadataModifiesHash_2.ast"),
+                                  OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -283,8 +242,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   @Test
   @Issue("MULE-18601")
   public void configurationNestedParamsCountedTwiceForHash() throws Exception {
-
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadAst("configurationNestedParamsCountedTwiceForHash_1.ast");
+    MetadataCacheId keyParts = getIdForComponentMetadata(app, OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     assertThat(keyParts.getParts(), hasSize(3));
@@ -305,36 +264,37 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void connectionParametersAsRequireForMetadataModifiesHash() throws Exception {
-
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, null);
 
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadAst("connectionParametersAsRequireForMetadataModifiesHash_1.ast");
+    MetadataCacheId keyParts = getIdForComponentMetadata(app, OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, asList(behaviourParameter.getName()));
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var modifiedApp = loadAst("connectionParametersAsRequireForMetadataModifiesHash_2.ast");
+    MetadataCacheId otherKeyParts = getIdForComponentMetadata(modifiedApp, OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
-
   }
 
   @Test
   public void differencesInRequiredParametersForMetadataYieldsDifferentHashes() throws Exception {
-
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, asList(contentParameter.getName()));
 
-    MetadataCacheId keyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadAst("differencesInRequiredParametersForMetadataYieldsDifferentHashes_1.ast");
+    MetadataCacheId keyParts = getIdForComponentMetadata(app, OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
     mockRequiredForMetadataModelProperty(configuration, null);
     mockRequiredForMetadataModelProperty(connectionProvider, asList(behaviourParameter.getName()));
 
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(getBaseApp(), OPERATION_LOCATION);
+    final var modifiedApp = loadAst("differencesInRequiredParametersForMetadataYieldsDifferentHashes_2.ast");
+    MetadataCacheId otherKeyParts = getIdForComponentMetadata(modifiedApp, OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(keyParts, not(otherKeyParts));
@@ -343,18 +303,13 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void metadataKeyCacheIdForConfigModelShouldIncludeConnectionParameters() throws Exception {
-    MetadataCacheId keyParts = getIdForMetadataKeys(getBaseApp(), MY_CONFIG);
+    final var app = loadAst("metadataKeyCacheIdForConfigModelShouldIncludeConnectionParameters_1.ast");
+    MetadataCacheId keyParts = getIdForMetadataKeys(app, MY_CONFIG);
     LOGGER.debug(keyParts.toString());
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ConnectionElementDeclaration connectionElementDeclaration =
-        ((ConfigurationElementDeclaration) declaration.getGlobalElements().get(0))
-            .getConnection().get();
-
     // Change the value of a connection parameter that is required for metadata
-    connectionElementDeclaration.getParameterGroups().get(0).getParameter("otherName").get().setValue(plain("changed"));
-
-    MetadataCacheId otherKeyParts = getIdForMetadataKeys(declaration, MY_CONFIG);
+    final var modifiedApp = loadAst("metadataKeyCacheIdForConfigModelShouldIncludeConnectionParameters_2.ast");
+    MetadataCacheId otherKeyParts = getIdForMetadataKeys(modifiedApp, MY_CONFIG);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(otherKeyParts, not(is(keyParts)));
@@ -362,22 +317,16 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
 
   @Test
   public void metadataKeyDoesNotModifyKeyHash() throws Exception {
-    MetadataCacheId keyParts = getIdForMetadataKeys(getBaseApp(), OPERATION_LOCATION);
+    final var app = loadAst("metadataKeyDoesNotModifyKeyHash_1.ast");
+    MetadataCacheId keyParts = getIdForMetadataKeys(app, OPERATION_LOCATION);
     LOGGER.debug(keyParts.toString());
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
-    operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
-
-    MetadataCacheId otherKeyParts = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var modifiedApp = loadAst("metadataKeyDoesNotModifyKeyHash_2.ast");
+    MetadataCacheId otherKeyParts = getIdForMetadataKeys(modifiedApp, OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
-    metadataKeyPartParam.setValue(ParameterSimpleValue.of("Document"));
-
-    MetadataCacheId finalKeyParts = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var modifiedApp2 = loadAst("metadataKeyDoesNotModifyKeyHash_3.ast");
+    MetadataCacheId finalKeyParts = getIdForMetadataKeys(modifiedApp2, OPERATION_LOCATION);
     LOGGER.debug(finalKeyParts.toString());
 
     assertThat(otherKeyParts, is(keyParts));
@@ -389,21 +338,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   public void multiLevelMetadataKeyModifiesHash() throws Exception {
     mockMultiLevelMetadataKeyId(operation);
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    operationDeclaration.addParameterGroup(keyGroup);
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_2, "8080"));
-
-    MetadataCacheId twoLevelParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    final var app = loadAst("multiLevelMetadataKeyModifiesHash_1.ast");
+    MetadataCacheId twoLevelParts = getIdForComponentMetadata(app, OPERATION_LOCATION);
     LOGGER.debug(twoLevelParts.toString());
 
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
-
-    MetadataCacheId otherKeyParts = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    final var modifiedApp = loadAst("multiLevelMetadataKeyModifiesHash_2.ast");
+    MetadataCacheId otherKeyParts = getIdForComponentMetadata(modifiedApp, OPERATION_LOCATION);
     LOGGER.debug(otherKeyParts.toString());
 
     assertThat(otherKeyParts, not(twoLevelParts));
@@ -413,25 +353,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   public void multiLevelPartValueModifiesHash() throws Exception {
     mockMultiLevelMetadataKeyId(operation);
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    operationDeclaration.addParameterGroup(keyGroup);
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
-
-    ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
-    keyGroup.addParameter(partTwo);
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
-
-    MetadataCacheId original = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    final var app = loadAst("multiLevelPartValueModifiesHash_1.ast");
+    MetadataCacheId original = getIdForComponentMetadata(app, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
-    partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getIdForComponentMetadata(declaration, OPERATION_LOCATION);
+    final var modifiedApp = loadAst("multiLevelPartValueModifiesHash_2.ast");
+    MetadataCacheId newHash = getIdForComponentMetadata(modifiedApp, OPERATION_LOCATION);
     LOGGER.debug(newHash.toString());
     LOGGER.debug(newHash.toString());
 
@@ -442,25 +369,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   public void multiLevelPartValueDoesNotModifyHashForKeys() throws Exception {
     mockMultiLevelMetadataKeyId(operation);
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    operationDeclaration.addParameterGroup(keyGroup);
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
-
-    ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
-    keyGroup.addParameter(partTwo);
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
-
-    MetadataCacheId original = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var app = loadAst("multiLevelPartValueDoesNotModifyHashForKeys_1.ast");
+    MetadataCacheId original = getIdForMetadataKeys(app, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
-    partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var modifiedApp = loadAst("multiLevelPartValueDoesNotModifyHashForKeys_2.ast");
+    MetadataCacheId newHash = getIdForMetadataKeys(modifiedApp, OPERATION_LOCATION);
     LOGGER.debug(newHash.toString());
 
     assertThat(original, is(newHash));
@@ -470,22 +384,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
   public void multiLevelPartValueDoesNotModifyGlobalId() throws Exception {
     mockMultiLevelMetadataKeyId(operation);
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    operationDeclaration.addParameterGroup(keyGroup);
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
-    ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
-    keyGroup.addParameter(partTwo);
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
-
-    MetadataCacheId original = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    final var app = loadAst("multiLevelPartValueDoesNotModifyGlobalId_1.ast");
+    MetadataCacheId original = getIdForGlobalMetadata(app, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
-    partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getIdForGlobalMetadata(declaration, OPERATION_LOCATION);
+    final var modifiedApp = loadAst("multiLevelPartValueDoesNotModifyGlobalId_2.ast");
+    MetadataCacheId newHash = getIdForGlobalMetadata(modifiedApp, OPERATION_LOCATION);
     LOGGER.debug(newHash.toString());
 
     assertThat(original, is(newHash));
@@ -498,21 +402,8 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     mockTypeResolversInformationModelProperty(operation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
                                               "keysResolver", true);
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    operationDeclaration.addParameterGroup(keyGroup);
-
-    ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
-    keyGroup.addParameter(partTwo);
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
-
-    MetadataCacheId original = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var app = loadAst("metadataKeyHashIdStructure_1.ast");
+    MetadataCacheId original = getIdForMetadataKeys(app, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
     assertThat(original.getParts(), hasSize(6));
@@ -529,25 +420,12 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     mockTypeResolversInformationModelProperty(operation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
                                               "keysResolver", true);
 
-    ArtifactDeclaration declaration = getBaseApp();
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    operationDeclaration.addParameterGroup(keyGroup);
-
-    ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
-    keyGroup.addParameter(partTwo);
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
-
-    MetadataCacheId original = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var app = loadAst("partialFetchingMultiLevelPartValueModifiesHashForKeys_1.ast");
+    MetadataCacheId original = getIdForMetadataKeys(app, OPERATION_LOCATION);
     LOGGER.debug(original.toString());
 
-    partTwo.setValue(ParameterSimpleValue.of("6666"));
-    MetadataCacheId newHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var modiifiedApp = loadAst("partialFetchingMultiLevelPartValueModifiesHashForKeys_2.ast");
+    MetadataCacheId newHash = getIdForMetadataKeys(modiifiedApp, OPERATION_LOCATION);
     LOGGER.debug(newHash.toString());
 
     assertThat(original, not(newHash));
@@ -559,25 +437,15 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
                                               "keysResolver");
     mockTypeResolversInformationModelProperty(anotherOperation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
                                               "keysResolver");
-    ArtifactDeclaration declaration = getBaseApp();
 
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-
-    ParameterElementDeclaration metadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
-    operationDeclaration.getParameterGroups().get(0).addParameter(metadataKeyPartParam);
-
-    ComponentElementDeclaration anotherOperationDeclaration =
-        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(1);
-
-    ParameterElementDeclaration anotherOperationMetadataKeyPartParam = newParam(METADATA_KEY_PART_1, "User");
-    anotherOperationDeclaration.getParameterGroups().get(0).addParameter(anotherOperationMetadataKeyPartParam);
-
-    MetadataCacheId operationKeysParts = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
+    final var app =
+        loadAst("sameSimpleMetadataKeyWithSameResolverOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationKeysParts = getIdForMetadataKeys(app, OPERATION_LOCATION);
     LOGGER.debug(operationKeysParts.toString());
 
-    MetadataCacheId anotherOperationKeysParts = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var modifiedApp =
+        loadAst("sameSimpleMetadataKeyWithSameResolverOnDifferentOperationsGeneratesSameHashForKeys_2.ast");
+    MetadataCacheId anotherOperationKeysParts = getIdForMetadataKeys(modifiedApp, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(anotherOperationKeysParts.toString());
 
     assertThat(anotherOperationKeysParts, is(operationKeysParts));
@@ -592,28 +460,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     mockTypeResolversInformationModelProperty(anotherOperation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
                                               "keysResolver");
 
-    ArtifactDeclaration declaration = getBaseApp();
-
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-    ComponentElementDeclaration anotherOperationDeclaration =
-        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(1);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-
-    operationDeclaration.addParameterGroup(keyGroup);
-    anotherOperationDeclaration.addParameterGroup(keyGroup);
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, "localhost"));
-
-    ParameterElementDeclaration partTwo = newParam(METADATA_KEY_PART_2, "8080");
-    keyGroup.addParameter(partTwo);
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, "/api"));
-
-    MetadataCacheId operationHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
-    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var app = loadAst("multilevelPartsWithSameValuesOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationHash = getIdForMetadataKeys(app, OPERATION_LOCATION);
+    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(app, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(operationHash.toString());
     LOGGER.debug(anotherOperationHash.toString());
 
@@ -629,33 +478,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     mockTypeResolversInformationModelProperty(anotherOperation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
                                               "keysResolver");
 
-    ArtifactDeclaration declaration = getBaseApp();
-
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-    ComponentElementDeclaration anotherOperationDeclaration =
-        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(1);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    ParameterGroupElementDeclaration anotherKeyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-
-    operationDeclaration.addParameterGroup(keyGroup);
-    anotherOperationDeclaration.addParameterGroup(anotherKeyGroup);
-
-    final String keyPart1Value = "localhost";
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, keyPart1Value));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_1, keyPart1Value));
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_2, "8080"));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_2, "6666"));
-
-    final String keyPart3Value = "/api";
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
-
-    MetadataCacheId operationHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
-    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var app =
+        loadAst("multilevelPartsWithDifferentValuesOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationHash = getIdForMetadataKeys(app, OPERATION_LOCATION);
+    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(app, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(operationHash.toString());
     LOGGER.debug(anotherOperationHash.toString());
 
@@ -673,34 +499,9 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     mockTypeResolversInformationModelProperty(anotherOperation, CATEGORY_NAME, "outputResolver", "attributesResolver", emptyMap(),
                                               "keysResolver");
 
-    ArtifactDeclaration declaration = getBaseApp();
-
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-    ComponentElementDeclaration anotherOperationDeclaration =
-        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(1);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    ParameterGroupElementDeclaration anotherKeyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-
-    operationDeclaration.addParameterGroup(keyGroup);
-    anotherOperationDeclaration.addParameterGroup(anotherKeyGroup);
-
-    final String keyPart1Value = "localhost";
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, keyPart1Value));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_1, keyPart1Value));
-
-    final String keyPart2Value = "8080";
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_2, keyPart2Value));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_2, keyPart2Value));
-
-    final String keyPart3Value = "/api";
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
-
-    MetadataCacheId operationHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
-    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var app = loadAst("partialFetchingWithSameValuesOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationHash = getIdForMetadataKeys(app, OPERATION_LOCATION);
+    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(app, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(operationHash.toString());
     LOGGER.debug(anotherOperationHash.toString());
 
@@ -714,34 +515,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     setPartialFetchingMock(operation);
     setPartialFetchingMock(anotherOperation);
 
-
-    ArtifactDeclaration declaration = getBaseApp();
-
-    ComponentElementDeclaration operationDeclaration = ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-        .getComponents().get(0);
-    ComponentElementDeclaration anotherOperationDeclaration =
-        ((ConstructElementDeclaration) declaration.getGlobalElements().get(1))
-            .getComponents().get(1);
-
-    ParameterGroupElementDeclaration keyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-    ParameterGroupElementDeclaration anotherKeyGroup = new ParameterGroupElementDeclaration(METADATA_KEY_GROUP);
-
-    operationDeclaration.addParameterGroup(keyGroup);
-    anotherOperationDeclaration.addParameterGroup(anotherKeyGroup);
-
-    final String keyPart1Value = "localhost";
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_1, keyPart1Value));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_1, keyPart1Value));
-
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_2, "8080"));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_2, "6666"));
-
-    final String keyPart3Value = "/api";
-    keyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
-    anotherKeyGroup.addParameter(newParam(METADATA_KEY_PART_3, keyPart3Value));
-
-    MetadataCacheId operationHash = getIdForMetadataKeys(declaration, OPERATION_LOCATION);
-    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(declaration, ANOTHER_OPERATION_LOCATION);
+    final var app =
+        loadAst("partialFetchingWithDifferentValuesOnDifferentOperationsGeneratesSameHashForKeys_1.ast");
+    MetadataCacheId operationHash = getIdForMetadataKeys(app, OPERATION_LOCATION);
+    MetadataCacheId anotherOperationHash = getIdForMetadataKeys(app, ANOTHER_OPERATION_LOCATION);
     LOGGER.debug(operationHash.toString());
     LOGGER.debug(anotherOperationHash.toString());
 
@@ -795,58 +572,6 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
             return mock(QueryEntityResolver.class);
           }
         })));
-  }
-
-  private ParameterElementDeclaration newParam(String name, String value) {
-    ParameterElementDeclaration param = new ParameterElementDeclaration(name);
-    param.setValue(ParameterSimpleValue.of(value));
-    return param;
-  }
-
-  private ArtifactDeclaration getBaseApp() {
-    return ElementDeclarer.newArtifact()
-        .withGlobalElement(declarer.newConfiguration(CONFIGURATION_NAME)
-            .withRefName(MY_CONFIG)
-            .withParameterGroup(newParameterGroup()
-                .withParameter(CONTENT_NAME, CONTENT_VALUE)
-                .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
-                .withParameter(LIST_NAME, newListValue().withValue(ITEM_VALUE).build())
-                .getDeclaration())
-            .withConnection(declarer.newConnection(CONNECTION_PROVIDER_NAME)
-                .withParameterGroup(newParameterGroup()
-                    .withParameter(CONTENT_NAME, CONTENT_VALUE)
-                    .withParameter(BEHAVIOUR_NAME, BEHAVIOUR_VALUE)
-                    .withParameter(LIST_NAME,
-                                   newListValue().withValue(ITEM_VALUE).build())
-                    .getDeclaration())
-                .getDeclaration())
-            .getDeclaration())
-        .withGlobalElement(ElementDeclarer.forExtension(MULE_NAME)
-            .newConstruct(FLOW_ELEMENT_IDENTIFIER)
-            .withRefName(MY_FLOW)
-            .withComponent(
-                           declarer.newOperation(OPERATION_NAME)
-                               .withConfig(MY_CONFIG)
-                               .withParameterGroup(g -> g.withParameter(CONTENT_NAME, "nonKey"))
-                               .getDeclaration())
-            .withComponent(
-                           declarer.newOperation(ANOTHER_OPERATION_NAME)
-                               .withConfig(MY_CONFIG)
-                               .withParameterGroup(g -> g.withParameter(CONTENT_NAME, "nonKey"))
-                               .getDeclaration())
-            .getDeclaration())
-        .withGlobalElement(declarer.newGlobalParameter("complexType")
-            .withRefName(MY_GLOBAL_TEMPLATE)
-            .withValue(ParameterObjectValue.builder()
-                .withParameter("otherName", "simpleParam")
-                .withParameter("myCamelCaseName", "someContent")
-                .withParameter("numbers", ParameterListValue.builder()
-                    .withValue("10")
-                    .withValue("20")
-                    .build())
-                .build())
-            .getDeclaration())
-        .getDeclaration();
   }
 
   private void mockSimpleMetadataKeyId(OperationModel model) {
@@ -945,6 +670,18 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
     when(metadataKeyId.getType()).thenReturn(TYPE_LOADER.load(String.class));
 
     return metadataKeyId;
+  }
+
+  private ArtifactAst loadAst(String astFileName) throws IOException {
+    ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
+
+    ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
+        .deserialize(this.getClass().getResourceAsStream("/asts/" + astFileName), name -> extensions.stream()
+            .filter(x -> x.getName().equals(name))
+            .findFirst()
+            .orElse(null));
+
+    return deserializedArtifactAst;
   }
 
 }
