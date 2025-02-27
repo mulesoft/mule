@@ -6,9 +6,18 @@
  */
 package org.mule.runtime.module.extension.api.http;
 
+import org.mule.runtime.http.api.HttpService;
 import org.mule.sdk.api.http.HttpServiceApi;
 
+import javax.inject.Inject;
+
+/**
+ * Definition of {@link HttpServiceApi} that just delegates all to the {@link HttpService}.
+ */
 public class HttpServiceApiDelegate implements HttpServiceApi {
+
+  @Inject
+  private HttpService delegate;
 
   @Override
   public void printThis(String message) {
