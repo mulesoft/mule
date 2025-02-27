@@ -14,7 +14,6 @@ module org.mule.test.runner {
 
   requires org.mule.runtime.api;
   requires org.mule.sdk.api;
-  requires org.mule.sdk.compatibility.api;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.core;
@@ -41,9 +40,6 @@ module org.mule.test.runner {
   requires org.apache.commons.lang3;
   requires semver4j;
   requires org.reflections;
-  // TODO: MULE-19762 remove once forward compatibility is finished
-  requires org.apache.maven.resolver;
-  requires org.apache.maven.resolver.util;
   requires net.bytebuddy;
 
   requires junit;

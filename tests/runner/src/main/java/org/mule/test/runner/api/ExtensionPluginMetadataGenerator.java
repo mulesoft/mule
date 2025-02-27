@@ -8,7 +8,6 @@ package org.mule.test.runner.api;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
-import static org.mule.test.runner.utils.RunnerModuleUtils.assureSdkApiInClassLoader;
 import static org.mule.test.runner.utils.TroubleshootingUtils.getLastModifiedDateFromUrl;
 import static org.mule.test.runner.utils.TroubleshootingUtils.getMD5FromFile;
 
@@ -232,9 +231,6 @@ class ExtensionPluginMetadataGenerator {
   File generateExtensionResources(Artifact plugin, Class extensionClass, DependencyResolver dependencyResolver,
                                   List<RemoteRepository> rootArtifactRemoteRepositories) {
     logger.debug("Generating Extension metadata for extension class: '{}'", extensionClass);
-
-    assureSdkApiInClassLoader(extensionClass.getClassLoader(), dependencyResolver, rootArtifactRemoteRepositories);
-
     final ExtensionModel extensionModel =
         getExtensionModel(plugin, extensionClass, dependencyResolver, rootArtifactRemoteRepositories);
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");

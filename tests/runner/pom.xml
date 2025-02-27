@@ -108,19 +108,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- TODO: MULE-19762 remove once forward compatibility is finished -->
-        <dependency>
-            <groupId>org.mule.sdk</groupId>
-            <artifactId>mule-sdk-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <!-- TODO: MULE-19762 remove once forward compatibility is finished -->
-        <dependency>
-            <groupId>org.mule.sdk</groupId>
-            <artifactId>mule-sdk-compatibility-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- 3rd party dependencies -->
         <dependency>
             <groupId>org.reflections</groupId>
