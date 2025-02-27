@@ -36,8 +36,8 @@ public class RouterStatistics implements Statistics {
   private long caughtInCatchAll;
   private long totalRouted;
   private long totalReceived;
-  private Map routed;
-  private int type;
+  private final Map<String, Long> routed;
+  private final int type;
 
   public synchronized void clear() {
     notRouted = 0;
@@ -65,7 +65,7 @@ public class RouterStatistics implements Statistics {
   public RouterStatistics(int type) {
     super();
     this.type = type;
-    routed = new HashMap();
+    routed = new HashMap<>();
   }
 
   /**
@@ -77,11 +77,11 @@ public class RouterStatistics implements Statistics {
     if (endpoints == null || endpoints.isEmpty()) {
       return;
     }
-    List list = new ArrayList(endpoints);
-    synchronized (list) {
-      for (int i = 0; i < list.size(); i++) {
-        incrementRoutedMessage(list.get(i));
-      }
+    List<Object> list = new ArrayList<>(endpoints);
+    synchronized (routed) {
+        for (Object o : list) {
+            incrementRoutedMessage(o);
+        }
     }
   }
 
@@ -97,16 +97,16 @@ public class RouterStatistics implements Statistics {
 
     String name = endpoint.toString();
 
-    Long cpt = (Long) routed.get(name);
+    Long cpt = routed.get(name);
     long count = 0;
 
     if (cpt != null) {
-      count = cpt.longValue();
+      count = cpt;
     }
 
     // TODO we should probably use a MutableLong here,
     // but that might be problematic for remote MBean access (serialization)
-    routed.put(name, new Long(++count));
+    routed.put(name, ++count);
 
     totalRouted++;
     totalReceived++;
@@ -121,14 +121,14 @@ public class RouterStatistics implements Statistics {
   }
 
   /**
-   * Increment no routed message
+   * Increment caught in catch all message
    */
   public synchronized void incrementCaughtMessage() {
     caughtInCatchAll++;
   }
 
   /**
-   * @return Returns the notRouted.
+   * @return Returns the caughtInCatchAll.
    */
   public final long getCaughtMessages() {
     return caughtInCatchAll;
@@ -159,12 +159,12 @@ public class RouterStatistics implements Statistics {
    * @return Returns the totalRouted.
    */
   public final long getRouted(String endpointName) {
-    Long l = (Long) routed.get(endpointName);
+    Long value = routed.get(endpointName);
 
-    if (l == null) {
+    if (value == null) {
       return 0;
     } else {
-      return l.longValue();
+      return value;
     }
   }
 
@@ -172,7 +172,7 @@ public class RouterStatistics implements Statistics {
     return type == TYPE_INBOUND;
   }
 
-  public Map getRouted() {
+  public Map<String, Long> getRouted() {
     return routed;
   }
 }

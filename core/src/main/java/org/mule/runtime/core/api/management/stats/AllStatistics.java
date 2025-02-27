@@ -83,7 +83,7 @@ public class AllStatistics {
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported, this method does nothing.
    */
   @Experimental
-  @Deprecated
+  @Deprecated(since = "4.5")
   public void enablePayloadStatistics(boolean b) {
     // Does nothing.
   }
@@ -130,7 +130,7 @@ public class AllStatistics {
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
   @Experimental
-  @Deprecated
+  @Deprecated(since = "4.5")
   public Collection<PayloadStatistics> getPayloadStatistics() {
     return payloadStatistics.values();
   }
@@ -142,7 +142,7 @@ public class AllStatistics {
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
   @Experimental
-  @Deprecated
+  @Deprecated(since = "4.5")
   public PayloadStatistics computePayloadStatisticsIfAbsent(Component component) {
     return payloadStatistics.computeIfAbsent(component.getLocation().getLocation(),
                                              loc -> {
@@ -160,7 +160,7 @@ public class AllStatistics {
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
    */
   @Experimental
-  @Deprecated
+  @Deprecated(since = "4.5")
   public PayloadStatistics getPayloadStatistics(String componentLocation) {
     return payloadStatistics.get(componentLocation);
   }
@@ -171,7 +171,7 @@ public class AllStatistics {
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return false.
    */
   @Experimental
-  @Deprecated
+  @Deprecated(since = "4.5")
   public boolean isPayloadStatisticsEnabled() {
     return false;
   }
