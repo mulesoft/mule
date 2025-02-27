@@ -79,9 +79,9 @@ public class RouterStatistics implements Statistics {
     }
     List<Object> list = new ArrayList<>(endpoints);
     synchronized (routed) {
-        for (Object o : list) {
-            incrementRoutedMessage(o);
-        }
+      for (Object o : list) {
+        incrementRoutedMessage(o);
+      }
     }
   }
 

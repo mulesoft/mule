@@ -39,7 +39,6 @@ public class AllStatistics {
   private final ApplicationStatistics appStats;
   private final FlowsSummaryStatistics flowSummaryStatistics;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
-  private final Map<String, PayloadStatistics> payloadStatistics = emptyMap();
   private ArtifactMeterProvider meterProvider;
 
   /**
@@ -122,47 +121,6 @@ public class AllStatistics {
 
   public FlowsSummaryStatistics getFlowSummaryStatistics() {
     return flowSummaryStatistics;
-  }
-
-  /**
-   * @return the available payload statistics for all components.
-   * @since 4.4, 4.3.1
-   * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
-   */
-  @Experimental
-  @Deprecated(since = "4.5")
-  public Collection<PayloadStatistics> getPayloadStatistics() {
-    return payloadStatistics.values();
-  }
-
-  /**
-   * @param component the component to get the statistics for.
-   * @return the statistics for the provided {@code component}.
-   * @since 4.4, 4.3.1
-   * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
-   */
-  @Experimental
-  @Deprecated(since = "4.5")
-  public PayloadStatistics computePayloadStatisticsIfAbsent(Component component) {
-    return payloadStatistics.computeIfAbsent(component.getLocation().getLocation(),
-                                             loc -> {
-                                               final PayloadStatistics statistics =
-                                                   new PayloadStatistics(loc, component.getIdentifier().toString());
-                                               statistics.setEnabled(isPayloadStatisticsEnabled());
-                                               return statistics;
-                                             });
-  }
-
-  /**
-   * @param componentLocation the location of the component to get the statistics for.
-   * @return the statistics for the component with the provided {@code componentLocation}.
-   * @since 4.4, 4.3.1
-   * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return empty data.
-   */
-  @Experimental
-  @Deprecated(since = "4.5")
-  public PayloadStatistics getPayloadStatistics(String componentLocation) {
-    return payloadStatistics.get(componentLocation);
   }
 
   /**

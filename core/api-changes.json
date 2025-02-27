@@ -917,6 +917,61 @@
             "annotation": "@java.lang.Deprecated(since = \"4.9\")",
             "attribute": "since",
             "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::computePayloadStatisticsIfAbsent(org.mule.runtime.api.component.Component)",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+            "new": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+            "annotation": "@java.lang.Deprecated(since = \"4.5\")",
+            "attribute": "since",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Collection<org.mule.runtime.core.api.management.stats.PayloadStatistics> org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics()",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics(java.lang.String)",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+            "new": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+            "annotation": "@java.lang.Deprecated(since = \"4.5\")",
+            "attribute": "since",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.management.stats.PayloadStatistics",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.returnTypeTypeParametersChanged",
+            "old": "method java.util.Map org.mule.runtime.core.api.management.stats.RouterStatistics::getRouted()",
+            "new": "method java.util.Map<java.lang.String, java.lang.Long> org.mule.runtime.core.api.management.stats.RouterStatistics::getRouted()",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
           }
         ]
       }
