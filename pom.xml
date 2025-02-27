@@ -179,7 +179,7 @@
 
         <muleAnnotationsApiVersion>1.8.2</muleAnnotationsApiVersion>
         <mule.module.maven.plugin.version>1.9.2</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.9.2-rc1</mule.extensions.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.9.2</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.9.2</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
