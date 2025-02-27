@@ -12,11 +12,13 @@ import static org.mule.runtime.api.notification.TransactionNotification.TRANSACT
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
+
 import static java.lang.System.identityHashCode;
 import static java.text.MessageFormat.format;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -197,7 +199,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   }
 
   @Override
-  public javax.transaction.Transaction suspend() throws TransactionException {
+  public jakarta.transaction.Transaction suspend() throws TransactionException {
     throw new IllegalTransactionStateException(notMuleXaTransaction(this));
   }
 

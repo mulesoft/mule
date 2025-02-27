@@ -14,10 +14,11 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.transaction.TransactionManagerFactory;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import jakarta.transaction.TransactionManager;
 
 /**
  * {@link FactoryBean} adapter for the configured {@link TransactionManagerFactory}.

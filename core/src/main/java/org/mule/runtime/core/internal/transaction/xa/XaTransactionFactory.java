@@ -16,7 +16,7 @@ import org.mule.runtime.core.internal.transaction.XaTransaction;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.TransactionManager;
 
 /**
  * <code>XaTransactionFactory</code> Is used to create/retrieve a Transaction from a transaction manager configured on the

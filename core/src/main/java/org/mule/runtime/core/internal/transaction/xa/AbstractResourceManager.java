@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.transaction.xa;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
@@ -13,12 +15,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.transaction.Status;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.lang.Thread.currentThread;
+import jakarta.transaction.Status;
 
 /**
  * This code is based on code coming from the <a href="http://jakarta.apache.org/commons/transaction/">commons-transaction</a>
@@ -103,16 +103,12 @@ public abstract class AbstractResourceManager {
   }
 
   protected boolean shutdown(int mode, long timeoutMSecs) {
-    switch (mode) {
-      case SHUTDOWN_MODE_NORMAL:
-        return waitForAllTxToStop(timeoutMSecs);
-      case SHUTDOWN_MODE_ROLLBACK:
-        throw new UnsupportedOperationException();
-      case SHUTDOWN_MODE_KILL:
-        return true;
-      default:
-        return false;
-    }
+    return switch (mode) {
+      case SHUTDOWN_MODE_NORMAL -> waitForAllTxToStop(timeoutMSecs);
+      case SHUTDOWN_MODE_ROLLBACK -> throw new UnsupportedOperationException();
+      case SHUTDOWN_MODE_KILL -> true;
+      default -> false;
+    };
   }
 
   /**

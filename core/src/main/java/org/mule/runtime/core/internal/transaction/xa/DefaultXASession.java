@@ -8,16 +8,18 @@ package org.mule.runtime.core.internal.transaction.xa;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
-import javax.transaction.Status;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
 import org.slf4j.Logger;
+
+import jakarta.transaction.Status;
 
 /**
  * Base class for an XAResource implementation.

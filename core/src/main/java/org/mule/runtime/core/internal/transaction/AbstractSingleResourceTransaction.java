@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.internal.transaction;
 
-import static java.util.Collections.unmodifiableMap;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotBindNullResource;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotBindToNullKey;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionSingleResourceOnly;
+
+import static java.util.Collections.unmodifiableMap;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
@@ -24,9 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.transaction.Status;
-
 import org.slf4j.Logger;
+
+import jakarta.transaction.Status;
 
 /**
  * This abstract class can be used as a base class for transactions that can enlist only one resource (such as a JMS session or
