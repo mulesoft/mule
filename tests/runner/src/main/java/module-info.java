@@ -40,10 +40,8 @@ module org.mule.test.runner {
   requires org.apache.commons.lang3;
   requires semver4j;
   requires org.reflections;
-  requires net.bytebuddy;
 
   requires junit;
 
   exports org.mule.test.runner;
-
 }
