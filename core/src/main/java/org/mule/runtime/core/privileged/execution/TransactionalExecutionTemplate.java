@@ -81,24 +81,6 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
   }
 
   /**
-   * Creates a ExecutionTemplate that will manage transactional context according to configured TransactionConfig
-   *
-   * @param muleContext       MuleContext for this application
-   * @param transactionConfig transaction config for the execution context
-   * @deprecated use
-   *             {@link #createTransactionalExecutionTemplate(MuleConfiguration, NotificationDispatcher, TransactionManager, TransactionConfig)}
-   *             instead.
-   */
-  @Deprecated
-  public static <T> TransactionalExecutionTemplate<T> createTransactionalExecutionTemplate(MuleContext muleContext,
-                                                                                           TransactionConfig transactionConfig) {
-    return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
-                                                getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                muleContext.getTransactionManager(),
-                                                transactionConfig);
-  }
-
-  /**
    * Creates a ExecutionTemplate that will manage transactional context according to the given txAction
    */
   public static <T> TransactionalExecutionTemplate<T> createTransactionalExecutionTemplate(Registry registry,
@@ -109,7 +91,10 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
     MuleTransactionConfig transactionConfig = new MuleTransactionConfig(txAction);
     transactionConfig.setFactory(factory);
 
-    return createTransactionalExecutionTemplate(muleContext, transactionConfig);
+    return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
+                                                getNotificationDispatcher((MuleContextWithRegistry) muleContext),
+                                                registry.lookupByType(TransactionManager.class).get(),
+                                                transactionConfig);
   }
 
   /**
@@ -139,25 +124,6 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
 
   private static String getApplicationName(MuleConfiguration muleConfiguration) {
     return muleConfiguration.getId();
-  }
-
-  /**
-   * Creates a TransactionalExecutionTemplate for inner scopes within a flow
-   *
-   * @param muleContext
-   * @param transactionConfig
-   * @return <T>
-   * @deprecated Use
-   *             {@link #createScopeTransactionalExecutionTemplate(MuleConfiguration, NotificationDispatcher, TransactionManager, TransactionConfig)}
-   *             instead.
-   */
-  @Deprecated
-  public static <T> TransactionalExecutionTemplate<T> createScopeTransactionalExecutionTemplate(MuleContext muleContext,
-                                                                                                TransactionConfig transactionConfig) {
-    return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
-                                                getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                muleContext.getTransactionManager(),
-                                                transactionConfig, false, false, true);
   }
 
   /**

@@ -6,12 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.privileged.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
+import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,10 +28,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.privileged.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
-import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -114,7 +116,6 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
   @Before
   public void before() throws Exception {
     TransactionManager transactionManager = mock(TransactionManager.class, RETURNS_DEEP_STUBS);
-    muleContext.setTransactionManager(transactionManager);
     transaction = spy(new XaTransaction("appName", transactionManager, getNotificationDispatcher(muleContext)));
     XATransactionalConnection connection = mock(XATransactionalConnection.class, RETURNS_DEEP_STUBS);
     config = new Object();
