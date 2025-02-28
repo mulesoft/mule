@@ -18,8 +18,10 @@ import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.g
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 
 import static java.lang.String.format;
@@ -687,7 +689,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private void handleTxManagerFactory(TransactionManagerFactory object) {
     try {
-      getMuleContext().setTransactionManager(object.create(getMuleContext().getConfiguration()));
+      registerObject(getMuleContext(), OBJECT_TRANSACTION_MANAGER,
+                     object.create(getMuleContext().getConfiguration()));
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't register an instance of a TransactionManager", e);
     }

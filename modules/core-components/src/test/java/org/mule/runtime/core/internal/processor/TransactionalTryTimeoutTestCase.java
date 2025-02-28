@@ -17,11 +17,16 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.core.internal.processor.TryScopeTestUtils.createPropagateErrorHandler;
 import static org.mule.runtime.core.internal.processor.TryScopeTestUtils.createTryScope;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.TimeoutStory.TRANSACTION_TIMEOUT;
+
+import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -29,9 +34,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static java.lang.Thread.sleep;
-import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
-import static org.mule.test.allure.AllureConstants.TransactionFeature.TimeoutStory.TRANSACTION_TIMEOUT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -48,16 +50,18 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+import java.util.Collection;
+import java.util.concurrent.TimeoutException;
+
 import javax.transaction.TransactionManager;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.Collection;
-import java.util.concurrent.TimeoutException;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @RunWith(Parameterized.class)
 @Feature(TRANSACTION)
@@ -94,12 +98,11 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
     when(profilingService.getProfilingDataProducer(TX_CONTINUE)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_START)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_COMMIT)).thenReturn(mock(ProfilingDataProducer.class));
-    muleContext.setTransactionManager(manager);
   }
 
   @Test
   public void transactionIsRolledBackAfterTimeout() throws Exception {
-    TryScope scope = createTryScope(muleContext, profilingService, of(isXa), of(TIMEOUT));
+    TryScope scope = createTryScope(muleContext, manager, profilingService, of(isXa), of(TIMEOUT));
     scope.setMessageProcessors(singletonList(new SleepyProcesssor()));
     scope.initialise();
     try {
@@ -116,7 +119,7 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void markedAsRollbackExternallyWhenTimeout() throws Exception {
-    TryScope scope = createTryScope(muleContext, profilingService, of(isXa), of(TIMEOUT));
+    TryScope scope = createTryScope(muleContext, manager, profilingService, of(isXa), of(TIMEOUT));
     scope.setMessageProcessors(singletonList(new SleepyProcesssor(true, false)));
     scope.initialise();
     try {
@@ -137,10 +140,10 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
     // tx is being attempted to be committed after the execution of its potential error handling
     // (i.e. no failure, or its on-error-continue). Therefore, a tx timeout error has to be handled in the
     // next level (a surrounding try, flow, etc...).
-    TryScope scope = createTryScope(muleContext, profilingService, of(isXa), of(TIMEOUT));
+    TryScope scope = createTryScope(muleContext, manager, profilingService, of(isXa), of(TIMEOUT));
     scope.setMessageProcessors(singletonList(new SleepyProcesssor()));
 
-    TryScope outer = createTryScope(muleContext, profilingService, empty());
+    TryScope outer = createTryScope(muleContext, manager, profilingService, empty());
     outer.setMessageProcessors(singletonList(scope));
     outer.setExceptionListener(new OnErrorContinueHandler());
     outer.initialise();
@@ -158,7 +161,7 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
     // If we end up having both an error and also a timeout (e.g. an operation that failed, did so because of
     // a connection issue, and it also exceded timeout), then the original error should have precedence over
     // the timeout, and it should be handled by the try's error handler.
-    TryScope scope = createTryScope(muleContext, profilingService, of(isXa), of(TIMEOUT));
+    TryScope scope = createTryScope(muleContext, manager, profilingService, of(isXa), of(TIMEOUT));
     scope.setMessageProcessors(singletonList(new SleepyProcesssor(false, true)));
     TemplateOnErrorHandler handler = createPropagateErrorHandler();
     HandlerProcessor processor = new HandlerProcessor();

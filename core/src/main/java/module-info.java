@@ -249,6 +249,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
       org.mule.runtime.launcher,
+      com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.kryo,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
@@ -258,6 +259,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
@@ -373,6 +375,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.launcher,
+      com.mulesoft.mule.runtime.bti,
       spring.beans,
       org.mule.test.unit,
       org.mule.test.runner;

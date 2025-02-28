@@ -13,7 +13,7 @@
 
     <properties>
         <surefire.args>
-            ${surefire.test.unit.open.args}
+            ${surefire.args.base}
         </surefire.args>
 		
         <javaModuleName>org.mule.test.core</javaModuleName>
