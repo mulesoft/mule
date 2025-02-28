@@ -86,14 +86,14 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
   public static <T> TransactionalExecutionTemplate<T> createTransactionalExecutionTemplate(Registry registry,
                                                                                            byte txAction,
                                                                                            TransactionFactory factory) {
-    final var muleContext = registry.lookupByType(MuleContext.class).get();
+    final var muleContext = registry.lookupByType(MuleContext.class).orElseThrow();
 
     MuleTransactionConfig transactionConfig = new MuleTransactionConfig(txAction);
     transactionConfig.setFactory(factory);
 
     return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
                                                 getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                registry.lookupByType(TransactionManager.class).get(),
+                                                registry.lookupByType(TransactionManager.class).orElseThrow(),
                                                 transactionConfig);
   }
 
