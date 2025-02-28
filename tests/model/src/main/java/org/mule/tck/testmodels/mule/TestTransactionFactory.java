@@ -8,9 +8,7 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
 import javax.transaction.TransactionManager;
@@ -36,17 +34,6 @@ public class TestTransactionFactory implements TransactionFactory {
 
   public TestTransactionFactory(Transaction mockTransaction) {
     this.mockTransaction = mockTransaction;
-  }
-
-  @Override
-  public Transaction beginTransaction(MuleContext muleContext) {
-    try {
-      return beginTransaction(muleContext.getConfiguration().getId(),
-                              ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class),
-                              muleContext.getTransactionManager());
-    } catch (Exception e) {
-      throw new RuntimeException();
-    }
   }
 
   @Override

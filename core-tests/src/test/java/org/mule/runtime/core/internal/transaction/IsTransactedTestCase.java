@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
@@ -89,11 +88,6 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
   public static class TransactedFactory implements TransactionFactory {
 
     @Override
-    public Transaction beginTransaction(MuleContext muleContext) {
-      return null;
-    }
-
-    @Override
     public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                         TransactionManager transactionManager) {
       return null;
@@ -106,11 +100,6 @@ public class IsTransactedTestCase extends AbstractMuleTestCase {
   }
 
   public static class NonTransactedFactory implements TransactionFactory {
-
-    @Override
-    public Transaction beginTransaction(MuleContext muleContext) {
-      return null;
-    }
 
     @Override
     public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
