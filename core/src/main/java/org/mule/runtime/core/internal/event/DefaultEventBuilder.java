@@ -418,7 +418,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final boolean notificationsEnabled;
 
     private final CaseInsensitiveHashMap<String, TypedValue<?>> variables;
-    private final CaseInsensitiveHashMap<String, TypedValue<?>> parameters;
+    private transient final CaseInsensitiveHashMap<String, TypedValue<?>> parameters;
     private final CaseInsensitiveHashMap<String, String> loggingVariables;
 
     private final String legacyCorrelationId;

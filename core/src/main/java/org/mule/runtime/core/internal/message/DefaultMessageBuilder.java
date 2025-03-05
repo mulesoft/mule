@@ -23,6 +23,7 @@ import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.privileged.metadata.DefaultCollectionDataType;
@@ -35,8 +36,10 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import jakarta.activation.DataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,11 @@ public final class DefaultMessageBuilder
 
   private TypedValue payload = of(NULL_TYPED_VALUE);
   private TypedValue attributes = of(NULL_TYPED_VALUE);
+
+  private final Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>();
+  private final Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>();
+  private Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
+  private Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
 
   public DefaultMessageBuilder() {}
 
