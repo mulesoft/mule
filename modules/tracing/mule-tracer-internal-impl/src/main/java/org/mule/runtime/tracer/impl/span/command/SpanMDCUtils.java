@@ -8,7 +8,6 @@ package org.mule.runtime.tracer.impl.span.command;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
-import org.mule.runtime.tracer.impl.span.InternalSpan;
 
 import org.slf4j.MDC;
 
@@ -19,8 +18,10 @@ import org.slf4j.MDC;
  */
 public class SpanMDCUtils {
 
-  public static final String SPAN_ID_MDC_KEY = "span-id";
-  public static final String TRACE_ID_MDC_KEY = "trace-id";
+  public static final String SPAN_ID_MDC_KEY = "span_id";
+  public static final String TRACE_ID_MDC_KEY = "trace_id";
+  public static final String TRACE_FLAGS_MDC_KEY = "trace_flags";
+  private static final String TRACE_FLAGS_DEFAULT_HEX_VALUE = "01";
 
   private SpanMDCUtils() {
 
@@ -36,6 +37,7 @@ public class SpanMDCUtils {
     if (spanIdentifier != null && spanIdentifier.isValid()) {
       MDC.put(SPAN_ID_MDC_KEY, spanIdentifier.getId());
       MDC.put(TRACE_ID_MDC_KEY, spanIdentifier.getTraceId());
+      MDC.put(TRACE_FLAGS_MDC_KEY, TRACE_FLAGS_DEFAULT_HEX_VALUE);
     }
   }
 
