@@ -444,8 +444,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   private boolean acceptsErrorType(CoreEvent event) {
-    Error error = event.getError().get();
-    return errorTypeMatcher == null || errorTypeMatcher.match(error.getErrorType())
+    Error error = event.getError().orElse(null);
+    return error == null || errorTypeMatcher == null
+        || errorTypeMatcher.match(error.getErrorType())
         || matchesSuppressedErrorType((PrivilegedError) error);
   }
 
