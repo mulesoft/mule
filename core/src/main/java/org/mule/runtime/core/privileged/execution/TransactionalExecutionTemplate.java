@@ -93,7 +93,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
 
     return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
                                                 getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                registry.lookupByType(TransactionManager.class).orElseThrow(),
+                                                registry.lookupByType(TransactionManager.class).orElse(null),
                                                 transactionConfig);
   }
 
