@@ -20,7 +20,7 @@ public class BeanWrapper {
   private final int cachedHashCode;
 
   public BeanWrapper(String name, Object o) {
-    requireNonNull(o, "bean must not be null");
+    requireNonNull(o, "bean `" + name + "` must not be null");
     this.name = name;
     this.wrappedObject = o;
     this.cachedHashCode = calculateHashCode();

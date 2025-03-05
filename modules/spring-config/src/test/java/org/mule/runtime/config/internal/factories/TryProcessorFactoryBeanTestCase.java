@@ -18,7 +18,6 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,7 +28,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
-import org.mule.runtime.core.internal.transaction.DelegateTransactionFactory;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
@@ -91,7 +89,6 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
     initialiseIfNeeded(tryMessageProcessor, muleContextMock);
     tryMessageProcessor.start();
     TransactionConfig transactionConfig = tryMessageProcessor.getTransactionConfig();
-    assertThat(transactionConfig.getFactory(), is(instanceOf(DelegateTransactionFactory.class)));
     assertThat(transactionConfig.getTimeout(), is(30000));
   }
 

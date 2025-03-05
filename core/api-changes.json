@@ -6,6 +6,24 @@
           {
             "ignore": true,
             "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.transaction.TransactionFactory org.mule.runtime.core.privileged.transaction.TransactionConfig::getFactory()",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.transaction.TransactionConfig::setFactory(org.mule.runtime.core.privileged.transaction.TransactionFactory)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.transaction.TypedTransactionFactory",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
             "old": "method javax.transaction.TransactionManager org.mule.runtime.core.api.MuleContext::getTransactionManager()",
             "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
           },

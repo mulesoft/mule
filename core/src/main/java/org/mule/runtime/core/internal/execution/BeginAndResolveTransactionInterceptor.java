@@ -11,9 +11,10 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
-import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 
 import javax.transaction.TransactionManager;
 
@@ -24,7 +25,7 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
 
   private static final Logger logger = LoggerFactory.getLogger(BeginAndResolveTransactionInterceptor.class);
   private final ExecutionInterceptor<T> next;
-  private final TransactionConfig transactionConfig;
+  private final MuleTransactionConfig transactionConfig;
   private final String applicationName;
   private final TransactionManager transactionManager;
   private final NotificationDispatcher notificationDispatcher;
@@ -38,7 +39,7 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
                                                boolean processOnException, boolean mustResolveAnyTransaction,
                                                boolean errorAtTimeout) {
     this.next = next;
-    this.transactionConfig = transactionConfig;
+    this.transactionConfig = (MuleTransactionConfig) transactionConfig;
     this.applicationName = applicationName;
     this.notificationDispatcher = notificationDispatcher;
     this.transactionManager = transactionManager;

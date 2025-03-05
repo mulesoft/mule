@@ -12,7 +12,6 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.privileged.transaction.TypedTransactionFactory;
 
 import javax.transaction.TransactionManager;
 

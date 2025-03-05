@@ -61,12 +61,10 @@ public final class MuleTransactionConfig implements TransactionConfig, MuleConte
     }
   }
 
-  @Override
   public TransactionFactory getFactory() {
     return factory;
   }
 
-  @Override
   public void setFactory(TransactionFactory factory) {
     if (factory == null) {
       throw new IllegalArgumentException("Transaction Factory cannot be null");
@@ -118,22 +116,15 @@ public final class MuleTransactionConfig implements TransactionConfig, MuleConte
   }
 
   public String getActionAsString() {
-    switch (action) {
-      case ACTION_ALWAYS_BEGIN:
-        return ACTION_ALWAYS_BEGIN_STRING;
-      case ACTION_BEGIN_OR_JOIN:
-        return ACTION_BEGIN_OR_JOIN_STRING;
-      case ACTION_ALWAYS_JOIN:
-        return ACTION_ALWAYS_JOIN_STRING;
-      case ACTION_JOIN_IF_POSSIBLE:
-        return ACTION_JOIN_IF_POSSIBLE_STRING;
-      case ACTION_NONE:
-        return ACTION_NONE_STRING;
-      case ACTION_INDIFFERENT:
-        return ACTION_INDIFFERENT_STRING;
-      default:
-        return ACTION_NEVER_STRING;
-    }
+    return switch (action) {
+      case ACTION_ALWAYS_BEGIN -> ACTION_ALWAYS_BEGIN_STRING;
+      case ACTION_BEGIN_OR_JOIN -> ACTION_BEGIN_OR_JOIN_STRING;
+      case ACTION_ALWAYS_JOIN -> ACTION_ALWAYS_JOIN_STRING;
+      case ACTION_JOIN_IF_POSSIBLE -> ACTION_JOIN_IF_POSSIBLE_STRING;
+      case ACTION_NONE -> ACTION_NONE_STRING;
+      case ACTION_INDIFFERENT -> ACTION_INDIFFERENT_STRING;
+      default -> ACTION_NEVER_STRING;
+    };
   }
 
   /**
@@ -154,18 +145,11 @@ public final class MuleTransactionConfig implements TransactionConfig, MuleConte
       return false;
     }
 
-    switch (action) {
-      case ACTION_ALWAYS_BEGIN, ACTION_ALWAYS_JOIN, ACTION_BEGIN_OR_JOIN:
-        return true;
-
-      case ACTION_JOIN_IF_POSSIBLE, ACTION_INDIFFERENT:
-        return TransactionCoordination.getInstance().getTransaction() != null;
-
-      default:
-        // should not happen
-        return false;
-
-    }
+    return switch (action) {
+      case ACTION_ALWAYS_BEGIN, ACTION_ALWAYS_JOIN, ACTION_BEGIN_OR_JOIN -> true;
+      case ACTION_JOIN_IF_POSSIBLE, ACTION_INDIFFERENT -> TransactionCoordination.getInstance().getTransaction() != null;
+      default -> /* should not happen */ false;
+    };
   }
 
   @Override

@@ -12,6 +12,7 @@ import org.mule.runtime.config.internal.BeanWrapper;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -31,6 +32,7 @@ public class AutoDiscoveredDependencyResolver {
   public List<BeanWrapper> getAutoDiscoveredDependencies(String beanName) {
     return springRegistry.getDependencies(beanName).entrySet()
         .stream()
+        .filter(x -> x.getValue() != null)
         .map(x -> new BeanWrapper(x.getKey(), x.getValue()))
         .collect(toList());
   }

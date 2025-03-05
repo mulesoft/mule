@@ -153,7 +153,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.util.queue;
   exports org.mule.runtime.core.api.util.xmlsecurity;
 
-  uses org.mule.runtime.core.privileged.transaction.TypedTransactionFactory;
+  uses org.mule.runtime.core.internal.transaction.TypedTransactionFactory;
 
   provides org.mule.runtime.api.el.AbstractBindingContextBuilderFactory with
       org.mule.runtime.core.api.el.DefaultBindingContextBuilderFactory;
@@ -167,7 +167,7 @@ module org.mule.runtime.core {
   provides org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory with
       org.mule.runtime.core.api.metadata.DefaultDataTypeBuilderFactory;
 
-  provides org.mule.runtime.core.privileged.transaction.TypedTransactionFactory with
+  provides org.mule.runtime.core.internal.transaction.TypedTransactionFactory with
       org.mule.runtime.core.internal.transaction.DelegateTransactionFactory;
 
   // for MUnit, MTF
@@ -441,6 +441,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.bti,
+      com.mulesoft.mule.runtime.xa,
       spring.beans;
   exports org.mule.runtime.core.internal.transaction.xa to
       org.mule.runtime.extensions.support,

@@ -73,10 +73,6 @@ public interface TransactionConfig {
    */
   byte ACTION_DEFAULT = ACTION_INDIFFERENT;
 
-  TransactionFactory getFactory();
-
-  void setFactory(TransactionFactory factory);
-
   byte getAction();
 
   void setAction(byte action);
