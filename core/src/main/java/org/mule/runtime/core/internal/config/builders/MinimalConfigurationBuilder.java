@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONEN
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_FACTORY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HTTP_SERVICE_API_REGISTRY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
@@ -117,7 +116,6 @@ import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
-import org.mule.sdk.api.http.HttpServiceApi;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -374,17 +372,5 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected void configureSpanExporterConfiguration(MuleContext muleContext) throws RegistrationException {
     registerObject(MULE_SPAN_EXPORTER_CONFIGURATION_KEY, new EmptySpanExporterConfiguration(), muleContext);
-  }
-
-  protected void registerHttpServiceApi(MuleContext muleContext) throws RegistrationException {
-    registerObject(MULE_HTTP_SERVICE_API_REGISTRY_KEY, new NoopHttpServiceApi(), muleContext);
-  }
-
-  private static class NoopHttpServiceApi implements HttpServiceApi {
-
-    @Override
-    public void printThis(String message) {
-      System.out.println("THIS IS THE NOOP SERVICE");
-    }
   }
 }

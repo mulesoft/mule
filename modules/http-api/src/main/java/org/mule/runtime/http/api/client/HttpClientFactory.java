@@ -7,6 +7,8 @@
 package org.mule.runtime.http.api.client;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 /**
  * Factory object for {@link HttpClient}.
@@ -14,7 +16,8 @@ import org.mule.api.annotation.NoImplement;
  * @since 4.0
  */
 @NoImplement
-public interface HttpClientFactory {
+public interface HttpClientFactory
+    extends org.mule.sdk.api.http.HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions, HttpResponse> {
 
   /**
    * @param configuration the {@link HttpClientConfiguration} specifying the desired client.

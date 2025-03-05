@@ -19,7 +19,7 @@ import java.util.Optional;
  * @since 4.2
  */
 @NoImplement
-public interface HttpRequestOptions {
+public interface HttpRequestOptions extends org.mule.sdk.api.http.HttpRequestOptions<HttpAuthentication, ProxyConfig> {
 
   /**
    * @return a fresh {@link HttpRequestOptionsBuilder} to create instances.

@@ -8,11 +8,11 @@ package org.mule.runtime.http.api.client;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.runtime.http.api.client.sse.ServerSentEventSource;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.ws.WebSocket;
+import org.mule.sdk.api.http.sse.ServerSentEventSource;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +28,7 @@ import java.util.function.BiConsumer;
  * @since 4.0
  */
 @NoImplement
-public interface HttpClient {
+public interface HttpClient extends org.mule.sdk.api.http.HttpClient<HttpRequest, HttpRequestOptions, HttpResponse> {
 
   /**
    * Fully configures the client, leaving it ready to use. Must be executed before any requests are attempted.
@@ -170,7 +170,7 @@ public interface HttpClient {
 
   /**
    * Creates a consumer of Server-sent events. The resulting {@link ServerSentEventSource} is not connected automatically.
-   * 
+   *
    * @param url the URL of the server.
    * @return a non-connected instance of {@link ServerSentEventSource}.
    */
