@@ -129,6 +129,10 @@ public class MuleProcessController {
     getController().uninstallLicense();
   }
 
+  public void verifyLicenseDetails(String path) {
+    getController().verifyLicenseDetails(path);
+  }
+
   public void addLibrary(File jar) {
     getController().addLibrary(jar);
   }
