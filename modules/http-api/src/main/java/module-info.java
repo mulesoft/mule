@@ -17,12 +17,12 @@ module org.mule.runtime.http.api {
   // For the deprecated API methods still relying on org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate
   requires org.mule.runtime.core;
   requires com.github.benmanes.caffeine;
+  requires org.mule.sdk.api;
 
   exports org.mule.runtime.http.api;
   exports org.mule.runtime.http.api.client;
   exports org.mule.runtime.http.api.client.auth;
   exports org.mule.runtime.http.api.client.proxy;
-  exports org.mule.runtime.http.api.client.sse;
   exports org.mule.runtime.http.api.client.ws;
   exports org.mule.runtime.http.api.domain;
   exports org.mule.runtime.http.api.domain.entity;

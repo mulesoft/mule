@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * Server-sent event.
  */
-public class ServerSentEvent implements Serializable {
+public class ServerSentEventImpl implements Serializable, org.mule.sdk.api.http.sse.ServerSentEvent {
 
   @Serial
   private static final long serialVersionUID = -1211505868025654629L;
@@ -22,7 +22,7 @@ public class ServerSentEvent implements Serializable {
   private final String eventData;
   private final String id;
 
-  public ServerSentEvent(String eventName, String eventData, String id) {
+  public ServerSentEventImpl(String eventName, String eventData, String id) {
     this.eventName = eventName;
     this.eventData = eventData;
     this.id = id;
@@ -64,7 +64,7 @@ public class ServerSentEvent implements Serializable {
     if (null == o || getClass() != o.getClass()) {
       return false;
     }
-    ServerSentEvent that = (ServerSentEvent) o;
+    ServerSentEventImpl that = (ServerSentEventImpl) o;
     return Objects.equals(eventName, that.eventName) && Objects.equals(eventData, that.eventData) && Objects.equals(id, that.id);
   }
 }
