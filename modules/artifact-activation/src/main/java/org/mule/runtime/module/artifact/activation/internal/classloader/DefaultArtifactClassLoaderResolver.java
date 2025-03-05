@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor.process;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -276,8 +279,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         packages.addAll(artifactPluginDescriptor.getClassLoaderConfiguration().getExportedPackages());
       }
     }
-
-    return parentClassLoader.getClassLoaderLookupPolicy().extend(packages.stream(), PARENT_FIRST);
+    LookupStrategy strategy = isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) ? CHILD_FIRST : PARENT_FIRST;
+    return parentClassLoader.getClassLoaderLookupPolicy().extend(packages.stream(), strategy);
   }
 
   /**
