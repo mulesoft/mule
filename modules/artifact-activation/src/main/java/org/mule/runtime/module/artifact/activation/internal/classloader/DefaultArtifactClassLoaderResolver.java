@@ -29,6 +29,7 @@ import static java.util.stream.Stream.concat;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.jpms.api.MuleContainerModule;
@@ -279,8 +280,14 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         packages.addAll(artifactPluginDescriptor.getClassLoaderConfiguration().getExportedPackages());
       }
     }
-    LookupStrategy strategy = isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) ? CHILD_FIRST : PARENT_FIRST;
+    LookupStrategy strategy;
+    try {
+      strategy = isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) ? CHILD_FIRST : PARENT_FIRST;
+    } catch (MuleRuntimeException e) {
+      strategy = PARENT_FIRST;
+    }
     return parentClassLoader.getClassLoaderLookupPolicy().extend(packages.stream(), strategy);
+
   }
 
   /**
