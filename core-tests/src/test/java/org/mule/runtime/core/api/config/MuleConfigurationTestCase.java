@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
@@ -40,6 +43,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @SmallTest
 @Feature(DEPLOYMENT_CONFIGURATION)
@@ -204,4 +210,89 @@ public class MuleConfigurationTestCase extends AbstractMuleTestCase {
     assertThat(config.isAutoWrapMessageAwareTransform(), is(false));
     assertThat(config.getMaxQueueTransactionFilesSizeInMegabytes(), is(500));
   }
+
+  @Test
+  public void notContainerNotstandaloneDirectory() throws Exception {
+    muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+                                                                    new MinimalConfigurationBuilder());
+    muleContext.start();
+
+    DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
+    mutableConfig.setContainerMode(false);
+    mutableConfig.setDataFolderName("sarasa");
+    assertThat(mutableConfig.getWorkingDirectory(), is("./.mule"));
+  }
+
+  @Test
+  public void standaloneDirectory() throws Exception {
+    muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+                                                                    new MinimalConfigurationBuilder());
+    muleContext.start();
+
+    DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
+    mutableConfig.setContainerMode(false);
+    try {
+      System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, "thehome");
+      mutableConfig.setDataFolderName("sarasa");
+      assertThat(mutableConfig.getWorkingDirectory(), is("./.mule/sarasa"));
+    } finally {
+      System.clearProperty(MULE_HOME_DIRECTORY_PROPERTY);
+    }
+  }
+
+  @Test
+  public void clusterId() throws Exception {
+    muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+                                                                    new MinimalConfigurationBuilder());
+
+    DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
+    mutableConfig.setClusterId("the cluster id");
+    assertThat(mutableConfig.getSystemName(), containsString("the cluster id"));
+  }
+
+  @Test
+  public void extendedProperties() throws Exception {
+    muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+                                                                    new MinimalConfigurationBuilder());
+
+    DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
+    Map<String, String> props = new HashMap<>();
+    props.put("name", "value");
+    mutableConfig.setExtendedProperties(props);
+    mutableConfig.setExtendedProperty("another", "property");
+    assertThat(mutableConfig.getExtendedProperties().keySet(), hasSize(2));
+    assertThat(mutableConfig.getExtendedProperty("name"), is("value"));
+    assertThat(mutableConfig.getExtendedProperty("another"), is("property"));
+  }
+
+  @Test
+  public void getExtension() throws Exception {
+    muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+                                                                    new MinimalConfigurationBuilder());
+
+    DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
+    assertThat(mutableConfig.getExtension(MuleConfigurationTestCase.class), is(nullValue()));
+  }
+
+  @Test
+  public void testEquals() throws Exception {
+    muleContext = new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder,
+                                                                    new MinimalConfigurationBuilder());
+
+    DefaultMuleConfiguration mutableConfig = ((DefaultMuleConfiguration) muleContext.getConfiguration());
+
+    MuleContext muleContext2 = null;
+    try {
+      muleContext2 =
+          new DefaultMuleContextFactory().createMuleContext(testServicesConfigurationBuilder, new MinimalConfigurationBuilder());
+      muleContext2.start();
+      DefaultMuleConfiguration mutableConfig2 = ((DefaultMuleConfiguration) muleContext2.getConfiguration());
+      assertThat(mutableConfig.equals(mutableConfig2), is(false));
+    } finally {
+      if (muleContext2 != null) {
+        muleContext2.dispose();
+      }
+    }
+  }
+
 }

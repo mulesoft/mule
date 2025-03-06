@@ -578,6 +578,400 @@
             "new": "class org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
             "interface": "org.mule.runtime.api.lifecycle.Initialisable",
             "justification": "W-17454026: Move the Default Error Handler validation to the ast validations"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method boolean org.mule.runtime.core.api.config.DefaultMuleConfiguration::isFlowTrace()",
+            "new": "method boolean org.mule.runtime.core.api.config.DefaultMuleConfiguration::isFlowTrace()",
+            "annotation": "@java.lang.Deprecated(since = \"4.7.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setCacheMessageAsBytes(boolean)",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setCacheMessageAsBytes(boolean)",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setClientMode(boolean)",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setClientMode(boolean)",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setDefaultSynchronousEndpoints(boolean)",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setDefaultSynchronousEndpoints(boolean)",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setEnableStreaming(boolean)",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setEnableStreaming(boolean)",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setLazyInit(boolean)",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setLazyInit(boolean)",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setSystemModelType(java.lang.String)",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setSystemModelType(java.lang.String)",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method boolean org.mule.runtime.core.api.config.DefaultMuleConfiguration::isFlowTrace() @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "new": "method boolean org.mule.runtime.core.api.config.DefaultMuleConfiguration::isFlowTrace() @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "annotation": "@java.lang.Deprecated(since = \"4.7.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setCacheMessageAsBytes(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setCacheMessageAsBytes(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setClientMode(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setClientMode(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setDefaultSynchronousEndpoints(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setDefaultSynchronousEndpoints(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setEnableStreaming(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setEnableStreaming(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setLazyInit(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setLazyInit(boolean) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setSystemModelType(java.lang.String) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "new": "method void org.mule.runtime.core.api.config.DefaultMuleConfiguration::setSystemModelType(java.lang.String) @ org.mule.runtime.core.api.config.ReconfigurableMuleConfiguration",
+            "annotation": "@java.lang.Deprecated(since = \"4.4.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.core.api.config.MuleManifest::getManifestProperty(java.lang.String)",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "class org.mule.runtime.core.api.config.MuleManifest",
+            "new": "class org.mule.runtime.core.api.config.MuleManifest",
+            "annotation": "@java.lang.Deprecated(since = \"4.9.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED",
+            "annotation": "@java.lang.Deprecated(since = \"4.9\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_CONTEXT_PROPERTY",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_CONTEXT_PROPERTY",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_RESPONSE_TIMEOUT",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE_LOG",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_FORCE_CONSOLE_LOG",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_POLICY_INTERVAL",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_POLICY_INTERVAL",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_STRATEGY_MAX",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_STRATEGY_MAX",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_STRATEGY_MIN",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_DEFAULT_STRATEGY_MIN",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_SECURITY_PROVIDER_PROPERTY",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_SECURITY_PROVIDER_PROPERTY",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_SIMPLE_LOG",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_SIMPLE_LOG",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUCKET_SIZE",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUCKET_SIZE",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_MAX_MEMORY",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_OAUTH_MANAGER",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_OAUTH_MANAGER",
+            "annotation": "@java.lang.Deprecated(since = \"4.2.1\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.OBJECT_PAYLOAD_STATISTICS_DECORATOR_FACTORY",
+            "annotation": "@java.lang.Deprecated(since = \"4.5.0\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX",
+            "new": "field org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX",
+            "annotation": "@java.lang.Deprecated(since = \"4.2\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "enum org.mule.runtime.core.api.config.bootstrap.ArtifactType",
+            "new": "enum org.mule.runtime.core.api.config.bootstrap.ArtifactType",
+            "annotation": "@java.lang.Deprecated(since = \"4.9\")",
+            "attribute": "since",
+            "justification": "W-17615532: Code smells fixes for org.mule.runtime.core.api.config"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::computePayloadStatisticsIfAbsent(org.mule.runtime.api.component.Component)",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+            "new": "method void org.mule.runtime.core.api.management.stats.AllStatistics::enablePayloadStatistics(boolean)",
+            "annotation": "@java.lang.Deprecated(since = \"4.5\")",
+            "attribute": "since",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Collection<org.mule.runtime.core.api.management.stats.PayloadStatistics> org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics()",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.management.stats.PayloadStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getPayloadStatistics(java.lang.String)",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.attributeAdded",
+            "old": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+            "new": "method boolean org.mule.runtime.core.api.management.stats.AllStatistics::isPayloadStatisticsEnabled()",
+            "annotation": "@java.lang.Deprecated(since = \"4.5\")",
+            "attribute": "since",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.management.stats.PayloadStatistics",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.returnTypeTypeParametersChanged",
+            "old": "method java.util.Map org.mule.runtime.core.api.management.stats.RouterStatistics::getRouted()",
+            "new": "method java.util.Map<java.lang.String, java.lang.Long> org.mule.runtime.core.api.management.stats.RouterStatistics::getRouted()",
+            "justification": "W-17916442: Code smells fixes for org.mule.runtime.core.api.management.stats"
           }
         ]
       }

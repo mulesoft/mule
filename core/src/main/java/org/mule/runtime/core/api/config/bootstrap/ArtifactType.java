@@ -19,7 +19,7 @@ import java.util.Set;
  * 
  * @deprecated Since 4.9 use {@link org.mule.runtime.api.artifact.ArtifactType} instead.
  */
-@Deprecated
+@Deprecated(since = "4.9")
 public enum ArtifactType {
 
   APP(org.mule.runtime.api.artifact.ArtifactType.APP, "app"),
@@ -41,16 +41,16 @@ public enum ArtifactType {
   ALL(null, "app/domain");
 
   public static final String APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY = "applyToArtifactType";
-  private final org.mule.runtime.api.artifact.ArtifactType artifactType;
+  private final org.mule.runtime.api.artifact.ArtifactType actualArtifactType;
   private final String artifactTypeAsString;
 
   ArtifactType(org.mule.runtime.api.artifact.ArtifactType artifactType, String artifactTypeAsString) {
-    this.artifactType = artifactType;
+    this.actualArtifactType = artifactType;
     this.artifactTypeAsString = artifactTypeAsString;
   }
 
   public org.mule.runtime.api.artifact.ArtifactType getArtifactType() {
-    return artifactType;
+    return actualArtifactType;
   }
 
   public String getAsString() {
