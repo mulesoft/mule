@@ -207,9 +207,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return future;
     },
                             e -> shouldRetry(e, context),
-                            e -> {
-                              interceptorChain.onError(context, e);
-                            },
+                            e -> interceptorChain.onError(context, e),
                             NULL_THROWABLE_CONSUMER,
                             identity(),
                             context.getCurrentScheduler())
@@ -322,7 +320,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     if (context.getTransactionConfig().isPresent()) {
       return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(muleConfiguration,
                                                                           notificationDispatcher,
-                                                                          context.getTransactionConfig().get()))
+                                                                          context.getTransactionConfig().orElseThrow()))
                                                                               .execute(callback);
     } else {
       return ((ExecutionTemplate<T>) defaultExecutionTemplate)

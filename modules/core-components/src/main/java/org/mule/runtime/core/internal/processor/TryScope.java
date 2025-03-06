@@ -250,8 +250,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
                                                          componentTracerFactory
                                                              .fromComponent(this, TRY_SCOPE_INNER_CHAIN_SPAN_NAME, ""));
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
-    if (messagingExceptionHandler instanceof GlobalErrorHandler) {
-      ((GlobalErrorHandler) messagingExceptionHandler).addComponentReference(getLocation());
+    if (messagingExceptionHandler instanceof GlobalErrorHandler geh) {
+      geh.addComponentReference(getLocation());
     }
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);

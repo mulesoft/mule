@@ -83,9 +83,5 @@ public interface TransactionConfig {
 
   int getTimeout();
 
-  boolean isInteractWithExternal();
-
-  void setInteractWithExternal(boolean interactWithExternal);
-
   boolean isConfigured();
 }

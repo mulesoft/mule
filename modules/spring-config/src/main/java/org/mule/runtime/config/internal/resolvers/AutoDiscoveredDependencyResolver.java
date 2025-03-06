@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.config.internal.resolvers;
 
-import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.config.internal.BeanWrapper;
 import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 
@@ -34,7 +32,7 @@ public class AutoDiscoveredDependencyResolver {
         .stream()
         .filter(x -> x.getValue() != null)
         .map(x -> new BeanWrapper(x.getKey(), x.getValue()))
-        .collect(toList());
+        .toList();
   }
 
 

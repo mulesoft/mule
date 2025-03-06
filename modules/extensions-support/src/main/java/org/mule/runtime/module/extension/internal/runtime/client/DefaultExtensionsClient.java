@@ -256,7 +256,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     try {
       stopIfNeeded(client);
     } catch (Exception e) {
-      LOGGER.error("Exception found trying to stop operation client for operation " + identifier);
+      LOGGER.error("Exception found trying to stop operation client for operation {}", identifier);
     } finally {
       disposeIfNeeded(client, LOGGER);
     }
@@ -315,8 +315,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
         return;
       }
 
-      if (value instanceof ComplexParameter) {
-        ComplexParameter complex = (ComplexParameter) value;
+      if (value instanceof ComplexParameter complex) {
         DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType(), reflectionCache);
         resolveLegacyParameters(complex.getParameters(), (propertyName, propertyValue) -> builder
             .addPropertyResolver(propertyName, new StaticValueResolver<>(propertyValue)));
@@ -346,8 +345,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       return (Result<T, A>) executeAsync(extension, operation, params).get();
     } catch (ExecutionException e) {
       Throwable cause = e.getCause();
-      if (cause instanceof MuleException) {
-        throw (MuleException) cause;
+      if (cause instanceof MuleException muleException) {
+        throw muleException;
       } else {
         throw new DefaultMuleException(cause);
       }
@@ -374,8 +373,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   }
 
   private void setContextEvent(OperationParameterizer parameterizer, OperationParameters parameters) {
-    if (parameters instanceof EventedOperationsParameterDecorator) {
-      parameterizer.inTheContextOf(((EventedOperationsParameterDecorator) parameters).getContextEvent());
+    if (parameters instanceof EventedOperationsParameterDecorator eop) {
+      parameterizer.inTheContextOf(eop.getContextEvent());
     }
   }
 

@@ -33,12 +33,10 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataMediator;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -170,6 +168,7 @@ public class OperationMessageProcessor extends ComponentMessageProcessor<Operati
   // "Fat" Tooling support
   /////////////////////////////////////////////////////////////////////////////
 
+  @Override
   protected void initializeForFatTooling() {
     this.entityMetadataMediator = new EntityMetadataMediator(componentModel);
     super.initializeForFatTooling();

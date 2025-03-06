@@ -352,9 +352,7 @@ public class XaTransaction extends AbstractTransaction {
       final Object value = entry.getValue();
       if (value instanceof MuleXaObject xaObject) {
         if (!xaObject.isReuseObject()) {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("About to close resource {}...", xaObject);
-          }
+          LOGGER.debug("About to close resource {}...", xaObject);
           try {
             xaObject.close();
             i.remove();
@@ -362,14 +360,10 @@ public class XaTransaction extends AbstractTransaction {
             LOGGER.error("Failed to close resource " + xaObject, e);
           }
         } else {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Not closing reusable object {}", xaObject);
-          }
+          LOGGER.debug("Not closing reusable object {}", xaObject);
         }
       } else {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Not closing non-MuleXaObject object {}", value);
-        }
+        LOGGER.debug("Not closing non-MuleXaObject object {}", value);
       }
     }
   }

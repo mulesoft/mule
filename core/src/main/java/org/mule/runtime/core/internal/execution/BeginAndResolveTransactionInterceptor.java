@@ -51,9 +51,8 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
     boolean resolveStartedTransaction = false;
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     if (action == TransactionConfig.ACTION_ALWAYS_BEGIN || (action == TransactionConfig.ACTION_BEGIN_OR_JOIN && tx == null)) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Beginning transaction");
-      }
+      logger.debug("Beginning transaction");
+
       executionContext.markTransactionStart();
 
       // Timeout is a traversal attribute of all Transaction implementations.

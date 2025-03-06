@@ -83,16 +83,6 @@ public final class MuleTransactionConfig implements TransactionConfig, MuleConte
 
   }
 
-  @Override
-  public boolean isInteractWithExternal() {
-    return interactWithExternal;
-  }
-
-  @Override
-  public void setInteractWithExternal(boolean interactWithExternal) {
-    this.interactWithExternal = interactWithExternal;
-  }
-
   public void setActionAsString(String action) {
     if (ACTION_ALWAYS_BEGIN_STRING.equals(action)) {
       this.action = ACTION_ALWAYS_BEGIN;

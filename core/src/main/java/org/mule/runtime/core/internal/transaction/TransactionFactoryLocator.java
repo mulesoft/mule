@@ -19,7 +19,7 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
@@ -91,12 +91,12 @@ public final class TransactionFactoryLocator implements Disposable {
   }
 
   private Map<TransactionType, TypedTransactionFactory> getAvailableFactories() throws InitialisationException {
-    Map<TransactionType, TypedTransactionFactory> factories = new HashMap<>();
+    Map<TransactionType, TypedTransactionFactory> discoveredFactories = new EnumMap<>(TransactionType.class);
     final var serviceLoader = load(TypedTransactionFactory.class, this.getClass().getClassLoader());
     for (TypedTransactionFactory factory : serviceLoader) {
       initialiseIfNeeded(factory, true, muleContext);
-      factories.put(factory.getType(), factory);
+      discoveredFactories.put(factory.getType(), factory);
     }
-    return factories;
+    return discoveredFactories;
   }
 }

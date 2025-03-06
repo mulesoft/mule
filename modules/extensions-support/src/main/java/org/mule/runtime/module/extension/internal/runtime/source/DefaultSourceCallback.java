@@ -258,20 +258,20 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     String name = null;
     Map<String, String> attributes = new HashMap<>();
 
-    DistributedTraceContextManager distributedSourceTraceContextManager = context.getDistributedSourceTraceContext();
+    DistributedTraceContextManager distributedTraceContextManager = context.getDistributedSourceTraceContext();
 
-    if (distributedSourceTraceContextManager instanceof SourceDistributedTraceContextManager) {
-      name = ((SourceDistributedTraceContextManager) distributedSourceTraceContextManager).getSpanName();
-      attributes = ((SourceDistributedTraceContextManager) distributedSourceTraceContextManager).getSpanRootAttributes();
+    if (distributedTraceContextManager instanceof SourceDistributedTraceContextManager distributedSourceTraceContextManager) {
+      name = distributedSourceTraceContextManager.getSpanName();
+      attributes = distributedSourceTraceContextManager.getSpanRootAttributes();
     }
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver, context.getDistributedSourceTraceContext(),
                                 name,
                                 attributes,
-                                context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).map(info -> (PollItemInformation) info));
+                                context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).map(PollItemInformation.class::cast));
 
-    executeFlow(context, messageProcessContext, resultAdapter, distributedSourceTraceContextManager);
+    executeFlow(context, messageProcessContext, resultAdapter, distributedTraceContextManager);
     contextAdapter.dispatched();
   }
 
@@ -300,8 +300,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     Charset existingEncoding = encodingParam;
     MediaType mediaType = mimeTypeInitParam;
     if (mediaType == null) {
-      if (value instanceof Result) {
-        final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
+      if (value instanceof Result result) {
+        final Optional<MediaType> optionalMediaType = result.getMediaType();
         if (optionalMediaType.isPresent()) {
           mediaType = optionalMediaType.get();
           existingEncoding = mediaType.getCharset().orElse(existingEncoding);

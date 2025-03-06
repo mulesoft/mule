@@ -5,6 +5,18 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.removed",
+            "old": "method boolean org.mule.runtime.core.privileged.transaction.TransactionConfig::isInteractWithExternal()",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.transaction.TransactionConfig::setInteractWithExternal(boolean)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
             "code": "java.method.numberOfParametersChanged",
             "old": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
             "new": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
