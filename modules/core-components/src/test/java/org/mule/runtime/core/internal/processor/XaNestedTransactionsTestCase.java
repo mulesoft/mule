@@ -49,8 +49,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.transaction.TransactionManager;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,7 +61,6 @@ public class XaNestedTransactionsTestCase extends AbstractMuleContextTestCase {
 
   private static List<Transaction> transactions;
   private ProfilingService profilingService = mock(ProfilingService.class);
-  private TransactionManager manager = mock(TransactionManager.class);
   private Flow flow;
 
   @Before
@@ -82,9 +79,9 @@ public class XaNestedTransactionsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void xaAllowsNestedTx() throws Exception {
-    TryScope inner = createTryScope(muleContext, manager, profilingService, of(true), empty());
+    TryScope inner = createTryScope(muleContext, profilingService, of(true), empty());
     inner.setMessageProcessors(singletonList(new TxCaptor()));
-    TryScope outer = createTryScope(muleContext, manager, profilingService, of(true), empty());
+    TryScope outer = createTryScope(muleContext, profilingService, of(true), empty());
     outer.setMessageProcessors(asList(new TxCaptor(), inner, new TxCaptor()));
 
     outer.initialise();
@@ -100,17 +97,17 @@ public class XaNestedTransactionsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void xaErrorInNestedTx() throws Exception {
-    TryScope inner = createTryScope(muleContext, manager, profilingService, of(true));
+    TryScope inner = createTryScope(muleContext, profilingService, of(true));
     inner.setMessageProcessors(asList(new TxCaptor(), new ErrorProcessor()));
     TemplateOnErrorHandler handler = createPropagateErrorHandler();
     handler.setMessageProcessors(singletonList(new TxCaptor()));
     inner.setExceptionListener(handler);
 
-    TryScope withHandler = createTryScope(muleContext, manager, profilingService, empty());
+    TryScope withHandler = createTryScope(muleContext, profilingService, empty());
     withHandler.setMessageProcessors(singletonList(inner));
     withHandler.setExceptionListener(new OnErrorContinueHandler());
 
-    TryScope outer = createTryScope(muleContext, manager, profilingService, of(true));
+    TryScope outer = createTryScope(muleContext, profilingService, of(true));
     outer.setMessageProcessors(asList(new TxCaptor(), withHandler, new TxCaptor()));
     outer.setExceptionListener(new OnErrorContinueHandler());
     outer.initialise();
@@ -129,14 +126,14 @@ public class XaNestedTransactionsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void xaErrorInOuterTx() throws Exception {
-    TryScope inner = createTryScope(muleContext, manager, profilingService, of(true));
+    TryScope inner = createTryScope(muleContext, profilingService, of(true));
     inner.setMessageProcessors(singletonList(new TxCaptor()));
 
-    TryScope outer = createTryScope(muleContext, manager, profilingService, of(true));
+    TryScope outer = createTryScope(muleContext, profilingService, of(true));
     outer.setMessageProcessors(asList(new TxCaptor(), inner, new ErrorProcessor()));
     outer.setExceptionListener(createPropagateErrorHandler());
 
-    TryScope surrounding = createTryScope(muleContext, manager, profilingService, empty());
+    TryScope surrounding = createTryScope(muleContext, profilingService, empty());
     surrounding.setMessageProcessors(singletonList(outer));
     surrounding.setExceptionListener(new OnErrorContinueHandler());
     surrounding.initialise();

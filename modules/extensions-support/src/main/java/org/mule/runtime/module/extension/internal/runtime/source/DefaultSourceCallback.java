@@ -52,8 +52,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.transaction.TransactionManager;
-
 /**
  * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder(ProfilingService)}
  * method.
@@ -107,12 +105,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     public Builder<T, A> setDefaultEncoding(Charset defaultEncoding) {
       product.defaultEncoding = defaultEncoding;
-
-      return this;
-    }
-
-    public Builder<T, A> setTransactionManager(TransactionManager transactionManager) {
-      product.transactionManager = transactionManager;
 
       return this;
     }
@@ -199,7 +191,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private ConfigurationInstance configurationInstance;
   private Processor listener;
   private Charset defaultEncoding;
-  private TransactionManager transactionManager;
 
   private String applicationName;
   private NotificationDispatcher notificationDispatcher;
@@ -394,14 +385,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   @Override
   public ComponentLocation getSourceLocation() {
     return messageSource.getLocation();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public TransactionManager getTransactionManager() {
-    return transactionManager;
   }
 
   /**

@@ -611,6 +611,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.streaming.object to
       kryo.shaded;
+  opens org.mule.runtime.core.internal.transaction to
+      spring.core;
   opens org.mule.runtime.core.internal.transformer to
       spring.core;
   opens org.mule.runtime.core.internal.value to

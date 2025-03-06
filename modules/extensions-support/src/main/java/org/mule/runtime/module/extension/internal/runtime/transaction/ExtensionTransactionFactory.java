@@ -11,8 +11,6 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
-import javax.transaction.TransactionManager;
-
 /**
  * Creates instances of {@link ExtensionTransactionFactory}
  *
@@ -24,8 +22,7 @@ public class ExtensionTransactionFactory implements TransactionFactory {
    * {@inheritDoc}
    */
   @Override
-  public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                                      TransactionManager transactionManager)
+  public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer)
       throws TransactionException {
     Transaction transaction = new ExtensionTransaction(applicationName, notificationFirer);
     transaction.begin();

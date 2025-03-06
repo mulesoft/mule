@@ -29,6 +29,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
@@ -96,14 +97,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import javax.transaction.TransactionManager;
-
 import com.google.common.collect.ImmutableList;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -136,9 +134,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Rule
   public MockitoRule mockito = rule().silent();
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExecutionContextAdapter operationContext;
@@ -178,9 +173,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Mock
   private NotificationDispatcher notificationDispatcher;
-
-  @Mock
-  private TransactionManager txManager;
 
   @Mock
   private ConnectionManagerAdapter connectionManagerAdapter;
@@ -249,7 +241,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             null,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
 
@@ -342,9 +333,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void enrichThrownException() throws Throwable {
-    expectedException.expect(instanceOf(HeisenbergException.class));
-    expectedException.expect(hasRootCause(sameInstance(exception)));
-    expectedException.expectMessage(ERROR);
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     stubFailingComponentExecutor(operationExecutor, exception);
 
@@ -355,15 +343,16 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             null,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+
+    var thrown = assertThrows(HeisenbergException.class, this::execute);
+    assertThat(thrown, hasRootCause(sameInstance(exception)));
+    assertThat(thrown.getMessage(), is(ERROR));
   }
 
   @Test
   public void notEnrichThrownException() throws Throwable {
-    expectedException.expect(sameInstance(exception));
     mockExceptionEnricher(operationModel, NullExceptionEnricher::new);
     stubFailingComponentExecutor(operationExecutor, exception);
 
@@ -374,18 +363,16 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             null,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+
+    var thrown = assertThrows(Exception.class, this::execute);
+    assertThat(thrown, sameInstance(exception));
   }
 
   @Test
   public void enrichThrownExceptionInValueTransformer() throws Throwable {
     final Exception exceptionToThrow = new RuntimeException(ERROR, exception);
-    expectedException.expectCause(hasRootCause(sameInstance(exception)));
-    expectedException.expect(instanceOf(HeisenbergException.class));
-    expectedException.expectMessage(ERROR);
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(exceptionToThrow);
@@ -397,18 +384,18 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+
+    var thrown = assertThrows(HeisenbergException.class, this::execute);
+    assertThat(thrown, hasRootCause(sameInstance(exception)));
+    assertThat(thrown.getMessage(), is(ERROR));
   }
 
   @Test
   public void enrichThrownSdkModuleExceptionInValueTransformer() throws Throwable {
     final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
         new org.mule.sdk.api.exception.ModuleException(ERROR, HEALTH, exception);
-    expectedException.expect(instanceOf(HeisenbergException.class));
-    expectedException.expectCause(sameInstance(moduleExceptionToThrow));
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
@@ -422,17 +409,16 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+
+    var thrown = assertThrows(HeisenbergException.class, this::execute);
+    assertThat(thrown.getCause(), sameInstance(moduleExceptionToThrow));
   }
 
   @Test
   public void enrichThrownLegacyModuleExceptionInValueTransformer() throws Throwable {
     final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, CUSTOM_ERROR, exception);
-    expectedException.expect(instanceOf(HeisenbergException.class));
-    expectedException.expectCause(sameInstance(moduleExceptionToThrow));
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
@@ -446,17 +432,16 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+
+    var thrown = assertThrows(HeisenbergException.class, this::execute);
+    assertThat(thrown.getCause(), sameInstance(moduleExceptionToThrow));
   }
 
   @Test
   public void notEnrichThrownExceptionInValueTransformer() throws Throwable {
     final Exception exceptionToThrow = new RuntimeException(ERROR, exception);
-    expectedException.expectCause(sameInstance(exception));
-    expectedException.expectMessage(ERROR);
     mockExceptionEnricher(operationModel, NullExceptionEnricher::new);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(exceptionToThrow);
@@ -468,19 +453,18 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
 
-    execute();
+    var thrown = assertThrows(Exception.class, this::execute);
+    assertThat(thrown.getCause(), sameInstance(exception));
+    assertThat(thrown.getMessage(), is(ERROR));
   }
 
   @Test
   public void notEnrichThrownSdkModuleExceptionInValueTransformer() throws Throwable {
     final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
         new org.mule.sdk.api.exception.ModuleException(ERROR, HEALTH, exception);
-    expectedException.expect(instanceOf(TypedException.class));
-    expectedException.expect(hasRootCause(sameInstance(exception)));
     mockExceptionEnricher(operationModel, NullExceptionEnricher::new);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
@@ -494,18 +478,17 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+
+    var thrown = assertThrows(TypedException.class, this::execute);
+    assertThat(thrown, hasRootCause(sameInstance(exception)));
   }
 
   @Test
   public void notEnrichThrownSdkModuleExceptionWithMessageInValueTransformer() throws Throwable {
     final org.mule.sdk.api.exception.ModuleException moduleExceptionToThrow =
         new org.mule.sdk.api.exception.ModuleException(ERROR, HEALTH, exceptionWithMessage);
-    expectedException.expect(instanceOf(TypedException.class));
-    expectedException.expectCause(sameInstance(exceptionWithMessage));
     mockExceptionEnricher(operationModel, NullExceptionEnricher::new);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
@@ -519,17 +502,16 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+
+    var thrown = assertThrows(TypedException.class, this::execute);
+    assertThat(thrown, hasRootCause(sameInstance(exceptionWithMessage)));
   }
 
   @Test
   public void notEnrichThrownLegacyModuleExceptionInValueTransformer() throws Throwable {
     final ModuleException moduleExceptionToThrow = new ModuleException(ERROR, CUSTOM_ERROR, exception);
-    expectedException.expect(instanceOf(TypedException.class));
-    expectedException.expect(hasRootCause(sameInstance(exception)));
     mockExceptionEnricher(operationModel, NullExceptionEnricher::new);
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     when(failingTransformer.apply(any(), any())).thenThrow(moduleExceptionToThrow);
@@ -543,10 +525,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+
+    var thrown = assertThrows(TypedException.class, this::execute);
+    assertThat(thrown, hasRootCause(sameInstance(exception)));
   }
 
   @Test
@@ -554,7 +537,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   public void invalidEnrichment() throws Throwable {
     final ResultTransformer failingTransformer = mock(ResultTransformer.class);
     ModuleException moduleException = new ModuleException(ERROR, TestErrorTypes.UNREGISTERED_ERROR_TYPE);
-    expectedException.expect(ModuleException.class);
     mockExceptionEnricher(operationModel, () -> exceptionEnricher);
     stubFailingComponentExecutor(operationExecutor, moduleException);
     mediator = new DefaultExecutionMediator<>(extensionModel,
@@ -564,10 +546,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                               muleContext.getExecutionClassLoader(),
                                               muleContext.getConfiguration(),
                                               notificationDispatcher,
-                                              txManager,
                                               failingTransformer,
                                               threadReleaseDataProducer, operationExecutionTracer, true);
-    execute();
+    var thrown = assertThrows(ModuleException.class, this::execute);
     verify(executorCallback, times(1)).error(moduleException);
   }
 
@@ -589,7 +570,6 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             muleContext.getExecutionClassLoader(),
                                             muleContext.getConfiguration(),
                                             notificationDispatcher,
-                                            txManager,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
 
@@ -645,12 +625,12 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       "initializing it is correctly propagated through the executor's error callback")
   @Issue("W-10742153")
   public void getStatisticsFromNotInitializedConfigurationInstance() throws Throwable {
-    expectedException.expect(IllegalStateException.class);
     ConfigurationInstance configurationInstance =
         new LifecycleAwareConfigurationInstance("name", mock(ConfigurationModel.class), null, mock(ConfigurationState.class),
                                                 of(mock(ConnectionProvider.class)));
     when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
-    execute();
+
+    assertThrows(IllegalStateException.class, () -> execute());
   }
 
   private void assertException(Consumer<Throwable> assertion) throws Throwable {

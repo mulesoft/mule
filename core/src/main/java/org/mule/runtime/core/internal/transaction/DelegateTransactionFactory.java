@@ -13,8 +13,6 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.transaction.Transaction;
 
-import javax.transaction.TransactionManager;
-
 /**
  * Transaction factory for DelegateTransaction. Used for transactional element since transaction type is not known until the first
  * transactional message processor is executed.
@@ -22,11 +20,10 @@ import javax.transaction.TransactionManager;
 public final class DelegateTransactionFactory implements TypedTransactionFactory {
 
   @Override
-  public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                                      TransactionManager transactionManager)
+  public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer)
       throws TransactionException {
     DelegateTransaction delegateTransaction =
-        new DelegateTransaction(applicationName, notificationFirer, transactionManager);
+        new DelegateTransaction(applicationName, notificationFirer);
     delegateTransaction.begin();
     return delegateTransaction;
   }

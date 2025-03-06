@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,18 +24,11 @@ import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.util.Optional;
-
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
 
   private ProfilingService profilingService = new NoOpProfilingService();
-
-  @Rule
-  public ExpectedException expected = ExpectedException.none();
 
   @Test
   public void connectionReleasedOnTxExceptionNoConnHandler() throws ConnectionException, TransactionException {
@@ -44,17 +41,13 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
     when(sourceCallback.getTransactionConfig()).thenReturn(txConfig);
 
     final SourceConnectionManager sourceConnMgr = mock(SourceConnectionManager.class);
-    when(sourceConnMgr.getConnectionHandler(conn)).thenReturn(Optional.empty());
+    when(sourceConnMgr.getConnectionHandler(conn)).thenReturn(empty());
     when(sourceCallback.getSourceConnectionManager()).thenReturn(sourceConnMgr);
 
     DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService, false);
 
-    expected.expect(TransactionException.class);
-    try {
-      ctx.bindConnection(conn);
-    } finally {
-      verify(sourceConnMgr).release(conn);
-    }
+    assertThrows(TransactionException.class, () -> ctx.bindConnection(conn));
+    verify(sourceConnMgr).release(conn);
   }
 
   @Test
@@ -69,23 +62,19 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
 
     final SourceConnectionManager sourceConnMgr = mock(SourceConnectionManager.class);
     final ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(sourceConnMgr.getConnectionHandler(conn)).thenReturn(Optional.of(connectionHandler));
+    when(sourceConnMgr.getConnectionHandler(conn)).thenReturn(of(connectionHandler));
     when(sourceCallback.getSourceConnectionManager()).thenReturn(sourceConnMgr);
 
     final TransactionSourceBinder binder = mock(TransactionSourceBinder.class);
     when(binder.bindToTransaction(txConfig, sourceCallback.getConfigurationInstance(), sourceCallback.getSourceLocation(),
-                                  connectionHandler, sourceCallback.getTransactionManager(), sourceCallback.getTimeout(), false))
+                                  connectionHandler, sourceCallback.getTimeout(), false))
                                       .thenThrow(TransactionException.class);
     when(sourceCallback.getTransactionSourceBinder()).thenReturn(binder);
 
     DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService, false);
 
-    expected.expect(TransactionException.class);
-    try {
-      ctx.bindConnection(conn);
-    } finally {
-      verify(sourceConnMgr).release(conn);
-    }
+    assertThrows(TransactionException.class, () -> ctx.bindConnection(conn));
+    verify(sourceConnMgr).release(conn);
   }
 
 

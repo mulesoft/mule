@@ -62,7 +62,7 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
   public void before() {
     transactionConfig = new MuleTransactionConfig();
     beginAndResolveTransactionInterceptor =
-        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, null, true, true, true);
+        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, true, true, true);
   }
 
   @Test
@@ -72,7 +72,7 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
 
     transactionConfig.setAction(ACTION_ALWAYS_BEGIN);
     transactionConfig.setFactory(transactionFactory);
-    when(transactionFactory.beginTransaction(any(), any(), any())).thenReturn(tx);
+    when(transactionFactory.beginTransaction(any(), any())).thenReturn(tx);
     when(executionInterceptor.execute(executionCallback, executionContext)).thenThrow(messagingException);
 
     try {

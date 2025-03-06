@@ -584,7 +584,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.addAll(getStreamingDefinitions());
     componentBuildingDefinitions.addAll(getIdempotentValidatorsDefinitions());
     componentBuildingDefinitions.addAll(getReconnectionDefinitions());
-    componentBuildingDefinitions.addAll(getTransactionDefinitions());
     return componentBuildingDefinitions;
   }
 
@@ -789,28 +788,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withObjectFactoryType(ReconnectionConfigObjectFactory.class)
         .withSetterParameterDefinition("failsDeployment", fromSimpleParameter("failsDeployment").build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build())
-        .build());
-
-    return buildingDefinitions;
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<ComponentBuildingDefinition> getTransactionDefinitions() {
-    List<ComponentBuildingDefinition> buildingDefinitions = new ArrayList<>();
-
-    buildingDefinitions.add(baseDefinition.withIdentifier("xa-transaction")
-        .withTypeDefinition(fromType(MuleTransactionConfig.class))
-        .withSetterParameterDefinition("factory", fromFixedValue(new XaTransactionFactory()).build())
-        .withSetterParameterDefinition("timeout", fromSimpleParameter("timeout").build())
-        .withSetterParameterDefinition("actionAsString", fromSimpleParameter("action").build())
-        .withSetterParameterDefinition("interactWithExternal", fromSimpleParameter("interactWithExternal").build())
-        .build());
-
-    buildingDefinitions.add(baseDefinition
-        .withIdentifier("environment")
-        .withTypeDefinition(fromType(Map.class))
-        .withObjectFactoryType(EnvironmentPropertyObjectFactory.class)
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("ref").build())
         .build());
 
     return buildingDefinitions;

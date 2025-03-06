@@ -26,8 +26,6 @@ import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 import java.util.Optional;
 
-import javax.transaction.TransactionManager;
-
 /**
  * Helper class in charge of bind the Source connection to the current Transaction, if one is available. Also, if the Transaction
  *
@@ -54,7 +52,6 @@ public class TransactionSourceBinder {
                                                                                               ConfigurationInstance configurationInstance,
                                                                                               ComponentLocation sourceLocation,
                                                                                               ConnectionHandler connectionHandler,
-                                                                                              TransactionManager transactionManager,
                                                                                               int timeout,
                                                                                               boolean errorAfterTimeout)
       throws ConnectionException, TransactionException {
@@ -64,8 +61,7 @@ public class TransactionSourceBinder {
     }
 
     Transaction tx =
-        ((MuleTransactionConfig) transactionConfig).getFactory().beginTransaction(applicationName, notificationDispatcher,
-                                                                                  transactionManager);
+        ((MuleTransactionConfig) transactionConfig).getFactory().beginTransaction(applicationName, notificationDispatcher);
     tx.setTimeout(timeout);
     ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
     ((TransactionAdapter) tx).setRollbackIfTimeout(errorAfterTimeout);

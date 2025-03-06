@@ -110,8 +110,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import javax.transaction.TransactionManager;
-
 import org.slf4j.Logger;
 
 /**
@@ -156,8 +154,7 @@ public class OperationClient implements Lifecycle {
                                      MuleContext muleContext,
                                      MuleConfiguration muleConfiguration,
                                      ArtifactEncoding artifactEncoding,
-                                     NotificationDispatcher notificationDispatcher,
-                                     TransactionManager transactionManager) {
+                                     NotificationDispatcher notificationDispatcher) {
 
     return new OperationClient(
                                key.getExtensionModel(),
@@ -170,8 +167,7 @@ public class OperationClient implements Lifecycle {
                                                        componentTracerFactory,
                                                        muleContext,
                                                        muleConfiguration,
-                                                       notificationDispatcher,
-                                                       transactionManager),
+                                                       notificationDispatcher),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache),
                                new ValueReturnDelegate(key.getOperationModel(), artifactEncoding),
                                streamingManager,
@@ -466,8 +462,7 @@ public class OperationClient implements Lifecycle {
                                                                            ComponentTracerFactory<CoreEvent> componentTracerFactory,
                                                                            MuleContext muleContext,
                                                                            MuleConfiguration muleConfiguration,
-                                                                           NotificationDispatcher notificationDispatcher,
-                                                                           TransactionManager transactionManager) {
+                                                                           NotificationDispatcher notificationDispatcher) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
@@ -483,7 +478,6 @@ public class OperationClient implements Lifecycle {
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 muleConfiguration,
                                                                                 notificationDispatcher,
-                                                                                transactionManager,
                                                                                 getResultTransformer(extensionConnectionSupplier,
                                                                                                      extensionModel,
                                                                                                      operationModel,

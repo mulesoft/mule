@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.transaction.XaTransaction;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
+import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 /**
@@ -26,9 +27,10 @@ public class XaTransactionFactory implements TransactionFactory {
 
   private int timeout;
 
+  private TransactionManager transactionManager;
+
   @Override
-  public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                                      TransactionManager transactionManager)
+  public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer)
       throws TransactionException {
     try {
       XaTransaction xat = new XaTransaction(applicationName, transactionManager, notificationFirer);
@@ -55,5 +57,10 @@ public class XaTransactionFactory implements TransactionFactory {
 
   public void setTimeout(int timeout) {
     this.timeout = timeout;
+  }
+
+  @Inject
+  public void setTransactionManager(TransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
   }
 }

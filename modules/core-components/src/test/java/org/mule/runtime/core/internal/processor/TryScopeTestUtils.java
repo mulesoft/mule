@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
 /**
@@ -47,18 +46,16 @@ public class TryScopeTestUtils {
    * Creates a {@link TryScope} that could be transactional (with local or xa transaction), without timeout.
    */
   public static TryScope createTryScope(MuleContext muleContext,
-                                        TransactionManager txManager,
                                         ProfilingService profilingService,
                                         Optional<Boolean> txType)
       throws MuleException {
-    return createTryScope(muleContext, txManager, profilingService, txType, empty());
+    return createTryScope(muleContext, profilingService, txType, empty());
   }
 
   /**
    * Creates a {@link TryScope} that could be transactional (with local or xa transaction), with a given timeout.
    */
   public static TryScope createTryScope(MuleContext muleContext,
-                                        TransactionManager txManager,
                                         ProfilingService profilingService,
                                         Optional<Boolean> txType,
                                         Optional<Integer> timeout)
@@ -76,7 +73,6 @@ public class TryScopeTestUtils {
     scope.setExceptionListener(mock(FlowExceptionHandler.class));
     scope.setProfilingService(profilingService);
     scope.setMuleConfiguration(mock(MuleConfiguration.class));
-    scope.setTransactionManager(txManager);
     scope.setMuleContext(muleContext);
     scope.setNotificationDispatcher(mock(NotificationDispatcher.class));
     muleContext.getInjector().inject(scope);

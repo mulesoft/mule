@@ -101,7 +101,6 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -204,9 +203,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
   @Inject
   private ProfilingService profilingService;
-
-  @Mock
-  private TransactionManager txManager;
 
   protected RetryPolicyTemplate retryPolicyTemplate;
   protected boolean primaryNodeOnly = false;
@@ -313,7 +309,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
         .setDefaultEncoding(defaultCharset())
-        .setTransactionManager(txManager)
         .build();
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);

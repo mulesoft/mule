@@ -68,10 +68,8 @@ import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -97,9 +95,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   @Inject
   private NotificationDispatcher notificationDispatcher;
-
-  @Inject
-  private Optional<TransactionManager> transactionManager;
 
   @Inject
   private ProfilingService profilingService;
@@ -129,7 +124,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
     boolean errorAfterTimeout = featureFlaggingService.isEnabled(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT);
     ExecutionTemplate<CoreEvent> executionTemplate =
-        createScopeTransactionalExecutionTemplate(muleConfiguration, notificationDispatcher, transactionManager.orElse(null),
+        createScopeTransactionalExecutionTemplate(muleConfiguration, notificationDispatcher,
                                                   transactionConfig, errorAfterTimeout);
     final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
 
@@ -314,10 +309,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
   void setMuleConfiguration(MuleConfiguration configuration) {
     this.muleConfiguration = configuration;
-  }
-
-  void setTransactionManager(TransactionManager transactionManager) {
-    this.transactionManager = of(transactionManager);
   }
 
   void setNotificationDispatcher(NotificationDispatcher notificationDispatcher) {

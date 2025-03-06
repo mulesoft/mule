@@ -16,8 +16,6 @@ import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 
-import javax.transaction.TransactionManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +25,6 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
   private final ExecutionInterceptor<T> next;
   private final MuleTransactionConfig transactionConfig;
   private final String applicationName;
-  private final TransactionManager transactionManager;
   private final NotificationDispatcher notificationDispatcher;
   private final boolean processOnException;
   private final boolean mustResolveAnyTransaction;
@@ -35,14 +32,12 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
 
   public BeginAndResolveTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig,
                                                String applicationName, NotificationDispatcher notificationDispatcher,
-                                               TransactionManager transactionManager,
                                                boolean processOnException, boolean mustResolveAnyTransaction,
                                                boolean errorAtTimeout) {
     this.next = next;
     this.transactionConfig = (MuleTransactionConfig) transactionConfig;
     this.applicationName = applicationName;
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionManager = transactionManager;
     this.processOnException = processOnException;
     this.mustResolveAnyTransaction = mustResolveAnyTransaction;
     this.errorAtTimeout = errorAtTimeout;
@@ -64,16 +59,13 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
       // Timeout is a traversal attribute of all Transaction implementations.
       // Setting it up here for all of them rather than in every implementation.
       tx = transactionConfig.getFactory().beginTransaction(applicationName,
-                                                           notificationDispatcher,
-                                                           transactionManager);
+                                                           notificationDispatcher);
       tx.setTimeout(timeout);
-      if (tx instanceof TransactionAdapter) {
-        ((TransactionAdapter) tx).setRollbackIfTimeout(errorAtTimeout);
+      if (tx instanceof TransactionAdapter txAdapter) {
+        txAdapter.setRollbackIfTimeout(errorAtTimeout);
       }
       resolveStartedTransaction = true;
-      if (logger.isDebugEnabled()) {
-        logger.debug("Transaction successfully started: " + tx);
-      }
+      logger.debug("Transaction successfully started: {}", tx);
     }
     T result;
     try {

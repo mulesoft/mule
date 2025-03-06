@@ -108,7 +108,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -149,9 +148,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ProfilingService profilingService;
-
-  @Inject
-  private Optional<TransactionManager> transactionManager;
 
   @Inject
   private MuleConfiguration configuration;
@@ -365,7 +361,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setTransactionConfig(transactionConfig.get())
         .setSource(this)
         .setDefaultEncoding(artifactEncoding.getDefaultEncoding())
-        .setTransactionManager(transactionManager.orElse(null))
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
         .setProcessContext(messageProcessContext)

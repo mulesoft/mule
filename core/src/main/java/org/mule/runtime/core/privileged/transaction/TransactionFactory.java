@@ -11,8 +11,6 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 
-import javax.transaction.TransactionManager;
-
 /**
  * <code>TransactionFactory</code> creates a transaction.
  */
@@ -27,8 +25,7 @@ public interface TransactionFactory {
    * @param applicationName        will be part of the notification
    * @param notificationDispatcher allows the Mule container to fire notifications
    */
-  Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,
-                               TransactionManager transactionManager)
+  Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher)
       throws TransactionException;
 
   /**

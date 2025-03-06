@@ -70,7 +70,6 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -79,7 +78,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -139,9 +137,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Inject
   private ArtifactEncoding artifactEncoding;
-
-  @Inject
-  private Optional<TransactionManager> transactionManager;
 
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, OperationClient> operationClientCache;
@@ -245,8 +240,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   muleContext,
                                   muleConfiguration,
                                   artifactEncoding,
-                                  notificationDispatcher,
-                                  transactionManager.orElse(null));
+                                  notificationDispatcher);
 
     try {
       initialiseIfNeeded(client);

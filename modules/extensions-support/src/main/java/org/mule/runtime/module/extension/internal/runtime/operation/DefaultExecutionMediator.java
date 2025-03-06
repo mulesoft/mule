@@ -54,8 +54,6 @@ import org.mule.runtime.tracer.api.component.ComponentTracer;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import javax.transaction.TransactionManager;
-
 import org.slf4j.Logger;
 
 /**
@@ -81,7 +79,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final MuleConfiguration muleConfiguration;
   private final NotificationDispatcher notificationDispatcher;
-  private final TransactionManager transactionManager;
   private final ResultTransformer resultTransformer;
   private final ClassLoader executionClassLoader;
   private final ComponentModel operationModel;
@@ -97,7 +94,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   ClassLoader executionClassLoader,
                                   MuleConfiguration muleConfiguration,
                                   NotificationDispatcher notificationDispatcher,
-                                  TransactionManager transactionManager,
                                   ResultTransformer resultTransformer,
                                   ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer,
                                   ComponentTracer<CoreEvent> operationExecutionTracer,
@@ -107,7 +103,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     this.muleConfiguration = requireNonNull(muleConfiguration);
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionManager = transactionManager;
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
 
@@ -327,7 +322,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     if (context.getTransactionConfig().isPresent()) {
       return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(muleConfiguration,
                                                                           notificationDispatcher,
-                                                                          transactionManager,
                                                                           context.getTransactionConfig().get()))
                                                                               .execute(callback);
     } else {
