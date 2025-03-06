@@ -64,7 +64,6 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
     registry = new SimpleRegistry(muleContextMock, new MuleLifecycleInterceptor());
     final var txFactoryLocator = new TransactionFactoryLocator();
     registry.inject(txFactoryLocator);
-    txFactoryLocator.initialise();
     registry.registerObject("txFactory", txFactoryLocator);
   }
 

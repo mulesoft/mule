@@ -11,8 +11,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static java.util.Optional.ofNullable;
 import static java.util.ServiceLoader.load;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.collection.SmallMap;
@@ -22,6 +22,9 @@ import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
@@ -31,17 +34,14 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public final class TransactionFactoryLocator implements Initialisable, Disposable {
+public final class TransactionFactoryLocator implements Disposable {
 
   @Inject
   private MuleContext muleContext;
 
   private final Map<TransactionType, TransactionFactory> factories = new SmallMap<>();
-
-  @Override
-  public void initialise() throws InitialisationException {
-    factories.putAll(getAvailableFactories());
-  }
+  private final ReadWriteLock lock = new ReentrantReadWriteLock();
+  private boolean initialized = false;
 
   /**
    * Given a {@link TransactionType} will look through SPI a {@link TransactionFactory} able to handle that kind of of
@@ -51,12 +51,43 @@ public final class TransactionFactoryLocator implements Initialisable, Disposabl
    * @return An {@link Optional} {@link TransactionFactory}
    */
   public Optional<TransactionFactory> lookUpTransactionFactory(TransactionType type) {
-    return ofNullable(factories.get(type));
+    if (!initialized) {
+      Lock writeLock = lock.writeLock();
+      try {
+        writeLock.lock();
+        if (!initialized) {
+          try {
+            factories.putAll(getAvailableFactories());
+          } catch (InitialisationException e) {
+            throw new MuleRuntimeException(e);
+          }
+          initialized = true;
+        }
+      } finally {
+        writeLock.unlock();
+      }
+    }
+    Lock readLock = lock.readLock();
+    TransactionFactory value;
+    try {
+      readLock.lock();
+      value = factories.get(type);
+    } finally {
+      readLock.unlock();
+    }
+    return ofNullable(value);
   }
 
   @Override
   public void dispose() {
-    factories.clear();
+    Lock writeLock = lock.writeLock();
+    try {
+      writeLock.lock();
+      factories.clear();
+      initialized = false;
+    } finally {
+      writeLock.unlock();
+    }
   }
 
   private Map<TransactionType, TypedTransactionFactory> getAvailableFactories() throws InitialisationException {

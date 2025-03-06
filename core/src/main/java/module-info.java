@@ -448,7 +448,8 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
-      com.mulesoft.mule.runtime.xa;
+      com.mulesoft.mule.runtime.xa,
+      spring.beans;
   exports org.mule.runtime.core.internal.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
