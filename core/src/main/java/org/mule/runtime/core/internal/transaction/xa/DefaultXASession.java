@@ -92,18 +92,15 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
         if (localContext == null) {
           throw new XAException(XAException.XAER_NOTA);
         }
-        // TODO: resume context
         resourceManager.removeSuspendedTransactionalResource(xid);
         break;
       // a new transaction
-      case TMNOFLAGS:
-      case TMJOIN:
+      case TMNOFLAGS, TMJOIN:
       default:
         try {
           localContext = createTransactionContext(xid);
           resourceManager.beginTransaction(localContext);
         } catch (Exception e) {
-          // TODO MULE-863: Is logging necessary?
           LOGGER.error("Could not create new transactional resource", e);
           throw (XAException) new XAException(e.getMessage()).initCause(e);
         }
@@ -127,23 +124,19 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
       throw new XAException(XAException.XAER_PROTO);
     }
 
-    try {
-      switch (flags) {
-        case TMSUSPEND:
-          // TODO: suspend context
-          resourceManager.addSuspendedTransactionalResource(localXid, localContext);
-          resourceManager.removeActiveTransactionalResource(localXid);
-          break;
-        case TMFAIL:
-          resourceManager.setTransactionRollbackOnly(localContext);
-          break;
-        case TMSUCCESS: // no-op
-        default: // no-op
-          break;
-      }
-    } catch (ResourceManagerException e) {
-      throw (XAException) new XAException(XAException.XAER_RMERR).initCause(e);
+    switch (flags) {
+      case TMSUSPEND:
+        resourceManager.addSuspendedTransactionalResource(localXid, localContext);
+        resourceManager.removeActiveTransactionalResource(localXid);
+        break;
+      case TMFAIL:
+        resourceManager.setTransactionRollbackOnly(localContext);
+        break;
+      case TMSUCCESS: // no-op
+      default: // no-op
+        break;
     }
+
     localXid = null;
     localContext = null;
   }

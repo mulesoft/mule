@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.transaction;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotBindNullResource;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCannotBindToNullKey;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionSingleResourceOnly;
@@ -17,8 +18,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 
@@ -46,8 +45,8 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
    */
   protected static Map<Integer, String> txStatusMappings = new HashMap<>(10); // populated later
 
-  protected volatile Object key;
-  protected volatile Object resource;
+  protected Object key;
+  protected Object resource;
 
   protected final AtomicBoolean started = new AtomicBoolean(false);
   protected final AtomicBoolean committed = new AtomicBoolean(false);
@@ -65,11 +64,6 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     }
 
     txStatusMappings = unmodifiableMap(txStatusMappings);
-  }
-
-  @Deprecated(since = "4.4")
-  protected AbstractSingleResourceTransaction(MuleContext muleContext) {
-    super(muleContext);
   }
 
   protected AbstractSingleResourceTransaction(String applicationName,
@@ -180,13 +174,13 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
         || (this.key != null && (this.key == key && this.resource == resource));
   }
 
-  protected Class getResourceType() {
-    throw new MuleRuntimeException(CoreMessages
-        .createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
+  protected Class<?> getResourceType() {
+    throw new MuleRuntimeException(createStaticMessage("Transaction type: " + this.getClass().getName()
+        + " doesn't support supports(..) method"));
   }
 
-  protected Class getKeyType() {
-    throw new MuleRuntimeException(CoreMessages
-        .createStaticMessage("Transaction type: " + this.getClass().getName() + " doesn't support supports(..) method"));
+  protected Class<?> getKeyType() {
+    throw new MuleRuntimeException(createStaticMessage("Transaction type: " + this.getClass().getName()
+        + " doesn't support supports(..) method"));
   }
 }

@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.core.internal.transaction.xa;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManagerDirty;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManagerNotReady;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.resourceManagerNotStarted;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
+
 import static java.lang.Thread.currentThread;
 
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 
 import java.util.ArrayList;
@@ -59,7 +63,7 @@ public abstract class AbstractResourceManager {
 
   private boolean dirty = false;
 
-  public synchronized void start() throws ResourceManagerSystemException {
+  public synchronized void start() {
     logger.info("Starting ResourceManager");
     operationMode = OPERATION_MODE_STARTING;
     doStart();
@@ -72,19 +76,19 @@ public abstract class AbstractResourceManager {
     }
   }
 
-  protected void doStart() throws ResourceManagerSystemException {
+  protected void doStart() {
     // template method
   }
 
-  protected void recover() throws ResourceManagerSystemException {
+  protected void recover() {
     // nothing to do (yet?)
   }
 
-  public synchronized void stop() throws ResourceManagerSystemException {
+  public synchronized void stop() {
     stop(SHUTDOWN_MODE_NORMAL);
   }
 
-  public synchronized boolean stop(int mode) throws ResourceManagerSystemException {
+  public synchronized boolean stop(int mode) {
     return stop(mode, getDefaultTransactionTimeout() * DEFAULT_COMMIT_TIMEOUT_FACTOR);
   }
 
@@ -169,14 +173,14 @@ public abstract class AbstractResourceManager {
     }
   }
 
-  public void setTransactionRollbackOnly(AbstractTransactionContext context) throws ResourceManagerException {
+  public void setTransactionRollbackOnly(AbstractTransactionContext context) {
     context.status = Status.STATUS_MARKED_ROLLBACK;
   }
 
   public void commitTransaction(AbstractTransactionContext context) throws ResourceManagerException {
     assureReady();
     if (context.status == Status.STATUS_MARKED_ROLLBACK) {
-      throw new ResourceManagerException(CoreMessages.transactionMarkedForRollback());
+      throw new ResourceManagerException(transactionMarkedForRollback());
     }
     synchronized (context) {
       if (logger.isDebugEnabled()) {
@@ -199,7 +203,7 @@ public abstract class AbstractResourceManager {
         context.notifyFinish();
       }
       if (logger.isDebugEnabled()) {
-        logger.debug("Committed transaction " + context);
+        logger.debug("Committed transaction {}", context);
       }
     }
   }
@@ -274,12 +278,12 @@ public abstract class AbstractResourceManager {
    */
   private void assureStarted() throws ResourceManagerSystemException {
     if (operationMode != OPERATION_MODE_STARTED) {
-      throw new ResourceManagerSystemException(CoreMessages.resourceManagerNotStarted());
+      throw new ResourceManagerSystemException(resourceManagerNotStarted());
     }
     // do not allow any further writing or commit or rollback when db is
     // corrupt
     if (dirty) {
-      throw new ResourceManagerSystemException(CoreMessages.resourceManagerDirty());
+      throw new ResourceManagerSystemException(resourceManagerDirty());
     }
   }
 
@@ -290,12 +294,12 @@ public abstract class AbstractResourceManager {
    */
   protected void assureReady() throws ResourceManagerSystemException {
     if (operationMode != OPERATION_MODE_STARTED && operationMode != OPERATION_MODE_STOPPING) {
-      throw new ResourceManagerSystemException(CoreMessages.resourceManagerNotReady());
+      throw new ResourceManagerSystemException(resourceManagerNotReady());
     }
     // do not allow any further writing or commit or rollback when db is
     // corrupt
     if (dirty) {
-      throw new ResourceManagerSystemException(CoreMessages.resourceManagerDirty());
+      throw new ResourceManagerSystemException(resourceManagerDirty());
     }
   }
 
