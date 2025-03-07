@@ -16,11 +16,23 @@ public interface SseClient extends AutoCloseable {
   /**
    * Sends an event to the client represented by this interface.
    * 
+   * @param name       the event name (topic).
+   * @param data       the data as string.
+   * @param id         event id (used to resume an event stream on reconnection).
+   * @param retryDelay new retry delay, in milliseconds.
+   */
+  void sendEvent(String name, String data, String id, Long retryDelay) throws IOException;
+
+  /**
+   * Equivalent to call {@code sendEvent(name, data, id, null);}
+   *
    * @param name the event name (topic).
    * @param data the data as string.
    * @param id   event id (used to resume an event stream on reconnection).
    */
-  void sendEvent(String name, String data, String id) throws IOException;
+  default void sendEvent(String name, String data, String id) throws IOException {
+    sendEvent(name, data, id, null);
+  }
 
   /**
    * Equivalent to call {@code sendEvent(name, data, null);}
