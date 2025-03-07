@@ -93,7 +93,6 @@ module org.mule.runtime.core {
   requires semver4j;
 
   requires jakarta.activation;
-  requires transitive jakarta.jms.api;
   requires jakarta.annotation;
   requires java.inject;
   requires java.management;
