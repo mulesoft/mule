@@ -803,7 +803,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private boolean shouldRunOnThisNode() {
-    return primaryNodeOnly && clusterService.isPrimaryPollingInstance();
+    return !primaryNodeOnly || clusterService.isPrimaryPollingInstance();
   }
 
   private Optional<ConfigurationInstance> startUsingConfiguration(CoreEvent event) {
