@@ -204,6 +204,8 @@ import org.apache.commons.lang3.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
 
+import jakarta.transaction.TransactionManager;
+
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
 
   /**

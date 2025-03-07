@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.TransactionManager;
 
 import org.junit.After;
 import org.junit.Before;

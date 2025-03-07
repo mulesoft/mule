@@ -74,7 +74,7 @@ module org.mule.runtime.spring.config {
   requires java.inject;
   // Spring JNDI support
   requires java.naming;
-  requires java.transaction;
+  requires jakarta.transaction;
 
   exports org.mule.runtime.config.api;
   exports org.mule.runtime.config.api.dsl;

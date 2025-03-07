@@ -11,8 +11,9 @@ import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.transaction.Status;
 import javax.transaction.xa.Xid;
+
+import jakarta.transaction.Status;
 
 public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionContext> extends AbstractResourceManager {
 

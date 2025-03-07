@@ -33,16 +33,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 
 import org.slf4j.Logger;
+
+import jakarta.transaction.HeuristicRollbackException;
+import jakarta.transaction.InvalidTransactionException;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
 
 /**
  * <code>XaTransaction</code> represents an XA transaction in Mule.
@@ -51,7 +52,7 @@ import org.slf4j.Logger;
 public class XaTransaction extends AbstractTransaction {
 
   private static final Logger LOGGER = getLogger(XaTransaction.class);
-  private static final String TX_MANAGER_CLASS = javax.transaction.TransactionManager.class.getName();
+  private static final String TX_MANAGER_CLASS = TransactionManager.class.getName();
   private static final String TX_MANAGER_NAME = "Transaction Manager";
 
   /**

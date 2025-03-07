@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.transaction;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 
-import javax.transaction.TransactionManager;
+import jakarta.transaction.TransactionManager;
 
 /**
  * <code>TransactionManagerFactory</code> is a factory class for creating a transaction manager for the Mule container.

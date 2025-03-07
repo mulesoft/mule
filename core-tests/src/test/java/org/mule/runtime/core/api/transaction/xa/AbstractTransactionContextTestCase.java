@@ -6,20 +6,21 @@
  */
 package org.mule.runtime.core.api.transaction.xa;
 
-import static javax.transaction.Status.STATUS_ACTIVE;
-import static javax.transaction.Status.STATUS_COMMITTED;
-import static javax.transaction.Status.STATUS_COMMITTING;
-import static javax.transaction.Status.STATUS_MARKED_ROLLBACK;
-import static javax.transaction.Status.STATUS_NO_TRANSACTION;
-import static javax.transaction.Status.STATUS_PREPARED;
-import static javax.transaction.Status.STATUS_PREPARING;
-import static javax.transaction.Status.STATUS_ROLLEDBACK;
-import static javax.transaction.Status.STATUS_ROLLING_BACK;
-import static javax.transaction.Status.STATUS_UNKNOWN;
+import static jakarta.transaction.Status.STATUS_ACTIVE;
+import static jakarta.transaction.Status.STATUS_COMMITTED;
+import static jakarta.transaction.Status.STATUS_COMMITTING;
+import static jakarta.transaction.Status.STATUS_MARKED_ROLLBACK;
+import static jakarta.transaction.Status.STATUS_NO_TRANSACTION;
+import static jakarta.transaction.Status.STATUS_PREPARED;
+import static jakarta.transaction.Status.STATUS_PREPARING;
+import static jakarta.transaction.Status.STATUS_ROLLEDBACK;
+import static jakarta.transaction.Status.STATUS_ROLLING_BACK;
+import static jakarta.transaction.Status.STATUS_UNKNOWN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import org.mule.runtime.core.internal.transaction.xa.AbstractTransactionContext;
+
 import org.junit.Test;
 
 public class AbstractTransactionContextTestCase {

@@ -93,13 +93,11 @@ module org.mule.runtime.core {
   requires semver4j;
 
   requires jakarta.activation;
-  requires transitive jakarta.jms.api;
   requires jakarta.annotation;
   requires java.inject;
+  requires transitive jakarta.jms.api;
   requires java.management;
-  // InvalidTransactionException extends java.rmi.RemoteException
-  requires java.rmi;
-  requires java.transaction;
+  requires jakarta.transaction;
 
   exports org.mule.runtime.core.api;
   exports org.mule.runtime.core.api.artifact;
