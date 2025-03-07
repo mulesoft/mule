@@ -11,6 +11,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.HttpClient;
 import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.SseRetryConfig;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -28,8 +29,8 @@ public class HttpClientWrapper implements HttpClient<HttpRequest, HttpRequestOpt
   }
 
   @Override
-  public ServerSentEventSource sseSource(String url) {
-    return delegate.sseSource(url);
+  public ServerSentEventSource sseSource(String url, SseRetryConfig retryConfig) {
+    return delegate.sseSource(url, retryConfig);
   }
 
   @Override

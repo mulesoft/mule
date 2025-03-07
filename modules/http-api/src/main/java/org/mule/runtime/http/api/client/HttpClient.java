@@ -13,6 +13,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.ws.WebSocket;
 import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.SseRetryConfig;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -171,10 +172,11 @@ public interface HttpClient extends org.mule.sdk.api.http.HttpClient<HttpRequest
   /**
    * Creates a consumer of Server-sent events. The resulting {@link ServerSentEventSource} is not connected automatically.
    *
-   * @param url the URL of the server.
+   * @param url         the URL of the server.
+   * @param retryConfig configuration for the retry mechanism.
    * @return a non-connected instance of {@link ServerSentEventSource}.
    */
-  default ServerSentEventSource sseSource(String url) {
+  default ServerSentEventSource sseSource(String url, SseRetryConfig retryConfig) {
     throw new UnsupportedOperationException("Server-sent Events are not supported");
   }
 }
