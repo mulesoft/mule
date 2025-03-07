@@ -656,7 +656,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
                 .filter(isFlowRef(fullFailingComponentLocationUpToTxOwner))
                 .filter(ref -> !getFlow(ref).equals(transactionOwnerFlow) || ref.startsWith(transactionLocation))
                 .collect(toSet());
-        return isFailingComponentNestedMoreThanOnce(referencesContainingFailingComponentUpToTxOwner, failingComponentHandledKey);
+        return handleFailingComponentNestedMoreThanOnce(referencesContainingFailingComponentUpToTxOwner,
+                                                        failingComponentHandledKey);
       }
     }
 
@@ -676,8 +677,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     return fullFailingComponentLocationUpToTxOwnerBuilder.toString();
   }
 
-  private boolean isFailingComponentNestedMoreThanOnce(Set<String> referencesContainingFailingComponentUpToTxOwner,
-                                                       String failingComponentHandledKey) {
+  private boolean handleFailingComponentNestedMoreThanOnce(Set<String> referencesContainingFailingComponentUpToTxOwner,
+                                                           String failingComponentHandledKey) {
     if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
       // The failing component is nested within more than one component that reference this handler:
       // transactionOwnerWithThisHandler-componentWithThisHandler-...-failingComponent
