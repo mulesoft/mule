@@ -73,7 +73,6 @@ module org.mule.runtime.extensions.support {
   // Usage of java.beans
   requires java.desktop;
   requires net.bytebuddy;
-  requires java.transaction;
   requires org.jgrapht.core;
 
   exports org.mule.runtime.module.extension.api.manager;

@@ -18,14 +18,13 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 import java.util.Optional;
-
-import javax.transaction.TransactionManager;
 
 /**
  * Helper class in charge of bind the Source connection to the current Transaction, if one is available. Also, if the Transaction
@@ -53,7 +52,6 @@ public class TransactionSourceBinder {
                                                                                               ConfigurationInstance configurationInstance,
                                                                                               ComponentLocation sourceLocation,
                                                                                               ConnectionHandler connectionHandler,
-                                                                                              TransactionManager transactionManager,
                                                                                               int timeout,
                                                                                               boolean errorAfterTimeout)
       throws ConnectionException, TransactionException {
@@ -63,8 +61,7 @@ public class TransactionSourceBinder {
     }
 
     Transaction tx =
-        transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher,
-                                                        transactionManager);
+        ((MuleTransactionConfig) transactionConfig).getFactory().beginTransaction(applicationName, notificationDispatcher);
     tx.setTimeout(timeout);
     ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
     ((TransactionAdapter) tx).setRollbackIfTimeout(errorAfterTimeout);

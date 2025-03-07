@@ -92,7 +92,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.event.InternalEvent;
-import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
@@ -118,7 +117,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
@@ -160,7 +158,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -246,9 +243,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private ArtifactEncoding artifactEncoding;
-
-  @Inject
-  private Optional<TransactionManager> transactionManager;
 
   @Inject
   private Optional<PolicyManager> policyManager;
@@ -1095,7 +1089,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         muleContext.getExecutionClassLoader(),
                                         muleConfiguration,
                                         notificationDispatcher,
-                                        transactionManager.orElse(null),
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
                                         componentTracerFactory.fromComponent(this, OPERATION_EXECUTION_SPAN_NAME, ""),

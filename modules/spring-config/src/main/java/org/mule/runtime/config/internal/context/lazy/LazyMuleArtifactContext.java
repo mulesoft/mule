@@ -18,8 +18,10 @@ import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.g
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.unregisterObject;
 
 import static java.lang.String.format;
@@ -358,17 +360,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private void initializeComponents(List<Object> components) {
     for (Object object : components) {
-      LOGGER.debug("Initializing component '{}'...", object.toString());
+      LOGGER.debug("Initializing component '{}'...", object);
       try {
         if (object instanceof MessageProcessorChain) {
           // When created it will be initialized
         } else {
-          try {
-            object = getMuleContext().getInjector().inject(object);
-          } catch (MuleException e) {
-            throw new LifecycleException(e, object);
-          }
-          getMuleRegistry().applyLifecycle(object, Initialisable.PHASE_NAME);
+          doInitializeComponent(object);
         }
       } catch (MuleException e) {
         throw new MuleRuntimeException(e);
@@ -376,9 +373,18 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
   }
 
+  private void doInitializeComponent(Object component) throws LifecycleException, MuleException {
+    try {
+      component = getMuleContext().getInjector().inject(component);
+    } catch (MuleException e) {
+      throw new LifecycleException(e, component);
+    }
+    getMuleRegistry().applyLifecycle(component, Initialisable.PHASE_NAME);
+  }
+
   private void startComponent(List<Object> components) {
     for (Object object : components) {
-      LOGGER.debug("Starting component '{}'...", object.toString());
+      LOGGER.debug("Starting component '{}'...", object);
       try {
         if (object instanceof MessageProcessorChain) {
           // Has to be ignored as when it is registered it will be started too
@@ -565,7 +571,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         super.doCreateApplicationComponents(beanFactory, minimalAppModel, mustBeRoot, springComponentModels);
 
     final Set<ComponentAst> orphanComponents = resolveOrphanComponents(minimalAppModel);
-    LOGGER.debug("orphanComponents found: {}", orphanComponents.toString());
+    LOGGER.debug("orphanComponents found: {}", orphanComponents);
 
     // Handle orphan named components...
     orphanComponents.stream()
@@ -600,9 +606,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
           }
         });
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("applicationComponents to be created: {}", applicationComponents.toString());
-    }
+    LOGGER.debug("applicationComponents to be created: {}", applicationComponents);
     return applicationComponents;
   }
 
@@ -625,17 +629,18 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         if (object != null) {
           // MessageProcessorChainBuilder has to be manually created and added to the registry in order to be able
           // to dispose it later
-          if (object instanceof MessageProcessorChainBuilder) {
-            handleChainBuilder((MessageProcessorChainBuilder) object, componentPair, objects);
-          } else if (object instanceof TransactionManagerFactory) {
-            handleTxManagerFactory((TransactionManagerFactory) object);
+          if (object instanceof MessageProcessorChainBuilder mpcb) {
+            handleChainBuilder(mpcb, componentPair, objects);
+          } else if (object instanceof TransactionManagerFactory txMgrFy) {
+            handleTxManagerFactory(txMgrFy);
           }
           objects.put(componentPair, object);
         }
       } catch (Exception e) {
         currentComponentInitializationState
             .commitTrackedBeansContainedIn(objects.keySet().stream()
-                .map(Pair::getFirst).collect(toList()));
+                .map(Pair::getFirst)
+                .toList());
         safeUnregisterBean(componentPair.getFirst());
 
         throw new MuleRuntimeException(e);
@@ -653,7 +658,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // TODO: Once is implemented MULE-17778 we should use graph to get the order for disposing beans
     currentComponentInitializationState
         .commitTrackedBeansContainedIn(objects.keySet().stream()
-            .map(Pair::getFirst).collect(toList()));
+            .map(Pair::getFirst)
+            .toList());
 
     // Sort in order to later initialize and start components according to their dependencies
     List<Object> sortedObjects = new ArrayList<>(objects.values());
@@ -671,7 +677,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       initialiseIfNeeded(messageProcessorChain, getMuleContext());
     } catch (InitialisationException e) {
       unregisterBeans(objects.keySet().stream()
-          .map(Pair::getFirst).collect(toList()));
+          .map(Pair::getFirst)
+          .toList());
       throw new IllegalStateException("Couldn't initialise an instance of a MessageProcessorChain", e);
     }
     try {
@@ -679,7 +686,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     } catch (RegistrationException e) {
       // Unregister any already created component
       unregisterBeans(objects.keySet().stream()
-          .map(Pair::getFirst).collect(toList()));
+          .map(Pair::getFirst)
+          .toList());
       throw new IllegalStateException("Couldn't register an instance of a MessageProcessorChain", e);
     }
     objects.put(chainKey, messageProcessorChain);
@@ -687,7 +695,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private void handleTxManagerFactory(TransactionManagerFactory object) {
     try {
-      getMuleContext().setTransactionManager(object.create(getMuleContext().getConfiguration()));
+      registerObject(getMuleContext(), OBJECT_TRANSACTION_MANAGER,
+                     object.create(getMuleContext().getConfiguration()));
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't register an instance of a TransactionManager", e);
     }
@@ -710,6 +719,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   @Override
   public void close() {
+    beanNamesBeingInitialized.remove();
     currentComponentInitializationState.clear();
     super.close();
   }
@@ -733,8 +743,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         LOGGER.error(
                      format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
                             beanName, e.getMessage()));
-        throw new MuleRuntimeException(I18nMessageFactory
-            .createStaticMessage("There was an error while unregistering component '%s'", beanName), e);
+        throw new MuleRuntimeException(createStaticMessage("There was an error while unregistering component '%s'", beanName), e);
       }
     }
   }

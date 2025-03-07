@@ -17,8 +17,8 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.privileged.exception.MessagingException;
-import org.mule.runtime.core.privileged.transaction.TransactionConfig;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -43,9 +43,6 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
   ExecutionInterceptor executionInterceptor;
 
   @Mock
-  TransactionConfig transactionConfig;
-
-  @Mock
   ExecutionCallback executionCallback;
 
   @Mock
@@ -59,10 +56,13 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
 
   BeginAndResolveTransactionInterceptor beginAndResolveTransactionInterceptor;
 
+  MuleTransactionConfig transactionConfig;
+
   @Before
   public void before() {
+    transactionConfig = new MuleTransactionConfig();
     beginAndResolveTransactionInterceptor =
-        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, null, true, true, true);
+        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, true, true, true);
   }
 
   @Test
@@ -70,9 +70,9 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
   public void executeWithException() throws Exception {
     Transaction tx = spy(Transaction.class);
 
-    when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_BEGIN);
-    when(transactionConfig.getFactory()).thenReturn(transactionFactory);
-    when(transactionFactory.beginTransaction(any(), any(), any())).thenReturn(tx);
+    transactionConfig.setAction(ACTION_ALWAYS_BEGIN);
+    transactionConfig.setFactory(transactionFactory);
+    when(transactionFactory.beginTransaction(any(), any())).thenReturn(tx);
     when(executionInterceptor.execute(executionCallback, executionContext)).thenThrow(messagingException);
 
     try {

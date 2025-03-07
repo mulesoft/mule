@@ -5,6 +5,135 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.removed",
+            "old": "method boolean org.mule.runtime.core.privileged.transaction.TransactionConfig::isInteractWithExternal()",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.transaction.TransactionConfig::setInteractWithExternal(boolean)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.numberOfParametersChanged",
+            "old": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
+            "new": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, ===javax.transaction.TransactionManager===, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
+            "new": "parameter <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, ===org.mule.runtime.core.privileged.transaction.TransactionConfig===, boolean)",
+            "parameterIndex": "2",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.parameterTypeChanged",
+            "old": "parameter <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, ===org.mule.runtime.core.privileged.transaction.TransactionConfig===)",
+            "new": "parameter <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, org.mule.runtime.core.privileged.transaction.TransactionConfig, ===boolean===)",
+            "parameterIndex": "3",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, org.mule.runtime.core.privileged.transaction.TransactionConfig, boolean)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.numberOfParametersChanged",
+            "old": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
+            "new": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.numberOfParametersChanged",
+            "old": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.TransactionFactory::beginTransaction(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.tx.TransactionException",
+            "new": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.TransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher) throws org.mule.runtime.api.tx.TransactionException",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.TransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager) throws org.mule.runtime.api.tx.TransactionException",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.transaction.TransactionFactory org.mule.runtime.core.privileged.transaction.TransactionConfig::getFactory()",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.transaction.TransactionConfig::setFactory(org.mule.runtime.core.privileged.transaction.TransactionFactory)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.transaction.TypedTransactionFactory",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method javax.transaction.TransactionManager org.mule.runtime.core.api.MuleContext::getTransactionManager()",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.api.MuleContext::setTransactionManager(javax.transaction.TransactionManager) throws java.lang.Exception",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.privileged.execution.TransactionalExecutionTemplate<T>::createTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.privileged.transaction.TransactionConfig)",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.noLongerDefault",
+            "old": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.TransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager) throws org.mule.runtime.api.tx.TransactionException",
+            "new": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.TransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager) throws org.mule.runtime.api.tx.TransactionException",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.nowAbstract",
+            "old": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.TransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager) throws org.mule.runtime.api.tx.TransactionException",
+            "new": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.TransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager) throws org.mule.runtime.api.tx.TransactionException",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.privileged.transaction.TransactionFactory::beginTransaction(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.tx.TransactionException",
+            "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"
+          },
+          {
+            "ignore": true,
             "code": "java.method.returnTypeTypeParametersChanged",
             "old": "method java.util.Map<java.lang.String, org.mule.runtime.api.util.Pair<org.mule.runtime.api.message.Error, org.mule.runtime.core.privileged.exception.EventProcessingException>> org.mule.runtime.core.privileged.routing.RoutingResult::getFailuresWithExceptionInfo()",
             "new": "method java.util.Map<java.lang.String, org.mule.runtime.api.util.Pair<org.mule.runtime.api.message.Error, org.mule.runtime.api.exception.MuleException>> org.mule.runtime.core.privileged.routing.RoutingResult::getFailuresWithExceptionInfo()",

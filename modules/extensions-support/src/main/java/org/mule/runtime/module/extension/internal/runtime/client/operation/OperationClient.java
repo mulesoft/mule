@@ -110,8 +110,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import javax.transaction.TransactionManager;
-
 import org.slf4j.Logger;
 
 /**
@@ -156,8 +154,7 @@ public class OperationClient implements Lifecycle {
                                      MuleContext muleContext,
                                      MuleConfiguration muleConfiguration,
                                      ArtifactEncoding artifactEncoding,
-                                     NotificationDispatcher notificationDispatcher,
-                                     TransactionManager transactionManager) {
+                                     NotificationDispatcher notificationDispatcher) {
 
     return new OperationClient(
                                key.getExtensionModel(),
@@ -170,8 +167,7 @@ public class OperationClient implements Lifecycle {
                                                        componentTracerFactory,
                                                        muleContext,
                                                        muleConfiguration,
-                                                       notificationDispatcher,
-                                                       transactionManager),
+                                                       notificationDispatcher),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache),
                                new ValueReturnDelegate(key.getOperationModel(), artifactEncoding),
                                streamingManager,
@@ -238,18 +234,18 @@ public class OperationClient implements Lifecycle {
     final ClassLoader extensionClassLoader = MuleExtensionUtils.getClassLoader(extensionModel);
 
     currentThread().setContextClassLoader(extensionClassLoader);
-    ResolverSet resolverSet;
+    ResolverSet createdResolverSet;
     try {
-      resolverSet = getResolverSetFromParameters(operationModel,
-                                                 NULL_PARAMS_FUNCTION,
-                                                 muleContext,
-                                                 true,
-                                                 reflectionCache,
-                                                 expressionManager,
-                                                 "",
-                                                 factory);
+      createdResolverSet = getResolverSetFromParameters(operationModel,
+                                                        NULL_PARAMS_FUNCTION,
+                                                        muleContext,
+                                                        true,
+                                                        reflectionCache,
+                                                        expressionManager,
+                                                        "",
+                                                        factory);
 
-      resolverSet.initialise();
+      createdResolverSet.initialise();
 
       ResolverSet absentResolverSet = fromValues(emptyMap(),
                                                  muleContext,
@@ -264,7 +260,7 @@ public class OperationClient implements Lifecycle {
     } finally {
       currentThread().setContextClassLoader(originalContextClassLoader);
     }
-    return resolverSet;
+    return createdResolverSet;
   }
 
   public <T, A> CompletableFuture<Result<T, A>> execute(OperationKey key, DefaultOperationParameterizer parameterizer) {
@@ -275,18 +271,18 @@ public class OperationClient implements Lifecycle {
       shouldCompleteEvent = true;
     }
 
-    OperationModel operationModel = key.getOperationModel();
+    OperationModel keyOperationModel = key.getOperationModel();
     Optional<ConfigurationInstance> configurationInstance = getConfigurationInstance(key, contextEvent);
 
     final Map<String, Object> resolvedParams =
-        resolveOperationParameters(operationModel, configurationInstance, parameterizer, contextEvent);
+        resolveOperationParameters(keyOperationModel, configurationInstance, parameterizer, contextEvent);
     CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
 
     ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
                                                                                     key.getExtensionModel(),
                                                                                     configurationInstance,
                                                                                     resolvedParams,
-                                                                                    operationModel,
+                                                                                    keyOperationModel,
                                                                                     contextEvent,
                                                                                     cursorProviderFactory,
                                                                                     streamingManager,
@@ -384,12 +380,12 @@ public class OperationClient implements Lifecycle {
   private EventCompletingValue<Object> asEventCompletingValue(Object value, ExecutionContextAdapter ctx,
                                                               boolean shouldCompleteEvent) {
     if (shouldCompleteEvent) {
-      if (value instanceof CursorIteratorProvider) {
-        return new EventCompletingValue<>(new EventCompletingCursorIteratorProviderDecorator((CursorIteratorProvider) value,
+      if (value instanceof CursorIteratorProvider cipValue) {
+        return new EventCompletingValue<>(new EventCompletingCursorIteratorProviderDecorator(cipValue,
                                                                                              ctx.getEvent()),
                                           false);
-      } else if (value instanceof CursorStreamProvider) {
-        return new EventCompletingValue<>(new EventCompletingCursorStreamProviderDecorator((CursorStreamProvider) value,
+      } else if (value instanceof CursorStreamProvider cspValue) {
+        return new EventCompletingValue<>(new EventCompletingCursorStreamProviderDecorator(cspValue,
                                                                                            ctx.getEvent()),
                                           false);
       }
@@ -413,14 +409,14 @@ public class OperationClient implements Lifecycle {
 
         if (configName != null) {
           configurationProvider = of(extensionManager.getConfigurationProvider(configName)
-              .map(configurationProvider -> {
-                if (configurationProvider.getExtensionModel() != extensionModel) {
+              .map(configProvider -> {
+                if (configProvider.getExtensionModel() != extensionModel) {
                   throw new IllegalArgumentException(format(
                                                             "A config of the '%s' extension was expected but one from '%s' was parameterized instead",
                                                             extensionModel.getName(),
-                                                            configurationProvider.getExtensionModel().getName()));
+                                                            configProvider.getExtensionModel().getName()));
                 }
-                return configurationProvider;
+                return configProvider;
               })
               .orElseThrow(() -> new MuleRuntimeException(
                                                           createStaticMessage("No configuration [" + configName + "] found"))));
@@ -466,8 +462,7 @@ public class OperationClient implements Lifecycle {
                                                                            ComponentTracerFactory<CoreEvent> componentTracerFactory,
                                                                            MuleContext muleContext,
                                                                            MuleConfiguration muleConfiguration,
-                                                                           NotificationDispatcher notificationDispatcher,
-                                                                           TransactionManager transactionManager) {
+                                                                           NotificationDispatcher notificationDispatcher) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
@@ -483,7 +478,6 @@ public class OperationClient implements Lifecycle {
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 muleConfiguration,
                                                                                 notificationDispatcher,
-                                                                                transactionManager,
                                                                                 getResultTransformer(extensionConnectionSupplier,
                                                                                                      extensionModel,
                                                                                                      operationModel,
@@ -518,7 +512,7 @@ public class OperationClient implements Lifecycle {
                                           .orElse(null);
   }
 
-  private static abstract class EventCompletingCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T> {
+  private abstract static class EventCompletingCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T> {
 
     private final CoreEvent event;
 
@@ -575,13 +569,13 @@ public class OperationClient implements Lifecycle {
 
     @Override
     public void triggerProfilingEvent(ComponentThreadingProfilingEventContext profilerEventContext) {
-
+      // Nothing to do
     }
 
     @Override
     public void triggerProfilingEvent(CoreEvent sourceData,
                                       Function<CoreEvent, ComponentThreadingProfilingEventContext> transformation) {
-
+      // Nothing to do
     }
   }
 

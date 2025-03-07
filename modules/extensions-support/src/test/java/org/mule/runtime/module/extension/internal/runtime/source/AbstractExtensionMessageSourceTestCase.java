@@ -99,12 +99,14 @@ import org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver;
 import java.net.URL;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
+
 import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.Mock;
 
 public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMuleContextTestCase {
@@ -307,7 +309,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
         .setDefaultEncoding(defaultCharset())
-        .setTransactionManager(muleContext.getTransactionManager())
         .build();
 
     when(sourceCallbackFactory.createSourceCallback(any())).thenReturn(sourceCallback);

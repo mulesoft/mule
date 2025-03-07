@@ -73,10 +73,6 @@ public interface TransactionConfig {
    */
   byte ACTION_DEFAULT = ACTION_INDIFFERENT;
 
-  TransactionFactory getFactory();
-
-  void setFactory(TransactionFactory factory);
-
   byte getAction();
 
   void setAction(byte action);
@@ -86,10 +82,6 @@ public interface TransactionConfig {
   void setTimeout(int timeout);
 
   int getTimeout();
-
-  boolean isInteractWithExternal();
-
-  void setInteractWithExternal(boolean interactWithExternal);
 
   boolean isConfigured();
 }

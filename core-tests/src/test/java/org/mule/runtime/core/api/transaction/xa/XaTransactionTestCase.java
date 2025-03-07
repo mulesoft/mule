@@ -9,9 +9,10 @@ package org.mule.runtime.core.api.transaction.xa;
 import static org.mule.runtime.core.api.transaction.Transaction.STATUS_NO_TRANSACTION;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.hamcrest.core.Is.is;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.any;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -36,6 +37,7 @@ import javax.transaction.xa.XAResource;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -64,7 +66,6 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUpMuleContext() throws Exception {
-    mockMuleContext.setTransactionManager(mockTransactionManager);
     when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
     notificationDispatcher = getNotificationDispatcher(mockMuleContext);
   }

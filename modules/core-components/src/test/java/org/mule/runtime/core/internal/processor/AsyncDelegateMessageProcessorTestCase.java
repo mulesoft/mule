@@ -59,7 +59,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractAsyncDelegate
   @Test
   public void processWithTx() throws Exception {
     Transaction transaction = new TestTransactionFactory(false)
-        .beginTransaction("appName", getNotificationDispatcher(muleContext), null);
+        .beginTransaction("appName", getNotificationDispatcher(muleContext));
 
     try {
       CoreEvent request = testEvent();

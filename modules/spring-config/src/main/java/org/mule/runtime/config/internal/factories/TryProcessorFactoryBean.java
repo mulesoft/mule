@@ -38,7 +38,6 @@ public class TryProcessorFactoryBean extends AbstractComponent implements Factor
   protected String transactionalAction;
   private TransactionType transactionType;
 
-  @Inject
   private TransactionFactoryLocator transactionFactoryLocator;
 
   @Override
@@ -84,5 +83,10 @@ public class TryProcessorFactoryBean extends AbstractComponent implements Factor
 
   public void setTransactionType(TransactionType transactionType) {
     this.transactionType = transactionType;
+  }
+
+  @Inject
+  public void setTransactionFactoryLocator(TransactionFactoryLocator transactionFactoryLocator) {
+    this.transactionFactoryLocator = transactionFactoryLocator;
   }
 }
