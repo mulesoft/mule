@@ -96,8 +96,6 @@ module org.mule.runtime.core {
   requires jakarta.annotation;
   requires java.inject;
   requires java.management;
-  // InvalidTransactionException extends java.rmi.RemoteException
-  requires java.rmi;
   requires jakarta.transaction;
 
   exports org.mule.runtime.core.api;
