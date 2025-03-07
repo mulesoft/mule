@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.context;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.SOME_NEW_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.getString;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;
@@ -219,7 +219,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   public static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
 
-  public static final String newProperty = SOME_NEW_PROPERTY;
+  public static final String newProperty = getString();
 
   /**
    * logger used by this class
