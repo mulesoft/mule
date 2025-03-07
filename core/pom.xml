@@ -202,6 +202,11 @@
             <artifactId>disruptor</artifactId>
         </dependency>
         <dependency>
+            <!-- jakarta.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
+            <groupId>jakarta.jms</groupId>
+            <artifactId>jakarta.jms-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
         </dependency>
