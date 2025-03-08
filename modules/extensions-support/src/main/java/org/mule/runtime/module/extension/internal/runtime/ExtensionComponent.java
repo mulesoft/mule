@@ -150,22 +150,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected CursorProviderFactory cursorProviderFactory;
 
-  /**
-   * Only to be accessed through {@link #getValueProviderMediator()} as this is a lazy value only used in design time.
-   *
-   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
-   * or when the underlying component doesn't support the capability in the first place
-   */
-  private DefaultValueProviderMediator<T> valueProviderMediator;
-
-  /**
-   * Only to be accessed through {@link #getSampleDataProviderMediator()} as this is a lazy value only used in design time.
-   *
-   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
-   * or when the underlying component doesn't support the capability in the first place
-   */
-  private DefaultSampleDataProviderMediator sampleDataProviderMediator;
-
   protected MuleContext muleContext;
 
   @Inject
@@ -270,8 +254,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     }, InitialisationException.class, e -> {
       throw new InitialisationException(e, this);
     });
-
-    initCacheIdGenerator();
   }
 
   private void initConfigurationResolver() {
@@ -565,53 +547,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return ExtensionModelUtils.requiresConfig(extensionModel, componentModel);
   }
 
-  private void initCacheIdGenerator() {
-    this.cacheIdGenerator = cacheIdGeneratorFactory
-        .map(f -> {
-          DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
-          ComponentLocator<ComponentAst> configLocator = location -> componentLocator
-              .find(location)
-              .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
-
-          return f.create(context, configLocator);
-        })
-        .orElse(null);
-  }
-
-  private ValueProviderMediator getValueProviderMediator() {
-    if (valueProviderMediator == null) {
-      synchronized (this) {
-        if (valueProviderMediator == null) {
-          valueProviderMediator =
-              new DefaultValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
-        }
-      }
-    }
-
-    return valueProviderMediator;
-  }
-
-  private DefaultSampleDataProviderMediator getSampleDataProviderMediator() {
-    if (sampleDataProviderMediator == null) {
-      synchronized (this) {
-        if (sampleDataProviderMediator == null) {
-          sampleDataProviderMediator = new DefaultSampleDataProviderMediator(
-                                                                             extensionModel,
-                                                                             componentModel,
-                                                                             this,
-                                                                             muleContext,
-                                                                             artifactEncoding,
-                                                                             reflectionCache,
-                                                                             streamingManager);
-        }
-      }
-    }
-
-    return sampleDataProviderMediator;
-  }
-
-  protected abstract ParameterValueResolver getParameterValueResolver();
-
   /**
    * @return the extension model where the component has been defined.
    */
@@ -633,8 +568,26 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   // "Fat" Tooling support
   /////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * Only to be accessed through {@link #getValueProviderMediator()} as this is a lazy value only used in design time.
+   *
+   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
+   * or when the underlying component doesn't support the capability in the first place
+   */
+  private DefaultValueProviderMediator<T> valueProviderMediator;
+
+  /**
+   * Only to be accessed through {@link #getSampleDataProviderMediator()} as this is a lazy value only used in design time.
+   *
+   * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
+   * or when the underlying component doesn't support the capability in the first place
+   */
+  private DefaultSampleDataProviderMediator sampleDataProviderMediator;
+
   protected void initializeForFatTooling() {
     this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
+
+    initCacheIdGenerator();
   }
 
   /**
@@ -834,6 +787,53 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                     SampleDataException.UNKNOWN, e);
     }
   }
+
+  private void initCacheIdGenerator() {
+    this.cacheIdGenerator = cacheIdGeneratorFactory
+        .map(f -> {
+          DslResolvingContext context = DslResolvingContext.getDefault(extensionManager.getExtensions());
+          ComponentLocator<ComponentAst> configLocator = location -> componentLocator
+              .find(location)
+              .map(component -> (ComponentAst) component.getAnnotation(ANNOTATION_COMPONENT_CONFIG));
+
+          return f.create(context, configLocator);
+        })
+        .orElse(null);
+  }
+
+  private ValueProviderMediator getValueProviderMediator() {
+    if (valueProviderMediator == null) {
+      synchronized (this) {
+        if (valueProviderMediator == null) {
+          valueProviderMediator =
+              new DefaultValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+        }
+      }
+    }
+
+    return valueProviderMediator;
+  }
+
+  private DefaultSampleDataProviderMediator getSampleDataProviderMediator() {
+    if (sampleDataProviderMediator == null) {
+      synchronized (this) {
+        if (sampleDataProviderMediator == null) {
+          sampleDataProviderMediator = new DefaultSampleDataProviderMediator(
+                                                                             extensionModel,
+                                                                             componentModel,
+                                                                             this,
+                                                                             muleContext,
+                                                                             artifactEncoding,
+                                                                             reflectionCache,
+                                                                             streamingManager);
+        }
+      }
+    }
+
+    return sampleDataProviderMediator;
+  }
+
+  protected abstract ParameterValueResolver getParameterValueResolver();
 
   protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer)
       throws MetadataResolvingException, ConnectionException {
