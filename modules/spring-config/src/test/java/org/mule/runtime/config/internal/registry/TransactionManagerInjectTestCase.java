@@ -6,22 +6,26 @@
  */
 package org.mule.runtime.config.internal.registry;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-import static org.junit.Assert.assertThat;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
 import javax.inject.Inject;
 import javax.transaction.TransactionManager;
+
+import org.junit.Test;
 
 public class TransactionManagerInjectTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void injectTransactionManager() throws Exception {
     TransactionManager manager = mock(TransactionManager.class);
-    muleContext.setTransactionManager(manager);
+    registerObject(muleContext, OBJECT_TRANSACTION_MANAGER, manager);
     TransactionClient txClient = new TransactionClient();
     muleContext.getInjector().inject(txClient);
 

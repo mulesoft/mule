@@ -6,20 +6,27 @@
  */
 package org.mule.runtime.core.internal.transaction;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import static java.util.Optional.ofNullable;
 import static java.util.ServiceLoader.load;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.collection.SmallMap;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
-import org.mule.runtime.core.privileged.transaction.TypedTransactionFactory;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.inject.Inject;
 
 /**
  * Locator which given a {@link TransactionType} will locates through SPI a {@link TransactionFactory} able to handle that kind of
@@ -28,6 +35,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @since 4.0
  */
 public final class TransactionFactoryLocator implements Disposable {
+
+  @Inject
+  private MuleContext muleContext;
 
   private final Map<TransactionType, TransactionFactory> factories = new SmallMap<>();
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -46,7 +56,11 @@ public final class TransactionFactoryLocator implements Disposable {
       try {
         writeLock.lock();
         if (!initialized) {
-          factories.putAll(getAvailableFactories());
+          try {
+            factories.putAll(getAvailableFactories());
+          } catch (InitialisationException e) {
+            throw new MuleRuntimeException(e);
+          }
           initialized = true;
         }
       } finally {
@@ -76,10 +90,13 @@ public final class TransactionFactoryLocator implements Disposable {
     }
   }
 
-  private Map<TransactionType, TypedTransactionFactory> getAvailableFactories() {
-    Map<TransactionType, TypedTransactionFactory> factories = new HashMap<>();
-    load(TypedTransactionFactory.class, this.getClass().getClassLoader())
-        .forEach(factory -> factories.put(factory.getType(), factory));
-    return factories;
+  private Map<TransactionType, TypedTransactionFactory> getAvailableFactories() throws InitialisationException {
+    Map<TransactionType, TypedTransactionFactory> discoveredFactories = new EnumMap<>(TransactionType.class);
+    final var serviceLoader = load(TypedTransactionFactory.class, this.getClass().getClassLoader());
+    for (TypedTransactionFactory factory : serviceLoader) {
+      initialiseIfNeeded(factory, true, muleContext);
+      discoveredFactories.put(factory.getType(), factory);
+    }
+    return discoveredFactories;
   }
 }

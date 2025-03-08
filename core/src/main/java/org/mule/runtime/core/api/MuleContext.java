@@ -44,8 +44,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Properties;
 
-import javax.transaction.TransactionManager;
-
 /**
  * @deprecated {@link MuleContext} interface will be replaced in future major version of mule.
  *             <p/>
@@ -60,26 +58,6 @@ import javax.transaction.TransactionManager;
  */
 @Deprecated
 public interface MuleContext extends Lifecycle {
-
-  /**
-   * Sets the Jta Transaction Manager to use with this Mule server instance
-   *
-   * @param manager the manager to use
-   * @throws Exception
-   * @deprecated Use only for test cases.
-   */
-  @Deprecated
-  void setTransactionManager(TransactionManager manager) throws Exception;
-
-  /**
-   * Returns the Jta transaction manager used by this Mule server instance, or null if a transaction manager has not been set
-   *
-   * @return the Jta transaction manager used by this Mule server instance, or null if a transaction manager has not been set
-   * 
-   * @deprecated since 4.6, cannot be used outside the container when running with Java 17+.
-   */
-  @Deprecated
-  TransactionManager getTransactionManager();
 
   ServerNotificationManager getNotificationManager();
 

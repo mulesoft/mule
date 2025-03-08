@@ -23,7 +23,6 @@ module org.mule.runtime.core.components {
 
   // javax.activation
   requires jakarta.activation;
-  requires java.transaction;
   // QName
   requires java.xml;
   requires reactor.core;

@@ -153,7 +153,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.util.queue;
   exports org.mule.runtime.core.api.util.xmlsecurity;
 
-  uses org.mule.runtime.core.privileged.transaction.TypedTransactionFactory;
+  uses org.mule.runtime.core.internal.transaction.TypedTransactionFactory;
 
   provides org.mule.runtime.api.el.AbstractBindingContextBuilderFactory with
       org.mule.runtime.core.api.el.DefaultBindingContextBuilderFactory;
@@ -167,7 +167,7 @@ module org.mule.runtime.core {
   provides org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory with
       org.mule.runtime.core.api.metadata.DefaultDataTypeBuilderFactory;
 
-  provides org.mule.runtime.core.privileged.transaction.TypedTransactionFactory with
+  provides org.mule.runtime.core.internal.transaction.TypedTransactionFactory with
       org.mule.runtime.core.internal.transaction.DelegateTransactionFactory;
 
   // for MUnit, MTF
@@ -249,6 +249,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
       org.mule.runtime.launcher,
+      com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.kryo,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
@@ -258,6 +259,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
@@ -373,6 +375,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.launcher,
+      com.mulesoft.mule.runtime.bti,
       spring.beans,
       org.mule.test.unit,
       org.mule.test.runner;
@@ -438,13 +441,15 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.bti,
+      com.mulesoft.mule.runtime.xa,
       spring.beans;
   exports org.mule.runtime.core.internal.transaction.xa to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
-      com.mulesoft.mule.runtime.xa;
+      com.mulesoft.mule.runtime.xa,
+      spring.beans;
   exports org.mule.runtime.core.internal.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -607,6 +612,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.streaming.object to
       kryo.shaded;
+  opens org.mule.runtime.core.internal.transaction to
+      spring.core;
   opens org.mule.runtime.core.internal.transformer to
       spring.core;
   opens org.mule.runtime.core.internal.value to

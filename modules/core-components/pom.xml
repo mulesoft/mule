@@ -32,7 +32,6 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.transaction=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.util.store=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.component=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.exception=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED

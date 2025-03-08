@@ -309,7 +309,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   protected ExecutionTemplate<CoreEvent> createExecutionTemplate(TransactionConfig config) {
     return createTransactionalExecutionTemplate(configuration,
                                                 notificationDispatcher,
-                                                null,
                                                 config);
   }
 
