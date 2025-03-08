@@ -273,8 +273,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private Mono<CoreEvent> applyInternal(final Exception exception) {
     return Mono.create(sink -> {
       final Consumer<Exception> router = router(identity(),
-                                                handledEvent -> sink.success(handledEvent),
-                                                rethrownError -> sink.error(rethrownError));
+                                                sink::success,
+                                                sink::error);
       try {
         router.accept(exception);
       } finally {
@@ -289,13 +289,11 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         logger.error("Exception during exception strategy execution");
         getExceptionListener().resolveAndLogException(me);
         boolean rollback = false;
-        if (obj instanceof CoreEvent) {
-          rollback = isOwnedTransaction((CoreEvent) obj, getException((CoreEvent) obj));
-        } else if (obj instanceof Either) {
-          if (((Either) obj).getLeft() instanceof MessagingException) {
-            MessagingException exception = (MessagingException) ((Either) obj).getLeft();
-            rollback = isOwnedTransaction(exception.getEvent(), exception);
-          }
+        if (obj instanceof CoreEvent coreEvent) {
+          rollback = isOwnedTransaction(coreEvent, getException(coreEvent));
+        } else if (obj instanceof Either either && either.getLeft() instanceof MessagingException messagingException) {
+          MessagingException exception = (MessagingException) ((Either) obj).getLeft();
+          rollback = isOwnedTransaction(messagingException.getEvent(), exception);
         }
         if (rollback) {
           profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
@@ -315,7 +313,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private void fireEndNotification(CoreEvent event, CoreEvent result, Throwable throwable) {
     getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
-        : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
+        : event, throwable instanceof MessagingException messagingException ? messagingException : null,
                                                                             configuredMessageProcessors),
                                                                  getLocation(), PROCESS_END));
   }
@@ -342,8 +340,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   protected void markExceptionAsHandled(Exception exception) {
-    if (exception instanceof MessagingException) {
-      ((MessagingException) exception).setHandled(true);
+    if (exception instanceof MessagingException messagingException) {
+      messagingException.setHandled(true);
     }
   }
 
@@ -357,20 +355,16 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public void start() throws MuleException {
-    if (fromGlobalErrorHandler) {
-      if (ownedProcessingStrategy.isPresent()) {
-        startIfNeeded(ownedProcessingStrategy);
-      }
+    if (fromGlobalErrorHandler && ownedProcessingStrategy.isPresent()) {
+      startIfNeeded(ownedProcessingStrategy);
     }
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
-    if (fromGlobalErrorHandler) {
-      if (ownedProcessingStrategy.isPresent()) {
-        stopIfNeeded(ownedProcessingStrategy);
-      }
+    if (fromGlobalErrorHandler && ownedProcessingStrategy.isPresent()) {
+      stopIfNeeded(ownedProcessingStrategy);
     }
     super.stop();
   }
@@ -601,12 +595,11 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   protected boolean isOwnedTransaction(CoreEvent event, Exception exception) {
     Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-    if (!(transaction instanceof TransactionAdapter)
+    if (!(transaction instanceof TransactionAdapter txAdapter)
         || !((TransactionAdapter) transaction).getComponentLocation().isPresent()) {
       return false;
     }
 
-    final TransactionAdapter txAdapter = (TransactionAdapter) transaction;
     if (inDefaultErrorHandler()) {
       // This case is for an implicit error handler, if we are in a configured default error handler then
       // it will be the same as the global error handler case.
