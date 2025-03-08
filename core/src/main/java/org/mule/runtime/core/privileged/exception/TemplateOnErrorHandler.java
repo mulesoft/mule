@@ -292,8 +292,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         if (obj instanceof CoreEvent coreEvent) {
           rollback = isOwnedTransaction(coreEvent, getException(coreEvent));
         } else if (obj instanceof Either either && either.getLeft() instanceof MessagingException messagingException) {
-          MessagingException exception = (MessagingException) ((Either) obj).getLeft();
-          rollback = isOwnedTransaction(messagingException.getEvent(), exception);
+          rollback = isOwnedTransaction(messagingException.getEvent(), messagingException);
         }
         if (rollback) {
           profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
