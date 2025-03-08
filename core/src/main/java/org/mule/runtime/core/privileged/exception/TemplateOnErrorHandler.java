@@ -596,7 +596,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   protected boolean isOwnedTransaction(CoreEvent event, Exception exception) {
     Transaction transaction = TransactionCoordination.getInstance().getTransaction();
     if (!(transaction instanceof TransactionAdapter txAdapter)
-        || !((TransactionAdapter) transaction).getComponentLocation().isPresent()) {
+        || !txAdapter.getComponentLocation().isPresent()) {
       return false;
     }
 
