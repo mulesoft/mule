@@ -9,13 +9,14 @@ package org.mule.runtime.http.api.server;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
-import org.mule.runtime.http.api.server.sse.SseClientHandler;
-import org.mule.runtime.http.api.server.sse.SseHandlerManager;
 import org.mule.runtime.http.api.server.ws.WebSocketHandler;
 import org.mule.runtime.http.api.server.ws.WebSocketHandlerManager;
+import org.mule.sdk.api.http.sse.SseClient;
+import org.mule.sdk.api.http.sse.SseHandlerManager;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * Represents a ServerSocket connection. Notice it should be started to be bound, stopped to be unbound and finally disposed to
@@ -120,7 +121,7 @@ public interface HttpServer {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
   }
 
-  default SseHandlerManager sse(String ssePath, SseClientHandler sseClientHandler) {
+  default SseHandlerManager sse(String ssePath, Consumer<SseClient> sseClientHandler) {
     throw new UnsupportedOperationException("Server-sent events are not supported");
   }
 }
