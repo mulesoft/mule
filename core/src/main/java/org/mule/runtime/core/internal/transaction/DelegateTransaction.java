@@ -132,7 +132,7 @@ public class DelegateTransaction extends AbstractTransaction {
   }
 
   @Override
-  public javax.transaction.Transaction suspend() throws TransactionException {
+  public jakarta.transaction.Transaction suspend() throws TransactionException {
     return delegate.suspend();
   }
 
@@ -244,7 +244,7 @@ public class DelegateTransaction extends AbstractTransaction {
     public void resume() {}
 
     @Override
-    public javax.transaction.Transaction suspend() {
+    public jakarta.transaction.Transaction suspend() {
       return null;
     }
 
