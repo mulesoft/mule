@@ -17,11 +17,16 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.core.internal.processor.TryScopeTestUtils.createPropagateErrorHandler;
 import static org.mule.runtime.core.internal.processor.TryScopeTestUtils.createTryScope;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.TimeoutStory.TRANSACTION_TIMEOUT;
+
+import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -29,9 +34,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static java.lang.Thread.sleep;
-import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
-import static org.mule.test.allure.AllureConstants.TransactionFeature.TimeoutStory.TRANSACTION_TIMEOUT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -48,16 +50,16 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import javax.transaction.TransactionManager;
+import java.util.Collection;
+import java.util.concurrent.TimeoutException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.Collection;
-import java.util.concurrent.TimeoutException;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @RunWith(Parameterized.class)
 @Feature(TRANSACTION)
@@ -69,7 +71,6 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
 
   private static Transaction transaction;
   private ProfilingService profilingService = mock(ProfilingService.class);
-  private TransactionManager manager = mock(TransactionManager.class);
   private Flow flow;
   private boolean isXa;
 
@@ -94,7 +95,6 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
     when(profilingService.getProfilingDataProducer(TX_CONTINUE)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_START)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_COMMIT)).thenReturn(mock(ProfilingDataProducer.class));
-    muleContext.setTransactionManager(manager);
   }
 
   @Test

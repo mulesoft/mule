@@ -9,9 +9,10 @@ package org.mule.runtime.core.api.transaction.xa;
 import static org.mule.runtime.core.api.transaction.Transaction.STATUS_NO_TRANSACTION;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-import static org.hamcrest.core.Is.is;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.any;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -29,17 +30,19 @@ import org.mule.runtime.core.internal.transaction.xa.XaResourceFactoryHolder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import jakarta.transaction.SystemException;
+import jakarta.transaction.TransactionManager;
 
 @SmallTest
 public class XaTransactionTestCase extends AbstractMuleTestCase {
@@ -64,7 +67,6 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUpMuleContext() throws Exception {
-    mockMuleContext.setTransactionManager(mockTransactionManager);
     when(mockMuleContext.getConfiguration().getId()).thenReturn("appName");
     notificationDispatcher = getNotificationDispatcher(mockMuleContext);
   }
@@ -85,7 +87,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void isRollbackOnly() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     when(tx.getStatus()).thenReturn(Transaction.STATUS_ACTIVE).thenReturn(Transaction.STATUS_COMMITTED)
         .thenReturn(Transaction.STATUS_MARKED_ROLLBACK).thenReturn(Transaction.STATUS_ROLLEDBACK)
         .thenReturn(Transaction.STATUS_ROLLING_BACK);
@@ -105,7 +107,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void setTxTimeoutWhenEnlistingResource() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
     int timeoutValue = 1500;
     int timeoutValueInSeconds = 1500 / 1000;
@@ -148,7 +150,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void rollbackTransaction() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -165,7 +167,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void rollbackOnly() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -176,7 +178,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalStateException.class)
   public void rollbackOnlyFailingInTx() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -194,7 +196,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test(expected = TransactionStatusException.class)
   public void getStatusFailing() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -205,7 +207,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void delistResource() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -217,7 +219,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test(expected = TransactionException.class)
   public void delistResourceFailing() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -237,7 +239,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void stringTest() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -261,7 +263,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resume() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -272,7 +274,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test(expected = TransactionException.class)
   public void resumeWithError() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -289,7 +291,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void suspend() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -300,7 +302,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test(expected = TransactionException.class)
   public void suspendWithError() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);
@@ -311,7 +313,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void bindAndDelist() throws Exception {
-    javax.transaction.Transaction tx = mock(javax.transaction.Transaction.class);
+    jakarta.transaction.Transaction tx = mock(jakarta.transaction.Transaction.class);
     XaTransaction xaTransaction =
         new XaTransaction("appName", mockTransactionManager, notificationDispatcher);
     when(mockTransactionManager.getTransaction()).thenReturn(tx);

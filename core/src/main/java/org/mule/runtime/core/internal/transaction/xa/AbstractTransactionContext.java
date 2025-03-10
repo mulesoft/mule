@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.transaction.xa;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.api.util.UUID;
 
-import javax.transaction.Status;
+import jakarta.transaction.Status;
 
 public abstract class AbstractTransactionContext {
 
@@ -25,6 +25,7 @@ public abstract class AbstractTransactionContext {
     readOnly = true;
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(id).append("[");
@@ -40,30 +41,19 @@ public abstract class AbstractTransactionContext {
   }
 
   private String getStatusString() {
-    switch (status) {
-      case Status.STATUS_ACTIVE:
-        return "active";
-      case Status.STATUS_MARKED_ROLLBACK:
-        return "marked rollback";
-      case Status.STATUS_PREPARED:
-        return "prepared";
-      case Status.STATUS_COMMITTED:
-        return "committed";
-      case Status.STATUS_ROLLEDBACK:
-        return "rolled back";
-      case Status.STATUS_UNKNOWN:
-        return "unknown";
-      case Status.STATUS_NO_TRANSACTION:
-        return "no transaction";
-      case Status.STATUS_PREPARING:
-        return "preparing";
-      case Status.STATUS_COMMITTING:
-        return "committing";
-      case Status.STATUS_ROLLING_BACK:
-        return "rolling back";
-      default:
-        return "undefined status";
-    }
+    return switch (status) {
+      case Status.STATUS_ACTIVE -> "active";
+      case Status.STATUS_MARKED_ROLLBACK -> "marked rollback";
+      case Status.STATUS_PREPARED -> "prepared";
+      case Status.STATUS_COMMITTED -> "committed";
+      case Status.STATUS_ROLLEDBACK -> "rolled back";
+      case Status.STATUS_UNKNOWN -> "unknown";
+      case Status.STATUS_NO_TRANSACTION -> "no transaction";
+      case Status.STATUS_PREPARING -> "preparing";
+      case Status.STATUS_COMMITTING -> "committing";
+      case Status.STATUS_ROLLING_BACK -> "rolling back";
+      default -> "undefined status";
+    };
   }
 
   public synchronized void finalCleanUp() throws ResourceManagerException {

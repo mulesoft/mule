@@ -6,21 +6,23 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.internal.transaction.DelegateTransaction;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
 import org.junit.Test;
 
-public class DelegateTransactionTestCase {
+public class DelegateTransactionTestCase extends AbstractMuleTestCase {
 
   @Test
   public void nullTx() throws TransactionException {
-    DelegateTransaction delegateTransaction = new DelegateTransaction("app", mock(NotificationDispatcher.class), null);
+    DelegateTransaction delegateTransaction = new DelegateTransaction("app", mock(NotificationDispatcher.class));
     assertThat(delegateTransaction.isBegun(), is(false));
     assertThat(delegateTransaction.isRollbackOnly(), is(false));
     assertThat(delegateTransaction.isRolledBack(), is(false));

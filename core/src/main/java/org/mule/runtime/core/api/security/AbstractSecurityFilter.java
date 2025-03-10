@@ -42,7 +42,7 @@ public abstract class AbstractSecurityFilter extends AbstractComponent implement
   @Override
   public final void initialise() throws InitialisationException {
     if (securityManager == null) {
-      securityManager = (SecurityManager) registry.lookupByName(OBJECT_SECURITY_MANAGER).get();
+      securityManager = (SecurityManager) registry.lookupByName(OBJECT_SECURITY_MANAGER).orElse(null);
     }
 
     if (securityManager == null) {

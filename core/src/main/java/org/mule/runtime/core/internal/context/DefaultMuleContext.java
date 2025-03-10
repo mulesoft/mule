@@ -72,7 +72,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.invalidJdk;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
@@ -201,11 +200,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import javax.transaction.TransactionManager;
-
 import org.apache.commons.lang3.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
+
+import jakarta.transaction.TransactionManager;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
 
@@ -825,28 +824,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   @Override
   public ServerNotificationManager getNotificationManager() {
     return notificationManager;
-  }
-
-  /**
-   * Sets the JTA Transaction Manager to use with this Mule server instance
-   *
-   * @param manager the manager to use
-   * @throws RegistrationException if a transaction manager has already been set
-   */
-  @Override
-  public void setTransactionManager(TransactionManager manager) throws RegistrationException {
-    // checkLifecycleForPropertySet(MuleProperties.OBJECT_TRANSACTION_MANAGER, Initialisable.PHASE_NAME);
-    muleRegistryHelper.registerObject(OBJECT_TRANSACTION_MANAGER, manager);
-  }
-
-  /**
-   * Returns the Jta transaction manager used by this Mule server instance. or null if a transaction manager has not been set
-   *
-   * @return the Jta transaction manager used by this Mule server instance. or null if a transaction manager has not been set
-   */
-  @Override
-  public TransactionManager getTransactionManager() {
-    return getRegistry().lookupObject(OBJECT_TRANSACTION_MANAGER);
   }
 
   protected void checkLifecycleForPropertySet(String propertyName, String phase) throws IllegalStateException {

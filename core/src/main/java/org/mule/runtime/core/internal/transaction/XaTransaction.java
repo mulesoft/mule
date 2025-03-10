@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.transaction;
 
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
@@ -15,12 +14,15 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegist
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionCommitFailed;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionResourceAlreadyListedForKey;
+
+import static java.lang.Thread.currentThread;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.MuleXaObject;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
@@ -31,16 +33,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 
 import org.slf4j.Logger;
+
+import jakarta.transaction.HeuristicRollbackException;
+import jakarta.transaction.InvalidTransactionException;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
 
 /**
  * <code>XaTransaction</code> represents an XA transaction in Mule.
@@ -49,7 +52,7 @@ import org.slf4j.Logger;
 public class XaTransaction extends AbstractTransaction {
 
   private static final Logger LOGGER = getLogger(XaTransaction.class);
-  private static final String TX_MANAGER_CLASS = "javax.transaction.TransactionManager";
+  private static final String TX_MANAGER_CLASS = TransactionManager.class.getName();
   private static final String TX_MANAGER_NAME = "Transaction Manager";
 
   /**
@@ -67,15 +70,6 @@ public class XaTransaction extends AbstractTransaction {
   public XaTransaction(String applicationName, TransactionManager transactionManager, NotificationDispatcher notificationFirer) {
     super(applicationName, notificationFirer);
     this.txManager = transactionManager;
-  }
-
-  /**
-   * @deprecated since 4.3.0. Use {@link #XaTransaction(String, TransactionManager, NotificationDispatcher)} instead
-   */
-  @Deprecated(since = "4.3.0")
-  public XaTransaction(MuleContext muleContext) {
-    super(muleContext);
-    this.txManager = muleContext.getTransactionManager();
   }
 
   @Override
@@ -359,9 +353,7 @@ public class XaTransaction extends AbstractTransaction {
       final Object value = entry.getValue();
       if (value instanceof MuleXaObject xaObject) {
         if (!xaObject.isReuseObject()) {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("About to close resource {}...", xaObject);
-          }
+          LOGGER.debug("About to close resource {}...", xaObject);
           try {
             xaObject.close();
             i.remove();
@@ -369,14 +361,10 @@ public class XaTransaction extends AbstractTransaction {
             LOGGER.error("Failed to close resource " + xaObject, e);
           }
         } else {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Not closing reusable object {}", xaObject);
-          }
+          LOGGER.debug("Not closing reusable object {}", xaObject);
         }
       } else {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Not closing non-MuleXaObject object {}", value);
-        }
+        LOGGER.debug("Not closing non-MuleXaObject object {}", value);
       }
     }
   }

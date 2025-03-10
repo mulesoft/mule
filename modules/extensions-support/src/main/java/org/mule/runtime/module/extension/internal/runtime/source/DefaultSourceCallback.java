@@ -52,8 +52,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.transaction.TransactionManager;
-
 /**
  * Default implementation of {@link SourceCallback}. Instances are to be created through the {@link #builder(ProfilingService)}
  * method.
@@ -107,12 +105,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     public Builder<T, A> setDefaultEncoding(Charset defaultEncoding) {
       product.defaultEncoding = defaultEncoding;
-
-      return this;
-    }
-
-    public Builder<T, A> setTransactionManager(TransactionManager transactionManager) {
-      product.transactionManager = transactionManager;
 
       return this;
     }
@@ -199,7 +191,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private ConfigurationInstance configurationInstance;
   private Processor listener;
   private Charset defaultEncoding;
-  private TransactionManager transactionManager;
 
   private String applicationName;
   private NotificationDispatcher notificationDispatcher;
@@ -267,20 +258,20 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     String name = null;
     Map<String, String> attributes = new HashMap<>();
 
-    DistributedTraceContextManager distributedSourceTraceContextManager = context.getDistributedSourceTraceContext();
+    DistributedTraceContextManager distributedTraceContextManager = context.getDistributedSourceTraceContext();
 
-    if (distributedSourceTraceContextManager instanceof SourceDistributedTraceContextManager) {
-      name = ((SourceDistributedTraceContextManager) distributedSourceTraceContextManager).getSpanName();
-      attributes = ((SourceDistributedTraceContextManager) distributedSourceTraceContextManager).getSpanRootAttributes();
+    if (distributedTraceContextManager instanceof SourceDistributedTraceContextManager distributedSourceTraceContextManager) {
+      name = distributedSourceTraceContextManager.getSpanName();
+      attributes = distributedSourceTraceContextManager.getSpanRootAttributes();
     }
     SourceResultAdapter resultAdapter =
         new SourceResultAdapter(result, cursorProviderFactory, mediaType, returnsListOfMessages,
                                 context.getCorrelationId(), payloadMediaTypeResolver, context.getDistributedSourceTraceContext(),
                                 name,
                                 attributes,
-                                context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).map(info -> (PollItemInformation) info));
+                                context.getVariable(ACCEPTED_POLL_ITEM_INFORMATION).map(PollItemInformation.class::cast));
 
-    executeFlow(context, messageProcessContext, resultAdapter, distributedSourceTraceContextManager);
+    executeFlow(context, messageProcessContext, resultAdapter, distributedTraceContextManager);
     contextAdapter.dispatched();
   }
 
@@ -309,8 +300,8 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     Charset existingEncoding = encodingParam;
     MediaType mediaType = mimeTypeInitParam;
     if (mediaType == null) {
-      if (value instanceof Result) {
-        final Optional<MediaType> optionalMediaType = ((Result) value).getMediaType();
+      if (value instanceof Result result) {
+        final Optional<MediaType> optionalMediaType = result.getMediaType();
         if (optionalMediaType.isPresent()) {
           mediaType = optionalMediaType.get();
           existingEncoding = mediaType.getCharset().orElse(existingEncoding);
@@ -394,14 +385,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   @Override
   public ComponentLocation getSourceLocation() {
     return messageSource.getLocation();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public TransactionManager getTransactionManager() {
-    return transactionManager;
   }
 
   /**

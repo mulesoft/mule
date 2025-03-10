@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+
 import static java.util.Optional.empty;
+
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -25,10 +27,11 @@ import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
-import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.xml.namespace.QName;
 
 /**
  * Utils to create a {@link TryScope} fully configured.
@@ -42,7 +45,9 @@ public class TryScopeTestUtils {
   /**
    * Creates a {@link TryScope} that could be transactional (with local or xa transaction), without timeout.
    */
-  public static TryScope createTryScope(MuleContext muleContext, ProfilingService profilingService, Optional<Boolean> txType)
+  public static TryScope createTryScope(MuleContext muleContext,
+                                        ProfilingService profilingService,
+                                        Optional<Boolean> txType)
       throws MuleException {
     return createTryScope(muleContext, profilingService, txType, empty());
   }
@@ -50,7 +55,9 @@ public class TryScopeTestUtils {
   /**
    * Creates a {@link TryScope} that could be transactional (with local or xa transaction), with a given timeout.
    */
-  public static TryScope createTryScope(MuleContext muleContext, ProfilingService profilingService, Optional<Boolean> txType,
+  public static TryScope createTryScope(MuleContext muleContext,
+                                        ProfilingService profilingService,
+                                        Optional<Boolean> txType,
                                         Optional<Integer> timeout)
       throws MuleException {
     TryScope scope = new TryScope();
@@ -66,7 +73,6 @@ public class TryScopeTestUtils {
     scope.setExceptionListener(mock(FlowExceptionHandler.class));
     scope.setProfilingService(profilingService);
     scope.setMuleConfiguration(mock(MuleConfiguration.class));
-    scope.setTransactionManager(muleContext.getTransactionManager());
     scope.setMuleContext(muleContext);
     scope.setNotificationDispatcher(mock(NotificationDispatcher.class));
     muleContext.getInjector().inject(scope);

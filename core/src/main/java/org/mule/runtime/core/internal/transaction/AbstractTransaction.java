@@ -12,25 +12,23 @@ import static org.mule.runtime.api.notification.TransactionNotification.TRANSACT
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
+
 import static java.lang.System.identityHashCode;
 import static java.text.MessageFormat.format;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -52,20 +50,8 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected ComponentLocation componentLocation;
 
   protected String applicationName;
-  protected MuleContext muleContext;
   protected final NotificationDispatcher notificationFirer;
   protected boolean rollbackAfterTimeout;
-
-  @Deprecated(since = "4.4.0")
-  protected AbstractTransaction(MuleContext muleContext) {
-    this.muleContext = muleContext;
-    try {
-      applicationName = muleContext.getConfiguration().getId();
-      notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
-    } catch (RegistrationException e) {
-      throw new MuleRuntimeException(e);
-    }
-  }
 
   protected AbstractTransaction(String applicationName, NotificationDispatcher notificationFirer) {
     this.applicationName = applicationName;
@@ -182,7 +168,6 @@ public abstract class AbstractTransaction implements TransactionAdapter {
    *
    */
   protected void fireNotification(TransactionNotification notification) {
-    // TODO profile this piece of code
     notificationFirer.dispatch(notification);
   }
 
@@ -197,7 +182,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   }
 
   @Override
-  public javax.transaction.Transaction suspend() throws TransactionException {
+  public jakarta.transaction.Transaction suspend() throws TransactionException {
     throw new IllegalTransactionStateException(notMuleXaTransaction(this));
   }
 

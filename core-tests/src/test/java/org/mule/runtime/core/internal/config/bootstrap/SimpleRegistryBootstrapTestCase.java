@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.config.bootstrap;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.createFromString;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 
@@ -19,6 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
@@ -99,5 +101,20 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleContextTestCase
     assertThat(BINDING_PROVIDER_PREDICATE.test("someFunctionsProvider"), is(true));
     assertThat(BINDING_PROVIDER_PREDICATE.test("my.bindings.provider"), is(false));
     assertThat(BINDING_PROVIDER_PREDICATE.test("someRandomEntry"), is(false));
+  }
+
+  @Test
+  public void createArtifactFromString() {
+    assertThat(createFromString("domain"), is(DOMAIN));
+  }
+
+  @Test(expected = MuleRuntimeException.class)
+  public void createArtifactFromStringWithError() {
+    createFromString("Messi");
+  }
+
+  @Test
+  public void toNewVersion() {
+    assertThat(DOMAIN.getArtifactType().getArtifactTypeAsString(), is("domain"));
   }
 }

@@ -20,12 +20,13 @@ import org.mule.runtime.core.api.MuleContext;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Issue("MULE-19984")
 @Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
@@ -99,8 +100,8 @@ public class BeanWrapperTestCase {
   @Test
   public void nullInWrapperTest() {
     exceptionRule.expect(NullPointerException.class);
-    exceptionRule.expectMessage("bean must not be null");
-    new BeanWrapper("null", null);
+    exceptionRule.expectMessage("bean `nullBean` must not be null");
+    new BeanWrapper("nullBean", null);
   }
 
   @Test

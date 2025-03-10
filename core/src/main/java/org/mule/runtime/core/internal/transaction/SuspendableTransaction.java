@@ -28,5 +28,5 @@ public interface SuspendableTransaction extends Transaction {
    *
    * @throws TransactionException if any error
    */
-  javax.transaction.Transaction suspend() throws TransactionException;
+  jakarta.transaction.Transaction suspend() throws TransactionException;
 }
