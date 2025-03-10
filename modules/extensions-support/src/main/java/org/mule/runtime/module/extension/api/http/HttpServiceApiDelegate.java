@@ -13,9 +13,11 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.proxy.ProxyConfig;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.server.HttpServerFactory;
+import org.mule.runtime.http.api.server.HttpServerConfiguration;
+import org.mule.runtime.http.api.server.ServerCreationException;
 import org.mule.sdk.api.http.HttpClientFactory;
 import org.mule.sdk.api.http.HttpRequestOptionsBuilder;
+import org.mule.sdk.api.http.HttpServerFactory;
 import org.mule.sdk.api.http.HttpServiceApi;
 
 import javax.inject.Inject;
@@ -24,7 +26,7 @@ import javax.inject.Inject;
  * Definition of {@link HttpServiceApi} that just delegates all to the {@link HttpService}.
  */
 public class HttpServiceApiDelegate implements
-    HttpServiceApi<HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions, HttpResponse>, HttpServerFactory, HttpAuthentication, ProxyConfig> {
+    HttpServiceApi<HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions, HttpResponse>, HttpServerFactory<HttpServerConfiguration, ServerCreationException>, HttpAuthentication, ProxyConfig> {
 
   @Inject
   private HttpService delegate;
@@ -35,8 +37,8 @@ public class HttpServiceApiDelegate implements
   }
 
   @Override
-  public HttpServerFactory getServerFactory() {
-    return delegate.getServerFactory();
+  public HttpServerFactory<HttpServerConfiguration, ServerCreationException> getServerFactory() {
+    return new HttpServerFactoryWrapper(delegate.getServerFactory());
   }
 
   @Override
