@@ -195,7 +195,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 public class MessagesTestCase {
