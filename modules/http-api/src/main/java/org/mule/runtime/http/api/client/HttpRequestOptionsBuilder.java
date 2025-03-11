@@ -16,7 +16,8 @@ import org.mule.runtime.http.api.client.proxy.ProxyConfig;
  *
  * @since 4.2
  */
-public final class HttpRequestOptionsBuilder {
+public final class HttpRequestOptionsBuilder
+    implements org.mule.sdk.api.http.HttpRequestOptionsBuilder<HttpAuthentication, ProxyConfig> {
 
   private int responseTimeout = 30000;
   private boolean followsRedirect = true;

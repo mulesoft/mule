@@ -373,5 +373,4 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   protected void configureSpanExporterConfiguration(MuleContext muleContext) throws RegistrationException {
     registerObject(MULE_SPAN_EXPORTER_CONFIGURATION_KEY, new EmptySpanExporterConfiguration(), muleContext);
   }
-
 }
