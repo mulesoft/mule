@@ -19,6 +19,8 @@ import java.util.OptionalLong;
 
 /**
  * Server-sent event.
+ *
+ * TODO: Move to service...
  */
 public class ServerSentEventImpl implements Serializable, org.mule.sdk.api.http.sse.ServerSentEvent {
 

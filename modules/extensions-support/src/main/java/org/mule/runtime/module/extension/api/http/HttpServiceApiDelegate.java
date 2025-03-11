@@ -7,42 +7,28 @@
 package org.mule.runtime.module.extension.api.http;
 
 import org.mule.runtime.http.api.HttpService;
-import org.mule.runtime.http.api.client.HttpClientConfiguration;
-import org.mule.runtime.http.api.client.HttpRequestOptions;
-import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.runtime.http.api.client.proxy.ProxyConfig;
-import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.server.HttpServerConfiguration;
-import org.mule.runtime.http.api.server.ServerCreationException;
-import org.mule.sdk.api.http.HttpClientFactory;
-import org.mule.sdk.api.http.HttpRequestOptionsBuilder;
-import org.mule.sdk.api.http.HttpServerFactory;
 import org.mule.sdk.api.http.HttpServiceApi;
+import org.mule.sdk.api.http.sse.ClientWithSse;
+import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.ServerWithSse;
+import org.mule.sdk.api.http.sse.SseClient;
+import org.mule.sdk.api.http.sse.SseEndpointManager;
+import org.mule.sdk.api.http.sse.SseRetryConfig;
 
-import javax.inject.Inject;
+import java.util.function.Consumer;
 
 /**
  * Definition of {@link HttpServiceApi} that just delegates all to the {@link HttpService}.
  */
-public class HttpServiceApiDelegate implements
-    HttpServiceApi<HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions, HttpResponse>, HttpServerFactory<HttpServerConfiguration, ServerCreationException>, HttpAuthentication, ProxyConfig> {
-
-  @Inject
-  private HttpService delegate;
+public class HttpServiceApiDelegate implements HttpServiceApi {
 
   @Override
-  public HttpClientFactory<HttpClientConfiguration, HttpRequest, HttpRequestOptions, HttpResponse> getClientFactory() {
-    return new HttpClientFactoryWrapper(delegate.getClientFactory());
+  public SseEndpointManager sseEndpoint(ServerWithSse httpServer, String ssePath, Consumer<SseClient> sseClientHandler) {
+    return httpServer.sse(ssePath, sseClientHandler);
   }
 
   @Override
-  public HttpServerFactory<HttpServerConfiguration, ServerCreationException> getServerFactory() {
-    return new HttpServerFactoryWrapper(delegate.getServerFactory());
-  }
-
-  @Override
-  public HttpRequestOptionsBuilder<HttpAuthentication, ProxyConfig> requestOptionsBuilder() {
-    return HttpRequestOptions.builder();
+  public ServerSentEventSource sseSource(ClientWithSse httpClient, String url, SseRetryConfig retryConfig) {
+    return httpClient.sseSource(url, retryConfig);
   }
 }
