@@ -14,16 +14,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import reactor.test.publisher.TestPublisher;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,38 +35,36 @@ class StreamPerEventSinkTest {
   private Consumer<CoreEvent> consumer;
   @Mock
   private CoreEvent event;
-  private TestPublisher<CoreEvent> publisher;
 
   @BeforeEach
   void setUp() {
-    publisher = TestPublisher.create();
     sink = new StreamPerEventSink(processor, consumer);
     when(processor.apply(any())).thenAnswer(inv -> inv.getArgument(0));
-    when(processor.andThen(any())).thenAnswer(inv -> inv.getArgument(0));
-    when(processor.compose(any())).thenAnswer(inv -> inv.getArgument(0));
   }
 
   @Test
-  void accept() throws InterruptedException {
-    CountDownLatch latch = new CountDownLatch(1);
-    doAnswer(inv -> {
-      latch.countDown();
-      return null;
-    }).when(consumer).accept(any());
-
+  void accept() {
     sink.accept(event);
-    latch.await();
 
-    publisher.assertSubscribers(1);
-    verify(processor).apply(any());
-    verifyNoMoreInteractions(processor);
+    verify(consumer).accept(event);
+  }
+
+  @Test
+  void acceptThrows() {
+    doThrow(new IllegalArgumentException("Imma tiny stoat")).when(consumer).accept(any());
+
+    assertThrows(IllegalArgumentException.class, () -> sink.accept(event));
+
+    verify(consumer).accept(event);
   }
 
   @Test
   void emit() {
+
     final BackPressureReason result = sink.emit(event);
 
+    verify(consumer).accept(event);
+    // We always return null from emit...
     assertNull(result);
-    publisher.assertSubscribers(1);
   }
 }
