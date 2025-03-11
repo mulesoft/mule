@@ -12,6 +12,9 @@ import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.ws.WebSocket;
+import org.mule.sdk.api.http.sse.ClientWithSse;
+import org.mule.sdk.api.http.sse.ServerSentEventSource;
+import org.mule.sdk.api.http.sse.SseRetryConfig;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +30,7 @@ import java.util.function.BiConsumer;
  * @since 4.0
  */
 @NoImplement
-public interface HttpClient {
+public interface HttpClient extends ClientWithSse {
 
   /**
    * Fully configures the client, leaving it ready to use. Must be executed before any requests are attempted.
@@ -165,5 +168,19 @@ public interface HttpClient {
                                                      String socketId,
                                                      WebSocketCallback callback) {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
+
+  /**
+   * Creates a consumer of Server-sent events. The resulting {@link ServerSentEventSource} is not connected automatically.
+   *
+   * @param url         the URL of the server.
+   * @param retryConfig configuration for the retry mechanism.
+   * @return a non-connected instance of {@link ServerSentEventSource}.
+   *
+   * @since 4.10.0
+   */
+  @Override
+  default ServerSentEventSource sseSource(String url, SseRetryConfig retryConfig) {
+    throw new UnsupportedOperationException("Server-sent Events are not supported");
   }
 }
