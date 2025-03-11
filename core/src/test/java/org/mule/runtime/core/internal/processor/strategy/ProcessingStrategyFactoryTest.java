@@ -37,17 +37,17 @@ public class ProcessingStrategyFactoryTest {
   private ProcessingStrategy delegate;
   @Mock
   private Injector injector;
-  @InjectMocks
-  private TransactionAwareStreamEmitterProcessingStrategyFactory taseFactory;
-  @InjectMocks
-  private DirectStreamPerThreadProcessingStrategyFactory dsptFactory;
+  @Mock
+  private TransactionAwareStreamEmitterProcessingStrategyDecorator decorator;
 
   @BeforeEach
   public void setUp() throws Exception {}
 
   @Test
   public void directStreamPerThreadFactory() {
-    final Sink result = dsptFactory.create(context, "foo").createSink(flow, pipeline);
+    final DirectStreamPerThreadProcessingStrategyFactory factory = new DirectStreamPerThreadProcessingStrategyFactory();
+
+    final Sink result = factory.create(context, "foo").createSink(flow, pipeline);
 
     assertThat(result, is(notNullValue()));
   }
@@ -55,7 +55,19 @@ public class ProcessingStrategyFactoryTest {
   @Test
   public void transactionAwareDirectStreamFactory() {
     when(context.getInjector()).thenReturn(injector);
-    final Sink result = taseFactory.create(context, "foo").createSink(flow, pipeline);
+    final TransactionAwareStreamEmitterProcessingStrategyFactory factory =
+        new TransactionAwareStreamEmitterProcessingStrategyFactory(ps -> decorator);
+
+    final Sink result = factory.create(context, "foo").createSink(flow, pipeline);
+
+    assertThat(result, is(notNullValue()));
+  }
+
+  @Test
+  public void proacterWossnameStreamFactory() {
+    final ProactorStreamEmitterProcessingStrategyFactory factory = new ProactorStreamEmitterProcessingStrategyFactory();
+
+    final Sink result = factory.create(context, "foo").createSink(flow, pipeline);
 
     assertThat(result, is(notNullValue()));
   }

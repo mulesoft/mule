@@ -14,15 +14,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.reactivestreams.Publisher;
+import reactor.test.publisher.TestPublisher;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,28 +36,31 @@ class StreamPerEventSinkTest {
   private Consumer<CoreEvent> consumer;
   @Mock
   private CoreEvent event;
-  @Mock
-  private Publisher<CoreEvent> publisher;
+  private TestPublisher<CoreEvent> publisher;
 
   @BeforeEach
   void setUp() {
+    publisher = TestPublisher.create();
     sink = new StreamPerEventSink(processor, consumer);
-    when(processor.apply(any())).thenReturn(publisher);
+    when(processor.apply(any())).thenAnswer(inv -> inv.getArgument(0));
+    when(processor.andThen(any())).thenAnswer(inv -> inv.getArgument(0));
+    when(processor.compose(any())).thenAnswer(inv -> inv.getArgument(0));
   }
 
   @Test
-  void accept() {
+  void accept() throws InterruptedException {
+    CountDownLatch latch = new CountDownLatch(1);
+    doAnswer(inv -> {
+      latch.countDown();
+      return null;
+    }).when(consumer).accept(any());
+
     sink.accept(event);
+    latch.await();
 
-    // We process the event
-    verify(consumer).accept(eq(event));
-  }
-
-  @Test
-  void acceptThrows() {
-    doThrow(new IllegalArgumentException("Misbegotten son of a wombat")).when(consumer).accept(any());
-
-    assertThrows(IllegalArgumentException.class, () -> sink.accept(event));
+    publisher.assertSubscribers(1);
+    verify(processor).apply(any());
+    verifyNoMoreInteractions(processor);
   }
 
   @Test
@@ -64,6 +68,6 @@ class StreamPerEventSinkTest {
     final BackPressureReason result = sink.emit(event);
 
     assertNull(result);
-    verify(consumer).accept(eq(event));
+    publisher.assertSubscribers(1);
   }
 }
