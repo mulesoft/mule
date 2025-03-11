@@ -43,7 +43,7 @@ import org.mule.tck.size.SmallTest;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 
-import jakarta.activation.MimeTypeParseException;
+import javax.activation.MimeTypeParseException;
 
 import org.junit.After;
 import org.junit.Before;

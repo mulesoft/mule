@@ -86,7 +86,7 @@ public class Controller {
     checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(args);
     try {
       osSpecificController.start(args);
-    } catch (Throwable mce) {
+    } catch (MuleControllerException mce) {
       try {
         printLog();
       } catch (IOException ioe) {
