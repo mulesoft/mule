@@ -276,11 +276,13 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
         mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
 
     final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
-        .forcePolicyUpdateNever(true)
+        .forcePolicyUpdateNever(false)
+        .forcePolicyUpdateAlways(true)
         .localMavenRepositoryLocation(localMavenRepository.get());
     mavenClientProvider.getSettingsSupplierFactory().addToMavenConfig(mavenConfigurationBuilder);
 
     final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
+    LOGGER.error("Using MavenConfiguration: {}", mavenConfiguration);
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Using MavenConfiguration: {}", mavenConfiguration);
     }
