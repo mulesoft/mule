@@ -6,13 +6,20 @@
  */
 package org.mule.runtime.deployment.model.internal.policy;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
+import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
+
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +34,19 @@ public class PolicyTemplateClassLoaderFactory implements DeployableArtifactClass
       throw new IllegalArgumentException("Policy folder does not exists: " + (rootFolder != null ? rootFolder.getName() : null));
     }
 
-    final ClassLoaderLookupPolicy classLoaderLookupPolicy = parent.getClassLoaderLookupPolicy();
+    List<String> packages = new ArrayList<>(descriptor.getClassLoaderConfiguration().getExportedPackages());
+    if (descriptor.getPlugins() != null) {
+      for (ArtifactPluginDescriptor artifactPluginDescriptor : descriptor.getPlugins()) {
+        packages.addAll(artifactPluginDescriptor.getClassLoaderConfiguration().getExportedPackages());
+      }
+    }
+
+    ClassLoaderLookupPolicy classLoaderLookupPolicy;
+    if (isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor)) {
+      classLoaderLookupPolicy = parent.getClassLoaderLookupPolicy().extend(packages.stream(), CHILD_FIRST, true);
+    } else {
+      classLoaderLookupPolicy = parent.getClassLoaderLookupPolicy();
+    }
 
     MuleDeployableArtifactClassLoader deployableArtifactClassLoader =
         new MuleDeployableArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
