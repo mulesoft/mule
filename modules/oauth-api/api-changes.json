@@ -1,4 +1,58 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "method void org.mule.oauth.client.api.AuthorizationCodeOAuthDancer::addListener(org.mule.oauth.client.api.listener.AuthorizationCodeListener)",
+          "new": "method void org.mule.oauth.client.api.AuthorizationCodeOAuthDancer::addListener(org.mule.oauth.client.api.listener.AuthorizationCodeListener)",
+          "annotation": "@java.lang.Deprecated(since = \"1.1\")",
+          "attribute": "since",
+          "justification": "W-17873252: fix SonarQube code smells"
+        },
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "method void org.mule.oauth.client.api.AuthorizationCodeOAuthDancer::removeListener(org.mule.oauth.client.api.listener.AuthorizationCodeListener)",
+          "new": "method void org.mule.oauth.client.api.AuthorizationCodeOAuthDancer::removeListener(org.mule.oauth.client.api.listener.AuthorizationCodeListener)",
+          "annotation": "@java.lang.Deprecated(since = \"1.1\")",
+          "attribute": "since",
+          "justification": "W-17873252: fix SonarQube code smells"
+        },
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "method org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "new": "method org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "annotation": "@java.lang.Deprecated(since = \"1.0\")",
+          "attribute": "since",
+          "justification": "W-17873252: fix SonarQube code smells"
+        },
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "method org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "new": "method org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "annotation": "@java.lang.Deprecated(since = \"1.0\")",
+          "attribute": "since",
+          "justification": "W-17873252: fix SonarQube code smells"
+        },
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "method void org.mule.oauth.client.api.AuthorizationCodeOAuthDancer::addListener(org.mule.oauth.client.api.listener.AuthorizationCodeListener) @ org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer",
+          "new": "method void org.mule.oauth.client.api.AuthorizationCodeOAuthDancer::addListener(org.mule.oauth.client.api.listener.AuthorizationCodeListener) @ org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer",
+          "annotation": "@java.lang.Deprecated(since = \"1.1\")",
+          "attribute": "since",
+          "justification": "W-17873252: fix SonarQube code smells"
+        },
+        {
+          "code": "java.annotation.attributeAdded",
+          "old": "method void org.mule.oauth.client.api.AuthorizationCodeOAuthDancer::removeListener(org.mule.oauth.client.api.listener.AuthorizationCodeListener) @ org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer",
+          "new": "method void org.mule.oauth.client.api.AuthorizationCodeOAuthDancer::removeListener(org.mule.oauth.client.api.listener.AuthorizationCodeListener) @ org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer",
+          "annotation": "@java.lang.Deprecated(since = \"1.1\")",
+          "attribute": "since",
+          "justification": "W-17873252: fix SonarQube code smells"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "_comment": "TODO W-13186030 Review these changes",

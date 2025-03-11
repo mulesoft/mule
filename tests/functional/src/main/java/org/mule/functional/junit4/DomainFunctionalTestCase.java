@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.TransactionManager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -214,6 +214,10 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     return emptyMap();
   }
 
+  protected Map<String, Object> getAppStartUpRegistryObjects() {
+    return emptyMap();
+  }
+
   @After
   public void disposeMuleContexts() {
     for (MuleContext muleContext : muleContexts.values()) {
@@ -238,6 +242,12 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
   private MuleContext createAppMuleContext(String[] configResource, ArtifactContext domainArtifactContext) throws Exception {
     return new ApplicationContextBuilder() {
+
+      @Override
+      protected void addBuilders(List<ConfigurationBuilder> builders) {
+        super.addBuilders(builders);
+        builders.add(new SimpleConfigurationBuilder(getAppStartUpRegistryObjects()));
+      }
 
       @Override
       protected Set<ExtensionModel> getExtensionModels() {

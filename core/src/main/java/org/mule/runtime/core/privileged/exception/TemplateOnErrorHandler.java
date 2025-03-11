@@ -87,6 +87,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -272,8 +273,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private Mono<CoreEvent> applyInternal(final Exception exception) {
     return Mono.create(sink -> {
       final Consumer<Exception> router = router(identity(),
-                                                handledEvent -> sink.success(handledEvent),
-                                                rethrownError -> sink.error(rethrownError));
+                                                sink::success,
+                                                sink::error);
       try {
         router.accept(exception);
       } finally {
@@ -288,13 +289,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         logger.error("Exception during exception strategy execution");
         getExceptionListener().resolveAndLogException(me);
         boolean rollback = false;
-        if (obj instanceof CoreEvent) {
-          rollback = isOwnedTransaction((CoreEvent) obj, getException((CoreEvent) obj));
-        } else if (obj instanceof Either) {
-          if (((Either) obj).getLeft() instanceof MessagingException) {
-            MessagingException exception = (MessagingException) ((Either) obj).getLeft();
-            rollback = isOwnedTransaction(exception.getEvent(), exception);
-          }
+        if (obj instanceof CoreEvent coreEvent) {
+          rollback = isOwnedTransaction(coreEvent, getException(coreEvent));
+        } else if (obj instanceof Either either && either.getLeft() instanceof MessagingException messagingException) {
+          rollback = isOwnedTransaction(messagingException.getEvent(), messagingException);
         }
         if (rollback) {
           profileTransactionAction(rollbackProducer, TX_ROLLBACK, getLocation());
@@ -314,7 +312,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private void fireEndNotification(CoreEvent event, CoreEvent result, Throwable throwable) {
     getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(result != null ? result
-        : event, throwable instanceof MessagingException ? (MessagingException) throwable : null,
+        : event, throwable instanceof MessagingException messagingException ? messagingException : null,
                                                                             configuredMessageProcessors),
                                                                  getLocation(), PROCESS_END));
   }
@@ -341,8 +339,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   protected void markExceptionAsHandled(Exception exception) {
-    if (exception instanceof MessagingException) {
-      ((MessagingException) exception).setHandled(true);
+    if (exception instanceof MessagingException messagingException) {
+      messagingException.setHandled(true);
     }
   }
 
@@ -356,20 +354,16 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public void start() throws MuleException {
-    if (fromGlobalErrorHandler) {
-      if (ownedProcessingStrategy.isPresent()) {
-        startIfNeeded(ownedProcessingStrategy);
-      }
+    if (fromGlobalErrorHandler && ownedProcessingStrategy.isPresent()) {
+      startIfNeeded(ownedProcessingStrategy);
     }
     super.start();
   }
 
   @Override
   public void stop() throws MuleException {
-    if (fromGlobalErrorHandler) {
-      if (ownedProcessingStrategy.isPresent()) {
-        stopIfNeeded(ownedProcessingStrategy);
-      }
+    if (fromGlobalErrorHandler && ownedProcessingStrategy.isPresent()) {
+      stopIfNeeded(ownedProcessingStrategy);
     }
     super.stop();
   }
@@ -600,87 +594,107 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   protected boolean isOwnedTransaction(CoreEvent event, Exception exception) {
     Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-    if (transaction == null || !(transaction instanceof TransactionAdapter)
-        || !((TransactionAdapter) transaction).getComponentLocation().isPresent()) {
+    if (!(transaction instanceof TransactionAdapter txAdapter)
+        || !txAdapter.getComponentLocation().isPresent()) {
       return false;
     }
 
-    final TransactionAdapter txAdapter = (TransactionAdapter) transaction;
     if (inDefaultErrorHandler()) {
       // This case is for an implicit error handler, if we are in a configured default error handler then
       // it will be the same as the global error handler case.
       return defaultErrorHandlerOwnsTransaction(txAdapter);
     }
 
-    if (fromGlobalErrorHandler && exception != null) {
-      String tempTransactionLocation = txAdapter.getComponentLocation().get().getLocation();
-      if (tempTransactionLocation.endsWith("/source")) {
-        // Set the flow as the location, as flows are the owners of transactions started by sources
-        tempTransactionLocation = tempTransactionLocation.substring(0, tempTransactionLocation.lastIndexOf('/'));
-      }
-      final String transactionLocation = tempTransactionLocation;
-
-      if (!componentsReferencingGlobalErrorHandler.contains(transactionLocation)) {
-        return false;
-      }
-
-      String localFailingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
-      String failingComponentHandledKey = transactionLocation + localFailingComponentLocation;
-      FailingComponentHandle failingComponentHandle = null;
-      if (failingComponentHandled.get(failingComponentHandledKey) != null) {
-        if (getFlowStackElementLocation(event.getFlowCallStack().peek()).endsWith(localFailingComponentLocation)) {
-          // There was an on-error-continue in the middle of the global on-error-propagate handlers, process handle logic from
-          // scratch
-          failingComponentHandled.remove(failingComponentHandledKey);
-        } else {
-          failingComponentHandle = failingComponentHandled.get(failingComponentHandledKey);
-        }
-      }
-
-      if (failingComponentHandle != null) {
-        failingComponentHandle.handle();
-        if (failingComponentHandle.isHandled()) {
-          failingComponentHandled.remove(failingComponentHandledKey);
-          return true;
-        }
-
-        return false;
-      } else {
-        StringBuilder fullFailingComponentLocationUpToTxOwnerBuilder = new StringBuilder();
-        for (FlowStackElement element : event.getFlowCallStack().getElements()) {
-          String location = getFlowStackElementLocation(element);
-          fullFailingComponentLocationUpToTxOwnerBuilder.insert(0, location + "/");
-          if (location.startsWith(transactionLocation)) {
-            // Stack element of the flow containing the transaction owner found, processing is finished
-            break;
-          }
-        }
-        String fullFailingComponentLocationUpToTxOwner = fullFailingComponentLocationUpToTxOwnerBuilder.toString();
-
-        String transactionOwnerFlow = getFlow(transactionLocation);
-        Set<String> referencesContainingFailingComponentUpToTxOwner =
-            componentsReferencingGlobalErrorHandler.stream().map(this::normalizeRef)
-                // If the flow of the global error handler reference component is not the same as the one of the failing component
-                // location, then it's been called as a flow-ref
-                .filter(ref -> getFlow(ref).equals(getFlow(fullFailingComponentLocationUpToTxOwner))
-                    ? fullFailingComponentLocationUpToTxOwner.contains(ref)
-                    : fullFailingComponentLocationUpToTxOwner.contains(normalizeFlowRef(ref)))
-                .filter(ref -> !getFlow(ref).equals(transactionOwnerFlow) || ref.startsWith(transactionLocation))
-                .collect(toSet());
-        if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
-          // The failing component is nested within more than one component that reference this handler:
-          // transactionOwnerWithThisHandler-componentWithThisHandler-...-failingComponent
-          failingComponentHandled.put(failingComponentHandledKey,
-                                      new FailingComponentHandle(referencesContainingFailingComponentUpToTxOwner.size()));
-
-          return false;
-        }
-
-        return true;
-      }
+    if (!fromGlobalErrorHandler || exception == null) {
+      return isOwnedTransactionByLocalErrorHandler(txAdapter);
     }
 
-    return isOwnedTransactionByLocalErrorHandler(txAdapter);
+
+    String tempTransactionLocation = txAdapter.getComponentLocation().get().getLocation();
+    if (tempTransactionLocation.endsWith("/source")) {
+      // Set the flow as the location, as flows are the owners of transactions started by sources
+      tempTransactionLocation = tempTransactionLocation.substring(0, tempTransactionLocation.lastIndexOf('/'));
+    }
+    final String transactionLocation = tempTransactionLocation;
+
+    if (!componentsReferencingGlobalErrorHandler.contains(transactionLocation)) {
+      return false;
+    }
+
+    String localFailingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
+    String failingComponentHandledKey = transactionLocation + localFailingComponentLocation;
+    final FailingComponentHandle failingComponentHandle =
+        getFailingComponentHandle(event, failingComponentHandledKey, localFailingComponentLocation);
+
+    if (failingComponentHandle != null) {
+      failingComponentHandle.handle();
+      if (failingComponentHandle.isHandled()) {
+        failingComponentHandled.remove(failingComponentHandledKey);
+        return true;
+      }
+
+      return false;
+    }
+
+    String fullFailingComponentLocationUpToTxOwner = getFullFailingComponentLocationUpToTxOwner(event, transactionLocation);
+    String transactionOwnerFlow = getFlow(transactionLocation);
+    Set<String> referencesContainingFailingComponentUpToTxOwner =
+        componentsReferencingGlobalErrorHandler.stream().map(this::normalizeRef)
+            // If the flow of the global error handler reference component is not the same as the one of the failing component
+            // location, then it's been called as a flow-ref
+            .filter(isFlowRef(fullFailingComponentLocationUpToTxOwner))
+            .filter(ref -> !getFlow(ref).equals(transactionOwnerFlow) || ref.startsWith(transactionLocation))
+            .collect(toSet());
+    return handleFailingComponentNestedMoreThanOnce(referencesContainingFailingComponentUpToTxOwner,
+                                                    failingComponentHandledKey);
+  }
+
+  private FailingComponentHandle getFailingComponentHandle(final CoreEvent event, final String failingComponentHandledKey,
+                                                           final String localFailingComponentLocation) {
+    FailingComponentHandle failingComponentHandle = null;
+    if (failingComponentHandled.get(failingComponentHandledKey) != null) {
+      if (getFlowStackElementLocation(event.getFlowCallStack().peek()).endsWith(localFailingComponentLocation)) {
+        // There was an on-error-continue in the middle of the global on-error-propagate handlers, process handle logic from
+        // scratch
+        failingComponentHandled.remove(failingComponentHandledKey);
+      } else {
+        failingComponentHandle = failingComponentHandled.get(failingComponentHandledKey);
+      }
+    }
+    return failingComponentHandle;
+  }
+
+  private String getFullFailingComponentLocationUpToTxOwner(final CoreEvent event, final String transactionLocation) {
+    StringBuilder fullFailingComponentLocationUpToTxOwnerBuilder = new StringBuilder();
+    for (FlowStackElement element : event.getFlowCallStack().getElements()) {
+      String location = getFlowStackElementLocation(element);
+      fullFailingComponentLocationUpToTxOwnerBuilder.insert(0, location + "/");
+      if (location.startsWith(transactionLocation)) {
+        // Stack element of the flow containing the transaction owner found, processing is finished
+        break;
+      }
+    }
+    return fullFailingComponentLocationUpToTxOwnerBuilder.toString();
+  }
+
+  private boolean handleFailingComponentNestedMoreThanOnce(final Set<String> referencesContainingFailingComponentUpToTxOwner,
+                                                           final String failingComponentHandledKey) {
+    if (referencesContainingFailingComponentUpToTxOwner.size() > 1) {
+      // The failing component is nested within more than one component that reference this handler:
+      // transactionOwnerWithThisHandler-componentWithThisHandler-...-failingComponent
+      failingComponentHandled.put(failingComponentHandledKey,
+                                  new FailingComponentHandle(referencesContainingFailingComponentUpToTxOwner.size()));
+
+      return false;
+    }
+
+    return true;
+  }
+
+  private Predicate<String> isFlowRef(String fullFailingComponentLocationUpToTxOwner) {
+    return ref -> getFlow(ref).equals(getFlow(fullFailingComponentLocationUpToTxOwner))
+        ? fullFailingComponentLocationUpToTxOwner.contains(ref)
+        : fullFailingComponentLocationUpToTxOwner.contains(normalizeFlowRef(ref));
   }
 
   private String getFlowStackElementLocation(FlowStackElement element) {

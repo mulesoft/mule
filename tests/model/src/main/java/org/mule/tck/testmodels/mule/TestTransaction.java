@@ -12,7 +12,7 @@ import org.mule.runtime.core.internal.transaction.AbstractSingleResourceTransact
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.transaction.Transaction;
+import jakarta.transaction.Transaction;
 
 /**
  * A test transaction that does nothing on commit or rollback. The transaction does retain a status so that developers can

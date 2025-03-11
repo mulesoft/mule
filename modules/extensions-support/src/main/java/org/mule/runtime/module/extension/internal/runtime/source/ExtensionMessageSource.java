@@ -108,7 +108,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -133,13 +132,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private NotificationListenerRegistry notificationListenerRegistry;
 
   @Inject
-  private ReflectionCache reflectionCache;
-
-  @Inject
   private TransactionFactoryLocator transactionFactoryLocator;
-
-  @Inject
-  private ExpressionManager expressionManager;
 
   @Inject
   private ClusterService clusterService;
@@ -149,12 +142,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ProfilingService profilingService;
-
-  @Inject
-  private Optional<TransactionManager> transactionManager;
-
-  @Inject
-  private MuleConfiguration configuration;
 
   @Inject
   private ArtifactEncoding artifactEncoding;
@@ -241,7 +228,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     SystemExceptionHandler systemExceptionHandler = muleContext.getExceptionListener();
     if (retryPolicyTemplate.isAsync()) {
       onSuccess = getSuccessRunnable(restarting);
-      onFailure = (t) -> {
+      onFailure = t -> {
         RetryPolicyExhaustedException exception = t instanceof RetryPolicyExhaustedException ? (RetryPolicyExhaustedException) t
             : new RetryPolicyExhaustedException(t, ExtensionMessageSource.this);
         systemExceptionHandler.handleException(exception);
@@ -250,7 +237,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     } else {
       onSuccess = () -> {
       };
-      onFailure = (t) -> {
+      onFailure = t -> {
       };
     }
     Supplier<CompletableFuture<Void>> futureSupplier = () -> {
@@ -365,7 +352,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setTransactionConfig(transactionConfig.get())
         .setSource(this)
         .setDefaultEncoding(artifactEncoding.getDefaultEncoding())
-        .setTransactionManager(transactionManager.orElse(null))
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
         .setProcessContext(messageProcessContext)
@@ -399,7 +385,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     try {
       refreshTokenIfNecessary(getConfigurationInstance()
-          .flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null), exception);
+          .flatMap(ConfigurationInstance::getConnectionProvider).orElse(null), exception);
     } catch (Exception refreshException) {
       if (!(refreshException instanceof MuleException)) {
         refreshException = new DefaultMuleException(refreshException);
@@ -557,8 +543,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Skipping lifecycle phase: " + e.getMessage(), e);
       }
-    } else if (e instanceof MuleException) {
-      throw (MuleException) e;
+    } else if (e instanceof MuleException muleException) {
+      throw muleException;
     } else {
       throw new DefaultMuleException(e);
     }
@@ -591,16 +577,16 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private TransactionConfig buildTransactionConfig() {
-    MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
-    transactionConfig.setAction(toActionCode(sourceAdapter.getTransactionalAction()));
-    transactionConfig.setMuleContext(muleContext);
+    MuleTransactionConfig txConfig = new MuleTransactionConfig();
+    txConfig.setAction(toActionCode(sourceAdapter.getTransactionalAction()));
+    txConfig.setMuleContext(muleContext);
     TransactionType transactionalType = sourceAdapter.getTransactionalType();
-    transactionConfig.setFactory(transactionFactoryLocator.lookUpTransactionFactory(transactionalType)
+    txConfig.setFactory(transactionFactoryLocator.lookUpTransactionFactory(transactionalType)
         .orElseThrow(() -> new IllegalStateException(format(
                                                             "Unable to create Source with Transactions of Type: [%s]. No factory available for this transaction type",
                                                             transactionalType))));
 
-    return transactionConfig;
+    return txConfig;
   }
 
   SourceConnectionManager getSourceConnectionManager() {
@@ -659,7 +645,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         // On connection exception, if the failed connection is present, it must be invalidated before stopping the source. This
         // warranties that a possible call to connectionProvider.disconnect made on the onStop method of the source, does not
         // affect the connection's invalidation
-        extractConnectionException(e).ifPresent(connectionException -> invalidateConnection(connectionException));
+        extractConnectionException(e).ifPresent(this::invalidateConnection);
         stopSource();
       } catch (Exception eStop) {
         e.addSuppressed(eStop);
@@ -775,8 +761,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         }
       }));
     } catch (MuleException e) {
-      if (e instanceof InitialisationException) {
-        throw (InitialisationException) e;
+      if (e instanceof InitialisationException initialisationException) {
+        throw initialisationException;
       } else {
         throw new InitialisationException(e, this);
       }
@@ -817,16 +803,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private boolean shouldRunOnThisNode() {
-    return primaryNodeOnly ? clusterService.isPrimaryPollingInstance() : true;
+    return !primaryNodeOnly || clusterService.isPrimaryPollingInstance();
   }
 
   private Optional<ConfigurationInstance> startUsingConfiguration(CoreEvent event) {
-    return getConfigurationAndTryToMutateStats(event,
-                                               (mutableConfigurationStats -> mutableConfigurationStats.addRunningSource()));
+    return getConfigurationAndTryToMutateStats(event, MutableConfigurationStats::addRunningSource);
   }
 
   private void stopUsingConfiguration(CoreEvent event) {
-    getConfigurationAndTryToMutateStats(event, (mutableConfigurationStats -> mutableConfigurationStats.discountRunningSource()));
+    getConfigurationAndTryToMutateStats(event, MutableConfigurationStats::discountRunningSource);
   }
 
   private Optional<ConfigurationInstance> getConfigurationAndTryToMutateStats(CoreEvent event,
@@ -834,8 +819,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     Optional<ConfigurationInstance> configurationInstanceOptional = getConfiguration(event);
     configurationInstanceOptional.ifPresent(configurationInstance -> {
       ConfigurationStats configurationStats = configurationInstance.getStatistics();
-      if (configurationStats instanceof MutableConfigurationStats) {
-        mutableConfigurationStatsConsumer.accept((MutableConfigurationStats) configurationStats);
+      if (configurationStats instanceof MutableConfigurationStats mutableConfigurationStats) {
+        mutableConfigurationStatsConsumer.accept(mutableConfigurationStats);
       }
     });
     return configurationInstanceOptional;

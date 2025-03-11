@@ -102,7 +102,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
         sourceCallback.getTransactionSourceBinder().bindToTransaction(sourceCallback.getTransactionConfig(),
                                                                       sourceCallback.getConfigurationInstance(),
                                                                       sourceCallback.getSourceLocation(),
-                                                                      connectionHandler, sourceCallback.getTransactionManager(),
+                                                                      connectionHandler,
                                                                       sourceCallback.getTimeout(), errorAfterTimeout);
         if (sourceCallback.getTransactionConfig().isTransacted()) {
           initialiseProfilingDataProducerIfNeeded();

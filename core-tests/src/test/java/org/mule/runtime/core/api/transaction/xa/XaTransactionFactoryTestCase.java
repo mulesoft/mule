@@ -6,36 +6,30 @@
  */
 package org.mule.runtime.core.api.transaction.xa;
 
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.transaction.xa.XaTransactionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import javax.transaction.TransactionManager;
-
 import org.junit.Test;
+
+import jakarta.transaction.TransactionManager;
 
 public class XaTransactionFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void setsTransactionTimeout() throws Exception {
     final int timeout = 1000;
+    final TransactionManager transactionManager = mock(TransactionManager.class);
     final XaTransactionFactory transactionFactory = new XaTransactionFactory();
     transactionFactory.setTimeout(timeout);
+    transactionFactory.setTransactionManager(transactionManager);
 
-    final MuleContext muleContext = mockContextWithServices();
-
-    final TransactionManager transactionManager = mock(TransactionManager.class);
-
-    final Transaction transaction = transactionFactory.beginTransaction("appName", getNotificationDispatcher(muleContext),
-                                                                        transactionManager);
+    final Transaction transaction = transactionFactory.beginTransaction("appName", mock(NotificationDispatcher.class));
     assertThat(transaction.getTimeout(), equalTo(timeout));
   }
 }

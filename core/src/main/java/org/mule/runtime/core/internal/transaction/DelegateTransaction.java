@@ -17,13 +17,10 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
 import java.util.Optional;
-
-import javax.transaction.TransactionManager;
 
 /**
  * Transaction placeholder to replace with proper transaction once transactional resource is discovered by mule
@@ -43,12 +40,8 @@ public class DelegateTransaction extends AbstractTransaction {
 
   private SuspendableTransaction delegate = new NullTransaction();
 
-  private final TransactionManager transactionManager;
-
-  public DelegateTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                             TransactionManager transactionManager) {
+  public DelegateTransaction(String applicationName, NotificationDispatcher notificationFirer) {
     super(applicationName, notificationFirer);
-    this.transactionManager = transactionManager;
   }
 
   @Override
@@ -111,8 +104,7 @@ public class DelegateTransaction extends AbstractTransaction {
                                                                                TransactionFactory.class.getName(),
                                                                                key.getClass().getName()))))
         .beginTransaction(applicationName,
-                          notificationFirer,
-                          transactionManager);
+                          notificationFirer);
     this.delegate.setTimeout(timeout);
     ((TransactionAdapter) delegate).setRollbackIfTimeout(this.rollbackAfterTimeout);
     this.delegate.bindResource(key, resource);
@@ -140,7 +132,7 @@ public class DelegateTransaction extends AbstractTransaction {
   }
 
   @Override
-  public javax.transaction.Transaction suspend() throws TransactionException {
+  public jakarta.transaction.Transaction suspend() throws TransactionException {
     return delegate.suspend();
   }
 
@@ -252,7 +244,7 @@ public class DelegateTransaction extends AbstractTransaction {
     public void resume() {}
 
     @Override
-    public javax.transaction.Transaction suspend() {
+    public jakarta.transaction.Transaction suspend() {
       return null;
     }
 

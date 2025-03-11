@@ -70,7 +70,6 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -79,7 +78,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -139,9 +137,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Inject
   private ArtifactEncoding artifactEncoding;
-
-  @Inject
-  private Optional<TransactionManager> transactionManager;
 
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, OperationClient> operationClientCache;
@@ -245,8 +240,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   muleContext,
                                   muleConfiguration,
                                   artifactEncoding,
-                                  notificationDispatcher,
-                                  transactionManager.orElse(null));
+                                  notificationDispatcher);
 
     try {
       initialiseIfNeeded(client);
@@ -262,7 +256,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     try {
       stopIfNeeded(client);
     } catch (Exception e) {
-      LOGGER.error("Exception found trying to stop operation client for operation " + identifier);
+      LOGGER.error("Exception found trying to stop operation client for operation {}", identifier);
     } finally {
       disposeIfNeeded(client, LOGGER);
     }
@@ -321,8 +315,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
         return;
       }
 
-      if (value instanceof ComplexParameter) {
-        ComplexParameter complex = (ComplexParameter) value;
+      if (value instanceof ComplexParameter complex) {
         DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType(), reflectionCache);
         resolveLegacyParameters(complex.getParameters(), (propertyName, propertyValue) -> builder
             .addPropertyResolver(propertyName, new StaticValueResolver<>(propertyValue)));
@@ -352,8 +345,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
       return (Result<T, A>) executeAsync(extension, operation, params).get();
     } catch (ExecutionException e) {
       Throwable cause = e.getCause();
-      if (cause instanceof MuleException) {
-        throw (MuleException) cause;
+      if (cause instanceof MuleException muleException) {
+        throw muleException;
       } else {
         throw new DefaultMuleException(cause);
       }
@@ -380,8 +373,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   }
 
   private void setContextEvent(OperationParameterizer parameterizer, OperationParameters parameters) {
-    if (parameters instanceof EventedOperationsParameterDecorator) {
-      parameterizer.inTheContextOf(((EventedOperationsParameterDecorator) parameters).getContextEvent());
+    if (parameters instanceof EventedOperationsParameterDecorator eop) {
+      parameterizer.inTheContextOf(eop.getContextEvent());
     }
   }
 

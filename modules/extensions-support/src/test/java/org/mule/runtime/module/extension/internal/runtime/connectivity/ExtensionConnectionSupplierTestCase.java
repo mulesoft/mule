@@ -6,26 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
-import static java.util.Arrays.asList;
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeThat;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.privileged.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+
+import static java.util.Arrays.asList;
+import static java.util.Optional.of;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assume.assumeThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -51,12 +53,9 @@ import java.util.Optional;
 import java.util.Properties;
 
 import javax.inject.Inject;
-import javax.transaction.TransactionManager;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -71,9 +70,6 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
   public static Collection<Boolean> params() {
     return asList(true, false);
   }
-
-  @Rule
-  public ExpectedException expected = none();
 
   @Inject
   private ExtensionConnectionSupplier adapter;
@@ -113,9 +109,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
 
   @Before
   public void before() throws Exception {
-    TransactionManager transactionManager = mock(TransactionManager.class, RETURNS_DEEP_STUBS);
-    muleContext.setTransactionManager(transactionManager);
-    transaction = spy(new XaTransaction("appName", transactionManager, getNotificationDispatcher(muleContext)));
+    transaction = mock(XaTransaction.class);
     XATransactionalConnection connection = mock(XATransactionalConnection.class, RETURNS_DEEP_STUBS);
     config = new Object();
 
@@ -145,6 +139,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
   public void xaTransaction() throws Exception {
     when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
 
+    doReturn(true).when(transaction).supports(any(), any());
     bindAndVerify();
   }
 
@@ -157,6 +152,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
 
     when(operationContext.getConfiguration()).thenReturn(of(configurationInstanceDecorator));
 
+    doReturn(true).when(transaction).supports(any(), any());
     bindAndVerify();
   }
 
@@ -167,14 +163,13 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     when(transaction.supports(any(), any())).thenReturn(false);
 
     if (lazyConnections) {
-      expected.expect(MuleRuntimeException.class);
-      expected.expectCause(instanceOf(TransactionException.class));
-      expected.expectMessage("but the current transaction doesn't support it and could not be bound");
+      var thrown = assertThrows(MuleRuntimeException.class, this::bindAndVerify);
+      assertThat(thrown.getCause(), instanceOf(TransactionException.class));
+      assertThat(thrown.getMessage(), containsString("but the current transaction doesn't support it and could not be bound"));
     } else {
-      expected.expect(TransactionException.class);
-      expected.expectMessage("but the current transaction doesn't support it and could not be bound");
+      var thrown = assertThrows(TransactionException.class, this::bindAndVerify);
+      assertThat(thrown.getMessage(), containsString("but the current transaction doesn't support it and could not be bound"));
     }
-    bindAndVerify();
   }
 
   @Test
@@ -183,15 +178,16 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
 
     final TransactionException txExceptionExpected = new TransactionException(new Exception());
+    doReturn(true).when(transaction).supports(any(), any());
     doThrow(txExceptionExpected).when(transaction).bindResource(any(), any());
 
     if (lazyConnections) {
-      expected.expect(MuleRuntimeException.class);
-      expected.expectCause(sameInstance(txExceptionExpected));
+      var thrown = assertThrows(MuleRuntimeException.class, this::bindAndVerify);
+      assertThat(thrown.getCause(), sameInstance(txExceptionExpected));
     } else {
-      expected.expect(sameInstance(txExceptionExpected));
+      var thrown = assertThrows(TransactionException.class, this::bindAndVerify);
+      assertThat(thrown, sameInstance(txExceptionExpected));
     }
-    bindAndVerify();
   }
 
   @Test
@@ -200,16 +196,17 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
 
     final TransactionException txExceptionExpected = new TransactionException(new Exception());
+    doReturn(true).when(transaction).supports(any(), any());
     doThrow(txExceptionExpected).when(transaction).bindResource(any(), any());
     doThrow(IllegalStateException.class).when(connectionProvider).disconnect(any());
 
     if (lazyConnections) {
-      expected.expect(MuleRuntimeException.class);
-      expected.expectCause(sameInstance(txExceptionExpected));
+      var thrown = assertThrows(MuleRuntimeException.class, this::bindAndVerify);
+      assertThat(thrown.getCause(), sameInstance(txExceptionExpected));
     } else {
-      expected.expect(sameInstance(txExceptionExpected));
+      var thrown = assertThrows(TransactionException.class, this::bindAndVerify);
+      assertThat(thrown, sameInstance(txExceptionExpected));
     }
-    bindAndVerify();
   }
 
   @Test
@@ -235,19 +232,17 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
 
     assumeThat(lazyConnections, is(false));
     when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+    doReturn(true).when(transaction).supports(any(), any());
     doThrow(expectedTxException).when(transaction).bindResource(any(), any());
 
-    expected.expect(TransactionException.class);
-    expected.expectCause(sameInstance(expectedConnectionException));
+    connectionManager.bind(config, connectionProvider);
+    TransactionCoordination.getInstance().bindTransaction(transaction);
+    var thrown =
+        assertThrows(TransactionException.class, () -> adapter.getConnection(operationContext, mock(ComponentTracer.class)));
+    assertThat(thrown.getCause(), sameInstance(expectedConnectionException));
 
-    try {
-      connectionManager.bind(config, connectionProvider);
-      TransactionCoordination.getInstance().bindTransaction(transaction);
-      adapter.getConnection(operationContext, mock(ComponentTracer.class));
-    } finally {
-      verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
-      verify(connectionProvider).disconnect(any(XATransactionalConnection.class));
-    }
+    verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
+    verify(connectionProvider).disconnect(any(XATransactionalConnection.class));
   }
 
   private void bindAndVerify() throws TransactionException, ConnectionException {
