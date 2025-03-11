@@ -29,10 +29,6 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.mule.sdk</groupId>
-            <artifactId>mule-sdk-api</artifactId>
-        </dependency>
 
         <!-- For the deprecated API methods still relying on org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate -->
         <dependency>

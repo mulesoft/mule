@@ -25,7 +25,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TR
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_SPAN_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_FACTORY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HTTP_SERVICE_API_REGISTRY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_FACTORY_KEY;
@@ -145,7 +144,6 @@ import org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory;
 import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConfigurableMeterExporterConfiguration;
 import org.mule.runtime.metrics.impl.DefaultMeterProvider;
 import org.mule.runtime.metrics.impl.meter.error.DefaultErrorMetricsFactory;
-import org.mule.runtime.module.extension.api.http.HttpServiceApiDelegate;
 import org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwardCompatibilityHelper;
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.extension.internal.store.SdkObjectStoreManagerAdapter;
@@ -257,7 +255,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY, getBeanDefinition(DefaultInitialSpanInfoProvider.class))
       .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))
       .put(FORWARD_COMPATIBILITY_HELPER_KEY, getBeanDefinition(DefaultForwardCompatibilityHelper.class))
-      .put(MULE_HTTP_SERVICE_API_REGISTRY_KEY, getBeanDefinition(HttpServiceApiDelegate.class))
       .build();
 
   // Do not use static field. BeanDefinitions are reused and produce weird behaviour

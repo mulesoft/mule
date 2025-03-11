@@ -11,9 +11,8 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
 import org.mule.runtime.http.api.server.ws.WebSocketHandler;
 import org.mule.runtime.http.api.server.ws.WebSocketHandlerManager;
-import org.mule.sdk.api.http.sse.ServerWithSse;
-import org.mule.sdk.api.http.sse.SseClient;
-import org.mule.sdk.api.http.sse.SseEndpointManager;
+import org.mule.runtime.http.api.sse.SseClient;
+import org.mule.runtime.http.api.sse.SseEndpointManager;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -27,7 +26,7 @@ import java.util.function.Consumer;
  * @since 4.0
  */
 @NoImplement
-public interface HttpServer extends ServerWithSse {
+public interface HttpServer {
 
   /**
    * Binds the ServerSocket to the network interface and starts listening for requests.
@@ -128,8 +127,9 @@ public interface HttpServer extends ServerWithSse {
    * @param ssePath          path to match.
    * @param sseClientHandler callback to be executed for each received {@link SseClient}.
    * @return an object that can be used to enable/disable/remove the endpoint from the server.
+   *
+   * @since 4.10.0
    */
-  @Override
   default SseEndpointManager sse(String ssePath, Consumer<SseClient> sseClientHandler) {
     throw new UnsupportedOperationException("Server-sent events are not supported");
   }

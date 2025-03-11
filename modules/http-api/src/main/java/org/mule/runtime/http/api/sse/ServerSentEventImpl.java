@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.http.api.domain.sse;
+package org.mule.runtime.http.api.sse;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -22,7 +22,7 @@ import java.util.OptionalLong;
  *
  * TODO: Move to service...
  */
-public class ServerSentEventImpl implements Serializable, org.mule.sdk.api.http.sse.ServerSentEvent {
+public class ServerSentEventImpl implements Serializable, ServerSentEvent {
 
   @Serial
   private static final long serialVersionUID = -1211505868025654629L;
