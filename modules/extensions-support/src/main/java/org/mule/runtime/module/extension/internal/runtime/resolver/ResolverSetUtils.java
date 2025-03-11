@@ -201,7 +201,7 @@ public class ResolverSetUtils {
             .getDescriptor().getType().getDeclaringClass();
         if (parameterGroupDeclaringClass.isPresent()) {
           DefaultObjectBuilder defaultObjectBuilder =
-              new DefaultObjectBuilder(parameterGroupDeclaringClass.get(), reflectionCache);
+              new DefaultObjectBuilder<>(parameterGroupDeclaringClass.get(), reflectionCache);
 
           for (Map.Entry<String, ValueResolver> stringValueResolverEntry : parameterGroupParametersValueResolvers.entrySet()) {
             defaultObjectBuilder.addPropertyResolver(stringValueResolverEntry.getKey(),
@@ -219,10 +219,10 @@ public class ResolverSetUtils {
 
   private static String getGroupName(ParameterGroupModelProperty groupModelProperty) {
     Object container = groupModelProperty.getDescriptor().getContainer();
-    if (container instanceof Field) {
-      return ((Field) container).getName();
-    } else if (container instanceof Parameter) {
-      return ((Parameter) container).getName();
+    if (container instanceof Field f) {
+      return f.getName();
+    } else if (container instanceof Parameter p) {
+      return p.getName();
     } else {
       throw new IllegalArgumentException("Group container of unexpected type: " + container);
     }
@@ -275,7 +275,7 @@ public class ResolverSetUtils {
                                                                 valueResolverFactory);
               effectivelyAcceptReferences = false;
             } else {
-              resolver = new StaticValueResolver(value);
+              resolver = new StaticValueResolver<>(value);
             }
             resolverReference
                 .set(getValueResolverFor(parameterName, arrayType, resolveAndInjectIfStatic(resolver, muleContext),
@@ -293,13 +293,13 @@ public class ResolverSetUtils {
           ValueResolver resolver;
           try {
             if (isMap(objectType)) {
-              if (value instanceof Map) {
+              if (value instanceof Map map) {
                 resolver =
-                    getParameterValueResolverForMap(parameterName, objectType, expressionSupport, (Map) value, reflectionCache,
+                    getParameterValueResolverForMap(parameterName, objectType, expressionSupport, map, reflectionCache,
                                                     muleContext, valueResolverFactory);
                 effectivelyAcceptReferences = false;
               } else {
-                resolver = new StaticValueResolver(value);
+                resolver = new StaticValueResolver<>(value);
               }
             } else {
               Optional<ValueResolver> pojoResolver =
@@ -309,7 +309,7 @@ public class ResolverSetUtils {
                 resolver = pojoResolver.get();
                 effectivelyAcceptReferences = false;
               } else {
-                resolver = new StaticValueResolver(value);
+                resolver = new StaticValueResolver<>(value);
               }
             }
             resolverReference
@@ -391,7 +391,7 @@ public class ResolverSetUtils {
                                    expressionSupport, required, modelProperties, acceptsReferences);
   }
 
-  private static Object resolveAndInjectIfStatic(ValueResolver valueResolver, MuleContext muleContext) throws MuleException {
+  private static Object resolveAndInjectIfStatic(ValueResolver valueResolver, MuleContext muleContext) {
     if (valueResolver.isDynamic()) {
       return valueResolver;
     }
@@ -419,7 +419,7 @@ public class ResolverSetUtils {
 
     if (pojoClass.isPresent()) {
       if (value instanceof Map valuesMap) {
-        DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(pojoClass.get(), reflectionCache);
+        DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
           if (valuesMap.containsKey(objectFieldType.getKey().getName().toString())) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
@@ -432,9 +432,9 @@ public class ResolverSetUtils {
           }
         }
 
-        return Optional.of(new ObjectBuilderValueResolver(objectBuilder, muleContext));
+        return Optional.of(new ObjectBuilderValueResolver<>(objectBuilder, muleContext));
       } else if (value instanceof ComponentParameterization valuesParameterization) {
-        DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder(pojoClass.get(), reflectionCache);
+        DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
         String aliasName = getAliasName(objectType);
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
           Object paramValue = valuesParameterization.getParameter(aliasName, objectFieldType.getKey().getName().getLocalPart());
@@ -476,7 +476,7 @@ public class ResolverSetUtils {
       }
       return CollectionValueResolver.of(type, itemsResolvers);
     } else {
-      return new StaticValueResolver(collection);
+      return new StaticValueResolver<>(collection);
     }
   }
 
