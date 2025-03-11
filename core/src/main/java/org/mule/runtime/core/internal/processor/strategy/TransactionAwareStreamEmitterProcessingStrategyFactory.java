@@ -13,6 +13,8 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
+import java.util.function.Function;
+
 /**
  * Creates a processing strategy with same behavior as {@link StreamEmitterProcessingStrategyFactory} apart from the fact it will
  * process synchronously without error when a transaction is active.
@@ -22,10 +24,21 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 public class TransactionAwareStreamEmitterProcessingStrategyFactory extends StreamEmitterProcessingStrategyFactory
     implements TransactionAwareProcessingStrategyFactory {
 
+  private final Function<ProcessingStrategy, TransactionAwareStreamEmitterProcessingStrategyDecorator> decoratorFactory;
+
+  public TransactionAwareStreamEmitterProcessingStrategyFactory() {
+    this(TransactionAwareStreamEmitterProcessingStrategyDecorator::new);
+  }
+
+  TransactionAwareStreamEmitterProcessingStrategyFactory(
+                                                         Function<ProcessingStrategy, TransactionAwareStreamEmitterProcessingStrategyDecorator> decoratorFactory) {
+    this.decoratorFactory = decoratorFactory;
+  }
+
   @Override
   public ProcessingStrategy create(MuleContext muleContext, String schedulersNamePrefix) {
     TransactionAwareStreamEmitterProcessingStrategyDecorator psDecorator =
-        new TransactionAwareStreamEmitterProcessingStrategyDecorator(super.create(muleContext, schedulersNamePrefix));
+        decoratorFactory.apply(super.create(muleContext, schedulersNamePrefix));
 
     try {
       initialiseIfNeeded(psDecorator, muleContext);
