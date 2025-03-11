@@ -15,6 +15,8 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.base.Joiner.on;
+import static org.eclipse.aether.ConfigurationProperties.HTTPS_SECURITY_MODE;
+import static org.eclipse.aether.ConfigurationProperties.HTTPS_SECURITY_MODE_INSECURE;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 
 import org.mule.maven.client.api.model.MavenConfiguration;
@@ -33,6 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -89,6 +92,8 @@ public class DependencyResolver implements AutoCloseable {
 
     this.resolutionContext = new MuleMavenResolutionContext(mavenConfiguration);
     this.repositoryStateFactory = new MuleMavenRepositoryStateFactory();
+    Properties userProperties = new Properties();
+    userProperties.setProperty(HTTPS_SECURITY_MODE, HTTPS_SECURITY_MODE_INSECURE);
     this.repositoryState =
         repositoryStateFactory.createMavenRepositoryState(resolutionContext.getLocalRepositoryLocation(), workspaceReader,
                                                           resolutionContext.getAuthenticatorSelector(),
@@ -99,7 +104,7 @@ public class DependencyResolver implements AutoCloseable {
                                                           mavenConfiguration.getOfflineMode(),
                                                           mavenConfiguration
                                                               .getIgnoreArtifactDescriptorRepositories(),
-                                                          empty(),
+                                                          Optional.of(userProperties),
                                                           session -> {
                                                           },
                                                           mavenConfiguration.getGlobalChecksumPolicy());
