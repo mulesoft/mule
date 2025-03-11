@@ -9,6 +9,8 @@ package org.mule.runtime.http.api.server;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
+import org.mule.runtime.http.api.server.sse.SseClientHandler;
+import org.mule.runtime.http.api.server.sse.SseHandlerManager;
 import org.mule.runtime.http.api.server.ws.WebSocketHandler;
 import org.mule.runtime.http.api.server.ws.WebSocketHandlerManager;
 
@@ -116,5 +118,9 @@ public interface HttpServer {
    */
   default WebSocketHandlerManager addWebSocketHandler(WebSocketHandler handler) {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
+
+  default SseHandlerManager sse(String ssePath, SseClientHandler sseClientHandler) {
+    throw new UnsupportedOperationException("Server-sent events are not supported");
   }
 }
