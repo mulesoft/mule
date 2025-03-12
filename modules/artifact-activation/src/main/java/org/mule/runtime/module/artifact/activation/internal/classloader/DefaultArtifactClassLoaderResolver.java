@@ -486,6 +486,10 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                                                                  .put(exportedPackage, CHILD_FIRST));
     }
 
+    if (packagesLookupPolicies.isEmpty()) {
+      return baseLookupPolicy.extend(pluginsLookupPolicies);
+    }
+
     return baseLookupPolicy.extend(pluginsLookupPolicies).extend(packagesLookupPolicies, true);
   }
 
