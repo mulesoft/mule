@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor.process;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -457,7 +460,10 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
       muleModulesExportedPackages.addAll(module.getExportedPackages());
     }
 
-    List<String> pluginLocalPackages = new ArrayList<>();
+    // create a map to store the desired lookup strategies for specific packages
+    Map<String, LookupStrategy> packagesLookupPolicies = new HashMap<>();
+
+    // apply CHILD_ONLY strategy to local packages
     for (String localPackage : descriptor.getClassLoaderConfiguration().getLocalPackages()) {
       // packages exported from another artifact in the region will be ParentFirst,
       // even if they are also exported by the container.
@@ -467,11 +473,24 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         LOGGER.debug("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
             + "', but it will be ignored since it is already available from the container.");
       } else {
-        pluginLocalPackages.add(localPackage);
+        packagesLookupPolicies.put(localPackage, CHILD_ONLY);
       }
     }
 
-    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPackages.stream(), CHILD_ONLY, true);
+    // apply CHILD_FIRST strategy to exported packages when policy isolation is enabled
+    boolean isPolicyPlugin = isPolicyPlugin(ownerArtifactClassLoader.getArtifactId());
+
+    if (isPolicyPlugin && isFeatureEnabled(ENABLE_POLICY_ISOLATION, ownerArtifactClassLoader.getArtifactDescriptor())) {
+      descriptor.getClassLoaderConfiguration().getExportedPackages().forEach(
+                                                                             exportedPackage -> packagesLookupPolicies
+                                                                                 .put(exportedPackage, CHILD_FIRST));
+    }
+
+    return baseLookupPolicy.extend(pluginsLookupPolicies).extend(packagesLookupPolicies, true);
+  }
+
+  private boolean isPolicyPlugin(String artifactId) {
+    return artifactId != null && artifactId.contains("/policy/");
   }
 
   /**
