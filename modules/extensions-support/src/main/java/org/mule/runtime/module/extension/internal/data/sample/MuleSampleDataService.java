@@ -96,17 +96,14 @@ public class MuleSampleDataService implements SampleDataService {
     checkArgument(!isBlank(componentName), "componentName cannot be blank");
     checkArgument(parameters != null, "parameters cannot be null");
 
-    ExtensionModel extensionModel = extensionManager.getExtension(extensionName).orElse(null);
-    if (extensionModel == null) {
-      throw new SampleDataException(format("Extension '%s' was not found", extensionName), INVALID_TARGET_EXTENSION);
-    }
+    ExtensionModel extensionModel = extensionManager.getExtension(extensionName)
+        .orElseThrow(() -> new SampleDataException(format("Extension '%s' was not found", extensionName),
+                                                   INVALID_TARGET_EXTENSION));
 
-    ComponentModel componentModel = extensionModel.findComponentModel(componentName).orElse(null);
-    if (componentModel == null) {
-      throw new SampleDataException(format("Extension '%s' does not contain any component called '%s''",
-                                           extensionName, componentName),
-                                    INVALID_TARGET_EXTENSION);
-    }
+    ComponentModel componentModel = extensionModel.findComponentModel(componentName)
+        .orElseThrow(() -> new SampleDataException(format("Extension '%s' does not contain any component called '%s''",
+                                                          extensionName, componentName),
+                                                   INVALID_TARGET_EXTENSION));
 
     SampleDataProviderMediator mediator = new DefaultSampleDataProviderMediator(
                                                                                 extensionModel,

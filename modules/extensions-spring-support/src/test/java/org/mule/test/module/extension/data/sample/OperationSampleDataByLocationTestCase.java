@@ -13,10 +13,6 @@ import static org.mule.test.data.sample.extension.provider.FailingTestSampleData
 import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.SAMPLE_DATA_EXCEPTION_ERROR_MSG;
 import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.SAMPLE_DATA_EXCEPTION_FAILURE;
 
-import org.mule.sdk.api.data.sample.SampleDataException;
-
-import java.util.Optional;
-
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -73,10 +69,9 @@ public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTes
 
   @Test
   public void missingActingParameter() throws Exception {
-    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
-    expectedException
-        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
-    assertMessage(getOperationSampleByLocation("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertError(getOperationSampleByLocation("missingActingParameter"),
+                MISSING_REQUIRED_PARAMETERS,
+                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
   }
 
   @Test
@@ -128,19 +123,16 @@ public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTes
 
   @Test
   public void missingBoundActingParameter() throws Exception {
-    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
-    expectedException
-        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
-    assertMessage(getOperationSampleByLocation("missingBoundActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
+    assertError(getOperationSampleByLocation("missingBoundActingParameter"),
+                MISSING_REQUIRED_PARAMETERS,
+                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
   }
 
   @Test
   public void missingBoundActingParameterFromContentField() throws Exception {
-    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
-    expectedException
-        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
-    assertMessage(getOperationSampleByLocation("missingBoundActingParameterFromContentField"), EXPECTED_PAYLOAD,
-                  EXPECTED_ATTRIBUTES);
+    assertError(getOperationSampleByLocation("missingBoundActingParameterFromContentField"),
+                MISSING_REQUIRED_PARAMETERS,
+                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
   }
 
   @Test
@@ -167,30 +159,28 @@ public class OperationSampleDataByLocationTestCase extends AbstractSampleDataTes
 
   @Test
   public void sampleDataExceptionWithErrorCause() throws Exception {
-    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG,
-                              Optional.of(IllegalStateException.class));
-    getOperationSampleByLocation("sampleDataExceptionWithErrorCause");
+    assertError(getOperationSampleByLocation("sampleDataExceptionWithErrorCause"),
+                SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG);
   }
 
   @Test
   public void sampleDataExceptionWithoutErrorCause() throws Exception {
-    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG,
-                              Optional.empty());
-    getOperationSampleByLocation("sampleDataExceptionWithoutErrorCause");
+    assertError(getOperationSampleByLocation("sampleDataExceptionWithoutErrorCause"),
+                SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG);
   }
 
   @Test
   public void customSampleDataExceptionWithErrorCause() throws Exception {
-    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG,
-                              Optional.of(IllegalStateException.class));
-    getOperationSampleByLocation("customSampleDataExceptionWithErrorCause");
+    assertError(getOperationSampleByLocation("customSampleDataExceptionWithErrorCause"),
+                SAMPLE_DATA_EXCEPTION_FAILURE,
+                CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                IllegalStateException.class);
   }
 
   @Test
   public void customSampleDataExceptionWithoutErrorCause() throws Exception {
-    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG,
-                              Optional.empty());
-    getOperationSampleByLocation("customSampleDataExceptionWithoutErrorCause");
+    assertError(getOperationSampleByLocation("customSampleDataExceptionWithoutErrorCause"),
+                SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG);
   }
 
 }
