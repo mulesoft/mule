@@ -70,13 +70,13 @@ public interface SseClient extends AutoCloseable {
   void onClose(Runnable callback);
 
   /**
+   * @return unique identifier of this client.
+   */
+  String getClientId();
+
+  /**
    * Closes the connection.
    */
   @Override
   void close() throws IOException;
-
-  /**
-   * @return unique identifier of this client.
-   */
-  long getClientId();
 }

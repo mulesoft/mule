@@ -13,6 +13,7 @@ import org.mule.runtime.http.api.server.ws.WebSocketHandler;
 import org.mule.runtime.http.api.server.ws.WebSocketHandlerManager;
 import org.mule.runtime.http.api.sse.SseClient;
 import org.mule.runtime.http.api.sse.SseEndpointManager;
+import org.mule.runtime.http.api.sse.SseRequestContext;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -124,6 +125,25 @@ public interface HttpServer {
   /**
    * Adds an endpoint to produce server-sent events.
    * 
+   * @param ssePath   path to match.
+   * @param onRequest callback to be executed when a request is received. It can be used to customize the SSE response and the SSE
+   *                  Client to be created.
+   * @param onClient  callback to be executed for each received {@link SseClient}. Note: this callback will be executed AFTER
+   *                  {@code onRequest}.
+   * @return an object that can be used to enable/disable/remove the endpoint from the server.
+   *
+   * @since 4.10.0
+   */
+  default SseEndpointManager sse(String ssePath,
+                                 Consumer<SseRequestContext> onRequest,
+                                 Consumer<SseClient> onClient) {
+    throw new UnsupportedOperationException("Server-sent events are not supported");
+  }
+
+  /**
+   * Adds an endpoint to produce server-sent events. Equivalent to call {@link #sse(String, Consumer, Consumer)} with a no-op
+   * {@code onRequest} callback.
+   *
    * @param ssePath          path to match.
    * @param sseClientHandler callback to be executed for each received {@link SseClient}.
    * @return an object that can be used to enable/disable/remove the endpoint from the server.
@@ -131,6 +151,7 @@ public interface HttpServer {
    * @since 4.10.0
    */
   default SseEndpointManager sse(String ssePath, Consumer<SseClient> sseClientHandler) {
-    throw new UnsupportedOperationException("Server-sent events are not supported");
+    return sse(ssePath, ctx -> {
+    }, sseClientHandler);
   }
 }
