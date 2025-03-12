@@ -16,8 +16,6 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.LazyC
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
 import static org.mule.test.allure.AllureConstants.JavaSdk.ConnectivityTestingStory.CONNECTIVITY_TEST;
 
-import static java.util.Optional.of;
-
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -25,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -232,7 +231,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
     when(testeableConnectionProvider.connect())
         .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
-    when(configurationInstance.getConnectionProvider()).thenReturn(of(testeableConnectionProvider));
+    doReturn(testeableConnectionProvider).when(configurationInstance).getConnectionProvider();
     final ConnectionValidationResult result = lazyConnectionManagerAdapter.testConnectivity(configurationInstance, true);
 
     assertThat(result, isFailure(nullValue(ErrorType.class), is(CONNECTION_CREATION_FAILURE_MESSAGE)));
@@ -247,7 +246,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
     when(testeableConnectionProvider.connect())
         .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
-    when(configurationInstance.getConnectionProvider()).thenReturn(of(testeableConnectionProvider));
+    doReturn(testeableConnectionProvider).when(configurationInstance).getConnectionProvider();
     final ConnectionValidationResult result = lazyConnectionManagerAdapter.testConnectivity(configurationInstance);
 
     assertThat(result, isFailure(nullValue(ErrorType.class), is(CONNECTION_CREATION_FAILURE_MESSAGE)));
