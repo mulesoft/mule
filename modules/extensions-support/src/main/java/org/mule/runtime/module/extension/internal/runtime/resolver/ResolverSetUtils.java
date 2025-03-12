@@ -336,7 +336,12 @@ public class ResolverSetUtils {
   }
 
   private static Object convertValueWithExpressionLanguage(Object value, MetadataType type, ExpressionManager expressionManager) {
-    TypedValue typedValue = value instanceof TypedValue ? (TypedValue) value : TypedValue.of(value);
+    TypedValue typedValue = value instanceof TypedValue
+        ? (TypedValue) value
+        : new TypedValue<>(value, DataType.builder().type(value.getClass())
+            .mediaType(getFirstValidMimeType(type))
+            .build());
+
     return expressionManager.evaluate(PAYLOAD_EXPRESSION,
                                       DataType.builder().type(getType(type).orElse(Object.class))
                                           .mediaType(getFirstValidMimeType(type))
