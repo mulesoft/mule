@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor.process;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -383,6 +386,16 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                                              PluginDescriptorResolver pluginDescriptorResolver,
                                                              PluginClassLoaderResolver pluginClassLoaderResolver) {
     RegionClassLoader regionClassLoader = (RegionClassLoader) ownerArtifactClassLoader.getParent();
+    /*
+     * (trial1/fail): 'regionClassLoader.filterForClassLoader(regionClassLoader.getOwnerClassLoader()).getExportedClassPackages()'
+     * doesn't have the problematic api package LookupStrategy strategy; if (ownerArtifactClassLoader.getArtifactId() != null &&
+     * ownerArtifactClassLoader.getArtifactId().contains("/policy/") && isFeatureEnabled(ENABLE_POLICY_ISOLATION,
+     * ownerArtifactClassLoader.getArtifactDescriptor())) { strategy = CHILD_FIRST; } else { strategy = PARENT_FIRST; }
+     * ClassLoaderLookupPolicy baseLookupPolicy = regionClassLoader.getClassLoaderLookupPolicy()
+     * .extend(regionClassLoader.filterForClassLoader(regionClassLoader.getOwnerClassLoader()) .getExportedClassPackages()
+     * .stream(), strategy);
+     */
+
     ClassLoaderLookupPolicy baseLookupPolicy = regionClassLoader.getClassLoaderLookupPolicy()
         .extend(regionClassLoader.filterForClassLoader(regionClassLoader.getOwnerClassLoader())
             .getExportedClassPackages()
@@ -403,6 +416,12 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         .forEach(dependencyPluginDescriptor -> {
           for (String exportedPackage : dependencyPluginDescriptor.getClassLoaderConfiguration().getExportedPackages()) {
             pluginsLookupPolicies.put(exportedPackage, PARENT_FIRST);
+            /*
+             * (trial 2/fail: dependencyPluginDescriptor.getClassLoaderConfiguration().getExportedPackages() didn't have the api
+             * package if (isFeatureEnabled(ENABLE_POLICY_ISOLATION, ownerArtifactClassLoader.getArtifactDescriptor())) {
+             * pluginsLookupPolicies.put(exportedPackage, CHILD_FIRST); } else { pluginsLookupPolicies.put(exportedPackage,
+             * PARENT_FIRST); }
+             */
           }
 
           if (isPrivilegedPluginDependency(descriptor, dependencyPluginDescriptor)) {
@@ -457,6 +476,13 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         pluginLocalPackages.add(localPackage);
       }
     }
+    // todo: option 3, this works.
+    List<String> pluginExportedPackages = new ArrayList<>();
+    if (isFeatureEnabled(ENABLE_POLICY_ISOLATION, ownerArtifactClassLoader.getArtifactDescriptor())) {
+      pluginExportedPackages.addAll(descriptor.getClassLoaderConfiguration().getExportedPackages());
+    }
+    baseLookupPolicy = baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginExportedPackages.stream(), CHILD_FIRST,
+                                                                             true);
 
     return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPackages.stream(), CHILD_ONLY, true);
   }
