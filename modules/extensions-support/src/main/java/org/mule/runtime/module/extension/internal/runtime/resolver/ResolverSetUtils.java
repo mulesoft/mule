@@ -33,6 +33,7 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -353,10 +354,17 @@ public class ResolverSetUtils {
         && value instanceof String
         && value.toString().startsWith("#[")
         && value.toString().endsWith("]")) {
-      return expressionManager.evaluate(value.toString(),
-                                        expectedOutputType,
-                                        NULL_BINDING_CONTEXT)
-          .getValue();
+
+      if (PAYLOAD_EXPRESSION.equals(value)) {
+        // @Content parameters default to `#[payload]`
+        return null;
+      } else {
+        return expressionManager.evaluate(value.toString(),
+                                          expectedOutputType,
+                                          NULL_BINDING_CONTEXT)
+            .getValue();
+      }
+
 
     } else {
       TypedValue<?> typedValue = value instanceof TypedValue tv
