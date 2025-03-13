@@ -156,6 +156,7 @@ public final class TransactionCoordination {
         logger.debug("Transaction has been marked rollbackOnly, rolling it back: " + tx);
       }
       tx.rollback();
+      throw new TransactionRollbackException(CoreMessages.transactionMarkedForRollback());
     } else {
       if (logger.isDebugEnabled()) {
         logger.debug("Committing transaction " + tx);
