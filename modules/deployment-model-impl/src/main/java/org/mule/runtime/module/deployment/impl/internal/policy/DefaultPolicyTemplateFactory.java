@@ -78,7 +78,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
         pluginDependenciesResolver.resolve(emptySet(), new ArrayList<>(descriptor.getPlugins()), false);
 
     try {
-      if (isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) && containerClassLoader != null) {
+      if (containerClassLoader != null && isPolicyIsolationEnabled(descriptor) && hasRequiredPlugin(descriptor)) {
         regionClassLoader =
             new RegionClassLoader(containerClassLoader.getArtifactId(),
                                   containerClassLoader.getArtifactDescriptor(),
@@ -117,6 +117,23 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
                                      artifactPlugins,
                                      resolveOwnArtifactPlugins(artifactPlugins, ownResolvedPluginDescriptors,
                                                                ownPolicyClassLoader));
+  }
+
+  private boolean isPolicyIsolationEnabled(PolicyTemplateDescriptor descriptor) {
+    return isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor);
+  }
+
+  private boolean hasRequiredPlugin(PolicyTemplateDescriptor descriptor) {
+    if (descriptor == null || descriptor.getPlugins() == null) {
+      return false;
+    }
+    Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
+    for (ArtifactPluginDescriptor plugin : plugins) {
+      if (plugin.getName().equals("HTTP") || plugin.getName().equals("Sockets")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // Need all the plugins that the policy itself depends on, while keeping a relationship with the appropriate classloader.
