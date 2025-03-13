@@ -487,13 +487,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
       containerOptUrls = resolvedDependencies.getOptDependencyUrls();
 
       logger.error("Container containerMuleApisOptUrls");
-      logger.error(Arrays.toString(containerMuleApisOptUrls.toArray(new URL[]{})));
+      logger.error(Arrays.toString(containerMuleApisOptUrls.toArray(new URL[] {})));
       logger.error("Container containerMuleApisUrls");
-      logger.error(Arrays.toString(containerMuleApisUrls.toArray(new URL[]{})));
+      logger.error(Arrays.toString(containerMuleApisUrls.toArray(new URL[] {})));
       logger.error("Container containerMuleUrls");
-      logger.error(Arrays.toString(containerMuleUrls.toArray(new URL[]{})));
+      logger.error(Arrays.toString(containerMuleUrls.toArray(new URL[] {})));
       logger.error("Container containerOptUrls");
-      logger.error(Arrays.toString(containerOptUrls.toArray(new URL[]{})));
+      logger.error(Arrays.toString(containerOptUrls.toArray(new URL[] {})));
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
