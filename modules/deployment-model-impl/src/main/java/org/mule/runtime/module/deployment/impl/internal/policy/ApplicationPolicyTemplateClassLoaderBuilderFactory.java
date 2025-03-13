@@ -11,7 +11,6 @@ import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFac
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
  * Creates {@link PolicyTemplateClassLoaderBuilder} for application artifacts.
