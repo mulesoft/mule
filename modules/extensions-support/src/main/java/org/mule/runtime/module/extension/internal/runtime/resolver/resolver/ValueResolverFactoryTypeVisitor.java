@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
-import static java.lang.String.format;
-import static java.time.Instant.ofEpochMilli;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
+import static java.lang.String.format;
+import static java.time.Instant.ofEpochMilli;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.model.DateTimeType;
 import org.mule.metadata.api.model.DateType;
@@ -101,7 +102,7 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
     if (acceptsReferences && value instanceof String) {
       return new RegistryLookupValueResolver((String) value);
     } else {
-      return new TypeSafeValueResolverWrapper(new StaticValueResolver<>(getValue()), getExpectedClass());
+      return new TypeSafeValueResolverWrapper(new StaticValueResolver<>(value), getExpectedClass());
     }
   }
 
