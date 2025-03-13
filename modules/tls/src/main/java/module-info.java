@@ -23,7 +23,6 @@ module org.mule.runtime.tls {
 
   // QName
   requires java.xml;
-  requires java.inject;
 
   requires com.google.common;
   // needed because byte-buddy generated classes for this module need to use spring SmartFactoryBean
