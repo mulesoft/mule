@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -19,6 +20,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ComponentParameterizationUtils.createComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
@@ -238,6 +240,7 @@ public class ResolverSetUtils {
       valueResolverFactory.ofNullableParameter(params, parameterGroupModel, parameterModel,
                                                value -> getParameterValueResolver(parameterModel.getName(),
                                                                                   parameterModel.getType(),
+                                                                                  parameterModel.getExpressionSupport(),
                                                                                   value,
                                                                                   parameterModel.getModelProperties(),
                                                                                   reflectionCache,
@@ -249,7 +252,9 @@ public class ResolverSetUtils {
     return parameterGroupParametersValueResolvers;
   }
 
-  private static ValueResolver getParameterValueResolver(String parameterName, MetadataType type, Object value,
+  private static ValueResolver getParameterValueResolver(String parameterName, MetadataType type,
+                                                         ExpressionSupport expressionSupport,
+                                                         Object value,
                                                          Set<ModelProperty> modelProperties, ReflectionCache reflectionCache,
                                                          MuleContext muleContext, ValueResolverFactory valueResolverFactory,
                                                          boolean acceptsReferences)
@@ -266,7 +271,7 @@ public class ResolverSetUtils {
           try {
             if (value instanceof Collection) {
 
-              resolver = getParameterValueResolverForCollection(parameterName, arrayType, (Collection) value,
+              resolver = getParameterValueResolverForCollection(parameterName, arrayType, expressionSupport, (Collection) value,
                                                                 reflectionCache, muleContext,
                                                                 valueResolverFactory);
               effectivelyAcceptReferences = false;
@@ -290,15 +295,16 @@ public class ResolverSetUtils {
           try {
             if (isMap(objectType)) {
               if (value instanceof Map) {
-                resolver = getParameterValueResolverForMap(parameterName, objectType, (Map) value, reflectionCache,
-                                                           muleContext, valueResolverFactory);
+                resolver =
+                    getParameterValueResolverForMap(parameterName, objectType, expressionSupport, (Map) value, reflectionCache,
+                                                    muleContext, valueResolverFactory);
                 effectivelyAcceptReferences = false;
               } else {
                 resolver = new StaticValueResolver(value);
               }
             } else {
               Optional<ValueResolver> pojoResolver =
-                  getPojoParameterValueResolver(parameterName, objectType, value, reflectionCache,
+                  getPojoParameterValueResolver(parameterName, objectType, expressionSupport, value, reflectionCache,
                                                 muleContext, valueResolverFactory);
               if (pojoResolver.isPresent()) {
                 resolver = pojoResolver.get();
@@ -328,7 +334,8 @@ public class ResolverSetUtils {
 
       });
     } else {
-      Object convertedValue = convertValueWithExpressionLanguage(value, type, muleContext.getExpressionManager());
+      Object convertedValue =
+          convertValueWithExpressionLanguage(value, type, expressionSupport, muleContext.getExpressionManager());
       resolverReference.set(getValueResolverFor(parameterName, type, convertedValue, null, NOT_SUPPORTED, false, modelProperties,
                                                 false, valueResolverFactory));
     }
@@ -336,14 +343,37 @@ public class ResolverSetUtils {
     return resolverReference.get();
   }
 
-  private static Object convertValueWithExpressionLanguage(Object value, MetadataType type, ExpressionManager expressionManager) {
-    TypedValue typedValue = value instanceof TypedValue ? (TypedValue) value : TypedValue.of(value);
-    return expressionManager.evaluate(PAYLOAD_EXPRESSION,
-                                      DataType.builder().type(getType(type).orElse(Object.class))
-                                          .mediaType(getFirstValidMimeType(type))
-                                          .build(),
-                                      BindingContext.builder().addBinding(PAYLOAD, typedValue).build())
-        .getValue();
+  private static Object convertValueWithExpressionLanguage(Object value, MetadataType type, ExpressionSupport expressionSupport,
+                                                           ExpressionManager expressionManager) {
+
+    final MediaType mimeType = getFirstValidMimeType(type);
+    final DataType expectedOutputType = DataType.builder().type(getType(type).orElse(Object.class))
+        .mediaType(mimeType)
+        .build();
+
+    if (!NOT_SUPPORTED.equals(expressionSupport)
+        && isExpression(value)) {
+      if (PAYLOAD_EXPRESSION.equals(value)) {
+        // @Content parameters default to `#[payload]`
+        return null;
+      } else {
+        return expressionManager.evaluate(value.toString(),
+                                          expectedOutputType,
+                                          NULL_BINDING_CONTEXT)
+            .getValue();
+      }
+    } else {
+      TypedValue<?> typedValue = value instanceof TypedValue
+          ? (TypedValue) value
+          : new TypedValue<>(value, DataType.builder().type(value.getClass())
+              .mediaType(mimeType)
+              .build());
+
+      return expressionManager.evaluate(PAYLOAD_EXPRESSION,
+                                        expectedOutputType,
+                                        BindingContext.builder().addBinding(PAYLOAD, typedValue).build())
+          .getValue();
+    }
   }
 
   private static MediaType getFirstValidMimeType(MetadataType type) {
@@ -382,7 +412,9 @@ public class ResolverSetUtils {
     });
   }
 
-  private static Optional<ValueResolver> getPojoParameterValueResolver(String parameterName, ObjectType objectType, Object value,
+  private static Optional<ValueResolver> getPojoParameterValueResolver(String parameterName, ObjectType objectType,
+                                                                       ExpressionSupport expressionSupport,
+                                                                       Object value,
                                                                        ReflectionCache reflectionCache, MuleContext muleContext,
                                                                        ValueResolverFactory valueResolverFactory)
       throws InitialisationException {
@@ -397,6 +429,7 @@ public class ResolverSetUtils {
           if (valuesMap.containsKey(objectFieldType.getKey().getName().toString())) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
                                               getParameterValueResolver(parameterName, objectFieldType.getValue(),
+                                                                        expressionSupport,
                                                                         valuesMap
                                                                             .get(objectFieldType.getKey().getName().toString()),
                                                                         emptySet(), reflectionCache,
@@ -414,6 +447,7 @@ public class ResolverSetUtils {
           if (paramValue != null) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
                                               getParameterValueResolver(parameterName, objectFieldType.getValue(),
+                                                                        expressionSupport,
                                                                         paramValue,
                                                                         emptySet(), reflectionCache,
                                                                         muleContext, valueResolverFactory, false));
@@ -430,6 +464,7 @@ public class ResolverSetUtils {
   }
 
   private static ValueResolver getParameterValueResolverForCollection(String parameterName, ArrayType arrayType,
+                                                                      ExpressionSupport expressionSupport,
                                                                       Collection collection,
                                                                       ReflectionCache reflectionCache,
                                                                       MuleContext muleContext,
@@ -441,7 +476,8 @@ public class ResolverSetUtils {
       List<ValueResolver<Object>> itemsResolvers = new ArrayList<>();
       for (Object collectionItem : collection) {
         itemsResolvers
-            .add(getParameterValueResolver(parameterName, arrayType.getType(), collectionItem, emptySet(), reflectionCache,
+            .add(getParameterValueResolver(parameterName, arrayType.getType(), expressionSupport, collectionItem, emptySet(),
+                                           reflectionCache,
                                            muleContext, valueResolverFactory, false));
       }
       return CollectionValueResolver.of(type, itemsResolvers);
@@ -450,7 +486,9 @@ public class ResolverSetUtils {
     }
   }
 
-  private static ValueResolver getParameterValueResolverForMap(String parameterName, ObjectType type, Map<Object, Object> map,
+  private static ValueResolver getParameterValueResolverForMap(String parameterName, ObjectType type,
+                                                               ExpressionSupport expressionSupport,
+                                                               Map<Object, Object> map,
                                                                ReflectionCache reflectionCache,
                                                                MuleContext muleContext, ValueResolverFactory valueResolverFactory)
       throws MuleException {
@@ -461,7 +499,7 @@ public class ResolverSetUtils {
     if (valueType != null) {
       valueValueResolverFunction = value -> {
         try {
-          return getParameterValueResolver(parameterName, valueType, value, emptySet(), reflectionCache,
+          return getParameterValueResolver(parameterName, valueType, expressionSupport, value, emptySet(), reflectionCache,
                                            muleContext, valueResolverFactory, false);
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
