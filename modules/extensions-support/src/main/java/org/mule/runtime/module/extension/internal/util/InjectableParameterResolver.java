@@ -88,7 +88,7 @@ public class InjectableParameterResolver {
       LOGGER.debug("The parameter: '" + topLevelRequiredParameter
           + "' on which the extraction expression was to be executed is not present in the context, returning null");
     }
-    return parameterValue;
+    return parameterValue instanceof String stringValue ? stringValue.trim() : parameterValue;
   }
 
   private Map<String, InjectableParameterInfo> getInjectableParametersMap(List<InjectableParameterInfo> injectableParameters) {
