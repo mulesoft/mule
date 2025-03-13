@@ -247,21 +247,6 @@ public class DependencyResolver implements AutoCloseable {
       ArtifactDescriptorResult pom =
           readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-apis-split-loader-bom",
                                                      "pom", version));
-      pom.addRepository((new RemoteRepository.Builder("muleEE", "default",
-                                                      "https://repository.mulesoft.org/nexus/content/repositories/releases-ee/"))
-                                                          .build());
-      System.out
-          .println("========================================== Dev Runtime Build 4.8.0 ================================================");
-      System.out
-          .println("========================================== Remote Repositories ================================================");
-      pom.getRepositories().stream().forEach(repo -> {
-        System.out.println("Repository: { id : " + repo.getId() + " | " + "url : " + repo.getUrl() + " | " + " isBlocked : "
-            + repo.isBlocked() + "}");
-      });
-      System.out
-          .println("========================================== Remote Repositories ================================================");
-      System.out
-          .println("========================================== Dev Runtime Build 4.8.0 ================================================");
       return resolveDependencyNode(null, pom.getDependencies(), pom.getManagedDependencies(), dependencyFilter,
                                    pom.getRepositories());
     } catch (ArtifactDescriptorException e) {

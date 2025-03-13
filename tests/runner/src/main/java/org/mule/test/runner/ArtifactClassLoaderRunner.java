@@ -276,8 +276,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
         mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
 
     final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
-        .forcePolicyUpdateNever(false)
-        .forcePolicyUpdateAlways(true)
+        .forcePolicyUpdateNever(true)
         .localMavenRepositoryLocation(localMavenRepository.get());
     mavenClientProvider.getSettingsSupplierFactory().addToMavenConfig(mavenConfigurationBuilder);
 
