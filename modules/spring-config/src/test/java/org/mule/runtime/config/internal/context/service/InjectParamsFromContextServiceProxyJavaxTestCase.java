@@ -21,20 +21,20 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThrows;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.config.utils.Utils.AmbiguousAugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.AugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.AugmentedSubclassMethodService;
-import org.mule.runtime.config.utils.Utils.AugmentedSubclassOverridesMethodService;
-import org.mule.runtime.config.utils.Utils.BaseOverloadedService;
-import org.mule.runtime.config.utils.Utils.BaseOverloadedService2;
-import org.mule.runtime.config.utils.Utils.BaseService;
-import org.mule.runtime.config.utils.Utils.BasicService;
-import org.mule.runtime.config.utils.Utils.HiddenAugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.InvalidAugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.InvalidNamedAugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.NamedAugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.OverloadedAugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.OverloadedAugmentedMethodService2;
+import org.mule.runtime.config.utils.UtilsJavax.AmbiguousAugmentedMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.AugmentedMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.AugmentedSubclassMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.AugmentedSubclassOverridesMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.BaseOverloadedService;
+import org.mule.runtime.config.utils.UtilsJavax.BaseOverloadedService2;
+import org.mule.runtime.config.utils.UtilsJavax.BaseService;
+import org.mule.runtime.config.utils.UtilsJavax.BasicService;
+import org.mule.runtime.config.utils.UtilsJavax.HiddenAugmentedMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.InvalidAugmentedMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.InvalidNamedAugmentedMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.NamedAugmentedMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.OverloadedAugmentedMethodService;
+import org.mule.runtime.config.utils.UtilsJavax.OverloadedAugmentedMethodService2;
 import org.mule.runtime.container.internal.MetadataInvocationHandler;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -44,10 +44,10 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-import jakarta.inject.Inject;
+import javax.inject.Inject;
 
 @SmallTest
-public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleContextTestCase {
+public class InjectParamsFromContextServiceProxyJavaxTestCase extends AbstractMuleContextTestCase {
 
   @Inject
   private Registry registry;

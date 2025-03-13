@@ -24,17 +24,16 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.junit.Rule;
 import org.junit.Test;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCase {
 
   private static final String KEY = "key";
   private static final String KEY2 = "key2";
-  private static final String EXTENDED_KEY = "extendedKey";
 
   // TODO W-10781591 Remove this, some tests specifically tests features provided by ObjectProcessors
   @Rule
@@ -88,7 +87,6 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
     ExtendedTestLifecycleObject object = new ExtendedTestLifecycleObject();
 
     muleContext.getInjector().inject(object);
-    // muleContext.getRegistry().registerObject(EXTENDED_KEY, object);
     assertInjection(object);
     assertThat(object.getKeyChild(), is(sameInstance(child1)));
     assertThat(object.getKey2Child(), is(sameInstance(child2)));
@@ -103,7 +101,33 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
     verify(muleContextAware).setMuleContext(muleContext);
   }
 
+  @Test
+  public void injectWithInheritanceJavax() throws Exception {
+    TestLifecycleObjectJavax child1 = new TestLifecycleObjectJavax();
+    TestLifecycleObjectJavax child2 = new TestLifecycleObjectJavax();
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(KEY, child1);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(KEY2, child2);
+
+    assertThat(((MuleContextWithRegistry) muleContext).getRegistry().lookupByType(TestLifecycleObjectJavax.class).size(), is(2));
+
+    ExtendedTestLifecycleObjectJavax object = new ExtendedTestLifecycleObjectJavax();
+
+    muleContext.getInjector().inject(object);
+    assertInjection(object);
+    assertThat(object.getKeyChild(), is(sameInstance(child1)));
+    assertThat(object.getKey2Child(), is(sameInstance(child2)));
+  }
+
   private void assertInjection(TestLifecycleObject object) {
+    assertThat(((MuleContextWithRegistry) muleContext).getRegistry().get(OBJECT_STORE_MANAGER),
+               is(object.getObjectStoreManager()));
+    assertThat(object.getMuleContext(), is(muleContext));
+
+    // just to make sure that injection is to thank for this
+    assertThat(object, is(not(instanceOf(MuleContextAware.class))));
+  }
+
+  private void assertInjection(TestLifecycleObjectJavax object) {
     assertThat(((MuleContextWithRegistry) muleContext).getRegistry().get(OBJECT_STORE_MANAGER),
                is(object.getObjectStoreManager()));
     assertThat(object.getMuleContext(), is(muleContext));
@@ -155,6 +179,29 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
     @Inject
     @Named(KEY2)
     public void setKey2Child(TestLifecycleObject key2Child) {
+      this.key2Child = key2Child;
+    }
+  }
+
+  public static class ExtendedTestLifecycleObjectJavax extends TestLifecycleObjectJavax {
+
+    @javax.inject.Inject
+    @javax.inject.Named(KEY)
+    private TestLifecycleObjectJavax keyChild;
+
+    private TestLifecycleObjectJavax key2Child;
+
+    public TestLifecycleObjectJavax getKeyChild() {
+      return keyChild;
+    }
+
+    public TestLifecycleObjectJavax getKey2Child() {
+      return key2Child;
+    }
+
+    @javax.inject.Inject
+    @javax.inject.Named(KEY2)
+    public void setKey2Child(TestLifecycleObjectJavax key2Child) {
       this.key2Child = key2Child;
     }
   }

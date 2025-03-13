@@ -8,15 +8,22 @@ package org.mule.runtime.config.internal.bean;
 
 import org.mule.runtime.core.api.config.MuleConfiguration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A test object that depends on the {@link MuleConfiguration}, to be used as a singleton bean.
  */
 public class TestCustomServiceDependingOnMuleConfiguration {
 
+  @javax.inject.Inject
+  public MuleConfiguration muleConfigurationJavax;
+
   @Inject
   public MuleConfiguration muleConfiguration;
+
+  public MuleConfiguration getMuleConfigurationJavax() {
+    return muleConfigurationJavax;
+  }
 
   public MuleConfiguration getMuleConfiguration() {
     return muleConfiguration;

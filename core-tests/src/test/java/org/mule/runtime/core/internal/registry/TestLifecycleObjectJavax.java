@@ -12,9 +12,9 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.MuleContext;
 
-import jakarta.inject.Inject;
+import javax.inject.Inject;
 
-public class TestLifecycleObject implements Lifecycle {
+public class TestLifecycleObjectJavax implements Lifecycle {
 
   private int initialise = 0;
   private int start = 0;
