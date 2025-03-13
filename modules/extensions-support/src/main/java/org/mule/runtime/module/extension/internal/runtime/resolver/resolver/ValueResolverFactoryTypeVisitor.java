@@ -99,8 +99,8 @@ public class ValueResolverFactoryTypeVisitor extends BasicTypeValueResolverFacto
   }
 
   private ValueResolver getDefaultResolver(Object value) {
-    if (acceptsReferences && value instanceof String) {
-      return new RegistryLookupValueResolver((String) value);
+    if (acceptsReferences && value instanceof String stringValue) {
+      return new RegistryLookupValueResolver(stringValue);
     } else {
       return new TypeSafeValueResolverWrapper(new StaticValueResolver<>(value), getExpectedClass());
     }

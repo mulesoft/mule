@@ -20,6 +20,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ComponentParameterizationUtils.createComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
@@ -57,6 +58,7 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingCont
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
@@ -351,7 +353,8 @@ public class ResolverSetUtils {
         .mediaType(mimeType)
         .build();
 
-    if (isExpressionValue(value, expressionSupport)) {
+    if (!NOT_SUPPORTED.equals(expressionSupport)
+        && isExpression(value)) {
       if (PAYLOAD_EXPRESSION.equals(value)) {
         // @Content parameters default to `#[payload]`
         return null;
@@ -373,13 +376,6 @@ public class ResolverSetUtils {
                                         BindingContext.builder().addBinding(PAYLOAD, typedValue).build())
           .getValue();
     }
-  }
-
-  private static boolean isExpressionValue(Object value, ExpressionSupport expressionSupport) {
-    return !NOT_SUPPORTED.equals(expressionSupport)
-        && value instanceof String stringValue
-        && stringValue.startsWith("#[")
-        && stringValue.endsWith("]");
   }
 
   private static MediaType getFirstValidMimeType(MetadataType type) {
