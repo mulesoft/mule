@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.metadata.api.model.MetadataFormat.JSON;
 import static org.mule.runtime.api.metadata.DataType.JSON_STRING;
+import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromParameters;
 
 import static java.util.Collections.emptySet;
@@ -158,7 +159,10 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
 
     ParameterizedModel pmzdModel = createModelWithExpressionParam(jsonType);
 
-    String value = "hello me";
+    String value = "#['hello me']";
+    MuleExpressionLanguage el = expressionManager;
+    when(el.evaluate(eq(value), any(DataType.class), any(BindingContext.class)))
+        .thenReturn(new TypedValue("hello me", STRING));
 
     ResolverSet resolvers = getResolverSetFromParameters(pmzdModel,
                                                          (pgm, pm) -> value,

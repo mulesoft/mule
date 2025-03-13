@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
@@ -28,13 +29,11 @@ import static java.util.Optional.empty;
 import static com.google.common.collect.ImmutableBiMap.of;
 
 import org.mule.metadata.api.model.ArrayType;
-import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -58,7 +57,6 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingCont
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.lang.reflect.Field;
@@ -254,94 +252,109 @@ public class ResolverSetUtils {
     return parameterGroupParametersValueResolvers;
   }
 
-  private static ValueResolver getParameterValueResolver(String parameterName, MetadataType type,
-                                                         ExpressionSupport expressionSupport,
-                                                         Object value,
-                                                         Set<ModelProperty> modelProperties, ReflectionCache reflectionCache,
-                                                         MuleContext muleContext, ValueResolverFactory valueResolverFactory,
-                                                         boolean acceptsReferences)
+  private static <T> ValueResolver<T> getParameterValueResolver(String parameterName, MetadataType type,
+                                                                ExpressionSupport expressionSupport,
+                                                                T value,
+                                                                Set<ModelProperty> modelProperties,
+                                                                ReflectionCache reflectionCache,
+                                                                MuleContext muleContext,
+                                                                ValueResolverFactory valueResolverFactory,
+                                                                boolean acceptsReferences)
       throws InitialisationException {
-    Reference<ValueResolver> resolverReference = new Reference<>();
+    ValueResolver<T> resolverReference;
 
-    if (type.getMetadataFormat().equals(MetadataFormat.JAVA)) {
-      type.accept(new MetadataTypeVisitor() {
+    if (type.getMetadataFormat().equals(JAVA)) {
+      resolverReference = getJavaParameterValueResolver(parameterName, type, expressionSupport, value, modelProperties,
+                                                        reflectionCache, muleContext,
+                                                        valueResolverFactory, acceptsReferences);
+    } else {
+      Object convertedValue =
+          convertValueWithExpressionLanguage(value, type, expressionSupport, muleContext.getExpressionManager());
+      resolverReference = getValueResolverFor(parameterName, type, convertedValue, null, NOT_SUPPORTED, false, modelProperties,
+                                              false, valueResolverFactory);
+    }
+    initialiseIfNeeded(resolverReference, muleContext);
+    return resolverReference;
+  }
 
-        @Override
-        public void visitArrayType(ArrayType arrayType) {
-          boolean effectivelyAcceptReferences = acceptsReferences;
-          ValueResolver resolver;
-          try {
-            if (value instanceof Collection collection) {
-              resolver = getParameterValueResolverForCollection(parameterName, arrayType, expressionSupport,
-                                                                collection,
-                                                                reflectionCache, muleContext,
-                                                                valueResolverFactory);
+  private static <T> ValueResolver<T> getJavaParameterValueResolver(String parameterName, MetadataType type,
+                                                                    ExpressionSupport expressionSupport,
+                                                                    T value, Set<ModelProperty> modelProperties,
+                                                                    ReflectionCache reflectionCache, MuleContext muleContext,
+                                                                    ValueResolverFactory valueResolverFactory,
+                                                                    boolean acceptsReferences) {
+    Reference<ValueResolver<T>> resolverReference = new Reference<>();
+    type.accept(new MetadataTypeVisitor() {
+
+      @Override
+      public void visitArrayType(ArrayType arrayType) {
+        boolean effectivelyAcceptReferences = acceptsReferences;
+        ValueResolver<T> resolver;
+        try {
+          if (value instanceof Collection collection) {
+            resolver = getParameterValueResolverForCollection(parameterName, arrayType, expressionSupport,
+                                                              collection,
+                                                              reflectionCache, muleContext,
+                                                              valueResolverFactory);
+            effectivelyAcceptReferences = false;
+          } else {
+            resolver = new StaticValueResolver<>(value);
+          }
+          resolverReference.set(valueResolverFor(parameterName, arrayType, resolveAndInjectIfStatic(resolver, muleContext),
+                                                 modelProperties, valueResolverFactory, effectivelyAcceptReferences));
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(e);
+        }
+      }
+
+      @Override
+      public void visitObject(ObjectType objectType) {
+        boolean effectivelyAcceptReferences = acceptsReferences;
+        ValueResolver<T> resolver;
+        try {
+          if (isMap(objectType)) {
+            if (value instanceof Map map) {
+              resolver =
+                  getParameterValueResolverForMap(parameterName, objectType, expressionSupport, map, reflectionCache,
+                                                  muleContext, valueResolverFactory);
               effectivelyAcceptReferences = false;
             } else {
               resolver = new StaticValueResolver<>(value);
             }
-            resolverReference
-                .set(getValueResolverFor(parameterName, arrayType, resolveAndInjectIfStatic(resolver, muleContext),
-                                         getDefaultValue(type),
-                                         getExpressionSupport(arrayType), false, modelProperties, effectivelyAcceptReferences,
-                                         valueResolverFactory));
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        }
-
-        @Override
-        public void visitObject(ObjectType objectType) {
-          boolean effectivelyAcceptReferences = acceptsReferences;
-          ValueResolver resolver;
-          try {
-            if (isMap(objectType)) {
-              if (value instanceof Map map) {
-                resolver =
-                    getParameterValueResolverForMap(parameterName, objectType, expressionSupport, map, reflectionCache,
-                                                    muleContext, valueResolverFactory);
-                effectivelyAcceptReferences = false;
-              } else {
-                resolver = new StaticValueResolver<>(value);
-              }
+          } else {
+            Optional<ValueResolver<T>> pojoResolver =
+                getPojoParameterValueResolver(parameterName, objectType, expressionSupport, value, reflectionCache,
+                                              muleContext, valueResolverFactory);
+            if (pojoResolver.isPresent()) {
+              resolver = pojoResolver.get();
+              effectivelyAcceptReferences = false;
             } else {
-              Optional<ValueResolver> pojoResolver =
-                  getPojoParameterValueResolver(parameterName, objectType, expressionSupport, value, reflectionCache,
-                                                muleContext, valueResolverFactory);
-              if (pojoResolver.isPresent()) {
-                resolver = pojoResolver.get();
-                effectivelyAcceptReferences = false;
-              } else {
-                resolver = new StaticValueResolver<>(value);
-              }
+              resolver = new StaticValueResolver<>(value);
             }
-            resolverReference
-                .set(getValueResolverFor(parameterName, objectType, resolveAndInjectIfStatic(resolver, muleContext),
-                                         getDefaultValue(type),
-                                         getExpressionSupport(objectType), false, modelProperties, effectivelyAcceptReferences,
-                                         valueResolverFactory));
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
           }
+          resolverReference
+              .set(valueResolverFor(parameterName, objectType, resolveAndInjectIfStatic(resolver, muleContext), modelProperties,
+                                    valueResolverFactory, effectivelyAcceptReferences));
+        } catch (MuleException e) {
+          throw new MuleRuntimeException(e);
         }
+      }
 
-        @Override
-        protected void defaultVisit(MetadataType metadataType) {
-          resolverReference.set(getValueResolverFor(parameterName, metadataType, value, getDefaultValue(type),
-                                                    getExpressionSupport(metadataType), false, modelProperties,
-                                                    acceptsReferences, valueResolverFactory));
-        }
+      @Override
+      protected void defaultVisit(MetadataType metadataType) {
+        resolverReference
+            .set(valueResolverFor(parameterName, metadataType, value, modelProperties, valueResolverFactory, acceptsReferences));
+      }
 
+      private ValueResolver<T> valueResolverFor(String parameterName, MetadataType metadataType, final Object value,
+                                                Set<ModelProperty> modelProperties, ValueResolverFactory valueResolverFactory,
+                                                final boolean acceptsReferences) {
+        return getValueResolverFor(parameterName, metadataType, value, getDefaultValue(metadataType),
+                                   getExpressionSupport(metadataType), false, modelProperties,
+                                   acceptsReferences, valueResolverFactory);
+      }
+    });
 
-
-      });
-    } else {
-      Object convertedValue =
-          convertValueWithExpressionLanguage(value, type, expressionSupport, muleContext.getExpressionManager());
-      resolverReference.set(getValueResolverFor(parameterName, type, convertedValue, null, NOT_SUPPORTED, false, modelProperties,
-                                                false, valueResolverFactory));
-    }
-    initialiseIfNeeded(resolverReference.get(), muleContext);
     return resolverReference.get();
   }
 
@@ -389,10 +402,11 @@ public class ResolverSetUtils {
     return parse(mimeType);
   }
 
-  private static ValueResolver getValueResolverFor(String parameterName, MetadataType metadataType, Object value,
-                                                   Object defaultValue, ExpressionSupport expressionSupport, boolean required,
-                                                   Set<ModelProperty> modelProperties, boolean acceptsReferences,
-                                                   ValueResolverFactory valueResolverFactory) {
+  private static <T> ValueResolver<T> getValueResolverFor(String parameterName, MetadataType metadataType, Object value,
+                                                          Object defaultValue, ExpressionSupport expressionSupport,
+                                                          boolean required,
+                                                          Set<ModelProperty> modelProperties, boolean acceptsReferences,
+                                                          ValueResolverFactory valueResolverFactory) {
     return valueResolverFactory.of(parameterName, metadataType, value, defaultValue,
                                    expressionSupport, required, modelProperties, acceptsReferences);
   }
@@ -414,11 +428,12 @@ public class ResolverSetUtils {
     });
   }
 
-  private static Optional<ValueResolver> getPojoParameterValueResolver(String parameterName, ObjectType objectType,
-                                                                       ExpressionSupport expressionSupport,
-                                                                       Object value,
-                                                                       ReflectionCache reflectionCache, MuleContext muleContext,
-                                                                       ValueResolverFactory valueResolverFactory)
+  private static <T> Optional<ValueResolver<T>> getPojoParameterValueResolver(String parameterName, ObjectType objectType,
+                                                                              ExpressionSupport expressionSupport,
+                                                                              Object value,
+                                                                              ReflectionCache reflectionCache,
+                                                                              MuleContext muleContext,
+                                                                              ValueResolverFactory valueResolverFactory)
       throws InitialisationException {
 
     Optional<Class<Object>> pojoClass = getType(objectType);
