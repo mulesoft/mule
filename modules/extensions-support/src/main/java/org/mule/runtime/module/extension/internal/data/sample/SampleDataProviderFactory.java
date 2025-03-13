@@ -97,7 +97,7 @@ public class SampleDataProviderFactory {
           throw new SampleDataException("The sample data provider requires a connection and none was provided",
                                         MISSING_REQUIRED_PARAMETERS);
         }
-        setValueIntoField(resolver, connectionSupplier.get(), connectionField);
+        setValueIntoField(resolver, connection, connectionField);
       }
 
       if (factoryModelProperty.usesConfig()) {
@@ -106,7 +106,7 @@ public class SampleDataProviderFactory {
           throw new SampleDataException("The sample data provider requires a configuration and none was provided",
                                         MISSING_REQUIRED_PARAMETERS);
         }
-        setValueIntoField(resolver, configurationSupplier.get(), configField);
+        setValueIntoField(resolver, config, configField);
       }
       return resolver;
     } catch (SampleDataException e) {
