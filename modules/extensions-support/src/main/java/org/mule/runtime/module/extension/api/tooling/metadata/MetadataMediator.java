@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.api.tooling.metadata;
 
 import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -37,6 +38,7 @@ import java.util.function.Supplier;
  *
  * @since 4.8
  */
+@NoImplement
 public interface MetadataMediator {
 
   /**

@@ -228,9 +228,7 @@ public abstract class AbstractSampleDataTestCase extends AbstractMuleContextTest
   }
 
   private ConfigurationProvider createConfigurationProvider(String configName) {
-    final var configAst = appAst.topLevelComponentsStream()
-        .filter(f -> componentIdEquals(f, configName))
-        .findFirst().orElseThrow();
+    final var configAst = getTopLevelComponent(configName);
 
     final var configParameterization = createComponentParameterizationFromComponentAst(configAst);
 
@@ -253,6 +251,12 @@ public abstract class AbstractSampleDataTestCase extends AbstractMuleContextTest
                                                                            null,
                                                                            SampleDataExecutor
                                                                                .getClassLoader(sampleDataExtension));
+  }
+
+  private ComponentAst getTopLevelComponent(String configName) {
+    return appAst.topLevelComponentsStream()
+        .filter(f -> componentIdEquals(f, configName))
+        .findFirst().orElseThrow();
   }
 
   private boolean componentIdEquals(ComponentAst component, String componentId) {

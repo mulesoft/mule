@@ -49,4 +49,9 @@ public class MuleValueAdapter implements Value {
   public String getPartName() {
     return value.getPartName();
   }
+
+  @Override
+  public String toString() {
+    return value.toString();
+  }
 }
