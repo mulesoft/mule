@@ -262,6 +262,7 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
   private void assertEqualsToMuleConfigurationInjectedInCustomService(MuleConfiguration actualConfig) throws MuleException {
     TestCustomServiceDependingOnMuleConfiguration testService =
         getMuleContext().getRegistry().lookupObject(CUSTOM_SERVICE_DEPENDING_ON_MULE_CONFIGURATION);
+    assertThat(actualConfig, is(testService.getMuleConfigurationJavax()));
     assertThat(actualConfig, is(testService.getMuleConfiguration()));
   }
 

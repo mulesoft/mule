@@ -11,10 +11,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-public class Utils {
+public class UtilsJavax {
 
   public static Object augmentedParam;
 

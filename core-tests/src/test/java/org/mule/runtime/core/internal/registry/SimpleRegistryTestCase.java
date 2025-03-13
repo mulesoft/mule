@@ -49,6 +49,17 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
+  public void testObjectLifecycleJavax() throws Exception {
+    muleContext.start();
+
+    InterfaceBasedTrackerJavax tracker = new InterfaceBasedTrackerJavax();
+    getRegistry().registerObject(TEST_KEY, tracker);
+
+    muleContext.dispose();
+    assertEquals(LIFECYCLE_PHASES, tracker.getTracker().toString());
+  }
+
+  @Test
   public void featureFlaggingService() throws Exception {
     muleContext.start();
 
@@ -239,6 +250,10 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
   }
 
   public class InterfaceBasedTracker extends AbstractLifecycleTracker {
+    // no custom methods
+  }
+
+  public class InterfaceBasedTrackerJavax extends AbstractLifecycleTrackerJavax {
     // no custom methods
   }
 
