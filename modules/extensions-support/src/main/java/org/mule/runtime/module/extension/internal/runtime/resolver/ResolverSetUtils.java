@@ -346,15 +346,12 @@ public class ResolverSetUtils {
   private static Object convertValueWithExpressionLanguage(Object value, MetadataType type, ExpressionSupport expressionSupport,
                                                            ExpressionManager expressionManager) {
 
+    final var mimeType = getFirstValidMimeType(type);
     final var expectedOutputType = DataType.builder().type(getType(type).orElse(Object.class))
-        .mediaType(getFirstValidMimeType(type))
+        .mediaType(mimeType)
         .build();
 
-    if (!NOT_SUPPORTED.equals(expressionSupport)
-        && value instanceof String
-        && value.toString().startsWith("#[")
-        && value.toString().endsWith("]")) {
-
+    if (isExpressionValue(value, expressionSupport)) {
       if (PAYLOAD_EXPRESSION.equals(value)) {
         // @Content parameters default to `#[payload]`
         return null;
@@ -364,13 +361,11 @@ public class ResolverSetUtils {
                                           NULL_BINDING_CONTEXT)
             .getValue();
       }
-
-
     } else {
       TypedValue<?> typedValue = value instanceof TypedValue tv
           ? tv
           : new TypedValue<>(value, DataType.builder().type(value.getClass())
-              .mediaType(getFirstValidMimeType(type))
+              .mediaType(mimeType)
               .build());
 
       return expressionManager.evaluate(PAYLOAD_EXPRESSION,
@@ -378,6 +373,13 @@ public class ResolverSetUtils {
                                         BindingContext.builder().addBinding(PAYLOAD, typedValue).build())
           .getValue();
     }
+  }
+
+  private static boolean isExpressionValue(Object value, ExpressionSupport expressionSupport) {
+    return !NOT_SUPPORTED.equals(expressionSupport)
+        && value instanceof String stringValue
+        && stringValue.startsWith("#[")
+        && stringValue.endsWith("]");
   }
 
   private static MediaType getFirstValidMimeType(MetadataType type) {
