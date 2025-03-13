@@ -596,7 +596,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.management.stats to
       kryo.shaded;
   opens org.mule.runtime.core.internal.message to
-      kryo.shaded;
+          com.mulesoft.mule.runtime.kryo,
+          kryo.shaded;
   opens org.mule.runtime.core.internal.policy to
       org.mule.runtime.deployment,
       spring.core;
