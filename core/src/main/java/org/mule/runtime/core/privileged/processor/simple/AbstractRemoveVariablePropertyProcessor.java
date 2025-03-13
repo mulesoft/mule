@@ -55,7 +55,7 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
       if (key != null) {
         return removeProperty((PrivilegedEvent) event, key);
       } else {
-        logger.info("Key expression return null, no property will be removed");
+        logger.info("Key expression "+identifierEvaluator.getRawValue()+" returns null, no property will be removed");
         return event;
       }
     }
