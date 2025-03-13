@@ -15,6 +15,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -43,11 +44,15 @@ class ComponentProcessingStrategyReactiveProcessorBuilderTest {
         .filter(m -> m.canAccess(builder))
         .forEach(m -> {
           try {
-            final Object value = mock(m.getParameters()[0].getClass());
-            m.invoke(builder, value);
-          } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-          } catch (InvocationTargetException e) {
+            Parameter parameter = m.getParameters()[0];
+            if (!parameter.getType().isPrimitive()) {
+              final Object value = mock(parameter.getType());
+              m.invoke(builder, value);
+
+            } else if (parameter.getType().equals(Integer.TYPE)) {
+              m.invoke(builder, 1);
+            }
+          } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
           }
         });
