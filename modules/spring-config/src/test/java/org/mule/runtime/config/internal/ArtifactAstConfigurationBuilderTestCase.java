@@ -19,6 +19,7 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -119,6 +120,8 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
     artifactContext.getMuleContext().getInjector().inject(memoryManagementInjected);
 
     assertThat(memoryManagementInjected.getMemoryManagementService(), is(notNullValue()));
+    assertThat(memoryManagementInjected.getMemoryManagementService(),
+               sameInstance(memoryManagementInjected.getMemoryManagementServiceJavax()));
   }
 
   @Test
@@ -174,8 +177,15 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
    */
   private static class MemoryManagementInjected {
 
+    @javax.inject.Inject
+    private MemoryManagementService memoryManagementServiceJavax;
+
     @Inject
     private MemoryManagementService memoryManagementService;
+
+    public MemoryManagementService getMemoryManagementServiceJavax() {
+      return memoryManagementServiceJavax;
+    }
 
     public MemoryManagementService getMemoryManagementService() {
       return memoryManagementService;

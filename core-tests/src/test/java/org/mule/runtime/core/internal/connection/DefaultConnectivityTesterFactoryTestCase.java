@@ -12,10 +12,7 @@ import static org.mule.test.allure.AllureConstants.JavaSdk.ConnectivityTestingSt
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
