@@ -10,6 +10,7 @@ import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * Server-side abstraction of a connected client.
@@ -70,11 +71,11 @@ public interface SseClient extends AutoCloseable {
   void sendComment(String comment);
 
   /**
-   * The callback will be called when the client closes its connection.
+   * The callback will be called when the client closes its connection or there is an error sending the response.
    *
-   * @param callback to be called when the client closes its connection.
+   * @param callback to be called in that situation.
    */
-  void onClose(Runnable callback);
+  void onClose(Consumer<Exception> callback);
 
   /**
    * @return unique identifier of this client.
