@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * <code>ByteArrayToSerializable</code> converts a serialized object to its object representation

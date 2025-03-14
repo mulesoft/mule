@@ -30,7 +30,7 @@ import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

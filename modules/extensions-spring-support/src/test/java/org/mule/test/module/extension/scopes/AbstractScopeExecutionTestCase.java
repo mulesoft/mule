@@ -14,7 +14,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;

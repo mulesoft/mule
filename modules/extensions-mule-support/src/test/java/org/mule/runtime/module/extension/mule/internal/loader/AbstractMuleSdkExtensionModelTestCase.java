@@ -10,23 +10,17 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLICATION_EXTENSION_MODEL;
 
 import static java.lang.String.format;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 
-import java.util.Optional;
-
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(REUSE)
 @Story(APPLICATION_EXTENSION_MODEL)

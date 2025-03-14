@@ -13,9 +13,10 @@ import static org.mule.runtime.feature.internal.togglz.config.MuleTogglzFeatureF
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.feature.api.management.FeatureFlaggingManagementService;
 import org.mule.runtime.feature.internal.togglz.user.MuleTogglzArtifactFeatureUser;
-import org.togglz.core.repository.FeatureState;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import org.togglz.core.repository.FeatureState;
 
 /**
  * The default implementation for a service to enable/disable runtime features.

@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.metadata.internal.cache;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
+
 import static org.apache.commons.lang3.math.NumberUtils.toLong;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lock.LockFactory;
@@ -30,8 +32,8 @@ import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,12 +6,13 @@
  */
 package org.mule.test.marvel.drstrange;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -47,7 +48,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class DrStrangeOperations {
 

@@ -18,7 +18,6 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -30,8 +29,8 @@ import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * {@link ValueProviderService} implementation flavour that initialises just the required components before executing the
@@ -47,7 +46,6 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
 
   public static final String NON_LAZY_VALUE_PROVIDER_SERVICE = "_muleNonLazyValueProviderService";
   private final Supplier<ValueProviderService> valueProviderServiceSupplier;
-  private final Supplier<ConfigurationComponentLocator> componentLocatorSupplier;
 
   private final LazyComponentInitializerAdapter lazyComponentInitializer;
 
@@ -55,14 +53,10 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   @Named(NON_LAZY_VALUE_PROVIDER_SERVICE)
   private ValueProviderService providerService;
 
-  private ConfigurationComponentLocator componentLocator;
-
   public LazyValueProviderService(LazyComponentInitializerAdapter lazyComponentInitializer,
-                                  Supplier<ValueProviderService> valueProviderServiceSupplier,
-                                  Supplier<ConfigurationComponentLocator> componentLocatorSupplier) {
+                                  Supplier<ValueProviderService> valueProviderServiceSupplier) {
     this.lazyComponentInitializer = lazyComponentInitializer;
     this.valueProviderServiceSupplier = valueProviderServiceSupplier;
-    this.componentLocatorSupplier = componentLocatorSupplier;
   }
 
   /**
@@ -110,6 +104,5 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
   @Override
   public void initialise() throws InitialisationException {
     this.providerService = valueProviderServiceSupplier.get();
-    this.componentLocator = componentLocatorSupplier.get();
   }
 }

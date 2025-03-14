@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * @since 1.7.0

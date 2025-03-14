@@ -13,7 +13,7 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.event.CoreEvent;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Component used on deployment test that require policies to check that they are invoked

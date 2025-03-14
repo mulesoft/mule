@@ -17,7 +17,7 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A {@link ValueResolver} implementation and extension of {@link TypeSafeExpressionValueResolver } which evaluates expressions

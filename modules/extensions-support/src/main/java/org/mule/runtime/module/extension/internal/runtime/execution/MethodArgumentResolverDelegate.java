@@ -108,7 +108,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 
 /**

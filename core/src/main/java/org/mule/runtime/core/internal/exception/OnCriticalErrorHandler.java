@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;

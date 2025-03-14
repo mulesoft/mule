@@ -14,7 +14,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.FactoryBean;
 

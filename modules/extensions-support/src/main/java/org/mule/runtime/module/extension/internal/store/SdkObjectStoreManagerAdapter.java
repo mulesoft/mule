@@ -13,7 +13,7 @@ import org.mule.sdk.api.store.ObjectStoreSettings;
 
 import java.io.Serializable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Adapts the Mule api for object store manager {@link ObjectStoreManager} into the SDK api

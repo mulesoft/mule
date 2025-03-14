@@ -13,7 +13,7 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.util.MuleSystemProperties;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Default {@link ComponentInitialStateManager} that always signals initialization of components.

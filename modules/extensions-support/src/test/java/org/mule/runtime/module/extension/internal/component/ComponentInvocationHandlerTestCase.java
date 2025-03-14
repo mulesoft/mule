@@ -41,7 +41,8 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.xml.namespace.QName;
 
 import org.junit.Test;

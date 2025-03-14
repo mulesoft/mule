@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.FactoryBean;
 

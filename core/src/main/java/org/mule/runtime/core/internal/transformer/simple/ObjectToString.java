@@ -31,7 +31,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Iterator;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * <code>ObjectToString</code> transformer is useful for debugging. It will return human-readable output for various kinds of

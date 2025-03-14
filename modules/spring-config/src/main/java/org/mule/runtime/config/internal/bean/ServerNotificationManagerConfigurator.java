@@ -6,27 +6,25 @@
  */
 package org.mule.runtime.config.internal.bean;
 
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.config.internal.bean.NotificationConfig.EVENT_MAP;
 import static org.mule.runtime.config.internal.bean.NotificationConfig.INTERFACE_MAP;
+
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.notification.Notification;
+import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
-import org.mule.runtime.api.notification.Notification;
-import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.NotificationsProvider;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +37,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
 
 public class ServerNotificationManagerConfigurator extends AbstractComponent implements Initialisable, Disposable {
 

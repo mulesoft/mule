@@ -42,7 +42,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * An implementation of a {@link ComponentMessageProcessor} for {@link OperationModel operation models}

@@ -6,8 +6,8 @@
  */
 package org.mule.tck.util;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.concurrent.CountDownLatch;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

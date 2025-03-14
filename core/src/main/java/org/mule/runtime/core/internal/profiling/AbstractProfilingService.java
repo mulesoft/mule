@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A {@link AbstractProfilingService} that discovers available {@link ProfilingDataConsumer}

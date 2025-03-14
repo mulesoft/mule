@@ -18,7 +18,7 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
@@ -38,7 +38,6 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProce
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
@@ -47,7 +46,7 @@ import org.mule.tck.probe.PollingProber;
 import java.io.File;
 import java.net.URL;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;

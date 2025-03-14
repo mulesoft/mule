@@ -11,9 +11,9 @@ import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
@@ -24,12 +24,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -44,8 +43,6 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
   private ServiceA serviceA;
   @Mock
   private ServiceProvider serviceProviderA;
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Before
   public void before() {
@@ -73,12 +70,12 @@ public class ServiceRegistryTestCase extends AbstractMuleTestCase {
   public void missingRequiredServiceDependency() throws ServiceResolutionError {
     ServiceProviderRequiredDependencyToServiceA serviceProviderRequiredDependencyToServiceA =
         new ServiceProviderRequiredDependencyToServiceA();
-    expectedException.expect(ServiceResolutionError.class);
-    expectedException
-        .expectMessage(containsString("Could not inject dependency on field "
-            + "'" + ServiceProviderRequiredDependencyToServiceA.class.getName() + "#serviceA' of type '"
-            + ServiceA.class.getName() + "'"));
-    serviceRegistry.inject(serviceProviderRequiredDependencyToServiceA);
+
+    var thrown =
+        assertThrows(ServiceResolutionError.class, () -> serviceRegistry.inject(serviceProviderRequiredDependencyToServiceA));
+    assertThat(thrown.getMessage(), containsString("Could not inject dependency on field "
+        + "'" + ServiceProviderRequiredDependencyToServiceA.class.getName() + "#serviceA' of type '"
+        + ServiceA.class.getName() + "'"));
   }
 
   @Test

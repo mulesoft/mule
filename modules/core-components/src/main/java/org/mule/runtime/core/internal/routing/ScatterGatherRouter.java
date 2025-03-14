@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
 import static org.mule.runtime.core.internal.routing.RoutingUtils.setSourcePolicyChildContext;
+
+import static java.util.Collections.emptyList;
+
 import static reactor.core.publisher.Flux.fromIterable;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -21,14 +23,13 @@ import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.profiling.tracing.ComponentTracerAware;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.mule.runtime.core.privileged.profiling.tracing.ComponentTracerAware;
-import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
-
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.reactivestreams.Publisher;
 

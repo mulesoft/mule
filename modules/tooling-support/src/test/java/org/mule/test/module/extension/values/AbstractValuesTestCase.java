@@ -28,13 +28,13 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.hamcrest.Matcher;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @Feature(SDK_TOOLING_SUPPORT)
 @Story(VALUE_PROVIDERS_SERVICE)

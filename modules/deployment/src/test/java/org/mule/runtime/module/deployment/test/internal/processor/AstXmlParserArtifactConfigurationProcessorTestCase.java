@@ -46,7 +46,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Rule;

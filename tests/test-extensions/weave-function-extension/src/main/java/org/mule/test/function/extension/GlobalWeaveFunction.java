@@ -6,9 +6,11 @@
  */
 package org.mule.test.function.extension;
 
-import static com.google.common.collect.Lists.partition;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+
+import static com.google.common.collect.Lists.partition;
+
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -20,17 +22,18 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathFactory;
+
+import com.google.common.collect.ImmutableMap;
 
 import org.w3c.dom.Document;
 

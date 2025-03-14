@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @MediaType("text/plain")
 public class ReconectionSource extends Source<ReconnectableConnection, Void> {
