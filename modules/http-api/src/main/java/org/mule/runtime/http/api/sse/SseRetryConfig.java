@@ -12,6 +12,8 @@ import org.mule.api.annotation.Experimental;
  * The {@link SseSource} implements the corresponding
  * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html">server-sent-events spec</a>. This interface allows
  * configuring the retry mechanism described there.
+ * <p>
+ * This API is EXPERIMENTAL. Do not use it until it is stable.
  *
  * @param allowRetryDelayOverride The server may use the retry key in the event to override the retry delay. With this
  *                                configuration, the user can set if the retry mechanism has to accept that parameter or not.
@@ -21,14 +23,13 @@ import org.mule.api.annotation.Experimental;
  *                                configuring that timeout. Default value is {@code 2000L}.
  * @param shouldRetryOnStreamEnd  By default, an event source will reconnect when the response stream ended, but this method
  *                                allows configuring whether reconnecting or not. Default value is {@code true}.
- *
- *                                <p>
- *                                This API is EXPERIMENTAL. Do not use it until it is stable.
  */
 @Experimental
 public record SseRetryConfig(boolean allowRetryDelayOverride, long initialRetryDelayMillis, boolean shouldRetryOnStreamEnd) {
 
+  public static final Long DEFAULT_RETRY_DELAY_MILLIS = 2000L;
+
   public static SseRetryConfig defaultConfig() {
-    return new SseRetryConfig(true, 2000L, true);
+    return new SseRetryConfig(true, DEFAULT_RETRY_DELAY_MILLIS, true);
   }
 }
