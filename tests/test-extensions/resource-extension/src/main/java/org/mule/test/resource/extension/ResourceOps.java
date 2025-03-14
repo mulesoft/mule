@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.Properties;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class ResourceOps {
 

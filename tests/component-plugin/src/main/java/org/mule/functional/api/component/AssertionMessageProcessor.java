@@ -6,11 +6,13 @@
  */
 package org.mule.functional.api.component;
 
-import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.junit.Assert.fail;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static org.mule.tck.processor.FlowAssert.addAssertion;
+
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.el.ValidationResult;
@@ -26,7 +28,7 @@ import org.mule.tck.processor.FlowAssertion;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class AssertionMessageProcessor extends AbstractComponent implements FlowAssertion, Processor, Startable {
 

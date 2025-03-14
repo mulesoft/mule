@@ -18,7 +18,6 @@ import static org.mule.sdk.api.annotation.source.SourceClusterSupport.NOT_SUPPOR
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -61,19 +60,14 @@ import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class JavaSourceModelParserTestCase {
 
   protected JavaSourceModelParser parser;
   protected SourceElement sourceElement;
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Test
   public void defaultClusterSupport() {

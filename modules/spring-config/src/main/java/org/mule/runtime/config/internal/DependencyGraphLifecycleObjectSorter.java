@@ -20,17 +20,17 @@ import org.mule.runtime.core.internal.lifecycle.phases.DefaultLifecycleObjectSor
 import org.mule.runtime.core.internal.lifecycle.phases.LifecycleObjectSorter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 
 import org.jgrapht.alg.connectivity.ConnectivityInspector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.springframework.beans.factory.config.BeanDefinition;
+
+import jakarta.inject.Inject;
 
 /**
  * Specialization of {@link DefaultLifecycleObjectSorter} which uses an {@link AbstractSpringRegistry} to not only consider the
@@ -53,7 +53,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     this.reverseGraphs = new ArrayList<>(orderedLifecycleTypes.length);
     this.resolver = resolver;
     this.orderedLifecycleTypes = orderedLifecycleTypes;
-    for (int i = 0; i < orderedLifecycleTypes.length; i++) {
+    for (Class<?> orderedLifecycleType : orderedLifecycleTypes) {
       DefaultDirectedGraph<BeanWrapper, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
       dependencyGraphs.add(graph);
       DefaultDirectedGraph<BeanWrapper, DefaultEdge> reverseGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
@@ -164,16 +164,12 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   public List<Object> getSortedObjects() {
     List<BeanWrapper> res = dependencyGraphs.stream().map(graph -> {
 
-      List<BeanWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(graph, new Comparator<BeanWrapper>() {
-
-        @Override
-        public int compare(BeanWrapper o1, BeanWrapper o2) {
-          if (getLifeCycleObjectNameOrder().getOrDefault(o1.getName(), -1) > getLifeCycleObjectNameOrder()
-              .getOrDefault(o2.getName(), -1)) {
-            return -1;
-          } else {
-            return 1;
-          }
+      List<BeanWrapper> sortedObjects = newArrayList(new TopologicalOrderIterator<>(graph, (o1, o2) -> {
+        if (getLifeCycleObjectNameOrder().getOrDefault(o1.getName(), -1) > getLifeCycleObjectNameOrder()
+            .getOrDefault(o2.getName(), -1)) {
+          return -1;
+        } else {
+          return 1;
         }
       }));
       reverse(sortedObjects);
@@ -197,6 +193,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
    *
    * @param lookupObjects lifecycle object list which is ordered based on the type
    */
+  @Override
   public void setLifeCycleObjectNameOrder(List<String> lookupObjects) {
     int index = 0;
     for (String objectName : lookupObjects) {

@@ -45,7 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 

@@ -49,7 +49,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Decorates a {@link ProcessingStrategy} so that processing takes place on the current thread in the event of a transaction being

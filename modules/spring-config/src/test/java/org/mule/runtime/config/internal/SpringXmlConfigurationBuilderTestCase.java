@@ -19,6 +19,7 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 
+import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;

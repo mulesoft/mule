@@ -24,9 +24,9 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 
 import java.util.concurrent.RejectedExecutionException;
 
-import org.reactivestreams.Publisher;
+import jakarta.inject.Inject;
 
-import javax.inject.Inject;
+import org.reactivestreams.Publisher;
 
 /**
  * Base class for {@link ProcessingStrategy} decorators.

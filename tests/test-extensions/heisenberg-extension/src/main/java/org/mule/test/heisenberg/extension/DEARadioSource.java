@@ -6,17 +6,19 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.sdk.api.runtime.source.BackPressureMode.DROP;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.sdk.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.annotation.source.BackPressure;
 import org.mule.test.heisenberg.extension.model.types.DEAOfficerAttributes;
 
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Alias("dea-radio")
 @BackPressure(defaultMode = DROP, supportedModes = DROP)

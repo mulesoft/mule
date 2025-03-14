@@ -24,7 +24,7 @@ import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Manager for handling message processing troubleshooting data.

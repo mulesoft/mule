@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.core.api.processor.Processor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Processor that throws the specified exception. Can be refactored to throw errors later on

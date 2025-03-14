@@ -14,7 +14,7 @@ import static org.mule.test.allure.AllureConstants.Sdk.SDK;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.config.api.LazyComponentInitializer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;

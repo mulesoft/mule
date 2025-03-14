@@ -7,7 +7,9 @@
 package org.mule.test.some.extension;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -22,7 +24,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

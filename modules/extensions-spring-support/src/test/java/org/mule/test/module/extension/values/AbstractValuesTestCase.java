@@ -28,8 +28,8 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.hamcrest.Matcher;
 

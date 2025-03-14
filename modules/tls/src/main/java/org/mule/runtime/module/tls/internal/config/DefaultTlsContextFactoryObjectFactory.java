@@ -14,7 +14,7 @@ import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.runtime.module.tls.internal.revocation.RevocationCheck;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * {@link ObjectFactory} for TLS context factory

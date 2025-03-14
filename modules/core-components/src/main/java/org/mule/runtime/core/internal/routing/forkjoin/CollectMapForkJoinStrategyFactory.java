@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.routing.forkjoin;
 
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_MAP;
+
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.metadata.DataType;
@@ -19,7 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * {@link ForkJoinStrategy} that:

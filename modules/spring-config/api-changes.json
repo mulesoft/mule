@@ -1,4 +1,28 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>.streamingManager",
+            "new": "field org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>.streamingManager",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>.streamingManager",
+            "new": "field org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>.streamingManager",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          }
+        ]
+      }
+    }
+  },
   "4.7.0": {
     "revapi": {
       "differences": {

@@ -8,6 +8,7 @@ package org.mule.test.marvel.drstrange;
 
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrange.CONFIG_NAME;
+
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -22,7 +23,7 @@ import org.mule.runtime.extension.api.annotation.param.reference.ObjectStoreRefe
 import org.mule.sdk.api.annotation.connectivity.ConnectionProviders;
 import org.mule.test.marvel.ironman.IronMan;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Default extension to test cursor streams and lists. Given Dr. Strange's ability to use the eye of Agamotto to reverse and

@@ -6,10 +6,11 @@
  */
 package org.mule.test.module.extension.dsl;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver.getDefault;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -26,12 +27,13 @@ import org.mule.test.subtypes.extension.TopLevelStatelessType;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
-import org.junit.Before;
-import org.junit.Test;
 
 public class ComplexPojoDslSyntaxResolverTestCase extends AbstractExtensionFunctionalTestCase {
 

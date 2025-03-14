@@ -5,6 +5,422 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor.expressionManager",
+            "new": "field org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor.expressionManager",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor.expressionManager",
+            "new": "field org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor.expressionManager",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor.expressionManager @ org.mule.runtime.core.api.processor.RaiseErrorProcessor",
+            "new": "field org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor.expressionManager @ org.mule.runtime.core.api.processor.RaiseErrorProcessor",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor.expressionManager @ org.mule.runtime.core.api.processor.RaiseErrorProcessor",
+            "new": "field org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor.expressionManager @ org.mule.runtime.core.api.processor.RaiseErrorProcessor",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext",
+            "new": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext",
+            "new": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext @ org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate",
+            "new": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext @ org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext @ org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate",
+            "new": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext @ org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext @ org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate",
+            "new": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext @ org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext @ org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate",
+            "new": "field org.mule.runtime.core.api.retry.policy.AbstractPolicyTemplate.muleContext @ org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.security.AbstractSecurityFilter.registry @ org.mule.runtime.core.api.security.AbstractAuthenticationFilter",
+            "new": "field org.mule.runtime.core.api.security.AbstractSecurityFilter.registry @ org.mule.runtime.core.api.security.AbstractAuthenticationFilter",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.security.AbstractSecurityFilter.registry @ org.mule.runtime.core.api.security.AbstractAuthenticationFilter",
+            "new": "field org.mule.runtime.core.api.security.AbstractSecurityFilter.registry @ org.mule.runtime.core.api.security.AbstractAuthenticationFilter",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.security.AbstractSecurityFilter.registry",
+            "new": "field org.mule.runtime.core.api.security.AbstractSecurityFilter.registry",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.security.AbstractSecurityFilter.registry",
+            "new": "field org.mule.runtime.core.api.security.AbstractSecurityFilter.registry",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+            "new": "method void org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "method void org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+            "new": "method void org.mule.runtime.core.api.security.MuleSecurityManagerConfigurator::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.privileged.exception.AbstractExceptionListener.notificationFirer",
+            "new": "field org.mule.runtime.core.privileged.exception.AbstractExceptionListener.notificationFirer",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.privileged.exception.AbstractExceptionListener.notificationFirer",
+            "new": "field org.mule.runtime.core.privileged.exception.AbstractExceptionListener.notificationFirer",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.muleContext @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext",
+            "new": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext",
+            "new": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext @ org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+            "new": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext @ org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext @ org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+            "new": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext @ org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext @ org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+            "new": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext @ org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext @ org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+            "new": "field org.mule.runtime.core.privileged.processor.AbstractExecutableComponent.muleContext @ org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "field org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory.muleContext",
+            "new": "field org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory.muleContext",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "field org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory.muleContext",
+            "new": "field org.mule.runtime.core.privileged.processor.objectfactory.MessageProcessorChainObjectFactory.muleContext",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setExpressionManager(org.mule.runtime.core.api.el.ExtendedExpressionManager)",
+            "new": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setExpressionManager(org.mule.runtime.core.api.el.ExtendedExpressionManager)",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setExpressionManager(org.mule.runtime.core.api.el.ExtendedExpressionManager)",
+            "new": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setExpressionManager(org.mule.runtime.core.api.el.ExtendedExpressionManager)",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setStreamingManager(org.mule.runtime.core.api.streaming.StreamingManager)",
+            "new": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setStreamingManager(org.mule.runtime.core.api.streaming.StreamingManager)",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setStreamingManager(org.mule.runtime.core.api.streaming.StreamingManager)",
+            "new": "method void org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor<T>::setStreamingManager(org.mule.runtime.core.api.streaming.StreamingManager)",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor::setExpressionManager(org.mule.runtime.core.api.el.ExtendedExpressionManager)",
+            "new": "method void org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor::setExpressionManager(org.mule.runtime.core.api.el.ExtendedExpressionManager)",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "method void org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor::setExpressionManager(org.mule.runtime.core.api.el.ExtendedExpressionManager)",
+            "new": "method void org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor::setExpressionManager(org.mule.runtime.core.api.el.ExtendedExpressionManager)",
+            "annotation": "@javax.inject.Inject",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
             "code": "java.method.removed",
             "old": "method boolean org.mule.runtime.core.privileged.transaction.TransactionConfig::isInteractWithExternal()",
             "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"

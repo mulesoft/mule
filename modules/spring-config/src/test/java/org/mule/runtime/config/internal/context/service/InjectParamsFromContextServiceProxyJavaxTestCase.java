@@ -179,7 +179,8 @@ public class InjectParamsFromContextServiceProxyJavaxTestCase extends AbstractMu
 
     var thrown = assertThrows(IllegalDependencyInjectionException.class,
                               () -> serviceProxy.augmented());
-    assertThat(thrown.getMessage(), is(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, "augmented", "AmbiguousAugmentedMethodService")));
+    assertThat(thrown.getMessage(),
+               is(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, "augmented", "AmbiguousAugmentedMethodService")));
 
     assertThat(augmentedParam, nullValue());
   }

@@ -10,10 +10,10 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_T
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getResource;
+import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getSampler;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
-import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getSampler;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -33,12 +33,13 @@ import org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResour
 
 import javax.inject.Inject;
 
-import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
-import io.opentelemetry.sdk.trace.samplers.Sampler;
-import io.opentelemetry.sdk.trace.SpanProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.opentelemetry.sdk.resources.Resource;
+import io.opentelemetry.sdk.trace.SpanProcessor;
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 
 /**
  * An implementation of {@link SpanExporterFactory} that creates {@link SpanExporter} that exports the internal spans as
@@ -90,6 +91,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.featureFlaggingService = featureFlaggingService;
   }
 
+  @Override
   public SpanExporter getSpanExporter(Span span, InitialSpanInfo initialSpanInfo) {
     return new OpenTelemetrySpanExporter(span, initialSpanInfo, artifactId, artifactType, spanProcessor,
                                          addMuleAncestorSpanId, resource, sampler);

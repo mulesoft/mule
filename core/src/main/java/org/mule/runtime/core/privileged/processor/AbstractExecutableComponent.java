@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.api.annotation.NoImplement;
@@ -35,11 +37,9 @@ import org.mule.runtime.core.privileged.exception.MessagingException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
 /**

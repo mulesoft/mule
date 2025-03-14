@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.config.internal.dsl.processor;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyMap;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -25,7 +26,8 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.xml.namespace.QName;
 
 @NoExtend

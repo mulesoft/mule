@@ -20,7 +20,7 @@ import org.mule.runtime.metrics.exporter.config.impl.FileMeterExporterConfigurat
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class OpenTelemetryAutoConfigurableMeterExporterConfiguration implements MeterExporterConfiguration {
 

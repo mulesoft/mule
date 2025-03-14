@@ -30,7 +30,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Base class for {@link ObjectFactory} implementation which create extension components.

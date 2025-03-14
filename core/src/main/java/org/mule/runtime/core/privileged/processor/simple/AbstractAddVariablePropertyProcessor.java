@@ -32,7 +32,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

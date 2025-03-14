@@ -16,7 +16,7 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Uses a custom message processor chain builder for subflows in order to generate the proper message processor ids.

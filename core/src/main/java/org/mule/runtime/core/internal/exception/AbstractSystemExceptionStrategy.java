@@ -23,7 +23,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.AbstractExceptionListener;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Fire a notification, log exception, clean up transaction if any, and trigger reconnection strategy if this is a

@@ -13,7 +13,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 import java.io.Serializable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Lookup an {@link ObjectStore} from the registry.
