@@ -386,6 +386,13 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-javax-inject-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
         <!--TODO: MULE-10837-->
         <dependency>
             <groupId>org.mule.runtime</groupId>
