@@ -14,7 +14,7 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Factory that allows the creation of {@link ComponentTracer} instances.

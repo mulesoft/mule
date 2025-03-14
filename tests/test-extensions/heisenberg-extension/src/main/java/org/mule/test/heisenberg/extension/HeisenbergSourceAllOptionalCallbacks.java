@@ -6,10 +6,6 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
@@ -20,6 +16,11 @@ import static org.mule.test.heisenberg.extension.HeisenbergSourceAllOptionalCall
 import static org.mule.test.heisenberg.extension.HeisenbergSourceAllOptionalCallbacks.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSourceAllOptionalCallbacks.TerminateStatus.NONE;
 import static org.mule.test.heisenberg.extension.HeisenbergSourceAllOptionalCallbacks.TerminateStatus.SUCCESS;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -53,7 +54,7 @@ import org.mule.test.heisenberg.extension.model.PersonalInfoAllOptional;
 
 import java.util.concurrent.ScheduledFuture;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Alias("ListenPaymentsAllOptional")
 @EmitsResponse

@@ -6,10 +6,15 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CORE_EXTENSIONS;
+import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CoreExtensionsStory.CORE_EXTENSIONS_DEPENDENCY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LOCK_FACTORY;
+import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LockFactoryStory.SERVER_LOCK_FACTORY;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
@@ -18,11 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CORE_EXTENSIONS;
-import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CoreExtensionsStory.CORE_EXTENSIONS_DEPENDENCY_INJECTION;
-import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LOCK_FACTORY;
-import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LockFactoryStory.SERVER_LOCK_FACTORY;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.service.Service;
@@ -50,15 +50,15 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import org.junit.Test;
+
+import org.mockito.InOrder;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.InOrder;
 
 @SmallTest
 @Feature(CORE_EXTENSIONS)
@@ -70,9 +70,6 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
       mock(MuleCoreExtensionDependencyResolver.class);
   private MuleCoreExtensionManagerServer coreExtensionManager =
       new DefaultMuleCoreExtensionManagerServer(coreExtensionDiscoverer, coreExtensionDependencyResolver);
-
-  @Rule
-  public ExpectedException expected = none();
 
   @Test
   public void discoversMuleCoreExtension() throws Exception {

@@ -8,12 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.lang.String.format;
 
-import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
-
-import javax.inject.Inject;
 
 /**
  * An {@link LifecycleAwareValueResolverWrapper} which throws an {@link IllegalArgumentException} if the resolved value is
@@ -26,9 +23,6 @@ import javax.inject.Inject;
  * @since 4.0
  */
 public class RequiredParameterValueResolverWrapper<T> extends LifecycleAwareValueResolverWrapper<T> {
-
-  @Inject
-  private ConfigurationProperties properties;
 
   private final String errorMessage;
 

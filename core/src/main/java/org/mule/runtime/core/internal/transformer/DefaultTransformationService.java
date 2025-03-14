@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Provides the same operations previously exposed by {@link Message} but decoupled from Message.

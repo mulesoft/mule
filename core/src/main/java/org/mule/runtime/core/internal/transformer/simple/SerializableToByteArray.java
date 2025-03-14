@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String to a byte array. If <code>Message</code> is

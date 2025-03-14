@@ -158,14 +158,14 @@ import org.mule.runtime.tracing.level.impl.config.AutoConfigurableTracingLevelCo
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+
+import jakarta.inject.Inject;
 
 /**
  * This class configured all the services available in a {@code MuleContext}.

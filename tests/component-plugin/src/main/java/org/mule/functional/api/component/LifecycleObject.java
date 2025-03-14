@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class LifecycleObject extends AbstractComponent implements Lifecycle {
 

@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Abstract class to generate an {@link ExtensionModel} from an extension built from an XML file.

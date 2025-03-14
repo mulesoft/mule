@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.sdk.api.data.sample.SampleDataException;
 import org.mule.sdk.api.runtime.operation.Result;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class MuleContextAwareSampleDataProvider extends ParameterizedTestSampleDataProvider {
 

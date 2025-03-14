@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.internal.routing.forkjoin;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -27,7 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.xml.namespace.QName;
 
 /**

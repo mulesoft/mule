@@ -21,16 +21,13 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
 import org.mule.sdk.api.connectivity.ConnectionProvider;
 import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 
-import java.util.Optional;
-
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

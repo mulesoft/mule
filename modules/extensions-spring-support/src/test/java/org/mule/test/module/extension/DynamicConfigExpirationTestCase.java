@@ -6,15 +6,16 @@
  */
 package org.mule.test.module.extension;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.streamRead;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.closePagingProviderCalls;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.getPageCalls;
 
 import static java.util.Arrays.asList;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.exception.MuleException;
@@ -28,8 +29,8 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.junit.Before;
 import org.junit.Test;

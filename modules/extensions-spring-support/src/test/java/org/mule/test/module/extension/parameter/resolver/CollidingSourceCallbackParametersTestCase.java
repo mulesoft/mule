@@ -6,10 +6,6 @@
  */
 package org.mule.test.module.extension.parameter.resolver;
 
-import static java.lang.Integer.parseInt;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
 import static org.mule.test.allure.AllureConstants.JavaSdk.Parameters.PARAMETERS;
@@ -18,12 +14,18 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergSourceAllOptionalCallbacks.executedOnError;
 import static org.mule.test.heisenberg.extension.HeisenbergSourceAllOptionalCallbacks.receivedInlineOnErrorData;
 
+import static java.lang.Integer.parseInt;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.junit.Test;
 

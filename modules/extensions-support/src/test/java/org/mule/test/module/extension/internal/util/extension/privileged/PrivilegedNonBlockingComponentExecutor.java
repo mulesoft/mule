@@ -7,6 +7,7 @@
 package org.mule.test.module.extension.internal.util.extension.privileged;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -16,7 +17,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class PrivilegedNonBlockingComponentExecutor
     implements CompletableComponentExecutor<OperationModel>, Startable, Stoppable {

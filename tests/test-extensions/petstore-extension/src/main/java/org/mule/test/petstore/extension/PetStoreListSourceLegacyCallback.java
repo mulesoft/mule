@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Alias("pet-source-list-legacy-callback")
 @MediaType(value = TEXT_PLAIN, strict = false)

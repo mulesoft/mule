@@ -39,7 +39,7 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.reactivestreams.Publisher;
 

@@ -8,7 +8,7 @@ package org.mule.test.module.extension;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.message.Message.of;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -18,8 +18,8 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import org.junit.Test;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public class ExtensionAsInjectedDependenciesTestCase extends AbstractExtensionFunctionalTestCase {
 

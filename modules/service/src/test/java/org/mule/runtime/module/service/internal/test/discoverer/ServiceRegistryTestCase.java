@@ -21,7 +21,7 @@ import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Test;
 

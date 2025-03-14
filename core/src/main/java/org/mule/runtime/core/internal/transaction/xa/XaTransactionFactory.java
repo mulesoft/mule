@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.internal.transaction.XaTransaction;
 import org.mule.runtime.core.privileged.transaction.TransactionFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.transaction.TransactionManager;
 
 /**

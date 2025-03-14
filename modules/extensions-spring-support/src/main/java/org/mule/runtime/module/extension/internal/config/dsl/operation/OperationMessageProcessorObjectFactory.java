@@ -24,7 +24,7 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link OperationMessageProcessor} instances

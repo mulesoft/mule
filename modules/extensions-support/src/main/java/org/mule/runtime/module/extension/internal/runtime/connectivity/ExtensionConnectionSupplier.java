@@ -34,7 +34,8 @@ import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.EventTracer;
 
 import java.util.Optional;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
 
 /**
  * A bridge between the execution of a {@link ComponentModel} and the {@link ConnectionManager} which provides the connections

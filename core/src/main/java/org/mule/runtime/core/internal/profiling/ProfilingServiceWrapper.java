@@ -35,7 +35,7 @@ import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

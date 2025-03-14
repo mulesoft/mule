@@ -14,7 +14,7 @@ import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * An {@link ObjectFactory} which produces instances of {@link ExpirationPolicy}

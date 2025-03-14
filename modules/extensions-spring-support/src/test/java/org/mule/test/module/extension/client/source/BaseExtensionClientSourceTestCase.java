@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.source.SourceHandler;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Base class for tests about message source support in {@link ExtensionsClient}

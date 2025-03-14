@@ -18,8 +18,8 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * {@link GlobalBindingContextProvider} that adds core function bindings.

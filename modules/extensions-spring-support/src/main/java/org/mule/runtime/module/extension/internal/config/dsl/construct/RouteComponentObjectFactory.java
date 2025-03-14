@@ -32,7 +32,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements.

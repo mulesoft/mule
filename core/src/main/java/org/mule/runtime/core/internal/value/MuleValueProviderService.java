@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.internal.value;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.internal.util.LocationUtils.deleteLastPartFromLocation;
 import static org.mule.runtime.core.internal.util.LocationUtils.isConnection;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.NOT_VALUE_PROVIDER_ENABLED;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -28,7 +29,7 @@ import org.mule.runtime.extension.api.values.ValueResolvingException;
 
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Default implementation of the {@link ValueProviderService}, which provides the capability to resolve {@link Value values} for

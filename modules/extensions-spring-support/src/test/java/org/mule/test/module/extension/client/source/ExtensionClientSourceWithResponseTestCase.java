@@ -38,7 +38,7 @@ import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Test;
 

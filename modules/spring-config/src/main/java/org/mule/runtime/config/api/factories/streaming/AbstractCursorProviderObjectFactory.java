@@ -12,7 +12,7 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @NoExtend
 public abstract class AbstractCursorProviderObjectFactory<T> extends AbstractComponentFactory<T> {

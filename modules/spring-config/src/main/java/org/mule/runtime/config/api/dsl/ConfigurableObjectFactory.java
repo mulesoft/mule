@@ -16,7 +16,7 @@ import org.mule.runtime.dsl.api.component.ObjectFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * {@inheritDoc}

@@ -11,9 +11,9 @@ import org.mule.runtime.config.internal.registry.AbstractSpringRegistry;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.springframework.beans.factory.config.BeanDefinition;
+
+import jakarta.inject.Inject;
 
 /**
  * Provides the dependencies that are explicit on the {@link BeanDefinition}. These were inferred from introspecting fields

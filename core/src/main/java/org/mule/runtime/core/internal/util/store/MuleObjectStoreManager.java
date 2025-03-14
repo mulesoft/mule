@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.store;
 
-import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -26,15 +28,15 @@ import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.store.AbstractPartitionableObjectStore;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.mule.runtime.core.internal.store.AbstractPartitionableObjectStore;
 import org.slf4j.Logger;
 
 public class MuleObjectStoreManager implements ObjectStoreManager, Initialisable, Disposable {

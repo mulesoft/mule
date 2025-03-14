@@ -13,7 +13,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.BYTES_STREAMING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.RandomStringUtils.insecure;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -29,7 +29,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
@@ -48,15 +47,16 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
@@ -106,9 +106,6 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   @Inject
   private StreamingManager streamingManager;
 
-  @Inject
-  private EventContextService eventContextService;
-
   @Rule
   public SystemProperty configName;
 
@@ -116,7 +113,7 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
     this.configName = new SystemProperty("configName", configName);
   }
 
-  private String data = randomAlphabetic(2048);
+  private String data = insecure().nextAlphabetic(2048);
 
   @Override
   protected String getConfigFile() {
@@ -210,7 +207,7 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
   @Test
   @Description("When the max buffer size is exceeded, the correct type of error is mapped")
   public void throwsBufferSizeExceededError() throws Exception {
-    data = randomAlphabetic(KB.toBytes(60));
+    data = insecure().nextAlphabetic(KB.toBytes(60));
     Object value = flowRunner("bufferExceeded").withPayload(data).run().getMessage().getPayload().getValue();
     assertThat(value, is(TOO_BIG));
   }
