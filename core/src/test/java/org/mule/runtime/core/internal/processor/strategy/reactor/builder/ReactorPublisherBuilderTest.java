@@ -12,25 +12,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.publisher.TestPublisher;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ReactorPublisherBuilderTest {
@@ -43,7 +38,7 @@ class ReactorPublisherBuilderTest {
   @BeforeAll
   static void setup() {
     methods = Arrays.stream(ReactorPublisherBuilder.class.getDeclaredMethods())
-        .filter(m -> m.getParameterCount() == 1)
+        .filter(m -> m.getName().matches("^[a-z]"))
         .toList();
   }
 
@@ -64,21 +59,12 @@ class ReactorPublisherBuilderTest {
   private static void setValues(ReactorPublisherBuilder<?> result) {
     methods.forEach(m -> {
       try {
-        Parameter parameter = m.getParameters()[0];
-        if (parameter.getType().isAssignableFrom(Optional.class)) {
-          Class<?> parameterizedType =
-              (Class<?>) ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments()[0];
-          m.invoke(result, Optional.of(mock(parameterizedType)));
-        } else if (ReactiveProcessor.class.isAssignableFrom(parameter.getType())) {
-          ReactiveProcessor value = (ReactiveProcessor) mock(parameter.getType());
-          when(value.apply(any())).thenAnswer(inv -> inv.getArgument(0));
-          m.invoke(result, value);
-        } else {
-          m.invoke(result, mock(parameter.getType()));
-        }
+        Object[] values = ParameterMockingTestUtil.getParameterValues(m);
+        m.invoke(result, values);
       } catch (IllegalAccessException | InvocationTargetException e) {
         throw new RuntimeException(e);
       }
     });
   }
+
 }
