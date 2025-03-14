@@ -27,7 +27,7 @@ public interface SseFailureContext {
   /**
    * @return the exception.
    */
-  Exception error();
+  Throwable error();
 
   /**
    * @return the SSE connection failure response.

@@ -68,8 +68,9 @@ public interface SseClient extends AutoCloseable {
   /**
    * Sends a comment.
    *
-   * @param comment the comment. TODO: What's the format of a "comment"?.
+   * @param comment the comment.
    */
+  // TODO (W-18041205): Implement comments.
   void sendComment(String comment);
 
   /**
@@ -77,7 +78,7 @@ public interface SseClient extends AutoCloseable {
    *
    * @param callback to be called in that situation.
    */
-  void onClose(Consumer<Exception> callback);
+  void onClose(Consumer<Throwable> callback);
 
   /**
    * @return unique identifier of this client.
