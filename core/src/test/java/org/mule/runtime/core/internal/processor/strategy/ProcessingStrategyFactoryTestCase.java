@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessingStrategyFactoryTest {
+class ProcessingStrategyFactoryTestCase {
 
   public static final String INDEX_DISPLAY_NAME_0 = "[{index}]{displayName}{0}";
   public static final String TEST_NAME = "{0}";
@@ -84,8 +84,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
   @MethodSource("strategyFactories")
   void createSink(String testName, ProcessingStrategyFactory factory,
-                  String ignored, Consumer<ProcessingStrategyFactoryTest> setup,
-                  BiConsumer<ProcessingStrategyFactoryTest, Object> assertions) {
+                  String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
+                  BiConsumer<ProcessingStrategyFactoryTestCase, Object> assertions) {
     setup.accept(this);
 
     final Sink result = getStrategy(factory, testName).createSink(flow, pipeline);
@@ -97,8 +97,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
   @MethodSource("strategyFactories")
   void accept(String testName, ProcessingStrategyFactory factory,
-              String ignored, Consumer<ProcessingStrategyFactoryTest> setup,
-              BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2) {
+              String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
+              BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
     setup.accept(this);
     when(pipeline.apply(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -108,8 +108,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
   @MethodSource("strategyFactories")
   void emit(String testName, ProcessingStrategyFactory factory,
-            String ignored, Consumer<ProcessingStrategyFactoryTest> setup,
-            BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2) {
+            String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
+            BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
     setup.accept(this);
     when(pipeline.apply(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -121,8 +121,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
   @MethodSource("strategyFactories")
   void backpressureAccepting(String testName, ProcessingStrategyFactory factory,
-                             String ignored, Consumer<ProcessingStrategyFactoryTest> setup,
-                             BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2) {
+                             String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
+                             BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
     setup.accept(this);
 
     getStrategy(factory, testName).checkBackpressureAccepting(event);
@@ -133,8 +133,8 @@ class ProcessingStrategyFactoryTest {
   @MethodSource("strategyFactories")
   void checkBackpressureEmitting(String testName, ProcessingStrategyFactory factory,
                                  String ignored,
-                                 Consumer<ProcessingStrategyFactoryTest> setup,
-                                 BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2) {
+                                 Consumer<ProcessingStrategyFactoryTestCase> setup,
+                                 BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
     setup.accept(this);
     if (factory instanceof AbstractProcessingStrategyFactory) {
       ((AbstractProcessingStrategyFactory) factory).setMaxConcurrencyEagerCheck(true);
@@ -148,8 +148,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
   void registerInternalSink(String testName, ProcessingStrategyFactory factory, String ignored,
-                            Consumer<ProcessingStrategyFactoryTest> setup,
-                            BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2) {
+                            Consumer<ProcessingStrategyFactoryTestCase> setup,
+                            BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
     setup.accept(this);
 
     TestPublisher<CoreEvent> internalSink = TestPublisher.create();
@@ -162,8 +162,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
   @MethodSource("strategyFactories")
   void isSynchronous(String testName, ProcessingStrategyFactory factory, String ignored,
-                     Consumer<ProcessingStrategyFactoryTest> setup,
-                     BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2) {
+                     Consumer<ProcessingStrategyFactoryTestCase> setup,
+                     BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
     setup.accept(this);
 
     final boolean result = getStrategy(factory, testName).isSynchronous();
@@ -174,8 +174,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
   void configureInternalPublisher(String testName, ProcessingStrategyFactory factory, String ignored,
-                                  Consumer<ProcessingStrategyFactoryTest> setup,
-                                  BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2) {
+                                  Consumer<ProcessingStrategyFactoryTestCase> setup,
+                                  BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
     setup.accept(this);
 
     TestPublisher<CoreEvent> internalSink = TestPublisher.create();
@@ -189,8 +189,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
   void getProcessingStrategyType(String testName, ProcessingStrategyFactory factory, String strategyName,
-                                 Consumer<ProcessingStrategyFactoryTest> ignored,
-                                 BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2) {
+                                 Consumer<ProcessingStrategyFactoryTestCase> ignored,
+                                 BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
 
     final Class<? extends ProcessingStrategy> result = factory.getProcessingStrategyType();
 
@@ -204,7 +204,7 @@ class ProcessingStrategyFactoryTest {
                         ""),
                    args("transactionAwareStreamEmitterFactory", new TransactionAwareStreamEmitterProcessingStrategyFactory(),
                         "TransactionAwareStreamEmitterProcessingStrategyDecorator",
-                        ProcessingStrategyFactoryTest::setupInjection,
+                        ProcessingStrategyFactoryTestCase::setupInjection,
                         (t, r) -> verify(t.featureFlaggingService).isEnabled(USE_TRANSACTION_SINK_INDEX)),
                    args("proacterWossnameStreamFactory", new ProactorStreamEmitterProcessingStrategyFactory(),
                         "ProactorStreamEmitterProcessingStrategy",
@@ -218,7 +218,7 @@ class ProcessingStrategyFactoryTest {
                         }),
                    args("transactionAwareProactorWossnameStrategyFactory",
                         new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(),
-                        "TransactionAwareStreamEmitterProcessingStrategyDecorator", ProcessingStrategyFactoryTest::setupInjection,
+                        "TransactionAwareStreamEmitterProcessingStrategyDecorator", ProcessingStrategyFactoryTestCase::setupInjection,
                         (t, r) -> {
                         }),
                    args("directProcessingStrategyFactory", new DirectProcessingStrategyFactory(),
@@ -246,8 +246,8 @@ class ProcessingStrategyFactoryTest {
   @ParameterizedTest(name = TEST_NAME)
   @MethodSource("lifecycleFactories")
   void start_stop(String testName, ProcessingStrategyFactory factory, String ignored3,
-                  Consumer<ProcessingStrategyFactoryTest> setup,
-                  BiConsumer<ProcessingStrategyFactoryTest, Object> ignored2)
+                  Consumer<ProcessingStrategyFactoryTestCase> setup,
+                  BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2)
       throws MuleException {
     when(context.getSchedulerBaseConfig()).thenReturn(schedulerConfig);
     when(context.getConfiguration()).thenReturn(configuration);
@@ -320,8 +320,8 @@ class ProcessingStrategyFactoryTest {
   }
 
   private static Arguments args(String testName, ProcessingStrategyFactory factory, String strategyName,
-                                Consumer<ProcessingStrategyFactoryTest> setup,
-                                BiConsumer<ProcessingStrategyFactoryTest, Object> assertions) {
+                                Consumer<ProcessingStrategyFactoryTestCase> setup,
+                                BiConsumer<ProcessingStrategyFactoryTestCase, Object> assertions) {
     return Arguments.of(testName, factory, strategyName, setup, assertions);
   }
 }

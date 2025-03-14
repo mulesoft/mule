@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-class ReactorPublisherBuilderTest {
+class ReactorPublisherBuilderUnitTestCase {
 
   private static List<Method> methods;
 

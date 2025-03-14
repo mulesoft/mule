@@ -11,7 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.reactivestreams.Publisher;
 import reactor.test.publisher.TestPublisher;
 
 import java.lang.reflect.InvocationTargetException;
@@ -21,27 +24,30 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PipelineProcessingStrategyReactiveProcessorBuilderTest {
+class ComponentProcessingStrategyReactiveProcessorBuilderUnitTestCase {
 
-  private PipelineProcessingStrategyReactiveProcessorBuilder builder;
-
+  private ComponentProcessingStrategyReactiveProcessorBuilder builder;
   @Mock
-  private ReactiveProcessor pipeline;
+  private Scheduler scheduler;
+  @Mock
+  private ReactiveProcessor processor;
+  @Mock
+  private Publisher<CoreEvent> publisher;
 
   @BeforeEach
   void setUp() {
-    when(pipeline.apply(any())).thenAnswer(inv -> inv.getArgument(0));
-
-    builder = PipelineProcessingStrategyReactiveProcessorBuilder
-        .pipelineProcessingStrategyReactiveProcessorFrom(pipeline, ClassLoader.getPlatformClassLoader(), "id", "app");
+    builder = ComponentProcessingStrategyReactiveProcessorBuilder.processingStrategyReactiveProcessorFrom(processor, scheduler,
+                                                                                                          "appId", "app");
   }
 
   @Test
-  void pipelineProcessingStrategyReactiveProcessorFrom() {
-    Arrays.stream(PipelineProcessingStrategyReactiveProcessorBuilder.class.getDeclaredMethods())
+  void build() {
+    when(processor.apply(any())).thenAnswer(inv -> inv.getArgument(0));
+    Arrays.stream(ComponentProcessingStrategyReactiveProcessorBuilder.class.getDeclaredMethods())
         .filter(m -> m.getName().startsWith("with"))
         .filter(m -> m.canAccess(builder))
         .forEach(m -> {
