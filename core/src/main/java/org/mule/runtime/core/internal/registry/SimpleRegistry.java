@@ -44,10 +44,10 @@ import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.NullLifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
-import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.registry.InjectProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -56,10 +56,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * A very simple implementation of {@link Registry}. Useful for starting really lightweight contexts which don't depend on heavier
@@ -104,7 +105,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       defaultEntries.put(OBJECT_MULE_CONTEXT, getMuleContext());
       defaultEntries.put(OBJECT_REGISTRY, new DefaultRegistry(getMuleContext()));
       defaultEntries.put("_muleContextProcessor", new MuleContextProcessor(getMuleContext()));
-      defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) getMuleContext()).getNotificationManager());
+      defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, getMuleContext().getNotificationManager());
       defaultEntries.put(OBJECT_ARTIFACT_ENCODING,
                          new DefaultArtifactEncoding(getMuleContext().getConfiguration().getDefaultEncoding()));
       defaultEntries.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
@@ -390,11 +391,20 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   }
 
   private <T> T injectInto(T object) {
-    for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
+    doInjectInto(object, Inject.class, Named.class, Named::value);
+    doInjectInto(object, javax.inject.Inject.class, javax.inject.Named.class, javax.inject.Named::value);
+    return object;
+  }
+
+  private <T, N extends Annotation> void doInjectInto(T object, final Class<? extends Annotation> injectAnnClass,
+                                                      final Class<N> namedAnnClass, Function<N, String> namedValue) {
+    for (Field field : getAllFields(object.getClass(), withAnnotation(injectAnnClass))) {
       try {
-        Object dependency = resolveTypedDependency(field.getType(), field.getAnnotation(Named.class),
-                                                   () -> ((ParameterizedType) (field.getGenericType()))
-                                                       .getActualTypeArguments()[0]);
+        final N namedAnnotation = field.getAnnotation(namedAnnClass);
+        Object dependency =
+            resolveTypedDependency(field.getType(), namedAnnotation != null ? namedValue.apply(namedAnnotation) : null,
+                                   () -> ((ParameterizedType) (field.getGenericType()))
+                                       .getActualTypeArguments()[0]);
 
         field.setAccessible(true);
         if (dependency != null) {
@@ -406,10 +416,12 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
                                    e);
       }
     }
-    for (Method method : getAllMethods(object.getClass(), withAnnotation(Inject.class))) {
+    for (Method method : getAllMethods(object.getClass(), withAnnotation(injectAnnClass))) {
       if (method.getParameters().length == 1) {
         try {
-          Object dependency = resolveTypedDependency(method.getParameterTypes()[0], method.getAnnotation(Named.class),
+          final N namedAnnotation = method.getAnnotation(namedAnnClass);
+          Object dependency = resolveTypedDependency(method.getParameterTypes()[0],
+                                                     namedAnnotation != null ? namedValue.apply(namedAnnotation) : null,
                                                      () -> ((ParameterizedType) (method.getGenericParameterTypes()[0]))
                                                          .getActualTypeArguments()[0]);
 
@@ -424,10 +436,9 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       }
 
     }
-    return object;
   }
 
-  private Object resolveTypedDependency(Class<?> dependencyType, final Named namedAnnotation, Supplier<Type> typeSupplier)
+  private Object resolveTypedDependency(Class<?> dependencyType, final String namedAnnotationValue, Supplier<Type> typeSupplier)
       throws RegistrationException {
     boolean nullToOptional = false;
     boolean collection = false;
@@ -446,15 +457,16 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       }
     }
 
-    return resolveDependency(dependencyType, nullToOptional, collection, namedAnnotation);
+    return resolveDependency(dependencyType, nullToOptional, collection, namedAnnotationValue);
   }
 
-  private Object resolveDependency(Class<?> dependencyType, boolean nullToOptional, boolean collection, Named nameAnnotation)
+  private Object resolveDependency(Class<?> dependencyType, boolean nullToOptional, boolean collection,
+                                   String namedAnnotationValue)
       throws RegistrationException {
     if (collection) {
       return resolveObjectsToInject(dependencyType);
     } else {
-      return resolveObjectToInject(dependencyType, nameAnnotation != null ? nameAnnotation.value() : null, nullToOptional);
+      return resolveObjectToInject(dependencyType, namedAnnotationValue, nullToOptional);
     }
   }
 
