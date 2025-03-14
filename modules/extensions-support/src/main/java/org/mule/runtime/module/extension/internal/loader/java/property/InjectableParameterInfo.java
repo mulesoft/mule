@@ -20,11 +20,7 @@ public class InjectableParameterInfo {
   private boolean required;
   private String extractionExpression;
 
-  InjectableParameterInfo(String parameterName, MetadataType type, boolean required) {
-    this(parameterName, type, required, null);
-  }
-
-  InjectableParameterInfo(String parameterName, MetadataType type, boolean required, String extractionExpression) {
+  public InjectableParameterInfo(String parameterName, MetadataType type, boolean required, String extractionExpression) {
     this.parameterName = parameterName;
     this.type = type;
     this.required = required;

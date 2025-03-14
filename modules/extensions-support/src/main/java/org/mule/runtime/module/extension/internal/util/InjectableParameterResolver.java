@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.value.ValueProviderUtil
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.BindingContext;
+import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.DataType;
@@ -44,12 +45,12 @@ public class InjectableParameterResolver {
   private static final Logger LOGGER = getLogger(InjectableParameterResolver.class);
 
   private final BindingContext expressionResolvingContext;
-  private final ExpressionManager expressionManager;
+  private final MuleExpressionLanguage expressionManager;
   private final Map<String, InjectableParameterInfo> injectableParametersMap;
 
   public InjectableParameterResolver(ParameterizedModel parameterizedModel,
                                      ParameterValueResolver parameterValueResolver,
-                                     ExpressionManager expressionManager,
+                                     MuleExpressionLanguage expressionManager,
                                      List<InjectableParameterInfo> injectableParameters) {
     this.expressionManager = expressionManager;
     this.injectableParametersMap = getInjectableParametersMap(injectableParameters);
@@ -88,7 +89,7 @@ public class InjectableParameterResolver {
       LOGGER.debug("The parameter: '" + topLevelRequiredParameter
           + "' on which the extraction expression was to be executed is not present in the context, returning null");
     }
-    return parameterValue;
+    return parameterValue instanceof String stringValue ? stringValue.trim() : parameterValue;
   }
 
   private Map<String, InjectableParameterInfo> getInjectableParametersMap(List<InjectableParameterInfo> injectableParameters) {
