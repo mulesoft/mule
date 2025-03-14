@@ -30,7 +30,7 @@ public interface SseFailureContext {
   Exception error();
 
   /**
-   * @return the response, if received, that means an unsuccessful SSE connection.
+   * @return the SSE connection failure response.
    */
   HttpResponse response();
 
