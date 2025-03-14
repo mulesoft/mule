@@ -36,6 +36,8 @@ module org.mule.runtime.http.api {
   exports org.mule.runtime.http.api.server.ws;
   exports org.mule.runtime.http.api.utils;
   exports org.mule.runtime.http.api.sse;
+  exports org.mule.runtime.http.api.sse.client;
+  exports org.mule.runtime.http.api.sse.server;
   exports org.mule.runtime.http.api.tcp;
   exports org.mule.runtime.http.api.ws;
   exports org.mule.runtime.http.api.ws.exception;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.http.api.client;
 
-import static org.mule.runtime.http.api.sse.SseRetryConfig.defaultConfig;
+import static org.mule.runtime.http.api.sse.client.SseRetryConfig.defaultConfig;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
@@ -14,8 +14,8 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.sse.SseRetryConfig;
-import org.mule.runtime.http.api.sse.SseSource;
+import org.mule.runtime.http.api.sse.client.SseRetryConfig;
+import org.mule.runtime.http.api.sse.client.SseSource;
 import org.mule.runtime.http.api.ws.WebSocket;
 
 import java.io.IOException;

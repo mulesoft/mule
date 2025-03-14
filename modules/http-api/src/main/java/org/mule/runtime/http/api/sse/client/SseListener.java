@@ -4,13 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.http.api.sse;
+package org.mule.runtime.http.api.sse.client;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.http.api.sse.ServerSentEvent;
 
 /**
- * Object to manage an SSE Endpoint. It allows temporarily disabling it or removing it from the server.
+ * An observer of server-sent events.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
  * 
@@ -18,20 +19,17 @@ import org.mule.api.annotation.NoImplement;
  */
 @Experimental
 @NoImplement
-public interface SseEndpointManager {
+public interface SseListener {
 
   /**
-   * Temporarily stops the handler from being accessed, resulting in a 503 status code return by the server.
+   * Method to be invoked for each received {@link ServerSentEvent}.
+   * 
+   * @param event the received event.
    */
-  void stop();
+  void onEvent(ServerSentEvent event);
 
   /**
-   * Allows access to the handler.
+   * Method to be invoked when the full event stream was consumed.
    */
-  void start();
-
-  /**
-   * Removes the handler from the server.
-   */
-  void dispose();
+  default void onClose() {}
 }

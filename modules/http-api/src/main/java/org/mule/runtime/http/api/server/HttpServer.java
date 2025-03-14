@@ -12,9 +12,9 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
 import org.mule.runtime.http.api.server.ws.WebSocketHandler;
 import org.mule.runtime.http.api.server.ws.WebSocketHandlerManager;
-import org.mule.runtime.http.api.sse.SseClient;
-import org.mule.runtime.http.api.sse.SseEndpointManager;
-import org.mule.runtime.http.api.sse.SseRequestContext;
+import org.mule.runtime.http.api.sse.server.SseClient;
+import org.mule.runtime.http.api.sse.server.SseEndpointManager;
+import org.mule.runtime.http.api.sse.server.SseRequestContext;
 
 import java.io.IOException;
 import java.util.Collection;
