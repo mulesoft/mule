@@ -52,11 +52,7 @@ public interface SseSource {
 
   /**
    * Registers a callback to be called when an error occurs.
-   * <p>
-   * Don't use this callback for reconnection/retry, it has to be done automatically by the source and should be configured using
-   * a {@link SseRetryConfig}.
-   * 
-   * @param onErrorCallback to be called when an error occurs.
+   * @param onConnectionFailure to be called when an error occurs.
    */
-  void doOnConnectionFailure(Consumer<SseFailureContext> onErrorCallback);
+  void doOnConnectionFailure(Consumer<SseFailureContext> onConnectionFailure);
 }
