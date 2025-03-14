@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
@@ -133,7 +134,11 @@ public interface HttpServer {
    * @return an object that can be used to enable/disable/remove the endpoint from the server.
    *
    * @since 4.10.0
+   *
+   * <p>
+   * This API is EXPERIMENTAL. Do not use it until it is stable.
    */
+  @Experimental
   default SseEndpointManager sse(String ssePath,
                                  Consumer<SseRequestContext> onRequest,
                                  Consumer<SseClient> onClient) {
@@ -149,7 +154,11 @@ public interface HttpServer {
    * @return an object that can be used to enable/disable/remove the endpoint from the server.
    *
    * @since 4.10.0
+   *
+   * <p>
+   * This API is EXPERIMENTAL. Do not use it until it is stable.
    */
+  @Experimental
   default SseEndpointManager sse(String ssePath, Consumer<SseClient> sseClientHandler) {
     return sse(ssePath, ctx -> {
     }, sseClientHandler);

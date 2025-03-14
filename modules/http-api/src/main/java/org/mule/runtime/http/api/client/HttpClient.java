@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.client;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
@@ -175,9 +176,12 @@ public interface HttpClient {
    * @param url         the URL of the server.
    * @param retryConfig configuration for the retry mechanism.
    * @return a non-connected instance of {@link SseSource}.
-   *
    * @since 4.10.0
+   *
+   * <p>
+   * This API is EXPERIMENTAL. Do not use it until it is stable.
    */
+  @Experimental
   default SseSource sseSource(String url, SseRetryConfig retryConfig) {
     throw new UnsupportedOperationException("Server-sent Events (SSE) are not supported in this HTTP Service version");
   }
