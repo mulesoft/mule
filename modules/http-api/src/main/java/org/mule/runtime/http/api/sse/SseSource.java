@@ -52,6 +52,7 @@ public interface SseSource {
 
   /**
    * Registers a callback to be called when an error occurs.
+   * 
    * @param onConnectionFailure to be called when an error occurs.
    */
   void doOnConnectionFailure(Consumer<SseFailureContext> onConnectionFailure);

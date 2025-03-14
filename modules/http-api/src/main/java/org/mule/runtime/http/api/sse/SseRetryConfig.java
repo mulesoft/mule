@@ -7,48 +7,28 @@
 package org.mule.runtime.http.api.sse;
 
 import org.mule.api.annotation.Experimental;
-import org.mule.api.annotation.NoImplement;
 
 /**
  * The {@link SseSource} implements the corresponding
  * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html">server-sent-events spec</a>. This interface allows
  * configuring the retry mechanism described there.
- * <p>
- * This API is EXPERIMENTAL. Do not use it until it is stable.
+ *
+ * @param allowRetryDelayOverride The server may use the retry key in the event to override the retry delay. With this
+ *                                configuration, the user can set if the retry mechanism has to accept that parameter or not.
+ *                                Default value is {@code true}.
+ * @param initialRetryDelayMillis The spec states: "A reconnection time, in milliseconds. This must initially be an
+ *                                implementation-defined value, probably in the region of a few seconds." This parameter allows
+ *                                configuring that timeout. Default value is {@code 2000L}.
+ * @param shouldRetryOnStreamEnd  By default, an event source will reconnect when the response stream ended, but this method
+ *                                allows configuring whether reconnecting or not. Default value is {@code true}.
+ *
+ *                                <p>
+ *                                This API is EXPERIMENTAL. Do not use it until it is stable.
  */
 @Experimental
-@NoImplement
-public interface SseRetryConfig {
+public record SseRetryConfig(boolean allowRetryDelayOverride, long initialRetryDelayMillis, boolean shouldRetryOnStreamEnd) {
 
-  SseRetryConfig DEFAULT = new SseRetryConfig() {};
-
-  /**
-   * The server may use the retry key in the event to override the retry delay. With this configuration, the user can set if the
-   * retry mechanism has to accept that parameter.
-   * 
-   * @return {@code true} if the "retry" parameter is allowed, or {@code false} otherwise.
-   */
-  default boolean allowRetryDelayOverride() {
-    return true;
-  }
-
-  /**
-   * The spec states: "A reconnection time, in milliseconds. This must initially be an implementation-defined value, probably in
-   * the region of a few seconds."
-   * 
-   * @return the initial retry delay. The default is 2 seconds
-   */
-  default long getInitialRetryDelayMillis() {
-    return 2000L;
-  }
-
-  /**
-   * By default, an event source will reconnect when the response stream ended, but this method allows configuring whether
-   * reconnecting or not.
-   * 
-   * @return whether the source should reconnect on end of response. {@code true} by default.
-   */
-  default boolean shouldRetryOnStreamEnd() {
-    return true;
+  public static SseRetryConfig defaultConfig() {
+    return new SseRetryConfig(true, 2000L, true);
   }
 }
