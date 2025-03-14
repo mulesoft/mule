@@ -44,26 +44,4 @@ public interface SseRetryConfig {
   default boolean shouldRetryOnStreamEnd() {
     return true;
   }
-
-  /**
-   * By default, an event source will reconnect when an error happens before receiving the response (for example, when the server
-   * is not available). This method allows configuring whether reconnecting or not.
-   * 
-   * @param error the exception seen instead of a response. Notice that it is not a successful error response (like a 404 or a
-   *              503), but an exception.
-   * @return whether the source should reconnect on error. {@code true} by default.
-   */
-  default boolean shouldRetryOnError(Throwable error) {
-    return true;
-  }
-
-  /**
-   * Determines if a reconnection is needed after a response with the passed statusCode.
-   * 
-   * @param statusCode the response status code.
-   * @return whether a reconnection is needed or not.
-   */
-  default boolean shouldRetryOnStatus(int statusCode) {
-    return true;
-  }
 }

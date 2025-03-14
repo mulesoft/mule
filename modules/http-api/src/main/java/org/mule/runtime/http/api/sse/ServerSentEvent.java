@@ -34,5 +34,5 @@ public interface ServerSentEvent {
    * 
    * @return the new retry delay, if the server configured it.
    */
-  OptionalLong getRetryDelay();
+  Optional<Long> getRetryDelay();
 }

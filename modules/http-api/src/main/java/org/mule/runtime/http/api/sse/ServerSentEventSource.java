@@ -51,5 +51,5 @@ public interface ServerSentEventSource {
    * 
    * @param onErrorCallback to be called when an error occurs.
    */
-  void doOnError(Consumer<ServerSentErrorContext> onErrorCallback);
+  void doOnConnectionFailure(Consumer<SseFailureContext> onErrorCallback);
 }

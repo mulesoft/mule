@@ -179,6 +179,6 @@ public interface HttpClient {
    * @since 4.10.0
    */
   default ServerSentEventSource sseSource(String url, SseRetryConfig retryConfig) {
-    throw new UnsupportedOperationException("Server-sent Events are not supported");
+    throw new UnsupportedOperationException("Server-sent Events (SSE) are not supported in this HTTP Service version");
   }
 }
