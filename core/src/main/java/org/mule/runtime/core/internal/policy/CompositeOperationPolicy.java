@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.Runtime.getRuntime;
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
@@ -162,11 +164,13 @@ public class CompositeOperationPolicy
   protected Publisher<CoreEvent> applyNextOperation(Publisher<CoreEvent> eventPub) {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> sinkRecorder = new FluxSinkRecorder<>();
 
-    return from(propagateCompletion(from(eventPub), sinkRecorder.flux(), pub -> from(pub)
+    Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> dispatchOperation = upstream -> from(upstream)
         .doOnNext(new OperationDispatcher(sinkRecorder, getParametersTransformer(), this.operation))
-        .map(e -> Either.empty()), sinkRecorder::complete, sinkRecorder::error,
+        .map(e -> Either.empty());
+
+    return from(propagateCompletion(eventPub, identity(), dispatchOperation, sinkRecorder::complete, sinkRecorder::error,
                                     shutdownTimeout, completionCallbackScheduler,
-                                    operation.getDslSource()))
+                                    operation.getDslSource()).apply(sinkRecorder.flux()))
                                         .map(result -> {
                                           result.applyLeft(t -> {
                                             throw propagate(t);
