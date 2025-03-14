@@ -189,6 +189,10 @@ public class HttpHeaders {
      */
     public static final String IF_UNMODIFIED_SINCE = "If-Unmodified-Since";
     /**
+     * {@value "Last-Event-ID"}
+     */
+    public static final String LAST_EVENT_ID = "Last-Event-ID";
+    /**
      * {@value "Last-Modified"}
      */
     public static final String LAST_MODIFIED = "Last-Modified";
@@ -466,6 +470,10 @@ public class HttpHeaders {
      * {@value "WebSocket"}
      */
     public static final String WEBSOCKET = "WebSocket";
+    /**
+     * {@value "text/event-stream"}
+     */
+    public static final String TEXT_EVENT_STREAM = "text/event-stream";
 
     private Values() {}
   }
