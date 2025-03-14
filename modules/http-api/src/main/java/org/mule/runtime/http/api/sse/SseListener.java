@@ -13,6 +13,8 @@ import org.mule.api.annotation.NoImplement;
  * An observer of server-sent events.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
+ * 
+ * @since 4.9.3, 4.10.0
  */
 @Experimental
 @NoImplement

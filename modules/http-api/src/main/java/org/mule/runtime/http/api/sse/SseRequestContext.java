@@ -9,7 +9,6 @@ package org.mule.runtime.http.api.sse;
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.http.api.server.HttpServer;
 
 import java.util.concurrent.CompletableFuture;
@@ -20,6 +19,8 @@ import java.util.function.Consumer;
  * by a request. This context can be used to reject an SSE connection before starting to send the event stream.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
+ * 
+ * @since 4.9.3, 4.10.0
  */
 @Experimental
 @NoImplement

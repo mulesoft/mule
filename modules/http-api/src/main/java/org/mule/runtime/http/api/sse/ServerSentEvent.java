@@ -15,6 +15,8 @@ import java.util.Optional;
  * Server-sent event (SSE).
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
+ * 
+ * @since 4.9.3, 4.10.0
  */
 @Experimental
 @NoImplement

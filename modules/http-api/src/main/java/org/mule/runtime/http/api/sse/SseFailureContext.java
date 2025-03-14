@@ -17,6 +17,8 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
  * it's necessary for the consumer.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
+ * 
+ * @since 4.9.3, 4.10.0
  */
 @Experimental
 @NoImplement

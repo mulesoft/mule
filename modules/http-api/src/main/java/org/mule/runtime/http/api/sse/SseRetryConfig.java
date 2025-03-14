@@ -23,6 +23,7 @@ import org.mule.api.annotation.Experimental;
  *                                configuring that timeout. Default value is {@code 2000L}.
  * @param shouldRetryOnStreamEnd  By default, an event source will reconnect when the response stream ended, but this method
  *                                allows configuring whether reconnecting or not. Default value is {@code true}.
+ * @since 4.9.3, 4.10.0
  */
 @Experimental
 public record SseRetryConfig(boolean allowRetryDelayOverride, long initialRetryDelayMillis, boolean shouldRetryOnStreamEnd) {
