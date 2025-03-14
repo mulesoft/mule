@@ -42,9 +42,10 @@ public interface SseRequestContext {
    * This method can be used to reject an SSE connection when a certain condition is not satisfied by the request. Once you called
    * this method, the event stream will not be sent.
    * 
-   * @param response the alternative response to be sent instead of the normal SSE response.
+   * @param statusCode   the status code of the response.
+   * @param reasonPhrase the reason phrase to add in the response.
    * @return a future that will be completed when the response was successfully sent. It can also be completed exceptionally if
    *         the response failed to be sent.
    */
-  CompletableFuture<Void> reject(HttpResponse response);
+  CompletableFuture<Void> reject(int statusCode, String reasonPhrase);
 }
