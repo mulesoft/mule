@@ -79,6 +79,10 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
 
     try {
       if (containerClassLoader != null && isPolicyIsolationEnabled(descriptor) && hasRequiredPlugin(descriptor)) {
+        // When policy isolation is enabled, a new RegionClassLoader provides a separate
+        // classloading environment for the policy, preventing potential classloader
+        // conflicts (when using the same dependency in both policy and domain).
+        // IsolatedPolicyClassLoader then enforces this isolation.
         regionClassLoader =
             new RegionClassLoader(containerClassLoader.getArtifactId(),
                                   containerClassLoader.getArtifactDescriptor(),
@@ -123,13 +127,14 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     return isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor);
   }
 
+  //
   private boolean hasRequiredPlugin(PolicyTemplateDescriptor descriptor) {
     if (descriptor == null || descriptor.getPlugins() == null) {
       return false;
     }
     Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
     for (ArtifactPluginDescriptor plugin : plugins) {
-      if (plugin.getName().equals("HTTP") || plugin.getName().equals("Sockets")) {
+      if (plugin.getName().equals("HTTP")) {
         return true;
       }
     }
