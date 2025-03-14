@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * A consumer of server-sent events.
  */
-public interface ServerSentEventSource {
+public interface SseSource {
 
   int READY_STATUS_CONNECTING = 0;
   int READY_STATUS_OPEN = 1;
@@ -28,20 +28,20 @@ public interface ServerSentEventSource {
   int getReadyState();
 
   /**
-   * Registers a {@link ServerSentEventListener listener} for a specific event name (a.k.a. topic, a.k.a. type).
+   * Registers a {@link SseListener listener} for a specific event name (a.k.a. topic, a.k.a. type).
    * 
-   * @param eventName The event name that the {@link ServerSentEventListener listener} will handle.
+   * @param eventName The event name that the {@link SseListener listener} will handle.
    * @param listener  The event handler.
    */
-  void register(String eventName, ServerSentEventListener listener);
+  void register(String eventName, SseListener listener);
 
   /**
-   * Registers a fallback {@link ServerSentEventListener listener} for all the events that aren't handled by any listener
-   * registered with {@link #register(String, ServerSentEventListener)}.
+   * Registers a fallback {@link SseListener listener} for all the events that aren't handled by any listener registered with
+   * {@link #register(String, SseListener)}.
    * 
    * @param listener The event handler.
    */
-  void register(ServerSentEventListener listener);
+  void register(SseListener listener);
 
   /**
    * Registers a callback to be called when an error occurs.

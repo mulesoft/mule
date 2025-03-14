@@ -11,7 +11,7 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.sse.ServerSentEventSource;
+import org.mule.runtime.http.api.sse.SseSource;
 import org.mule.runtime.http.api.sse.SseRetryConfig;
 import org.mule.runtime.http.api.ws.WebSocket;
 
@@ -170,15 +170,15 @@ public interface HttpClient {
   }
 
   /**
-   * Creates a consumer of Server-sent events. The resulting {@link ServerSentEventSource} is not connected automatically.
+   * Creates a consumer of Server-sent events. The resulting {@link SseSource} is not connected automatically.
    *
    * @param url         the URL of the server.
    * @param retryConfig configuration for the retry mechanism.
-   * @return a non-connected instance of {@link ServerSentEventSource}.
+   * @return a non-connected instance of {@link SseSource}.
    *
    * @since 4.10.0
    */
-  default ServerSentEventSource sseSource(String url, SseRetryConfig retryConfig) {
+  default SseSource sseSource(String url, SseRetryConfig retryConfig) {
     throw new UnsupportedOperationException("Server-sent Events (SSE) are not supported in this HTTP Service version");
   }
 }

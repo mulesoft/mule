@@ -7,22 +7,21 @@
 package org.mule.runtime.http.api.sse;
 
 import java.util.Optional;
-import java.util.OptionalLong;
 
 /**
- * Server-sent event.
+ * Server-sent event (SSE).
  */
 public interface ServerSentEvent {
 
   /**
    * @return the event name, the topic of the event.
    */
-  String getEventName();
+  String getName();
 
   /**
    * @return the full data as string.
    */
-  String getEventData();
+  String getData();
 
   /**
    * @return event id.

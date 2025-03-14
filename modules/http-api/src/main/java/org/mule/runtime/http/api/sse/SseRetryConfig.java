@@ -7,7 +7,7 @@
 package org.mule.runtime.http.api.sse;
 
 /**
- * The {@link ServerSentEventSource} implements the corresponding
+ * The {@link SseSource} implements the corresponding
  * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html">server-sent-events spec</a>. This interface allows
  * configuring the retry mechanism described there.
  */

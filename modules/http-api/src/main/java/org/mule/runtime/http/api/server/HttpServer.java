@@ -137,7 +137,7 @@ public interface HttpServer {
   default SseEndpointManager sse(String ssePath,
                                  Consumer<SseRequestContext> onRequest,
                                  Consumer<SseClient> onClient) {
-    throw new UnsupportedOperationException("Server-sent events are not supported");
+    throw new UnsupportedOperationException("Server-sent Events (SSE) are not supported in this HTTP Service version");
   }
 
   /**

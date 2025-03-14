@@ -9,7 +9,7 @@ package org.mule.runtime.http.api.sse;
 /**
  * An observer of server-sent events.
  */
-public interface ServerSentEventListener {
+public interface SseListener {
 
   /**
    * Method to be invoked for each received {@link ServerSentEvent}.
