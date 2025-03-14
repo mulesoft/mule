@@ -201,11 +201,17 @@
             <groupId>com.conversantmedia</groupId>
             <artifactId>disruptor</artifactId>
         </dependency>
+
+        <!-- jakarta.jms (2.x and 3.x) are included to provide the same user experience on CE/EE when JMS connector is used -->
         <dependency>
-            <!-- jakarta.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
             <groupId>jakarta.jms</groupId>
             <artifactId>jakarta.jms-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.btm.jms</groupId>
+            <artifactId>jakarta.jms-api-${jakarta.javax.jms.version}</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>

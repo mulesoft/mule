@@ -70,7 +70,6 @@ import org.mule.runtime.module.extension.internal.value.DefaultValueProviderMedi
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;

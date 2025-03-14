@@ -96,6 +96,7 @@ module org.mule.runtime.core {
   requires jakarta.annotation;
   requires java.inject;
   requires transitive jakarta.jms.api;
+  requires transitive jakarta.messaging;
   requires java.management;
   requires jakarta.transaction;
 
@@ -389,7 +390,8 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.split to
       org.mule.runtime.core.components,
-      com.mulesoft.mule.runtime.batch;
+      com.mulesoft.mule.runtime.batch,
+      kryo.shaded;
   exports org.mule.runtime.core.internal.rx to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support;
