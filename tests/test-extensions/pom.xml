@@ -52,6 +52,7 @@
         <module>semantic-terms-extension</module>
         <module>reusable-app</module>
         <module>provided-dependency</module>
+        <module>javax-inject-extension</module>
     </modules>
 
     <build>
