@@ -433,7 +433,8 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.routing.split to
       org.mule.runtime.core.components,
-      com.mulesoft.mule.runtime.batch;
+      com.mulesoft.mule.runtime.batch,
+      kryo.shaded;
   exports org.mule.runtime.core.internal.rx to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support;
