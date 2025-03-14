@@ -6,11 +6,18 @@
  */
 package org.mule.runtime.http.api.sse;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
+
 /**
  * The {@link SseSource} implements the corresponding
  * <a href="https://html.spec.whatwg.org/multipage/server-sent-events.html">server-sent-events spec</a>. This interface allows
  * configuring the retry mechanism described there.
+ * <p>
+ * This API is EXPERIMENTAL. Do not use it until it is stable.
  */
+@Experimental
+@NoImplement
 public interface SseRetryConfig {
 
   SseRetryConfig DEFAULT = new SseRetryConfig() {};

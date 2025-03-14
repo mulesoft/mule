@@ -6,11 +6,18 @@
  */
 package org.mule.runtime.http.api.sse;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
+
 import java.io.IOException;
 
 /**
  * Server-side abstraction of a connected client.
+ * <p>
+ * This API is EXPERIMENTAL. Do not use it until it is stable.
  */
+@Experimental
+@NoImplement
 public interface SseClient extends AutoCloseable {
 
   /**
@@ -35,24 +42,24 @@ public interface SseClient extends AutoCloseable {
   }
 
   /**
-   * Equivalent to call {@code sendEvent(name, data, null);}
+   * Equivalent to call {@code sendEvent(name, data, null, null);}
    *
    * @param name the event name (topic).
    * @param data the data as string.
    */
   default void sendEvent(String name, String data) throws IOException {
-    sendEvent(name, data, null);
+    sendEvent(name, data, null, null);
   }
 
   /**
-   * Equivalent to call {@code sendEvent("message", data, null);}
+   * Equivalent to call {@code sendEvent("message", data, null, null);}
    * <p>
-   * Note: If you want to send a message without topic, you can call {@code sendEvent(null, data);}
+   * Note: If you want to send a message without a topic, you can call {@code sendEvent(null, data);}
    *
    * @param data the data as string.
    */
   default void sendEvent(String data) throws IOException {
-    sendEvent("message", data, null);
+    sendEvent("message", data, null, null);
   }
 
   /**

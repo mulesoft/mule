@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.http.api.sse;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
+
 /**
  * Object to manage an SSE Endpoint. It allows temporarily disabling it or removing it from the server.
- *
- * @since 4.0
+ * <p>
+ * This API is EXPERIMENTAL. Do not use it until it is stable.
  */
+@Experimental
+@NoImplement
 public interface SseEndpointManager {
 
   /**

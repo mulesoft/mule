@@ -6,11 +6,18 @@
  */
 package org.mule.runtime.http.api.sse;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
+
 import java.util.Optional;
 
 /**
  * Server-sent event (SSE).
+ * <p>
+ * This API is EXPERIMENTAL. Do not use it until it is stable.
  */
+@Experimental
+@NoImplement
 public interface ServerSentEvent {
 
   /**

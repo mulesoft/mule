@@ -6,11 +6,18 @@
  */
 package org.mule.runtime.http.api.sse;
 
+import org.mule.api.annotation.Experimental;
+import org.mule.api.annotation.NoImplement;
+
 import java.util.function.Consumer;
 
 /**
  * A consumer of server-sent events.
+ * <p>
+ * This API is EXPERIMENTAL. Do not use it until it is stable.
  */
+@Experimental
+@NoImplement
 public interface SseSource {
 
   int READY_STATUS_CONNECTING = 0;
