@@ -17,7 +17,10 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -32,10 +35,15 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.publisher.TestPublisher;
 import reactor.test.subscriber.TestSubscriber;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -47,17 +55,25 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
 
+/**
+ * This test suite exists mostly to generate coverage - the actual checks in it are not strong. This covers a lot of basic method
+ * calls, many of which have very little code but still lines that count for coverage, so... do 'em all and have a few more
+ * specific tests for things that are more meaningful. That said, this test does check some easy things, including that we call
+ * the feature flags service when we expected to, and that the results returned from methods are 'real'.
+ */
 @ExtendWith(MockitoExtension.class)
 class ProcessingStrategyFactoryTestCase {
 
-  public static final String INDEX_DISPLAY_NAME_0 = "[{index}]{displayName}{0}";
-  public static final String TEST_NAME = "{0}";
-  public static final List<String> NON_SYNCHRONOUS =
+  static final String TEST_NAME = "[{index}]{displayName}_{0}";
+  static final List<String> NON_SYNCHRONOUS =
       List.of("transactionAwareStreamEmitterFactory", "proacterWossnameStreamFactory", "streamEmitterProcessingStrategyFactory",
               "transactionAwareProactorWossnameStrategyFactory");
   @Mock
@@ -66,6 +82,8 @@ class ProcessingStrategyFactoryTestCase {
   private MuleConfiguration configuration;
   @Mock
   private FeatureFlaggingService featureFlaggingService;
+  @Mock
+  private InternalProfilingService profilingService;
   @Mock
   private FlowConstruct flow;
   @Mock
@@ -80,21 +98,28 @@ class ProcessingStrategyFactoryTestCase {
   private CoreEvent event;
   @Mock
   private Scheduler scheduler;
+  @Mock
+  private BaseEventContext eventContext;
 
-  @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
+  @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
   void createSink(String testName, ProcessingStrategyFactory factory,
                   String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
                   BiConsumer<ProcessingStrategyFactoryTestCase, Object> assertions) {
     setup.accept(this);
+    lenient().when(context.getConfiguration()).thenReturn(configuration);
+    lenient().when(flow.getMuleContext()).thenReturn(context);
 
     final Sink result = getStrategy(factory, testName).createSink(flow, pipeline);
+    if (result instanceof Disposable) {
+      ((Disposable) result).dispose();
+    }
 
     assertThat(result, is(notNullValue()));
     assertions.accept(this, result);
   }
 
-  @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
+  @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
   void accept(String testName, ProcessingStrategyFactory factory,
               String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
@@ -105,7 +130,7 @@ class ProcessingStrategyFactoryTestCase {
     getStrategy(factory, testName).createSink(flow, pipeline).accept(event);
   }
 
-  @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
+  @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
   void emit(String testName, ProcessingStrategyFactory factory,
             String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
@@ -118,7 +143,7 @@ class ProcessingStrategyFactoryTestCase {
     assertThat(testName, result, is(nullValue()));
   }
 
-  @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
+  @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
   void backpressureAccepting(String testName, ProcessingStrategyFactory factory,
                              String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
@@ -127,6 +152,52 @@ class ProcessingStrategyFactoryTestCase {
 
     getStrategy(factory, testName).checkBackpressureAccepting(event);
     // THere's not much to do here - the check throws an exception if the answer is 'no'... maybe set that up?
+    verifyNoMoreInteractions(event);
+  }
+
+  @ParameterizedTest(name = TEST_NAME)
+  @MethodSource("strategyFactories_byProcessType")
+  void onProcessor(String testName, ProcessingStrategyFactory factory,
+                   Consumer<ProcessingStrategyFactoryTestCase> setup,
+                   ReactiveProcessor.ProcessingType type)
+      throws MuleException {
+    setup.accept(this);
+    lenient().when(pipeline.getProcessingType()).thenReturn(type);
+    lenient().when(context.getConfiguration()).thenReturn(configuration);
+    lenient().when(profilingService.enrichWithProfilingEventFlux(any(), any(), any())).thenAnswer(inv -> inv.getArgument(0));
+    lenient().when(profilingService.setCurrentExecutionContext((Flux<?>) any(), any())).thenAnswer(inv -> inv.getArgument(0));
+
+    final ProcessingStrategy strategy = getStrategy(factory, testName);
+    if (strategy instanceof Lifecycle) {
+      setupStartStopContext();
+      ((Lifecycle) strategy).start();
+    }
+    final ReactiveProcessor result = strategy.onProcessor(pipeline);
+    TestPublisher<CoreEvent> testPublisher = TestPublisher.create();
+    result.apply(testPublisher);
+    testPublisher.next(event);
+
+    verify(pipeline, atMostOnce()).getProcessingType();
+    verify(pipeline, atMost(2)).apply(any());
+    verifyNoMoreInteractions(pipeline);
+  }
+
+  @ParameterizedTest(name = TEST_NAME)
+  @MethodSource("strategyFactories")
+  void onPipeline(String testName, ProcessingStrategyFactory factory,
+                  String ignored, Consumer<ProcessingStrategyFactoryTestCase> setup,
+                  BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
+    setup.accept(this);
+    lenient().when(context.getConfiguration()).thenReturn(configuration);
+    lenient().when(context.getArtifactType()).thenReturn(ArtifactType.APP);
+    lenient().when(context.getSchedulerBaseConfig()).thenReturn(schedulerConfig);
+    lenient().when(schedulerConfig.withName(any())).thenReturn(schedulerConfig);
+    lenient().when(context.getSchedulerService()).thenReturn(schedulerService);
+    lenient().when(schedulerService.cpuLightScheduler(any())).thenReturn(scheduler);
+
+    getStrategy(factory, testName).onPipeline(pipeline);
+
+    verifyNoMoreInteractions(pipeline);
   }
 
   @ParameterizedTest(name = TEST_NAME)
@@ -136,7 +207,9 @@ class ProcessingStrategyFactoryTestCase {
                                  Consumer<ProcessingStrategyFactoryTestCase> setup,
                                  BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2) {
     setup.accept(this);
+    lenient().when(event.getContext()).thenReturn(eventContext);
     if (factory instanceof AbstractProcessingStrategyFactory) {
+      ((AbstractProcessingStrategyFactory) factory).setMaxConcurrency(10);
       ((AbstractProcessingStrategyFactory) factory).setMaxConcurrencyEagerCheck(true);
     }
 
@@ -159,7 +232,7 @@ class ProcessingStrategyFactoryTestCase {
     assertThat(internalSink.subscribeCount(), is(1L));
   }
 
-  @ParameterizedTest(name = INDEX_DISPLAY_NAME_0)
+  @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
   void isSynchronous(String testName, ProcessingStrategyFactory factory, String ignored,
                      Consumer<ProcessingStrategyFactoryTestCase> setup,
@@ -218,7 +291,8 @@ class ProcessingStrategyFactoryTestCase {
                         }),
                    args("transactionAwareProactorWossnameStrategyFactory",
                         new TransactionAwareProactorStreamEmitterProcessingStrategyFactory(),
-                        "TransactionAwareStreamEmitterProcessingStrategyDecorator", ProcessingStrategyFactoryTestCase::setupInjection,
+                        "TransactionAwareStreamEmitterProcessingStrategyDecorator",
+                        ProcessingStrategyFactoryTestCase::setupInjection,
                         (t, r) -> {
                         }),
                    args("directProcessingStrategyFactory", new DirectProcessingStrategyFactory(),
@@ -227,9 +301,10 @@ class ProcessingStrategyFactoryTestCase {
                         "BlockingProcessingStrategy"));
   }
 
-  static List<Arguments> lifecycleFactories() {
+  static List<Arguments> strategyFactories_byProcessType() {
     return strategyFactories().stream()
-        .filter(args -> Lifecycle.class.isAssignableFrom(((ProcessingStrategyFactory) args.get()[1]).getProcessingStrategyType()))
+        .flatMap(args -> Arrays.stream(ReactiveProcessor.ProcessingType.values())
+            .map(type -> Arguments.of(args.get()[0], args.get()[1], args.get()[3], type)))
         .toList();
   }
 
@@ -249,11 +324,7 @@ class ProcessingStrategyFactoryTestCase {
                   Consumer<ProcessingStrategyFactoryTestCase> setup,
                   BiConsumer<ProcessingStrategyFactoryTestCase, Object> ignored2)
       throws MuleException {
-    when(context.getSchedulerBaseConfig()).thenReturn(schedulerConfig);
-    when(context.getConfiguration()).thenReturn(configuration);
-    when(context.getSchedulerService()).thenReturn(schedulerService);
-    when(schedulerService.cpuLightScheduler(any())).thenReturn(scheduler);
-    when(context.getArtifactType()).thenReturn(ArtifactType.APP);
+    setupStartStopContext();
     setup.accept(this);
     ProcessingStrategy strategy = getStrategy(factory, testName);
     MockInjector.injectMocksFromSuite(this, strategy);
@@ -268,6 +339,12 @@ class ProcessingStrategyFactoryTestCase {
     }
 
     verify(context, atLeastOnce()).getArtifactType();
+  }
+
+  static List<Arguments> lifecycleFactories() {
+    return strategyFactories().stream()
+        .filter(args -> Lifecycle.class.isAssignableFrom(((ProcessingStrategyFactory) args.get()[1]).getProcessingStrategyType()))
+        .toList();
   }
 
   @Test
@@ -309,8 +386,18 @@ class ProcessingStrategyFactoryTestCase {
     }
   }
 
+  private void setupStartStopContext() {
+    when(context.getSchedulerBaseConfig()).thenReturn(schedulerConfig);
+    when(context.getConfiguration()).thenReturn(configuration);
+    when(context.getSchedulerService()).thenReturn(schedulerService);
+    when(schedulerService.cpuLightScheduler(any())).thenReturn(scheduler);
+    when(context.getArtifactType()).thenReturn(ArtifactType.APP);
+  }
+
   private ProcessingStrategy getStrategy(ProcessingStrategyFactory factory, String testName) {
-    return factory.create(context, testName);
+    ProcessingStrategy strategy = factory.create(context, testName);
+    MockInjector.injectMocksFromSuite(this, strategy);
+    return strategy;
   }
 
   private static Arguments args(String testName, ProcessingStrategyFactory factory, String strategyName) {
