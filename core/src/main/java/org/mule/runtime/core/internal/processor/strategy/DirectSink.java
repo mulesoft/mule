@@ -40,8 +40,11 @@ class DirectSink implements Sink, Disposable {
   public DirectSink(Function<Publisher<CoreEvent>, Publisher<CoreEvent>> function,
                     Consumer<CoreEvent> eventConsumer, int bufferSize) {
     EmitterProcessor<CoreEvent> emitterProcessor = EmitterProcessor.create(bufferSize);
-    final reactor.core.Disposable disposable = emitterProcessor.transform(function).doOnError(throwable -> {
-    }).subscribe();
+    final reactor.core.Disposable disposable = emitterProcessor
+        .transform(function)
+        .doOnError(throwable -> {
+        })
+        .subscribe();
     reactorSink = new DefaultReactorSink(emitterProcessor.sink(), millis -> disposable.dispose(), eventConsumer, bufferSize);
   }
 
