@@ -38,7 +38,7 @@ class ReactorPublisherBuilderUnitTestCase {
   @BeforeAll
   static void setup() {
     methods = Arrays.stream(ReactorPublisherBuilder.class.getDeclaredMethods())
-        .filter(m -> m.getName().matches("^[a-z]"))
+        .filter(m -> m.getName().matches("^[a-z].*"))
         .toList();
   }
 
