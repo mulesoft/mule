@@ -53,10 +53,16 @@ public class SseSourceConfig {
     return retryConfig;
   }
 
+  /**
+   * @return a callback to configure the initiator request.
+   */
   public Consumer<HttpRequestBuilder> getRequestCustomizer() {
     return requestCustomizer;
   }
 
+  /**
+   * @return the request options of the initiator request.
+   */
   public HttpRequestOptions getRequestOptions() {
     return requestOptions;
   }
