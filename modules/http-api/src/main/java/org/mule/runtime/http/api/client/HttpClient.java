@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.http.api.client;
 
-import static org.mule.runtime.http.api.sse.client.SseRetryConfig.defaultConfig;
-
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.sse.client.SseRetryConfig;
 import org.mule.runtime.http.api.sse.client.SseSource;
+import org.mule.runtime.http.api.sse.client.SseSourceConfig;
 import org.mule.runtime.http.api.ws.WebSocket;
 
 import java.io.IOException;
@@ -177,28 +175,13 @@ public interface HttpClient {
    * <p>
    * This API is EXPERIMENTAL. Do not use it until it is stable.
    *
-   * @param url         the URL of the server.
-   * @param retryConfig configuration for the retry mechanism.
+   * @param config {@link SseSourceConfig configuration} of the SSE event source.
    * @return a non-connected instance of {@link SseSource}.
-   * @since 4.10.0
+   * @see SseSourceConfig
+   * @since 4.10.0, 4.9.3
    */
   @Experimental
-  default SseSource sseSource(String url, SseRetryConfig retryConfig) {
+  default SseSource sseSource(SseSourceConfig config) {
     throw new UnsupportedOperationException("Server-sent Events (SSE) are not supported in this HTTP Service version");
-  }
-
-  /**
-   * Creates a consumer of Server-sent events. The resulting {@link SseSource} is not connected automatically. Equivalent to call
-   * {@link #sseSource(String, SseRetryConfig)} with the default retry config.
-   * <p>
-   * This API is EXPERIMENTAL. Do not use it until it is stable.
-   *
-   * @param url the URL of the server.
-   * @return a non-connected instance of {@link SseSource}.
-   * @since 4.10.0
-   */
-  @Experimental
-  default SseSource sseSource(String url) {
-    return sseSource(url, defaultConfig());
   }
 }
