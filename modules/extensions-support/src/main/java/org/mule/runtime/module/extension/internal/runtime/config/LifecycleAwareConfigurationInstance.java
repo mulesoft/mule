@@ -35,7 +35,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

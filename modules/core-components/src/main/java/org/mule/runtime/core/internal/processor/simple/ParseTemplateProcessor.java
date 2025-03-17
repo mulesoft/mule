@@ -36,8 +36,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import jakarta.activation.MimetypesFileTypeMap;
-import javax.inject.Inject;
-
+import jakarta.inject.Inject;
 
 /**
  * Loads a template and parses its content to resolve expressions.
