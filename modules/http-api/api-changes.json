@@ -1,4 +1,100 @@
 {
+  "4.9.3": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.http.api.HttpHeaders.Names.LAST_EVENT_ID",
+          "justification": "New header name used for Server Sent Events (SSE)"
+        },
+        {
+          "ignore": true,
+          "code": "java.field.addedStaticField",
+          "new": "field org.mule.runtime.http.api.HttpHeaders.Values.TEXT_EVENT_STREAM",
+          "justification": "New header value used for Server Sent Events (SSE)"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.sse.client.SseSource org.mule.runtime.http.api.client.HttpClient::sseSource(org.mule.runtime.http.api.sse.client.SseSourceConfig)",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.sse.server.SseEndpointManager org.mule.runtime.http.api.server.HttpServer::sse(java.lang.String, java.util.function.Consumer<org.mule.runtime.http.api.sse.server.SseClient>)",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.defaultMethodAddedToInterface",
+          "new": "method org.mule.runtime.http.api.sse.server.SseEndpointManager org.mule.runtime.http.api.server.HttpServer::sse(java.lang.String, java.util.function.Consumer<org.mule.runtime.http.api.sse.server.SseRequestContext>, java.util.function.Consumer<org.mule.runtime.http.api.sse.server.SseClient>)",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.sse.ServerSentEvent",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.sse.client.SseFailureContext",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.sse.client.SseListener",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.sse.client.SseRetryConfig",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.sse.client.SseSource",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.sse.client.SseSourceConfig",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.sse.client.SseSourceConfigBuilder",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.sse.server.SseClient",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.sse.server.SseEndpointManager",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.sse.server.SseRequestContext",
+          "justification": "Adding Server Sent Events (SSE) support"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [
