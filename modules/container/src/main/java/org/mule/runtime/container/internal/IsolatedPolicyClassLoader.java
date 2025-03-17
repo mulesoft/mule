@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.container;
+package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
@@ -17,7 +17,6 @@ import java.net.URL;
 public class IsolatedPolicyClassLoader extends MuleDeployableArtifactClassLoader {
 
   private static IsolatedPolicyClassLoader instance;
-
 
   private IsolatedPolicyClassLoader(String artifactId,
                                     DeployableArtifactDescriptor artifactDescriptor,
