@@ -13,7 +13,7 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 import java.util.function.Consumer;
 
 /**
- * A consumer of server-sent events.
+ * Configuration for a server-sent events source.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
  *
@@ -39,10 +39,16 @@ public class SseSourceConfig {
     this.requestOptions = requestOptions;
   }
 
+  /**
+   * @return the url of the server.
+   */
   public String getUrl() {
     return url;
   }
 
+  /**
+   * @return the {@link SseRetryConfig}.
+   */
   public SseRetryConfig getRetryConfig() {
     return retryConfig;
   }
