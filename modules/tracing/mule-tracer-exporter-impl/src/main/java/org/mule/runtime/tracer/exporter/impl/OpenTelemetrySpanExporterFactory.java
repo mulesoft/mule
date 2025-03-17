@@ -31,8 +31,6 @@ import org.mule.runtime.tracer.exporter.impl.capturer.CapturingSpanExporterWrapp
 import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +38,8 @@ import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
+
+import jakarta.inject.Inject;
 
 /**
  * An implementation of {@link SpanExporterFactory} that creates {@link SpanExporter} that exports the internal spans as

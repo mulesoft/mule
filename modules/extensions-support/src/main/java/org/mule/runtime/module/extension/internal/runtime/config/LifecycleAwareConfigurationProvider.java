@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -64,10 +65,10 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
 
   public LifecycleAwareConfigurationProvider(String name, ExtensionModel extensionModel, ConfigurationModel configurationModel,
                                              MuleContext muleContext) {
-    this.name = name;
-    this.extensionModel = extensionModel;
-    this.configurationModel = configurationModel;
-    this.muleContext = muleContext;
+    this.name = requireNonNull(name);
+    this.extensionModel = requireNonNull(extensionModel);
+    this.configurationModel = requireNonNull(configurationModel);
+    this.muleContext = requireNonNull(muleContext);
     extensionClassLoader = getClassLoader(extensionModel);
     lifecycleManager = new DefaultLifecycleManager<>(format("%s-%s", getClass().getName(), getName()), this);
   }
