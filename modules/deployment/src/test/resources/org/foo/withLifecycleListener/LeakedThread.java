@@ -16,10 +16,13 @@ public class LeakedThread extends Thread {
   private final CountDownLatch latch = new CountDownLatch(1);
 
   public void run() {
-    try {
-      latch.await();
-    } catch (InterruptedException e) {
-      // does nothing
+    while(true) {
+      try {
+        latch.await();
+        break; // Exit the loop once the latch is released
+      } catch (InterruptedException e) {
+        // Keep looping
+      }
     }
   }
 
