@@ -12,8 +12,8 @@ import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
-import org.mule.runtime.http.api.sse.client.SseSourceConfig;
 import org.mule.runtime.http.api.sse.client.SseSource;
+import org.mule.runtime.http.api.sse.client.SseSourceConfig;
 import org.mule.runtime.http.api.ws.WebSocket;
 
 import java.io.IOException;
@@ -175,7 +175,7 @@ public interface HttpClient {
    * <p>
    * This API is EXPERIMENTAL. Do not use it until it is stable.
    *
-   * @param config the URL of the server.
+   * @param config {@link SseSourceConfig configuration} of the SSE event source.
    * @return a non-connected instance of {@link SseSource}.
    * @see SseSourceConfig
    * @since 4.10.0, 4.9.3
