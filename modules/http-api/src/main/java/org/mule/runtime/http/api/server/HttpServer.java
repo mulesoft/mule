@@ -6,14 +6,19 @@
  */
 package org.mule.runtime.http.api.server;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpConstants.Protocol;
 import org.mule.runtime.http.api.server.ws.WebSocketHandler;
 import org.mule.runtime.http.api.server.ws.WebSocketHandlerManager;
+import org.mule.runtime.http.api.sse.server.SseClient;
+import org.mule.runtime.http.api.sse.server.SseEndpointManager;
+import org.mule.runtime.http.api.sse.server.SseRequestContext;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * Represents a ServerSocket connection. Notice it should be started to be bound, stopped to be unbound and finally disposed to
@@ -116,5 +121,44 @@ public interface HttpServer {
    */
   default WebSocketHandlerManager addWebSocketHandler(WebSocketHandler handler) {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
+
+  /**
+   * Adds an endpoint to produce server-sent events.
+   * <p>
+   * This API is EXPERIMENTAL. Do not use it until it is stable.
+   *
+   * @param ssePath   path to match.
+   * @param onRequest callback to be executed when a request is received. It can be used to customize the SSE response and the SSE
+   *                  Client to be created.
+   * @param onClient  callback to be executed for each received {@link SseClient}. Note: this callback will be executed AFTER
+   *                  {@code onRequest}.
+   * @return an object that can be used to enable/disable/remove the endpoint from the server.
+   *
+   * @since 4.10.0
+   */
+  @Experimental
+  default SseEndpointManager sse(String ssePath,
+                                 Consumer<SseRequestContext> onRequest,
+                                 Consumer<SseClient> onClient) {
+    throw new UnsupportedOperationException("Server-sent Events (SSE) are not supported in this HTTP Service version");
+  }
+
+  /**
+   * Adds an endpoint to produce server-sent events. Equivalent to call {@link #sse(String, Consumer, Consumer)} with a no-op
+   * {@code onRequest} callback.
+   * <p>
+   * This API is EXPERIMENTAL. Do not use it until it is stable.
+   *
+   * @param ssePath          path to match.
+   * @param sseClientHandler callback to be executed for each received {@link SseClient}.
+   * @return an object that can be used to enable/disable/remove the endpoint from the server.
+   *
+   * @since 4.10.0
+   */
+  @Experimental
+  default SseEndpointManager sse(String ssePath, Consumer<SseClient> sseClientHandler) {
+    return sse(ssePath, ctx -> {
+    }, sseClientHandler);
   }
 }
