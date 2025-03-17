@@ -17,8 +17,8 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
 import java.util.function.Consumer;
 
 /**
- * Builder for instances of {@link SseSourceConfig}. The url is required, so you have to specify it in the
- * constructor of the builder, and the rest of the parameters have their own with* method.
+ * Builder for instances of {@link SseSourceConfig}. The url is required, so you have to specify it in the constructor of the
+ * builder, and the rest of the parameters have their own with* method.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
  *
@@ -39,6 +39,7 @@ public class SseSourceConfigBuilder {
 
   /**
    * Configures the {@link SseRetryConfig}.
+   * 
    * @param retryConfig the retry config.
    * @return this same builder.
    */
@@ -49,6 +50,7 @@ public class SseSourceConfigBuilder {
 
   /**
    * Configures a callback to customize the initiator request builder.
+   * 
    * @param requestCustomizer the callback.
    * @return this same builder.
    */
@@ -59,6 +61,7 @@ public class SseSourceConfigBuilder {
 
   /**
    * Configures the {@link HttpRequestOptions} of the initiator request.
+   * 
    * @param requestOptions the request options.
    * @return this same builder.
    */
@@ -68,8 +71,8 @@ public class SseSourceConfigBuilder {
   }
 
   /**
-   * Builds an instance of {@link SseSourceConfig} with the specified parameters.
-   * This method is intended to be called only once.
+   * Builds an instance of {@link SseSourceConfig} with the specified parameters. This method is intended to be called only once.
+   * 
    * @return the new instance of {@link SseSourceConfig}.
    */
   public SseSourceConfig build() {
