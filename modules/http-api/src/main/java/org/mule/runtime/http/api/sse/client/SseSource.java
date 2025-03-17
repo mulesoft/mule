@@ -20,7 +20,7 @@ import java.util.function.Consumer;
  */
 @Experimental
 @NoImplement
-public interface SseSource {
+public interface SseSource extends AutoCloseable {
 
   int READY_STATUS_CONNECTING = 0;
   int READY_STATUS_OPEN = 1;
@@ -58,4 +58,10 @@ public interface SseSource {
    * @param onConnectionFailure to be called when an error occurs.
    */
   void doOnConnectionFailure(Consumer<SseFailureContext> onConnectionFailure);
+
+  /**
+   * Aborts reconnection if it's scheduled, and closes the connection if established.
+   */
+  @Override
+  void close();
 }
