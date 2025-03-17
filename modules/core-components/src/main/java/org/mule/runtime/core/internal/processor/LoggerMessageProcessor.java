@@ -29,10 +29,10 @@ import org.mule.runtime.core.internal.interception.HasParamsAsTemplateProcessor;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
 
 /**
  * MessageProcessor implementation that logs the current element of a value evaluated from it using an expression evaluator. By

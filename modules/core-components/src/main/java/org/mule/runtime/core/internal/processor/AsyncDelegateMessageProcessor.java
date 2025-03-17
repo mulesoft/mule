@@ -77,12 +77,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.inject.Inject;
 import reactor.core.publisher.Flux;
 
 /**
@@ -182,7 +181,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     startIfNeeded(delegate);
 
     sink = processingStrategy
-        .createSink(getFromAnnotatedObject(componentLocator, this).filter(c -> c instanceof FlowConstruct).orElse(null),
+        .createSink(getFromAnnotatedObject(componentLocator, this).filter(FlowConstruct.class::isInstance).orElse(null),
                     processAsyncChainFunction());
 
     final SchedulerConfig schedulerConfig =
