@@ -21,5 +21,10 @@ public interface PolicyTemplateClassLoaderBuilderFactory {
    */
   PolicyTemplateClassLoaderBuilder createArtifactClassLoaderBuilder();
 
+  /**
+   * Retrieves the filtering container class loader.
+   *
+   * @return The filtering container class loader.
+   */
   FilteringContainerClassLoader getFilteringContainerClassLoader();
 }
