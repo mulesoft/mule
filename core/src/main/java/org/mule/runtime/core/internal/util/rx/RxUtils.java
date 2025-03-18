@@ -6,10 +6,15 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.lang.Integer.getInteger;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MAX_COMPONENTS_PER_REACTIVE_SUBSCRIPTION_THREAD;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.MultiFluxSubscriber.MULTI_FLUX_SUBSCRIBER;
+import static org.mule.runtime.core.internal.util.rx.SubscribedProcessorsContext.subscribedProcessors;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -17,10 +22,15 @@ import static java.util.function.UnaryOperator.identity;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.core.scheduler.Schedulers.immediate;
+import static reactor.util.context.Context.of;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -31,7 +41,10 @@ import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,11 +55,14 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
-
+import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.util.annotation.Nullable;
+import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Reactor specific utils
@@ -54,20 +70,20 @@ import reactor.util.annotation.Nullable;
 public class RxUtils {
 
   private static final Logger LOGGER = getLogger(RxUtils.class);
-
   public static final String KEY_ON_NEXT_ERROR_STRATEGY = "reactor.onNextError.localStrategy";
   public static final String ON_NEXT_FAILURE_STRATEGY = "reactor.core.publisher.OnNextFailureStrategy$ResumeStrategy";
 
   // Some components involve inner chains that may reference to a global error handler (for example, the parallel-for-each).
   // Those should recreate the error routers for each thread to avoid issues with the inflight counter. (W-12556497)
   public static final String REACTOR_RECREATE_ROUTER = "recreateRouter";
+  public static final int DEFAULT_MAX_COMPONENTS_PER_REACTIVE_SUBSCRIPTION_THREAD = 40;
 
   /**
    * Defers the subscription of the <it>deferredSubscriber</it> until <it>triggeringSubscriber</it> subscribes. Once that occurs
    * the latter subscription will take place on the same context. For an example of this, look at
    * {@link org.mule.runtime.core.internal.routing.ChoiceRouter}
    * <p>
-   * This serves its purpose in some in which the are two Fluxes, A and B, and are related in that in some part of A's reactor
+   * This serves its purpose in some in which there are two Fluxes, A and B, and are related in that in some part of A's reactor
    * chain, the processed event is published into a sink that belongs to B. Also, suppose that some of A's processors need to be
    * initialized in order to make the whole assembled chain work. In those cases, one may want to do A's subscription after it has
    * initialized, and once B has subscribed.
@@ -95,7 +111,36 @@ public class RxUtils {
    * the latter subscription will take place on the same context. For an example of this, look at
    * {@link org.mule.runtime.core.internal.routing.ChoiceRouter}
    * <p>
-   * This serves its purpose in some in which the are two Fluxes, A and B, and are related in that in some part of A's reactor
+   * This serves its purpose in some in which there are two Fluxes, A and B, and are related in that in some part of A's reactor
+   * chain, the processed event is published into a sink that belongs to B. Also, suppose that some of A's processors need to be
+   * initialized in order to make the whole assembled chain work. In those cases, one may want to do A's subscription after it has
+   * initialized, and once B has subscribed.
+   * <p>
+   * A -----> B's Sink -> B -------> downstream chain
+   * <p>
+   * In this method, A corresponds to <it>deferredSubscriber</it>; and B to <it>triggeringSubscriber</it>.
+   *
+   * @param <T>                  the element type of the downstream {@link Flux}
+   * @param <U>                  the element type of the upstream {@link Flux}
+   *
+   * @param triggeringSubscriber the downstream {@link Flux}, whose subscription will trigger the subscription of the
+   *                             <it>deferredSubscriber</it> {@link Flux}, on the same context as the former one.
+   * @param deferredSubscriber   the upstream {@link Flux}, whose subscription will be deferred
+   * @return the triggeringSubscriber {@link Flux}, decorated with the callback that will perform this deferred subscription.
+   * @since 4.3
+   */
+  public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
+                                                                    Flux<U> deferredSubscriber,
+                                                                    Scheduler subscribeOnScheduler) {
+    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null);
+  }
+
+  /**
+   * Defers the subscription of the <it>deferredSubscriber</it> until <it>triggeringSubscriber</it> subscribes. Once that occurs
+   * the latter subscription will take place on the same context. For an example of this, look at
+   * {@link org.mule.runtime.core.internal.routing.ChoiceRouter}
+   * <p>
+   * This serves its purpose in some in which there are two Fluxes, A and B, and are related in that in some part of A's reactor
    * chain, the processed event is published into a sink that belongs to B. Also, suppose that some of A's processors need to be
    * initialized in order to make the whole assembled chain work. In those cases, one may want to do A's subscription after it has
    * initialized, and once B has subscribed.
@@ -121,11 +166,68 @@ public class RxUtils {
                                                                     @Nullable Consumer<? super U> consumer,
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
                                                                     @Nullable Runnable completeConsumer) {
+
     return triggeringSubscriber
-        .transformDeferredContextual((eventPub, ctx) -> eventPub
-            .doOnSubscribe(s -> deferredSubscriber
-                .contextWrite(ctx)
-                .subscribe(consumer, errorConsumer, completeConsumer)));
+        .transformDeferredContextual((eventPub, ctx) -> eventPub.doOnSubscribe(s -> {
+          startPendingSubscription(ctx);
+          just(ctx)
+              .publishOn(getSubscriptionScheduler(ctx))
+              .doOnNext(c -> deferredSubscriber
+                  .subscribe(consumer, throwable -> handleSubscriptionError(throwable, errorConsumer, ctx), completeConsumer,
+                             of(ctx)))
+              .subscribe(RxUtils::completePendingSubscription, throwable -> failPendingSubscription(throwable, ctx));
+        }));
+  }
+
+  private static reactor.core.scheduler.Scheduler getSubscriptionScheduler(ContextView ctx) {
+    MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
+    if (multiFluxSubscriber != null && multiFluxSubscriber.subscriptionScheduler != null
+        && isSubscribedProcessorsLimitReached(ctx)) {
+      return fromExecutorService(multiFluxSubscriber.subscriptionScheduler);
+    } else {
+      return immediate();
+    }
+  }
+
+  private static boolean isSubscribedProcessorsLimitReached(ContextView ctx) {
+    int maxComponentsPerSubscriptionThread =
+        getInteger(MAX_COMPONENTS_PER_REACTIVE_SUBSCRIPTION_THREAD, DEFAULT_MAX_COMPONENTS_PER_REACTIVE_SUBSCRIPTION_THREAD);
+    return subscribedProcessors(ctx)
+        .map(SubscribedProcessors::getSubscribedProcessorsCount)
+        .filter(subscribedProcessorsCount -> subscribedProcessorsCount > 0 && maxComponentsPerSubscriptionThread > 0
+            && subscribedProcessorsCount % maxComponentsPerSubscriptionThread == 0)
+        .isPresent();
+  }
+
+  private static void handleSubscriptionError(Throwable throwable, Consumer<? super Throwable> errorConsumer, ContextView ctx) {
+    try {
+      failPendingSubscription(throwable, ctx);
+    } finally {
+      if (errorConsumer != null) {
+        errorConsumer.accept(throwable);
+      }
+    }
+  }
+
+  private static void failPendingSubscription(Throwable throwable, ContextView ctx) {
+    MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
+    if (multiFluxSubscriber != null) {
+      multiFluxSubscriber.failPendingSubscription(throwable);
+    }
+  }
+
+  private static void completePendingSubscription(ContextView ctx) {
+    MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
+    if (multiFluxSubscriber != null) {
+      multiFluxSubscriber.completePendingSubscription(ctx);
+    }
+  }
+
+  private static void startPendingSubscription(ContextView ctx) {
+    MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
+    if (multiFluxSubscriber != null) {
+      multiFluxSubscriber.startPendingSubscription(ctx);
+    }
   }
 
   /**
@@ -404,6 +506,84 @@ public class RxUtils {
     return result -> result.reduce(me -> {
       throw propagateWrappingFatal(me);
     }, identity());
+  }
+
+  public static class MultiFluxSubscriber<T> implements CoreSubscriber<T> {
+
+    public static String MULTI_FLUX_SUBSCRIBER = "MULTI_FLUX_SUBSCRIBER";
+    public static final String NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR = "No subscriptions active for processor.";
+    private Throwable lastSubscriptionError;
+    private final Phaser subscriptionPhaser = new Phaser(1);
+    private final Scheduler subscriptionScheduler;
+    private boolean subscribed = false;
+    private final List<ContextView> pendingContexts = new ArrayList<>();
+
+    public MultiFluxSubscriber(Scheduler subscriptionScheduler) {
+      this.subscriptionScheduler = subscriptionScheduler;
+    }
+
+    @Override
+    public Context currentContext() {
+      return CoreSubscriber.super.currentContext().put(MULTI_FLUX_SUBSCRIBER, this);
+    }
+
+    @Override
+    public void onSubscribe(Subscription s) {
+      synchronized (this) {
+        // Protect the subscriptionPhaser from potential extra calls.
+        if (!subscribed) {
+          subscribed = true;
+          s.request(Long.MAX_VALUE);
+          subscriptionPhaser.arrive();
+        }
+      }
+    }
+
+    @Override
+    public void onNext(T t) {
+      // Nothing to do.
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+      lastSubscriptionError = throwable;
+      subscriptionPhaser.forceTermination();
+    }
+
+    @Override
+    public void onComplete() {
+      subscriptionPhaser.forceTermination();
+    }
+
+    public void startPendingSubscription(ContextView context) {
+      subscriptionPhaser.register();
+      synchronized (pendingContexts) {
+        pendingContexts.add(context);
+      }
+    }
+
+    public void completePendingSubscription(ContextView context) {
+      subscriptionPhaser.arrive();
+      synchronized (pendingContexts) {
+        pendingContexts.remove(context);
+      }
+    }
+
+    public void awaitAllSubscriptions() {
+      subscriptionPhaser.awaitAdvance(0);
+      if (lastSubscriptionError != null) {
+        throw new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR),
+                                       lastSubscriptionError);
+      }
+    }
+
+    public void failPendingSubscription(Throwable throwable) {
+      this.onError(throwable);
+    }
+
+    public List<ContextView> getPendingContexts() {
+      return pendingContexts;
+    }
   }
 
 }
