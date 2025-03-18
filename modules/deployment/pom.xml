@@ -93,6 +93,13 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-maven-client-impl</artifactId>
             <scope>runtime</scope>
+            <exclusions>
+                <!-- Avoid conflict with jakarta.inject-api -->
+                <exclusion>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>

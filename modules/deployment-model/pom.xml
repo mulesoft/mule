@@ -41,6 +41,13 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-artifact-activation</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <!-- TODO TD-0247889 Remove this exclusion -->
+                <exclusion>
+                    <groupId>org.mule</groupId>
+                    <artifactId>mule-maven-client-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

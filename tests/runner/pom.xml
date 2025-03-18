@@ -72,6 +72,11 @@
                     <groupId>com.vdurmont</groupId>
                     <artifactId>semver4j</artifactId>
                 </exclusion>
+                <!-- Avoid conflict with jakarta.inject-api -->
+                <exclusion>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
