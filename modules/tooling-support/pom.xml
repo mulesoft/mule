@@ -15,6 +15,12 @@
     <properties>
         <javaModuleName>org.mule.runtime.tooling.support</javaModuleName>
         <!-- Add visibility required by the tests exclusively -->
+        <surefire.module.path>
+            ${org.mule.runtime.boot:mule-module-jpms-utils:jar}
+        </surefire.module.path>
+        <surefire.add.modules>
+            org.mule.runtime.jpms.utils
+        </surefire.add.modules>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
             --add-modules=net.bytebuddy.agent
@@ -25,11 +31,23 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
             --add-opens=org.mule.runtime.tooling.support/org.mule.runtime.module.tooling.internal=ALL-UNNAMED
-            ${surefire.test.unit.open.args}
+            ${surefire.module.args}
         </surefire.args>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Module layer is created by the tests-runner, don't need surefire to config the boot layer for the JVM -->
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <build>
         <plugins>
@@ -94,14 +112,52 @@
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
-			
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-weave</artifactId>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-dwb-api</artifactId> 
+            <scope>provided</scope>             
+        </dependency>         
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-runner</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -126,6 +182,35 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-values-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-sample-data-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-model</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests.plugin</groupId>
+            <artifactId>mule-tests-component-plugin</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
     </dependencies>

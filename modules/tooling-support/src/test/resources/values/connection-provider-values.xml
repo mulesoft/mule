@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:values="http://www.mulesoft.org/schema/mule/values"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
+
+    <values:config name="with-value-parameter-connection">
+        <values:with-value-parameter-connection channel="dummyValue"/>
+    </values:config>
+
+    <values:config name="with-value-with-required-param-connection">
+        <values:with-value-with-required-param-connection channel="dummyValue" required1="value1" required2="value2"/>
+    </values:config>
+
+    <values:config name="values-with-required-params-from-param-group-connection">
+        <values:with-values-with-required-params-from-param-group-connection valueParam="param" channels="param" anyParameter="someValue">
+        </values:with-values-with-required-params-from-param-group-connection>
+    </values:config>
+
+    <values:config name="values-with-required-params-from-show-in-dsl-group-connection">
+        <values:with-values-with-required-params-from-show-in-dsl-group-connection valueParam="someValue" >
+            <values:some-group channels="someValue" anyParameter="someValue"/>
+        </values:with-values-with-required-params-from-show-in-dsl-group-connection>
+    </values:config>
+
+    <values:config name="values-with-required-params-from-show-in-dsl-group-dynamic-connection">
+        <values:with-values-with-required-params-from-show-in-dsl-group-connection valueParam="someValue" >
+            <values:some-group channels="#['dynamic value']" anyParameter="someValue"/>
+        </values:with-values-with-required-params-from-show-in-dsl-group-connection>
+    </values:config>
+
+    <values:config name="values-with-required-params-from-show-in-dsl-static-group-dynamic-connection">
+        <values:with-values-with-required-params-from-show-in-dsl-group-connection valueParam="#['value']" >
+            <values:some-group channels="channel" anyParameter="someValue"/>
+        </values:with-values-with-required-params-from-show-in-dsl-group-connection>
+    </values:config>
+
+    <values:config name="dynamic-connection">
+        <values:with-value-parameter-connection channel="#['dynamic value']"/>
+    </values:config>
+
+    <values:config name="failure-config">
+        <values:failure-connection errorCode="CUSTOM_ERROR" />
+    </values:config>
+
+    <values:config name="dynamic-failure-config">
+        <values:failure-connection errorCode="#['CUSTOM_ERROR']" />
+    </values:config>
+
+    <values:config name="with-value-four-bound-acting-parameters">
+        <values:with-value-four-bound-acting-parameters-connection parameterOne="some value"
+                                                                   parameterTwo="another value"
+                                                                   parameterThree="a value" parameterFour="last value"/>
+    </values:config>
+
+    <values:config name="with-parameter-with-field-values-connection">
+        <values:with-parameter-with-field-values-connection channel="dummyValue"/>
+    </values:config>
+
+</mule>
