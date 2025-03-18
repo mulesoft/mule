@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -244,13 +245,13 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             null,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
 
-    final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
+    final ReconnectableConnectionProviderWrapper<?> connectionProviderWrapper =
         new ReconnectableConnectionProviderWrapper<>(null,
                                                      defaultReconnectionConfig(true, retryPolicy));
     initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
-    Optional<ConnectionProvider> connectionProvider = of(connectionProviderWrapper);
+    Optional<ConnectionProvider<?>> connectionProvider = of(connectionProviderWrapper);
 
-    when(configurationInstance.getConnectionProvider()).thenReturn(connectionProvider);
+    doReturn(connectionProvider).when(configurationInstance).getConnectionProvider();
     when(exceptionEnricher.enrichException(any())).thenAnswer(inv -> {
       final Throwable toEnrich = inv.getArgument(0);
       if (toEnrich == exception || toEnrich.getCause() == exception) {

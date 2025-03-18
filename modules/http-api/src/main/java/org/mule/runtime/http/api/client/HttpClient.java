@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.http.api.client;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 import org.mule.runtime.http.api.client.ws.WebSocketCallback;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.http.api.sse.client.SseSource;
+import org.mule.runtime.http.api.sse.client.SseSourceConfig;
 import org.mule.runtime.http.api.ws.WebSocket;
 
 import java.io.IOException;
@@ -165,5 +168,20 @@ public interface HttpClient {
                                                      String socketId,
                                                      WebSocketCallback callback) {
     throw new UnsupportedOperationException("WebSockets are only supported in Enterprise Edition");
+  }
+
+  /**
+   * Creates a consumer of Server-sent events. The resulting {@link SseSource} is not connected automatically.
+   * <p>
+   * This API is EXPERIMENTAL. Do not use it until it is stable.
+   *
+   * @param config {@link SseSourceConfig configuration} of the SSE event source.
+   * @return a non-connected instance of {@link SseSource}.
+   * @see SseSourceConfig
+   * @since 4.10.0, 4.9.3
+   */
+  @Experimental
+  default SseSource sseSource(SseSourceConfig config) {
+    throw new UnsupportedOperationException("Server-sent Events (SSE) are not supported in this HTTP Service version");
   }
 }
