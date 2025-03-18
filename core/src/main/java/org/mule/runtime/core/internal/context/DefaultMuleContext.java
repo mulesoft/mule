@@ -39,6 +39,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.NTLM_AVOID_SEND_PAY
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
@@ -343,6 +344,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureComputeConnectionErrorsInStats();
       configureToStringTransformerTransformIteratorElements();
       configureEnablePolicyIsolation();
+      configureSeparateClassLoaderForPolicyIsolation();
       configureEntityResolverFailOnFirstErrorFeature();
       configureEnableProfilingService();
       configureSetVariableWithNullVale();
@@ -1303,6 +1305,17 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_POLICY_ISOLATION,
                                                 minMuleVersion(v4_4_0));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION} feature flag.
+   *
+   * @since 4.6.0
+   */
+  private static void configureSeparateClassLoaderForPolicyIsolation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION,
+                                                minMuleVersion(v4_6_0));
   }
 
   /**
