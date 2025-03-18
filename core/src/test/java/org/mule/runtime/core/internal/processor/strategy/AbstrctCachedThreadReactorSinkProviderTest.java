@@ -15,6 +15,7 @@ import reactor.core.publisher.FluxSink;
 
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
@@ -37,6 +38,9 @@ class AbstrctCachedThreadReactorSinkProviderTest {
     final FluxSink<CoreEvent> result = provider.getSink();
     result.next(event);
     result.complete();
+
+    verify(sink).next(event);
+    verify(sink).complete();
   }
 
   @Test
@@ -49,5 +53,23 @@ class AbstrctCachedThreadReactorSinkProviderTest {
     final FluxSink<CoreEvent> result = provider.getSink();
     result.next(event);
     result.complete();
+
+    verify(sink).next(event);
+    verify(sink).complete();
   }
+
+  @Test
+  void disposeCompletesOpenSinks() {
+    provider = mock(AbstractCachedThreadReactorSinkProvider.class,
+                    withSettings().useConstructor(false).defaultAnswer(CALLS_REAL_METHODS));
+    when(provider.createSink()).thenReturn(sink);
+
+    final FluxSink<CoreEvent> result = provider.getSink();
+    result.next(event);
+
+    provider.dispose();
+
+    verify(sink).complete();
+  }
+
 }
