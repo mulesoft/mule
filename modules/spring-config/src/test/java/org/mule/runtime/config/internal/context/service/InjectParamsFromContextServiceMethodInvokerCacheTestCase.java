@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
+import static java.util.Optional.of;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -30,7 +32,7 @@ public class InjectParamsFromContextServiceMethodInvokerCacheTestCase {
 
   @Test
   public void lookupByNameCaching() throws Throwable {
-    when(registry.lookupByName(any())).thenReturn(java.util.Optional.of("malaFama"));
+    when(registry.lookupByName(any())).thenReturn(of("malaFama"));
     BaseService service = new Utils.InvalidNamedAugmentedMethodService();
     Method method = BaseService.class.getMethod("augmented");
     injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
@@ -41,7 +43,7 @@ public class InjectParamsFromContextServiceMethodInvokerCacheTestCase {
 
   @Test
   public void lookupByNameCachingJavax() throws Throwable {
-    when(registry.lookupByName(any())).thenReturn(java.util.Optional.of("malaFama"));
+    when(registry.lookupByName(any())).thenReturn(of("malaFama"));
     UtilsJavax.BaseService service = new UtilsJavax.InvalidNamedAugmentedMethodService();
     Method method = BaseService.class.getMethod("augmented");
     injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);

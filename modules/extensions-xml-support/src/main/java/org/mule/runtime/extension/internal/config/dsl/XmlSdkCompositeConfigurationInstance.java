@@ -33,8 +33,6 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
 
   private final String name;
   private final ConfigurationModel model;
-  private final Event event;
-  private final Registry registry;
   private final LazyValue<Optional<ConfigurationInstance>> actualConfigurationInstance;
 
   public XmlSdkCompositeConfigurationInstance(String name,
@@ -43,8 +41,6 @@ class XmlSdkCompositeConfigurationInstance implements ConfigurationInstance {
                                               Registry registry) {
     this.name = name;
     this.model = model;
-    this.event = event;
-    this.registry = registry;
     this.actualConfigurationInstance = new LazyValue<>(
                                                        () -> model
                                                            .getConnectionProviderModel(MODULE_CONNECTION_GLOBAL_ELEMENT_NAME)

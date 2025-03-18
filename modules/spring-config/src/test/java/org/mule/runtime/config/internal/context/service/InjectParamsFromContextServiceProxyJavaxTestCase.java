@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
-import static org.mule.runtime.config.utils.Utils.augmentedParam;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.NO_OBJECT_FOUND_FOR_PARAM;
+import static org.mule.runtime.config.utils.UtilsJavax.augmentedParam;
 
 import static java.lang.String.format;
 import static java.lang.reflect.Proxy.newProxyInstance;
@@ -42,6 +42,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Method;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -51,6 +52,11 @@ public class InjectParamsFromContextServiceProxyJavaxTestCase extends AbstractMu
 
   @Inject
   private Registry registry;
+
+  @Before
+  public void setUo() {
+    augmentedParam = null;
+  }
 
   @Override
   protected boolean doTestClassInjection() {
@@ -200,7 +206,7 @@ public class InjectParamsFromContextServiceProxyJavaxTestCase extends AbstractMu
   public void throughProxyAugmentedInvocation() {
     BaseService service = new AugmentedMethodService();
 
-    final MetadataInvocationHandler noOpHandler = new MetadataInvocationHandler(service) {
+    final MetadataInvocationHandler<BaseService> noOpHandler = new MetadataInvocationHandler<>(service) {
 
       @Override
       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

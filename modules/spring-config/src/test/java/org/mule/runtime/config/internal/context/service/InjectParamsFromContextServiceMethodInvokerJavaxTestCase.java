@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.NO_OBJECT_FOUND_FOR_PARAM;
-import static org.mule.runtime.config.utils.Utils.augmentedParam;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.NO_OBJECT_FOUND_FOR_PARAM;
+import static org.mule.runtime.config.utils.UtilsJavax.augmentedParam;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -60,6 +61,7 @@ public class InjectParamsFromContextServiceMethodInvokerJavaxTestCase extends Ab
   public void setUp() throws NoSuchMethodException {
     injectParamsFromContextServiceMethodInvoker = new InjectParamsFromContextServiceMethodInvoker(registry);
     method = BaseService.class.getMethod("augmented");
+    augmentedParam = null;
   }
 
   @Test
@@ -138,7 +140,7 @@ public class InjectParamsFromContextServiceMethodInvokerJavaxTestCase extends Ab
   public void overloadedAugmentedInvocation2() throws Throwable {
     BaseOverloadedService service = new OverloadedAugmentedMethodService();
 
-    java.util.List<Method> methods = asList(OverloadedAugmentedMethodService.class.getMethods());
+    List<Method> methods = asList(OverloadedAugmentedMethodService.class.getMethods());
 
     Optional<Method> method = methods.stream().filter(m -> m.getName().equals("augmented") && m.getParameterCount() == 1
         && !m.getParameters()[0].getName().contains("context")).findFirst();

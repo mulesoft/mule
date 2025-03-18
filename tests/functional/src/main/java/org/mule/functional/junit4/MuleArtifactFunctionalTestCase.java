@@ -23,11 +23,11 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerConfigSystemProperty;
 
-import jakarta.inject.Inject;
-
 import org.junit.Rule;
 
 import org.mockito.junit.MockitoRule;
+
+import jakarta.inject.Inject;
 
 /**
  * Base class for mule functional test cases that run tests using class loading isolation. This class will set the default values
@@ -119,7 +119,8 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
 
   private CoreEvent baseEvent() throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
-    return CoreEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(Message.of(TEST_PAYLOAD)).build();
+    return CoreEvent.builder(create(flowConstruct, eventContextService, TEST_CONNECTOR_LOCATION))
+        .message(Message.of(TEST_PAYLOAD)).build();
   }
 
   @Override
