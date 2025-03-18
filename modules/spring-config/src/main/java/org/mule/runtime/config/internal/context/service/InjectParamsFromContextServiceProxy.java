@@ -7,18 +7,19 @@
 package org.mule.runtime.config.internal.context.service;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.calculateAugmentedArgForParamerter;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.resolveInjectableMethodFor;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 
-import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static java.util.Arrays.asList;
-import static java.util.Arrays.deepEquals;
+import static java.util.Objects.requireNonNull;
+
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.internal.MetadataInvocationHandler;
-import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -28,10 +29,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
+import jakarta.inject.Inject;
 
 /**
  * Proxies a {@link Service} instance to automatically {@link Inject} parameters for invocations of implementation methods.
@@ -40,14 +40,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  */
 public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandler<Service> {
 
-  public static final String MANY_CANDIDATES_ERROR_MSG_TEMPLATE =
-      "More than one invocation candidate for method '%s' in service '%s'";
-  public static final String NO_OBJECT_FOUND_FOR_PARAM =
-      "No object found in the registry for parameter '%s' of method '%s' in service '%s'";
-
-  private final Registry registry;
-  private final com.github.benmanes.caffeine.cache.LoadingCache<Class<?>, Collection<?>> lookupAllByTypeCache;
-  private final com.github.benmanes.caffeine.cache.LoadingCache<String, Optional<?>> lookupByNameCache;
+  private final LoadingCache<Class<?>, Collection<?>> lookupAllByTypeCache;
+  private final LoadingCache<String, Optional<?>> lookupByNameCache;
 
   /**
    * Creates a new proxy for the provided service instance.
@@ -57,10 +51,10 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
    */
   public InjectParamsFromContextServiceProxy(Service service, Registry registry) {
     super(service);
-    checkArgument(registry != null, "context cannot be null");
-    this.registry = registry;
-    lookupAllByTypeCache = Caffeine.newBuilder().build(registry::lookupAllByType);
-    lookupByNameCache = Caffeine.newBuilder().build(registry::lookupByName);
+    requireNonNull(registry, "registry cannot be null");
+
+    lookupAllByTypeCache = newBuilder().build(registry::lookupAllByType);
+    lookupByNameCache = newBuilder().build(registry::lookupByName);
   }
 
   @Override
@@ -74,17 +68,9 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
 
       for (int i = method.getParameters().length; i < injectable.getParameters().length; ++i) {
         final Parameter parameter = injectable.getParameters()[i];
-        Object arg;
-        if (parameter.isAnnotationPresent(Named.class)) {
-          arg = lookupByNameCache.get(parameter.getAnnotation(Named.class).value())
-              .orElseThrow(() -> new IllegalDependencyInjectionException(format(NO_OBJECT_FOUND_FOR_PARAM,
-                                                                                parameter.getName(), injectable.getName(),
-                                                                                getProxiedObject().getName())));
-        } else {
-          final Collection<?> lookupObjects = lookupAllByTypeCache.get(parameter.getType());
-          arg = lookupObjects.iterator().next();
-        }
-        augmentedArgs.add(arg);
+        augmentedArgs.add(calculateAugmentedArgForParamerter(parameter,
+                                                             lookupByNameCache, lookupAllByTypeCache,
+                                                             injectable, getProxiedObject().getName()));
       }
 
       return doInvoke(proxy, injectable, augmentedArgs.toArray());
@@ -95,40 +81,11 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
     Method candidate = null;
 
     for (Method serviceImplMethod : getImplementationDeclaredMethods()) {
-      if (isPublic(serviceImplMethod.getModifiers())
-          && serviceImplMethod.getName().equals(method.getName())
-          && serviceImplMethod.getAnnotationsByType(Inject.class).length > 0
-          && equivalentParams(method.getParameters(), serviceImplMethod.getParameters())) {
-        if (candidate != null
-            && !(candidate.getName().equals(serviceImplMethod.getName())
-                && deepEquals(candidate.getParameterTypes(), serviceImplMethod.getParameterTypes()))) {
-          throw new IllegalDependencyInjectionException(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, method.getName(),
-                                                               getProxiedObject().getName()));
-        }
-        candidate = serviceImplMethod;
-      }
+      candidate = resolveInjectableMethodFor(method, serviceImplMethod,
+                                             lookupAllByTypeCache,
+                                             candidate, getProxiedObject().getName());
     }
     return candidate;
-  }
-
-  private boolean equivalentParams(Parameter[] invocationParams, Parameter[] serviceImplParams) {
-    int i = 0;
-    for (Parameter invocationParam : invocationParams) {
-      if (i >= serviceImplParams.length || !serviceImplParams[i].getType().equals(invocationParam.getType())) {
-        return false;
-      }
-      ++i;
-    }
-
-    // Check that the remaining parameters are injectable
-    for (int j = i; j < serviceImplParams.length; ++j) {
-      if (!serviceImplParams[j].isAnnotationPresent(Named.class)
-          && lookupAllByTypeCache.get(serviceImplParams[j].getType()).isEmpty()) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   /**

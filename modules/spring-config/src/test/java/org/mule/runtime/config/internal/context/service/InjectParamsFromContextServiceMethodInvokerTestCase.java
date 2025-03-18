@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.NO_OBJECT_FOUND_FOR_PARAM;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.utils.Utils.augmentedParam;
 
 import static java.lang.String.format;
@@ -60,6 +60,7 @@ public class InjectParamsFromContextServiceMethodInvokerTestCase extends Abstrac
   public void setUp() throws NoSuchMethodException {
     injectParamsFromContextServiceMethodInvoker = new InjectParamsFromContextServiceMethodInvoker(registry);
     method = BaseService.class.getMethod("augmented");
+    augmentedParam = null;
   }
 
   @Test

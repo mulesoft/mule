@@ -40,8 +40,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.getAllMethods;
+import static org.reflections.ReflectionUtils.Fields;
+import static org.reflections.ReflectionUtils.Methods;
+import static org.reflections.ReflectionUtils.get;
 import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -135,14 +136,14 @@ public class MuleContextUtils {
     @Override
     public <T> T inject(T object) {
       doInjectInto(object, Inject.class);
-      // Still need to support javax.inkect for the time being...
-      // doInjectInto(object, javax.inject.Inject.class);
+      // Still need to support javax.inject for the time being...
+      doInjectInto(object, javax.inject.Inject.class);
 
       return object;
     }
 
     private <T> void doInjectInto(final T object, final Class<? extends Annotation> injectAnnClass) {
-      for (Field field : getAllFields(object.getClass(), withAnnotation(injectAnnClass))) {
+      for (Field field : get(Fields.of(object.getClass()), withAnnotation(injectAnnClass))) {
         Class<?> dependencyType = field.getType();
 
         boolean nullToOptional = false;
@@ -170,7 +171,7 @@ public class MuleContextUtils {
                                      e);
         }
       }
-      for (Method method : getAllMethods(object.getClass(), withAnnotation(injectAnnClass))) {
+      for (Method method : get(Methods.of(object.getClass()), withAnnotation(injectAnnClass))) {
         if (method.getParameters().length == 1) {
           Class<?> dependencyType = method.getParameterTypes()[0];
 

@@ -51,9 +51,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Utils class to create {@link ResolvedMinMuleVersion}s from {@link Type}s.
@@ -459,7 +459,10 @@ public final class MinMuleVersionUtils {
       fieldMinMuleVersion.updateIfHigherMMV(typeMMV, getReasonType("Field", field.getName(), typeMMV));
     }
     for (Type annotation : field.getAnnotations().collect(toList())) {
-      if (annotation.isSameType(Inject.class) && !parameterType.isSameType(Optional.class)) {
+      if ((annotation.isSameType(Inject.class)
+          // Still need to support javax.inject for the time being...
+          || annotation.isSameType(javax.inject.Inject.class))
+          && !parameterType.isSameType(Optional.class)) {
         // Parse injected classes but exclude Optionals (such as ForwardCompatibilityHelper)
         ResolvedMinMuleVersion typeMMV = getEnforcedMinMuleVersion(parameterType);
         fieldMinMuleVersion.updateIfHigherMMV(typeMMV, getReasonType("Field", field.getName(), typeMMV));
