@@ -16,18 +16,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.reactivestreams.Publisher;
 
-import javax.lang.model.util.Types;
-import java.util.concurrent.Flow;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DirectSinkTest {
+class DirectSinkTestCase {
 
   private DirectSink sink;
   @Mock

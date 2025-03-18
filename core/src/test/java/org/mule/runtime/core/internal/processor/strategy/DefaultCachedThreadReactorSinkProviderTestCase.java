@@ -41,7 +41,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultCachedThreadReactorSinkProviderTest {
+class DefaultCachedThreadReactorSinkProviderTestCase {
 
   private static ExecutorService service;
   private DefaultCachedThreadReactorSinkProvider provider;
