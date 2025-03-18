@@ -346,19 +346,20 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
     return eventPublisher -> from(eventPublisher).transformDeferredContextual((pipelineUpstream, reactorContext) -> {
       if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
-        return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
+        return handlePipelineError(from(propagateCompletion(pipelineUpstream, identity(),
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
                                                                                             pipelineInlet, true),
                                                             pipelineOutlet::complete,
-                                                            pipelineOutlet::error)));
+                                                            pipelineOutlet::error).apply(pipelineOutlet.flux())));
       } else {
-        return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
+        return handlePipelineError(from(propagateCompletion(pipelineUpstream, identity(),
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
                                                                                             pipelineInlet, false),
                                                             pipelineOutlet::complete,
                                                             pipelineOutlet::error,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            completionCallbackScheduler, getDslSource())));
+                                                            completionCallbackScheduler, getDslSource())
+                                                                .apply(pipelineOutlet.flux())));
       }
     });
   }
