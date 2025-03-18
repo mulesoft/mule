@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
@@ -123,11 +124,13 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
                                                                ownPolicyClassLoader));
   }
 
+  // Use additional feature flag SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION,
+  // so that we can use isolated classloader as parent classloader, only when this feature is enabled.
   private boolean isPolicyIsolationEnabled(PolicyTemplateDescriptor descriptor) {
-    return isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor);
+    return isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) &&
+        isFeatureEnabled(SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION, descriptor);
   }
 
-  //
   private boolean hasRequiredPlugin(PolicyTemplateDescriptor descriptor) {
     if (descriptor == null || descriptor.getPlugins() == null) {
       return false;
