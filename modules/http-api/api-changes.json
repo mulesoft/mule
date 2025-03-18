@@ -4,6 +4,12 @@
       "ignore": [
         {
           "ignore": true,
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.sse.client.SseSource org.mule.runtime.http.api.client.ManagedLifecycleHttpClient::sseSource(org.mule.runtime.http.api.sse.client.SseSourceConfig)",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
           "code": "java.field.addedStaticField",
           "new": "field org.mule.runtime.http.api.HttpHeaders.Names.LAST_EVENT_ID",
           "justification": "New header name used for Server Sent Events (SSE)"

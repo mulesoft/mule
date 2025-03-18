@@ -8,6 +8,8 @@ package org.mule.runtime.http.api.client;
 
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.http.api.sse.client.SseSource;
+import org.mule.runtime.http.api.sse.client.SseSourceConfig;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -65,5 +67,10 @@ public final class ManagedLifecycleHttpClient implements HttpClient {
   @Override
   public HttpResponse send(HttpRequest request, HttpRequestOptions options) throws IOException, TimeoutException {
     return httpClient.send(request, options);
+  }
+
+  @Override
+  public SseSource sseSource(SseSourceConfig config) {
+    return httpClient.sseSource(config);
   }
 }
