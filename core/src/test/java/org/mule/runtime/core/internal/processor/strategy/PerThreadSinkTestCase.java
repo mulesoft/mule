@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
  * Check some error handling.
  */
 @ExtendWith(MockitoExtension.class)
-class PerThreadSinkTest {
+class PerThreadSinkTestCase {
 
   private PerThreadSink sink;
   @Mock

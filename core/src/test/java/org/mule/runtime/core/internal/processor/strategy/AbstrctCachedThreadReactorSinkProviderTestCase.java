@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 @ExtendWith(MockitoExtension.class)
-class AbstrctCachedThreadReactorSinkProviderTest {
+class AbstrctCachedThreadReactorSinkProviderTestCase {
 
   private AbstractCachedThreadReactorSinkProvider provider;
   @Mock
