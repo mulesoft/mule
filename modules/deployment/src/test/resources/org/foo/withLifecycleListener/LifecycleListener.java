@@ -29,7 +29,7 @@ public class LifecycleListener implements ArtifactLifecycleListener {
     callArtifactDisposalCallback(disposalContext);
     assertClassCanBeLoadedWith(disposalContext.getExtensionClassLoader(), "org.foo.withLifecycleListener.LeakedThread");
 
-    // If one of the avobe failed, the exception will make it skip the disposal code, and the associated test will fail.
+    // If one of the above failed, the exception will make it skip the disposal code, and the associated test will fail.
 
     // Iterates through the threads that are owned by the extension being disposed of, calling the graceful stop methods and
     // joining them
