@@ -6,26 +6,27 @@
  */
 package org.foo.withLifecycleListener;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Thread for testing purposes. The idea is to retain the Thread's Context ClassLoader until the Thread is terminated.
  */
 public class LeakedThread extends Thread {
 
-  private boolean stopRequested = false;
+  private final CountDownLatch latch = new CountDownLatch(1);
 
-  public synchronized void run() {
-    stopRequested = false;
-    while (!stopRequested) {
+  public void run() {
+    while(true) {
       try {
-        wait();
+        latch.await();
+        break; // Exit the loop once the latch is released
       } catch (InterruptedException e) {
-        // does nothing (keeps waiting)
+        // Keep looping
       }
     }
   }
 
-  public synchronized void stopPlease() {
-    stopRequested = true;
-    notify();
+  public void stopPlease() {
+    latch.countDown();
   }
 }
