@@ -152,7 +152,7 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.4.1-SNAPSHOT</muleBomVersion>
+        <muleBomVersion>4.4.0-20250319</muleBomVersion>
 
         <activemqVersion>5.15.12</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
