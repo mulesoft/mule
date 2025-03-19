@@ -96,7 +96,6 @@ module org.mule.runtime.core {
   requires jakarta.annotation;
   requires transitive jakarta.jms.api;
   requires transitive jakarta.messaging;
-  requires java.inject;
   requires java.management;
   requires jakarta.transaction;
 
