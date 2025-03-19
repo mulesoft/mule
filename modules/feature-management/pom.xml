@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.15-SNAPSHOT</version>
+        <version>4.6.15-rc1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-feature-management</artifactId>
-    <version>4.6.15-SNAPSHOT</version>
+    <version>4.6.15-rc1</version>
     <name>Mule Global Configuration Module</name>
     <description>This module performs feature management for the runtime</description>
 
