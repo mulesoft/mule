@@ -35,8 +35,6 @@ module org.mule.runtime.extension.model {
   requires org.mule.runtime.artifact.ast.dependency.graph;
   requires org.mule.runtime.errors;
   
-  requires java.inject;
-
   requires com.google.common;
   requires com.google.gson;
   requires org.apache.commons.lang3;

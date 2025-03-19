@@ -71,7 +71,6 @@ module org.mule.runtime.spring.config {
 
   // PropertyDescriptor and PropertyEditor from java.beans
   requires java.desktop;
-  requires java.inject;
   // Spring JNDI support
   requires java.naming;
   requires jakarta.transaction;

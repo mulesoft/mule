@@ -20,7 +20,6 @@ module org.mule.runtime.service {
   requires org.mule.runtime.jpms.utils;
   requires org.mule.runtime.metadata.model.java;
 
-  requires java.inject;
   requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;

@@ -18,7 +18,6 @@ module org.mule.runtime.tracer.customization.impl {
   requires org.mule.runtime.tracer.customization.api;
   requires org.mule.runtime.tracer.configuration.api;
 
-  requires java.inject;
   requires org.apache.commons.lang3;
 
   exports org.mule.runtime.tracer.customization.impl.provider to

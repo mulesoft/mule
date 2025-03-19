@@ -25,8 +25,6 @@ module org.mule.runtime.metadata.support {
   requires com.google.common;
   requires org.apache.commons.lang3;
 
-  requires java.inject;
-
   exports org.mule.runtime.metadata.api.dsl;
   exports org.mule.runtime.metadata.api.cache;
   exports org.mule.runtime.metadata.api.locator;

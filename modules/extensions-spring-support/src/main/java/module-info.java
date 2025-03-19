@@ -29,7 +29,6 @@ module org.mule.runtime.extensions.spring.support {
   requires org.mule.runtime.spring.config;
 
   requires java.compiler;
-  requires java.inject;
 
   requires jakarta.xml.bind;
 

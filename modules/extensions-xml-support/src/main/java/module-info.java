@@ -33,7 +33,6 @@ module org.mule.runtime.extensions.xml.support {
   requires org.mule.runtime.properties.config;
   requires org.mule.runtime.spring.config;
 
-  requires java.inject;
   requires java.xml;
 
   requires com.google.common;
