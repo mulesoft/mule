@@ -24,6 +24,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Coverage tests for {@link StreamPerEventSink}
+ */
 @ExtendWith(MockitoExtension.class)
 class StreamPerEventSinkTestCase {
 
@@ -42,14 +45,14 @@ class StreamPerEventSinkTestCase {
   }
 
   @Test
-  void accept() {
+  void acceptForwardsEventToConsumer() {
     sink.accept(event);
 
     verify(consumer).accept(event);
   }
 
   @Test
-  void acceptThrows() {
+  void acceptThrowsWhenComsumerThrows() {
     doThrow(new IllegalArgumentException("Imma tiny stoat")).when(consumer).accept(any());
 
     assertThrows(IllegalArgumentException.class, () -> sink.accept(event));
@@ -58,7 +61,7 @@ class StreamPerEventSinkTestCase {
   }
 
   @Test
-  void emit() {
+  void emitForwardsRequestToConsumer() {
 
     final BackPressureReason result = sink.emit(event);
 

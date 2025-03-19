@@ -25,6 +25,10 @@ import java.util.List;
 
 import static org.mockito.Mockito.verify;
 
+/**
+ * Coverage tests for {@link FluxSinkWrapper} Mostly the tests just make sure that the delegate is called when the wrapper method
+ * is called.
+ */
 @ExtendWith(MockitoExtension.class)
 class FluxSinkWrapperTestCase {
 
@@ -42,6 +46,8 @@ class FluxSinkWrapperTestCase {
   void fluxSinkDelegates(String testName, Method m) throws InvocationTargetException, IllegalAccessException {
     Object[] values = ParameterMockingTestUtil.getParameterValues(m, CoreEvent.class);
     m.invoke(sink, values);
+    // Is this sneaky? Calling 'verify' puts the object into verification mode, so when the method is invoked on the mock it
+    // verifies the activity
     m.invoke(verify(delegate), values);
   }
 
@@ -54,6 +60,9 @@ class FluxSinkWrapperTestCase {
         .toList();
   }
 
+  /**
+   * contextView is not overridden in FluxSinkWrapper, so it's the default implementation on the interface we're testing...
+   */
   @Test
   void contextView() {
     sink.contextView();
