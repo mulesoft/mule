@@ -6,16 +6,17 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.NATIVE_QUERY;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;

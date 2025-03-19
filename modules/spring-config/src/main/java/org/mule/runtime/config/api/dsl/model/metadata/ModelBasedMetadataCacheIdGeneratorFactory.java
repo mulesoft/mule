@@ -8,9 +8,10 @@ package org.mule.runtime.config.api.dsl.model.metadata;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
+import org.mule.runtime.metadata.internal.cache.ComponentAstBasedMetadataCacheIdGenerator;
 
 
 /**
@@ -23,6 +24,6 @@ public class ModelBasedMetadataCacheIdGeneratorFactory implements MetadataCacheI
   @Override
   public MetadataCacheIdGenerator<ComponentAst> create(DslResolvingContext context,
                                                        ComponentLocator<ComponentAst> locator) {
-    return new ComponentBasedMetadataCacheIdGenerator(context, locator);
+    return new ComponentAstBasedMetadataCacheIdGenerator(locator);
   }
 }
