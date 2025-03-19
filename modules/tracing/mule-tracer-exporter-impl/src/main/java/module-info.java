@@ -32,8 +32,6 @@ module org.mule.runtime.tracer.exporter.impl {
   requires com.google.gson;
   requires org.apache.commons.lang3;
 
-  requires java.inject;
-
   exports org.mule.runtime.tracer.exporter.impl to
       org.mule.runtime.spring.config,
       spring.beans;
