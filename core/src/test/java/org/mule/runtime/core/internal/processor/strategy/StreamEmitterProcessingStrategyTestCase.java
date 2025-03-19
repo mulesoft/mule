@@ -33,9 +33,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Coverage tests for {@link StreamEmitterProcessingStrategy} Checks some details of shutting down the object.
+ */
 @ExtendWith(MockitoExtension.class)
 class StreamEmitterProcessingStrategyTestCase {
 
@@ -80,9 +82,12 @@ class StreamEmitterProcessingStrategyTestCase {
     TestPublisher<CoreEvent> testPublisher = TestPublisher.create();
     final Publisher<CoreEvent> pub = strategy.configureInternalPublisher(testPublisher);
     final Future<?> future = disposeInFuture(10);
-    pub.subscribe(TestSubscriber.create());
+    TestSubscriber<CoreEvent> testSubscriber = TestSubscriber.create();
+    pub.subscribe(testSubscriber);
     testPublisher.complete(); // Trigger the decrement active sinks.
     future.get(100L, TimeUnit.MILLISECONDS);
+
+    assertThat(testSubscriber.isTerminatedComplete(), is(true));
   }
 
   @Test
@@ -90,11 +95,14 @@ class StreamEmitterProcessingStrategyTestCase {
     timeout.set(100);
     TestPublisher<CoreEvent> testPublisher = TestPublisher.create();
     final Publisher<CoreEvent> pub = strategy.configureInternalPublisher(testPublisher);
-    pub.subscribe(TestSubscriber.create());
+    TestSubscriber<CoreEvent> testSubscriber = TestSubscriber.create();
+    pub.subscribe(testSubscriber);
     final Future<?> future = disposeInFuture(10);
     Thread.sleep(50L); // Have to wait so the dispose loop that sleeps for 10 millis has a chance to loop...
     testPublisher.complete(); // Trigger the decrement active sinks.
     future.get(100L, TimeUnit.MILLISECONDS);
+
+    assertThat(testSubscriber.isTerminatedComplete(), is(true));
   }
 
   @Test
@@ -107,6 +115,7 @@ class StreamEmitterProcessingStrategyTestCase {
     Thread.sleep(20L); // Have to wait so the dispose loop that sleeps for 10 millis has a chance to loop...
     future.cancel(true);
     Thread.sleep(20L);
+
     assertThrows(CancellationException.class, () -> future.get(100L, TimeUnit.MILLISECONDS));
   }
 
@@ -115,9 +124,19 @@ class StreamEmitterProcessingStrategyTestCase {
     strategy.onRejected(flowScheduler); // Set up that we want to retry
 
     BackPressureReason backPressureReason = strategy.checkBackpressureEmitting(event);
+
     assertThat(backPressureReason, is(BackPressureReason.REQUIRED_SCHEDULER_BUSY));
   }
 
+  /**
+   * Call the dispose method in a separate thread, using a latch to make sure it gets run. <b>N.B.</b> the latch only guarantees
+   * the method was started - if it yeilds or sleeps control will likely go back to the main thread and might not ever get back to
+   * the dispose thread...
+   * 
+   * @param timeout Max time to wait for execution...
+   * @return A future that represents the result of calling dispose.
+   * @throws InterruptedException
+   */
   private Future<?> disposeInFuture(int timeout) throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
 
