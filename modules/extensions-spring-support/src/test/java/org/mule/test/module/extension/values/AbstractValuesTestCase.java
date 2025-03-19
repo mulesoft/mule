@@ -72,36 +72,10 @@ import io.qameta.allure.Story;
 
 @Feature(SDK_TOOLING_SUPPORT)
 @Story(VALUE_PROVIDERS_SERVICE)
-// @ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
-// public abstract class AbstractValuesTestCase extends MuleArtifactFunctionalTestCase {
 public abstract class AbstractValuesTestCase extends AbstractMuleContextTestCase {
 
   private static final CachingAstXmlParser AST_PARSER =
       new CachingAstXmlParser(true, false, emptyMap(), APPLICATION, emptyArtifact());
-
-  // @Inject
-  // @Named(VALUE_PROVIDER_SERVICE_KEY)
-  // private ValueProviderService valueProviderService;
-  //
-  // @Override
-  // public boolean enableLazyInit() {
-  // return true;
-  // }
-  //
-  // @Override
-  // public boolean disableXmlValidations() {
-  // return true;
-  // }
-  //
-  // @Override
-  // public boolean addToolingObjectsToRegistry() {
-  // return true;
-  // }
-  //
-  // @Override
-  // protected boolean isDisposeContextPerClass() {
-  // return true;
-  // }
 
   private ExtensionModel valuesExtension;
 

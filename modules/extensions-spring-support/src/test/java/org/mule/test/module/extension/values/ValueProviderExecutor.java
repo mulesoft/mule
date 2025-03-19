@@ -20,11 +20,10 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.value.ResolvingFailure;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueResult;
-import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
@@ -35,7 +34,6 @@ import org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProvider
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-
 
 import org.slf4j.Logger;
 
@@ -127,13 +125,9 @@ public class ValueProviderExecutor {
                   e);
 
       return resultFrom(newFailure(e).withFailureCode(e.getFailureCode()).build());
-      // } catch (ExpressionNotSupportedException e) {
-      // return resultFrom(newFailure(new ValueResolvingException(e.getMessage(), INVALID_PARAMETER_VALUE))
-      // .withFailureCode(INVALID_PARAMETER_VALUE).build());
     } catch (MuleRuntimeException e) {
       Throwable cause = e.getCause();
-      if (cause instanceof ValueResolvingException) {
-        ValueResolvingException valueResolvingException = (ValueResolvingException) cause;
+      if (cause instanceof ValueResolvingException valueResolvingException) {
         if (LOGGER.isWarnEnabled()) {
           LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s %s",
                              valueResolvingException.getFailureCode(),
@@ -169,12 +163,11 @@ public class ValueProviderExecutor {
   }
 
   private <C> Supplier<C> connectionSupplier(Optional<ConnectionProvider<C>> connectionProvider) {
-    return () -> (C) connectionProvider
+    return () -> connectionProvider
         .map(cp -> {
           try {
             return cp.connect();
           } catch (ConnectionException e) {
-            //
             throw new MuleRuntimeException(e);
           }
         }).orElse((C) null);

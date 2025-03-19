@@ -95,11 +95,6 @@ public class SourcesSampleDataByLocationTestCase extends AbstractSampleDataTestC
   }
 
   @Test
-  public void connectionLessWithTwoBoundActingParameterFromContentField() throws Exception {
-
-  }
-
-  @Test
   public void sampleDataExceptionWithErrorCause() throws Exception {
     assertError(getSourceSampleByLocation("sampleDataExceptionWithErrorCause"),
                 SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG, IllegalStateException.class);

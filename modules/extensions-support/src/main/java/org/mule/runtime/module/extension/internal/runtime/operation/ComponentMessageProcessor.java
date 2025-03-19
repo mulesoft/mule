@@ -1232,12 +1232,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ParameterValueResolver getParameterValueResolver() {
     CoreEvent event = getNullEvent();
     try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
-      LazyExecutionContext executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
-      return new OperationParameterValueResolver(executionContext, resolverSet, reflectionCache, expressionManager);
+      LazyExecutionContext<?> executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
+      return new OperationParameterValueResolver<>(executionContext, resolverSet, reflectionCache, expressionManager);
     } finally {
-      if (event != null) {
-        ((BaseEventContext) event.getContext()).success();
-      }
+      ((BaseEventContext) event.getContext()).success();
     }
   }
 
