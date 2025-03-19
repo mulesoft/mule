@@ -27,6 +27,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+/**
+ * Coverage tests for {@link org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.DefaultReactorSink
+ * DefaultReactorSink}
+ */
 @ExtendWith(MockitoExtension.class)
 class DefaultReactorSinkTestCase {
 
