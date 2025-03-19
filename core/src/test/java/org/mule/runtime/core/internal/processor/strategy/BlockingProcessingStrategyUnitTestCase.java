@@ -23,6 +23,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+/**
+ * Coverage tests for
+ * {@link org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BlockingProcessingStrategy}
+ */
 @ExtendWith(MockitoExtension.class)
 class BlockingProcessingStrategyUnitTestCase {
 

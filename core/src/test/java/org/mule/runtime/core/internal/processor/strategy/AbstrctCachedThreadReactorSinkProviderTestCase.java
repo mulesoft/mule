@@ -19,6 +19,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+/**
+ * Coverage tests for the {@link AbstractCachedThreadReactorSinkProvider} Note that the name of the test class is mis-spelled
+ * intentionally as test cases that start with 'Abstract' are not run.
+ *
+ */
 @ExtendWith(MockitoExtension.class)
 class AbstrctCachedThreadReactorSinkProviderTestCase {
 

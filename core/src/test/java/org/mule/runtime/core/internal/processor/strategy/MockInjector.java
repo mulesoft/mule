@@ -10,16 +10,13 @@ import org.mockito.Mock;
 import org.mule.runtime.api.util.Pair;
 
 import javax.inject.Inject;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Simplified injection utility for tests. Injects mocks set up on the 'test' object (expected to be the test class...) in a
- * target by looking for 'Inject' annotated fields.
- *
+ * Simplified injection utility for tests. Injects mock objects set up on the 'test' object (expected to be the test class...) in
+ * a target by looking for 'Inject' annotated fields. <br/>
  * If there's not a suitable mock, there's no injection. N.B. does not currently look at 'extra interfaces' for the mocks.
  */
 public class MockInjector {
@@ -27,8 +24,7 @@ public class MockInjector {
   /**
    * Inject fields marked with '@Mock' on the 'test' object into any fields marked with 'Inject' on the target. This walks up the
    * class hierarchy in both cases, so mocks defined on a superclass of 'test' will be injected, and fields marked with 'Inject'
-   * on superclasses of 'target' will be checked.
-   *
+   * on superclasses of 'target' will be checked. <br/>
    * Note: no mock, no effect. If the test doesn't have a field that has a type that is assignable to the injected field, no
    * injection will happen.
    *
@@ -69,8 +65,8 @@ public class MockInjector {
    * @param base object to get hierarchy for...
    * @return list of Class&lt;?&gt; objects
    */
-  private static List<Class> getClassesInHierarchy(Object base) {
-    final List<Class> classes = new ArrayList<>();
+  private static List<Class<?>> getClassesInHierarchy(Object base) {
+    final List<Class<?>> classes = new ArrayList<>();
     for (Class<?> c = base.getClass(); !c.equals(Object.class); c = c.getSuperclass()) {
       classes.add(c);
     }

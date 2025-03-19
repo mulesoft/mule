@@ -36,6 +36,8 @@ class PerThreadSinkTestCase {
   @BeforeEach
   void setUp() {
     sink = new PerThreadSink(sinkSupplier);
+    // Do a sneaky throw of an exception that would actually be thrown by the cache creation system sometimes. We can't intercept
+    // the cache, though so...
     when(sinkSupplier.get()).thenAnswer(inv -> {
       Sneak.sneakyThrow(new ExecutionException(new NullPointerException("Ho ho! <chomp> <chomp>")));
       return null;
@@ -54,6 +56,10 @@ class PerThreadSinkTestCase {
     assertThrows(IllegalStateException.class, () -> sink.emit(event));
   }
 
+  /**
+   * Setting up for a sneaky throw because I don't have mocking access to the part of the code that actually throws the exception
+   * I want.
+   */
   private static class Sneak {
 
     static void sneakyThrow(Throwable t) {

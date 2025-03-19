@@ -26,6 +26,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+/**
+ * Coverage tests for {@link AbstractStreamProcessingStrategyFactory.AbstractStreamProcessingStrategy} Note name is mis-spelled
+ * intentionally as test cases with names starting with 'Abstract' are skipped.
+ */
 @ExtendWith(MockitoExtension.class)
 class AbstrctStreamProcessingStrategyTestCase {
 
