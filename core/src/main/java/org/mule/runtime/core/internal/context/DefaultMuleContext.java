@@ -344,7 +344,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureComputeConnectionErrorsInStats();
       configureToStringTransformerTransformIteratorElements();
       configureEnablePolicyIsolation();
-      configureSeparateClassLoaderForPolicyIsolation();
       configureEntityResolverFailOnFirstErrorFeature();
       configureEnableProfilingService();
       configureSetVariableWithNullVale();
@@ -381,6 +380,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate();
       configureNtlmAvoidSendPayloadOnType1();
       configureForkJoinCompleteChildrenOnTimeout();
+      configureSeparateClassLoaderForPolicyIsolation();
     }
   }
 
