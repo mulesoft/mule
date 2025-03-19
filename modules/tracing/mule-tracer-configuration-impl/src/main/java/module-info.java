@@ -25,7 +25,6 @@ module org.mule.runtime.tracer.configuration.impl {
 
   requires com.fasterxml.jackson.databind;
   requires com.fasterxml.jackson.dataformat.yaml;
-  requires java.inject;
   requires org.slf4j;
 
   exports org.mule.runtime.tracing.level.impl.config to

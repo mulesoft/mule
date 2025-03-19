@@ -21,7 +21,6 @@ module org.mule.runtime.metrics.exporter.impl {
   requires org.mule.runtime.metrics.exporter.configuration.impl;
   requires org.mule.runtime.metrics.api;
 
-  requires java.inject;
   requires com.google.gson;
   requires io.opentelemetry.api;
   requires io.opentelemetry.exporter.otlp;

@@ -5,8 +5,6 @@
  * LICENSE.txt file.
  */
 
-import org.mule.runtime.config.internal.model.dsl.properties.DefaultInitialisableConfigurationPropertiesProviderFactory;
-
 /**
  * Properties Config.
  *
@@ -27,7 +25,6 @@ module org.mule.runtime.properties.config {
 
   // QName used to process annotations from Mule DSL
   requires java.xml;
-  requires java.inject;
 
   exports org.mule.runtime.config.api.properties;
 
