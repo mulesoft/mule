@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.policy.proxy;
 
-import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
+
+import static java.lang.reflect.Proxy.newProxyInstance;
+
 import static org.reflections.ReflectionUtils.getAllMethods;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -20,7 +22,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Proxies an object instance to filter invocations (without raising an exception) of lifecycle methods from {@link Startable},

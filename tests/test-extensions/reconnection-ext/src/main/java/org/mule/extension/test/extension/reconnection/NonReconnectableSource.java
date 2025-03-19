@@ -21,7 +21,7 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * This class represents a {@link Source} that after failure never reconnects. It also keeps track of how many attempts were made.
