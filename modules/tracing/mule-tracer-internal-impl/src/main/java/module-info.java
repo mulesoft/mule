@@ -19,7 +19,6 @@ module org.mule.runtime.tracer.internal.impl {
   requires org.mule.runtime.tracer.exporter.api;
   requires org.mule.runtime.tracer.exporter.configuration.api;
 
-  requires java.inject;
   requires org.apache.commons.lang3;
   requires com.google.common;
 
