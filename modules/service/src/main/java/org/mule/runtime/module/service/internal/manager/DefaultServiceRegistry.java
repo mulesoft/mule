@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Qualifier;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Qualifier;
 
 /**
  * Keeps track of {@link Service} implementations and is capable of injecting them into {@link ServiceProvider} instances with
