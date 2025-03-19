@@ -16,6 +16,10 @@ import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
 
+/**
+ * Tests for methods in {@link AbstractStreamProcessingStrategyFactory} Note that the test case is misspelled intentionally
+ * because test cases starting with 'Abstract' are skipped. Mostly these are just here for coverage - not much logic to check.
+ */
 class AbstrctStreamProcessingStrategyFactoryTestCase {
 
   private AbstractStreamProcessingStrategyFactory factory;
