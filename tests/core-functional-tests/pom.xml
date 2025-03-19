@@ -87,12 +87,6 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-tooling-support</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.mule.services</groupId>

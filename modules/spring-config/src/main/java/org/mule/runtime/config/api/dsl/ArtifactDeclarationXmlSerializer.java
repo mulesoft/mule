@@ -7,12 +7,12 @@
 package org.mule.runtime.config.api.dsl;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.config.internal.dsl.model.DefaultArtifactDeclarationXmlSerializer;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 
 import java.io.InputStream;
+import java.util.ServiceLoader;
 
 import org.w3c.dom.Document;
 
@@ -22,8 +22,10 @@ import org.w3c.dom.Document;
  * XML configuration file into an {@link ArtifactDeclaration} representation.
  *
  * @since 4.0
+ * @deprecated Use mule-artifact-ast instead.
  */
 @NoImplement
+@Deprecated(forRemoval = true, since = "4.10")
 public interface ArtifactDeclarationXmlSerializer {
 
   /**
@@ -34,8 +36,14 @@ public interface ArtifactDeclarationXmlSerializer {
    * @return an instance of the default implementation of the {@link ArtifactDeclarationXmlSerializer}
    */
   static ArtifactDeclarationXmlSerializer getDefault(DslResolvingContext context) {
-    return new DefaultArtifactDeclarationXmlSerializer(context);
+    final var defaultArtifactDeclarationXmlSerializer =
+        ServiceLoader.load(ArtifactDeclarationXmlSerializer.class, ArtifactDeclarationXmlSerializer.class.getClassLoader())
+            .findFirst().get();
+    defaultArtifactDeclarationXmlSerializer.setContext(context);
+    return defaultArtifactDeclarationXmlSerializer;
   }
+
+  void setContext(DslResolvingContext context);
 
   /**
    * Serializes an {@link ArtifactDeclaration} into an XML {@link Document}

@@ -6,11 +6,6 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
@@ -19,6 +14,12 @@ import static org.mule.test.metadata.extension.query.MetadataExtensionEntityReso
 import static org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver.SQUARE;
 import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.NATIVE_QUERY;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;

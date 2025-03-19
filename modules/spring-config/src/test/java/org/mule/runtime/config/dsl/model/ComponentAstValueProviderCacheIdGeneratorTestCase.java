@@ -6,316 +6,286 @@
  */
 package org.mule.runtime.config.dsl.model;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.app.declaration.api.component.location.Location.builderFromStringRepresentation;
 
 import org.mule.runtime.api.component.location.Location;
-import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
-import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterElementDeclaration;
-import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
-import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.metadata.internal.cache.ComponentAstBasedValueProviderCacheIdGenerator;
-import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
+import org.mule.runtime.metadata.internal.cache.ComponentAstBasedValueProviderCacheIdGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 import org.junit.Test;
 
 public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractMockedValueProviderExtensionTestCase {
 
-  private Optional<ValueProviderCacheId> computeIdFor(ArtifactDeclaration appDeclaration,
+  private Optional<ValueProviderCacheId> computeIdFor(ArtifactAst app,
                                                       String location,
                                                       String parameterName)
       throws Exception {
-    ArtifactAst app = loadApplicationModel(appDeclaration);
     Locator locator = new Locator(app);
     ValueProviderCacheIdGenerator cacheIdGenerator = new ComponentAstBasedValueProviderCacheIdGenerator(locator);
     ComponentAst component = getComponentAst(app, location);
     return cacheIdGenerator.getIdForResolvedValues(component, parameterName);
   }
 
-  private Optional<ParameterizedElementDeclaration> getParameterElementDeclaration(ArtifactDeclaration artifactDeclaration,
-                                                                                   String location) {
-    AtomicBoolean isConnection = new AtomicBoolean(false);
-    if (location.endsWith("/connection")) {
-      isConnection.set(true);
-      location = location.split("/connection")[0];
-    }
-    return artifactDeclaration.<ParameterizedElementDeclaration>findElement(builderFromStringRepresentation(location).build())
-        .map(d -> isConnection.get() ? ((ConfigurationElementDeclaration) d).getConnection().orElse(null) : d);
-  }
-
-  private void modifyParameter(ArtifactDeclaration artifactDeclaration, String ownerLocation, String parameterName,
-                               Consumer<ParameterElementDeclaration> parameterConsumer) {
-    getParameterElementDeclaration(artifactDeclaration, ownerLocation)
-        .map(
-             owner -> owner.getParameterGroups()
-                 .stream()
-                 .flatMap(pg -> pg.getParameters().stream())
-                 .filter(p -> p.getName().equals(parameterName))
-                 .findAny()
-                 .map(fp -> {
-                   parameterConsumer.accept(fp);
-                   return EMPTY; // Needed to avoid exception
-                 })
-                 .orElseThrow(() -> new RuntimeException("Could not find parameter to modify")))
-        .orElseThrow(() -> new RuntimeException("Location not found"));
-  }
-
-
   @Test
   public void idForParameterWithNoProviderInConfig() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
-    assertThat(computeIdFor(app, MY_CONFIG, ACTING_PARAMETER_NAME).isPresent(), is(false));
+    final var app = loadAst("idForParameterWithNoProviderInConfig_1");
+    assertThat(computeIdFor(app, MY_CONFIG, ACTING_PARAMETER_NAME).isPresent(),
+               is(false));
   }
 
   @Test
   public void idForParameterWithNoProviderInSource() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
-    assertThat(computeIdFor(app, SOURCE_LOCATION, ACTING_PARAMETER_NAME).isPresent(), is(false));
+    final var app = loadAst("idForParameterWithNoProviderInSource_1");
+    assertThat(computeIdFor(app, SOURCE_LOCATION, ACTING_PARAMETER_NAME).isPresent(),
+               is(false));
   }
 
   @Test
   public void idForParameterWithNoProviderInOperation() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
-    assertThat(computeIdFor(app, OPERATION_LOCATION, ACTING_PARAMETER_NAME).isPresent(), is(false));
+    final var app = loadAst("idForParameterWithNoProviderInOperation_1");
+    assertThat(computeIdFor(app, OPERATION_LOCATION, ACTING_PARAMETER_NAME)
+        .isPresent(), is(false));
   }
 
   @Test
   public void idForConfigNoChanges() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfigNoChanges_1");
     Optional<ValueProviderCacheId> configId = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     assertThat(configId.isPresent(), is(true));
-    checkIdsAreEqual(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
+    checkIdsAreEqual(configId, computeIdFor(loadAst(this.name.getMethodName() + "_2"), MY_CONFIG, PROVIDED_PARAMETER_NAME));
   }
-
-
 
   @Test
   public void idForConfigChangingNotActingParameters() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfigChangingNotActingParameters_1");
     Optional<ValueProviderCacheId> configId = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     assertThat(configId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfigChangingNotActingParameters_2");
+    checkIdsAreEqual(configId, computeIdFor(modifiedApp, MY_CONFIG, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfigChangingActingParameter() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfigChangingActingParameter_1");
     Optional<ValueProviderCacheId> configId = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     assertThat(configId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfigChangingActingParameter_2");
+    checkIdsAreDifferent(configId, computeIdFor(modifiedApp, MY_CONFIG, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfigChangingActingParameterInGroup() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfigChangingActingParameterInGroup_1");
     Optional<ValueProviderCacheId> configId = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     assertThat(configId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, PARAMETER_IN_GROUP_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(configId, computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfigChangingActingParameterInGroup_2");
+    checkIdsAreDifferent(configId, computeIdFor(modifiedApp, MY_CONFIG, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessOperationNoChanges() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessOperationNoChanges_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessOperationNoChanges_2");
+    checkIdsAreEqual(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessOperationChangingActingParameter() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessOperationChangingActingParameter_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    modifyParameter(app, OPERATION_LOCATION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessOperationChangingActingParameter_2");
+    checkIdsAreDifferent(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessOperationChangingActingParameterInGroup() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessOperationChangingActingParameterInGroup_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    modifyParameter(app, OPERATION_LOCATION, PARAMETER_IN_GROUP_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessOperationChangingActingParameterInGroup_2");
+    checkIdsAreDifferent(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessOperationChangesInConfig() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessOperationChangesInConfig_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessOperationChangesInConfig_2");
+    checkIdsAreEqual(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessOperationChangesInConnection() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessOperationChangesInConnection_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
-                    p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    modifyParameter(app, MY_CONNECTION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessOperationChangesInConnection_2");
+    checkIdsAreEqual(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
 
   @Test
   public void idForConfiglessAndConnectionlessSourceNoChanges() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessSourceNoChanges_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessSourceNoChanges_2");
+    checkIdsAreEqual(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessSourceChangingActingParameter() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessSourceChangingActingParameter_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    modifyParameter(app, SOURCE_LOCATION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessSourceChangingActingParameter_2");
+    checkIdsAreDifferent(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessSourceChangingActingParameterInGroup() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessSourceChangingActingParameterInGroup_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    modifyParameter(app, SOURCE_LOCATION, PARAMETER_IN_GROUP_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessSourceChangingActingParameterInGroup_2");
+    checkIdsAreDifferent(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessSourceChangesInConfig() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessSourceChangesInConfig_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessSourceChangesInConfig_2");
+    checkIdsAreEqual(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfiglessAndConnectionlessSourceChangesInConnection() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("idForConfiglessAndConnectionlessSourceChangesInConnection_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
-                    p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    modifyParameter(app, MY_CONNECTION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfiglessAndConnectionlessSourceChangesInConnection_2");
+    checkIdsAreEqual(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfigAwareOperationChangesInConfigNotRequiredForMetadata() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    final var app = loadAst("idForConfigAwareOperationChangesInConfigNotRequiredForMetadata_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfigAwareOperationChangesInConfigNotRequiredForMetadata_2");
+    checkIdsAreEqual(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfigAwareOperationChangesInConfigRequiredForMetadata() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    final var app = loadAst("idForConfigAwareOperationChangesInConfigRequiredForMetadata_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfigAwareOperationChangesInConfigRequiredForMetadata_2");
+    checkIdsAreDifferent(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConnectionAwareOperationChangesInConnectionNotRequiredForMetadata() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
+    final var app = loadAst("idForConnectionAwareOperationChangesInConnectionNotRequiredForMetadata_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    modifyParameter(app, MY_CONNECTION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConnectionAwareOperationChangesInConnectionNotRequiredForMetadata_2");
+    checkIdsAreEqual(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConnectionAwareOperationChangesInConnectionRequiredForMetadata() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
+    final var app = loadAst("idForConnectionAwareOperationChangesInConnectionRequiredForMetadata_1");
     Optional<ValueProviderCacheId> opId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(opId.isPresent(), is(true));
-    modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
-                    p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(opId, computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConnectionAwareOperationChangesInConnectionRequiredForMetadata_2");
+    checkIdsAreDifferent(opId, computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfigAwareSourceChangesInConfigNotRequiredForMetadata() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    final var app = loadAst("idForConfigAwareSourceChangesInConfigNotRequiredForMetadata_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfigAwareSourceChangesInConfigNotRequiredForMetadata_2");
+    checkIdsAreEqual(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConfigAwareSourceChangesInConfigRequiredForMetadata() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    final var app = loadAst("idForConfigAwareSourceChangesInConfigRequiredForMetadata_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    modifyParameter(app, MY_CONFIG, PARAMETER_REQUIRED_FOR_METADATA_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConfigAwareSourceChangesInConfigRequiredForMetadata_2");
+    checkIdsAreDifferent(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConnectionAwareSourceChangesInConnectionNotRequiredForMetadata() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
+    final var app = loadAst("idForConnectionAwareSourceChangesInConnectionNotRequiredForMetadata_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    modifyParameter(app, MY_CONNECTION, ACTING_PARAMETER_NAME, p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreEqual(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+
+    final var modifiedApp = loadAst("idForConnectionAwareSourceChangesInConnectionNotRequiredForMetadata_2");
+    checkIdsAreEqual(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void idForConnectionAwareSourceChangesInConnectionRequiredForMetadata() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
+    final var app = loadAst("idForConnectionAwareSourceChangesInConnectionRequiredForMetadata_1");
     Optional<ValueProviderCacheId> sourceId = computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME);
     assertThat(sourceId.isPresent(), is(true));
-    modifyParameter(app, MY_CONNECTION, PARAMETER_REQUIRED_FOR_METADATA_NAME,
-                    p -> p.setValue(ParameterSimpleValue.of("newValue")));
-    checkIdsAreDifferent(sourceId, computeIdFor(app, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
+    final var modifiedApp = loadAst("idForConnectionAwareSourceChangesInConnectionRequiredForMetadata_2");
+    checkIdsAreDifferent(sourceId, computeIdFor(modifiedApp, SOURCE_LOCATION, PROVIDED_PARAMETER_NAME));
   }
 
   @Test
   public void equalConfigsWithDifferentNameGetSameHash() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
-    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
-    app.addGlobalElement(declareConfig(config.getConnection().get(), "newName",
-                                       PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
-                                       ACTING_PARAMETER_DEFAULT_VALUE,
-                                       PROVIDED_PARAMETER_DEFAULT_VALUE,
-                                       PARAMETER_IN_GROUP_DEFAULT_VALUE));
+    final var app = loadAst("equalConfigsWithDifferentNameGetSameHash_1");
     Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
     checkIdsAreEqual(config1Id, config2Id);
@@ -323,28 +293,18 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
 
   @Test
   public void differentConfigsWithDifferentProviderIdGetDifferentHash() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
-    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
-    app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
-                                            PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
-                                            ACTING_PARAMETER_DEFAULT_VALUE,
-                                            PROVIDED_PARAMETER_DEFAULT_VALUE,
-                                            PARAMETER_IN_GROUP_DEFAULT_VALUE));
+    final var app = loadAst("differentConfigsWithDifferentProviderIdGetDifferentHash_1");
     Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
+
     when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
-    Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
+    final var modifiedApp = loadAst("differentConfigsWithDifferentProviderIdGetDifferentHash_2");
+    Optional<ValueProviderCacheId> config2Id = computeIdFor(modifiedApp, "newName", PROVIDED_PARAMETER_NAME);
     checkIdsAreDifferent(config1Id, config2Id);
   }
 
   @Test
   public void differentConfigsWithSameProviderIdGetSameHash() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
-    ConfigurationElementDeclaration config = (ConfigurationElementDeclaration) app.getGlobalElements().get(0);
-    app.addGlobalElement(declareOtherConfig(config.getConnection().get(), "newName",
-                                            PARAMETER_REQUIRED_FOR_METADATA_DEFAULT_VALUE,
-                                            ACTING_PARAMETER_DEFAULT_VALUE,
-                                            PROVIDED_PARAMETER_DEFAULT_VALUE,
-                                            PARAMETER_IN_GROUP_DEFAULT_VALUE));
+    final var app = loadAst("differentConfigsWithSameProviderIdGetSameHash_1");
     Optional<ValueProviderCacheId> config1Id = computeIdFor(app, MY_CONFIG, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> config2Id = computeIdFor(app, "newName", PROVIDED_PARAMETER_NAME);
     checkIdsAreEqual(config1Id, config2Id);
@@ -352,27 +312,31 @@ public class ComponentAstValueProviderCacheIdGeneratorTestCase extends AbstractM
 
   @Test
   public void differentValueProviderIdGetsDifferentHash() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
     when(valueProviderModel.requiresConnection()).thenReturn(true);
     when(valueProviderModel.requiresConfiguration()).thenReturn(true);
+    final var app = loadAst("differentValueProviderIdGetsDifferentHash_1");
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+
     when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
-    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    final var modifiedApp = loadAst("differentValueProviderIdGetsDifferentHash_2");
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(modifiedApp, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     checkIdsAreDifferent(opId1, opId2);
   }
 
   @Test
   public void differentOperationsWithDifferentProviderIdGetsDifferentHash() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("differentOperationsWithDifferentProviderIdGetsDifferentHash_1");
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+
     when(valueProviderModel.getProviderId()).thenReturn("newValueProviderId");
-    Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
+    final var modifiedApp = loadAst("differentOperationsWithDifferentProviderIdGetsDifferentHash_2");
+    Optional<ValueProviderCacheId> opId2 = computeIdFor(modifiedApp, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     checkIdsAreDifferent(opId1, opId2);
   }
 
   @Test
   public void differentOperationsWithSameValueProviderIdGetsSameHash() throws Exception {
-    ArtifactDeclaration app = getBaseApp();
+    final var app = loadAst("differentOperationsWithSameValueProviderIdGetsSameHash_1");
     Optional<ValueProviderCacheId> opId1 = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     Optional<ValueProviderCacheId> opId2 = computeIdFor(app, OTHER_OPERATION_LOCATION, PROVIDED_PARAMETER_NAME);
     checkIdsAreEqual(opId1, opId2);
