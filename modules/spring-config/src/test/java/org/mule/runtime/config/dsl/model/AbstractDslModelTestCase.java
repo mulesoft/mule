@@ -6,20 +6,6 @@
  */
 package org.mule.runtime.config.dsl.model;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static org.mockito.junit.MockitoJUnit.rule;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -35,6 +21,22 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONNECTION;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.junit.MockitoJUnit.rule;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -87,6 +89,7 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoRule;
@@ -153,6 +156,9 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   @Mock(lenient = true)
   protected ParameterGroupModel configParameterGroupModel;
 
+  @Mock(lenient = true)
+  protected ParameterGroupModel connectionParameterGroupModel;
+
   protected ParameterModel errorMappingsParameter;
 
   protected ParameterGroupModel errorMappingsParameterGroup;
@@ -171,6 +177,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
   protected List<ParameterModel> componentParameterModels;
   protected List<ParameterModel> anotherComponentParameterModels;
   protected List<ParameterModel> configParameterModels;
+  protected List<ParameterModel> connectionParameterModels;
 
   @Before
   public void before() {
@@ -280,6 +287,29 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
           return Optional.empty();
         });
 
+    this.connectionParameterModels =
+        asList(configRefParameter, contentParameter, behaviourParameter, listParameter, keyParameter);
+    when(connectionParameterGroupModel.getName()).thenReturn(DEFAULT_GROUP_NAME);
+    when(connectionParameterGroupModel.isShowInDsl()).thenReturn(false);
+    when(connectionParameterGroupModel.getParameterModels()).thenReturn(connectionParameterModels);
+    when(connectionParameterGroupModel.getParameter(anyString()))
+        .then(invocation -> {
+          String paramName = invocation.getArgument(0);
+          switch (paramName) {
+            case NAME_PARAM_NAME:
+              return of(nameParameter);
+            case KEY_NAME:
+              return of(keyParameter);
+            case CONTENT_NAME:
+              return of(contentParameter);
+            case LIST_NAME:
+              return of(listParameter);
+            case BEHAVIOUR_NAME:
+              return of(behaviourParameter);
+          }
+          return Optional.empty();
+        });
+
     errorMappingsParameter = createParameterModel(ERROR_MAPPINGS_PARAMETER_NAME, false, BaseTypeBuilder.create(JAVA).arrayType()
         .of(TYPE_LOADER.load(ErrorMapping.class)).build(), null, NOT_SUPPORTED,
                                                   BEHAVIOUR, null, emptyList(), emptySet());
@@ -320,7 +350,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     RequiredForMetadataModelProperty requiredForMetadataModelProperty = new RequiredForMetadataModelProperty(parameters);
 
     when(connectionProvider.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
-    when(connectionProvider.getParameterGroupModels()).thenReturn(asList(parameterGroupModel));
+    when(connectionProvider.getParameterGroupModels()).thenReturn(asList(connectionParameterGroupModel));
     when(connectionProvider.getStereotype()).thenReturn(CONNECTION);
 
     when(configuration.getName()).thenReturn(CONFIGURATION_NAME);
@@ -358,7 +388,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(dslContext.getTypeCatalog()).thenReturn(typeCatalog);
 
     when(configuration.getAllParameterModels()).thenReturn(configParameterModels);
-    when(connectionProvider.getAllParameterModels()).thenReturn(componentParameterModels);
+    when(connectionProvider.getAllParameterModels()).thenReturn(connectionParameterModels);
   }
 
   private ImmutableParameterModel createParameterModel(String paramName, boolean isComponentId, MetadataType type,

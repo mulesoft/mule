@@ -56,6 +56,7 @@ module org.mule.runtime.extension.model {
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.tls,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.ee.extension.model;
   exports org.mule.runtime.config.internal.dsl.processor.xml.provider to

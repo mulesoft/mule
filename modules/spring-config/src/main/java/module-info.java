@@ -103,6 +103,8 @@ module org.mule.runtime.spring.config {
       spring.beans;
   exports org.mule.runtime.config.internal.context.lazy to
       org.mule.runtime.tooling.support;
+  exports org.mule.runtime.config.internal.dsl to
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.config.internal.dsl.processor to
       org.mule.runtime.core,
       spring.beans;
@@ -124,11 +126,14 @@ module org.mule.runtime.spring.config {
   exports org.mule.runtime.config.internal.lazy to
       spring.beans;
   exports org.mule.runtime.config.internal.model to
-      org.mule.runtime.extensions.xml.support;
+      org.mule.runtime.extensions.xml.support,
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.config.internal.processor to
       spring.beans;
 
   uses org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
+  uses org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer;
+  uses org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
   uses org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 
   opens org.mule.runtime.config.api.dsl to
