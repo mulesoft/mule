@@ -22,7 +22,7 @@ import org.mule.sdk.api.runtime.source.SourceCallback;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * This class represents a {@link Source} that can fail starting repeatedly and after all reconnect successfully. Also keeps in
