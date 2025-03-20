@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:values="http://www.mulesoft.org/schema/mule/values"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
+
+    <values:config name="config">
+        <values:connection></values:connection>
+        <values:config-values>
+            <values:config-value value="config1"/>
+            <values:config-value value="config2"/>
+            <values:config-value value="config3"/>
+        </values:config-values>
+    </values:config>
+
+    <flow name="simple-source" >
+        <values:simple-source channel="dummyValue"/>
+    </flow>
+
+    <flow name="source-with-connection">
+        <values:source-with-connection config-ref="config" channel="dummyValue"/>
+    </flow>
+
+    <flow name="source-with-configuration">
+        <values:source-with-configuration config-ref="config" channel="dummyValues"/>
+    </flow>
+
+    <flow name="source-with-values-with-required-parameters">
+        <values:source-with-values-with-required-parameters channels="dummyValue" requiredInteger="2"
+                                                            requiredString="aString">
+            <values:strings>
+                <values:string value="1"/>
+                <values:string value="2"/>
+            </values:strings>
+        </values:source-with-values-with-required-parameters>
+    </flow>
+
+    <flow name="source-with-values-with-required-parameter-inside-param-group">
+        <values:source-with-values-with-required-parameter-inside-param-group anyParameter="aParam"
+                                                                              channels="dummyValue"/>
+    </flow>
+
+    <flow name="source-with-multi-level-value">
+        <values:source-with-multi-level-value/>
+    </flow>
+
+    <flow name="source-with-required-parameter-with-alias">
+        <values:source-with-required-parameter-with-alias channels="dummyValue" superString="dummyValue"/>
+    </flow>
+
+    <flow name="source-with-required-parameter-inside-show-in-dsl-group">
+        <values:source-with-required-parameter-inside-show-in-dsl-group values="dummyValue">
+            <values:values-group channels="dummyValue" anyParameter="someValue"/>
+        </values:source-with-required-parameter-inside-show-in-dsl-group>
+    </flow>
+
+    <flow name="source-must-not-start">
+        <values:source-must-not-start/>
+    </flow>
+
+    <flow name="source-with-two-bound-acting-parameters">
+        <values:source-with-two-bound-acting-parameters oneParameter="oneParameterValue" someParameter="someParameterValue"/>
+    </flow>
+
+    <flow name="simple-source-with-parameter-with-field-values" >
+        <values:simple-source-with-parameter-with-field-values channel="dummyValue"/>
+    </flow>
+
+    <flow name="source-with-multi-level-field-values">
+        <values:source-with-multi-level-field-values/>
+    </flow>
+
+    <flow name="simple-source-with-parameter-with-field-values" >
+        <values:simple-source-with-parameter-with-field-values channel="dummyValue"/>
+    </flow>
+
+    <flow name="source-with-multi-level-field-values">
+        <values:source-with-multi-level-field-values/>
+    </flow>
+
+</mule>

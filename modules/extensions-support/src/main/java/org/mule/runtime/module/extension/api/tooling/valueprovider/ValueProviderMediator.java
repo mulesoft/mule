@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.tooling.valueprovider;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
@@ -21,6 +22,7 @@ import java.util.function.Supplier;
  *
  * @since 4.8
  */
+@NoImplement
 public interface ValueProviderMediator {
 
   /**

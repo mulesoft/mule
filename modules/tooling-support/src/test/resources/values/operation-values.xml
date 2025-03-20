@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:values="http://www.mulesoft.org/schema/mule/values"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
+
+    <values:config name="config">
+        <values:config-values>
+            <values:config-value value="config1"/>
+            <values:config-value value="config2"/>
+            <values:config-value value="config3"/>
+        </values:config-values>
+    </values:config>
+
+    <flow name="single-values-enabled-parameter">
+        <values:single-values-enabled-parameter channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithConnection">
+        <values:single-values-enabled-parameter-with-connection config-ref="config" channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithConfiguration">
+        <values:single-values-enabled-parameter-with-configuration config-ref="config" channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithRequiredParameters">
+        <values:single-values-enabled-parameter-with-required-parameters channels="dummyValue" requiredInteger="2"
+                                                                         requiredString="aString">
+            <values:strings>
+                <values:string value="1"/>
+                <values:string value="2"/>
+            </values:strings>
+        </values:single-values-enabled-parameter-with-required-parameters>
+    </flow>
+
+    <flow name="singleOptionsEnabledParameterWithRequiredParametersUsingExpressions">
+        <values:single-values-enabled-parameter-with-required-parameters channels="dummyValue" requiredInteger="2"
+                                                                         requiredString="aString">
+            <values:strings>
+                <values:string value="#[1]"/>
+                <values:string value="2"/>
+            </values:strings>
+        </values:single-values-enabled-parameter-with-required-parameters>
+    </flow>
+
+    <flow name="singleOptionsEnabledParameterWithOptionalParameter">
+        <values:single-values-enabled-parameter-with-required-parameters channels="dummyValue" requiredInteger="2">
+            <values:strings>
+                <values:string value="1"/>
+                <values:string value="2"/>
+            </values:strings>
+        </values:single-values-enabled-parameter-with-required-parameters>
+    </flow>
+
+    <flow name="singleOptionsEnabledParameterWithMissingRequiredParameters">
+        <values:single-values-enabled-parameter-with-required-parameters/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterInsideParameterGroup">
+        <values:single-values-enabled-parameter-inside-parameter-group anyParameter="aParam" channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterRequiresValuesOfParameterGroup">
+        <values:single-values-enabled-parameter-requires-values-of-parameter-group anyParameter="aParam"
+                                                                                   channels="dummyValue"
+                                                                                   values="dummyValue"/>
+    </flow>
+
+    <flow name="multiLevelValue">
+        <values:multi-level-value/>
+    </flow>
+
+    <flow name="singleValuesWithRequiredParameterWithAlias">
+        <values:single-values-with-required-parameter-with-alias channels="dummyValue" superString="dummyValue"/>
+    </flow>
+
+    <flow name="resolverGetsMuleContextInjection">
+        <values:resolver-gets-mule-context-injection channel="dummyValue"/>
+    </flow>
+
+    <flow name="valuesInsideShowInDslGroup">
+        <values:values-inside-show-in-dsl-group values="dummyValue">
+            <values:values-group channels="dummyValue" anyParameter="someValue"/>
+        </values:values-inside-show-in-dsl-group>
+    </flow>
+
+    <flow name="valuesInsideShowInDslDynamicGroup">
+        <values:values-inside-show-in-dsl-group values="dummyValue">
+            <values:values-group channels="#[payload ++ payload]" anyParameter="someValue"/>
+        </values:values-inside-show-in-dsl-group>
+    </flow>
+
+    <flow name="withErrorValueProvider">
+        <values:with-error-value-provider errorCode="CUSTOM_ERROR"/>
+    </flow>
+
+    <flow name="withBoundActingParameter">
+        <values:with-bound-acting-parameter actingParameter="Acting parameter value"/>
+    </flow>
+
+    <flow name="withBoundActingParameterWithAlias">
+        <values:with-bound-acting-parameter-with-alias parameterAlias="Acting parameter value"/>
+    </flow>
+
+    <flow name="withBoundActingParameterField">
+        <values:with-bound-acting-parameter-field
+            actingParameter='#[output application/json --- { "field" : "Acting parameter value" }]'/>
+    </flow>
+
+    <flow name="withBoundActingParameterFieldWithDot">
+        <values:with-bound-acting-parameter-field-with-dot
+            actingParameter='#[output application/json --- { "field.with.dot" : "Acting parameter value" }]'/>
+    </flow>
+
+    <flow name="withTwoActingParameters">
+        <values:with-two-acting-parameters scalarActingParameter="Scalar value"
+                                           actingParameter='#[output application/json --- { "field" : "Acting parameter value" }]'/>
+    </flow>
+
+    <flow name="withTwoBoundActingParameters">
+        <values:with-two-bound-acting-parameters anotherParameter="Scalar value"
+                                                 actingParameter='#[output application/json --- { "field" : "Acting parameter value" }]'/>
+    </flow>
+
+    <flow name="withBoundActingParameterToXmlTagContent">
+        <values:with-bound-acting-parameter-to-xml-tag-content
+            actingParameter='#[output application/xml --- { "nested": { "xmlTag": "This is the tag content"}}]'/>
+    </flow>
+
+    <flow name="withBoundActingParameterToXmlTagAttribute">
+        <values:with-bound-acting-parameter-to-xml-tag-attribute
+            actingParameter='#[output application/xml --- { "nested": { "xmlTag" @(attribute: "This is the attribute value"): "This is content"}}]'/>
+    </flow>
+
+    <flow name="withFourBoundActingParameters">
+        <values:with-four-bound-acting-parameters
+            actingParameter='#[output application/json --- { "field1": "Field1 Value", "nested": { "field2" : "Field2 Value", "field3" : "Field3 Value"}, "anotherNested" : { "field4" : "Field4 Value" } }]'/>
+    </flow>
+
+    <flow name="withMissingBoundActingParameter">
+        <values:with-bound-acting-parameter-field
+                actingParameter='#[output application/json --- { "someOtherField" : "Acting parameter value" }]'/>
+    </flow>
+
+    <flow name="withBoundActingParameterArray">
+        <values:with-bound-acting-parameter-array
+            actingParameter='#[output application/json --- { "jsonArray" : ["One Value", "Another value", "Yet another value"]}]'/>
+    </flow>
+
+    <flow name="withPojoBoundActingParameter">
+        <values:with-pojo-bound-acting-parameter actingParameter='#[output application/json --- { "pojoField" : {
+          "pojoId" : "This is the pojo ID" , "pojoName" : "This is the pojo name" , "pojoNumber" : "23" , "pojoBoolean" : "true" } }]'/>
+    </flow>
+
+    <flow name="withMapBoundActingParameter">
+        <values:with-map-bound-acting-parameter actingParameter='#[output application/json --- { "mapField" : {
+          "pojoId" : "This is the pojo ID" , "pojoName" : "This is the pojo name" , "pojoNumber" : "23" , "pojoBoolean" : "true" } }]'/>
+    </flow>
+
+    <flow name="withPojoFieldBoundActingParameterFieldExpression">
+        <values:with-pojo-field-bound-acting-parameter-field actingParameter='#[output application/json --- {
+          "pojoId" : "This is the pojo ID" , "pojoBoolean" : "true" }]'/>
+    </flow>
+
+    <flow name="withPojoFieldBoundActingParameterFieldDsl">
+        <values:with-pojo-field-bound-acting-parameter-field>
+            <values:acting-parameter pojoId="This is the pojo ID" pojoName="This is the pojo name" pojoNumber="23"
+                                     pojoBoolean="true"/>
+        </values:with-pojo-field-bound-acting-parameter-field>
+    </flow>
+
+    <flow name="withPojoFieldBoundIncompleteActingParameterFieldDsl">
+        <values:with-pojo-field-bound-acting-parameter-field>
+            <values:acting-parameter pojoId="This is the pojo ID" pojoName="This is the pojo name"/>
+        </values:with-pojo-field-bound-acting-parameter-field>
+    </flow>
+
+    <flow name="withBoundActingParameterEnum">
+        <values:with-bound-acting-parameter-enum
+            actingParameter='#[output application/json --- { "enumField" : "ENUM_VALUE" }]'/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterPresent">
+        <values:with-bound-optional-acting-parameter actingParameter="Acting parameter value"/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameter">
+        <values:with-bound-optional-acting-parameter/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterFieldPresent">
+        <values:with-bound-optional-acting-parameter-field
+            actingParameter='#[output application/json --- { "nested": { "field": "Acting parameter value"}}]'/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterFieldMissingParameter">
+        <values:with-bound-optional-acting-parameter-field/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterFieldMissingField">
+        <values:with-bound-optional-acting-parameter-field
+            actingParameter='#[output application/json --- { "nested": { "otherField": "another value"}}]'/>
+    </flow>
+
+    <flow name="withBoundOptionalActingParameterFieldMissingPath">
+        <values:with-bound-optional-acting-parameter-field
+            actingParameter='#[output application/json --- { "otherField": "another value"}]'/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithOneFieldValues">
+        <values:single-values-enabled-parameter-with-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithMoreThanOneFieldValues">
+        <values:single-values-enabled-parameter-with-more-than-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="parameterWithMultilevelFieldValue">
+        <values:parameter-with-multilevel-field-value channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithOneFieldValues">
+        <values:single-values-enabled-parameter-with-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="singleValuesEnabledParameterWithMoreThanOneFieldValues">
+        <values:single-values-enabled-parameter-with-more-than-one-field-values channels="dummyValue"/>
+    </flow>
+
+    <flow name="parameterWithMultilevelFieldValue">
+        <values:parameter-with-multilevel-field-value channels="dummyValue"/>
+    </flow>
+
+    <flow name="withBoundActingParameterFromContentField">
+        <values:with-bound-acting-parameter-from-content-field>
+            <values:body>
+                { "field" : "Acting parameter value" }
+            </values:body>
+        </values:with-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="withBoundActingParameterFromContentFieldWithExpression">
+        <values:with-bound-acting-parameter-from-content-field>
+            <values:body>#[output application/json --- { "field" : "Acting parameter value" }]</values:body>
+        </values:with-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="withBoundActingParameterFromContentJsonField">
+        <values:with-bound-acting-parameter-from-content-field>
+            <values:body>
+                { "field" : { "complexField" : "Acting parameter value" } }
+            </values:body>
+        </values:with-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="withBoundActingParameterFromXmlContentFieldWithExpression">
+        <values:with-bound-acting-parameter-from-xml-content-field>
+            <values:xml-body>#[output application/xml --- { "field" : "Acting parameter value" }]</values:xml-body>
+        </values:with-bound-acting-parameter-from-xml-content-field>
+    </flow>
+
+    <flow name="withBoundActingParameterFromXmlContentField">
+        <values:with-bound-acting-parameter-from-xml-content-field>
+            <values:xml-body>
+                <![CDATA[<field>Acting parameter value</field>]]>
+            </values:xml-body>
+        </values:with-bound-acting-parameter-from-xml-content-field>
+    </flow>
+
+    <flow name="parameterWithTwoFieldWithSameValues">
+        <values:parameter-with-two-field-with-same-values/>
+    </flow>
+
+    <flow name="parameterWithMultipleMultiLevelFieldValuesWithSameVP">
+        <values:parameter-with-multiple-multilevel-field-value-using-same-provider/>
+    </flow>
+
+    <flow name="actingParameterWithReservedName">
+        <values:acting-parameter-with-reserved-name type="typeValue"/>
+    </flow>
+</mule>

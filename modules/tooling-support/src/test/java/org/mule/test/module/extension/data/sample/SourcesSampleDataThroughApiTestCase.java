@@ -80,12 +80,14 @@ public class SourcesSampleDataThroughApiTestCase extends AbstractSampleDataTestC
 
   @Test
   public void missingActingParameter() throws Exception {
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+
     Map<String, Object> params = getDefaultParameters();
     params.remove("attributes");
 
-    assertError(getSampleByComponentName("connected-listener", params, "config"),
-                MISSING_REQUIRED_PARAMETERS,
-                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSampleByComponentName("connected-listener", params, "config"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test

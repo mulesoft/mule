@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:some="http://www.mulesoft.org/schema/mule/some"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/some http://www.mulesoft.org/schema/mule/some/current/mule-some.xsd">
+
+    <flow name="dslTrueSomeParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true>
+            <some:awesome-parameter-group someParameter="hello dog!"/>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!"/>
+            </some:awesome-parameter-group>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueSomeParameterDynamic">
+        <some:one-required-parameter-resolver-operation-dsl-true>
+            <some:awesome-parameter-group someParameter="#[vars.someParameter]"/>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameterDynamic">
+        <some:one-required-parameter-resolver-operation-dsl-true>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="#[vars.anotherParameter]"/>
+            </some:awesome-parameter-group>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="someParameter">
+        <some:one-required-parameter-resolver-operation someParameter="hello dog!"/>
+    </flow>
+
+    <flow name="complexParameter">
+        <some:one-required-parameter-resolver-operation>
+            <some:complex-parameter anotherParameter="hello bird!"/>
+        </some:one-required-parameter-resolver-operation>
+    </flow>
+
+    <flow name="someParameterDynamic">
+        <some:one-required-parameter-resolver-operation someParameter="#[vars.someParameter]"/>
+    </flow>
+
+    <flow name="complexParameterDynamic">
+        <some:one-required-parameter-resolver-operation>
+            <some:complex-parameter anotherParameter="#[vars.anotherParameter]"/>
+        </some:one-required-parameter-resolver-operation>
+    </flow>
+
+    <flow name="dslTrueRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true>
+            <some:awesome-parameter-group repeatedNameParameter="hello cat!"/>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameterWithRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+            </some:awesome-parameter-group>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueSomeParameterDynamicWithRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true>
+            <some:awesome-parameter-group repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameterDynamicWithRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation-dsl-true>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="#['hello bird!']"
+                                        repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+            </some:awesome-parameter-group>
+        </some:one-required-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="repeatedNameParameter">
+        <some:one-required-parameter-resolver-operation repeatedNameParameter="hello cat!"/>
+    </flow>
+
+    <flow name="complexParameterWithRepeatedNameParameter">
+        <some:one-required-parameter-resolver-operation>
+            <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+        </some:one-required-parameter-resolver-operation>
+    </flow>
+
+    <flow name="repeatedNameParameterDynamic">
+        <some:one-required-parameter-resolver-operation repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+    </flow>
+
+    <flow name="complexParameterWithRepeatedNameParameterDynamic">
+        <some:one-required-parameter-resolver-operation>
+            <some:complex-parameter anotherParameter="#['hello bird!']" repeatedNameParameter="#[vars.repeatedNameParameter]"/>
+        </some:one-required-parameter-resolver-operation>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInComplexParameter">
+        <some:repeated-parameter-name-dsl-true>
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+            </some:awesome-parameter-group>
+        </some:repeated-parameter-name-dsl-true>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInComplexParameterDynamic">
+        <some:repeated-parameter-name-dsl-true>
+            <some:pojo-parameter anotherParameter="#['hello lizard!']" repeatedNameParameter="#['hi lizard!']"/>
+            <some:awesome-parameter-group>
+                <some:complex-parameter anotherParameter="#['hello bird!']" repeatedNameParameter="#['hi bird!']"/>
+            </some:awesome-parameter-group>
+        </some:repeated-parameter-name-dsl-true>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInParameterGroup">
+        <some:repeated-parameter-name-dsl-true>
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+            <some:awesome-parameter-group repeatedNameParameter="hello cat!"/>
+        </some:repeated-parameter-name-dsl-true>
+    </flow>
+
+    <flow name="dslTrueRepeatedParameterNameInParameterGroupDynamic">
+        <some:repeated-parameter-name-dsl-true>
+            <some:pojo-parameter anotherParameter="#['hello lizard!']" repeatedNameParameter="#['hi lizard!']"/>
+            <some:awesome-parameter-group repeatedNameParameter="#['hello cat!']"/>
+        </some:repeated-parameter-name-dsl-true>
+    </flow>
+
+    <flow name="repeatedParameterNameInComplexParameter">
+        <some:repeated-parameter-name>
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+            <some:complex-parameter anotherParameter="hello bird!" repeatedNameParameter="hi bird!"/>
+        </some:repeated-parameter-name>
+    </flow>
+
+    <flow name="repeatedParameterNameInComplexParameterDynamic">
+        <some:repeated-parameter-name>
+            <some:pojo-parameter anotherParameter="#['hello lizard!']" repeatedNameParameter="#['hi lizard!']"/>
+            <some:complex-parameter anotherParameter="#['hello bird!']" repeatedNameParameter="#['hi bird!']"/>
+        </some:repeated-parameter-name>
+    </flow>
+
+    <flow name="repeatedParameterNameInParameterGroup">
+        <some:repeated-parameter-name repeatedNameParameter="hello cat!">
+            <some:pojo-parameter anotherParameter="hello lizard!" repeatedNameParameter="hi lizard!"/>
+        </some:repeated-parameter-name>
+    </flow>
+
+    <flow name="repeatedParameterNameInParameterGroupDynamic">
+        <some:repeated-parameter-name repeatedNameParameter="#['hello cat!']">
+            <some:pojo-parameter anotherParameter="#['hello lizard!']" repeatedNameParameter="#['hi lizard!']"/>
+        </some:repeated-parameter-name>
+    </flow>
+
+    <flow name="dslTrueSomeParameterAlias">
+        <some:one-required-aliased-parameter-resolver-operation-dsl-true>
+            <some:aliased-parameter-group some-parameter-alias="hello dog!"/>
+        </some:one-required-aliased-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameterAlias">
+        <some:one-required-aliased-parameter-resolver-operation-dsl-true>
+            <some:aliased-parameter-group>
+                <some:complex-parameter-alias another-parameter-alias="hello bird!" yet-another-parameter-alias="whatever"/>
+            </some:aliased-parameter-group>
+        </some:one-required-aliased-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueSomeParameterAliasDynamic">
+        <some:one-required-aliased-parameter-resolver-operation-dsl-true>
+            <some:aliased-parameter-group some-parameter-alias="#[vars.someParameter]"/>
+        </some:one-required-aliased-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="dslTrueComplexParameterAliasDynamic">
+        <some:one-required-aliased-parameter-resolver-operation-dsl-true>
+            <some:aliased-parameter-group>
+                <some:complex-parameter-alias another-parameter-alias="#[vars.anotherParameter]"/>
+            </some:aliased-parameter-group>
+        </some:one-required-aliased-parameter-resolver-operation-dsl-true>
+    </flow>
+
+    <flow name="someParameterAlias">
+        <some:one-required-aliased-parameter-resolver-operation some-parameter-alias="hello dog!"/>
+    </flow>
+
+    <flow name="complexParameterAlias">
+        <some:one-required-aliased-parameter-resolver-operation>
+            <some:complex-parameter-alias another-parameter-alias="hello bird!"/>
+        </some:one-required-aliased-parameter-resolver-operation>
+    </flow>
+
+    <flow name="someParameterAliasDynamic">
+        <some:one-required-aliased-parameter-resolver-operation some-parameter-alias="#[vars.someParameter]"/>
+    </flow>
+
+    <flow name="complexParameterAliasDynamic">
+        <some:one-required-aliased-parameter-resolver-operation>
+            <some:complex-parameter-alias another-parameter-alias="#[vars.anotherParameter]"
+                                          yet-another-parameter-alias="#['whatever']"/>
+        </some:one-required-aliased-parameter-resolver-operation>
+    </flow>
+
+    <flow name="value">
+        <some:say-hi person="   Max Mule   "/>
+    </flow>
+
+    <flow name="expression">
+        <some:say-hi person="#['   Max Mule   ']"/>
+    </flow>
+
+    <flow name="content">
+        <some:say-hi-content>
+            <some:person>
+                Max Mule
+            </some:person>
+        </some:say-hi-content>
+    </flow>
+
+    <flow name="contentExpression">
+        <some:say-hi-content>
+            <some:person>
+                #['   Max Mule   ']
+            </some:person>
+        </some:say-hi-content>
+    </flow>
+
+    <flow name="contentCDATA">
+        <some:say-hi-content>
+            <some:person>
+                <![CDATA[   Max Mule   ]]>
+            </some:person>
+        </some:say-hi-content>
+    </flow>
+
+    <flow name="text">
+        <some:say-hi-text>
+            <some:persona>
+                Max Mule
+            </some:persona>
+        </some:say-hi-text>
+    </flow>
+
+    <flow name="textExpression">
+        <some:say-hi-text>
+            <some:persona>
+                #['   Max Mule   ']
+            </some:persona>
+        </some:say-hi-text>
+    </flow>
+
+    <flow name="textCDATA">
+        <some:say-hi-text>
+            <some:persona>
+                <![CDATA[   Max Mule   ]]>
+            </some:persona>
+        </some:say-hi-text>
+    </flow>
+
+    <flow name="pojo">
+        <some:say-hi-pojo>
+            <some:person-pojo person="   Max Mule   "/>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pojoExpression">
+        <some:say-hi-pojo>
+            <some:person-pojo person="#['   Max Mule   ']"/>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pojoText">
+        <some:say-hi-pojo>
+            <some:person-pojo>
+                <some:person-text>
+                    Max Mule
+                </some:person-text>
+            </some:person-pojo>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pojoTextExpression">
+        <some:say-hi-pojo>
+            <some:person-pojo>
+                <some:person-text>
+                    #['   Max Mule   ']
+                </some:person-text>
+            </some:person-pojo>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pojoTextCDATA">
+        <some:say-hi-pojo>
+            <some:person-pojo>
+                <some:person-text>
+                    <![CDATA[   Max Mule   ]]>
+                </some:person-text>
+            </some:person-pojo>
+        </some:say-hi-pojo>
+    </flow>
+
+    <flow name="pg">
+        <some:say-hi-parameter-group person="   Max Mule   "/>
+    </flow>
+
+    <flow name="pgExpression">
+        <some:say-hi-parameter-group person="#['   Max Mule   ']"/>
+    </flow>
+
+    <flow name="pgText">
+        <some:say-hi-parameter-group>
+            <some:person-text>
+                Max Mule
+            </some:person-text>
+        </some:say-hi-parameter-group>
+    </flow>
+
+    <flow name="pgTextExpression">
+        <some:say-hi-parameter-group>
+            <some:person-text>
+                #['   Max Mule   ']
+            </some:person-text>
+        </some:say-hi-parameter-group>
+    </flow>
+
+    <flow name="pgTextCDATA">
+        <some:say-hi-parameter-group>
+            <some:person-text>
+                <![CDATA[   Max Mule   ]]>
+            </some:person-text>
+        </some:say-hi-parameter-group>
+    </flow>
+
+    <flow name="pgDsl">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl person="   Max Mule   "/>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+    <flow name="pgDslExpression">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl person="#['   Max Mule   ']"/>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+    <flow name="pgDslText">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl>
+                <some:person-text>
+                    Max Mule
+                </some:person-text>
+            </some:person-pg-dsl>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+    <flow name="pgDslTextExpression">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl>
+                <some:person-text>
+                    #['   Max Mule   ']
+                </some:person-text>
+            </some:person-pg-dsl>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+    <flow name="pgDslTextCDATA">
+        <some:say-hi-parameter-group-dsl>
+            <some:person-pg-dsl>
+                <some:person-text>
+                    <![CDATA[   Max Mule   ]]>
+                </some:person-text>
+            </some:person-pg-dsl>
+        </some:say-hi-parameter-group-dsl>
+    </flow>
+
+</mule>

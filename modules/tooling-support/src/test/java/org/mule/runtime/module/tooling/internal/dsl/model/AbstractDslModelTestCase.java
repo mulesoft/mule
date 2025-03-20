@@ -202,11 +202,7 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
                                             SUPPORTED, CONTENT, null,
                                             emptyList(), emptySet());
 
-    MetadataKeyPartModelProperty keyParameterMetadataKeyPartModelProperty = mock(MetadataKeyPartModelProperty.class);
-    when(keyParameterMetadataKeyPartModelProperty.getName()).thenReturn("keyResolver");
-    when(keyParameterMetadataKeyPartModelProperty.getOrder()).thenReturn(1);
-    when(keyParameterMetadataKeyPartModelProperty.isPublic()).thenReturn(true);
-    when(keyParameterMetadataKeyPartModelProperty.isProvidedByKeyResolver()).thenReturn(true);
+    MetadataKeyPartModelProperty keyParameterMetadataKeyPartModelProperty = new MetadataKeyPartModelProperty(1, true);
 
     keyParameter = createParameterModel(KEY_NAME, false, stringType, null,
                                         NOT_SUPPORTED, CONTENT, null,

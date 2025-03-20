@@ -14,6 +14,10 @@ import static org.mule.test.data.sample.extension.provider.FailingTestSampleData
 import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.SAMPLE_DATA_EXCEPTION_ERROR_MSG;
 import static org.mule.test.data.sample.extension.provider.FailingTestSampleDataProvider.SAMPLE_DATA_EXCEPTION_FAILURE;
 
+import org.mule.sdk.api.data.sample.SampleDataException;
+
+import java.util.Optional;
+
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -66,16 +70,18 @@ public class SourcesSampleDataByLocationTestCase extends AbstractSampleDataTestC
 
   @Test
   public void missingActingParameter() throws Exception {
-    assertError(getSourceSampleByLocation("missingActingParameter"),
-                MISSING_REQUIRED_PARAMETERS,
-                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSourceSampleByLocation("missingActingParameter"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
   public void missingActingParameterInGroup() throws Exception {
-    assertError(getSourceSampleByLocation("missingActingParameterInGroup"),
-                MISSING_REQUIRED_PARAMETERS,
-                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSourceSampleByLocation("missingActingParameterInGroup"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
@@ -96,25 +102,28 @@ public class SourcesSampleDataByLocationTestCase extends AbstractSampleDataTestC
 
   @Test
   public void sampleDataExceptionWithErrorCause() throws Exception {
-    assertError(getSourceSampleByLocation("sampleDataExceptionWithErrorCause"),
-                SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG, IllegalStateException.class);
+    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                              Optional.of(IllegalStateException.class));
+    getSourceSampleByLocation("sampleDataExceptionWithErrorCause");
   }
 
   @Test
   public void sampleDataExceptionWithoutErrorCause() throws Exception {
-    assertError(getSourceSampleByLocation("sampleDataExceptionWithoutErrorCause"),
-                SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG);
+    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                              Optional.empty());
+    getSourceSampleByLocation("sampleDataExceptionWithoutErrorCause");
   }
 
   public void customSampleDataExceptionWithErrorCause() throws Exception {
-    assertError(getSourceSampleByLocation("customSampleDataExceptionWithErrorCause"),
-                SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG,
-                IllegalStateException.class);
+    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                              Optional.of(IllegalStateException.class));
+    getSourceSampleByLocation("customSampleDataExceptionWithErrorCause");
   }
 
   @Test
   public void customSampleDataExceptionWithoutErrorCause() throws Exception {
-    assertError(getSourceSampleByLocation("customSampleDataExceptionWithoutErrorCause"),
-                SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG);
+    expectSampleDataException(SampleDataException.class, SAMPLE_DATA_EXCEPTION_FAILURE, CUSTOM_SAMPLE_DATA_EXCEPTION_ERROR_MSG,
+                              Optional.empty());
+    getSourceSampleByLocation("customSampleDataExceptionWithoutErrorCause");
   }
 }

@@ -493,11 +493,6 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   @Test
   public void presentFieldValueProviderGetsId() throws Exception {
     final String targetSelector = "some.target.path";
-    FieldValueProviderModel fieldValueProviderModel = createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME,
-                                                                                    FIELD_VALUE_PROVIDER_ID,
-                                                                                    targetSelector);
-    when(providedParameter.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
-
     ArtifactDeclaration app = getBaseApp();
     Optional<ValueProviderCacheId> cacheId = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME, targetSelector);
     assertThat(cacheId.isPresent(), equalTo(true));
@@ -511,16 +506,6 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   // to correctly identify them without evaluating the path expression, we are using the whole parameter for caching
   public void changesInParameterWithActingFieldReturnsDifferentHash() throws Exception {
     final String targetSelector = "some.target.path";
-    FieldValueProviderModel fieldValueProviderModel =
-        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetSelector);
-
-    ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
-                                                                           COMPLEX_ACTING_PARAMETER_NAME
-                                                                               + ".innerPojoParam.stringParam");
-
-    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
-    when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
-
     ArtifactDeclaration app = getBaseApp();
 
     List<Optional<ValueProviderCacheId>> allIds = new LinkedList<>();
@@ -541,15 +526,6 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   @Test
   public void actingFieldFromNotExistentParameterIsNotConsideredForId() throws Exception {
     final String targetSelector = "some.target.path";
-    FieldValueProviderModel fieldValueProviderModel =
-        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetSelector);
-
-    ActingParameterModel actingParameterModel = createActingParameterModel(ACTING_PARAMETER_NAME,
-                                                                           "notExistentParam.stringParam");
-
-    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
-    when(providedParameter.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
-
     ArtifactDeclaration app = getBaseApp();
 
     Optional<ValueProviderCacheId> id = computeIdFor(app, OPERATION_LOCATION, PROVIDED_PARAMETER_NAME, targetSelector);
@@ -559,16 +535,6 @@ public class ValueProviderCacheIdGeneratorTestCase extends AbstractMockedValuePr
   @Test
   public void actingFieldAsExpressionUsesWholeParameter() throws Exception {
     final String targetSelector = "some.target.path";
-    FieldValueProviderModel fieldValueProviderModel =
-        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetSelector);
-
-    ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
-                                                                           COMPLEX_ACTING_PARAMETER_NAME
-                                                                               + ".innerPojoParam.stringParam");
-
-    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
-    when(providedParameterFromComplex.getFieldValueProviderModels()).thenReturn(singletonList(fieldValueProviderModel));
-
     ArtifactDeclaration app = getBaseApp();
 
     modifyParameter(app, OPERATION_LOCATION, COMPLEX_ACTING_PARAMETER_NAME,

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.api.tooling.sampledata;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
@@ -20,6 +21,7 @@ import java.util.function.Supplier;
  *
  * @since 4.8
  */
+@NoImplement
 public interface SampleDataProviderMediator {
 
   /**

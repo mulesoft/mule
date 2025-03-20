@@ -1,4 +1,36 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "interface org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator",
+            "new": "interface org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator",
+            "annotation": "@org.mule.api.annotation.NoImplement",
+            "justification": "W-18076467: Convert sampleData and valueResolvers tests in extensions-spring-support to unit tests - annotation was missing"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "interface org.mule.runtime.module.extension.api.tooling.sampledata.SampleDataProviderMediator",
+            "new": "interface org.mule.runtime.module.extension.api.tooling.sampledata.SampleDataProviderMediator",
+            "annotation": "@org.mule.api.annotation.NoImplement",
+            "justification": "W-18076467: Convert sampleData and valueResolvers tests in extensions-spring-support to unit tests - annotation was missing"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "interface org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProviderMediator",
+            "new": "interface org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProviderMediator",
+            "annotation": "@org.mule.api.annotation.NoImplement",
+            "justification": "W-18076467: Convert sampleData and valueResolvers tests in extensions-spring-support to unit tests - annotation was missing"
+          }
+        ]
+      }
+    }
+  },
   "4.9.0": {
     "revapi": {
       "differences": {

@@ -83,12 +83,14 @@ public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTes
 
   @Test
   public void missingActingParameter() throws Exception {
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+
     Map<String, Object> params = getDefaultParameters();
     params.remove("attributes");
 
-    assertError(getSampleByComponentName("useConnection", params, "config"),
-                MISSING_REQUIRED_PARAMETERS,
-                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSampleByComponentName("useConnection", params, "config"), EXPECTED_PAYLOAD, EXPECTED_ATTRIBUTES);
   }
 
   @Test
@@ -118,11 +120,7 @@ public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTes
 
   @Test
   public void connectionLessWithTwoBoundActingParameterOneWithAnAlias() throws Exception {
-    Map<String, Object> params = getDefaultParameters();
-    params.put("payloadParameterAlias", params.get("payload"));
-    params.remove("payload");
-
-    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterOneWithAnAlias", params,
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterOneWithAnAlias", getDefaultParameters(),
                                            null),
                   EXPECTED_PAYLOAD,
                   EXPECTED_ATTRIBUTES);
@@ -142,11 +140,10 @@ public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTes
   public void connectionLessWithTwoBoundActingParameterFromXMLContentTag() throws Exception {
     Map<String, Object> params = new HashMap<>();
     params
-        .put("message", """
-            <nested>
-              <payloadXmlTag>my payload</payloadXmlTag>
-              <attributesXmlTag>my attributes</attributesXmlTag>
-            </nested>""");
+        .put("message", "<nested>\n" +
+            "  <payloadXmlTag>my payload</payloadXmlTag>\n" +
+            "  <attributesXmlTag>my attributes</attributesXmlTag>\n" +
+            "</nested>");
     assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromXMLContentTag", params, null),
                   EXPECTED_PAYLOAD,
                   EXPECTED_ATTRIBUTES);
@@ -156,10 +153,9 @@ public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTes
   public void connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute() throws Exception {
     Map<String, Object> params = new HashMap<>();
     params
-        .put("message", """
-            <nested>
-              <xmlTag payloadXmlAttribute="my payload" attributesXmlAttribute="my attributes">This is content</xmlTag>
-            </nested>""");
+        .put("message", "<nested>\n" +
+            "  <xmlTag payloadXmlAttribute=\"my payload\" attributesXmlAttribute=\"my attributes\">This is content</xmlTag>\n" +
+            "</nested>");
     assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute", params, null),
                   EXPECTED_PAYLOAD,
                   EXPECTED_ATTRIBUTES);
@@ -174,12 +170,15 @@ public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTes
 
   @Test
   public void missingBoundActingParameter() throws Exception {
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+
     Map<String, Object> params = getDefaultParameters();
     params.remove("attributes");
 
-    assertError(getSampleByComponentName("useConnectionWithTwoBoundActingParameter", params, "config"),
-                MISSING_REQUIRED_PARAMETERS,
-                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSampleByComponentName("useConnectionWithTwoBoundActingParameter", params, "config"), EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
   }
 
   @Test
@@ -187,9 +186,12 @@ public class OperationSampleDataThroughApiTestCase extends AbstractSampleDataTes
     Map<String, Object> params = new HashMap<>();
     params.put("message", "{ \"payload\" : \"my payload\" }");
 
-    assertError(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromContentField", params, "config"),
-                MISSING_REQUIRED_PARAMETERS,
-                "Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    expectSampleDataException(MISSING_REQUIRED_PARAMETERS);
+    expectedException
+        .expectMessage("Unable to retrieve Sample Data. There are missing required parameters for the resolution: [attributes]");
+    assertMessage(getSampleByComponentName("connectionLessWithTwoBoundActingParameterFromContentField", params, "config"),
+                  EXPECTED_PAYLOAD,
+                  EXPECTED_ATTRIBUTES);
   }
 
   @Test
