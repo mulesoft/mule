@@ -124,9 +124,9 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
                                                                ownPolicyClassLoader));
   }
 
-  // Use additional feature flag SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION,
-  // so that we can use isolated classloader as parent classloader, only when this feature is enabled.
   private boolean isPolicyIsolationEnabled(PolicyTemplateDescriptor descriptor) {
+    // Use additional feature flag SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION,
+    // so that we can use isolated classloader as parent classloader, only when this feature is enabled.
     return isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) &&
         isFeatureEnabled(SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION, descriptor);
   }
