@@ -11,9 +11,9 @@ import java.util.List;
 
 import io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest;
 import io.opentelemetry.proto.common.v1.KeyValue;
-import io.opentelemetry.proto.metrics.v1.InstrumentationLibraryMetrics;
 import io.opentelemetry.proto.metrics.v1.Metric;
 import io.opentelemetry.proto.metrics.v1.ResourceMetrics;
+import io.opentelemetry.proto.metrics.v1.ScopeMetrics;
 
 public class TestOpenTelemetryMeterExporterUtils {
 
@@ -33,12 +33,12 @@ public class TestOpenTelemetryMeterExporterUtils {
       // Adding the resource name.
       List<KeyValue> attributeKeyValues = resourceMetrics.getResource().getAttributesList();
 
-      for (InstrumentationLibraryMetrics instrumentationLibraryMetrics : resourceMetrics.getInstrumentationLibraryMetricsList()) {
-        for (Metric metrics : instrumentationLibraryMetrics.getMetricsList()) {
+      for (ScopeMetrics scopeMetrics : resourceMetrics.getScopeMetricsList()) {
+        for (Metric metrics : scopeMetrics.getMetricsList()) {
           TestExportedMeter exportedMeter = new TestExportedMeter();
           addResourceName(exportedMeter, attributeKeyValues);
           exportedMeter.setDescription(metrics.getDescription());
-          exportedMeter.setInstrumentName(instrumentationLibraryMetrics.getInstrumentationLibrary().getName());
+          exportedMeter.setInstrumentName(scopeMetrics.getScope().getName());
           exportedMeter.setName(metrics.getName());
           exportedMeter.setValue(metrics.getSum().getDataPoints(0).getAsInt());
           exportedMeters.add(exportedMeter);
