@@ -15,10 +15,10 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.management.stats.ApiKitStatsUtils.isApiKitFlow;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
-import static org.mule.runtime.core.api.management.stats.ApiKitStatsUtils.isApiKitFlow;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
@@ -34,7 +34,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import static reactor.core.Exceptions.propagate;
@@ -79,9 +78,9 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.interceptor.FlowInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -166,9 +165,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     this.triggerFlow = source != null;
     this.apikitFlow = isApiKitFlow(getName());
 
-    this.processingStrategyFactory = processingStrategyFactory.orElseGet(() -> defaultProcessingStrategy());
-    if (this.processingStrategyFactory instanceof AsyncProcessingStrategyFactory) {
-      ((AsyncProcessingStrategyFactory) this.processingStrategyFactory).setMaxConcurrency(this.maxConcurrency);
+    this.processingStrategyFactory = processingStrategyFactory.orElseGet(this::defaultProcessingStrategy);
+    if (this.processingStrategyFactory instanceof AsyncProcessingStrategyFactory asyncProcessingStrategyFactory) {
+      asyncProcessingStrategyFactory.setMaxConcurrency(this.maxConcurrency);
     } else if (maxConcurrency != null) {
       LOGGER.warn("{} does not support 'maxConcurrency'. Ignoring the value.",
                   this.processingStrategyFactory.getClass().getSimpleName());
@@ -176,7 +175,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     processingStrategy = this.processingStrategyFactory.create(muleContext, getName());
     backpressureStrategySelector = new BackPressureStrategySelector(this);
-    FLOW_BACKPRESSURE_ERROR_TYPE = muleContext.getErrorTypeRepository().getErrorType(FLOW_BACK_PRESSURE).get();
+    FLOW_BACKPRESSURE_ERROR_TYPE = muleContext.getErrorTypeRepository().getErrorType(FLOW_BACK_PRESSURE).orElseThrow();
   }
 
   /**
@@ -274,7 +273,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     flowInterceptors.addAll(createInterceptors(interceptorManager.getFlowInterceptorFactories()
         .stream()
         .map(FlowInterceptorFactoryAdapter::new)
-        .collect(toList()), muleContext.getInjector()));
+        .toList(), muleContext.getInjector()));
 
     doInitialiseProcessingStrategy();
 
@@ -298,15 +297,19 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    */
   public Consumer<Exception> errorRouterForSourceResponseError(Function<Pipeline, Consumer<Exception>> terminationCallbackFactory) {
     if (errorRouterForSourceResponseError == null) {
-      synchronized (this) {
-        if (errorRouterForSourceResponseError == null) {
-          final Consumer<Exception> terminationCallback = terminationCallbackFactory.apply(this);
-          errorRouterForSourceResponseError = getExceptionListener()
-              .router(identity(),
-                      event -> terminationCallback.accept((MessagingException) event.getError().get().getCause()),
-                      error -> terminationCallback.accept((MessagingException) error));
-        }
-      }
+      return doErrorRouterForSourceResponseError(terminationCallbackFactory);
+    }
+
+    return errorRouterForSourceResponseError;
+  }
+
+  private synchronized Consumer<Exception> doErrorRouterForSourceResponseError(Function<Pipeline, Consumer<Exception>> terminationCallbackFactory) {
+    if (errorRouterForSourceResponseError == null) {
+      final Consumer<Exception> terminationCallback = terminationCallbackFactory.apply(this);
+      errorRouterForSourceResponseError = getExceptionListener()
+          .router(identity(),
+                  event -> terminationCallback.accept((MessagingException) event.getError().get().getCause()),
+                  error -> terminationCallback.accept((MessagingException) error));
     }
 
     return errorRouterForSourceResponseError;
@@ -345,7 +348,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   protected Function<Publisher<CoreEvent>, Publisher<CoreEvent>> routeThroughProcessingStrategyTransformer() {
     FluxSinkRecorder<Either<Throwable, CoreEvent>> pipelineOutlet = new FluxSinkRecorder<>();
     return eventPublisher -> from(eventPublisher).transformDeferredContextual((pipelineUpstream, reactorContext) -> {
-      if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
+      if (reactorContext.getOrDefault(WITHIN_PROCESS_TO_APPLY, false).booleanValue()) {
         return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
                                                                                             pipelineInlet, true),
@@ -388,7 +391,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         // default. This check may not be needed anymore for ProactorStreamProcessingStrategy. See MULE-16988.
         .doOnNext(getSource() == null || getSource().getBackPressureStrategy() == WAIT
             ? event -> sink.accept(event)
-            : event -> sinkEmit(event))
+            : this::sinkEmit)
         .map(e -> Either.empty());
   }
 
@@ -454,8 +457,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       getStatistics().incReceivedEvents();
 
       FlowCallStack flowCallStack = event.getFlowCallStack();
-      if (flowCallStack instanceof DefaultFlowCallStack) {
-        ((DefaultFlowCallStack) flowCallStack).push(new FlowStackElement(AbstractPipeline.this.getName(), getIdentifier(), null));
+      if (flowCallStack instanceof DefaultFlowCallStack fs) {
+        fs.push(new FlowStackElement(AbstractPipeline.this.getName(), getIdentifier(), null));
       }
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
                                                                  AbstractPipeline.this.getName(), PROCESS_START));
@@ -468,8 +471,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
         MessagingException messagingException = null;
         if (throwable != null) {
-          if (throwable instanceof MessagingException) {
-            messagingException = (MessagingException) throwable;
+          if (throwable instanceof MessagingException msgException) {
+            messagingException = msgException;
           } else {
             messagingException = new MessagingException(event, throwable, AbstractPipeline.this);
           }
@@ -484,8 +487,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private void fireCompleteNotification(CoreEvent event, MessagingException messagingException) {
     if (event != null) {
       FlowCallStack flowCallStack = event.getFlowCallStack();
-      if (flowCallStack instanceof DefaultFlowCallStack) {
-        ((DefaultFlowCallStack) flowCallStack).pop();
+      if (flowCallStack instanceof DefaultFlowCallStack fs) {
+        fs.pop();
       }
     } else {
       LOGGER.warn("No event on flow completion", messagingException);
@@ -505,16 +508,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    for (Object processor : getProcessors()) {
-      if (processor instanceof Processor) {
-        builder.chain((Processor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException(
-                                           "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-      }
-    }
+    builder.chain(getProcessors().toArray(Processor[]::new));
   }
 
   @Override
@@ -568,8 +562,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     stopSafely(this::doStop);
     stopSafely(this::doStopProcessingStrategy);
 
-    if (e instanceof MuleException) {
-      throw (MuleException) e;
+    if (e instanceof MuleException muleException) {
+      throw muleException;
     }
 
     throw new DefaultMuleException(e);

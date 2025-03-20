@@ -62,7 +62,6 @@ import org.mule.runtime.config.internal.bean.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.internal.bean.NotificationConfig;
 import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
 import org.mule.runtime.config.internal.dsl.processor.AddVariablePropertyConfigurator;
-import org.mule.runtime.config.internal.dsl.processor.EnvironmentPropertyObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.dsl.processor.ReconnectionConfigObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
@@ -136,8 +135,6 @@ import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrate
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
-import org.mule.runtime.core.internal.transaction.MuleTransactionConfig;
-import org.mule.runtime.core.internal.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -154,7 +151,6 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 

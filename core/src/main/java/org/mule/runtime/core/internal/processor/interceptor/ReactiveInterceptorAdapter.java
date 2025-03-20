@@ -268,7 +268,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
    *
    * @return the adapters, in the order they have to be applied.
    */
-  public static List<ReactiveInterceptorAdapter> createInterceptors(List<ComponentInterceptorFactoryAdapter> interceptorFactoryAdapters,
+  public static List<ReactiveInterceptorAdapter> createInterceptors(List<? extends ComponentInterceptorFactoryAdapter> interceptorFactoryAdapters,
                                                                     Injector injector) {
     List<ReactiveInterceptorAdapter> interceptors = new LinkedList<>();
 

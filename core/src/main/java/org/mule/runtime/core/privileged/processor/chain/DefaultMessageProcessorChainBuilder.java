@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.HasLocation;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.profiling.tracing.ComponentTracerAware;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 
@@ -63,8 +62,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
 
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
-      Processor processor = initializeMessageProcessor(processors.get(i));
-      tempList.addFirst(processor);
+      tempList.addFirst(processors.get(i));
     }
 
     return createSimpleChain(tempList, ofNullable(processingStrategy));
@@ -74,8 +72,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
     DefaultMessageProcessorChain messageProcessorChain;
 
-    if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
-      messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
+    if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain chain) {
+      messageProcessorChain = chain;
     } else {
       messageProcessorChain =
           new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
@@ -104,24 +102,6 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     if (processors != null) {
       this.processors.addAll(processors);
     }
-    return this;
-  }
-
-  @Override
-  public DefaultMessageProcessorChainBuilder chain(MessageProcessorBuilder... builders) {
-    for (MessageProcessorBuilder messageProcessorBuilder : builders) {
-      this.processors.add(messageProcessorBuilder);
-    }
-    return this;
-  }
-
-  public DefaultMessageProcessorChainBuilder chainBefore(Processor processor) {
-    this.processors.add(0, processor);
-    return this;
-  }
-
-  public DefaultMessageProcessorChainBuilder chainBefore(MessageProcessorBuilder builder) {
-    this.processors.add(0, builder);
     return this;
   }
 

@@ -6,21 +6,24 @@
  */
 package org.mule.runtime.core.privileged.processor;
 
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
+import static java.util.Collections.emptyList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import java.util.List;
 
@@ -51,7 +54,7 @@ public class ProcessorChainRouter extends AbstractExecutableComponent implements
     return publisher -> from(publisher).transform(processorChain);
   }
 
-  public void setProcessors(List processors) {
+  public void setProcessors(List<Processor> processors) {
     this.processors = processors;
   }
 
@@ -74,15 +77,7 @@ public class ProcessorChainRouter extends AbstractExecutableComponent implements
   public void initialise() throws InitialisationException {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("processor chain '" + name + "'");
-    for (Object processor : processors) {
-      if (processor instanceof Processor) {
-        builder.chain((Processor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-      }
-    }
+    builder.chain(processors);
     processorChain = builder.build();
     initialiseIfNeeded(processorChain, muleContext);
   }

@@ -12,7 +12,6 @@ import static org.mule.runtime.core.privileged.processor.chain.DefaultMessagePro
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -42,15 +41,7 @@ public abstract class AbstractProcessorRouteFactoryBean<T> extends AbstractCompo
   @Override
   public T doGetObject() throws Exception {
     final DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    for (Object processor : messageProcessors) {
-      if (processor instanceof Processor) {
-        builder.chain((Processor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessors or MessageProcessorBuilders configured");
-      }
-    }
+    builder.chain(messageProcessors);
     MessageProcessorChain chain = newLazyProcessorChainBuilder(builder, muleContext,
                                                                () -> getProcessingStrategy(locator, this).orElse(null));
     return getProcessorRoute(chain);

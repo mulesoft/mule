@@ -5,6 +5,44 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.parameterTypeParameterChanged",
+            "old": "parameter void org.mule.runtime.core.privileged.processor.ProcessorChainRouter::setProcessors(===java.util.List===)",
+            "new": "parameter void org.mule.runtime.core.privileged.processor.ProcessorChainRouter::setProcessors(===java.util.List<org.mule.runtime.core.api.processor.Processor>===)",
+            "parameterIndex": "0",
+            "justification": "W-18087604: Remove dead code related to chains building with ProcessorBuilder"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder::chainBefore(org.mule.runtime.core.api.processor.Processor)",
+            "justification": "W-18087604: Remove dead code related to chains building with ProcessorBuilder"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder::chainBefore(org.mule.runtime.core.privileged.processor.MessageProcessorBuilder)",
+            "justification": "W-18087604: Remove dead code related to chains building with ProcessorBuilder"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder::chain(org.mule.runtime.core.privileged.processor.MessageProcessorBuilder[])",
+            "justification": "W-18087604: Remove dead code related to chains building with ProcessorBuilder"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder::chain(org.mule.runtime.core.privileged.processor.MessageProcessorBuilder[])",
+            "justification": "W-18087604: Remove dead code related to chains building with ProcessorBuilder"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.processor.Processor org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder::initializeMessageProcessor(java.lang.Object)",
+            "justification": "W-18087604: Remove dead code related to chains building with ProcessorBuilder"
+          },
+          {
+            "ignore": true,
             "code": "java.method.removed",
             "old": "method boolean org.mule.runtime.core.privileged.transaction.TransactionConfig::isInteractWithExternal()",
             "justification": "W-17935419: Encapsulate the TransactionManager - Remove JTA from runtime api"

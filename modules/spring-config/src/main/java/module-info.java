@@ -30,8 +30,8 @@ module org.mule.runtime.spring.config {
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.container;
-  requires org.mule.runtime.core;
-  requires org.mule.runtime.core.components;
+  requires transitive org.mule.runtime.core;
+  requires transitive org.mule.runtime.core.components;
   requires org.mule.runtime.deployment.model;
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.extensions.support;
