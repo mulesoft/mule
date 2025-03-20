@@ -23,7 +23,6 @@
         </surefire.add.modules>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-modules=net.bytebuddy.agent
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.value.cache=org.mule.runtime.tooling.support
             --add-exports=org.mule.runtime.metadata.support/org.mule.runtime.metadata.internal=org.mule.runtime.tooling.support
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
