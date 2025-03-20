@@ -9,8 +9,8 @@ package org.mule.runtime.core.privileged.processor.chain;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 
-import static java.util.function.Function.identity;
 import static java.util.Optional.ofNullable;
+import static java.util.function.UnaryOperator.identity;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ComposedErrorException;
@@ -20,17 +20,15 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
-
+import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 
-import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
-import org.mule.runtime.core.internal.message.ErrorBuilder;
-
 import java.util.Collection;
 import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Provide standard methods to do error mapping/handling in a {@link MessageProcessorChain}.
@@ -49,18 +47,19 @@ public final class ChainErrorHandlingUtils {
    */
   public static BiFunction<Throwable, Object, Throwable> getLocalOperatorErrorHook(Processor processor, ErrorTypeLocator locator,
                                                                                    Collection<ExceptionContextProvider> exceptionContextProviders) {
-    final MessagingExceptionResolver exceptionResolver =
-        (processor instanceof Component) ? new MessagingExceptionResolver((Component) processor) : null;
-    final Function<MessagingException, MessagingException> messagingExceptionMapper =
+    final MessagingExceptionResolver exceptionResolver = (processor instanceof Component component)
+        ? new MessagingExceptionResolver(component)
+        : null;
+    final UnaryOperator<MessagingException> messagingExceptionMapper =
         resolveMessagingException(processor, e -> exceptionResolver.resolve(e, locator, exceptionContextProviders));
 
     return (throwable, event) -> {
       throwable = unwrap(throwable);
-      if (event instanceof CoreEvent) {
-        if (throwable instanceof MessagingException) {
-          return messagingExceptionMapper.apply((MessagingException) throwable);
+      if (event instanceof CoreEvent coreEvent) {
+        if (throwable instanceof MessagingException msgException) {
+          return messagingExceptionMapper.apply(msgException);
         } else {
-          return resolveException(processor, (CoreEvent) event, throwable, locator, exceptionContextProviders, exceptionResolver);
+          return resolveException(processor, coreEvent, throwable, locator, exceptionContextProviders, exceptionResolver);
         }
       } else {
         return throwable;
@@ -77,16 +76,16 @@ public final class ChainErrorHandlingUtils {
       event = CoreEvent.builder(event).error(null).build();
     }
 
-    if (processor instanceof Component) {
-      return exceptionResolver.resolve(new MessagingException(event, throwable, (Component) processor), locator,
+    if (processor instanceof Component component) {
+      return exceptionResolver.resolve(new MessagingException(event, throwable, component), locator,
                                        exceptionContextProviders);
     } else {
       return new MessagingException(event, throwable);
     }
   }
 
-  static Function<MessagingException, MessagingException> resolveMessagingException(Processor processor,
-                                                                                    Function<MessagingException, MessagingException> messagingExceptionMapper) {
+  static UnaryOperator<MessagingException> resolveMessagingException(Processor processor,
+                                                                     UnaryOperator<MessagingException> messagingExceptionMapper) {
     if (processor instanceof Component) {
       return exception -> {
         if (!exception.getEvent().getError().isPresent()

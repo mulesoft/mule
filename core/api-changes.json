@@ -89,6 +89,22 @@
   */
 
 },
+{
+  "ignore": true,
+  "code": "java.method.removed",
+  "old": "method org.mule.runtime.core.api.processor.Processor org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder::initializeMessageProcessor(java.lang.Object)",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.privileged.processor.chain",
+  "classQualifiedName": "org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder",
+  "classSimpleName": "AbstractMessageProcessorChainBuilder",
+  "methodName": "initializeMessageProcessor",
+  "elementKind": "method",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.9.0-rc1",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
           {
             "ignore": true,
             "code": "java.method.removed",
