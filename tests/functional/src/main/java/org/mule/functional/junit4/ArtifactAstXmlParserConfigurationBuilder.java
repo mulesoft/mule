@@ -16,6 +16,7 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ArtifactType;
@@ -28,6 +29,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * {@link AbstractConfigurationBuilder} implementation that delegates to {@link ArtifactAstConfigurationBuilder} using cached
@@ -48,7 +50,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   private final boolean enableLazyInit;
   private final boolean addToolingObjectsToRegistry;
 
-  private final CachingAstXmlParser cachingAstXmlParser;
+  private final Supplier<CachingAstXmlParser> cachingAstXmlParser;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   private ArtifactDeclaration artifactDeclaration;
@@ -68,12 +70,12 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     this.enableLazyInit = enableLazyInit;
     this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
 
-    this.cachingAstXmlParser = new CachingAstXmlParser(false, false,
-                                                       artifactProperties,
-                                                       artifactType,
-                                                       parentArtifactContext != null
-                                                           ? parentArtifactContext.getArtifactAst()
-                                                           : emptyArtifact());
+    this.cachingAstXmlParser = new LazyValue<>(() -> new CachingAstXmlParser(false, false,
+                                                                             artifactProperties,
+                                                                             artifactType,
+                                                                             parentArtifactContext != null
+                                                                                 ? parentArtifactContext.getArtifactAst()
+                                                                                 : emptyArtifact()));
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
 
     this.artifactDeclaration = requireNonNull(artifactDeclaration);
@@ -90,12 +92,12 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     this.enableLazyInit = enableLazyInit;
     this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
 
-    this.cachingAstXmlParser = new CachingAstXmlParser(disableXmlValidations, ignoreCaches,
-                                                       artifactProperties,
-                                                       artifactType,
-                                                       parentArtifactContext != null
-                                                           ? parentArtifactContext.getArtifactAst()
-                                                           : emptyArtifact());
+    this.cachingAstXmlParser = new LazyValue<>(() -> new CachingAstXmlParser(disableXmlValidations, ignoreCaches,
+                                                                             artifactProperties,
+                                                                             artifactType,
+                                                                             parentArtifactContext != null
+                                                                                 ? parentArtifactContext.getArtifactAst()
+                                                                                 : emptyArtifact()));
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
 
     this.configResources = requireNonNull(configResources);
@@ -119,12 +121,12 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
     } else if (configResources.length == 0) {
       artifactAst = emptyArtifact();
     } else {
-      artifactAst = cachingAstXmlParser.parse(muleContext.getConfiguration().getId(),
-                                              extensions,
-                                              muleContext.getExecutionClassLoader(),
-                                              muleContext.getConfiguration().getArtifactCoordinates(),
-                                              expressionLanguageMetadataService,
-                                              configResources);
+      artifactAst = cachingAstXmlParser.get().parse(muleContext.getConfiguration().getId(),
+                                                    extensions,
+                                                    muleContext.getExecutionClassLoader(),
+                                                    muleContext.getConfiguration().getArtifactCoordinates(),
+                                                    expressionLanguageMetadataService,
+                                                    configResources);
     }
 
     artifactAstConfigurationBuilder = createArtifactContextFactory(artifactAst,
