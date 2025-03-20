@@ -175,6 +175,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final String applicationName;
 
   private final AtomicBoolean started = new AtomicBoolean(false);
+  private boolean shouldControlRetryPolicyLifecycle;
 
   public ExtensionMessageSource(ExtensionModel extensionModel,
                                 SourceModel sourceModel,
@@ -190,6 +191,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
     this.customRetryPolicyTemplate = retryPolicyTemplate;
+    this.shouldControlRetryPolicyLifecycle = retryPolicyTemplate != null;
     this.primaryNodeOnly = primaryNodeOnly;
     this.backPressureStrategy = backPressureStrategy;
     this.notificationDispatcher = notificationDispatcher;
@@ -213,7 +215,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                                restarting);
         muleContext.getInjector().inject(sourceAdapter);
         retryPolicyTemplate = createRetryPolicyTemplate(customRetryPolicyTemplate);
-        initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
+        if (shouldControlRetryPolicyLifecycle) {
+          initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
+        }
       } finally {
         if (initialiserEvent != null) {
           ((BaseEventContext) initialiserEvent.getContext()).success();
@@ -472,7 +476,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     LOGGER.debug("Message source '{}' on flow '{}' is starting", sourceModel.getName(),
                  getLocation().getRootContainerName());
     lifecycle(() -> lifecycleManager.fireStartPhase((phase, o) -> {
-      startIfNeeded(retryPolicyTemplate);
+      if (shouldControlRetryPolicyLifecycle) {
+        startIfNeeded(retryPolicyTemplate);
+      }
 
       if (retryScheduler == null) {
         retryScheduler = schedulerService.ioScheduler();
@@ -505,8 +511,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     try {
       safeLifecycle(() -> lifecycleManager.fireDisposePhase((phase, o) -> {
         disposeSource();
-        stopIfNeeded(retryPolicyTemplate);
-        disposeIfNeeded(retryPolicyTemplate, LOGGER);
+        if (shouldControlRetryPolicyLifecycle) {
+          stopIfNeeded(retryPolicyTemplate);
+          disposeIfNeeded(retryPolicyTemplate, LOGGER);
+        }
         stopSchedulers();
       }));
     } catch (MuleException e) {
