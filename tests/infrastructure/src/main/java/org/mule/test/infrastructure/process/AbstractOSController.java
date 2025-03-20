@@ -250,12 +250,10 @@ public abstract class AbstractOSController {
   }
 
   protected Map<String, String> copyEnvironmentVariables() {
-    Map<String, String> newEnv = new HashMap<>();
+    Map<String, String> newEnv = new HashMap<>(System.getenv());
 
     if (this.testEnvVars != null) {
       newEnv.putAll(this.testEnvVars);
-    } else {
-      newEnv.putAll(System.getenv());
     }
 
     newEnv.put(MULE_HOME_VARIABLE, muleHome);
