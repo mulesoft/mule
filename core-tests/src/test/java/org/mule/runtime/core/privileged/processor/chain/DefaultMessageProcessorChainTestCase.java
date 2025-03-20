@@ -45,6 +45,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.Exceptions.errorCallbackNotImplemented;
 import static reactor.core.publisher.Flux.from;
+import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
