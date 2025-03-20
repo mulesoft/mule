@@ -15,7 +15,6 @@ import org.mule.runtime.module.artifact.api.classloader.DeployableArtifactClassL
 /**
  * Creates {@link PolicyTemplateClassLoaderBuilder} for application artifacts.
  */
-@SuppressWarnings("deprecation")
 public class ApplicationPolicyTemplateClassLoaderBuilderFactory implements PolicyTemplateClassLoaderBuilderFactory {
 
   private final DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> artifactClassLoaderFactory;
