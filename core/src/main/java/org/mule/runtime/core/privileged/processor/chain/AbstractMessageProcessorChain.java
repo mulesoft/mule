@@ -433,7 +433,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private void handleErrorForContinueStrategy(Processor processor, BiConsumer<BaseEventContext, ? super Exception> errorBubbler,
                                               final MessagingExceptionResolver exceptionResolver,
-                                              final Function<MessagingException, MessagingException> messagingExceptionMapper,
+                                              final UnaryOperator<MessagingException> messagingExceptionMapper,
                                               Throwable throwable, Object object) {
     if (!(object instanceof CoreEvent) && !(throwable instanceof MessagingException)) {
       LOGGER.error(UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE, throwable);
@@ -702,11 +702,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private void fireNotification(CoreEvent event, Processor processor,
                                 MessagingException exceptionThrown, int action) {
-    if (serverNotificationHandler != null) {
-      if (processor instanceof Component component && component.getLocation() != null) {
-        serverNotificationHandler.fireNotification(createFrom(event, component.getLocation(), component,
-                                                              exceptionThrown, action));
-      }
+    if (serverNotificationHandler != null && processor instanceof Component component && component.getLocation() != null) {
+      serverNotificationHandler.fireNotification(createFrom(event, component.getLocation(), component,
+                                                            exceptionThrown, action));
     }
   }
 

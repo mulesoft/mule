@@ -15,10 +15,10 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.management.stats.ApiKitStatsUtils.isApiKitFlow;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
-import static org.mule.runtime.core.api.management.stats.ApiKitStatsUtils.isApiKitFlow;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.ON_NEXT_FAILURE_STRATEGY;
@@ -34,7 +34,6 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import static reactor.core.Exceptions.propagate;
@@ -79,9 +78,9 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.processor.interceptor.FlowInterceptorFactoryAdapter;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -118,7 +117,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final List<Processor> processors;
   private MessageProcessorChain pipeline;
 
-  private volatile Consumer<Exception> errorRouterForSourceResponseError;
+  private Consumer<Exception> errorRouterForSourceResponseError;
 
   private final ProcessingStrategyFactory processingStrategyFactory;
   private final ProcessingStrategy processingStrategy;
@@ -298,15 +297,19 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    */
   public Consumer<Exception> errorRouterForSourceResponseError(Function<Pipeline, Consumer<Exception>> terminationCallbackFactory) {
     if (errorRouterForSourceResponseError == null) {
-      synchronized (this) {
-        if (errorRouterForSourceResponseError == null) {
-          final Consumer<Exception> terminationCallback = terminationCallbackFactory.apply(this);
-          errorRouterForSourceResponseError = getExceptionListener()
-              .router(identity(),
-                      event -> terminationCallback.accept((MessagingException) event.getError().get().getCause()),
-                      error -> terminationCallback.accept((MessagingException) error));
-        }
-      }
+      return doErrorRouterForSourceResponseError(terminationCallbackFactory);
+    }
+
+    return errorRouterForSourceResponseError;
+  }
+
+  private synchronized Consumer<Exception> doErrorRouterForSourceResponseError(Function<Pipeline, Consumer<Exception>> terminationCallbackFactory) {
+    if (errorRouterForSourceResponseError == null) {
+      final Consumer<Exception> terminationCallback = terminationCallbackFactory.apply(this);
+      errorRouterForSourceResponseError = getExceptionListener()
+          .router(identity(),
+                  event -> terminationCallback.accept((MessagingException) event.getError().get().getCause()),
+                  error -> terminationCallback.accept((MessagingException) error));
     }
 
     return errorRouterForSourceResponseError;

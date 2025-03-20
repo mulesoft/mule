@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_INTENSIVE;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 
@@ -45,7 +44,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.bubble;
 import static reactor.core.Exceptions.errorCallbackNotImplemented;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -61,6 +59,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.ObjectUtils;
@@ -338,7 +337,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException));
     messageProcessor = builder.build();
-    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, getTestEventUsingFlow("0")));
+    final CoreEvent event = getTestEventUsingFlow("0");
+    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, event));
     assertThat(thrown, is(illegalStateException));
   }
 
@@ -347,7 +347,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("1"));
     messageProcessor = builder.build();
-    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, getTestEventUsingFlow("0")));
+    final CoreEvent event = getTestEventUsingFlow("0");
+    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, event));
     assertThat(thrown, is(illegalStateException));
   }
 
@@ -356,7 +357,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("2"));
     messageProcessor = builder.build();
-    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, getTestEventUsingFlow("0")));
+    final CoreEvent event = getTestEventUsingFlow("0");
+    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, event));
     assertThat(thrown, is(illegalStateException));
   }
 
