@@ -43,10 +43,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 
+@Issue("W-17340911")
 public class DefaultPolicyTemplateFactoryIsolationTestCase {
 
   private static final String POLICY_ID = "policyId";
