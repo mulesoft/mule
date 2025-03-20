@@ -30,16 +30,6 @@ public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
   MessageProcessorChainBuilder chain(Processor... processors);
 
   /**
-   * Chain a {@link MessageProcessorBuilder} by adding it the the list of processors builders that the builder implementation will
-   * use to construct a {@link MessageProcessorChain}. The {@link MessageProcessorBuilder#build()} method is invoked when the
-   * chain is constructed.
-   *
-   * @param builders {@link MessageProcessorBuilder} instance(s) to be used in the construction of a {@link MessageProcessorChain}
-   * @return the current {@link MessageProcessorBuilder} instance.
-   */
-  MessageProcessorChainBuilder chain(MessageProcessorBuilder... builders);
-
-  /**
    * Apply a {@link ProcessingStrategy} to the Processors of the target {@link MessageProcessorChain}.
    * 
    * @param processingStrategy the strategy to apply for each {@link Processor} in the target {@link MessageProcessorChain}.

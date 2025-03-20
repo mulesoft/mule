@@ -108,24 +108,6 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   }
 
   @Override
-  public DefaultMessageProcessorChainBuilder chain(MessageProcessorBuilder... builders) {
-    for (MessageProcessorBuilder messageProcessorBuilder : builders) {
-      this.processors.add(messageProcessorBuilder);
-    }
-    return this;
-  }
-
-  public DefaultMessageProcessorChainBuilder chainBefore(Processor processor) {
-    this.processors.add(0, processor);
-    return this;
-  }
-
-  public DefaultMessageProcessorChainBuilder chainBefore(MessageProcessorBuilder builder) {
-    this.processors.add(0, builder);
-    return this;
-  }
-
-  @Override
   public void setComponentTracer(ComponentTracer<CoreEvent> componentTracer) {
     this.chainComponentTracer = componentTracer;
   }

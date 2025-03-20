@@ -505,16 +505,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    for (Object processor : getProcessors()) {
-      if (processor instanceof Processor) {
-        builder.chain((Processor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException(
-                                           "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-      }
-    }
+    builder.chain(getProcessors().toArray(Processor[]::new));
   }
 
   @Override

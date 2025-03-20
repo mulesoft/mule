@@ -3,6 +3,92 @@
     "revapi": {
       "differences": {
         "differences": [
+{
+  "ignore": true,
+  "code": "java.method.parameterTypeParameterChanged",
+  "old": "parameter void org.mule.runtime.core.privileged.processor.ProcessorChainRouter::setProcessors(===java.util.List===)",
+  "new": "parameter void org.mule.runtime.core.privileged.processor.ProcessorChainRouter::setProcessors(===java.util.List<org.mule.runtime.core.api.processor.Processor>===)",
+  "parameterIndex": "0",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "oldType": "java.util.List",
+  "newType": "java.util.List<org.mule.runtime.core.api.processor.Processor>",
+  "package": "org.mule.runtime.core.privileged.processor",
+  "classQualifiedName": "org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+  "classSimpleName": "ProcessorChainRouter",
+  "methodName": "setProcessors",
+  "elementKind": "parameter",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.9.0-rc1",
+  "oldArchiveRole": "primary",
+  "newArchive": "org.mule.runtime:mule-core:jar:4.10.0-SNAPSHOT",
+  "newArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.method.removed",
+  "old": "method org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder::chainBefore(org.mule.runtime.core.api.processor.Processor)",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.privileged.processor.chain",
+  "classQualifiedName": "org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
+  "classSimpleName": "DefaultMessageProcessorChainBuilder",
+  "methodName": "chainBefore",
+  "elementKind": "method",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.9.0-rc1",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.method.removed",
+  "old": "method org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder::chainBefore(org.mule.runtime.core.privileged.processor.MessageProcessorBuilder)",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.privileged.processor.chain",
+  "classQualifiedName": "org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
+  "classSimpleName": "DefaultMessageProcessorChainBuilder",
+  "methodName": "chainBefore",
+  "elementKind": "method",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.9.0-rc1",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.method.removed",
+  "old": "method org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder::chain(org.mule.runtime.core.privileged.processor.MessageProcessorBuilder[])",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.privileged.processor.chain",
+  "classQualifiedName": "org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
+  "classSimpleName": "DefaultMessageProcessorChainBuilder",
+  "methodName": "chain",
+  "elementKind": "method",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.9.0-rc1",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
+{
+  "ignore": true,
+  "code": "java.method.removed",
+  "old": "method org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder::chain(org.mule.runtime.core.privileged.processor.MessageProcessorBuilder[])",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+  /*  "package": "org.mule.runtime.core.privileged.processor.chain",
+  "classQualifiedName": "org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder",
+  "classSimpleName": "MessageProcessorChainBuilder",
+  "methodName": "chain",
+  "elementKind": "method",
+  "oldArchive": "org.mule.runtime:mule-core:jar:4.9.0-rc1",
+  "oldArchiveRole": "primary",
+  "breaksVersioningRules": "true",
+  */
+
+},
           {
             "ignore": true,
             "code": "java.method.removed",

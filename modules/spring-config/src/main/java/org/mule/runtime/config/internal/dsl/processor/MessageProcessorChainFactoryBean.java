@@ -6,20 +6,19 @@
  */
 package org.mule.runtime.config.internal.dsl.processor;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.newLazyProcessorChainBuilder;
+
+import static java.util.Collections.emptyMap;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
+import org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
@@ -32,14 +31,14 @@ import javax.xml.namespace.QName;
 public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<MessageProcessorChain>
     implements MuleContextAware {
 
-  protected List processors;
+  protected List<Processor> processors;
   protected String name;
   protected MuleContext muleContext;
 
   @Inject
   protected ConfigurationComponentLocator locator;
 
-  public void setMessageProcessors(List processors) {
+  public void setMessageProcessors(List<Processor> processors) {
     this.processors = processors;
   }
 
@@ -50,26 +49,15 @@ public class MessageProcessorChainFactoryBean extends AbstractComponentFactory<M
 
   @Override
   public MessageProcessorChain doGetObject() throws Exception {
-    MessageProcessorChainBuilder builder = getBuilderInstance();
-    for (Object processor : processors) {
-      if (processor instanceof Processor) {
-        builder.chain((Processor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException(format("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured. Found a %s",
-                                                  processor.getClass().getName()));
-      }
-    }
-    return newLazyProcessorChainBuilder((DefaultMessageProcessorChainBuilder) builder,
+    AbstractMessageProcessorChainBuilder builder = getBuilderInstance();
+    builder.chain(processors.toArray(Processor[]::new));
+    return newLazyProcessorChainBuilder(builder,
                                         muleContext,
                                         () -> getProcessingStrategy(locator, this).orElse(null));
   }
 
-  protected MessageProcessorChainBuilder getBuilderInstance() {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.setName("processor chain '" + name + "'");
-    return builder;
+  protected AbstractMessageProcessorChainBuilder getBuilderInstance() {
+    return new DefaultMessageProcessorChainBuilder();
   }
 
   public void setName(String name) {

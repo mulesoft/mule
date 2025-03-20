@@ -31,7 +31,7 @@ import java.util.List;
  */
 public abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorChainBuilder {
 
-  protected List processors = new ArrayList();
+  protected List<Processor> processors = new ArrayList<>();
   protected String name;
   protected ProcessingStrategy processingStrategy;
   protected FlowExceptionHandler messagingExceptionHandler;
