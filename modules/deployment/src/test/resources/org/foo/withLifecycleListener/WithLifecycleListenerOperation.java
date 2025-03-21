@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.core.api.MuleContext;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class WithLifecycleListenerOperation {
 
