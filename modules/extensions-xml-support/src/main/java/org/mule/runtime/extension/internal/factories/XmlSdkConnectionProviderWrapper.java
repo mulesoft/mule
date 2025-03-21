@@ -50,9 +50,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Base class responsible of instantiating and managing lifecycle of the actual connection provider (the {@code delegate}) within

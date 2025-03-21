@@ -95,7 +95,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
