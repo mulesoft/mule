@@ -10,10 +10,6 @@ import static org.mule.runtime.api.util.IOUtils.getInputStreamWithCacheControl;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.util.ClassUtils;
-
 import java.beans.PropertyEditor;
 import java.io.InputStream;
 import java.net.URL;
@@ -30,19 +26,13 @@ import org.springframework.beans.PropertyEditorRegistry;
 /**
  * The preferred way to configure property editors in Spring 2/3 is to implement a registrar
  */
-public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, MuleContextAware {
+public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar {
 
-  private MuleContext muleContext;
   private Map<Class<?>, Class<PropertyEditor>> customPropertyEditorsCache;
   private static final String CUSTOM_PROPERTY_EDITOR_RESOURCE_NAME = "META-INF/mule.custom-property-editors";
 
   private final DatePropertyEditor datePropertyEditor = new DatePropertyEditor(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"),
                                                                                new SimpleDateFormat("yyyy-MM-dd"), true);
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
-  }
 
   @Override
   public void registerCustomEditors(PropertyEditorRegistry registry) {
@@ -53,10 +43,7 @@ public class MulePropertyEditorRegistrar implements PropertyEditorRegistrar, Mul
     }
     for (Map.Entry<Class<?>, Class<PropertyEditor>> entry : customPropertyEditorsCache.entrySet()) {
       try {
-        final PropertyEditor customEditor = ClassUtils.instantiateClass(entry.getValue());
-        if (customEditor instanceof MuleContextAware) {
-          ((MuleContextAware) customEditor).setMuleContext(muleContext);
-        }
+        final PropertyEditor customEditor = entry.getValue().getConstructor().newInstance();
         registry.registerCustomEditor(entry.getKey(), customEditor);
       } catch (Exception e) {
         throw new IllegalStateException("Error loading custom property editors", e);
