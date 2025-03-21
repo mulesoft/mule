@@ -9,9 +9,6 @@ package org.mule.runtime.config.internal.dsl.model;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
-import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
-import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
-import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.ERROR_MAPPING_ELEMENT_IDENTIFIER;
@@ -52,6 +49,7 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.DataUnit;
@@ -107,7 +105,6 @@ import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
@@ -148,6 +145,7 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -651,8 +649,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private ConfigurableInstanceFactory getAddVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyProcessor> transformerType) {
     return parameters -> {
-      AbstractAddVariablePropertyProcessor transformer =
-          (AbstractAddVariablePropertyProcessor) createNewInstance(transformerType);
+      AbstractAddVariablePropertyProcessor transformer;
+      try {
+        transformer = transformerType.getConstructor().newInstance();
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+          | NoSuchMethodException | SecurityException e) {
+        throw new MuleRuntimeException(e);
+      }
       transformer.setIdentifier((String) parameters.get("identifier"));
       transformer.setValue((String) parameters.get("value"));
       return transformer;
@@ -789,12 +792,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
-  private Builder getCoreTransformerBaseBuilder(final Class<? extends AbstractTransformer> transformerClass) {
-    return getTransformerBaseBuilder(transformerClass).withNamespace(CORE_PREFIX);
-  }
-
   private Builder getCoreMuleMessageTransformerBaseBuilder() {
-    return getMuleMessageTransformerBaseBuilder().withNamespace(CORE_PREFIX);
+    return new ComponentBuildingDefinition.Builder<>()
+        .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
+        .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
+        .asPrototype().withNamespace(CORE_PREFIX);
   }
 
 }

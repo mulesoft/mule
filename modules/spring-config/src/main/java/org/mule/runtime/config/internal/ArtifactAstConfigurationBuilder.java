@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -32,6 +33,7 @@ import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
+import org.mule.runtime.config.internal.model.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
 import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
@@ -102,6 +104,14 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
          componentBuildingDefinitionRegistry);
   }
 
+  public ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties)
+      throws ConfigurationException {
+    this(artifactAst, emptyMap(), ArtifactType.APP, false, false,
+         new DefaultComponentBuildingDefinitionRegistryFactory()
+             .create(artifactAst.dependencies(),
+                     artifactAst::dependenciesDsl));
+  }
+
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     if (emptyArtifact().equals(artifactAst) && artifactType == DOMAIN) {
@@ -139,7 +149,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                                                         artifactType,
                                                                                         enableLazyInit);
     if (baseMuleArtifactContext instanceof ConfigurableApplicationContext) {
-      ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
+      baseMuleArtifactContext.setParent(parentContext);
     }
     return baseMuleArtifactContext;
   }

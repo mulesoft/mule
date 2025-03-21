@@ -54,7 +54,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_OBJECT_NAME_PROCESSOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
@@ -98,7 +97,6 @@ import org.mule.runtime.config.internal.factories.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.factories.MuleContextFactoryBean;
 import org.mule.runtime.config.internal.factories.TransactionManagerFactoryBean;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultComponentInitialStateManager;
-import org.mule.runtime.config.internal.processor.MuleObjectNameProcessor;
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.EventContextService;
@@ -206,7 +204,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DelegateConnectionManagerAdapter.class))
       .put(OBJECT_MULE_CONFIGURATION, getBeanDefinition(MuleConfigurationConfigurator.class))
       .put(OBJECT_TRANSACTION_FACTORY_LOCATOR, getBeanDefinition(TransactionFactoryLocator.class))
-      .put(OBJECT_OBJECT_NAME_PROCESSOR, getBeanDefinition(MuleObjectNameProcessor.class))
       .put(OBJECT_POLICY_MANAGER, getBeanDefinition(DefaultPolicyManager.class))
       .put(INTERCEPTOR_MANAGER_REGISTRY_KEY, getBeanDefinition(DefaultProcessorInterceptorManager.class))
       .put(OBJECT_NOTIFICATION_DISPATCHER, getBeanDefinition(DefaultNotificationDispatcher.class))

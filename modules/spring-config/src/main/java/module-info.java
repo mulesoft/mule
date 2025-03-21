@@ -71,13 +71,10 @@ module org.mule.runtime.spring.config {
 
   // PropertyDescriptor and PropertyEditor from java.beans
   requires java.desktop;
-  // Spring JNDI support
-  requires java.naming;
   requires jakarta.transaction;
 
   exports org.mule.runtime.config.api;
   exports org.mule.runtime.config.api.dsl;
-  exports org.mule.runtime.config.api.dsl.artifact;
   exports org.mule.runtime.config.api.dsl.model;
   exports org.mule.runtime.config.api.dsl.model.properties;
   exports org.mule.runtime.config.api.dsl.processor;
