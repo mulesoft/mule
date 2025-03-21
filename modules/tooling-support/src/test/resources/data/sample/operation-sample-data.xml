@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sample-data="http://www.mulesoft.org/schema/mule/sample-data"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/sample-data http://www.mulesoft.org/schema/mule/sample-data/current/mule-sample-data.xsd">
+
+    <sample-data:config name="config" prefix="from-conf-">
+        <sample-data:connection/>
+    </sample-data:config>
+
+    <flow name="connectionLess">
+        <sample-data:connection-less payload="my payload" attributes="my attributes"/>
+    </flow>
+
+    <flow name="useConnection">
+        <sample-data:use-connection payload="my payload" attributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="useConfig">
+        <sample-data:use-config payload="my payload" attributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="nonBlocking">
+        <sample-data:non-blocking payload="my payload" attributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="parameterGroup">
+        <sample-data:parameter-group groupParameter="my payload" optionalParameter="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="parameterGroupWithOptional">
+        <sample-data:parameter-group groupParameter="my payload" config-ref="config"/>
+    </flow>
+
+    <flow name="showInDslParameterGroup">
+        <sample-data:show-in-dsl-parameter-group config-ref="config">
+            <sample-data:group groupParameter="my payload" optionalParameter="my attributes"/>
+        </sample-data:show-in-dsl-parameter-group>
+    </flow>
+
+    <flow name="aliasedGroup">
+        <sample-data:aliased-group aliasedPayload="my payload" aliasedAttributes="my attributes" config-ref="config"/>
+    </flow>
+
+    <flow name="missingActingParameter">
+        <sample-data:use-connection payload="my payload" config-ref="config"/>
+    </flow>
+
+    <flow name="muleContextAwareSampleData">
+        <sample-data:mule-context-aware-sample-data payload="my payload" attributes="my attributes"/>
+    </flow>
+
+    <flow name="complexActingParameter">
+        <sample-data:complex-acting-parameter>
+            <sample-data:complex payload="my payload" attributes="my attributes"/>
+        </sample-data:complex-acting-parameter>
+    </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameter">
+        <sample-data:connection-less-with-two-bound-acting-parameter payload="my payload" attributes="my attributes"/>
+    </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameterFromContentField">
+        <sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
+            <sample-data:message>
+                { "payload" : "my payload", "attributes": "my attributes" }
+            </sample-data:message>
+        </sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameterFromXMLContentTag">
+        <sample-data:connection-less-with-two-bound-acting-parameter-from-xml-content-tag
+                message='#[output application/xml --- { "nested": { "payloadXmlTag": "my payload", "attributesXmlTag": "my attributes" } }]'/>
+    </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameterFromXMLContentTagAttribute">
+        <sample-data:connection-less-with-two-bound-acting-parameter-from-xml-content-tag-attribute
+                message='#[output application/xml --- { "nested": { "xmlTag" @(payloadXmlAttribute: "my payload", attributesXmlAttribute:  "my attributes"): "This is content" } }]'/>
+    </flow>
+
+    <flow name="connectionLessWithTwoBoundActingParameterOneWithAnAlias">
+        <sample-data:connection-less-with-two-bound-acting-parameter-one-with-an-alias payloadParameterAlias="my payload"
+                                                                                       attributes="my attributes"/>
+    </flow>
+
+    <flow name="useConnectionWithTwoBoundActingParameter">
+        <sample-data:use-connection-with-two-bound-acting-parameter payload="my payload" attributes="my attributes"
+                                                                    config-ref="config"/>
+    </flow>
+
+    <flow name="missingBoundActingParameter">
+        <sample-data:use-connection-with-two-bound-acting-parameter payload="my payload" config-ref="config"/>
+    </flow>
+
+    <flow name="missingBoundActingParameterFromContentField">
+        <sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
+            <sample-data:message>
+                { "payload" : "my payload" }
+            </sample-data:message>
+        </sample-data:connection-less-with-two-bound-acting-parameter-from-content-field>
+    </flow>
+
+    <flow name="complexBoundActingParameter">
+        <sample-data:complex-bound-acting-parameter>
+            <sample-data:complex payload="my payload" attributes="my attributes"/>
+        </sample-data:complex-bound-acting-parameter>
+    </flow>
+
+    <flow name="pojoBoundActingParameter">
+        <sample-data:pojo-bound-acting-parameter actingParameter='#[output application/json --- { "pojoFields" : {
+          "payload" : "my payload" , "attributes" : "my attributes" } }]'/>
+    </flow>
+
+    <flow name="boundActingParameterFromPojoFieldWithExpression">
+        <sample-data:bound-acting-parameter-from-pojo-field complex='#[output application/json --- {
+          "payload" : "my payload" , "attributes" : "my attributes" }]'/>
+    </flow>
+
+    <flow name="boundActingParameterFromPojoFieldWithExpressionDsl">
+        <sample-data:bound-acting-parameter-from-pojo-field>
+            <sample-data:complex payload="my payload" attributes="my attributes"/>
+        </sample-data:bound-acting-parameter-from-pojo-field>
+    </flow>
+
+    <flow name="sampleDataExceptionWithErrorCause">
+        <sample-data:failing-operation payload="my payload" attributes="my attributes" useCustomSampleDataException="false"
+                                       withExceptionCause="true"/>
+    </flow>
+
+    <flow name="sampleDataExceptionWithoutErrorCause">
+        <sample-data:failing-operation payload="my payload" attributes="my attributes" useCustomSampleDataException="false"
+                                       withExceptionCause="false"/>
+    </flow>
+
+    <flow name="customSampleDataExceptionWithErrorCause">
+        <sample-data:failing-operation payload="my payload" attributes="my attributes" useCustomSampleDataException="true"
+                                       withExceptionCause="true"/>
+    </flow>
+
+    <flow name="customSampleDataExceptionWithoutErrorCause">
+        <sample-data:failing-operation payload="my payload" attributes="my attributes" useCustomSampleDataException="true"
+                                       withExceptionCause="false"/>
+    </flow>
+
+</mule>

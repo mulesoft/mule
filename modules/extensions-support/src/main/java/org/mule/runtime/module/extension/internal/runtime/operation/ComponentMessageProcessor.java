@@ -1103,19 +1103,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected abstract void validateOperationConfiguration(ConfigurationProvider configurationProvider);
 
-  @Override
-  protected ParameterValueResolver getParameterValueResolver() {
-    CoreEvent event = getNullEvent();
-    try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
-      LazyExecutionContext executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
-      return new OperationParameterValueResolver(executionContext, resolverSet, reflectionCache, expressionManager);
-    } finally {
-      if (event != null) {
-        ((BaseEventContext) event.getContext()).success();
-      }
-    }
-  }
-
   /**
    * This is the processing type that is actually taken into account when the processing strategy is applied. This is used by the
    * flux created in {@link #startInnerFlux()}.
@@ -1236,4 +1223,20 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public void setMuleConfiguration(MuleConfiguration muleConfiguration) {
     this.muleConfiguration = muleConfiguration;
   }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // "Fat" Tooling support
+  /////////////////////////////////////////////////////////////////////////////
+
+  @Override
+  protected ParameterValueResolver getParameterValueResolver() {
+    CoreEvent event = getNullEvent();
+    try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
+      LazyExecutionContext<?> executionContext = new LazyExecutionContext<>(resolverSet, componentModel, extensionModel, ctx);
+      return new OperationParameterValueResolver<>(executionContext, resolverSet, reflectionCache, expressionManager);
+    } finally {
+      ((BaseEventContext) event.getContext()).success();
+    }
+  }
+
 }

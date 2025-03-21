@@ -27,7 +27,7 @@ import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLO
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
+import static org.apache.commons.lang3.RandomStringUtils.insecure;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -36,8 +36,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -61,6 +61,7 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.ObjectUtils;
@@ -72,7 +73,6 @@ import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProacto
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareStreamEmitterProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.size.SmallTest;
@@ -89,9 +89,7 @@ import org.slf4j.Logger;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -113,9 +111,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   private final RuntimeException illegalStateException = new IllegalStateException();
 
   private Processor messageProcessor;
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Parameterized.Parameters(name = "{0}, {2}")
   public static Collection<Object[]> parameters() {
@@ -160,7 +155,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
     muleContext = spy(AbstractMuleContextTestCase.muleContext);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.isContainerMode()).thenReturn(false);
-    when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
+    when(muleConfiguration.getId()).thenReturn(insecure().nextNumeric(3));
     when(muleConfiguration.getShutdownTimeout()).thenReturn(1000L);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
 
@@ -281,16 +276,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   }
 
   @Test
-  public void testMPChainWithBuilder() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-    builder.chain(getAppendingMP("1"));
-    builder.chain((MessageProcessorBuilder) () -> getAppendingMP("2"));
-    builder.chain(getAppendingMP("3"));
-    messageProcessor = builder.build();
-    assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("0123"));
-  }
-
-  @Test
   public void testNestedMPChain() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"),
@@ -353,27 +338,30 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
   public void testExceptionAfter() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException));
-    expectedException.expect(is(illegalStateException));
     messageProcessor = builder.build();
-    process(messageProcessor, getTestEventUsingFlow("0"));
+    final CoreEvent event = getTestEventUsingFlow("0");
+    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, event));
+    assertThat(thrown, is(illegalStateException));
   }
 
   @Test
   public void testExceptionBefore() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("1"));
-    expectedException.expect(is(illegalStateException));
     messageProcessor = builder.build();
-    process(messageProcessor, getTestEventUsingFlow("0"));
+    final CoreEvent event = getTestEventUsingFlow("0");
+    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, event));
+    assertThat(thrown, is(illegalStateException));
   }
 
   @Test
   public void testExceptionBetween() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(getAppendingMP("1"), new ExceptionThrowingMessageProcessor(illegalStateException), getAppendingMP("2"));
-    expectedException.expect(is(illegalStateException));
     messageProcessor = builder.build();
-    process(messageProcessor, getTestEventUsingFlow("0"));
+    final CoreEvent event = getTestEventUsingFlow("0");
+    var thrown = assertThrows(Exception.class, () -> process(messageProcessor, event));
+    assertThat(thrown, is(illegalStateException));
   }
 
   @Test

@@ -75,7 +75,8 @@ public final class ArtifactAstUtils {
                          extensions,
                          disableValidations,
                          muleContext.getExecutionClassLoader(),
-                         getExtensionModelLoadingMediator(muleContext.getConfiguration(),
+                         getExtensionModelLoadingMediator(muleContext.getConfiguration().getId(),
+                                                          muleContext.getConfiguration().getArtifactCoordinates(),
                                                           expressionLanguageMetadataService));
   }
 
@@ -149,13 +150,55 @@ public final class ArtifactAstUtils {
                                                            MuleConfiguration muleConfiguration,
                                                            ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
+    return parseAndBuildAppExtensionModel(artifactName,
+                                          configResources,
+                                          parserSupplier,
+                                          extensions,
+                                          disableValidations,
+                                          artifactClassLoader,
+                                          muleConfiguration.getArtifactCoordinates(),
+                                          expressionLanguageMetadataService);
+  }
+
+  /**
+   * Parses {@code configResources} for a Mule application and returns an {@link ArtifactAst} enriched with an additional
+   * {@link ExtensionModel} which models the app itself, with all its defined operations, sources, functions, etc.
+   * <p>
+   * This extra {@link ExtensionModel} is accessible through the {@link ArtifactAst#dependencies()} set its named after the
+   * {@code muleContext.getConfiguration.getId()} return value
+   *
+   * @param artifactName                      the name of the artifact whose configs will be parsed
+   * @param configResources                   the paths to the application's config files
+   * @param parserSupplier                    the supplier used to obtain the ast parser. It might be invoked several times during
+   *                                          the parsing
+   * @param extensions                        the initial set of extensions the app depends on.
+   * @param artifactType                      the artifact type
+   * @param disableValidations                whether to disable DSL validation
+   * @param artifactClassLoader               the artifact's classloader
+   * @param artifactCoordinates               the application's Maven coordinates
+   * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
+   * @return an {@link ArtifactAst}
+   * @throws ConfigurationException it the app couldn't be parsed
+   * 
+   * @since 4.10
+   */
+  public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
+                                                           String[] configResources,
+                                                           AstXmlParserSupplier parserSupplier,
+                                                           Set<ExtensionModel> extensions,
+                                                           boolean disableValidations,
+                                                           ClassLoader artifactClassLoader,
+                                                           Optional<ArtifactCoordinates> artifactCoordinates,
+                                                           ExpressionLanguageMetadataService expressionLanguageMetadataService)
+      throws ConfigurationException {
     return parseArtifact(artifactName,
                          left(loadConfigResources(configResources, artifactClassLoader)),
                          parserSupplier,
                          extensions,
                          disableValidations,
                          artifactClassLoader,
-                         getExtensionModelLoadingMediator(muleConfiguration,
+                         getExtensionModelLoadingMediator(artifactName,
+                                                          artifactCoordinates,
                                                           expressionLanguageMetadataService));
   }
 
@@ -196,7 +239,8 @@ public final class ArtifactAstUtils {
                          extensions,
                          disableValidations,
                          artifactClassLoader,
-                         getExtensionModelLoadingMediator(muleConfiguration,
+                         getExtensionModelLoadingMediator(artifactName,
+                                                          muleConfiguration.getArtifactCoordinates(),
                                                           expressionLanguageMetadataService));
   }
 
@@ -276,7 +320,8 @@ public final class ArtifactAstUtils {
                          extensions,
                          disableValidations,
                          artifactClassLoader,
-                         getExtensionModelLoadingMediator(muleConfiguration,
+                         getExtensionModelLoadingMediator(artifactName,
+                                                          muleConfiguration.getArtifactCoordinates(),
                                                           expressionLanguageMetadataService));
   }
 
@@ -323,14 +368,14 @@ public final class ArtifactAstUtils {
                                                                      ExtensionManager extensionManager,
                                                                      ExpressionLanguageMetadataService expressionLanguageMetadataService)
       throws ConfigurationException {
-    return getExtensionModelLoadingMediator(muleConfiguration, expressionLanguageMetadataService)
-        .loadExtensionModel(ast, artifactClassLoader, extensionManager.getExtensions());
+    return getExtensionModelLoadingMediator(muleConfiguration.getId(), muleConfiguration.getArtifactCoordinates(),
+                                            expressionLanguageMetadataService)
+                                                .loadExtensionModel(ast, artifactClassLoader, extensionManager.getExtensions());
   }
 
-  private static MuleSdkExtensionModelLoadingMediator getExtensionModelLoadingMediator(MuleConfiguration muleConfiguration,
+  private static MuleSdkExtensionModelLoadingMediator getExtensionModelLoadingMediator(String artifactId,
+                                                                                       Optional<ArtifactCoordinates> artifactCoordinates,
                                                                                        ExpressionLanguageMetadataService expressionLanguageMetadataService) {
-    String artifactId = muleConfiguration.getId();
-    Optional<ArtifactCoordinates> artifactCoordinates = muleConfiguration.getArtifactCoordinates();
     return new MuleSdkApplicationExtensionModelLoadingMediator(expressionLanguageMetadataService, artifactId,
                                                                artifactCoordinates,
                                                                empty());

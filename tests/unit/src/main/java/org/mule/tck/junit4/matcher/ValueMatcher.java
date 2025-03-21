@@ -9,14 +9,16 @@ package org.mule.tck.junit4.matcher;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.hamcrest.core.IsIterableContaining.hasItems;
+
 import org.mule.runtime.api.value.Value;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.hamcrest.collection.IsIterableContainingInOrder;
 
 /**
  * {@link Matcher} to easily test the structure of a {@link Value}

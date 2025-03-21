@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:sample-data="http://www.mulesoft.org/schema/mule/sample-data"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/sample-data http://www.mulesoft.org/schema/mule/sample-data/current/mule-sample-data.xsd">
+
+    <sample-data:config name="config" prefix="from-conf-">
+        <sample-data:connection/>
+    </sample-data:config>
+
+    <flow name="connectionLess">
+        <sample-data:listener payload="my payload" attributes="my attributes"/>
+        <logger/>
+    </flow>
+
+    <flow name="useConnection">
+        <sample-data:connected-listener payload="my payload" attributes="my attributes" config-ref="config"/>
+        <logger/>
+    </flow>
+
+    <flow name="useConfig">
+        <sample-data:config-listener payload="my payload" attributes="my attributes" config-ref="config"/>
+        <logger/>
+    </flow>
+
+    <flow name="parameterGroup">
+        <sample-data:parameter-group-listener groupParameter="my payload" optionalParameter="my attributes"/>
+        <logger/>
+    </flow>
+
+    <flow name="parameterGroupWithOptional">
+        <sample-data:parameter-group-listener groupParameter="my payload"/>
+        <logger/>
+    </flow>
+
+    <flow name="showInDslParameterGroup">
+        <sample-data:show-in-dsl-parameter-group-listener>
+            <sample-data:group groupParameter="my payload" optionalParameter="my attributes"/>
+        </sample-data:show-in-dsl-parameter-group-listener>
+        <logger/>
+    </flow>
+
+    <flow name="aliasedGroup">
+        <sample-data:aliased-group-listener aliasedPayload="my payload" aliasedAttributes="my attributes"/>
+        <logger/>
+    </flow>
+
+    <flow name="missingActingParameter">
+        <sample-data:connected-listener payload="my payload" config-ref="config"/>
+        <logger/>
+    </flow>
+
+    <flow name="missingActingParameterInGroup">
+        <sample-data:connected-listener payload="my payload" config-ref="config"/>
+        <logger/>
+    </flow>
+
+    <flow name="muleContextAwareSampleData">
+        <sample-data:mule-context-aware-listener payload="my payload" attributes="my attributes"/>
+        <logger/>
+    </flow>
+
+    <flow name="complexActingParameter">
+        <sample-data:complex-acting-parameter-listener>
+            <sample-data:complex payload="my payload" attributes="my attributes"/>
+        </sample-data:complex-acting-parameter-listener>
+        <logger/>
+    </flow>
+
+    <flow name="connectionLessWithBoundActingParameter">
+        <sample-data:listener-with-two-bound-acting-parameters payload="my payload" attributes="my attributes"/>
+        <logger/>
+    </flow>
+
+    <flow name="sampleDataExceptionWithErrorCause">
+        <sample-data:failing-listener payload="my payload" attributes="my attributes" withExceptionCause="true"/>
+        <logger/>
+    </flow>
+
+    <flow name="sampleDataExceptionWithoutErrorCause">
+        <sample-data:failing-listener payload="my payload" attributes="my attributes" withExceptionCause="false"/>
+        <logger/>
+    </flow>
+
+    <flow name="customSampleDataExceptionWithErrorCause">
+        <sample-data:failing-listener payload="my payload" attributes="my attributes" useCustomSampleDataException="true"
+                                      withExceptionCause="true"/>
+        <logger/>
+    </flow>
+
+    <flow name="customSampleDataExceptionWithoutErrorCause">
+        <sample-data:failing-listener payload="my payload" attributes="my attributes" useCustomSampleDataException="true"
+                                      withExceptionCause="false"/>
+        <logger/>
+    </flow>
+
+</mule>

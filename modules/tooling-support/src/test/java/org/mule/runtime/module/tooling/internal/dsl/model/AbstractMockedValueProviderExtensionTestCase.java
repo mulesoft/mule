@@ -350,11 +350,21 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
                                                        Object defaultValue, ExpressionSupport expressionSupport,
                                                        ParameterRole parameterRole, ValueProviderModel valueProviderModel,
                                                        List<StereotypeModel> allowedStereotypes) {
-    return spy(new ImmutableParameterModel(paramName, "", type, false, false,
-                                           false, isComponentId, expressionSupport, defaultValue,
-                                           parameterRole, ParameterDslConfiguration.getDefaultInstance(), null, null,
-                                           valueProviderModel,
-                                           allowedStereotypes, emptySet()));
+    final String targetSelector = "some.target.path";
+    FieldValueProviderModel fieldValueProviderModel =
+        createFieldValueProviderModel(FIELD_VALUE_PROVIDER_NAME, FIELD_VALUE_PROVIDER_ID, targetSelector);
+
+    ActingParameterModel actingParameterModel = createActingParameterModel(COMPLEX_ACTING_PARAMETER_NAME,
+                                                                           COMPLEX_ACTING_PARAMETER_NAME
+                                                                               + ".innerPojoParam.stringParam");
+
+    when(fieldValueProviderModel.getParameters()).thenReturn(singletonList(actingParameterModel));
+
+    return new ImmutableParameterModel(paramName, "", type, false, false,
+                                       false, isComponentId, expressionSupport, defaultValue,
+                                       parameterRole, ParameterDslConfiguration.getDefaultInstance(), null, null,
+                                       valueProviderModel,
+                                       allowedStereotypes, emptySet(), null, null, singletonList(fieldValueProviderModel));
   }
 
   private ImmutableOperationModel createOperationModel(String operationName, List<ParameterGroupModel> paramGroups) {

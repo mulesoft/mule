@@ -444,6 +444,7 @@ public class IsolatedClassLoaderFactory {
 
   private Set<String> getProductionCodePackages(URL testCodeUrl) {
     int index = testCodeUrl.toString().lastIndexOf("test-classes");
+
     try {
       final URI productionCodeUri = new URL(testCodeUrl.toString().substring(0, index) + "classes").toURI();
       if (new File(productionCodeUri).exists()) {

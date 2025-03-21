@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 import java.util.ArrayList;
@@ -31,22 +30,13 @@ import java.util.List;
  */
 public abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorChainBuilder {
 
-  protected List processors = new ArrayList();
+  protected List<Processor> processors = new ArrayList<>();
   protected String name;
   protected ProcessingStrategy processingStrategy;
   protected FlowExceptionHandler messagingExceptionHandler;
   protected ComponentLocation location;
   protected MuleContext muleContext;
   protected ComponentTracer<CoreEvent> chainComponentTracer;
-
-  // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
-  protected Processor initializeMessageProcessor(Object processor) {
-    if (processor instanceof MessageProcessorBuilder) {
-      return ((MessageProcessorBuilder) processor).build();
-    } else {
-      return (Processor) processor;
-    }
-  }
 
   public void setName(String name) {
     this.name = name;

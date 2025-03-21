@@ -12,19 +12,18 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
-import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 
-import org.springframework.beans.factory.FactoryBean;
-
 import java.util.List;
+
+import org.springframework.beans.factory.FactoryBean;
 
 public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
     implements FactoryBean<Processor>, MuleContextAware, NameableObject {
 
   protected MuleContext muleContext;
 
-  protected List messageProcessors;
+  protected List<Processor> messageProcessors;
   protected String name;
   protected Integer maxConcurrency;
 
@@ -33,7 +32,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
     return Processor.class;
   }
 
-  public void setMessageProcessors(List messageProcessors) {
+  public void setMessageProcessors(List<Processor> messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
@@ -41,16 +40,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractComponent
   public AsyncDelegateMessageProcessor getObject() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'async' child chain");
-
-    for (Object processor : messageProcessors) {
-      if (processor instanceof Processor) {
-        builder.chain((Processor) processor);
-      } else if (processor instanceof MessageProcessorBuilder) {
-        builder.chain((MessageProcessorBuilder) processor);
-      } else {
-        throw new IllegalArgumentException("MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-      }
-    }
+    builder.chain(messageProcessors);
     AsyncDelegateMessageProcessor delegate = new AsyncDelegateMessageProcessor(builder, name);
     delegate.setAnnotations(getAnnotations());
     if (getMaxConcurrency() != null) {

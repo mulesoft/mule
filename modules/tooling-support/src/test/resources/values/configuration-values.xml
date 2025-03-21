@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:values="http://www.mulesoft.org/schema/mule/values"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/values http://www.mulesoft.org/schema/mule/values/current/mule-values.xsd">
+
+    <values:config-with-value-config name="config-with-value"/>
+
+    <values:value-with-required-param-config name="value-with-required-param" required1="value1" required2="value2"/>
+
+    <values:values-with-required-params-from-show-in-dsl-group-config name="values-with-required-params-from-show-in-dsl-group">
+        <values:some-group anyParameter="someValue"/>
+    </values:values-with-required-params-from-show-in-dsl-group-config>
+
+    <values:values-with-required-params-from-param-group-config name="values-with-required-params-from-param-group-config" anyParameter="someValue"/>
+
+    <values:config-with-value-config name="dynamic-config" channel="#['dynamic vaue']"/>
+
+    <values:values-with-required-params-from-show-in-dsl-group-config valueParam="#['dynamic value']" name="dynamic-config-values-with-required-params-from-show-in-dsl-static-group">
+        <values:some-group anyParameter="someValue"/>
+    </values:values-with-required-params-from-show-in-dsl-group-config>
+
+    <values:values-with-required-params-from-show-in-dsl-group-config valueParam="value" name="dynamic-config-values-with-required-params-from-show-in-dsl-dynamic-group">
+        <values:some-group anyParameter="#['someValue']"/>
+    </values:values-with-required-params-from-show-in-dsl-group-config>
+
+    <values:failure-config errorCode="CUSTOM_ERROR" name="failure-config"/>
+
+    <values:failure-config errorCode="#['CUSTOM_ERROR']" name="dynamic-failure-config"/>
+
+    <values:with-bound-value-parameter-config name="with-bound-acting-parameter"
+                                              actingParameter="Acting parameter value"/>
+
+    <values:config-with-parameter-with-field-values-config name="config-with-parameter-with-field-values"/>
+
+</mule>
