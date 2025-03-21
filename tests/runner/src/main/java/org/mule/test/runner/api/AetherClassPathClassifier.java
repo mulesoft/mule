@@ -6,7 +6,6 @@
  */
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
@@ -15,13 +14,10 @@ import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.JAR_EXTENSION;
 import static org.mule.test.runner.utils.RunnerModuleUtils.RUNNER_PROPERTIES_MULE_VERSION;
-import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiArtifact;
-import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkCompatibilityApiArtifact;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Paths.get;
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
@@ -44,7 +40,6 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.andFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 
-import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -62,7 +57,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -78,7 +72,6 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Lists;
 import com.vdurmont.semver4j.Semver;
 import com.vdurmont.semver4j.SemverException;
-
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -439,10 +432,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
     directDependencies
         .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOG4J_CONFIGURATOR_ARTIFACT_ID, JAR_EXTENSION, muleVersion),
                             COMPILE));
-
-    // TODO: MULE-19762 remove once forward compatiblity is finished
-    directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
-    directDependencies.add(new Dependency(getDefaultSdkCompatibilityApiArtifact(), COMPILE));
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
