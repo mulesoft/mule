@@ -14,7 +14,7 @@ import org.mule.runtime.service.test.api.FooService;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class FooServiceProvider implements ServiceProvider {
 

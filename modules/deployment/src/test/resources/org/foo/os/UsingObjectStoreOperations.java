@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.util.UUID;
 
 import java.io.Serializable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class UsingObjectStoreOperations implements Initialisable {
   

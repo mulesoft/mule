@@ -10,7 +10,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Extension for testing purposes

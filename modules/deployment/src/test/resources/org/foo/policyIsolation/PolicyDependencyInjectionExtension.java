@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.foo.policyIsolation.internal.InternalRegistryBean;
 import org.foo.policyIsolation.internal.PolicyDependencyInjectionFunctions;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Extension designed to test the policy classloading and context isolation
