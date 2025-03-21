@@ -114,6 +114,10 @@ public class MuleProperties {
   public static final String OBJECT_MULE_CONTEXT = "_muleContext";
   public static final String OBJECT_MULE_CONTEXT_PROCESSOR = "_muleContextProcessor";
   public static final String OBJECT_PROPERTY_PLACEHOLDER_PROCESSOR = "_mulePropertyPlaceholderProcessor";
+  /**
+   * @deprecated No object with this key is being registered as of 4.10
+   */
+  @Deprecated(forRemoval = true, since = "4.10")
   public static final String OBJECT_OBJECT_NAME_PROCESSOR = "_muleObjectNameProcessor";
   public static final String OBJECT_LIFECYCLE_MANAGER = "_muleLifecycleManager";
   public static final String OBJECT_CLASSLOADER_REPOSITORY = "_muleClassLoaderRepository";
