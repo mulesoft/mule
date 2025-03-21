@@ -55,6 +55,8 @@ public class ParameterMockingTestUtil {
       return value;
     } else if (parameter.getType().equals(Integer.TYPE)) {
       return 1;
+    } else if (parameter.getType().equals(Long.TYPE)) {
+      return 2L;
     } else {
       return Mockito.mock(parameter.getType());
     }

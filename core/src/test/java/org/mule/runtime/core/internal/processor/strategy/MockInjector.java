@@ -69,7 +69,7 @@ public class MockInjector {
    * @param base object to get hierarchy for...
    * @return list of Class&lt;?&gt; objects
    */
-  private static List<Class> getClassesInHierarchy(Object base) {
+  public static List<Class> getClassesInHierarchy(Object base) {
     final List<Class> classes = new ArrayList<>();
     for (Class<?> c = base.getClass(); !c.equals(Object.class); c = c.getSuperclass()) {
       classes.add(c);
