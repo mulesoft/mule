@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -106,7 +105,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
 
   public ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties)
       throws ConfigurationException {
-    this(artifactAst, emptyMap(), ArtifactType.APP, false, false,
+    this(artifactAst, artifactProperties, ArtifactType.APP, false, false,
          new DefaultComponentBuildingDefinitionRegistryFactory()
              .create(artifactAst.dependencies(),
                      artifactAst::dependenciesDsl));

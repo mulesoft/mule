@@ -195,6 +195,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String RAISE_ERROR = "raise-error";
   private static final String INHERIT_ITERABLE_REPEATABILITY = "inheritIterableRepeatability";
 
+  private static final String PARAM_VALUE = "value";
+  private static final String PARAM_ENCODING = "encoding";
+  private static final String PARAM_MIME_TYPE = "mimeType";
+
   @SuppressWarnings("rawtypes")
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(CORE_PREFIX);
@@ -234,9 +238,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(errorHandlerBuilder.build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))
-            .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
-            .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
-            .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build()).build());
+            .withSetterParameterDefinition(PARAM_VALUE, fromSimpleParameter(PARAM_VALUE).build())
+            .withSetterParameterDefinition(PARAM_MIME_TYPE, fromSimpleParameter(PARAM_MIME_TYPE).build())
+            .withSetterParameterDefinition(PARAM_ENCODING, fromSimpleParameter(PARAM_ENCODING).build()).build());
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(LOGGER).withTypeDefinition(fromType(LoggerMessageProcessor.class))
@@ -252,8 +256,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                    .withAttributeDefinition(fromSimpleParameter("variableName").build())
                                                    .build(),
                                                newBuilder()
-                                                   .withKey("value")
-                                                   .withAttributeDefinition(fromSimpleParameter("value").build())
+                                                   .withKey(PARAM_VALUE)
+                                                   .withAttributeDefinition(fromSimpleParameter(PARAM_VALUE).build())
                                                    .build())
                                                        .withIdentifier("set-variable")
                                                        .withTypeDefinition(fromType(AddFlowVariableProcessor.class))
@@ -268,7 +272,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("global-property")
         .withTypeDefinition(fromType(String.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("value").build())
+        .withConstructorParameterDefinition(fromSimpleParameter(PARAM_VALUE).build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUTE)
@@ -647,9 +651,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return transformerComponentBuildingDefinitions;
   }
 
-  private ConfigurableInstanceFactory getAddVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyProcessor> transformerType) {
+  private <T, P extends AbstractAddVariablePropertyProcessor<T>> ConfigurableInstanceFactory<P> getAddVariableTransformerInstanceFactory(Class<P> transformerType) {
     return parameters -> {
-      AbstractAddVariablePropertyProcessor transformer;
+      P transformer;
       try {
         transformer = transformerType.getConstructor().newInstance();
       } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
@@ -657,23 +661,23 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         throw new MuleRuntimeException(e);
       }
       transformer.setIdentifier((String) parameters.get("identifier"));
-      transformer.setValue((String) parameters.get("value"));
+      transformer.setValue((String) parameters.get(PARAM_VALUE));
       return transformer;
     };
   }
 
   @SuppressWarnings("unchecked")
-  private static ComponentBuildingDefinition.Builder getSetVariablePropertyBaseBuilder(ConfigurableInstanceFactory configurableInstanceFactory,
-                                                                                       Class<? extends AbstractAddVariablePropertyProcessor> setterClass,
-                                                                                       KeyAttributeDefinitionPair... configurationAttributes) {
+  private static <T, P extends AbstractAddVariablePropertyProcessor<T>> ComponentBuildingDefinition.Builder<P> getSetVariablePropertyBaseBuilder(ConfigurableInstanceFactory<P> configurableInstanceFactory,
+                                                                                                                                                 Class<P> setterClass,
+                                                                                                                                                 KeyAttributeDefinitionPair... configurationAttributes) {
     KeyAttributeDefinitionPair[] commonTransformerParameters = {
         newBuilder()
-            .withKey("encoding")
-            .withAttributeDefinition(fromSimpleParameter("encoding").build())
+            .withKey(PARAM_ENCODING)
+            .withAttributeDefinition(fromSimpleParameter(PARAM_ENCODING).build())
             .build(),
         newBuilder()
-            .withKey("mimeType")
-            .withAttributeDefinition(fromSimpleParameter("mimeType").build())
+            .withKey(PARAM_MIME_TYPE)
+            .withAttributeDefinition(fromSimpleParameter(PARAM_MIME_TYPE).build())
             .build(),
         newBuilder()
             .withKey("muleContext")
@@ -794,8 +798,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
   private Builder getCoreMuleMessageTransformerBaseBuilder() {
     return new ComponentBuildingDefinition.Builder<>()
-        .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build())
-        .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
+        .withSetterParameterDefinition(PARAM_ENCODING, fromSimpleParameter(PARAM_ENCODING).build())
+        .withSetterParameterDefinition(PARAM_MIME_TYPE, fromSimpleParameter(PARAM_MIME_TYPE).build())
         .asPrototype().withNamespace(CORE_PREFIX);
   }
 
