@@ -3,18 +3,18 @@
     "revapi": {
       "differences": {
         "differences": [
-{
-  "ignore": true,
-  "code": "java.class.removed",
-  "old": "class org.mule.runtime.config.api.dsl.artifact.SpringArtifactConfigurationProcessor",
-  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-},
-{
-  "ignore": true,
-  "code": "java.class.removed",
-  "old": "class org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils",
-  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-},
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.dsl.artifact.SpringArtifactConfigurationProcessor",
+            "justification": "W-18098781: Remove dead code related to spring"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils",
+            "justification": "W-18098781: Remove dead code related to spring"
+          },
           {
             "ignore": true,
             "code": "java.class.removed",
