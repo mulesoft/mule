@@ -98,16 +98,6 @@ public class JavaxInjectCompatibilityTestCase extends AbstractExtensionFunctiona
     assertThat(flowOutput.getPayload().getValue(), is(defaultCharset().name()));
   }
 
-  @Test
-  public void pojoAttribute() {
-
-  }
-
-  @Test
-  public void pojoParam() {
-
-  }
-
   public static String storeData(String data) {
     storedData = data;
     return data;

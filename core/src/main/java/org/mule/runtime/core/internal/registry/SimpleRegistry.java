@@ -399,42 +399,51 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   private <T, N extends Annotation> void doInjectInto(T object, final Class<? extends Annotation> injectAnnClass,
                                                       final Class<N> namedAnnClass, Function<N, String> namedValue) {
     for (Field field : getAllFields(object.getClass(), withAnnotation(injectAnnClass))) {
-      try {
-        final N namedAnnotation = field.getAnnotation(namedAnnClass);
-        Object dependency =
-            resolveTypedDependency(field.getType(), namedAnnotation != null ? namedValue.apply(namedAnnotation) : null,
-                                   () -> ((ParameterizedType) (field.getGenericType()))
-                                       .getActualTypeArguments()[0]);
+      injectToField(object, namedAnnClass, namedValue, field);
+    }
+    for (Method method : getAllMethods(object.getClass(), withAnnotation(injectAnnClass))) {
+      injectToMethod(object, namedAnnClass, namedValue, method);
+    }
+  }
 
-        field.setAccessible(true);
+  private <N extends Annotation, T> void injectToField(T object, final Class<N> namedAnnClass, Function<N, String> namedValue,
+                                                       Field field) {
+    try {
+      final N namedAnnotation = field.getAnnotation(namedAnnClass);
+      Object dependency =
+          resolveTypedDependency(field.getType(), namedAnnotation != null ? namedValue.apply(namedAnnotation) : null,
+                                 () -> ((ParameterizedType) (field.getGenericType()))
+                                     .getActualTypeArguments()[0]);
+
+      field.setAccessible(true);
+      if (dependency != null) {
+        field.set(object, dependency);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(format("Could not inject dependency on field %s of type %s", field.getName(),
+                                        object.getClass().getName()),
+                                 e);
+    }
+  }
+
+  private <N extends Annotation, T> void injectToMethod(T object, final Class<N> namedAnnClass, Function<N, String> namedValue,
+                                                        Method method) {
+    if (method.getParameters().length == 1) {
+      try {
+        final N namedAnnotation = method.getAnnotation(namedAnnClass);
+        Object dependency = resolveTypedDependency(method.getParameterTypes()[0],
+                                                   namedAnnotation != null ? namedValue.apply(namedAnnotation) : null,
+                                                   () -> ((ParameterizedType) (method.getGenericParameterTypes()[0]))
+                                                       .getActualTypeArguments()[0]);
+
         if (dependency != null) {
-          field.set(object, dependency);
+          method.invoke(object, dependency);
         }
       } catch (Exception e) {
-        throw new RuntimeException(format("Could not inject dependency on field %s of type %s", field.getName(),
+        throw new RuntimeException(format("Could not inject dependency on method %s of type %s", method.getName(),
                                           object.getClass().getName()),
                                    e);
       }
-    }
-    for (Method method : getAllMethods(object.getClass(), withAnnotation(injectAnnClass))) {
-      if (method.getParameters().length == 1) {
-        try {
-          final N namedAnnotation = method.getAnnotation(namedAnnClass);
-          Object dependency = resolveTypedDependency(method.getParameterTypes()[0],
-                                                     namedAnnotation != null ? namedValue.apply(namedAnnotation) : null,
-                                                     () -> ((ParameterizedType) (method.getGenericParameterTypes()[0]))
-                                                         .getActualTypeArguments()[0]);
-
-          if (dependency != null) {
-            method.invoke(object, dependency);
-          }
-        } catch (Exception e) {
-          throw new RuntimeException(format("Could not inject dependency on method %s of type %s", method.getName(),
-                                            object.getClass().getName()),
-                                     e);
-        }
-      }
-
     }
   }
 

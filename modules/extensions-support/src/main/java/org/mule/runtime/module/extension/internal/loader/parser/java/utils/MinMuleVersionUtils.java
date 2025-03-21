@@ -459,44 +459,50 @@ public final class MinMuleVersionUtils {
       fieldMinMuleVersion.updateIfHigherMMV(typeMMV, getReasonType("Field", field.getName(), typeMMV));
     }
     for (Type annotation : field.getAnnotations().collect(toList())) {
-      if ((annotation.isSameType(Inject.class)
-          // Still need to support javax.inject for the time being...
-          || annotation.isSameType(javax.inject.Inject.class))
-          && !parameterType.isSameType(Optional.class)) {
-        // Parse injected classes but exclude Optionals (such as ForwardCompatibilityHelper)
-        ResolvedMinMuleVersion typeMMV = getEnforcedMinMuleVersion(parameterType);
-        fieldMinMuleVersion.updateIfHigherMMV(typeMMV, getReasonType("Field", field.getName(), typeMMV));
-      }
-      if (isParameterOrParameterGroup(annotation)) {
-        ResolvedMinMuleVersion parameterContainerMMV =
-            calculateParameterTypeMinMuleVersion(parameterType, seenTypesForRecursionControl);
-        fieldMinMuleVersion.updateIfHigherMMV(parameterContainerMMV,
-                                              getReasonFieldType(field.getName(),
-                                                                 parameterContainerMMV.getMinMuleVersion().toString(),
-                                                                 "parameter", parameterContainerMMV.getName()));
-      }
-      if (annotation.isSameType(Connection.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Connection.class)) {
-        // Sources inject the ConnectionProvider instead of the connection
-        if (parameterType.isAssignableTo(ConnectionProvider.class)
-            || parameterType.isAssignableTo(org.mule.sdk.api.connectivity.ConnectionProvider.class)) {
-          ResolvedMinMuleVersion connectionProviderMMV = resolveConnectionProviderMinMuleVersion(parameterType);
-          fieldMinMuleVersion.updateIfHigherMMV(connectionProviderMMV,
-                                                getReasonFieldType(field.getName(),
-                                                                   connectionProviderMMV.getMinMuleVersion().toString(),
-                                                                   "connection provider", connectionProviderMMV.getName()));
-        }
-      }
-      if (annotation.isSameType(Config.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Config.class)) {
-        ResolvedMinMuleVersion configurationMMV =
-            resolveConfigurationMinMuleVersion(parameterType, getEnforcedMinMuleVersion(annotation).getMinMuleVersion());
-        fieldMinMuleVersion.updateIfHigherMMV(configurationMMV,
-                                              getReasonFieldType(field.getName(), configurationMMV.getMinMuleVersion().toString(),
-                                                                 "configuration", configurationMMV.getName()));
-      }
-      ResolvedMinMuleVersion annotationMMV = getEnforcedMinMuleVersion(annotation);
-      fieldMinMuleVersion.updateIfHigherMMV(annotationMMV, getReasonAnnotated("Field", field.getName(), annotationMMV));
+      calculateFieldAnnotationMinMuleVersion(field, seenTypesForRecursionControl, parameterType, fieldMinMuleVersion, annotation);
     }
     return fieldMinMuleVersion;
+  }
+
+  private static void calculateFieldAnnotationMinMuleVersion(ExtensionParameter field, Set<String> seenTypesForRecursionControl,
+                                                             Type parameterType, ResolvedMinMuleVersion fieldMinMuleVersion,
+                                                             Type annotation) {
+    if ((annotation.isSameType(Inject.class)
+        // Still need to support javax.inject for the time being...
+        || annotation.isSameType(javax.inject.Inject.class))
+        && !parameterType.isSameType(Optional.class)) {
+      // Parse injected classes but exclude Optionals (such as ForwardCompatibilityHelper)
+      ResolvedMinMuleVersion typeMMV = getEnforcedMinMuleVersion(parameterType);
+      fieldMinMuleVersion.updateIfHigherMMV(typeMMV, getReasonType("Field", field.getName(), typeMMV));
+    }
+    if (isParameterOrParameterGroup(annotation)) {
+      ResolvedMinMuleVersion parameterContainerMMV =
+          calculateParameterTypeMinMuleVersion(parameterType, seenTypesForRecursionControl);
+      fieldMinMuleVersion.updateIfHigherMMV(parameterContainerMMV,
+                                            getReasonFieldType(field.getName(),
+                                                               parameterContainerMMV.getMinMuleVersion().toString(),
+                                                               "parameter", parameterContainerMMV.getName()));
+    }
+    if (annotation.isSameType(Connection.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Connection.class)) {
+      // Sources inject the ConnectionProvider instead of the connection
+      if (parameterType.isAssignableTo(ConnectionProvider.class)
+          || parameterType.isAssignableTo(org.mule.sdk.api.connectivity.ConnectionProvider.class)) {
+        ResolvedMinMuleVersion connectionProviderMMV = resolveConnectionProviderMinMuleVersion(parameterType);
+        fieldMinMuleVersion.updateIfHigherMMV(connectionProviderMMV,
+                                              getReasonFieldType(field.getName(),
+                                                                 connectionProviderMMV.getMinMuleVersion().toString(),
+                                                                 "connection provider", connectionProviderMMV.getName()));
+      }
+    }
+    if (annotation.isSameType(Config.class) || annotation.isSameType(org.mule.sdk.api.annotation.param.Config.class)) {
+      ResolvedMinMuleVersion configurationMMV =
+          resolveConfigurationMinMuleVersion(parameterType, getEnforcedMinMuleVersion(annotation).getMinMuleVersion());
+      fieldMinMuleVersion.updateIfHigherMMV(configurationMMV,
+                                            getReasonFieldType(field.getName(), configurationMMV.getMinMuleVersion().toString(),
+                                                               "configuration", configurationMMV.getName()));
+    }
+    ResolvedMinMuleVersion annotationMMV = getEnforcedMinMuleVersion(annotation);
+    fieldMinMuleVersion.updateIfHigherMMV(annotationMMV, getReasonAnnotated("Field", field.getName(), annotationMMV));
   }
 
   private static ResolvedMinMuleVersion calculateMethodParameterMinMuleVersion(ExtensionParameter methodParameter) {
