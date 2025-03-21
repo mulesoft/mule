@@ -6,33 +6,40 @@
  */
 package org.mule.test.module.extension.inject;
 
-import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
-import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.createComponentParameterizationFromComponentAst;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVAX_INJECT_COMPATIBILITY;
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
-import static org.mule.test.javaxinject.JavaxInjectCompatibilityTestExtension.JAVAX_INJECT_COMPATIBILITY_TEST_EXTENSION;
 
 import static java.nio.charset.Charset.defaultCharset;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
 import static org.hamcrest.core.Is.is;
 
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.component.location.Location;
+import org.mule.functional.junit4.AbstractArtifactAstTestCase;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.value.ValueProviderService;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.value.ValueResult;
-import org.mule.runtime.core.api.data.sample.SampleDataService;
+import org.mule.runtime.module.extension.api.runtime.config.ConfigurationProviderFactory;
+import org.mule.runtime.module.extension.api.runtime.config.ExtensionDesignTimeResolversFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
+import org.mule.runtime.module.extension.internal.runtime.config.DefaultExtensionDesignTimeResolversFactory;
 import org.mule.sdk.api.data.sample.SampleDataException;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+import org.mule.test.javaxinject.JavaxInjectCompatibilityTestExtension;
+import org.mule.test.module.extension.data.sample.SampleDataExecutor;
+import org.mule.test.module.extension.values.ValueProviderExecutor;
 
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import org.junit.Before;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -40,35 +47,22 @@ import io.qameta.allure.Story;
 
 @Feature(JAVA_SDK)
 @Story(JAVAX_INJECT_COMPATIBILITY)
-@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
-public class JavaxInjectCompatibilityToolingTestCase extends MuleArtifactFunctionalTestCase {
+public class JavaxInjectCompatibilityToolingTestCase extends AbstractArtifactAstTestCase {
 
-  @Inject
-  @Named(SAMPLE_DATA_SERVICE_KEY)
-  private SampleDataService sampleDataService;
+  private ExtensionModel javaxInjectExtension;
 
-  @Inject
-  @Named(VALUE_PROVIDER_SERVICE_KEY)
-  private ValueProviderService valueProviderService;
+  private ExtensionDesignTimeResolversFactory extensionDesignTimeResolversFactory;
+  private ConfigurationProviderFactory configurationProviderFactory;
+  private SampleDataExecutor sampleDataExecutor;
 
-  @Override
-  public boolean enableLazyInit() {
-    return true;
-  }
+  @Before
+  public void createExtensionDesignTimeResolversFactory() throws InitialisationException {
+    extensionDesignTimeResolversFactory = new DefaultExtensionDesignTimeResolversFactory();
+    initialiseIfNeeded(extensionDesignTimeResolversFactory, true, muleContext);
+    configurationProviderFactory = new DefaultConfigurationProviderFactory();
+    initialiseIfNeeded(configurationProviderFactory, true, muleContext);
 
-  @Override
-  public boolean disableXmlValidations() {
-    return true;
-  }
-
-  @Override
-  public boolean addToolingObjectsToRegistry() {
-    return true;
-  }
-
-  @Override
-  protected boolean isDisposeContextPerClass() {
-    return true;
+    sampleDataExecutor = new SampleDataExecutor(extensionDesignTimeResolversFactory);
   }
 
   @Override
@@ -76,18 +70,38 @@ public class JavaxInjectCompatibilityToolingTestCase extends MuleArtifactFunctio
     return "inject/javax-inject-compatibility-config.xml";
   }
 
+  @Override
+  protected Set<ExtensionModel> getRequiredExtensions() {
+    final var extensions = new HashSet<ExtensionModel>();
+    extensions.add(getExtensionModel());
+    javaxInjectExtension = loadExtension(JavaxInjectCompatibilityTestExtension.class, emptySet());
+    extensions.add(javaxInjectExtension);
+    return extensions;
+  }
+
   @Test
   public void sampleData() throws SampleDataException {
+    final var operationAst = getFlowComponent("operation", OPERATION);
     final Message sampleData =
-        sampleDataService.getSampleData(JAVAX_INJECT_COMPATIBILITY_TEST_EXTENSION, "execute", emptyMap(), Optional::empty);
+        sampleDataExecutor.getSampleData(javaxInjectExtension,
+                                         createComponentParameterizationFromComponentAst(operationAst),
+                                         empty())
+            .getSampleData()
+            .orElseThrow();
 
     assertThat(sampleData.getPayload().getValue(), is(defaultCharset().name()));
   }
 
   @Test
   public void valueProviders() {
-    Location location = Location.builder().globalName("valueProvider").addProcessorsPart().addIndexPart(0).build();
-    final ValueResult values = valueProviderService.getFieldValues(location, "param", null);
+    final var operationAst = getFlowComponent("valueProvider", OPERATION);
+
+    final var valueProviderExecutor = new ValueProviderExecutor(extensionDesignTimeResolversFactory,
+                                                                operationAst.getModel(ParameterizedModel.class).orElseThrow());
+
+    final var operationParameterization = createComponentParameterizationFromComponentAst(operationAst);
+    final ValueResult values =
+        valueProviderExecutor.resolveValues(javaxInjectExtension, "param", operationParameterization, empty(), null);
 
     assertThat(values.getValues(), iterableWithSize(1));
     assertThat(values.getValues().iterator().next().getId(), is(defaultCharset().name()));
