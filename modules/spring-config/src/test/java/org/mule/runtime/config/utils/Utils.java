@@ -11,8 +11,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public class Utils {
 

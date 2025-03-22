@@ -109,8 +109,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -130,6 +128,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
+import jakarta.inject.Inject;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 

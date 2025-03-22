@@ -12,7 +12,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.MuleContext;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class TestLifecycleObject implements Lifecycle {
 

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.utils.Utils.augmentedParam;
 
 import static java.lang.String.format;
@@ -18,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.config.utils.Utils.AmbiguousAugmentedMethodService;
@@ -41,20 +42,21 @@ import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Method;
 
-import javax.inject.Inject;
-
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import jakarta.inject.Inject;
 
 @SmallTest
 public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleContextTestCase {
 
-  @Rule
-  public ExpectedException expected = ExpectedException.none();
-
   @Inject
   private Registry registry;
+
+  @Before
+  public void setUp() {
+    augmentedParam = null;
+  }
 
   @Override
   protected boolean doTestClassInjection() {
@@ -122,10 +124,10 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
-    expected.expect(IllegalDependencyInjectionException.class);
-    expected.expectMessage(format(NO_OBJECT_FOUND_FOR_PARAM, "param", "augmented", "InvalidNamedAugmentedMethodService"));
-
-    serviceProxy.augmented();
+    var thrown = assertThrows(IllegalDependencyInjectionException.class,
+                              () -> serviceProxy.augmented());
+    assertThat(thrown.getMessage(),
+               is(format(NO_OBJECT_FOUND_FOR_PARAM, "param", "augmented", "InvalidNamedAugmentedMethodService")));
   }
 
   @Test
@@ -181,9 +183,10 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
 
     final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
 
-    expected.expect(IllegalDependencyInjectionException.class);
-    expected.expectMessage(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, "augmented", "AmbiguousAugmentedMethodService"));
-    serviceProxy.augmented();
+    var thrown = assertThrows(IllegalDependencyInjectionException.class,
+                              () -> serviceProxy.augmented());
+    assertThat(thrown.getMessage(),
+               is(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, "augmented", "AmbiguousAugmentedMethodService")));
 
     assertThat(augmentedParam, nullValue());
   }
@@ -203,7 +206,7 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
   public void throughProxyAugmentedInvocation() {
     BaseService service = new AugmentedMethodService();
 
-    final MetadataInvocationHandler noOpHandler = new MetadataInvocationHandler(service) {
+    final MetadataInvocationHandler<BaseService> noOpHandler = new MetadataInvocationHandler<>(service) {
 
       @Override
       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
