@@ -266,12 +266,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
     }
 
     logger.debug("applying processors");
-    object = applyProcessors(object, metadata);
-    if (object == null) {
-      return;
-    }
-
-    doRegisterObject(key, object);
+    doRegisterObject(key, applyProcessors(object, metadata));
   }
 
   @Override
