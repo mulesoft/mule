@@ -424,7 +424,8 @@ public class DependencyResolver implements AutoCloseable {
           }
 
           if (artifact.getGroupId().equals("com.mulesoft.connectivity")) {
-            logger.error("DependencyResolver dependency found: {} : {}", artifact.getArtifactId(), artifact.getFile());
+            logger.error("DependencyResolver dependency found: {} : {} : {}", artifact.getArtifactId(), artifact.getFile(),
+                         artifact.getClassifier());
           } else {
             logger.error("com.mulesoft.connectivity group not found");
           }
