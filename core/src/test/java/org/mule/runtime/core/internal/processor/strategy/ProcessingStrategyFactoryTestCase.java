@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -100,6 +102,8 @@ class ProcessingStrategyFactoryTestCase {
   private Scheduler scheduler;
   @Mock
   private BaseEventContext eventContext;
+  @Captor
+  private ArgumentCaptor<Publisher<CoreEvent>> publisherCaptor;
 
   @ParameterizedTest(name = TEST_NAME)
   @MethodSource("strategyFactories")
@@ -128,6 +132,9 @@ class ProcessingStrategyFactoryTestCase {
     when(pipeline.apply(any())).thenAnswer(inv -> inv.getArgument(0));
 
     getStrategy(factory, testName).createSink(flow, pipeline).accept(event);
+
+    verify(pipeline).apply(publisherCaptor.capture());
+    // Hm. Limited things we can do - checking things about the type is too specific to the strategy...
   }
 
   @ParameterizedTest(name = TEST_NAME)
