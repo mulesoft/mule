@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
@@ -28,6 +29,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -48,23 +51,29 @@ class ProfilingUtilsTest {
   @MethodSource("locationTestData")
   void getLocation(String name, ReactiveProcessor processor, Consumer<ReactiveProcessor> verifier) {
 
-    ProfilingUtils.getLocation(processor);
+    final ComponentLocation result = ProfilingUtils.getLocation(processor);
 
+    // Normally it's not null, but it's all mocking - this is just here to make SonarQube happy because it's not clever enough
+    // to figure out that the verifier actually does verify stuff. :face_with_rolling_eyes:
+    assertThat(result, is(nullValue()));
     verifier.accept(processor);
   }
 
   static Stream<Arguments> locationTestData() {
     return Stream.of(
-                     args("HasLocation", mock(ReactiveProcessor.class, withSettings().extraInterfaces(HasLocation.class)),
+                     args("HasLocation", getProcessor(HasLocation.class),
                           o -> verify((HasLocation) o).resolveLocation()),
                      args("InterceptedReactiveProcessor",
-                          new InterceptedReactiveProcessor(mock(ReactiveProcessor.class,
-                                                                withSettings().extraInterfaces(HasLocation.class)),
+                          new InterceptedReactiveProcessor(getProcessor(HasLocation.class),
                                                            mock(ReactiveProcessor.class)),
                           o -> verify((HasLocation) ((InterceptedReactiveProcessor) o).getProcessor()).resolveLocation()),
-                     args("Component", mock(ReactiveProcessor.class, withSettings().extraInterfaces(Component.class)),
+                     args("Component", getProcessor(Component.class),
                           o -> verify((Component) o).getLocation()),
                      args("Plain", mock(ReactiveProcessor.class), Mockito::verifyNoMoreInteractions));
+  }
+
+  private static ReactiveProcessor getProcessor(Class<?> extraInterface) {
+    return mock(ReactiveProcessor.class, withSettings().extraInterfaces(extraInterface));
   }
 
   private static Arguments args(String name, ReactiveProcessor processor, Consumer<ReactiveProcessor> verifier) {
