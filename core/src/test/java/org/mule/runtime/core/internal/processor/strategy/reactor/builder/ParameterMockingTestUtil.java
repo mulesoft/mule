@@ -7,13 +7,11 @@
 package org.mule.runtime.core.internal.processor.strategy.reactor.builder;
 
 import org.mockito.Mockito;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.sound.sampled.Control;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
