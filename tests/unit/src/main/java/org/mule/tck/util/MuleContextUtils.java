@@ -40,8 +40,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.getAllMethods;
+import static org.reflections.ReflectionUtils.Fields;
+import static org.reflections.ReflectionUtils.Methods;
+import static org.reflections.ReflectionUtils.get;
 import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -98,6 +99,7 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -110,11 +112,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+
+import jakarta.inject.Inject;
 
 /**
  * Provides helper methods to handle mock {@link MuleContext}s in unit tests.
@@ -133,7 +135,15 @@ public class MuleContextUtils {
 
     @Override
     public <T> T inject(T object) {
-      for (Field field : getAllFields(object.getClass(), withAnnotation(Inject.class))) {
+      doInjectInto(object, Inject.class);
+      // Still need to support javax.inject for the time being...
+      doInjectInto(object, javax.inject.Inject.class);
+
+      return object;
+    }
+
+    private <T> void doInjectInto(final T object, final Class<? extends Annotation> injectAnnClass) {
+      for (Field field : get(Fields.of(object.getClass()), withAnnotation(injectAnnClass))) {
         Class<?> dependencyType = field.getType();
 
         boolean nullToOptional = false;
@@ -161,7 +171,7 @@ public class MuleContextUtils {
                                      e);
         }
       }
-      for (Method method : getAllMethods(object.getClass(), withAnnotation(Inject.class))) {
+      for (Method method : get(Methods.of(object.getClass()), withAnnotation(injectAnnClass))) {
         if (method.getParameters().length == 1) {
           Class<?> dependencyType = method.getParameterTypes()[0];
 
@@ -188,7 +198,6 @@ public class MuleContextUtils {
         }
 
       }
-      return object;
     }
 
     private Object resolveObjectToInject(Class<?> dependencyType) {

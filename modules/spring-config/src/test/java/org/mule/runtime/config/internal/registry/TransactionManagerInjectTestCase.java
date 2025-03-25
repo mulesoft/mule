@@ -15,10 +15,9 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import javax.inject.Inject;
-
 import org.junit.Test;
 
+import jakarta.inject.Inject;
 import jakarta.transaction.TransactionManager;
 
 public class TransactionManagerInjectTestCase extends AbstractMuleContextTestCase {

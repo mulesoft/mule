@@ -52,8 +52,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import javax.inject.Inject;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,6 +60,8 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 
 import io.qameta.allure.Issue;
+
+import jakarta.inject.Inject;
 
 public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCase {
 

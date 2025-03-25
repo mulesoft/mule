@@ -1056,6 +1056,7 @@ public interface AllureConstants {
       String CONNECTIVITY_TEST = "Connectivity test";
     }
 
+    String JAVAX_INJECT_COMPATIBILITY = "javax.inject compatibility";
   }
 
   interface XmlSdk {

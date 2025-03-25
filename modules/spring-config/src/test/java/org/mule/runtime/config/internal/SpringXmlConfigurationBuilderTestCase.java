@@ -57,8 +57,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 
-import javax.inject.Inject;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -66,6 +64,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import io.qameta.allure.Issue;
+
+import jakarta.inject.Inject;
 
 public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase {
 

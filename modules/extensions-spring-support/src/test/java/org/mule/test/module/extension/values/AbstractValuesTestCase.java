@@ -6,24 +6,16 @@
  */
 package org.mule.test.module.extension.values;
 
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.CONNECTION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
-import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.createComponentParameterizationFromComponentAst;
-import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
-import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.tck.junit4.matcher.value.ValueResultSuccessMatcher.isSuccess;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.ValueProvidersStory.VALUE_PROVIDERS_SERVICE;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.stream;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toMap;
@@ -32,33 +24,24 @@ import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsIterableContaining.hasItems;
 
-import org.mule.functional.junit4.CachingAstXmlParser;
-import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
-import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.functional.junit4.AbstractArtifactAstTestCase;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.api.value.ValueResult;
-import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.api.runtime.config.ConfigurationProviderFactory;
 import org.mule.runtime.module.extension.api.runtime.config.ExtensionDesignTimeResolversFactory;
-import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultExtensionDesignTimeResolversFactory;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.ValueMatcher;
 import org.mule.test.module.extension.data.sample.SampleDataExecutor;
 import org.mule.test.values.extension.ValuesExtension;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -72,27 +55,12 @@ import io.qameta.allure.Story;
 
 @Feature(SDK_TOOLING_SUPPORT)
 @Story(VALUE_PROVIDERS_SERVICE)
-public abstract class AbstractValuesTestCase extends AbstractMuleContextTestCase {
-
-  private static final CachingAstXmlParser AST_PARSER =
-      new CachingAstXmlParser(true, false, emptyMap(), APPLICATION, emptyArtifact());
+public abstract class AbstractValuesTestCase extends AbstractArtifactAstTestCase {
 
   private ExtensionModel valuesExtension;
 
   private ExtensionDesignTimeResolversFactory extensionDesignTimeResolversFactory;
   private ConfigurationProviderFactory configurationProviderFactory;
-
-  private ArtifactAst appAst;
-
-  @Before
-  public void loadAst() {
-    appAst = AST_PARSER.parse(this.getClass().getName(),
-                              getRequiredExtensions(),
-                              this.getClass().getClassLoader(),
-                              empty(),
-                              null,
-                              new String[] {getConfigFile()});
-  }
 
   @Before
   public void createExtensionDesignTimeResolversFactory() throws InitialisationException {
@@ -102,39 +70,13 @@ public abstract class AbstractValuesTestCase extends AbstractMuleContextTestCase
     initialiseIfNeeded(configurationProviderFactory, true, muleContext);
   }
 
-  protected abstract String getConfigFile();
-
+  @Override
   protected Set<ExtensionModel> getRequiredExtensions() {
     final var extensions = new HashSet<ExtensionModel>();
     extensions.add(getExtensionModel());
     valuesExtension = loadExtension(ValuesExtension.class, emptySet());
     extensions.add(valuesExtension);
     return extensions;
-  }
-
-  protected ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {
-    DefaultJavaExtensionModelLoader loader = new DefaultJavaExtensionModelLoader();
-    return loadExtensionWithLoader(extension, deps, loader);
-  }
-
-  protected ExtensionModel loadExtensionWithLoader(Class extension, Set<ExtensionModel> deps,
-                                                   ExtensionModelLoader extensionModelLoader) {
-    Map<String, Object> ctx = new HashMap<>();
-    ctx.put(TYPE_PROPERTY_NAME, extension.getName());
-    ctx.put(VERSION, "4.10.0");
-    ctx.putAll(getExtensionLoaderContextAdditionalParameters());
-    return extensionModelLoader.loadExtensionModel(currentThread().getContextClassLoader(), DslResolvingContext.getDefault(deps),
-                                                   ctx);
-  }
-
-  /**
-   * Subclasses can override this method so that extension models are generated with an extension loading context that contains
-   * the parameters returned by this method.
-   *
-   * @return a map with parameters to be added to the extension loader context.
-   */
-  protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
-    return emptyMap();
   }
 
   protected Matcher<Iterable<Value>> hasValues(String... values) {
@@ -270,24 +212,6 @@ public abstract class AbstractValuesTestCase extends AbstractMuleContextTestCase
     return values.getValues();
   }
 
-  private ComponentAst getFlowComponent(String flowName, ComponentType componentType) {
-    return appAst.topLevelComponentsStream()
-        .filter(f -> componentIdEquals(f, flowName))
-        .flatMap(flowAst -> flowAst.directChildrenStream()
-            .filter(comp -> componentType.equals(comp.getComponentType())))
-        .findFirst().orElseThrow();
-  }
-
-  private Optional<String> configNameFromComponent(ComponentAst comp) {
-    return comp.getParameters()
-        .stream()
-        .filter(p -> p.getModel().getAllowedStereotypes()
-            .stream()
-            .anyMatch(as -> as.isAssignableTo(CONFIG)))
-        .map(p -> (String) p.getValue().getRight())
-        .findAny();
-  }
-
   private ConfigurationProvider createConfigurationProvider(String configName) {
     final var configAst = getTopLevelComponent(configName);
 
@@ -312,25 +236,6 @@ public abstract class AbstractValuesTestCase extends AbstractMuleContextTestCase
                                                                            null,
                                                                            SampleDataExecutor
                                                                                .getClassLoader(valuesExtension));
-  }
-
-  private boolean componentIdEquals(ComponentAst component, String componentId) {
-    return component.getComponentId()
-        .map(componentId::equals)
-        .orElse(false);
-  }
-
-  private ComponentAst getTopLevelComponent(String configName) {
-    return appAst.topLevelComponentsStream()
-        .filter(f -> componentIdEquals(f, configName))
-        .findFirst().orElseThrow();
-  }
-
-  private ComponentAst getConnectionProvider(ComponentAst configAst) {
-    return configAst.directChildrenStream()
-        .filter(c -> CONNECTION.equals(c.getComponentType()))
-        .findAny()
-        .orElseThrow();
   }
 
 }
