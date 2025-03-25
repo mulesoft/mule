@@ -101,13 +101,13 @@ public enum WebSocketCloseCode {
     WebSocketCloseCode code = CODES.get(protocolCode);
     if (code == null) {
       if (isPrivateUseCode(protocolCode)) { // 4000-4999
-        LOGGER.info("Received private use WebSocket close code: {}", protocolCode);
+        LOGGER.debug("Received private use WebSocket close code: {}", protocolCode);
       } else if (isRegisteredCode(protocolCode)) { // 3000-3999
-        LOGGER.warn("Received library/framework WebSocket close code: {}", protocolCode);
+        LOGGER.debug("Received library/framework WebSocket close code: {}", protocolCode);
       } else if (isReservedCode(protocolCode)) { // 1000-2999
-        LOGGER.error("Received undefined reserved WebSocket close code: {}", protocolCode);
+        throw new IllegalArgumentException("Received undefined reserved WebSocket close code:" + protocolCode);
       } else {
-        LOGGER.error("Received invalid WebSocket close code: {}", protocolCode); // Should never happen
+        throw new IllegalArgumentException("Received invalid WebSocket close code:" + protocolCode); // Should never happen
       }
       return unknownWithCode(protocolCode);
     }
@@ -122,28 +122,62 @@ public enum WebSocketCloseCode {
     this.originalCode = protocolCode;
   }
 
+  /**
+   * Creates a WebSocketCloseCode instance for an unknown close code, preserving the original numeric code received.
+   *
+   * @param originalCode The original, numeric close code received.
+   * @return A WebSocketCloseCode instance representing the unknown code.
+   */
   public static WebSocketCloseCode unknownWithCode(int originalCode) {
     WebSocketCloseCode unknown = WebSocketCloseCode.UNKNOWN;
     unknown.originalCode = originalCode;
     return unknown;
   }
 
+  /**
+   * Gets the WebSocket protocol close code.
+   *
+   * @return The WebSocket protocol close code.
+   */
   public int getProtocolCode() {
     return protocolCode;
   }
 
+  /**
+   * Gets the original, numeric close code received.
+   *
+   * @return The original, numeric close code.
+   */
   public int getOriginalCode() {
     return originalCode;
   }
 
+  /**
+   * Checks if the given close code is a reserved code (1000-2999).
+   *
+   * @param code The close code to check.
+   * @return {@code true} if the code is reserved, {@code false} otherwise.
+   */
   public static boolean isReservedCode(int code) {
     return code >= 1000 && code <= 2999;
   }
 
+  /**
+   * Checks if the given close code is an IANA-registered code (3000-3999).
+   *
+   * @param code The close code to check.
+   * @return {@code true} if the code is registered, {@code false} otherwise.
+   */
   public static boolean isRegisteredCode(int code) {
     return code >= 3000 && code <= 3999;
   }
 
+  /**
+   * Checks if the given close code is a private use code (4000-4999).
+   *
+   * @param code The close code to check.
+   * @return {@code true} if the code is a private use code, {@code false} otherwise.
+   */
   public static boolean isPrivateUseCode(int code) {
     return code >= 4000 && code <= 4999;
   }
