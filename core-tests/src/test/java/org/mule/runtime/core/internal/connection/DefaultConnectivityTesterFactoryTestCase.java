@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static org.mule.test.allure.AllureConstants.JavaSdk.ConnectivityTestingStory.CONNECTIVITY_TEST;
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.JavaSdk.ConnectivityTestingStory.CONNECTIVITY_TEST;
 
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
@@ -33,16 +33,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+import jakarta.inject.Inject;
 
 @Feature(JAVA_SDK)
 @Story(CONNECTIVITY_TEST)

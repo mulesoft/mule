@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public abstract class AbstractLifecycleTracker implements Lifecycle, MuleContextAware {
 

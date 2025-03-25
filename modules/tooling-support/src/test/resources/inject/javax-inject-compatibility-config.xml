@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:javax-inject="http://www.mulesoft.org/schema/mule/javax-inject"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/javax-inject http://www.mulesoft.org/schema/mule/javax-inject/current/mule-javax-inject.xsd">
+
+    <flow name="source" initialState="stopped">
+         <javax-inject:source />
+         <set-payload value="#[java!org::mule::test::module::extension::inject::JavaxInjectCompatibilityTestCase::storeData(payload)]" />
+    </flow>
+
+    <flow name="sourceConfig" initialState="stopped">
+         <javax-inject:source />
+         <set-payload value="#[java!org::mule::test::module::extension::inject::JavaxInjectCompatibilityTestCase::storeData(attributes)]" />
+    </flow>
+
+    <flow name="operation">
+         <javax-inject:execute />
+    </flow>
+
+    <flow name="operationConfig">
+         <javax-inject:execute-config />
+    </flow>
+
+    <flow name="operationConnection">
+         <javax-inject:execute-connection />
+    </flow>
+
+    <flow name="operationPojo">
+         <javax-inject:execute-pojo >
+         	<javax-inject:pojo-param/>
+         </javax-inject:execute-pojo>
+    </flow>
+
+    <flow name="valueProvider">
+         <javax-inject:value-provider param="v"/>
+    </flow>
+
+    <flow name="function">
+         <set-payload value="#[JavaxInject::execute()]" />
+    </flow>
+
+</mule>

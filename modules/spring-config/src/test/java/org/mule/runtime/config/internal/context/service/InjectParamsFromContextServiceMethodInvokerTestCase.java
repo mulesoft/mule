@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.NO_OBJECT_FOUND_FOR_PARAM;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceUtils.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.utils.Utils.augmentedParam;
 
 import static java.lang.String.format;
@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.config.utils.Utils.AmbiguousAugmentedMethodService;
@@ -37,17 +38,12 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import javax.inject.Inject;
-
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import jakarta.inject.Inject;
 
 public class InjectParamsFromContextServiceMethodInvokerTestCase extends AbstractMuleContextTestCase {
-
-  @Rule
-  public ExpectedException expected = ExpectedException.none();
 
   @Inject
   private Registry registry;
@@ -64,6 +60,7 @@ public class InjectParamsFromContextServiceMethodInvokerTestCase extends Abstrac
   public void setUp() throws NoSuchMethodException {
     injectParamsFromContextServiceMethodInvoker = new InjectParamsFromContextServiceMethodInvoker(registry);
     method = BaseService.class.getMethod("augmented");
+    augmentedParam = null;
   }
 
   @Test
@@ -115,10 +112,9 @@ public class InjectParamsFromContextServiceMethodInvokerTestCase extends Abstrac
   public void invalidNamedAugmentedInvocation() throws Throwable {
     BaseService service = new InvalidNamedAugmentedMethodService();
 
-    expected.expect(IllegalDependencyInjectionException.class);
-    expected.expectMessage(format(NO_OBJECT_FOUND_FOR_PARAM, "param", method.getName(), service.toString()));
-
-    injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
+    var thrown = assertThrows(IllegalDependencyInjectionException.class,
+                              () -> injectParamsFromContextServiceMethodInvoker.invoke(service, method, null));
+    assertThat(thrown.getMessage(), is(format(NO_OBJECT_FOUND_FOR_PARAM, "param", method.getName(), service.toString())));
   }
 
   @Test
@@ -157,9 +153,9 @@ public class InjectParamsFromContextServiceMethodInvokerTestCase extends Abstrac
   public void ambiguousAugmentedInvocation() throws Throwable {
     BaseService service = new AmbiguousAugmentedMethodService();
 
-    expected.expectMessage(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, method.getName(), service.toString()));
-    expected.expect(IllegalDependencyInjectionException.class);
-    injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
+    var thrown = assertThrows(IllegalDependencyInjectionException.class,
+                              () -> injectParamsFromContextServiceMethodInvoker.invoke(service, method, null));
+    assertThat(thrown.getMessage(), is(format(MANY_CANDIDATES_ERROR_MSG_TEMPLATE, method.getName(), service.toString())));
 
     assertThat(augmentedParam, nullValue());
   }

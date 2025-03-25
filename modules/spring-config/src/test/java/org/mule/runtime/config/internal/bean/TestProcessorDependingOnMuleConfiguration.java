@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.config.internal.bean;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.sameInstance;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.message.Message;
@@ -13,7 +16,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A simple {@link Processor} that has the {@link MuleConfiguration} as an injected dependency.
@@ -23,11 +26,16 @@ import javax.inject.Inject;
  */
 public class TestProcessorDependingOnMuleConfiguration extends AbstractComponent implements Processor {
 
+  @javax.inject.Inject
+  public MuleConfiguration muleConfigurationJavax;
+
   @Inject
   public MuleConfiguration muleConfiguration;
 
   @Override
   public CoreEvent process(CoreEvent event) {
+    assertThat(muleConfiguration, sameInstance(muleConfigurationJavax));
+
     return CoreEvent.builder(event).message(Message.of(muleConfiguration.getDefaultErrorHandlerName())).build();
   }
 }

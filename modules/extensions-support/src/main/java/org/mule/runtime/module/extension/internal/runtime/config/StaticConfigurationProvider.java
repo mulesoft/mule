@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFieldsStream;
 
 import org.mule.runtime.api.event.Event;
@@ -19,10 +18,11 @@ import org.mule.runtime.core.internal.lifecycle.InjectedDependenciesProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * {@link ConfigurationProvider} which provides always the same {@link #configuration}.
@@ -53,13 +53,23 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
 
   @Override
   public Collection<Either<Class<?>, String>> getInjectedDependencies() {
-    return getAnnotatedFieldsStream(configuration.getValue().getClass(), Inject.class)
-        .map(field -> {
-          Named name = field.getAnnotation(Named.class);
-          return name != null
-              ? Either.<Class<?>, String>right(name.value())
-              : Either.<Class<?>, String>left(field.getType());
-        }).collect(toList());
+    return getAnnotatedFieldsStream(configuration.getValue().getClass(), Inject.class,
+                                    // Still need to support javax.inject for the time being...
+                                    javax.inject.Inject.class)
+                                        .map(field -> {
+                                          Named name = field.getAnnotation(Named.class);
+                                          return name != null
+                                              ? Either.<Class<?>, String>right(name.value())
+                                              : javaxNamed(field);
+                                        }).toList();
+  }
+
+  // Still need to support javax.inject for the time being...
+  private Either<Class<?>, String> javaxNamed(Field field) {
+    javax.inject.Named name = field.getAnnotation(javax.inject.Named.class);
+    return name != null
+        ? Either.<Class<?>, String>right(name.value())
+        : Either.<Class<?>, String>left(field.getType());
   }
 
   /**
