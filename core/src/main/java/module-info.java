@@ -389,7 +389,8 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.split to
       org.mule.runtime.core.components,
-      com.mulesoft.mule.runtime.batch;
+      com.mulesoft.mule.runtime.batch,
+      kryo.shaded;
   exports org.mule.runtime.core.internal.rx to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support;
@@ -595,6 +596,7 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.management.stats to
       kryo.shaded;
   opens org.mule.runtime.core.internal.message to
+      com.mulesoft.mule.runtime.kryo,
       kryo.shaded;
   opens org.mule.runtime.core.internal.policy to
       org.mule.runtime.deployment,
