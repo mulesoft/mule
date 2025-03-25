@@ -21,8 +21,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -41,7 +39,6 @@ import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.test.publisher.TestPublisher;
 import reactor.test.subscriber.TestSubscriber;
 

@@ -19,7 +19,6 @@ import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
-import javax.lang.model.util.Types;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
