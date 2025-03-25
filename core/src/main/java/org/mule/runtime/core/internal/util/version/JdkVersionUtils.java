@@ -214,7 +214,7 @@ public class JdkVersionUtils {
    * pattern with groups for major, minor, micro, update and milestone (if exists).
    * major_version.minor_version.micro_version[_update_version][-milestone]
    */
-  public static final Pattern JDK_VERSION =
+  static final Pattern JDK_VERSION =
       Pattern.compile("^([0-9]+)(?:\\.([0-9]+))?(?:\\.([0-9]+))?(?:_([0-9]+))?(?:-?(.+))?$");
 
   public static List<JdkVersionRange> createJdkVersionRanges(String versionsString) {
