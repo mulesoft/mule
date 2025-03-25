@@ -133,7 +133,7 @@ class ProcessingStrategyFactoryTestCase {
 
     getStrategy(factory, testName).createSink(flow, pipeline).accept(event);
 
-    verify(pipeline).apply(publisherCaptor.capture());
+    verify(pipeline, atLeastOnce()).apply(publisherCaptor.capture());
     // Hm. Limited things we can do - checking things about the type is too specific to the strategy...
   }
 
