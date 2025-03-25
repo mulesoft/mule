@@ -168,7 +168,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-      if (extraBootPackages.stream().anyMatch(bp -> name.startsWith(bp))) {
+      if (extraBootPackages.stream().anyMatch(bp -> name.startsWith(bp)) || name.contains("com.mulesoft.connectivity")) {
         return super.loadClass(name, resolve);
       } else {
         throw new ClassNotFoundException(name);
