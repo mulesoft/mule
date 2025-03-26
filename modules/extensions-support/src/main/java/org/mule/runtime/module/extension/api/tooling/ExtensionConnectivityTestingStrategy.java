@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.api.tooling;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
+
+import static java.lang.String.format;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.api.annotation.NoInstantiate;
@@ -27,7 +28,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Implementation of {@code ConnectivityTestingStrategy} that can do connectivity testing over components creates with extensions

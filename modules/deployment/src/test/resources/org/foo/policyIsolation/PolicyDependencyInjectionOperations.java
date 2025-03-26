@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.foo.policyIsolation.internal.InternalRegistryBean;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class PolicyDependencyInjectionOperations {
 

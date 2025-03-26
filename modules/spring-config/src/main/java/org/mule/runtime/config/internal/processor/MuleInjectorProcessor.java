@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.config.internal.processor;
 
-import javax.inject.Inject;
-
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+
+import jakarta.inject.Inject;
 
 /**
  * Specialization of {@link AutowiredAnnotationBeanPostProcessor} which acts as the default injection post processors to be used

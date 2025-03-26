@@ -22,10 +22,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
+
+import jakarta.inject.Inject;
 
 /**
  * A {@link BeanDependencyResolver} to resolve direct dependencies based on spring

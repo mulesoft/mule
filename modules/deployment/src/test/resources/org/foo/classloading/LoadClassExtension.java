@@ -9,7 +9,7 @@ package org.foo.classloading;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Extension for testing purposes

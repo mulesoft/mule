@@ -28,7 +28,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Implementation of {@link ConnectionManager} which manages connections opened on a specific application.

@@ -119,8 +119,7 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
 
       registerConstantBeanDefinition(VALUE_PROVIDER_SERVICE_KEY,
                                      new LazyValueProviderService(lazyComponentInitializer, () -> getRegistry()
-                                         .<ValueProviderService>lookupObject(NON_LAZY_VALUE_PROVIDER_SERVICE),
-                                                                  () -> getMuleContext().getConfigurationComponentLocator()),
+                                         .<ValueProviderService>lookupObject(NON_LAZY_VALUE_PROVIDER_SERVICE)),
                                      true);
       registerBeanDefinition(NON_LAZY_VALUE_PROVIDER_SERVICE, getBeanDefinition(MuleValueProviderService.class));
 

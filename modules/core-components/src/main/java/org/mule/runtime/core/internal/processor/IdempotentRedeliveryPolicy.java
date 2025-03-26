@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
@@ -20,6 +16,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.BLOCKING;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
@@ -52,11 +54,10 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.slf4j.Logger;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import reactor.core.publisher.Mono;
 
 /**

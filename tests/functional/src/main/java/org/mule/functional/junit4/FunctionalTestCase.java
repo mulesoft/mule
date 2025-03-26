@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -56,9 +56,9 @@ import org.junit.Rule;
 
 /**
  * A base test case for tests that initialize Mule using a configuration file. The default configuration builder used is
- * SpringXmlConfigurationBuilder. To use this test case, ensure you have the mule-modules-builders JAR file on your classpath. To
- * use a different builder, just overload the <code>getBuilder()</code> method of this class to return the type of builder you
- * want to use with your test.
+ * {@link ArtifactAstXmlParserConfigurationBuilder}. To use this test case, ensure you have the mule-modules-builders JAR file on
+ * your classpath. To use a different builder, just overload the <code>getBuilder()</code> method of this class to return the type
+ * of builder you want to use with your test.
  */
 public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 

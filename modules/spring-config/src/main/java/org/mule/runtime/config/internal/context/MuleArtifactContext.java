@@ -40,7 +40,6 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -93,7 +92,6 @@ import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
-import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
 import org.mule.runtime.config.privileged.spring.ByteBuddySpringCachesManager;
@@ -314,8 +312,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
 
     fetchOrGenerateApplicationExtensionModel(appName).ifPresent(appExtensionModel -> {
-      ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager
-          ? ((CompositeArtifactExtensionManager) extensionManager).getChildExtensionManager()
+      ExtensionManager appManager = extensionManager instanceof CompositeArtifactExtensionManager composite
+          ? composite.getChildExtensionManager()
           : extensionManager;
 
       appManager.registerExtension(appExtensionModel);
@@ -353,17 +351,17 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   protected void doRegisterErrors(final ArtifactAst artifactAst) {
-    final ErrorTypeRepository errorTypeRepository = artifactAst.enrichedErrorTypeRepository();
+    final ErrorTypeRepository repository = artifactAst.enrichedErrorTypeRepository();
     final ErrorTypeLocator errorTypeLocator =
-        createDefaultErrorTypeLocator(errorTypeRepository, ofNullable(featureFlaggingService));
+        createDefaultErrorTypeLocator(repository, ofNullable(featureFlaggingService));
 
-    registerErrorMappings(errorTypeRepository, errorTypeLocator,
+    registerErrorMappings(repository, errorTypeLocator,
                           artifactAst.dependencies(), artifactAst::dependenciesDsl);
 
     // Because instances of the repository and locator may be already created and injected into another objects, those instances
     // cannot just be set into the registry, and this contributing layer is needed to ensure the correct functioning of the DI
     // mechanism.
-    this.errorTypeRepository.setDelegate(errorTypeRepository);
+    this.errorTypeRepository.setDelegate(repository);
     this.errorTypeLocator.setDelegate(errorTypeLocator);
   }
 
@@ -379,11 +377,10 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
     registerEditors(beanFactory);
 
-    registerAnnotationConfigProcessors((BeanDefinitionRegistry) beanFactory, beanFactory);
+    registerAnnotationConfigProcessors(beanFactory);
 
     addBeanPostProcessors(beanFactory,
                           new MuleContextPostProcessor(muleContext),
-                          new LifecycleStatePostProcessor(muleContext.getLifecycleManager().getState()),
                           new ComponentLocatorCreatePostProcessor(componentLocator));
 
     beanFactory.registerSingleton(OBJECT_MULE_CONTEXT, muleContext);
@@ -430,13 +427,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
               && ConfigurableObjectProvider.class.isAssignableFrom(springModel.getType());
         })
         .map(componentModel -> new Pair<>(componentModel, componentModel.getComponentId()))
-        .collect(toList());
+        .toList();
   }
 
   private void registerEditors(ConfigurableListableBeanFactory beanFactory) {
-    MulePropertyEditorRegistrar registrar = new MulePropertyEditorRegistrar();
-    registrar.setMuleContext(muleContext);
-    beanFactory.addPropertyEditorRegistrar(registrar);
+    beanFactory.addPropertyEditorRegistrar(new MulePropertyEditorRegistrar());
   }
 
   protected void addBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, BeanPostProcessor... processors) {
@@ -712,7 +707,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                     .getBeanDefinition());
   }
 
-  private void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, ConfigurableListableBeanFactory beanFactory) {
+  private void registerAnnotationConfigProcessors(ConfigurableListableBeanFactory beanFactory) {
     registerInjectorProcessor(beanFactory);
   }
 

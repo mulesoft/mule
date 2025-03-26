@@ -39,7 +39,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnect
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A {@link AbstractExtensionObjectFactory} which produces {@link ConfigurationProvider} instances

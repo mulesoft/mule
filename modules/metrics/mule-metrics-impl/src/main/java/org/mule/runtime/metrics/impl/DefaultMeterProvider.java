@@ -17,7 +17,7 @@ import org.mule.runtime.metrics.exporter.api.MeterExporterFactory;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
 import org.mule.runtime.metrics.impl.meter.repository.MeterRepository;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A default implementation of the {@link MeterProvider}

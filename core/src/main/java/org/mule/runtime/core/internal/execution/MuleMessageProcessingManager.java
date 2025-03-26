@@ -22,7 +22,7 @@ import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Default implementation for {@link MessageProcessingManager}.

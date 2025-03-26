@@ -23,7 +23,7 @@ import org.mule.runtime.extension.internal.processor.ModuleOperationMessageProce
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class ModuleOperationMessageProcessorFactoryBean extends AbstractComponent
     implements ObjectFactory<ModuleOperationMessageProcessor> {

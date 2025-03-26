@@ -20,7 +20,7 @@ import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Default implementation of {@link InitialSpanInfoProvider}

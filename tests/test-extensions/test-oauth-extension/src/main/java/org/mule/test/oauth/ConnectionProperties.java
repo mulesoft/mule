@@ -12,7 +12,7 @@ import org.mule.test.values.extension.MyPojo;
 
 import java.time.ZonedDateTime;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class ConnectionProperties {
 

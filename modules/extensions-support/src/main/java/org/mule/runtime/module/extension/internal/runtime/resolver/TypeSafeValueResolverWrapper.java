@@ -20,7 +20,7 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingCont
 
 import java.io.InputStream;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * {@link ValueResolver} wrapper implementation which wraps another {@link ValueResolver} and ensures that the output is always of

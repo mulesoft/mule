@@ -6,8 +6,9 @@
  */
 package org.mule.test.oauth;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -15,7 +16,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -24,7 +24,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 
 import java.util.concurrent.ScheduledFuture;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @MediaType(TEXT_PLAIN)
 @Alias("listener")

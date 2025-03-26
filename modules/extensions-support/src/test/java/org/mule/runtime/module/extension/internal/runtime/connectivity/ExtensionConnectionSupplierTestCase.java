@@ -52,7 +52,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Properties;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;

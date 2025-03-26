@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.core.lifecyle.AbstractLifecycleTracker;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implements Processor {
 

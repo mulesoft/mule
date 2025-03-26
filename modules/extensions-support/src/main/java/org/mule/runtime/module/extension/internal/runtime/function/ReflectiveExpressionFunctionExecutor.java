@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.function;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -17,6 +14,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.BindingContext;
@@ -42,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

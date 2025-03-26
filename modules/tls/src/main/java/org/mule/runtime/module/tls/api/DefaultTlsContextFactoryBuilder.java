@@ -16,7 +16,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.inject.Qualifier;
+import jakarta.inject.Qualifier;
 
 /**
  * A {@link Qualifier} annotation for injecting the application's default {@link TlsContextFactoryBuilder}

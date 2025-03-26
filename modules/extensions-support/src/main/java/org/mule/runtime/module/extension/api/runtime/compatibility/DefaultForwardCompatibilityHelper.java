@@ -17,7 +17,7 @@ import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySo
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class DefaultForwardCompatibilityHelper implements ForwardCompatibilityHelper {
 

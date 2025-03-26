@@ -21,7 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * <code>EncryptionTransformer</code> will transform an array of bytes or string into an encrypted array of bytes

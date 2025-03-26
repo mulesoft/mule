@@ -15,8 +15,9 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -27,14 +28,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 @Feature(REUSE)
 @Stories({@Story(APPLICATION_EXTENSION_MODEL), @Story(ERROR_HANDLING)})

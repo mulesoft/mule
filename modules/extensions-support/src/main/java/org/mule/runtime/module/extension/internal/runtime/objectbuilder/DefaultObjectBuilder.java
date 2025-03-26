@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableMap;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getMuleVersion;
@@ -22,6 +19,11 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.injectFields;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
+
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -38,7 +40,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Default implementation of {@link ObjectBuilder} which creates instances through a provided {@link Class}.

@@ -37,7 +37,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A {@link AbstractExtensionObjectFactory} that produces {@link ConnectionProviderResolver} instances

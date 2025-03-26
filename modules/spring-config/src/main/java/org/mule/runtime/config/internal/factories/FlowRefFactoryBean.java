@@ -70,7 +70,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.xml.namespace.QName;
 
 import com.google.common.cache.CacheBuilder;

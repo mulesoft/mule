@@ -7,17 +7,18 @@
 package org.mule.runtime.core.privileged.processor.objectfactory;
 
 import static java.lang.String.format;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @NoExtend
 public class MessageProcessorChainObjectFactory extends AbstractComponentFactory<MessageProcessorChain> {

@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import static org.mule.runtime.api.interception.FlowInterceptorFactory.FLOW_INTERCEPTORS_ORDER_REGISTRY_KEY;
 import static org.mule.runtime.api.interception.ProcessorInterceptorFactory.INTERCEPTORS_ORDER_REGISTRY_KEY;
 import static org.mule.runtime.api.interception.SourceInterceptorFactory.SOURCE_INTERCEPTORS_ORDER_REGISTRY_KEY;
+
+import static java.lang.Integer.MAX_VALUE;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -30,8 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public class DefaultProcessorInterceptorManager implements InterceptorManager, Initialisable {
 

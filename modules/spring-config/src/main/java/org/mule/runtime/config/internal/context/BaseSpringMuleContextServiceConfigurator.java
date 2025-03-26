@@ -47,7 +47,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;

@@ -6,7 +6,7 @@
  */
 package org.foo.policyIsolation.internal;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class PolicyDependencyInjectionFunctions {
 

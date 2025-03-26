@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Implementation of {@link ValueResolver} which accesses the mule registry and returns the value associated with {@link #key}.

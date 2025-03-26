@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -17,8 +14,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.unwrap;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
+import static org.mule.runtime.core.internal.util.InjectionUtils.getInjectionTarget;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.AUTHORIZATION_CODE_STATE_INTERFACES;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.CLIENT_CREDENTIALS_STATE_INTERFACES;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
@@ -27,6 +24,11 @@ import static org.mule.runtime.module.extension.internal.runtime.connectivity.oa
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromStaticValues;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
@@ -76,7 +78,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

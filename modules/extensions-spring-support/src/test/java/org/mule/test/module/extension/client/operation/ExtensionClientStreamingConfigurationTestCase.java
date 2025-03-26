@@ -6,6 +6,11 @@
  */
 package org.mule.test.module.extension.client.operation;
 
+import static org.mule.runtime.api.util.DataUnit.BYTE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
+import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,10 +20,6 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.DataUnit.BYTE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
-import static org.mule.test.allure.AllureConstants.ExtensionsClientFeature.EXTENSIONS_CLIENT;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.streaming.CursorProvider;
@@ -36,11 +37,13 @@ import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import org.junit.Test;
+
+import org.mockito.ArgumentCaptor;
 
 import io.qameta.allure.Feature;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
 @Feature(EXTENSIONS_CLIENT)
 public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeisenbergConfigTestCase {

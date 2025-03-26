@@ -16,7 +16,7 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * {@code ObjectFactory} for a security manager configuration element.

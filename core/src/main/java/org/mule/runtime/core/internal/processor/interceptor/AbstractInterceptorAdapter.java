@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static java.lang.String.valueOf;
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_PARAMS;
+
+import static java.lang.String.valueOf;
+import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.interception.ProcessorParameterValue;
@@ -30,7 +31,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Provides common interception functionality.

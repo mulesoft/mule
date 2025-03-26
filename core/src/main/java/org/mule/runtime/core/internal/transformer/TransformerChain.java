@@ -33,7 +33,7 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A referencable chain of transformers that can be used as a single transformer

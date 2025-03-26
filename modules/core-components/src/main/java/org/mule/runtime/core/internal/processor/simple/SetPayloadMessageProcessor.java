@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.util.attribute.AttributeEvaluator;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Modifies the payload of a {@link Message} according to the provided value.

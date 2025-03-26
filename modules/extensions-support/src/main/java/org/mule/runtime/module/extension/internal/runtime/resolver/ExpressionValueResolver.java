@@ -21,7 +21,7 @@ import org.mule.runtime.core.internal.util.attribute.AttributeEvaluator;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * A {@link ValueResolver} which evaluates a MEL expressions

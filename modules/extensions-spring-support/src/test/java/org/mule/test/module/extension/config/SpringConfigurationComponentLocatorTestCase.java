@@ -15,13 +15,16 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.DefaultComponentIdentifier;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
-import org.junit.Test;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.inject.Inject;
+
+import org.junit.Test;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 public class SpringConfigurationComponentLocatorTestCase extends AbstractExtensionFunctionalTestCase {
 

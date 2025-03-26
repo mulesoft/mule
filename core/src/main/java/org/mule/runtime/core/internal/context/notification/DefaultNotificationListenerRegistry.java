@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 
 import java.util.function.Predicate;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Implementation of {@link NotificationListenerRegistry} registers listeners using a ServerNotificationHandler implementation.

@@ -15,7 +15,7 @@ import org.mule.runtime.metrics.exporter.api.MeterExporterFactory;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.capturer.CapturingMeterExporterWrapper;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;

@@ -19,7 +19,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMes
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} which produces {@link ConstructMessageProcessor} instances

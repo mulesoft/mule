@@ -17,8 +17,6 @@ import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_I
 import static java.lang.Boolean.TRUE;
 import static java.text.MessageFormat.format;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
-
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -41,10 +39,11 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,7 +200,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       statistics.incFatalError();
     }
 
-    String logUniqueId = defaultString(event.getCorrelationId(), NOT_SET);
+    String logUniqueId = Objects.toString(event.getCorrelationId(), NOT_SET);
 
     String printableLogMessage =
         format("Message identification summary here: id={0}, correlation={1}", logUniqueId, event.getGroupCorrelation());

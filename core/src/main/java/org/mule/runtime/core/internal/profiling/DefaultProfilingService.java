@@ -25,8 +25,11 @@ import org.mule.runtime.core.internal.profiling.discovery.CompositeProfilingData
 import org.mule.runtime.core.internal.profiling.discovery.DefaultProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.core.internal.profiling.producer.provider.ProfilingDataProducerResolver;
 import org.mule.runtime.core.internal.profiling.threading.JvmThreadSnapshotCollector;
-import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
 import org.mule.runtime.core.internal.profiling.tracing.ThreadLocalTracingService;
+import org.mule.runtime.feature.internal.config.profiling.ProfilingFeatureFlaggingService;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -35,11 +38,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
-import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

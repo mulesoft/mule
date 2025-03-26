@@ -26,7 +26,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Locator which given a {@link TransactionType} will locates through SPI a {@link TransactionFactory} able to handle that kind of

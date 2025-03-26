@@ -16,7 +16,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.classloading.api.ClassLoadingHelper;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Rule;
 import org.junit.Test;

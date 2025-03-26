@@ -18,7 +18,7 @@ import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.FactoryBean;
 

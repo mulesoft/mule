@@ -38,7 +38,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Default implementation of {@link ImplicitConfigurationProviderFactory}. Implicit configurations are created from

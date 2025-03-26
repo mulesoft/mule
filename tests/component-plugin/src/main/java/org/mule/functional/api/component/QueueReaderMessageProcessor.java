@@ -14,8 +14,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 
-import javax.inject.Inject;
-
 /**
  * Reads {@link CoreEvent} from a test connector's queue.
  */
@@ -24,9 +22,6 @@ public class QueueReaderMessageProcessor implements Processor {
   private final String queueName;
   private final Long timeout;
   private final TestConnectorQueueHandler queueHandler;
-
-  @Inject
-  private Registry registry;
 
   /**
    * Creates a queue reader
@@ -41,11 +36,9 @@ public class QueueReaderMessageProcessor implements Processor {
       checkArgument(timeout >= 0L, "Timeout cannot be negative");
     }
 
-    this.registry = registry;
     this.queueHandler = new TestConnectorQueueHandler(registry);
     this.queueName = queueName;
     this.timeout = timeout;
-    this.registry = registry;
   }
 
   @Override

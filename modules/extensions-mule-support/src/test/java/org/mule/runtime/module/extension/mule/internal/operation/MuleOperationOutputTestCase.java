@@ -11,9 +11,8 @@ import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.OPERA
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
@@ -25,12 +24,13 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.subtypes.extension.CarDoor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(REUSE)
 @Story(OPERATIONS)

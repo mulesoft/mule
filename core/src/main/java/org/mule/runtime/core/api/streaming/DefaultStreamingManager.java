@@ -53,7 +53,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import java.io.Closeable;
 import java.io.InputStream;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

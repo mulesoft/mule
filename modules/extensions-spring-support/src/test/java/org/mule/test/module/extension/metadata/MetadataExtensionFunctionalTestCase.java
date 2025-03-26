@@ -68,8 +68,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.junit.Before;
 import org.junit.runners.Parameterized;

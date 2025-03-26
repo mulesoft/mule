@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Initialisable, Disposable {
 
