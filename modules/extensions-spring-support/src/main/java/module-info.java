@@ -37,13 +37,15 @@ module org.mule.runtime.extensions.spring.support {
   requires org.dom4j;
   requires org.jsoup;
   requires org.reflections;
+  requires org.mule.runtime.extensions.api.persistence;
 
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
       org.mule.runtime.module.extension.internal.config.dsl.DefaultExtensionBuildingDefinitionProvider;
   provides org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator with
       org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
   provides org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory with
-      org.mule.runtime.module.extension.internal.resources.MulePluginDescriptorGenerator;
+      org.mule.runtime.module.extension.internal.resources.MulePluginDescriptorGenerator,
+      org.mule.runtime.module.extension.internal.resources.TemporalExtensionModelResourceGenerator;
 
   exports org.mule.runtime.module.extension.api.resources;
 

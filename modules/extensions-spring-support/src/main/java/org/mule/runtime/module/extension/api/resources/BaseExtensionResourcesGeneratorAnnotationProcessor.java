@@ -6,6 +6,17 @@
  */
 package org.mule.runtime.module.extension.api.resources;
 
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+
+import static javax.lang.model.SourceVersion.RELEASE_17;
+import static javax.tools.Diagnostic.Kind.ERROR;
+
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
@@ -17,17 +28,6 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_SKIP;
 import static org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator.EXPORTED_PACKAGES_VALIDATOR_STRICT_VALIDATION;
-
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.singleton;
-import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
-
-import static javax.lang.model.SourceVersion.RELEASE_17;
-import static javax.tools.Diagnostic.Kind.ERROR;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -183,11 +183,14 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
       params.put(COMPILATION_MODE, true);
     }
 
-    return getExtensionModelLoader()
-        .loadExtensionModel(builder(classLoader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())))
+    ExtensionModelLoadingRequest.Builder requestBuilder =
+        builder(classLoader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())))
             .addParameters(params)
-            .setForceExtensionValidation(true)
-            .build());
+            .setForceExtensionValidation(true);
+
+    configureLoadingRequest(requestBuilder);
+
+    return getExtensionModelLoader().loadExtensionModel(requestBuilder.build());
   }
 
   private Optional<TypeElement> getExtension(RoundEnvironment env) {
