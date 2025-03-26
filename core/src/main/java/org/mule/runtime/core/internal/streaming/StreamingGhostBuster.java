@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static org.mule.runtime.core.internal.streaming.CursorManager.STREAMING_VERBOSE;
+import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
+
 import static java.lang.System.identityHashCode;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
+
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.mule.runtime.core.internal.streaming.CursorManager.STREAMING_VERBOSE;
-import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,6 +23,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.streaming.CursorProvider;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -28,9 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
-import javax.inject.Inject;
-
-import org.mule.runtime.api.streaming.CursorProvider;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

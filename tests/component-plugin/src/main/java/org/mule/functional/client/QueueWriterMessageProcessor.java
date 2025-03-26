@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Writes {@link CoreEvent} to a test connector's queue.

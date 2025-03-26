@@ -9,7 +9,7 @@ package org.foo.goodbye;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Configuration(name = "config")
 public class GoodByeConfiguration {

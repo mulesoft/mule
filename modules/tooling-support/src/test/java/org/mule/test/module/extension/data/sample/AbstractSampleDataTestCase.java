@@ -18,7 +18,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
@@ -36,11 +36,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.mule.tests:mule-tests-model"})
 public abstract class AbstractSampleDataTestCase extends MuleArtifactFunctionalTestCase {

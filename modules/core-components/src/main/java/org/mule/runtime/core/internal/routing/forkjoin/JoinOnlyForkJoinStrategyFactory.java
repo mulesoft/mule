@@ -16,7 +16,7 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import java.util.List;
 import java.util.function.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * {@link ForkJoinStrategy} that:

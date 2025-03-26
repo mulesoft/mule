@@ -38,7 +38,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.concurrent.locks.Lock;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 

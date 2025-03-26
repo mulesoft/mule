@@ -1,4 +1,28 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "@interface org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder",
+            "new": "@interface org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder",
+            "annotation": "@jakarta.inject.Qualifier",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "@interface org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder",
+            "new": "@interface org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilder",
+            "annotation": "@javax.inject.Qualifier",
+            "justification": "W-17068187: Update Jakarta.inject in mule-api, add legacy javax"
+          }
+        ]
+      }
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

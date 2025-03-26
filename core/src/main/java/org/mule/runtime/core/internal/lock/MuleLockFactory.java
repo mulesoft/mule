@@ -18,8 +18,8 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.util.concurrent.locks.Lock;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public class MuleLockFactory implements LockFactory, Initialisable, Disposable {
 

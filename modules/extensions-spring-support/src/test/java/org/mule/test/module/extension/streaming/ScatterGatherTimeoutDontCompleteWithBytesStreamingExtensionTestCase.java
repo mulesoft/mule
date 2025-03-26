@@ -34,15 +34,16 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import org.junit.ClassRule;
+import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.ClassRule;
-import org.junit.Test;
 
 @Features({@Feature(STREAMING), @Feature(FORK_JOIN_STRATEGIES)})
 @Story(BYTES_STREAMING)

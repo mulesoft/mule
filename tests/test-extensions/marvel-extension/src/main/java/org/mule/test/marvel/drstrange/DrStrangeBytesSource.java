@@ -6,9 +6,11 @@
  */
 package org.mule.test.marvel.drstrange;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -31,7 +33,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.xml.namespace.QName;
 
 @Alias("bytes-caster")

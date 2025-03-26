@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 import java.lang.String;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class UsingObjectStoreData implements Serializable {
 

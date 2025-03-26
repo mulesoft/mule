@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * {@link ObjectFactory} for reconnection configuration.

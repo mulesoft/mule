@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;

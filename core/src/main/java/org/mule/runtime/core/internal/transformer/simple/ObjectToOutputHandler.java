@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /** <code>ObjectToOutputHandler</code> converts a byte array into a String. */
 public class ObjectToOutputHandler extends AbstractTransformer implements DiscoverableTransformer {

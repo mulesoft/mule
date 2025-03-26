@@ -24,7 +24,8 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import javax.xml.namespace.QName;
 
 @NoExtend

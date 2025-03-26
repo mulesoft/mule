@@ -16,7 +16,7 @@ import static java.util.Optional.empty;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.config.api.LazyComponentInitializer;
@@ -24,12 +24,13 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.test.marvel.ironman.IronMan;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Story;
+
 import org.junit.Test;
 
 @Features({@Feature(REUSE), @Feature(LAZY_INITIALIZATION)})

@@ -29,7 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @MediaType(TEXT_PLAIN)
 public class MagnetoMutantSummon extends Source<InputStream, Void> {

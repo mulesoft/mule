@@ -6,10 +6,6 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
@@ -28,6 +24,11 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.ERROR_INVOKE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.NONE;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatus.SUCCESS;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -51,7 +52,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.sdk.api.annotation.source.BackPressure;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.notification.NotificationEmitter;
@@ -61,6 +61,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.extension.api.runtime.source.SourceResult;
 import org.mule.sdk.api.annotation.notification.Fires;
+import org.mule.sdk.api.annotation.source.BackPressure;
 import org.mule.sdk.api.connectivity.ConnectionProvider;
 import org.mule.sdk.api.runtime.source.BackPressureContext;
 import org.mule.test.heisenberg.extension.model.Methylamine;
@@ -70,7 +71,7 @@ import org.mule.test.heisenberg.extension.model.Weapon;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Alias("ListenPayments")
 @EmitsResponse

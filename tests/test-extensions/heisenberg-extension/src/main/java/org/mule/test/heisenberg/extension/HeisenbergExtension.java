@@ -64,7 +64,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT)
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17, JAVA_21})

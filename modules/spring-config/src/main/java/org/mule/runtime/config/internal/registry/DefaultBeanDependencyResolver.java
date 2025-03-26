@@ -22,10 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.inject.Inject;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
+
+import jakarta.inject.Inject;
 
 /**
  * Default {@link BeanDependencyResolver} to resolve dependencies based on spring
@@ -125,6 +126,7 @@ public class DefaultBeanDependencyResolver implements BeanDependencyResolver {
     }
   }
 
+  @Override
   public ConfigurationDependencyResolver getConfigurationDependencyResolver() {
     return configurationDependencyResolver;
   }

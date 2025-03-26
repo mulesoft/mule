@@ -69,11 +69,10 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import jakarta.inject.Inject;
 import reactor.util.context.ContextView;
 
 /**

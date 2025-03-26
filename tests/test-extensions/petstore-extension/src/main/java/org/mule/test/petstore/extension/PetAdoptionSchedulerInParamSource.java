@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @MetadataScope(outputResolver = PollingSourceMetadataResolver.class)
 @MediaType(TEXT_PLAIN)

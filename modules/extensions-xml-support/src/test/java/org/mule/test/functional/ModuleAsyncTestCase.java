@@ -7,13 +7,13 @@
 package org.mule.test.functional;
 
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mule.test.allure.AllureConstants.RoutersFeature.AsyncStory.ASYNC;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mule.test.allure.AllureConstants.ScopeFeature.AsyncStory.ASYNC;
 
 import org.mule.functional.api.component.TestConnectorQueueHandler;
 import org.mule.runtime.api.artifact.Registry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.Before;
 import org.junit.Test;

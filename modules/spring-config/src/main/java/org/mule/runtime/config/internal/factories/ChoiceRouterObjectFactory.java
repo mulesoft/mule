@@ -15,11 +15,10 @@ import org.mule.runtime.core.internal.routing.ProcessorExpressionRoute;
 import org.mule.runtime.core.internal.routing.ProcessorRoute;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRouter> {
 
