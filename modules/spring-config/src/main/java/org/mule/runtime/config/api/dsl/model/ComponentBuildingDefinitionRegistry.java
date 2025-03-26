@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.config.api.dsl.model;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.COLLECTION;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.MAP;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry.WrapperElementType.SINGLE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.api.dsl.processor.AbstractAttributeDefinitionVisitor;
@@ -18,6 +19,7 @@ import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair;
+import org.mule.runtime.dsl.api.component.SetterAttributeDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,27 +71,27 @@ public final class ComponentBuildingDefinitionRegistry {
   }
 
   private <T> Map<String, WrapperElementType> getWrapperIdentifierAndTypeMap(ComponentBuildingDefinition<T> buildingDefinition) {
-    final Map<String, WrapperElementType> wrapperIdentifierAndTypeMap = new HashMap<>();
+    final Map<String, WrapperElementType> definitionWrapperIdentifierAndTypeMap = new HashMap<>();
     AbstractAttributeDefinitionVisitor wrapperIdentifiersCollector = new AbstractAttributeDefinitionVisitor() {
 
       @Override
       public void onComplexChildCollection(Class<?> type, Optional<String> wrapperIdentifierOptional) {
-        wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> wrapperIdentifierAndTypeMap
+        wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> definitionWrapperIdentifierAndTypeMap
             .put(abbreviateIdentifier(buildingDefinition, wrapperIdentifier), COLLECTION));
       }
 
       @Override
       public void onComplexChild(Class<?> type, Optional<String> wrapperIdentifierOptional, Optional<String> childIdentifier) {
-        wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> wrapperIdentifierAndTypeMap
+        wrapperIdentifierOptional.ifPresent(wrapperIdentifier -> definitionWrapperIdentifierAndTypeMap
             .put(abbreviateIdentifier(buildingDefinition, wrapperIdentifier), SINGLE));
       }
 
       @Override
       public void onComplexChildMap(Class<?> keyType, Class<?> valueType, String wrapperIdentifier) {
-        wrapperIdentifierAndTypeMap.put(abbreviateIdentifier(buildingDefinition, wrapperIdentifier), MAP);
+        definitionWrapperIdentifierAndTypeMap.put(abbreviateIdentifier(buildingDefinition, wrapperIdentifier), MAP);
       }
 
-      private <T> String abbreviateIdentifier(ComponentBuildingDefinition<T> buildingDefinition, String wrapperIdentifier) {
+      private String abbreviateIdentifier(ComponentBuildingDefinition<T> buildingDefinition, String wrapperIdentifier) {
         final String namespace = buildingDefinition.getComponentIdentifier().getNamespace();
         if (CORE_PREFIX.equals(namespace)) {
           return wrapperIdentifier;
@@ -109,10 +111,10 @@ public final class ComponentBuildingDefinitionRegistry {
     Consumer<AttributeDefinition> collectWrappersConsumer =
         attributeDefinition -> attributeDefinition.accept(wrapperIdentifiersCollector);
     buildingDefinition.getSetterParameterDefinitions().stream()
-        .map(setterAttributeDefinition -> setterAttributeDefinition.getAttributeDefinition())
+        .map(SetterAttributeDefinition::getAttributeDefinition)
         .forEach(collectWrappersConsumer);
     buildingDefinition.getConstructorAttributeDefinition().stream().forEach(collectWrappersConsumer);
-    return wrapperIdentifierAndTypeMap;
+    return definitionWrapperIdentifierAndTypeMap;
   }
 
   /**

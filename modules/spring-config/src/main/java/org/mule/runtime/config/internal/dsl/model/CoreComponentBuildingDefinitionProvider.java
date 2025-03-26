@@ -9,9 +9,6 @@ package org.mule.runtime.config.internal.dsl.model;
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.PARALLEL_FOREACH_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_ELEMENT;
-import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
-import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
-import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.ERROR_MAPPING_ELEMENT_IDENTIFIER;
@@ -52,6 +49,7 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.DataUnit;
@@ -107,7 +105,6 @@ import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.api.source.scheduler.PeriodicScheduler;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
-import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
@@ -148,6 +145,7 @@ import org.mule.runtime.dsl.api.component.TypeConverter;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -197,6 +195,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String RAISE_ERROR = "raise-error";
   private static final String INHERIT_ITERABLE_REPEATABILITY = "inheritIterableRepeatability";
 
+  private static final String PARAM_VALUE = "value";
+  private static final String PARAM_ENCODING = "encoding";
+  private static final String PARAM_MIME_TYPE = "mimeType";
+
   @SuppressWarnings("rawtypes")
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(CORE_PREFIX);
@@ -236,9 +238,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(errorHandlerBuilder.build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(SET_PAYLOAD).withTypeDefinition(fromType(SetPayloadMessageProcessor.class))
-            .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
-            .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
-            .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build()).build());
+            .withSetterParameterDefinition(PARAM_VALUE, fromSimpleParameter(PARAM_VALUE).build())
+            .withSetterParameterDefinition(PARAM_MIME_TYPE, fromSimpleParameter(PARAM_MIME_TYPE).build())
+            .withSetterParameterDefinition(PARAM_ENCODING, fromSimpleParameter(PARAM_ENCODING).build()).build());
 
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(LOGGER).withTypeDefinition(fromType(LoggerMessageProcessor.class))
@@ -254,8 +256,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                    .withAttributeDefinition(fromSimpleParameter("variableName").build())
                                                    .build(),
                                                newBuilder()
-                                                   .withKey("value")
-                                                   .withAttributeDefinition(fromSimpleParameter("value").build())
+                                                   .withKey(PARAM_VALUE)
+                                                   .withAttributeDefinition(fromSimpleParameter(PARAM_VALUE).build())
                                                    .build())
                                                        .withIdentifier("set-variable")
                                                        .withTypeDefinition(fromType(AddFlowVariableProcessor.class))
@@ -270,7 +272,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition
         .withIdentifier("global-property")
         .withTypeDefinition(fromType(String.class))
-        .withConstructorParameterDefinition(fromSimpleParameter("value").build())
+        .withConstructorParameterDefinition(fromSimpleParameter(PARAM_VALUE).build())
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier(ROUTE)
@@ -649,28 +651,33 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return transformerComponentBuildingDefinitions;
   }
 
-  private ConfigurableInstanceFactory getAddVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyProcessor> transformerType) {
+  private <T, P extends AbstractAddVariablePropertyProcessor<T>> ConfigurableInstanceFactory<P> getAddVariableTransformerInstanceFactory(Class<P> transformerType) {
     return parameters -> {
-      AbstractAddVariablePropertyProcessor transformer =
-          (AbstractAddVariablePropertyProcessor) createNewInstance(transformerType);
+      P transformer;
+      try {
+        transformer = transformerType.getConstructor().newInstance();
+      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+          | NoSuchMethodException | SecurityException e) {
+        throw new MuleRuntimeException(e);
+      }
       transformer.setIdentifier((String) parameters.get("identifier"));
-      transformer.setValue((String) parameters.get("value"));
+      transformer.setValue((String) parameters.get(PARAM_VALUE));
       return transformer;
     };
   }
 
   @SuppressWarnings("unchecked")
-  private static ComponentBuildingDefinition.Builder getSetVariablePropertyBaseBuilder(ConfigurableInstanceFactory configurableInstanceFactory,
-                                                                                       Class<? extends AbstractAddVariablePropertyProcessor> setterClass,
-                                                                                       KeyAttributeDefinitionPair... configurationAttributes) {
+  private static <T, P extends AbstractAddVariablePropertyProcessor<T>> ComponentBuildingDefinition.Builder<P> getSetVariablePropertyBaseBuilder(ConfigurableInstanceFactory<P> configurableInstanceFactory,
+                                                                                                                                                 Class<P> setterClass,
+                                                                                                                                                 KeyAttributeDefinitionPair... configurationAttributes) {
     KeyAttributeDefinitionPair[] commonTransformerParameters = {
         newBuilder()
-            .withKey("encoding")
-            .withAttributeDefinition(fromSimpleParameter("encoding").build())
+            .withKey(PARAM_ENCODING)
+            .withAttributeDefinition(fromSimpleParameter(PARAM_ENCODING).build())
             .build(),
         newBuilder()
-            .withKey("mimeType")
-            .withAttributeDefinition(fromSimpleParameter("mimeType").build())
+            .withKey(PARAM_MIME_TYPE)
+            .withAttributeDefinition(fromSimpleParameter(PARAM_MIME_TYPE).build())
             .build(),
         newBuilder()
             .withKey("muleContext")
@@ -789,12 +796,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return buildingDefinitions;
   }
 
-  private Builder getCoreTransformerBaseBuilder(final Class<? extends AbstractTransformer> transformerClass) {
-    return getTransformerBaseBuilder(transformerClass).withNamespace(CORE_PREFIX);
-  }
-
   private Builder getCoreMuleMessageTransformerBaseBuilder() {
-    return getMuleMessageTransformerBaseBuilder().withNamespace(CORE_PREFIX);
+    return new ComponentBuildingDefinition.Builder<>()
+        .withSetterParameterDefinition(PARAM_ENCODING, fromSimpleParameter(PARAM_ENCODING).build())
+        .withSetterParameterDefinition(PARAM_MIME_TYPE, fromSimpleParameter(PARAM_MIME_TYPE).build())
+        .asPrototype().withNamespace(CORE_PREFIX);
   }
 
 }

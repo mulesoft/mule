@@ -32,6 +32,7 @@ import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
+import org.mule.runtime.config.internal.model.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
 import org.mule.runtime.config.internal.registry.SpringRegistry;
 import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
@@ -102,6 +103,14 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
          componentBuildingDefinitionRegistry);
   }
 
+  public ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties)
+      throws ConfigurationException {
+    this(artifactAst, artifactProperties, ArtifactType.APP, false, false,
+         new DefaultComponentBuildingDefinitionRegistryFactory()
+             .create(artifactAst.dependencies(),
+                     artifactAst::dependenciesDsl));
+  }
+
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     if (emptyArtifact().equals(artifactAst) && artifactType == DOMAIN) {
@@ -139,7 +148,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                                                         artifactType,
                                                                                         enableLazyInit);
     if (baseMuleArtifactContext instanceof ConfigurableApplicationContext) {
-      ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
+      baseMuleArtifactContext.setParent(parentContext);
     }
     return baseMuleArtifactContext;
   }

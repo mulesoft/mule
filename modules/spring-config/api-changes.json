@@ -6,6 +6,18 @@
           {
             "ignore": true,
             "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.dsl.artifact.SpringArtifactConfigurationProcessor",
+            "justification": "W-18098781: Remove dead code related to spring"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils",
+            "justification": "W-18098781: Remove dead code related to spring"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
             "old": "class org.mule.runtime.config.api.SpringXmlConfigurationBuilderFactory",
             "justification": "W-17774312: Move ArtifactDeclaration uses from spring-config to tooling-support"
           },
