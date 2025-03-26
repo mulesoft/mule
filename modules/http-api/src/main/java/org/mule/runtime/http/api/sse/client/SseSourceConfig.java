@@ -38,7 +38,7 @@ public class SseSourceConfig {
     this.retryConfig = retryConfig;
     this.requestCustomizer = requestCustomizer;
     this.requestOptions = requestOptions;
-      this.preserveHeaderCase = preserveHeaderCase;
+    this.preserveHeaderCase = preserveHeaderCase;
   }
 
   /**

@@ -73,8 +73,8 @@ public class SseSourceConfigBuilder {
   }
 
   /**
-   * Configures the SSE initiator request to preserve the header case.
-   * Defaults to the value of {@link PRESERVE_HEADER_CASE}.
+   * Configures the SSE initiator request to preserve the header case. Defaults to the value of {@link PRESERVE_HEADER_CASE}.
+   * 
    * @param preserveHeadersCase whether the initiator request should preserve headers' case or not.
    * @return this same builder.
    */
