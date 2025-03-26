@@ -53,7 +53,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
     this.reverseGraphs = new ArrayList<>(orderedLifecycleTypes.length);
     this.resolver = resolver;
     this.orderedLifecycleTypes = orderedLifecycleTypes;
-    for (Class<?> orderedLifecycleType : orderedLifecycleTypes) {
+    for (int i = 0; i < orderedLifecycleTypes.length; i++) {
       DefaultDirectedGraph<BeanWrapper, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
       dependencyGraphs.add(graph);
       DefaultDirectedGraph<BeanWrapper, DefaultEdge> reverseGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
