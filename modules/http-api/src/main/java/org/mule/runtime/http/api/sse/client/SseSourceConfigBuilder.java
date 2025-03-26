@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.sse.client;
 
+import static org.mule.runtime.http.api.server.HttpServerProperties.PRESERVE_HEADER_CASE;
 import static org.mule.runtime.http.api.sse.client.SseRetryConfig.defaultConfig;
 
 import static java.util.Objects.requireNonNull;
@@ -32,6 +33,7 @@ public class SseSourceConfigBuilder {
   private Consumer<HttpRequestBuilder> requestCustomizer = b -> {
   };
   private HttpRequestOptions requestOptions = HttpRequestOptions.builder().build();
+  private boolean preserveHeaderCase = PRESERVE_HEADER_CASE;
 
   public SseSourceConfigBuilder(String url) {
     this.url = requireNonNull(url);
@@ -71,11 +73,23 @@ public class SseSourceConfigBuilder {
   }
 
   /**
+   * Configures the SSE initiator request to preserve the header case.
+   * Defaults to the value of {@link PRESERVE_HEADER_CASE}.
+   * @param preserveHeadersCase whether the initiator request should preserve headers' case or not.
+   * @return this same builder.
+   */
+  public SseSourceConfigBuilder withPreserveHeadersCase(boolean preserveHeadersCase) {
+    this.preserveHeaderCase = preserveHeadersCase;
+    return this;
+  }
+
+  /**
    * Builds an instance of {@link SseSourceConfig} with the specified parameters. This method is intended to be called only once.
    * 
    * @return the new instance of {@link SseSourceConfig}.
+   * @since 4.10.0, 4.9.4
    */
   public SseSourceConfig build() {
-    return new SseSourceConfig(url, retryConfig, requestCustomizer, requestOptions);
+    return new SseSourceConfig(url, retryConfig, requestCustomizer, requestOptions, preserveHeaderCase);
   }
 }
