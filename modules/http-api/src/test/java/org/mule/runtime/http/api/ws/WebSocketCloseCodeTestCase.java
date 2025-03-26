@@ -66,9 +66,11 @@ public class WebSocketCloseCodeTestCase {
     assertThat(code.getOriginalCode(), is(3500));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void fromProtocolCodeWithReservedCodeThrowsException() {
-    fromProtocolCode(2500);
+  @Test
+  public void fromProtocolCodeWithReservedCode() {
+    WebSocketCloseCode code = fromProtocolCode(2500);
+    assertThat(code, is(UNKNOWN));
+    assertThat(code.getOriginalCode(), is(2500));
   }
 
   @Test(expected = IllegalArgumentException.class)
