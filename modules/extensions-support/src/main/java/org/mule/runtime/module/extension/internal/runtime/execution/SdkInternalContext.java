@@ -10,6 +10,8 @@ import static java.util.Collections.synchronizedMap;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.collection.SmallMap;
@@ -26,9 +28,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import reactor.util.context.Context;
 import org.slf4j.Logger;
-import static org.slf4j.LoggerFactory.getLogger;
+
+import reactor.util.context.Context;
 
 /**
  * Contains internal context handled by SDK operations.
@@ -65,9 +67,15 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   }
 
   public void putContext(ComponentLocation location, String eventId) {
-    LOGGER.debug("Adding new context at location - {} for event - {}", location != null ? location.getLocation() : "null",
-                 eventId);
-    locationSpecificContext.put(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
+    final var locationString = location != null ? location.getLocation() : "null";
+    LOGGER.debug("Adding new context at location - {} for event - {}", locationString, eventId);
+
+    final var previousValue =
+        locationSpecificContext.put(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
+    if (previousValue != null) {
+      throw new IllegalStateException("Context at location - %s for event - %s already present"
+          .formatted(locationString, eventId));
+    }
   }
 
   /**
