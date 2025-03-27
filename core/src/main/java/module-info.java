@@ -18,6 +18,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged",
         "org.mule.runtime.core.privileged.el",
         "org.mule.runtime.core.privileged.event",
+        "org.mule.runtime.core.privileged.event.context",
         "org.mule.runtime.core.privileged.exception",
         "org.mule.runtime.core.privileged.execution",
         "org.mule.runtime.core.privileged.interception",
@@ -174,6 +175,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.el;
   // for MuleFwk, MUnit, MTF, ApiGateway, Tracing and Validation
   exports org.mule.runtime.core.privileged.event;
+  exports org.mule.runtime.core.privileged.event.context;
   // for MuleFwk, MUnit, ApiKit, DataWeave and Validation
   exports org.mule.runtime.core.privileged.exception;
   // for test-components
@@ -589,6 +591,7 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.execution to
       spring.core;
   opens org.mule.runtime.core.internal.event to
+      com.mulesoft.mule.runtime.kryo,
       kryo.shaded;
   opens org.mule.runtime.core.internal.lock to
       org.mule.runtime.core.components,
