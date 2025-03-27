@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static org.mule.runtime.api.notification.AbstractServerNotification.CUSTOM_EVENT_ACTION_START_RANGE;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationsTestCase.DummyNotification.EVENT_RECEIVED;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
@@ -13,7 +14,9 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -176,6 +179,19 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     manager.fireNotification(notification);
 
     verify(notificationListener, times(1)).onNotification(notification);
+  }
+
+  @Test
+  public void testCustomNotification() {
+    String testMessage = "Some message";
+    assertThrows(IllegalArgumentException.class, () -> new CustomNotification(testMessage, CUSTOM_EVENT_ACTION_START_RANGE - 1));
+    assertThrows(IllegalArgumentException.class,
+                 () -> new CustomNotification(testMessage, CUSTOM_EVENT_ACTION_START_RANGE - 1, "1"));
+
+    CustomNotification customNotification = new CustomNotification(testMessage, CUSTOM_EVENT_ACTION_START_RANGE + 1);
+    assertThat(customNotification.getEventName(), is("CustomNotification"));
+    assertThat(customNotification.toString(),
+               startsWith("CustomNotification{action=none, resourceId=null, serverId=null, timestamp="));
   }
 
   private NotificationListenerRegistry getNotificationListenerRegistry() throws RegistrationException {
