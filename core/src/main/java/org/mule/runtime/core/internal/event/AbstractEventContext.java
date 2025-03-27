@@ -80,6 +80,7 @@ public abstract class AbstractEventContext implements SpanContextAware, BaseEven
   // Kept for backwards compatibility of deserialization of objects serialized with previous versions
   private byte state = -1;
   private transient AtomicInteger stateCtx = new AtomicInteger(STATE_READY);
+  private transient volatile AtomicInteger childIdProvider = new AtomicInteger();
   private transient volatile boolean childrenComplete = false;
   private volatile Either<Throwable, CoreEvent> result;
 
@@ -444,6 +445,13 @@ public abstract class AbstractEventContext implements SpanContextAware, BaseEven
 
   protected int getState() {
     return stateCtx.get();
+  }
+
+  @Override
+  public String nextChildId() {
+    return getId() != null
+        ? new StringBuilder(getId()).append("_").append(childIdProvider.getAndIncrement()).toString()
+        : "" + childIdProvider.getAndIncrement();
   }
 
 }

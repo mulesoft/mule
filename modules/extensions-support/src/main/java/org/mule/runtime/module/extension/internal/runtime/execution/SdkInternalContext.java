@@ -71,7 +71,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     LOGGER.debug("Adding new context at location - {} for event - {}", locationString, eventId);
 
     final var previousValue =
-        locationSpecificContext.put(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
+        locationSpecificContext.putIfAbsent(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
     if (previousValue != null) {
       throw new IllegalStateException("Context at location - %s for event - %s already present"
           .formatted(locationString, eventId));
@@ -99,15 +99,40 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
                                           Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback,
                                           ExecutionContextAdapter executionContextAdapter) {
+    final var locationString = location != null ? location.getLocation() : "null";
     LOGGER.debug("Setting Operation Parameters at location - {} for event - {}",
-                 location != null ? location.getLocation() : "null", eventId);
-    locationSpecificContext.get(new Pair<>(location, eventId)).setOperationExecutionParams(configuration, parameters,
-                                                                                           operationEvent,
-                                                                                           callback, executionContextAdapter);
+                 locationString, eventId);
+
+    final var locationSpecificSdkInternalContext = getLocationSpecificSdkInternalContext(location, eventId);
+    if (locationSpecificSdkInternalContext.getOperationExecutionParams() != null) {
+      throw new IllegalStateException("Context at location - %s for event - %s already has Operation Parameters set"
+          .formatted(locationString, eventId));
+    }
+
+    locationSpecificSdkInternalContext.setOperationExecutionParams(configuration, parameters,
+                                                                   operationEvent,
+                                                                   callback, executionContextAdapter);
   }
 
   public OperationExecutionParams getOperationExecutionParams(ComponentLocation location, String eventId) {
-    return locationSpecificContext.get(new Pair<>(location, eventId)).getOperationExecutionParams();
+    final var locationSpecificSdkInternalContext = getLocationSpecificSdkInternalContext(location, eventId);
+    final var operationExecutionParams = locationSpecificSdkInternalContext.getOperationExecutionParams();
+    if (operationExecutionParams == null) {
+      final var locationString = location != null ? location.getLocation() : "null";
+      throw new NullPointerException("No Operation Parameters for Context at location - %s for event - %s"
+          .formatted(locationString, eventId));
+    }
+    return operationExecutionParams;
+  }
+
+  private LocationSpecificSdkInternalContext getLocationSpecificSdkInternalContext(ComponentLocation location, String eventId) {
+    final var locationSpecificSdkInternalContext = locationSpecificContext.get(new Pair<>(location, eventId));
+    if (locationSpecificSdkInternalContext == null) {
+      final var locationString = location != null ? location.getLocation() : "null";
+      throw new NullPointerException("No Context at location - %s for event - %s"
+          .formatted(locationString, eventId));
+    }
+    return locationSpecificSdkInternalContext;
   }
 
   public Map<String, Object> getResolutionResult(ComponentLocation location, String eventId) {
