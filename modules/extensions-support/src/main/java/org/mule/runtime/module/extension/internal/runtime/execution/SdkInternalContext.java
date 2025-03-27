@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.util.Collections.synchronizedMap;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
 
@@ -14,7 +13,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
@@ -26,6 +24,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -55,9 +54,8 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
    * SDK components may be nested within each other, so some of the context must be kept separately for the component it belongs
    * to.
    */
-  // TODO MULE-18296 determine what implementation of thread safe map is better here after that fix.
   private final Map<Pair<ComponentLocation, String>, LocationSpecificSdkInternalContext> locationSpecificContext =
-      synchronizedMap(new SmallMap<>());
+      new ConcurrentHashMap<>(5);
 
   private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 

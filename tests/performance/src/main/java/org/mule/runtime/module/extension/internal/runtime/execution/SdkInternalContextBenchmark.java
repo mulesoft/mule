@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import org.mule.AbstractBenchmark;
-import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -28,7 +28,6 @@ import org.openjdk.jmh.annotations.Warmup;
 @OutputTimeUnit(NANOSECONDS)
 public class SdkInternalContextBenchmark extends AbstractBenchmark {
 
-  final static ComponentLocation LOCATION = DefaultComponentLocation.from("comp/0");
 
   @State(Scope.Benchmark)
   public static class ContextContainer {
@@ -44,22 +43,24 @@ public class SdkInternalContextBenchmark extends AbstractBenchmark {
   @Benchmark
   @Threads(3)
   public void contextWith3Parallel(ContextContainer ctx) {
+    var location = DefaultComponentLocation.from("comp/" + currentThread().getId());
     for (int i = 0; i < 100; ++i) {
       final var id = "" + i;
-      ctx.ctx.putContext(LOCATION, id);
-      ctx.ctx.setConfiguration(LOCATION, id, empty());
-      ctx.ctx.removeContext(LOCATION, id);
+      ctx.ctx.putContext(location, id);
+      ctx.ctx.setConfiguration(location, id, empty());
+      ctx.ctx.removeContext(location, id);
     }
   }
 
   @Benchmark
   @Threads(300)
   public void contextWith300ParallelChildren(ContextContainer ctx) {
+    var location = DefaultComponentLocation.from("comp/" + currentThread().getId());
     for (int i = 0; i < 100; ++i) {
       final var id = "" + i;
-      ctx.ctx.putContext(LOCATION, id);
-      ctx.ctx.setConfiguration(LOCATION, id, empty());
-      ctx.ctx.removeContext(LOCATION, id);
+      ctx.ctx.putContext(location, id);
+      ctx.ctx.setConfiguration(location, id, empty());
+      ctx.ctx.removeContext(location, id);
     }
   }
 }
