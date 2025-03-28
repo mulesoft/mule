@@ -122,9 +122,8 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
         getLocationSpecificSdkInternalContext(location, eventId);
     final OperationExecutionParams<M> operationExecutionParams = locationSpecificSdkInternalContext.getOperationExecutionParams();
     if (operationExecutionParams == null) {
-      final var locationString = getLocationString(location);
       throw new NullPointerException("No Operation Parameters for Context at location - %s for event - %s"
-          .formatted(locationString, eventId));
+          .formatted(getLocationString(location), eventId));
     }
     return operationExecutionParams;
   }

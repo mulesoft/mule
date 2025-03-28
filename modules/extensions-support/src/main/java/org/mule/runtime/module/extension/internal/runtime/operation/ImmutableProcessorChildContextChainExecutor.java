@@ -82,13 +82,6 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     final String eventId = eventWithCorrelationId.getContext().getId();
     SdkInternalContext sdkInternalContext = SdkInternalContext.from(eventWithCorrelationId);
     sdkInternalContext.putContext(location, eventId);
-    SdkInternalContext.OperationExecutionParams params =
-        sdkInternalContext.getOperationExecutionParams(location, originalEvent.getContext().getId());
-    if (params != null) {
-      sdkInternalContext.setOperationExecutionParams(location, eventId, params.configuration(), params.parameters(),
-                                                     eventWithCorrelationId, params.callback(),
-                                                     params.executionContextAdapter());
-    }
   }
 
   private CoreEvent withPreviousCorrelationid(CoreEvent event) {
