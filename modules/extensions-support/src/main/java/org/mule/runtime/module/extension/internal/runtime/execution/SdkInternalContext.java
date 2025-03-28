@@ -61,12 +61,13 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   private UnaryOperator<Context> innerChainSubscriberContextMapping = identity();
 
   public void removeContext(ComponentLocation location, String eventId) {
-    LOGGER.debug("Removing context at location - {} for event - {}", location != null ? location.getLocation() : "null", eventId);
+    LOGGER.debug("Removing context at location - {} for event - {}",
+                 getLocationString(location), eventId);
     locationSpecificContext.remove(new Pair<>(location, eventId));
   }
 
   public void putContext(ComponentLocation location, String eventId) {
-    final var locationString = location != null ? location.getLocation() : "null";
+    final var locationString = getLocationString(location);
     LOGGER.debug("Adding new context at location - {} for event - {}", locationString, eventId);
 
     final var previousValue =
@@ -85,8 +86,8 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
    */
   public void setConfiguration(ComponentLocation location, String eventId,
                                Optional<ConfigurationInstance> configuration) {
-    LOGGER.debug("Adding configuration at location - {} for event - {}", location != null ? location.getLocation() : "null",
-                 eventId);
+    LOGGER.debug("Adding configuration at location - {} for event - {}",
+                 getLocationString(location), eventId);
     locationSpecificContext.get(new Pair<>(location, eventId)).setConfiguration(configuration);
   }
 
@@ -99,7 +100,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
                                                                      Map<String, Object> parameters, CoreEvent operationEvent,
                                                                      ExecutorCallback callback,
                                                                      ExecutionContextAdapter<M> executionContextAdapter) {
-    final var locationString = location != null ? location.getLocation() : "null";
+    final var locationString = getLocationString(location);
     LOGGER.debug("Setting Operation Parameters at location - {} for event - {}",
                  locationString, eventId);
 
@@ -121,7 +122,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
         getLocationSpecificSdkInternalContext(location, eventId);
     final OperationExecutionParams<M> operationExecutionParams = locationSpecificSdkInternalContext.getOperationExecutionParams();
     if (operationExecutionParams == null) {
-      final var locationString = location != null ? location.getLocation() : "null";
+      final var locationString = getLocationString(location);
       throw new NullPointerException("No Operation Parameters for Context at location - %s for event - %s"
           .formatted(locationString, eventId));
     }
@@ -133,11 +134,15 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     final LocationSpecificSdkInternalContext<M> locationSpecificSdkInternalContext =
         locationSpecificContext.get(new Pair<>(location, eventId));
     if (locationSpecificSdkInternalContext == null) {
-      final var locationString = location != null ? location.getLocation() : "null";
+      final var locationString = getLocationString(location);
       throw new NullPointerException("No Context at location - %s for event - %s"
           .formatted(locationString, eventId));
     }
     return locationSpecificSdkInternalContext;
+  }
+
+  private String getLocationString(ComponentLocation location) {
+    return location != null ? location.getLocation() : "null";
   }
 
   public Map<String, Object> getResolutionResult(ComponentLocation location, String eventId) {
