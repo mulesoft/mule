@@ -15,9 +15,13 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_RESOURCES;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.readString;
+import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -27,6 +31,7 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
@@ -36,6 +41,7 @@ import org.mule.runtime.module.extension.internal.resources.manifest.DefaultClas
 import org.mule.runtime.module.extension.internal.resources.manifest.ExportedPackagesCollector;
 import org.mule.runtime.module.extension.internal.resources.manifest.ProcessingEnvironmentClassPackageFinder;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -98,8 +104,44 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory, 
       }
     });
 
+    setMetadataFromSource(builder);
+
     final String descriptorJson = new MulePluginModelJsonSerializer().serialize(builder.build());
-    return of(new GeneratedResource(AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR, descriptorJson.getBytes()));
+    return of(new GeneratedResource(false, AUTO_GENERATED_MULE_ARTIFACT_DESCRIPTOR, descriptorJson.getBytes()));
+  }
+
+  /**
+   * Prevent the generation of the mule-artifact.json to override any value set explicitly by the plugin developer
+   * 
+   * @param builder
+   */
+  private void setMetadataFromSource(final MulePluginModelBuilder builder) {
+    readPluginModelFromSource().ifPresent(sourcePluginModel -> {
+      if (sourcePluginModel.getMinMuleVersion() != null) {
+        builder.setMinMuleVersion(sourcePluginModel.getMinMuleVersion());
+      }
+      if (sourcePluginModel.getClassLoaderModelLoaderDescriptor() != null) {
+        builder.withClassLoaderModelDescriptorLoader(sourcePluginModel.getClassLoaderModelLoaderDescriptor());
+      }
+    });
+  }
+
+  private Optional<MulePluginModel> readPluginModelFromSource() {
+    if (processingEnvironment == null) {
+      return empty();
+    }
+
+    try {
+      final String extensionResourcesLocation = processingEnvironment.getOptions().get(EXTENSION_RESOURCES);
+      final var path = get(extensionResourcesLocation, "META-INF", "mule-artifact", MULE_ARTIFACT_JSON_DESCRIPTOR);
+      if (!path.toFile().exists()) {
+        return empty();
+      }
+      var sourceMuleArtifactJson = readString(path, UTF_8);
+      return of(new MulePluginModelJsonSerializer().deserialize(sourceMuleArtifactJson));
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   private String getLoaderId(ExtensionModel extensionModel) {

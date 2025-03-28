@@ -7,12 +7,13 @@
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
-import static org.mule.runtime.module.extension.internal.resources.documentation.DefaultExtensionDescriptionsSerializer.SERIALIZER;
+import static org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
 
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -30,8 +31,6 @@ import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * A {@link GeneratedResourceFactory} which generates an XML file with all the {@link ExtensionModel} elements and it's
@@ -52,7 +51,7 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
                                                            walker.getOperations(),
                                                            walker.getSources(),
                                                            getTypesDocumentation(extensionModel)));
-    return Optional.of(new GeneratedResource(SERIALIZER.getFileName(extensionModel.getName()), documenter.getBytes()));
+    return of(new GeneratedResource(true, "META-INF/" + SERIALIZER.getFileName(extensionModel.getName()), documenter.getBytes()));
   }
 
   private class ExtensionDocumenterWalker extends ExtensionWalker {
@@ -64,34 +63,33 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
 
     @Override
     protected void onConfiguration(ConfigurationModel model) {
-      configs.addAll(createParameterizedElement(model));
+      configs.add(createParameterizedElement(model));
     }
 
     @Override
     protected void onOperation(HasOperationModels owner, OperationModel model) {
-      operations.addAll(createParameterizedElement(model));
+      operations.add(createParameterizedElement(model));
     }
 
     @Override
     protected void onConnectionProvider(HasConnectionProviderModels owner, ConnectionProviderModel model) {
-      connections.addAll(createParameterizedElement(model));
+      connections.add(createParameterizedElement(model));
     }
 
     @Override
     protected void onSource(HasSourceModels owner, SourceModel model) {
-      sources.addAll(createParameterizedElement(model));
+      sources.add(createParameterizedElement(model));
     }
 
-    private List<DefaultXmlExtensionElementDocumentation> createParameterizedElement(ParameterizedModel model) {
-      ImmutableList.Builder<DefaultXmlExtensionElementDocumentation> builder = ImmutableList.builder();
+    private DefaultXmlExtensionElementDocumentation createParameterizedElement(ParameterizedModel model) {
       DefaultXmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
       element.setName(model.getName());
       element.setDescription(model.getDescription());
       element.setParameters(model.getAllParameterModels().stream()
           .map(p -> new DefaultXmlExtensionParameterDocumentation(p.getName(), p.getDescription()))
-          .collect(toList()));
-      builder.add(element);
-      return builder.build();
+          .toList());
+
+      return element;
     }
 
     public List<DefaultXmlExtensionElementDocumentation> getConfigs() {
@@ -112,25 +110,29 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
   }
 
   private List<DefaultXmlExtensionElementDocumentation> getTypesDocumentation(ExtensionModel extensionModel) {
-    List<DefaultXmlExtensionElementDocumentation> types = new ArrayList<>();
+    return extensionModel.getTypes()
+        .stream()
+        .map(type -> ExtensionMetadataTypeUtils.getId(type)
+            .map(id -> {
+              DefaultXmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
+              element.setName(id);
+              element.setDescription(getDescription(type));
+              element.setParameters(type.getFields().stream()
+                  .map(f -> new DefaultXmlExtensionParameterDocumentation(getAlias(f), getDescription(f)))
+                  .toList());
 
-    extensionModel.getTypes().forEach(type -> ExtensionMetadataTypeUtils.getId(type)
-        .ifPresent(id -> {
-          DefaultXmlExtensionElementDocumentation element = new DefaultXmlExtensionElementDocumentation();
-          element.setName(id);
-          element.setDescription(type.getAnnotation(DescriptionAnnotation.class)
-              .map(DescriptionAnnotation::getValue).orElse(""));
-          element.setParameters(type.getFields().stream()
-              .map(f -> new DefaultXmlExtensionParameterDocumentation(getAlias(f),
-                                                                      f.getAnnotation(DescriptionAnnotation.class)
-                                                                          .map(DescriptionAnnotation::getValue).orElse("")))
-              .collect(toList()));
-
-          types.add(element);
-        }));
-    return types;
+              return element;
+            }))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
   }
 
+  private String getDescription(MetadataType type) {
+    return type.getAnnotation(DescriptionAnnotation.class)
+        .map(DescriptionAnnotation::getValue)
+        .orElse("");
+  }
 
   private DefaultXmlExtensionDocumentation getDocumenter(ExtensionModel model,
                                                          List<DefaultXmlExtensionElementDocumentation> configs,

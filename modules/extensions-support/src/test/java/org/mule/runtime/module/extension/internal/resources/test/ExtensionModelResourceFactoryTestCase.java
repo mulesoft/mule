@@ -6,20 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.resources.test;
 
-import static java.lang.Thread.currentThread;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 
+import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
+import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.XMLUnit;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,9 +41,10 @@ public class ExtensionModelResourceFactoryTestCase {
   @Test
   public void generate() throws Exception {
     GeneratedResource resource = resourceFactory.generateResource(extensionModel).get();
-    assertThat(resource.getPath(), equalTo(RESOURCE_NAME));
+    assertThat(resource.getPath(), equalTo("META-INF/" + RESOURCE_NAME));
     XMLUnit.setIgnoreWhitespace(true);
-    String expected = IOUtils.toString(currentThread().getContextClassLoader().getResourceAsStream(RESOURCE_NAME));
+    String expected =
+        IOUtils.toString(currentThread().getContextClassLoader().getResourceAsStream(RESOURCE_NAME), UTF_8);
     XMLUnit.compareXML(expected, new String(resource.getContent()));
   }
 }
