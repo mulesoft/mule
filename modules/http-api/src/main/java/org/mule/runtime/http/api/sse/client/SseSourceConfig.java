@@ -26,17 +26,19 @@ public class SseSourceConfig {
   private final SseRetryConfig retryConfig;
   private final Consumer<HttpRequestBuilder> requestCustomizer;
   private final HttpRequestOptions requestOptions;
+  private final boolean preserveHeaderCase;
 
   public static SseSourceConfigBuilder builder(String url) {
     return new SseSourceConfigBuilder(url);
   }
 
   SseSourceConfig(String url, SseRetryConfig retryConfig, Consumer<HttpRequestBuilder> requestCustomizer,
-                  HttpRequestOptions requestOptions) {
+                  HttpRequestOptions requestOptions, boolean preserveHeaderCase) {
     this.url = url;
     this.retryConfig = retryConfig;
     this.requestCustomizer = requestCustomizer;
     this.requestOptions = requestOptions;
+    this.preserveHeaderCase = preserveHeaderCase;
   }
 
   /**
@@ -65,5 +67,13 @@ public class SseSourceConfig {
    */
   public HttpRequestOptions getRequestOptions() {
     return requestOptions;
+  }
+
+  /**
+   * @return whether the initiator request should preserve headers' case or not.
+   * @since 4.10.0, 4.9.4
+   */
+  public boolean isPreserveHeaderCase() {
+    return preserveHeaderCase;
   }
 }
