@@ -183,8 +183,10 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
       params.put(COMPILATION_MODE, true);
     }
 
+    final var builder = builder(classLoader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())));
+    configureLoadingRequest(builder);
     return getExtensionModelLoader()
-        .loadExtensionModel(builder(classLoader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())))
+        .loadExtensionModel(builder
             .addParameters(params)
             .setForceExtensionValidation(true)
             .build());
