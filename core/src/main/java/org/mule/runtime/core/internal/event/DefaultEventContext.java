@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.event;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.privileged.event.DefaultFlowCallStack.newDefaultFlowCallStack;
 
-import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;
 import static java.time.Instant.now;
 import static java.util.Objects.requireNonNull;
@@ -21,6 +20,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -99,8 +99,8 @@ public final class DefaultEventContext extends AbstractEventContext implements S
                                        FlowExceptionHandler exceptionHandler, final String correlationId) {
     BaseEventContext child = new ChildEventContext(parent, componentLocation.orElse(null), exceptionHandler,
                                                    parent.getDepthLevel() + 1, correlationId);
-    if (parent instanceof AbstractEventContext) {
-      ((AbstractEventContext) parent).addChildContext(child);
+    if (parent instanceof AbstractEventContext aec) {
+      aec.addChildContext(child);
     }
 
     return child;
@@ -290,16 +290,14 @@ public final class DefaultEventContext extends AbstractEventContext implements S
    * @return a tracked {@link CursorProvider}.
    * @since 4.3.0
    */
-  public CursorProvider track(ManagedCursorProvider provider, StreamingGhostBuster ghostBuster) {
+  public <T extends Cursor> CursorProvider<T> track(ManagedCursorProvider<T> provider, StreamingGhostBuster ghostBuster) {
     return streamingState.addProvider(provider, ghostBuster);
   }
 
   private void eventContextMaintain(EventContextService eventContextService) {
-    if (eventContextService != null && eventContextService instanceof DefaultEventContextService) {
-      ((DefaultEventContextService) eventContextService).addContext(this);
-      this.onTerminated((e, t) -> {
-        ((DefaultEventContextService) eventContextService).removeContext(DefaultEventContext.this);
-      });
+    if (eventContextService instanceof DefaultEventContextService decs) {
+      decs.addContext(this);
+      this.onTerminated((e, t) -> decs.removeContext(DefaultEventContext.this));
     }
   }
 
@@ -346,13 +344,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.root = parent.getRootContext();
       this.parent = parent;
       this.componentLocation = componentLocation;
-      this.id = parent.getId() != null
-          ? parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)))
-          : Integer.toString(identityHashCode(this));
+      this.id = parent.nextChildId();
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
-      if (parent instanceof SpanContextAware) {
-        SpanContext parentSpanContext = getParentDistributedTraceContext((SpanContextAware) parent);
+      if (parent instanceof SpanContextAware sca) {
+        SpanContext parentSpanContext = getParentDistributedTraceContext(sca);
         if (parentSpanContext != null) {
           spanContext = parentSpanContext.copy();
         }
@@ -361,11 +357,6 @@ public final class DefaultEventContext extends AbstractEventContext implements S
 
     private SpanContext getParentDistributedTraceContext(SpanContextAware parent) {
       return parent.getSpanContext();
-    }
-
-    private ChildEventContext(BaseEventContext parent, ComponentLocation componentLocation,
-                              FlowExceptionHandler messagingExceptionHandler, int depthLevel) {
-      this(parent, componentLocation, messagingExceptionHandler, depthLevel, null);
     }
 
     @Override
