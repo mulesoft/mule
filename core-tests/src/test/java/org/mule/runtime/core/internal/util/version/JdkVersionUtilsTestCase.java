@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util.java;
+package org.mule.runtime.core.internal.util.version;
 
-import static org.mule.runtime.core.internal.util.java.JdkVersionUtils.isRecommendedJdkVersion;
-import static org.mule.runtime.core.internal.util.java.JdkVersionUtils.isSupportedJdkVersion;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.isRecommendedJdkVersion;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.isSupportedJdkVersion;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.SUPPORTED_ENVIRONMENTS;
 import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.JdkVersionStory.JDK_VERSION;
@@ -26,8 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.internal.util.java.JdkVersionUtils.JdkVersion;
-import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils.JdkVersion;
 import org.mule.runtime.manifest.internal.DefaultMuleManifest;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

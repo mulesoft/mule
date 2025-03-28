@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.construct.BackPressureReason.MAX_CONCURRENCY_EXCEEDED;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE_ASYNC;
@@ -70,7 +71,7 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
                                           int parallelism,
                                           int maxConcurrency,
                                           boolean maxConcurrencyEagerCheck) {
-    super(subscribers, maxConcurrency, maxConcurrencyEagerCheck);
+    super(subscribers, maxConcurrency, maxConcurrencyEagerCheck, () -> currentThread());
     this.cpuLightSchedulerSupplier = cpuLightSchedulerSupplier;
     this.parallelism = parallelism;
   }

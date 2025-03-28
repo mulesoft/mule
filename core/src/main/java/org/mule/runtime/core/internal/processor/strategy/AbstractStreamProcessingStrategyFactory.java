@@ -125,12 +125,15 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
     final protected int maxConcurrency;
     final protected boolean maxConcurrencyEagerCheck;
     final protected ClassLoader executionClassloader;
+    private final Supplier<Thread> threadSupplier;
 
-    protected AbstractStreamProcessingStrategy(int subscribers, int maxConcurrency, boolean maxConcurrencyEagerCheck) {
+    protected AbstractStreamProcessingStrategy(int subscribers, int maxConcurrency, boolean maxConcurrencyEagerCheck,
+                                               Supplier<Thread> threadSupplier) {
       this.subscribers = requireNonNull(subscribers);
       this.maxConcurrency = requireNonNull(maxConcurrency);
       this.maxConcurrencyEagerCheck = maxConcurrency < MAX_VALUE && maxConcurrencyEagerCheck;
-      this.executionClassloader = currentThread().getContextClassLoader();
+      this.executionClassloader = threadSupplier.get().getContextClassLoader();
+      this.threadSupplier = threadSupplier;
     }
 
     protected void awaitSubscribersCompletion(FlowConstruct flowConstruct, final long shutdownTimeout,
@@ -147,7 +150,7 @@ public abstract class AbstractStreamProcessingStrategyFactory extends AbstractPr
           }
         }
       } catch (InterruptedException e) {
-        currentThread().interrupt();
+        threadSupplier.get().interrupt();
         if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
           throw new IllegalStateException(format("Subscribers of ProcessingStrategy for flow '%s' not completed before thread interruption",
                                                  flowConstruct.getName()));
