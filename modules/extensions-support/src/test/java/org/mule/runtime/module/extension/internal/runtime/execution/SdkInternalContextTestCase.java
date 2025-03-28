@@ -50,8 +50,8 @@ public class SdkInternalContextTestCase extends AbstractMuleTestCase {
     pushContext(ctx, comp1, "event1", completedForComponents);
     pushContext(ctx, comp2, "event1", completedForComponents);
 
-    ctx.getOperationExecutionParams(comp1, "event1").getCallback().complete(comp1);
-    ctx.getOperationExecutionParams(comp2, "event1").getCallback().complete(comp2);
+    ctx.getOperationExecutionParams(comp1, "event1").callback().complete(comp1);
+    ctx.getOperationExecutionParams(comp2, "event1").callback().complete(comp2);
 
     assertThat(completedForComponents, contains(new Pair<>(comp1, "event1"), new Pair<>(comp2, "event1")));
   }
@@ -69,8 +69,8 @@ public class SdkInternalContextTestCase extends AbstractMuleTestCase {
     pushContext(ctx, comp1, "event1", completedForComponents);
     pushContext(ctx, comp1, "event2", completedForComponents);
 
-    ctx.getOperationExecutionParams(comp1, "event1").getCallback().complete(comp1);
-    ctx.getOperationExecutionParams(comp1, "event2").getCallback().complete(comp1);
+    ctx.getOperationExecutionParams(comp1, "event1").callback().complete(comp1);
+    ctx.getOperationExecutionParams(comp1, "event2").callback().complete(comp1);
 
     assertThat(completedForComponents, contains(new Pair<>(comp1, "event1"), new Pair<>(comp1, "event2")));
   }

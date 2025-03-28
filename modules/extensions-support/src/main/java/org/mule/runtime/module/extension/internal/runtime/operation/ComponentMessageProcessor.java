@@ -513,7 +513,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
               getOperationExecutionParams(event);
 
           if (operationExecutionParams != null) {
-            operationContext = operationExecutionParams.getExecutionContextAdapter();
+            operationContext = operationExecutionParams.executionContextAdapter();
             operationContext.changeEvent(event);
           } else {
             // There was an error propagated before <execute-next> and the operation execution parameters don't exist yet.
@@ -726,9 +726,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           .configureInternalPublisher(from(p)
               .transform(processingStrategy.onProcessor(innerProcessor))
               .doOnNext(result -> getOperationExecutionParams(result)
-                  .getCallback().complete(result))
+                  .callback().complete(result))
               .onErrorContinue((t, result) -> getOperationExecutionParams(((EventProcessingException) t).getEvent())
-                  .getCallback().error(t.getCause()))));
+                  .callback().error(t.getCause()))));
     },
                                                 getRuntime().availableProcessors());
   }
@@ -819,7 +819,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private void prepareAndExecuteOperation(CoreEvent event, Supplier<ExecutorCallback> callbackSupplier) {
     OperationExecutionParams oep = getOperationExecutionParams(event);
 
-    ExecutionContextAdapter<T> operationContext = oep.getExecutionContextAdapter();
+    ExecutionContextAdapter<T> operationContext = oep.executionContextAdapter();
 
     setCurrentEvent((PrivilegedEvent) event);
     boolean wasProcessorPathSet = setCurrentLocation();

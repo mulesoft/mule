@@ -85,9 +85,9 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     SdkInternalContext.OperationExecutionParams params =
         sdkInternalContext.getOperationExecutionParams(location, originalEvent.getContext().getId());
     if (params != null) {
-      sdkInternalContext.setOperationExecutionParams(location, eventId, params.getConfiguration(), params.getParameters(),
-                                                     eventWithCorrelationId, params.getCallback(),
-                                                     params.getExecutionContextAdapter());
+      sdkInternalContext.setOperationExecutionParams(location, eventId, params.configuration(), params.parameters(),
+                                                     eventWithCorrelationId, params.callback(),
+                                                     params.executionContextAdapter());
     }
   }
 

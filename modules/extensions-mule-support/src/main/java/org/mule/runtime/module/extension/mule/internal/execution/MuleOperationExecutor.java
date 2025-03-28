@@ -90,7 +90,7 @@ public class MuleOperationExecutor implements CompletableComponentExecutor<Compo
     Map<String, Object> parameters = new HashMap<>();
     from(inputEvent)
         .getOperationExecutionParams(ctx.getComponent().getLocation(), inputEvent.getContext().getId())
-        .getParameters()
+        .parameters()
         .forEach((key, value) -> parameters.put(key, mapParameterValue(value)));
     return parameters;
   }

@@ -88,7 +88,7 @@ public abstract class AbstractEventContext implements SpanContextAware, BaseEven
 
   protected FlowCallStack flowCallStack;
 
-  public AbstractEventContext() {
+  protected AbstractEventContext() {
     this(NULL_EXCEPTION_HANDLER, 0, Optional.empty());
   }
 
@@ -97,8 +97,8 @@ public abstract class AbstractEventContext implements SpanContextAware, BaseEven
    * @param externalCompletion optional future that allows an external entity (e.g. a source) to signal completion of response
    *                           processing and delay termination.
    */
-  public AbstractEventContext(FlowExceptionHandler exceptionHandler, int depthLevel,
-                              Optional<CompletableFuture<Void>> externalCompletion) {
+  protected AbstractEventContext(FlowExceptionHandler exceptionHandler, int depthLevel,
+                                 Optional<CompletableFuture<Void>> externalCompletion) {
     this.depthLevel = depthLevel;
     this.externalCompletion = externalCompletion.orElse(null);
     if (this.externalCompletion != null) {
@@ -231,8 +231,8 @@ public abstract class AbstractEventContext implements SpanContextAware, BaseEven
       Optional<BaseEventContext> parentContext = getParentContext();
       if (parentContext.isPresent()) {
         BaseEventContext context = parentContext.get();
-        if (context instanceof AbstractEventContext) {
-          ((AbstractEventContext) context).tryComplete();
+        if (context instanceof AbstractEventContext aec) {
+          aec.tryComplete();
         }
       }
 
@@ -372,8 +372,8 @@ public abstract class AbstractEventContext implements SpanContextAware, BaseEven
     try {
       childContexts.stream().filter(context -> !context.isTerminated()).forEach(context -> {
         childConsumer.accept(context);
-        if (context instanceof AbstractEventContext) {
-          ((AbstractEventContext) context).forEachChild(childConsumer);
+        if (context instanceof AbstractEventContext aec) {
+          aec.forEachChild(childConsumer);
         }
       });
     } finally {

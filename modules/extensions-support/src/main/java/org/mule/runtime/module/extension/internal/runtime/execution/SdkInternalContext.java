@@ -7,11 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.util.Optional.empty;
-import static java.util.function.Function.identity;
+import static java.util.function.UnaryOperator.identity;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.event.InternalEvent;
@@ -25,7 +26,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.slf4j.Logger;
 
@@ -57,7 +58,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   private final Map<Pair<ComponentLocation, String>, LocationSpecificSdkInternalContext> locationSpecificContext =
       new ConcurrentHashMap<>(5);
 
-  private Function<Context, Context> innerChainSubscriberContextMapping = identity();
+  private UnaryOperator<Context> innerChainSubscriberContextMapping = identity();
 
   public void removeContext(ComponentLocation location, String eventId) {
     LOGGER.debug("Removing context at location - {} for event - {}", location != null ? location.getLocation() : "null", eventId);
@@ -69,7 +70,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     LOGGER.debug("Adding new context at location - {} for event - {}", locationString, eventId);
 
     final var previousValue =
-        locationSpecificContext.putIfAbsent(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
+        locationSpecificContext.putIfAbsent(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext<>());
     if (previousValue != null) {
       throw new IllegalStateException("Context at location - %s for event - %s already present"
           .formatted(locationString, eventId));
@@ -93,15 +94,17 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     return locationSpecificContext.get(new Pair<>(location, eventId)).getConfiguration();
   }
 
-  public void setOperationExecutionParams(ComponentLocation location, String eventId,
-                                          Optional<ConfigurationInstance> configuration,
-                                          Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback,
-                                          ExecutionContextAdapter executionContextAdapter) {
+  public <M extends ComponentModel> void setOperationExecutionParams(ComponentLocation location, String eventId,
+                                                                     Optional<ConfigurationInstance> configuration,
+                                                                     Map<String, Object> parameters, CoreEvent operationEvent,
+                                                                     ExecutorCallback callback,
+                                                                     ExecutionContextAdapter<M> executionContextAdapter) {
     final var locationString = location != null ? location.getLocation() : "null";
     LOGGER.debug("Setting Operation Parameters at location - {} for event - {}",
                  locationString, eventId);
 
-    final var locationSpecificSdkInternalContext = getLocationSpecificSdkInternalContext(location, eventId);
+    final LocationSpecificSdkInternalContext<M> locationSpecificSdkInternalContext =
+        getLocationSpecificSdkInternalContext(location, eventId);
     if (locationSpecificSdkInternalContext.getOperationExecutionParams() != null) {
       throw new IllegalStateException("Context at location - %s for event - %s already has Operation Parameters set"
           .formatted(locationString, eventId));
@@ -112,9 +115,11 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
                                                                    callback, executionContextAdapter);
   }
 
-  public OperationExecutionParams getOperationExecutionParams(ComponentLocation location, String eventId) {
-    final var locationSpecificSdkInternalContext = getLocationSpecificSdkInternalContext(location, eventId);
-    final var operationExecutionParams = locationSpecificSdkInternalContext.getOperationExecutionParams();
+  public <M extends ComponentModel> OperationExecutionParams<M> getOperationExecutionParams(ComponentLocation location,
+                                                                                            String eventId) {
+    final LocationSpecificSdkInternalContext<M> locationSpecificSdkInternalContext =
+        getLocationSpecificSdkInternalContext(location, eventId);
+    final OperationExecutionParams<M> operationExecutionParams = locationSpecificSdkInternalContext.getOperationExecutionParams();
     if (operationExecutionParams == null) {
       final var locationString = location != null ? location.getLocation() : "null";
       throw new NullPointerException("No Operation Parameters for Context at location - %s for event - %s"
@@ -123,8 +128,10 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     return operationExecutionParams;
   }
 
-  private LocationSpecificSdkInternalContext getLocationSpecificSdkInternalContext(ComponentLocation location, String eventId) {
-    final var locationSpecificSdkInternalContext = locationSpecificContext.get(new Pair<>(location, eventId));
+  private <M extends ComponentModel> LocationSpecificSdkInternalContext<M> getLocationSpecificSdkInternalContext(ComponentLocation location,
+                                                                                                                 String eventId) {
+    final LocationSpecificSdkInternalContext<M> locationSpecificSdkInternalContext =
+        locationSpecificContext.get(new Pair<>(location, eventId));
     if (locationSpecificSdkInternalContext == null) {
       final var locationString = location != null ? location.getLocation() : "null";
       throw new NullPointerException("No Context at location - %s for event - %s"
@@ -156,11 +163,11 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     return DefaultPolicyManager.isNoPolicyOperation(getPolicyToApply(location, eventId));
   }
 
-  public Function<Context, Context> getInnerChainSubscriberContextMapping() {
+  public UnaryOperator<Context> getInnerChainSubscriberContextMapping() {
     return innerChainSubscriberContextMapping;
   }
 
-  public void setInnerChainSubscriberContextMapping(Function<Context, Context> innerChainSubscriberContextMapping) {
+  public void setInnerChainSubscriberContextMapping(UnaryOperator<Context> innerChainSubscriberContextMapping) {
     this.innerChainSubscriberContextMapping = innerChainSubscriberContextMapping;
   }
 
@@ -169,9 +176,9 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     return this;
   }
 
-  public static final class LocationSpecificSdkInternalContext {
+  public static final class LocationSpecificSdkInternalContext<M extends ComponentModel> {
 
-    private OperationExecutionParams operationExecutionParams;
+    private OperationExecutionParams<M> operationExecutionParams;
 
     private Optional<ConfigurationInstance> configuration = empty();
 
@@ -179,15 +186,15 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
 
     private OperationPolicy policyToApply;
 
-    public OperationExecutionParams getOperationExecutionParams() {
+    public OperationExecutionParams<M> getOperationExecutionParams() {
       return operationExecutionParams;
     }
 
     public void setOperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
                                             CoreEvent operationEvent, ExecutorCallback callback,
-                                            ExecutionContextAdapter executionContextAdapter) {
+                                            ExecutionContextAdapter<M> executionContextAdapter) {
       this.operationExecutionParams =
-          new OperationExecutionParams(configuration, parameters, operationEvent, callback, executionContextAdapter);
+          new OperationExecutionParams<>(configuration, parameters, operationEvent, callback, executionContextAdapter);
     }
 
     public Optional<ConfigurationInstance> getConfiguration() {
@@ -215,42 +222,12 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     }
   }
 
-  public static final class OperationExecutionParams {
+  public static final record OperationExecutionParams<M extends ComponentModel> (Optional<ConfigurationInstance> configuration,
+      Map<String, Object> parameters,
+      CoreEvent operationEvent,
+      ExecutorCallback callback,
+      ExecutionContextAdapter<M> executionContextAdapter) {
 
-    private final Optional<ConfigurationInstance> configuration;
-    private final Map<String, Object> parameters;
-    private final CoreEvent operationEvent;
-    private final ExecutorCallback callback;
-    private final ExecutionContextAdapter executionContextAdapter;
-
-    public OperationExecutionParams(Optional<ConfigurationInstance> configuration, Map<String, Object> parameters,
-                                    CoreEvent operationEvent, ExecutorCallback callback,
-                                    ExecutionContextAdapter executionContextAdapter) {
-      this.configuration = configuration;
-      this.parameters = parameters;
-      this.operationEvent = operationEvent;
-      this.callback = callback;
-      this.executionContextAdapter = executionContextAdapter;
-    }
-
-    public Optional<ConfigurationInstance> getConfiguration() {
-      return configuration;
-    }
-
-    public Map<String, Object> getParameters() {
-      return parameters;
-    }
-
-    public CoreEvent getOperationEvent() {
-      return operationEvent;
-    }
-
-    public ExecutorCallback getCallback() {
-      return callback;
-    }
-
-    public ExecutionContextAdapter getExecutionContextAdapter() {
-      return executionContextAdapter;
-    }
   }
+
 }
