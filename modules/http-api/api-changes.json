@@ -1,4 +1,22 @@
 {
+  "4.9.4": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.http.api.sse.client.SseSourceConfig::isPreserveHeaderCase()",
+          "justification": "Adding Server Sent Events (SSE) support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.sse.client.SseSourceConfigBuilder org.mule.runtime.http.api.sse.client.SseSourceConfigBuilder::withPreserveHeadersCase(boolean)",
+          "justification": "Adding Server Sent Events (SSE) support"
+        }
+      ]
+    }
+  },
   "4.9.3": {
     "revapi": {
       "ignore": [
