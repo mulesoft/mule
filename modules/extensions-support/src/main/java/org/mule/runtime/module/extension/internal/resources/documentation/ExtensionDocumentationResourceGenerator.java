@@ -40,6 +40,8 @@ import java.util.Optional;
  */
 public class ExtensionDocumentationResourceGenerator implements GeneratedResourceFactory {
 
+  private static final String META_INF_RESOURCE_PREFIX = "META-INF/";
+
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
     ExtensionDocumenterWalker walker = new ExtensionDocumenterWalker();
@@ -51,7 +53,7 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
                                                            walker.getOperations(),
                                                            walker.getSources(),
                                                            getTypesDocumentation(extensionModel)));
-    return of(new GeneratedResource(true, "META-INF/" + SERIALIZER.getFileName(extensionModel.getName()), documenter.getBytes()));
+    return of(new GeneratedResource(true, META_INF_RESOURCE_PREFIX + SERIALIZER.getFileName(extensionModel.getName()), documenter.getBytes()));
   }
 
   private class ExtensionDocumenterWalker extends ExtensionWalker {
