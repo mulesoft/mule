@@ -12,6 +12,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
@@ -47,9 +48,12 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupportAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
@@ -455,17 +459,36 @@ public class ResolverSetUtils {
 
         return Optional.of(new ObjectBuilderValueResolver<>(objectBuilder, muleContext));
       } else if (value instanceof ComponentParameterization valuesParameterization) {
-        DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
+        DefaultObjectBuilder objectBuilder;
+        try {
+          objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
+        } catch (IllegalArgumentException e) {
+          if (valuesParameterization.getModel() instanceof MetadataTypeAdapter metadataTypeAdapter) {
+            Optional<Class<Object>> parameterizedType = getType(metadataTypeAdapter.getType());
+            if (parameterizedType.isPresent()) {
+              objectBuilder = new DefaultObjectBuilder<>(parameterizedType.get(), reflectionCache);
+              objectType = (ObjectType) metadataTypeAdapter.getType();
+            } else {
+              throw e;
+            }
+          } else {
+            throw e;
+          }
+        }
         String aliasName = getAliasName(objectType);
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
           Object paramValue = valuesParameterization.getParameter(aliasName, objectFieldType.getKey().getName().getLocalPart());
           if (paramValue != null) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
                                               getParameterValueResolver(parameterName, objectFieldType.getValue(),
-                                                                        expressionSupport,
+                                                                        objectFieldType
+                                                                            .getAnnotation(ExpressionSupportAnnotation.class)
+                                                                            .map(ExpressionSupportAnnotation::getExpressionSupport)
+                                                                            .orElse(NOT_SUPPORTED),
                                                                         paramValue,
                                                                         emptySet(), reflectionCache,
-                                                                        muleContext, valueResolverFactory, false));
+                                                                        muleContext, valueResolverFactory,
+                                                                        acceptsReferences(objectFieldType.getValue())));
           }
         }
 
@@ -476,6 +499,14 @@ public class ResolverSetUtils {
     } else {
       return empty();
     }
+  }
+
+  private static boolean acceptsReferences(MetadataType type) {
+    Optional<TypeDslAnnotation> annotation = type.getAnnotation(TypeDslAnnotation.class);
+    if (!annotation.isPresent()) {
+      return false;
+    }
+    return annotation.get().allowsTopLevelDefinition();
   }
 
   private static ValueResolver getParameterValueResolverForCollection(String parameterName, ArrayType arrayType,
