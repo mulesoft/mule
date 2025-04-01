@@ -53,7 +53,8 @@ public class ExtensionDocumentationResourceGenerator implements GeneratedResourc
                                                            walker.getOperations(),
                                                            walker.getSources(),
                                                            getTypesDocumentation(extensionModel)));
-    return of(new GeneratedResource(true, META_INF_RESOURCE_PREFIX + SERIALIZER.getFileName(extensionModel.getName()), documenter.getBytes()));
+    return of(new GeneratedResource(true, META_INF_RESOURCE_PREFIX + SERIALIZER.getFileName(extensionModel.getName()),
+                                    documenter.getBytes()));
   }
 
   private class ExtensionDocumenterWalker extends ExtensionWalker {
