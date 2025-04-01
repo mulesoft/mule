@@ -6,10 +6,12 @@
  */
 package org.mule.test.runner.api;
 
-import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.resources.GeneratedResource;
+import static java.util.Optional.of;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
+import org.mule.runtime.extension.api.resources.GeneratedResource;
 
 import java.util.Optional;
 
@@ -25,7 +27,7 @@ public class TestDslResourceFactory implements DslResourceFactory {
 
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {
-    return Optional.of(new GeneratedResource(extensionModel.getName().toLowerCase() + ".xsd", new byte[] {1}));
+    return of(new GeneratedResource(false, extensionModel.getName().toLowerCase() + ".xsd", new byte[] {1}));
   }
 
 }
