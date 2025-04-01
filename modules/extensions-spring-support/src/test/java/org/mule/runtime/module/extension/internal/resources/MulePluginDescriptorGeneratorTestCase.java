@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
@@ -21,9 +23,10 @@ import java.io.InputStream;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.skyscreamer.jsonassert.JSONAssert;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 @SmallTest
 public class MulePluginDescriptorGeneratorTestCase extends AbstractGeneratedResourceFactoryTestCase {
