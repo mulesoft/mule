@@ -7,7 +7,6 @@
 package org.mule.test.runner.infrastructure;
 
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
-import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
@@ -58,8 +57,9 @@ class ExtensionsTestLoaderResourcesGenerator implements ResourcesGenerator {
 
   List<GeneratedResource> dumpAll() {
     List<GeneratedResource> allResources =
-        contents.entrySet().stream().map(entry -> new GeneratedResource(entry.getKey(), entry.getValue().toString().getBytes()))
-            .collect(toImmutableList());
+        contents.entrySet().stream()
+            .map(entry -> new GeneratedResource(false, entry.getKey(), entry.getValue().toString().getBytes()))
+            .toList();
 
     allResources.forEach(resource -> {
       File targetFile = new File(resource.getPath());
@@ -75,8 +75,11 @@ class ExtensionsTestLoaderResourcesGenerator implements ResourcesGenerator {
 
   @Override
   public List<GeneratedResource> generateFor(ExtensionModel extensionModel) {
-    List<GeneratedResource> resources = resourceFactories.stream().map(factory -> factory.generateResource(extensionModel))
-        .filter(Optional::isPresent).map(Optional::get).collect(toImmutableList());
+    List<GeneratedResource> resources = resourceFactories.stream()
+        .map(factory -> factory.generateResource(extensionModel))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
 
     resources.forEach(this::write);
     return resources;

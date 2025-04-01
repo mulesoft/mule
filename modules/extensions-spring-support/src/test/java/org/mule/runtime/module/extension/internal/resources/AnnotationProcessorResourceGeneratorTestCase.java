@@ -12,6 +12,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.module.extension.internal.resources.test.ResourcesGeneratorContractTestCase;
 import org.mule.tck.size.SmallTest;
@@ -21,15 +22,19 @@ import java.io.OutputStream;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.FileObject;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class AnnotationProcessorResourceGeneratorTestCase extends ResourcesGeneratorContractTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private ProcessingEnvironment processingEnvironment;
