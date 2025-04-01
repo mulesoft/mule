@@ -106,7 +106,7 @@ class StreamEmitterProcessingStrategyTestCase {
   }
 
   @Test
-  void dispose_waitInterrupted() throws InterruptedException, ExecutionException, TimeoutException {
+  void dispose_waitInterrupted() throws InterruptedException {
     timeout.set(100);
     TestPublisher<CoreEvent> testPublisher = TestPublisher.create();
     final Publisher<CoreEvent> pub = strategy.configureInternalPublisher(testPublisher);
@@ -135,7 +135,7 @@ class StreamEmitterProcessingStrategyTestCase {
    * 
    * @param timeout Max time to wait for execution...
    * @return A future that represents the result of calling dispose.
-   * @throws InterruptedException
+   * @throws InterruptedException when interrupted...
    */
   private Future<?> disposeInFuture(int timeout) throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
@@ -144,7 +144,7 @@ class StreamEmitterProcessingStrategyTestCase {
       latch.countDown();
       strategy.dispose();
     });
-    latch.await(timeout, TimeUnit.MILLISECONDS);
+    assertThat("Timed out waiting for future", latch.await(timeout, TimeUnit.MILLISECONDS), is(true));
     return result;
   }
 }

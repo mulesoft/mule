@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.processor.strategy;
 import org.mockito.Mock;
 import org.mule.runtime.api.util.Pair;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +60,8 @@ public class MockInjector {
   }
 
   /**
-   * Walk up the class hierarchy and return a list of classes in hierarchy order. Stops at Object.class (which won't be included)
+   * Walk up the class hierarchy and return a list of classes in hierarchy order. Stops at <code>Object.class</code> (which won't
+   * be included)
    *
    * @param base object to get hierarchy for...
    * @return list of Class&lt;?&gt; objects

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
  * Coverage tests for {@link ReactorSinkProviderBasedSink} Minimal checks - mostly just make sure the delegate gets called.
  */
 @ExtendWith(MockitoExtension.class)
-class ReactorSinkProviderBasedSinkTestCase {
+class ReactorSinkProviderBasedSinkUnitTestCase {
 
   private ReactorSinkProviderBasedSink sink;
   @Mock
