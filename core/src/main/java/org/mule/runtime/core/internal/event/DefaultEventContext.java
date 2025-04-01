@@ -10,7 +10,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.privileged.event.DefaultFlowCallStack.newDefaultFlowCallStack;
 
-import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;
 import static java.time.Instant.now;
 import static java.util.Collections.emptyList;
@@ -354,9 +353,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.root = parent.getRootContext();
       this.parent = parent;
       this.componentLocation = componentLocation;
-      this.id = parent.getId() != null
-          ? parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)))
-          : Integer.toString(identityHashCode(this));
+      this.id = parent.nextChildId();
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
       if (parent instanceof SpanContextAware) {
