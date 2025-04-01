@@ -481,10 +481,7 @@ public class ResolverSetUtils {
           if (paramValue != null) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
                                               getParameterValueResolver(parameterName, objectFieldType.getValue(),
-                                                                        objectFieldType
-                                                                            .getAnnotation(ExpressionSupportAnnotation.class)
-                                                                            .map(ExpressionSupportAnnotation::getExpressionSupport)
-                                                                            .orElse(NOT_SUPPORTED),
+                                                                        retrieveExpressionSupport(objectFieldType),
                                                                         paramValue,
                                                                         emptySet(), reflectionCache,
                                                                         muleContext, valueResolverFactory,
@@ -507,6 +504,13 @@ public class ResolverSetUtils {
       return false;
     }
     return annotation.get().allowsTopLevelDefinition();
+  }
+
+  private static ExpressionSupport retrieveExpressionSupport(ObjectFieldType objectFieldType) {
+    return objectFieldType
+        .getAnnotation(ExpressionSupportAnnotation.class)
+        .map(ExpressionSupportAnnotation::getExpressionSupport)
+        .orElse(NOT_SUPPORTED);
   }
 
   private static ValueResolver getParameterValueResolverForCollection(String parameterName, ArrayType arrayType,
