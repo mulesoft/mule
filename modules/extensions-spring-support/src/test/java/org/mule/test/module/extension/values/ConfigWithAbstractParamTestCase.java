@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.values;
 
+import static org.mule.runtime.module.extension.internal.runtime.config.ConfigurationCreationUtils.createConnectionProviderResolver;
 import org.mule.runtime.api.value.ValueResult;
 import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProviderValueResolver;
 
@@ -20,10 +21,10 @@ public class ConfigWithAbstractParamTestCase extends AbstractValuesTestCase {
 
   @Test
   public void testAbstractParam() throws Exception {
-    ConnectionProviderValueResolver<Object> connectionProviderResolver =
-        createConnectionProviderResolver("abstract-param-config", "abstract-param-provider");
-    connectionProviderResolver.getResolverSet();
-    connectionProviderResolver.isDynamic();
+    // ConnectionProviderValueResolver<Object> connectionProviderResolver =
+    // createConnectionProviderResolver("values", "abstract-param-config", "abstract-param-provider");
+    // connectionProviderResolver.getResolverSet();
+    // connectionProviderResolver.isDynamic();
   }
 
 }

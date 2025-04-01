@@ -478,14 +478,14 @@ public class ResolverSetUtils {
         String aliasName = getAliasName(objectType);
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
           Object paramValue = valuesParameterization.getParameter(aliasName, objectFieldType.getKey().getName().getLocalPart());
-          if (paramValue != null) {
+          if (paramValue != null && !acceptsReferences(objectFieldType.getValue())) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
                                               getParameterValueResolver(parameterName, objectFieldType.getValue(),
                                                                         retrieveExpressionSupport(objectFieldType),
                                                                         paramValue,
                                                                         emptySet(), reflectionCache,
                                                                         muleContext, valueResolverFactory,
-                                                                        acceptsReferences(objectFieldType.getValue())));
+                                                                        false));
           }
         }
 
