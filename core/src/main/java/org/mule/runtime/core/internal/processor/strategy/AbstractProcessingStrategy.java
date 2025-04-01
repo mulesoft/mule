@@ -82,29 +82,6 @@ public abstract class AbstractProcessingStrategy implements ProcessingStrategyAd
   }
 
   /**
-   * Checks whether an error indicates that a thread pool is full.
-   *
-   * @param t the thrown error to analyze
-   * @return {@code true} if {@code t} indicates that a thread pool needed for the processing strategy owner rejected a task.
-   */
-  protected boolean isSchedulerBusy(Throwable t) {
-    final Throwable cause = unwrap(t);
-    return RejectedExecutionException.class.isAssignableFrom(cause.getClass()) || isOverloadError(cause);
-  }
-
-  private boolean isOverloadError(final Throwable cause) {
-    if (cause instanceof MessagingException) {
-      return ((MessagingException) cause).getEvent().getError()
-          .map(e -> e.getErrorType())
-          .filter(errorType -> OVERLOAD.getName().equals(errorType.getIdentifier())
-              && OVERLOAD.getNamespace().equals(errorType.getNamespace()))
-          .isPresent();
-    } else {
-      return false;
-    }
-  }
-
-  /**
    * Extension of {@link Sink} using Reactor's {@link FluxSink} to accept events.
    */
   interface ReactorSink<E> extends Sink, Disposable {
