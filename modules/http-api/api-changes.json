@@ -13,7 +13,148 @@
           "code": "java.method.added",
           "new": "method org.mule.runtime.http.api.sse.client.SseSourceConfigBuilder org.mule.runtime.http.api.sse.client.SseSourceConfigBuilder::withPreserveHeadersCase(boolean)",
           "justification": "Adding Server Sent Events (SSE) support"
-        }
+        },
+        {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.BAD_GATEWAY",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "BAD_GATEWAY",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.INTERNAL_SERVER_ERROR",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "INTERNAL_SERVER_ERROR",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.INVALID_PAYLOAD",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "INVALID_PAYLOAD",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.MESSAGE_TOO_BIG",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "MESSAGE_TOO_BIG",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.MISSING_EXTENSIONS",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "MISSING_EXTENSIONS",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.POLICY_VIOLATION",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "POLICY_VIOLATION",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.SERVICE_RESTARTED",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "SERVICE_RESTARTED",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.TRY_AGAIN_LATER",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "TRY_AGAIN_LATER",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.field.addedStaticField",
+            "new": "field org.mule.runtime.http.api.ws.WebSocketCloseCode.UNKNOWN",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "fieldName": "UNKNOWN",
+            "elementKind": "enumConstant"
+          },
+          {
+            "code": "java.method.added",
+            "new": "method int org.mule.runtime.http.api.ws.WebSocketCloseCode::getOriginalCode()",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "methodName": "getOriginalCode",
+            "elementKind": "method"
+          },
+          {
+            "code": "java.method.added",
+            "new": "method boolean org.mule.runtime.http.api.ws.WebSocketCloseCode::isPrivateUseCode(int)",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "methodName": "isPrivateUseCode",
+            "elementKind": "method"
+
+          },
+          {
+            "code": "java.method.added",
+            "new": "method boolean org.mule.runtime.http.api.ws.WebSocketCloseCode::isRegisteredCode(int)",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "methodName": "isRegisteredCode",
+            "elementKind": "method"
+          },
+          {
+            "code": "java.method.added",
+            "new": "method boolean org.mule.runtime.http.api.ws.WebSocketCloseCode::isReservedCode(int)",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "methodName": "isReservedCode",
+            "elementKind": "method"
+          },
+          {
+            "code": "java.method.added",
+            "new": "method org.mule.runtime.http.api.ws.WebSocketCloseCode org.mule.runtime.http.api.ws.WebSocketCloseCode::unknownWithCode(int)",
+            "justification": "W-17846088: Handle all websocket close codes",
+            "package": "org.mule.runtime.http.api.ws",
+            "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketCloseCode",
+            "classSimpleName": "WebSocketCloseCode",
+            "methodName": "unknownWithCode",
+            "elementKind": "method"
+          }
       ]
     }
   },
