@@ -464,8 +464,7 @@ public class ResolverSetUtils {
         return Optional.of(new ObjectBuilderValueResolver<>(objectBuilder, muleContext));
       } else if (value instanceof ComponentParameterization valuesParameterization) {
         DefaultObjectBuilder objectBuilder = null;
-        if (objectType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable)
-            .orElse(false)) {
+        if (isInstantiableType(objectType)) {
           objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
         } else if (valuesParameterization.getModel() instanceof MetadataTypeAdapter metadataTypeAdapter) {
           Optional<Class<Object>> parameterizedType = getType(metadataTypeAdapter.getType());
@@ -514,6 +513,10 @@ public class ResolverSetUtils {
         .getAnnotation(ExpressionSupportAnnotation.class)
         .map(ExpressionSupportAnnotation::getExpressionSupport)
         .orElse(NOT_SUPPORTED);
+  }
+
+  private static boolean isInstantiableType(MetadataType type) {
+    return type.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable).orElse(false);
   }
 
   private static ValueResolver getParameterValueResolverForCollection(String parameterName, ArrayType arrayType,
