@@ -112,6 +112,8 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
+
 /**
  * {@link ExtensionsClient} delegate class for executing extension operations
  *
@@ -135,6 +137,9 @@ public class OperationClient implements Lifecycle {
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
   private final ResolverSet resolverSet;
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   private Optional<ConfigurationProvider> configurationProvider = null;
 
@@ -243,7 +248,7 @@ public class OperationClient implements Lifecycle {
                                                         reflectionCache,
                                                         expressionManager,
                                                         "",
-                                                        factory);
+                                                        factory, artifactEncoding);
 
       createdResolverSet.initialise();
 

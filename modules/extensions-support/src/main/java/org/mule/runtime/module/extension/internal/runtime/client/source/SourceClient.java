@@ -22,6 +22,7 @@ import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -60,6 +61,8 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 
+import javax.inject.Inject;
+
 /**
  * {@link ExtensionsClient} delegate class for creating and operating message sources
  *
@@ -85,6 +88,9 @@ public class SourceClient<T, A> implements Lifecycle {
   private ExtensionMessageSource source;
   private MessagingExceptionResolver messagingExceptionResolver;
   private Optional<ConfigurationProvider> configurationProvider = empty();
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   public SourceClient(ExtensionModel extensionModel,
                       SourceModel sourceModel,
@@ -169,7 +175,7 @@ public class SourceClient<T, A> implements Lifecycle {
                                                                             true,
                                                                             reflectionCache,
                                                                             expressionManager,
-                                                                            "");
+                                                                            "", artifactEncoding);
 
       resolverSet.initialise();
       return resolverSet;
