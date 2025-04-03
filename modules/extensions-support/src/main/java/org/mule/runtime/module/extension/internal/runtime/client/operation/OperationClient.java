@@ -137,9 +137,7 @@ public class OperationClient implements Lifecycle {
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
   private final ResolverSet resolverSet;
-
-  @Inject
-  private ArtifactEncoding artifactEncoding;
+  private final ArtifactEncoding artifactEncoding;
 
   private Optional<ConfigurationProvider> configurationProvider = null;
 
@@ -179,7 +177,8 @@ public class OperationClient implements Lifecycle {
                                extensionManager,
                                expressionManager,
                                reflectionCache,
-                               muleContext);
+                               muleContext,
+                               artifactEncoding);
   }
 
   private OperationClient(ExtensionModel extensionModel,
@@ -191,7 +190,8 @@ public class OperationClient implements Lifecycle {
                           ExtensionManager extensionManager,
                           ExpressionManager expressionManager,
                           ReflectionCache reflectionCache,
-                          MuleContext muleContext) {
+                          MuleContext muleContext,
+                          ArtifactEncoding artifactEncoding) {
     this.extensionModel = extensionModel;
     this.operationModel = new FilteredOperationModel(operationModel);
     this.mediator = mediator;
@@ -202,6 +202,7 @@ public class OperationClient implements Lifecycle {
     this.expressionManager = expressionManager;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
+    this.artifactEncoding = artifactEncoding;
     resolverSet = createResolverSet();
   }
 
