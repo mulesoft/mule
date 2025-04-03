@@ -207,6 +207,7 @@ public class ResolverSetUtils {
         if (parameterGroupDeclaringClass.isPresent()) {
           DefaultObjectBuilder defaultObjectBuilder =
               new DefaultObjectBuilder<>(parameterGroupDeclaringClass.get(), reflectionCache);
+          defaultObjectBuilder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
 
           for (Map.Entry<String, ValueResolver> stringValueResolverEntry : parameterGroupParametersValueResolvers.entrySet()) {
             defaultObjectBuilder.addPropertyResolver(stringValueResolverEntry.getKey(),
@@ -445,6 +446,7 @@ public class ResolverSetUtils {
     if (pojoClass.isPresent()) {
       if (value instanceof Map valuesMap) {
         DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
+        objectBuilder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
           if (valuesMap.containsKey(objectFieldType.getKey().getName().toString())) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
@@ -467,6 +469,7 @@ public class ResolverSetUtils {
             Optional<Class<Object>> parameterizedType = getType(metadataTypeAdapter.getType());
             if (parameterizedType.isPresent()) {
               objectBuilder = new DefaultObjectBuilder<>(parameterizedType.get(), reflectionCache);
+              objectBuilder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
               objectType = (ObjectType) metadataTypeAdapter.getType();
             } else {
               throw e;
@@ -478,14 +481,14 @@ public class ResolverSetUtils {
         String aliasName = getAliasName(objectType);
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
           Object paramValue = valuesParameterization.getParameter(aliasName, objectFieldType.getKey().getName().getLocalPart());
-          if (paramValue != null && !acceptsReferences(objectFieldType.getValue())) {
+          if (paramValue != null) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
                                               getParameterValueResolver(parameterName, objectFieldType.getValue(),
                                                                         retrieveExpressionSupport(objectFieldType),
                                                                         paramValue,
                                                                         emptySet(), reflectionCache,
                                                                         muleContext, valueResolverFactory,
-                                                                        false));
+                                                                        acceptsReferences(objectFieldType.getValue())));
           }
         }
 
