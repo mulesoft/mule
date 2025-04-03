@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
@@ -34,6 +35,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -461,22 +463,20 @@ public class ResolverSetUtils {
 
         return Optional.of(new ObjectBuilderValueResolver<>(objectBuilder, muleContext));
       } else if (value instanceof ComponentParameterization valuesParameterization) {
-        DefaultObjectBuilder objectBuilder;
-        try {
+        DefaultObjectBuilder objectBuilder = null;
+        if (objectType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable)
+            .orElse(false)) {
           objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
-        } catch (IllegalArgumentException e) {
-          if (valuesParameterization.getModel() instanceof MetadataTypeAdapter metadataTypeAdapter) {
-            Optional<Class<Object>> parameterizedType = getType(metadataTypeAdapter.getType());
-            if (parameterizedType.isPresent()) {
-              objectBuilder = new DefaultObjectBuilder<>(parameterizedType.get(), reflectionCache);
-              objectBuilder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
-              objectType = (ObjectType) metadataTypeAdapter.getType();
-            } else {
-              throw e;
-            }
-          } else {
-            throw e;
+        } else if (valuesParameterization.getModel() instanceof MetadataTypeAdapter metadataTypeAdapter) {
+          Optional<Class<Object>> parameterizedType = getType(metadataTypeAdapter.getType());
+          if (parameterizedType.isPresent()) {
+            objectBuilder = new DefaultObjectBuilder<>(parameterizedType.get(), reflectionCache);
+            objectBuilder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
+            objectType = (ObjectType) metadataTypeAdapter.getType();
           }
+        }
+        if (objectBuilder == null) {
+          throw new IllegalArgumentException(format("Class %s cannot be instantiated.", pojoClass.get()));
         }
         String aliasName = getAliasName(objectType);
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
