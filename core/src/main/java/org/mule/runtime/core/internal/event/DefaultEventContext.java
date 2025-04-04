@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;
 import static java.time.Instant.now;
 import static java.util.Collections.emptyList;
@@ -335,9 +334,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
       this.root = parent.getRootContext();
       this.parent = parent;
       this.componentLocation = componentLocation;
-      this.id = parent.getId() != null
-          ? parent.getId().concat("_").concat(Integer.toString(identityHashCode(this)))
-          : Integer.toString(identityHashCode(this));
+      this.id = parent.nextChildId();
       this.correlationId = correlationId != null ? correlationId : parent.getCorrelationId();
       this.rootId = root.getRootId();
     }

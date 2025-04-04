@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static com.google.common.base.Functions.identity;
+import static org.mule.runtime.api.functional.Either.left;
+import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
+
+import static com.google.common.base.Functions.identity;
 import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.mule.runtime.api.functional.Either.left;
-import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static reactor.core.publisher.Mono.empty;
 
 import org.mule.runtime.api.functional.Either;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -73,6 +76,7 @@ public abstract class AbstractEventContext implements BaseEventContext {
   private final int depthLevel;
 
   private volatile byte state = STATE_READY;
+  private transient AtomicInteger childIdProvider = new AtomicInteger();
   private volatile Either<Throwable, CoreEvent> result;
 
   private LazyValue<ResponsePublisher> responsePublisher = new LazyValue<>(ResponsePublisher::new);
@@ -93,7 +97,7 @@ public abstract class AbstractEventContext implements BaseEventContext {
                               Optional<CompletableFuture<Void>> externalCompletion) {
     this.depthLevel = depthLevel;
     this.externalCompletion = externalCompletion.orElse(null);
-    externalCompletion.ifPresent(completableFuture -> completableFuture.thenAccept((aVoid) -> tryTerminate()));
+    externalCompletion.ifPresent(completableFuture -> completableFuture.thenAccept(aVoid -> tryTerminate()));
     this.exceptionHandler = exceptionHandler;
   }
 
@@ -182,7 +186,7 @@ public abstract class AbstractEventContext implements BaseEventContext {
       }
 
       final Consumer<Exception> router = exceptionHandler.router(identity(),
-                                                                 handled -> success(handled),
+                                                                 this::success,
                                                                  rethrown -> responseDone(left(rethrown)));
       try {
         router.accept((Exception) throwable);
@@ -436,6 +440,13 @@ public abstract class AbstractEventContext implements BaseEventContext {
 
   protected byte getState() {
     return state;
+  }
+
+  @Override
+  public String nextChildId() {
+    return getId() != null
+        ? new StringBuilder(getId()).append("_").append(childIdProvider.getAndIncrement()).toString()
+        : "" + childIdProvider.getAndIncrement();
   }
 
 }
