@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.9.3-rc1</version>
+        <version>4.9.3</version>
     </parent>
     <artifactId>mule-module-metadata-support</artifactId>
     <packaging>jar</packaging>
