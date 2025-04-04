@@ -118,7 +118,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                                        reflectionCache,
                                                                        parametersOwner,
                                                                        dslSyntaxResolver,
-                                                                       muleContext);
+                                                                       muleContext, artifactEncoding);
   }
 
   private <T> T lookup(Class<T> clazz) {
@@ -148,7 +148,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                                   parametersOwner,
                                                                   dslSyntaxResolver,
                                                                   extensionClassLoader,
-                                                                  muleContext);
+                                                                  muleContext, artifactEncoding);
   }
 
   @Override
@@ -200,7 +200,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                                           true,
                                                                           reflectionCache,
                                                                           expressionManager,
-                                                                          parameterizedModel.getName());
+                                                                          parameterizedModel.getName(), artifactEncoding);
     return new DesignTimeParameterValueResolver(resolverSet,
                                                 parameterizedModel,
                                                 reflectionCache,

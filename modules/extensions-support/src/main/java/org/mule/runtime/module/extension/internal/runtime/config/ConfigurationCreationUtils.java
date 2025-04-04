@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.Resolv
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromStaticValues;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -72,6 +73,7 @@ public final class ConfigurationCreationUtils {
    * @param dslSyntaxResolver            a {@link DslSyntaxResolver}
    * @param extensionClassLoader         the extension's {@link ClassLoader}
    * @param muleContext                  the current {@link MuleContext}
+   * @param artifactEncoding             the encoding used in the application
    * @return a new {@link ConfigurationProvider}
    * @throws MuleException if the resolver cannot be created
    * @since 4.5.0
@@ -88,7 +90,7 @@ public final class ConfigurationCreationUtils {
                                                                   String parametersOwner,
                                                                   DslSyntaxResolver dslSyntaxResolver,
                                                                   ClassLoader extensionClassLoader,
-                                                                  MuleContext muleContext) {
+                                                                  MuleContext muleContext, ArtifactEncoding artifactEncoding) {
     return withContextClassLoader(extensionClassLoader, () -> {
       ResolverSet resolverSet = getResolverSetFromStaticValues(
                                                                configurationModel,
@@ -97,7 +99,7 @@ public final class ConfigurationCreationUtils {
                                                                false,
                                                                reflectionCache,
                                                                expressionManager,
-                                                               parametersOwner);
+                                                               parametersOwner, artifactEncoding);
 
       final ConnectionProviderValueResolver connectionResolver = connectionProviderResolver
           .orElseGet(() -> supportsConnectivity(extensionModel, configurationModel)
@@ -147,6 +149,7 @@ public final class ConfigurationCreationUtils {
    * @param parametersOwner         the owner component name
    * @param dslSyntaxResolver       a {@link DslSyntaxResolver}
    * @param muleContext             the current {@link MuleContext}
+   * @param artifactEncoding        the encoding used in the application
    * @return a new {@link ConnectionProviderResolver}
    * @param <C> the generic type of the provider's connection object
    * @throws MuleException if the resolver cannot be created
@@ -160,7 +163,8 @@ public final class ConfigurationCreationUtils {
                                                                                    ReflectionCache reflectionCache,
                                                                                    String parametersOwner,
                                                                                    DslSyntaxResolver dslSyntaxResolver,
-                                                                                   MuleContext muleContext)
+                                                                                   MuleContext muleContext,
+                                                                                   ArtifactEncoding artifactEncoding)
       throws MuleException {
 
     final ConnectionProviderModel providerModel = settings.getConnectionProviderModel();
@@ -170,7 +174,7 @@ public final class ConfigurationCreationUtils {
                                                                                 false,
                                                                                 reflectionCache,
                                                                                 expressionManager,
-                                                                                parametersOwner);
+                                                                                parametersOwner, artifactEncoding);
 
     BaseConnectionProviderObjectBuilder builder;
     if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
