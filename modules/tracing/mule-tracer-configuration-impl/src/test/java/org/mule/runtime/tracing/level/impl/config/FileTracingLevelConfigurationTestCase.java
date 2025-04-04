@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
@@ -67,7 +68,7 @@ public class FileTracingLevelConfigurationTestCase {
 
   @Test
   public void whenNoFileExistsExceptionIsThrown() {
-    expectedException.expect(MuleRuntimeException.class);
+    expectedException.expect(ResourceNotFoundException.class);
     expectedException.expectMessage("Couldn't find resource: conf" + separator
         + "non-existent.conf neither on classpath or in file system");
     final SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
