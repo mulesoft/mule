@@ -101,7 +101,7 @@ public class ResolverSetUtils {
    * @param reflectionCache    a reflection cache.
    * @param expressionManager  the expression manager.
    * @param parametersOwner    the owner of the parameters from the parameters resolver.
-   * @param artifactEncoding   the used in the runtime
+   * @param artifactEncoding   the encoding used in the application
    * @return the corresponding {@link ResolverSet}
    * @throws MuleException
    */
@@ -129,7 +129,7 @@ public class ResolverSetUtils {
    * @param reflectionCache           a reflection cache.
    * @param expressionManager         the expression manager.
    * @param parametersOwner           the owner of the parameters from the parameters resolver.
-   * @param artifactEncoding          the used in the runtime
+   * @param artifactEncoding          the encoding used in the application
    * @return the corresponding {@link ResolverSet}
    * @throws MuleException
    */
@@ -163,7 +163,7 @@ public class ResolverSetUtils {
    * @param expressionManager    the expression manager.
    * @param parametersOwner      the owner of the parameters from the parameters resolver.
    * @param valueResolverFactory the {@link ValueResolverFactory} to be used
-   * @param artifactEncoding     the used in the runtime
+   * @param artifactEncoding     the encoding used in the application
    * @return the corresponding {@link ResolverSet}
    * @throws MuleException
    * @since 4.5.0

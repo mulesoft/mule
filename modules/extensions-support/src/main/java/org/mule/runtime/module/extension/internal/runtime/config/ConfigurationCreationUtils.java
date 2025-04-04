@@ -73,7 +73,7 @@ public final class ConfigurationCreationUtils {
    * @param dslSyntaxResolver            a {@link DslSyntaxResolver}
    * @param extensionClassLoader         the extension's {@link ClassLoader}
    * @param muleContext                  the current {@link MuleContext}
-   * @param artifactEncoding             the used in the runtime
+   * @param artifactEncoding             the encoding used in the application
    * @return a new {@link ConfigurationProvider}
    * @throws MuleException if the resolver cannot be created
    * @since 4.5.0
@@ -149,7 +149,7 @@ public final class ConfigurationCreationUtils {
    * @param parametersOwner         the owner component name
    * @param dslSyntaxResolver       a {@link DslSyntaxResolver}
    * @param muleContext             the current {@link MuleContext}
-   * @param artifactEncoding        the used in the runtime
+   * @param artifactEncoding        the encoding used in the application
    * @return a new {@link ConnectionProviderResolver}
    * @param <C> the generic type of the provider's connection object
    * @throws MuleException if the resolver cannot be created
