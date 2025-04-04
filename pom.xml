@@ -160,7 +160,7 @@
         <dev.list>mule-esb@mulesoft.com</dev.list>
 
         <muleBomVersion>4.9.3-rc1</muleBomVersion>
-        <muleMavenClientBomVersion>2.4.3-rc1</muleMavenClientBomVersion>
+        <muleMavenClientBomVersion>2.4.3</muleMavenClientBomVersion>
 
         <weaveVersion>2.9.2</weaveVersion>
 
