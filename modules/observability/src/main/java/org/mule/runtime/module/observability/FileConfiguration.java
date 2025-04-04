@@ -22,8 +22,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,26 +74,6 @@ public abstract class FileConfiguration {
     } else {
       return getProperty(key);
     }
-  }
-
-  protected List<String> readStringListFromConfig(String key) {
-    JsonNode configuration = getConfiguration();
-    List<String> configuredValues = new ArrayList<>();
-    if (configuration != null) {
-      String[] path = key.split("\\.");
-      JsonNode configurationValue = configuration;
-      for (int i = 0; i < path.length && configurationValue != null; i++) {
-        configurationValue = configurationValue.get(path[i]);
-      }
-      if (configurationValue != null) {
-        configurationValue.elements().forEachRemaining(jsonNode -> {
-          if (jsonNode.isTextual()) {
-            configuredValues.add(jsonNode.textValue());
-          }
-        });
-      }
-    }
-    return configuredValues;
   }
 
   protected abstract boolean isAValueCorrespondingToAPath(String key);

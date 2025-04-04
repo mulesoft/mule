@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public interface TracingLevelConfiguration {
 
   /**
-   * @return The configured tracing level.
+   * @return the default tracing level, MONITORING, if no other tracing level is specified from a configuration.
    */
   TracingLevel getTracingLevel();
 
@@ -28,7 +28,6 @@ public interface TracingLevelConfiguration {
    * @return a tracing level.
    */
   TracingLevel getTracingLevelOverride(String location);
-
 
   /**
    * Consumer to be invoked when a {@link TracingLevelConfiguration} is changed.

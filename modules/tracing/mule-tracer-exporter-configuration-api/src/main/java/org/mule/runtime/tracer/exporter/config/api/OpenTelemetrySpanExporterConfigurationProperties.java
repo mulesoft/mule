@@ -24,8 +24,6 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
   public static final String MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH =
       MULE_OPEN_TELEMETRY_EXPORTER + ".configurationFilePath";
 
-  // This is not a OpenTelemetry specific property. We cannot change the name of the system property because of backwards
-  // compatibility, but it should be named "EXPORTERS_DEFAULT_TRACING_LEVEL".
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL =
       MULE_OPEN_TELEMETRY_EXPORTER + ".defaultTracingLevel";
 
