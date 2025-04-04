@@ -23,6 +23,7 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.Compon
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 
@@ -33,6 +34,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -47,9 +49,12 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.ast.api.MetadataTypeAdapter;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.extension.api.declaration.type.annotation.ExpressionSupportAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
@@ -203,6 +208,7 @@ public class ResolverSetUtils {
         if (parameterGroupDeclaringClass.isPresent()) {
           DefaultObjectBuilder defaultObjectBuilder =
               new DefaultObjectBuilder<>(parameterGroupDeclaringClass.get(), reflectionCache);
+          defaultObjectBuilder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
 
           for (Map.Entry<String, ValueResolver> stringValueResolverEntry : parameterGroupParametersValueResolvers.entrySet()) {
             defaultObjectBuilder.addPropertyResolver(stringValueResolverEntry.getKey(),
@@ -441,6 +447,7 @@ public class ResolverSetUtils {
     if (pojoClass.isPresent()) {
       if (value instanceof Map valuesMap) {
         DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
+        objectBuilder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
           if (valuesMap.containsKey(objectFieldType.getKey().getName().toString())) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
@@ -449,23 +456,38 @@ public class ResolverSetUtils {
                                                                         valuesMap
                                                                             .get(objectFieldType.getKey().getName().toString()),
                                                                         emptySet(), reflectionCache,
-                                                                        muleContext, valueResolverFactory, false));
+                                                                        muleContext, valueResolverFactory,
+                                                                        false));
           }
         }
 
         return Optional.of(new ObjectBuilderValueResolver<>(objectBuilder, muleContext));
       } else if (value instanceof ComponentParameterization valuesParameterization) {
-        DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
+        DefaultObjectBuilder objectBuilder = null;
+        if (isInstantiableType(objectType)) {
+          objectBuilder = new DefaultObjectBuilder<>(pojoClass.get(), reflectionCache);
+        } else if (valuesParameterization.getModel() instanceof MetadataTypeAdapter metadataTypeAdapter) {
+          Optional<Class<Object>> parameterizedType = getType(metadataTypeAdapter.getType());
+          if (parameterizedType.isPresent()) {
+            objectBuilder = new DefaultObjectBuilder<>(parameterizedType.get(), reflectionCache);
+            objectBuilder.setEncoding(muleContext.getConfiguration().getDefaultEncoding());
+            objectType = (ObjectType) metadataTypeAdapter.getType();
+          }
+        }
+        if (objectBuilder == null) {
+          throw new IllegalArgumentException(format("Class %s cannot be instantiated.", pojoClass.get()));
+        }
         String aliasName = getAliasName(objectType);
         for (ObjectFieldType objectFieldType : objectType.getFields()) {
           Object paramValue = valuesParameterization.getParameter(aliasName, objectFieldType.getKey().getName().getLocalPart());
           if (paramValue != null) {
             objectBuilder.addPropertyResolver(objectFieldType.getKey().getName().toString(),
                                               getParameterValueResolver(parameterName, objectFieldType.getValue(),
-                                                                        expressionSupport,
+                                                                        retrieveExpressionSupport(objectFieldType),
                                                                         paramValue,
                                                                         emptySet(), reflectionCache,
-                                                                        muleContext, valueResolverFactory, false));
+                                                                        muleContext, valueResolverFactory,
+                                                                        acceptsReferences(objectFieldType.getValue())));
           }
         }
 
@@ -476,6 +498,21 @@ public class ResolverSetUtils {
     } else {
       return empty();
     }
+  }
+
+  private static boolean acceptsReferences(MetadataType type) {
+    return type.getAnnotation(TypeDslAnnotation.class).map(TypeDslAnnotation::allowsTopLevelDefinition).orElse(false);
+  }
+
+  private static ExpressionSupport retrieveExpressionSupport(ObjectFieldType objectFieldType) {
+    return objectFieldType
+        .getAnnotation(ExpressionSupportAnnotation.class)
+        .map(ExpressionSupportAnnotation::getExpressionSupport)
+        .orElse(NOT_SUPPORTED);
+  }
+
+  private static boolean isInstantiableType(MetadataType type) {
+    return type.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable).orElse(false);
   }
 
   private static ValueResolver getParameterValueResolverForCollection(String parameterName, ArrayType arrayType,
@@ -535,7 +572,7 @@ public class ResolverSetUtils {
     return MapValueResolver.of(mapClass, keyResolvers, valueResolvers, reflectionCache, muleContext);
   }
 
-  public static boolean acceptsReferences(ParameterModel parameterModel) {
+  private static boolean acceptsReferences(ParameterModel parameterModel) {
     return parameterModel.getDslConfiguration().allowsReferences();
   }
 
