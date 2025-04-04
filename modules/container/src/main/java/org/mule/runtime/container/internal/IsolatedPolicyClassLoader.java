@@ -14,6 +14,13 @@ import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescrip
 
 import java.net.URL;
 
+/**
+ * Dedicated {@link ClassLoader} providing complete isolation for Mule policies.
+ * <p>
+ * Addresses class loading limitations of the partial isolation mechanism associated with {@code mule.enable.policy.isolation}.
+ * Ensures policies run in a fully independent environment, typically enabled via the
+ * {@code mule.policy.isolation.separateClassLoader} system property.
+ */
 public class IsolatedPolicyClassLoader extends MuleDeployableArtifactClassLoader {
 
   private static IsolatedPolicyClassLoader instance;

@@ -1066,7 +1066,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
             .setMinMuleVersion(MIN_MULE_VERSION)
             .setName(FOO_POLICY_NAME)
             .setRequiredProduct(MULE)
-            .withBundleDescriptorLoader(createBundleDescriptorLoader(FOO_POLICY_NAME,
+            .withBundleDescriptorLoader(
+                                        createBundleDescriptorLoader(FOO_POLICY_NAME,
                                                                      MULE_POLICY_CLASSIFIER,
                                                                      PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
             .withClassLoaderModelDescriptorLoader(
@@ -1081,7 +1082,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     // deploy app that depends on the domain
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           httpPlugin)
+                                                                                           helloExtensionV1Plugin)
                                                                                                .dependingOn(domainFileBuilder);
     addPackedAppFromBuilder(applicationFileBuilder);
 
