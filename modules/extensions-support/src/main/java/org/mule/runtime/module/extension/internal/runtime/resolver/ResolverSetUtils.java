@@ -456,8 +456,7 @@ public class ResolverSetUtils {
                                                                         valuesMap
                                                                             .get(objectFieldType.getKey().getName().toString()),
                                                                         emptySet(), reflectionCache,
-                                                                        muleContext, valueResolverFactory,
-                                                                        false));
+                                                                        muleContext, valueResolverFactory, false));
           }
         }
 
