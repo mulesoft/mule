@@ -40,6 +40,7 @@ import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.internal.config.DefaultArtifactEncoding;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
@@ -91,7 +92,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
                                                          true,
                                                          new ReflectionCache(),
                                                          null, "",
-                                                         new ValueResolverFactory());
+                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
 
@@ -116,7 +117,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
                                                          true,
                                                          new ReflectionCache(),
                                                          null, "",
-                                                         new ValueResolverFactory());
+                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
 
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
@@ -141,7 +142,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
                                                          true,
                                                          new ReflectionCache(),
                                                          null, "",
-                                                         new ValueResolverFactory());
+                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
 
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
@@ -170,7 +171,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
                                                          true,
                                                          new ReflectionCache(),
                                                          null, "",
-                                                         new ValueResolverFactory());
+                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
 
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
@@ -196,7 +197,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
                                                          true,
                                                          new ReflectionCache(),
                                                          null, "",
-                                                         new ValueResolverFactory());
+                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
 
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);

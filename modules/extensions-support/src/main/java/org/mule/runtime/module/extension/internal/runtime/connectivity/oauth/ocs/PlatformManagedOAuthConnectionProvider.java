@@ -32,6 +32,7 @@ import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -108,6 +109,9 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
   @Inject
   private ExtensionManager extensionManager;
+
+  @Inject
+  private ArtifactEncoding artifactEncoding;
 
   private PlatformManagedOAuthDancer dancer;
   private ConnectionProvider<C> delegate;
@@ -246,7 +250,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
                                           false,
                                           new ReflectionCache(),
                                           expressionManager,
-                                          this.toString());
+                                          this.toString(), artifactEncoding);
   }
 
   private PlatformManagedConnectionDescriptor fetchConnectionDescriptor() throws MuleException {
