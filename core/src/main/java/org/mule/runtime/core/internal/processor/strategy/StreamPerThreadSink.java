@@ -197,20 +197,26 @@ public class StreamPerThreadSink implements Sink, Disposable {
         LOGGER.warn("TX Subscribers of ProcessingStrategy for flow '{}' not completed before thread interruption",
                     flowConstruct.getName());
       }
+      LOGGER.warn("invalidate all shinks: {}",sinks);
       sinks.invalidateAll();
+      LOGGER.warn("invalidate all sinksNestedTx: {}",sinksNestedTx);
       sinksNestedTx.invalidateAll();
       legacySinks.invalidateAll();
       legacySinksNestedTx.invalidateAll();
     } else if (disposableSinks.get() != 0) {
+      long remainingDisposableSinks = disposableSinks.get();
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
-        throw new IllegalStateException(format("TX Subscribers of ProcessingStrategy for flow '%s' not completed in %d ms",
+        throw new IllegalStateException(format("TX Subscribers %d of ProcessingStrategy for flow '%s' not completed in %d ms",
+                                               remainingDisposableSinks,
                                                flowConstruct.getName(),
                                                shutdownTimeout));
       } else {
-        LOGGER.warn("TX Subscribers of ProcessingStrategy for flow '{}' not completed in {} ms", flowConstruct.getName(),
+        LOGGER.warn("TX Subscribers {} of ProcessingStrategy for flow '{}' not completed in {} ms", remainingDisposableSinks, flowConstruct.getName(),
                     shutdownTimeout);
       }
+      LOGGER.warn("invalidate all shinks: {}",sinks);
       sinks.invalidateAll();
+      LOGGER.warn("invalidate all sinksNestedTx: {}",sinksNestedTx);
       sinksNestedTx.invalidateAll();
       legacySinks.invalidateAll();
       legacySinksNestedTx.invalidateAll();
