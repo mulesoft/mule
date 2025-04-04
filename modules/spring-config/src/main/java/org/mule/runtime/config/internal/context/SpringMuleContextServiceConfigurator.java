@@ -151,7 +151,7 @@ import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfi
 import org.mule.runtime.tracer.impl.CoreEventComponentTracerFactory;
 import org.mule.runtime.tracer.impl.SelectableCoreEventTracer;
 import org.mule.runtime.tracer.impl.span.factory.ExecutionSpanFactory;
-import org.mule.runtime.tracing.level.impl.config.AutoConfigurableTracingLevelConfiguration;
+import org.mule.runtime.tracing.level.impl.config.FileTracingLevelConfiguration;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -249,7 +249,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(MULE_METER_EXPORTER_CONFIGURATION_KEY,
            getBeanDefinition(OpenTelemetryAutoConfigurableMeterExporterConfiguration.class))
       .put(MULE_METER_EXPORTER_FACTORY_KEY, getBeanDefinition(OpenTelemetryMeterExporterFactory.class))
-      .put(MULE_TRACING_LEVEL_CONFIGURATION_KEY, getBeanDefinition(AutoConfigurableTracingLevelConfiguration.class))
+      .put(MULE_TRACING_LEVEL_CONFIGURATION_KEY, getBeanDefinition(FileTracingLevelConfiguration.class))
       .put(MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY, getBeanDefinition(DefaultInitialSpanInfoProvider.class))
       .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))
       .put(FORWARD_COMPATIBILITY_HELPER_KEY, getBeanDefinition(DefaultForwardCompatibilityHelper.class))
