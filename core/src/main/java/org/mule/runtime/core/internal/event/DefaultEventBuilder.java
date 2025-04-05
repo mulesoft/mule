@@ -80,7 +80,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private boolean modified;
   private boolean internalParametersInitialized = false;
   private boolean notificationsEnabled = true;
-  private static final CaseInsensitiveHashMap EMPTY_MAP = new CaseInsensitiveHashMap<>().toImmutableCaseInsensitiveMap();
 
   public DefaultEventBuilder(BaseEventContext messageContext) {
     this.context = messageContext;
