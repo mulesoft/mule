@@ -238,7 +238,7 @@ public class DependencyResolver implements AutoCloseable {
       throws DependencyCollectionException, DependencyResolutionException {
     try {
       final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
-      final String version = getImplementationVersion();
+      final String version = "4.9.0"; // getImplementationVersion(); Hard coding this version for mule-runtime-apis-split-loader-bom
       ArtifactDescriptorResult pom =
           readArtifactDescriptor(new DefaultArtifact("com.mulesoft.mule.distributions", "mule-runtime-apis-split-loader-bom",
                                                      "pom", version));
