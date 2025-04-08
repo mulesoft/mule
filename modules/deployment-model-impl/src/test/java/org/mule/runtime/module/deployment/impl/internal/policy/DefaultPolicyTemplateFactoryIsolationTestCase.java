@@ -10,6 +10,8 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION;
 import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentSuccessfulStory.POLICY_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -38,16 +40,23 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 
-public class DefaultPolicyTemplateFactoryIsolationTestCase {
+@Feature(POLICY_DEPLOYMENT)
+@Story(POLICY_ISOLATION)
+@Issue("W-17340911")
+public class DefaultPolicyTemplateFactoryIsolationTestCase extends AbstractMuleTestCase {
 
   private static final String POLICY_ID = "policyId";
   private static final String POLICY_NAME = "testPolicy";

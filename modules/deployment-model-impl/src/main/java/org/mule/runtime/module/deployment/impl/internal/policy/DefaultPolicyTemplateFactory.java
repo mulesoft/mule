@@ -80,17 +80,12 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
 
     try {
       if (containerClassLoader != null && isPolicyIsolationEnabled(descriptor) && hasRequiredPlugin(descriptor)) {
-        // When policy isolation is enabled, a new RegionClassLoader provides a separate
+        // When policy isolation is enabled, IsolatedPolicyClassLoader provides a separate
         // classloading environment for the policy, preventing potential classloader
         // conflicts (when using the same dependency in both policy and domain).
-        // IsolatedPolicyClassLoader then enforces this isolation.
-        regionClassLoader =
-            new RegionClassLoader(containerClassLoader.getArtifactId(),
-                                  containerClassLoader.getArtifactDescriptor(),
-                                  containerClassLoader,
-                                  containerClassLoader.getClassLoaderLookupPolicy());
+
         parentClassLoader = IsolatedPolicyClassLoader
-            .getInstance(regionClassLoader);
+            .getInstance(containerClassLoader);
       } else {
         parentClassLoader = application.getRegionClassLoader();
       }

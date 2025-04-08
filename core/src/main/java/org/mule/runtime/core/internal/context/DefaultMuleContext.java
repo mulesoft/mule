@@ -1310,12 +1310,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * Configures the {@link MuleRuntimeFeature#SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION} feature flag.
    *
-   * @since 4.9.4, 4.6.15
+   * @since 4.10.0, 4.9.4, 4.6.15
    */
   private static void configureSeparateClassLoaderForPolicyIsolation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION,
-                                                minMuleVersion(v4_6_0));
+                                                minMuleVersion(v4_10_0));
   }
 
   /**

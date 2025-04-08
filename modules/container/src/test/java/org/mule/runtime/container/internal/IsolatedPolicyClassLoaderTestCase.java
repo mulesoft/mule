@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.container.internal;
 
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentSuccessfulStory.POLICY_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -14,14 +17,18 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Test;
 
-public class IsolatedPolicyClassLoaderTestCase {
+@Feature(POLICY_DEPLOYMENT)
+@Story(POLICY_ISOLATION)
+@Issue("W-17340911")
+public class IsolatedPolicyClassLoaderTestCase extends AbstractMuleTestCase {
 
-  protected static final String PACKAGE_NAME = "java.lang";
-  protected static final String CLASS_NAME = PACKAGE_NAME + ".Object";
-  private static final Class PARENT_LOADED_CLASS = Object.class;
   protected static final String ARTIFACT_ID = "testAppId";
   public static final String APP_NAME = "testApp";
 
@@ -33,14 +40,14 @@ public class IsolatedPolicyClassLoaderTestCase {
   }
 
   @Test
-  public void getIsolatedPolicyClassLoaderInstance() throws ClassNotFoundException {
-    final ClassLoader parentClassLoader = mock(ClassLoader.class);
-    when(parentClassLoader.loadClass(CLASS_NAME)).thenReturn(PARENT_LOADED_CLASS);
+  public void getIsolatedPolicyClassLoaderInstance() {
+    FilteringContainerClassLoader mockContainerClassLoader = mock(FilteringContainerClassLoader.class);
+    when(mockContainerClassLoader.getArtifactId()).thenReturn(ARTIFACT_ID);
+    when(mockContainerClassLoader.getArtifactDescriptor()).thenReturn(artifactDescriptor);
+    when(mockContainerClassLoader.getClassLoaderLookupPolicy()).thenReturn(lookupPolicy);
 
-    RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-
-    IsolatedPolicyClassLoader instance1 = IsolatedPolicyClassLoader.getInstance(regionClassLoader);
-    IsolatedPolicyClassLoader instance2 = IsolatedPolicyClassLoader.getInstance(regionClassLoader);
+    IsolatedPolicyClassLoader instance1 = IsolatedPolicyClassLoader.getInstance(mockContainerClassLoader);
+    IsolatedPolicyClassLoader instance2 = IsolatedPolicyClassLoader.getInstance(mockContainerClassLoader);
     assertThat(instance1, is(instance2));
   }
 
