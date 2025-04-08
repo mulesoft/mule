@@ -70,6 +70,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private List<BindingContext> globalBindings = new LinkedList<>();
   private volatile boolean initialised = false;
 
+  private boolean disposed = false;
+
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
                                             DefaultExpressionLanguageFactoryService service,
@@ -289,9 +291,10 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   }
 
   @Override
-  public void dispose() {
-    if (expressionExecutor != null) {
+  public synchronized void dispose() {
+    if (expressionExecutor != null && !disposed) {
       expressionExecutor.dispose();
+      disposed = true;
     }
   }
 

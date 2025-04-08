@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
-import static java.util.Collections.synchronizedMap;
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -24,6 +23,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import reactor.util.context.Context;
@@ -49,9 +49,8 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
    * SDK components may be nested within each other, so some of the context must be kept separately for the component it belongs
    * to.
    */
-  // TODO MULE-18296 determine what implementation of thread safe map is better here after that fix.
   private final Map<Pair<ComponentLocation, String>, LocationSpecificSdkInternalContext> locationSpecificContext =
-      synchronizedMap(new SmallMap<>());
+      new ConcurrentHashMap<>(5);
 
   private Function<Context, Context> innerChainSubscriberContextMapping = identity();
 
@@ -60,7 +59,14 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
   }
 
   public void putContext(ComponentLocation location, String eventId) {
-    locationSpecificContext.put(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
+    final String locationString = getLocationString(location);
+
+    final LocationSpecificSdkInternalContext previousValue =
+        locationSpecificContext.putIfAbsent(new Pair<>(location, eventId), new LocationSpecificSdkInternalContext());
+    if (previousValue != null) {
+      throw new IllegalStateException(format("Context at location - %s for event - %s already present",
+                                             locationString, eventId));
+    }
   }
 
   /**
@@ -82,13 +88,40 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
                                           Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback,
                                           ExecutionContextAdapter executionContextAdapter) {
-    locationSpecificContext.get(new Pair<>(location, eventId)).setOperationExecutionParams(configuration, parameters,
-                                                                                           operationEvent,
-                                                                                           callback, executionContextAdapter);
+    final String locationString = getLocationString(location);
+
+    final LocationSpecificSdkInternalContext locationSpecificSdkInternalContext =
+        getLocationSpecificSdkInternalContext(location, eventId);
+    if (locationSpecificSdkInternalContext.getOperationExecutionParams() != null) {
+      throw new IllegalStateException(format("Context at location - %s for event - %s already has Operation Parameters set",
+                                             locationString, eventId));
+    }
+
+    locationSpecificSdkInternalContext.setOperationExecutionParams(configuration, parameters,
+                                                                   operationEvent,
+                                                                   callback, executionContextAdapter);
   }
 
-  public OperationExecutionParams getOperationExecutionParams(ComponentLocation location, String eventId) {
-    return locationSpecificContext.get(new Pair<>(location, eventId)).getOperationExecutionParams();
+  public OperationExecutionParams getOperationExecutionParams(ComponentLocation location,
+                                                              String eventId) {
+    return this.getLocationSpecificSdkInternalContext(location, eventId)
+        .getOperationExecutionParams();
+  }
+
+  private LocationSpecificSdkInternalContext getLocationSpecificSdkInternalContext(ComponentLocation location,
+                                                                                   String eventId) {
+    final LocationSpecificSdkInternalContext locationSpecificSdkInternalContext =
+        locationSpecificContext.get(new Pair<>(location, eventId));
+    if (locationSpecificSdkInternalContext == null) {
+      final String locationString = getLocationString(location);
+      throw new NullPointerException(format("No Context at location - %s for event - %s",
+                                            locationString, eventId));
+    }
+    return locationSpecificSdkInternalContext;
+  }
+
+  private String getLocationString(ComponentLocation location) {
+    return location != null ? location.getLocation() : "null";
   }
 
   public Map<String, Object> getResolutionResult(ComponentLocation location, String eventId) {
