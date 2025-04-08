@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.activation.internal.descriptor;
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
@@ -63,7 +64,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   }
 
   private void validateModel(M artifactModel) {
-    artifactModel.validateModel(artifactLocation.getName());
+    if (!ExecutionEnvironment.isMuleFramework()) {
+      artifactModel.validateModel(this.artifactLocation.getName());
+    }
   }
 
   protected void doValidation(T descriptor) {
