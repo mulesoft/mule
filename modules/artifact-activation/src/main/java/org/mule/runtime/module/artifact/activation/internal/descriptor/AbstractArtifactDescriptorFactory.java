@@ -70,7 +70,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   }
 
   protected void doValidation(T descriptor) {
-    artifactDescriptorValidator.validate(descriptor);
+    if (!ExecutionEnvironment.isMuleFramework()) {
+      artifactDescriptorValidator.validate(descriptor);
+    }
   }
 
   protected M getArtifactModel() {
