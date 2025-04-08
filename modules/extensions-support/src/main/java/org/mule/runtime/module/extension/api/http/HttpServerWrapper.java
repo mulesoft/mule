@@ -10,7 +10,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.sdk.api.http.HttpConstants;
 import org.mule.sdk.api.http.server.HttpServer;
 import org.mule.sdk.api.http.server.RequestHandler;
-import org.mule.sdk.api.http.server.RequestHandlerManager;
+import org.mule.sdk.api.http.server.EndpointAvailabilityHandler;
 import org.mule.sdk.api.http.server.ServerAddress;
 import org.mule.sdk.api.http.sse.server.SseClient;
 import org.mule.sdk.api.http.sse.server.SseEndpointManager;
@@ -76,17 +76,19 @@ public class HttpServerWrapper implements HttpServer {
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
-    return null;
+  public EndpointAvailabilityHandler addRequestHandler(Collection<String> methods, String path, RequestHandler requestHandler) {
+    return new EndpointAvailabilityHandlerWrapper(delegate.addRequestHandler(methods, path,
+                                                                             new RequestHandlerWrapper(requestHandler)));
   }
 
   @Override
-  public RequestHandlerManager addRequestHandler(String path, RequestHandler requestHandler) {
-    return null;
+  public EndpointAvailabilityHandler addRequestHandler(String path, RequestHandler requestHandler) {
+    return new EndpointAvailabilityHandlerWrapper(delegate.addRequestHandler(path, new RequestHandlerWrapper(requestHandler)));
   }
 
   @Override
   public SseEndpointManager sse(String ssePath, Consumer<SseRequestContext> onRequest, Consumer<SseClient> onClient) {
+    // TODO: Hi!
     return null;
   }
 }
