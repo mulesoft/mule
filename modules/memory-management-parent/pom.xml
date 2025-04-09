@@ -12,10 +12,6 @@
     <name>Mule Memory Management Service Modules</name>
     <description>Modules related to the memory management service</description>
 
-    <properties>
-        <formatterConfigPath>../formatter.xml</formatterConfigPath>
-    </properties>
-
     <modules>
         <module>memory-management</module>
         <module>memory-management-tests</module>

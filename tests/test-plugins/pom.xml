@@ -13,10 +13,6 @@
     <name>Test Plugins for Mule</name>
     <description>Provides plugins to use on tests</description>
 
-    <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-    </properties>
-
     <modules>
         <module>empty-plugin</module>
         <module>dependant-plugin</module>

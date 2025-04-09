@@ -19,10 +19,6 @@
     <name>Mule Metrics Modules</name>
     <description>Modules related to the Runtime Tracer</description>
 
-    <properties>
-        <formatterConfigPath>../formatter.xml</formatterConfigPath>
-    </properties>
-
     <modules>
         <module>mule-metrics-api</module>
         <module>mule-metrics-impl</module>

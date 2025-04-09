@@ -14,7 +14,6 @@
     <properties>
         <javaModuleName>org.mule.runtime.errors</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

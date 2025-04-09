@@ -16,7 +16,6 @@
 
     <properties>
         <javaModuleName>org.mule.test.extension.soap</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
 </project>

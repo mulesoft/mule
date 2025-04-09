@@ -32,7 +32,6 @@
             --add-opens=org.mule.runtime.tooling.support/org.mule.runtime.module.tooling.internal=ALL-UNNAMED
             ${surefire.module.args}
         </surefire.args>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

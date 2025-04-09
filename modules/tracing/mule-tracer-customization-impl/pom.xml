@@ -22,7 +22,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.tracer.customization.impl</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

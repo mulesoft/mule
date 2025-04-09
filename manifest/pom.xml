@@ -20,8 +20,6 @@
         <project.build.java11TestSourceDirectory>${project.basedir}/src/test/java11</project.build.java11TestSourceDirectory>
 
         <oldMuleArtifactVersion>4.9.0-SNAPSHOT</oldMuleArtifactVersion>
-
-        <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
