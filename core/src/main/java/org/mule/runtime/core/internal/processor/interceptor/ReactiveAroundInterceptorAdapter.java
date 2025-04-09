@@ -94,21 +94,21 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
           .around(((Component) component).getLocation(),
                   getResolvedParams(eventWithResolvedParams), interceptionEvent,
                   reactiveInterceptionAction))
-                      .exceptionally(t -> {
-                        if (t instanceof MessagingException) {
-                          throw new CompletionException(t);
-                        } else {
-                          throw new CompletionException(resolveMessagingException(eventWithResolvedParams,
-                                                                                  t instanceof CompletionException
-                                                                                      ? t.getCause()
-                                                                                      : t,
-                                                                                  (Component) component,
-                                                                                  empty()));
-                        }
-                      })
-                      .thenApply(interceptedEvent -> interceptedEvent != null
-                          ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
-                          : null);
+          .exceptionally(t -> {
+            if (t instanceof MessagingException) {
+              throw new CompletionException(t);
+            } else {
+              throw new CompletionException(resolveMessagingException(eventWithResolvedParams,
+                                                                      t instanceof CompletionException
+                                                                          ? t.getCause()
+                                                                          : t,
+                                                                      (Component) component,
+                                                                      empty()));
+            }
+          })
+          .thenApply(interceptedEvent -> interceptedEvent != null
+              ? ((DefaultInterceptionEvent) interceptedEvent).resolve()
+              : null);
     } catch (Exception e) {
       throw propagate(resolveMessagingException(interceptionEvent.resolve(), e, (Component) component, empty()));
     }

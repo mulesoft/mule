@@ -31,14 +31,14 @@ public interface ArtifactDeploymentTemplate {
 
   /**
    * Callback to be invoked just before redeploying an artifact.
-   * 
+   *
    * @param artifact the artifact that is about to be redeployed.
    */
   void preRedeploy(Artifact artifact);
 
   /**
    * Callback to be invoked just after redeploying an artifact.
-   * 
+   *
    * @param artifact the artifact that was just redeployed.
    */
   void postRedeploy(Artifact artifact);

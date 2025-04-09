@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * Provides a way to discover {@link ExtensionModel}s from the Mule Runtime or from {@code mule-plugins} in the context of a
  * deployable artifact.
- * 
+ *
  * @since 4.5
  */
 @NoImplement
@@ -29,7 +29,7 @@ public interface ExtensionModelDiscoverer {
 
   /**
    * Creates an {@link ExtensionModelDiscoverer} that will generate the extension models for plugins in a class loader.
-   * 
+   *
    * @param classLoaderFactory             a way to obtain the class loader for a given plugin.
    * @param extensionModelLoaderRepository repository to manage access to an
    *                                       {@link org.mule.runtime.extension.api.loader.ExtensionModelLoader}.
@@ -65,7 +65,7 @@ public interface ExtensionModelDiscoverer {
    * Discovers the extension models provided by the Mule Runtime.
    *
    * @return {@link Set} of the runtime provided {@link ExtensionModel}s.
-   * 
+   *
    * @deprecated since 4.5 use {@link RuntimeExtensionModelProviderLoaderUtils#discoverRuntimeExtensionModels()} instead.
    */
   @Deprecated

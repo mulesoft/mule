@@ -72,7 +72,7 @@ public class NumberParameterWithinRangeTestCase extends AbstractCoreValidationTe
                                                                  "        <logger level=\"INFO\" />\n" +
                                                                  "    </flow>\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     // No errors
     assertThat(msg.isPresent(), is(false));
@@ -92,7 +92,7 @@ public class NumberParameterWithinRangeTestCase extends AbstractCoreValidationTe
                                                                  "        <logger level=\"INFO\" />\n" +
                                                                  "    </flow>\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getValidation().getLevel(), is(ERROR));
     assertThat(msg.get().getMessage(),

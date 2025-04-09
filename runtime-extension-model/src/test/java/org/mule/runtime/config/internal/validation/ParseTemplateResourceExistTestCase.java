@@ -51,7 +51,7 @@ public class ParseTemplateResourceExistTestCase extends AbstractCoreValidationTe
                                                                  +
                                                                  "</flow>\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getValidation().getLevel(), is(ERROR));
     assertThat(msg.get().getMessage(),
@@ -73,7 +73,7 @@ public class ParseTemplateResourceExistTestCase extends AbstractCoreValidationTe
                                                                  +
                                                                  "</flow>\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     // No errors
     assertThat(msg.isPresent(), is(false));
@@ -99,7 +99,7 @@ public class ParseTemplateResourceExistTestCase extends AbstractCoreValidationTe
                                                                  + absolutePath + "\" />\n" +
                                                                  "</flow>\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     // No errors
     assertThat(msg.isPresent(), is(false));

@@ -54,7 +54,7 @@ public class MacroExpansionAstPostProcessor implements ApplicationModelAstPostPr
                               .map(xmlSdk1ConfigModels::contains)
                               .orElse(comp.getIdentifier().getName().equals(DEFAULT_GLOBAL_ELEMENTS)))
                           .flatMap(ComponentAst::directChildrenStream)))
-                              .filter(comp -> !comp.getIdentifier().getName().equals(DEFAULT_GLOBAL_ELEMENTS))
-                              .collect(toSet());
+        .filter(comp -> !comp.getIdentifier().getName().equals(DEFAULT_GLOBAL_ELEMENTS))
+        .collect(toSet());
   }
 }

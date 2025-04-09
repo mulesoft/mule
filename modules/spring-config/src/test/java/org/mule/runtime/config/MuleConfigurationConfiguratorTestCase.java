@@ -337,7 +337,7 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
                                           new DefaultComponentBuildingDefinitionRegistryFactory()
                                               .create(artifactAst.dependencies(),
                                                       artifactAst::dependenciesDsl))
-                                                          .configure(muleContext);
+          .configure(muleContext);
     }
 
     @Override

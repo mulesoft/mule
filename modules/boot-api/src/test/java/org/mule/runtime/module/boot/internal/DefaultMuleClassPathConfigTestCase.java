@@ -59,20 +59,20 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
                                                        new JarCompiler()
                                                            .compiling(getResourceFile("/org/test/opt/FromThirdPartyLib.java"))
                                                            .compile("third-party-lib.jar"))
-                                                               .getArtifactFile();
+        .getArtifactFile();
 
     File fromMuleModuleJarFile = new JarFileBuilder("mule-module",
                                                     new JarCompiler()
                                                         .compiling(getResourceFile("/org/test/mule/FromMuleModule.java"))
                                                         .dependingOn(fromThirdPartyLibJarFile)
                                                         .compile("mule-module.jar"))
-                                                            .getArtifactFile();
+        .getArtifactFile();
 
     File fromUserLibJarFile = new JarFileBuilder("user-lib",
                                                  new JarCompiler()
                                                      .compiling(getResourceFile("/org/test/user/FromUserLib.java"))
                                                      .compile("user-lib.jar"))
-                                                         .getArtifactFile();
+        .getArtifactFile();
 
     File fromUserLibPropertiesFile = getResourceFile("/org/test/user/properties.yaml");
 
@@ -87,14 +87,14 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
                                                                    new JarCompiler()
                                                                        .compiling(getResourceFile("/org/test/opt/javaspecific/FromThirdPartyLib.java"))
                                                                        .compile("third-party-lib-javaspecific.jar"))
-                                                                           .getArtifactFile();
+        .getArtifactFile();
 
     File fromMuleModuleJarJavaSpecificFile = new JarFileBuilder("mule-module-javaspecific",
                                                                 new JarCompiler()
                                                                     .compiling(getResourceFile("/org/test/mule/javaspecific/FromMuleModule.java"))
                                                                     .dependingOn(fromThirdPartyLibJarJavaSpecificFile)
                                                                     .compile("mule-module-javaspecific.jar"))
-                                                                        .getArtifactFile();
+        .getArtifactFile();
 
     final var javaSpecificationVersion = getProperty("java.specification.version").split("\\.")[0];
     copyFileToDirectory(fromMuleModuleJarJavaSpecificFile, new File(muleHome, "lib/mule/jdk-" + javaSpecificationVersion));
@@ -103,7 +103,7 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
 
   /**
    * Creates an instance of {@link File} with the path specified in the parameter {@code resource}.
-   * 
+   *
    * @param resource the path to the file.
    * @return a {@link File} representing the resource.
    * @throws URISyntaxException if an error occurred while trying to convert the URI.

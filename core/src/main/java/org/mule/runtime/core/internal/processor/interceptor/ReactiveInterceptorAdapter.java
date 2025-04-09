@@ -116,7 +116,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                           error -> {
                             InternalEvent resolvedEvent = doAfter(interceptor, (Component) component,
                                                                   of(error.getCause()))
-                                                                      .apply((InternalEvent) error.getEvent());
+                                .apply((InternalEvent) error.getEvent());
                             Component failingComponent = error.getFailingComponent() != null
                                 ? error.getFailingComponent()
                                 : (Component) component;

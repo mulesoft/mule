@@ -217,7 +217,7 @@ public class JavaMetadataKeyIdModelParserUtils {
                                                                      keyIdResolverModelParser.get().getMetadataType(),
                                                                      ((JavaMetadataKeyModelParser) enclosingKeyIdResolverModelParser
                                                                          .get())
-                                                                             .keyIdResolverDeclarationClass()));
+                                                                         .keyIdResolverDeclarationClass()));
       }
     }
 

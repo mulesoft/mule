@@ -42,7 +42,7 @@ import java.util.function.Predicate;
  * <p/>
  * Extending validations don't do the actual resource resolution, but instead generate the failed validations for any errors that
  * happened during the resolution of the imports during the artifact parsing.
- * 
+ *
  * @since 4.8
  */
 public abstract class AbstractImportValidation implements ArtifactValidation {
@@ -65,7 +65,7 @@ public abstract class AbstractImportValidation implements ArtifactValidation {
 
   /**
    * Determines whether this resolution failure is to be handled by this validator or not.
-   * 
+   *
    * @param resolutionFailureMessage
    * @return whether this resolution failure is to be handled by this validator or not.
    */

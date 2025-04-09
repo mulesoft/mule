@@ -13,10 +13,10 @@ import org.junit.rules.ExternalResource;
 /**
  * This is a JUnit rule to start and stop Mule Runtime during tests. Usage:
  * <p/>
- * 
+ *
  * <pre>
  * public static class MuleStandaloneIntegrationTests {
- * 
+ *
  *   &#064;Rule
  *   public MuleStandalone standalone = new MuleStandalone(&quot;/path/to/mule/home&quot;);
  *

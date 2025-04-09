@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Validator for {@link DeployableArtifactDescriptor#getSupportedJavaVersions()}. Checks the currently running Java version
  * against the values provided by the descriptor.
- * 
+ *
  * @since 4.6
  */
 public class SupportedJvmArtifactDescriptorValidator implements ArtifactDescriptorValidator {

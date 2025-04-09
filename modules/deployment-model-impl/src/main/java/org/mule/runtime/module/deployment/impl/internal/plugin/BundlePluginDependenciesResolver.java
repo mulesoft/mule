@@ -228,14 +228,14 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                     pluginDescriptor
                         .setClassLoaderConfiguration(createBuilderWithoutDependency(originalClassLoaderConfiguration, dependency,
                                                                                     includeLocals)
-                                                                                        .dependingOn(ImmutableSet.of(
-                                                                                                                     new BundleDependency.Builder()
-                                                                                                                         .setDescriptor(artifactPluginDescriptorResolved
-                                                                                                                             .getBundleDescriptor())
-                                                                                                                         .setScope(dependency
-                                                                                                                             .getScope())
-                                                                                                                         .build()))
-                                                                                        .build());
+                            .dependingOn(ImmutableSet.of(
+                                                         new BundleDependency.Builder()
+                                                             .setDescriptor(artifactPluginDescriptorResolved
+                                                                 .getBundleDescriptor())
+                                                             .setScope(dependency
+                                                                 .getScope())
+                                                             .build()))
+                            .build());
                   } else {
                     if (logger.isDebugEnabled()) {
                       logger.debug(format(

@@ -219,13 +219,13 @@ public class BundlePluginDependenciesResolver {
                     pluginDescriptor
                         .setClassLoaderConfiguration(createBuilderWithoutDependency(originalClassLoaderConfiguration, dependency,
                                                                                     includeLocals)
-                                                                                        .dependingOn(singleton(new BundleDependency.Builder()
-                                                                                            .setDescriptor(artifactPluginDescriptorResolved
-                                                                                                .getBundleDescriptor())
-                                                                                            .setScope(dependency
-                                                                                                .getScope())
-                                                                                            .build()))
-                                                                                        .build());
+                            .dependingOn(singleton(new BundleDependency.Builder()
+                                .setDescriptor(artifactPluginDescriptorResolved
+                                    .getBundleDescriptor())
+                                .setScope(dependency
+                                    .getScope())
+                                .build()))
+                            .build());
                   } else {
                     throw new ArtifactActivationException(createStaticMessage(format("Transitive dependencies should be resolved by now for mule-plugin '%s', but '%s' is missing",
                                                                                      pluginDescriptor.getBundleDescriptor(),

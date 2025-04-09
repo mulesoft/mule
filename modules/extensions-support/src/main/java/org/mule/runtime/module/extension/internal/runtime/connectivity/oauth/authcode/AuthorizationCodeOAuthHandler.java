@@ -237,7 +237,7 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
                        httpServer.getServerAddress().getIp(),
                        httpServer.getServerAddress().getPort(),
                        callbackConfig.getCallbackPath())
-                           .toExternalForm();
+            .toExternalForm();
       } catch (MalformedURLException e) {
         throw new MuleRuntimeException(createStaticMessage(format(
                                                                   "Could not derive a external callback url from <http:listener-config> '%s'",

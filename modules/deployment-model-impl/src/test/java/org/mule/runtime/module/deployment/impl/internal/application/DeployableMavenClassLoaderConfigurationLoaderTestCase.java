@@ -295,8 +295,8 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
     assertThat(classLoaderConfiguration.getUrls()[0], equalTo(
                                                               toFile(getClass().getClassLoader().getResource(Paths
                                                                   .get(APPS_FOLDER, PATCHED_JAR_APP_WHITESPACES).toString()))
-                                                                      .toURI()
-                                                                      .toURL()));
+                                                                  .toURI()
+                                                                  .toURL()));
   }
 
   /**
@@ -383,7 +383,8 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
                                                      anyBoolean(),
                                                      any(),
                                                      any(),
-                                                     any())).thenReturn(resolvedDependencies);
+                                                     any()))
+        .thenReturn(resolvedDependencies);
 
     File app = toFile(getClass().getClassLoader().getResource(Paths.get(APPS_FOLDER, "no-dependencies").toString()));
 
@@ -398,7 +399,8 @@ public class DeployableMavenClassLoaderConfigurationLoaderTestCase {
       org.mule.maven.pom.parser.api.model.BundleDependency dependency = resolvedDependencies.get(i - 1);
       URL url = getDummyUriFor(dependency.getDescriptor().getGroupId(),
                                dependency.getDescriptor().getArtifactId(),
-                               dependency.getDescriptor().getVersion()).toURL();
+                               dependency.getDescriptor().getVersion())
+          .toURL();
       assertThat(classLoaderConfiguration.getUrls()[i], is(equalTo(url)));
     }
   }

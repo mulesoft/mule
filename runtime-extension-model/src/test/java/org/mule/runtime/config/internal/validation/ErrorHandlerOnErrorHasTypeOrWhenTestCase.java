@@ -54,7 +54,7 @@ public class ErrorHandlerOnErrorHasTypeOrWhenTestCase extends AbstractCoreValida
                           "    </flow>\n" +
                           "\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));
@@ -84,7 +84,7 @@ public class ErrorHandlerOnErrorHasTypeOrWhenTestCase extends AbstractCoreValida
                           "    </flow>\n" +
                           "\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Every handler (except for the last one) within an 'error-handler' must specify a 'when' or 'type' attribute."));

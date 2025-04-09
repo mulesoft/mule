@@ -61,11 +61,11 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(CoreEvent.class), any(ComponentLocation.class),
                                            anyBoolean(),
                                            anyBoolean()))
-                                               .thenReturn(true);
+        .thenReturn(true);
     when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(CoreEvent.class), any(ComponentLocation.class),
                                            anyBoolean(),
                                            anyBoolean()))
-                                               .thenReturn(false);
+        .thenReturn(false);
 
     when(muleContext.getExpressionManager()).thenReturn(expressionManager);
 

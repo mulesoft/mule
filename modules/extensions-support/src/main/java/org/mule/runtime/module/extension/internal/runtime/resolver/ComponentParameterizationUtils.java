@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * Utils class to create {@link ComponentParameterization}s.
- * 
+ *
  * @since 4.5
  */
 public class ComponentParameterizationUtils {
@@ -23,7 +23,7 @@ public class ComponentParameterizationUtils {
    * Creates a {@link ComponentParameterization} of a {@link ParameterizedModel} based on static values of its parameters. Keep in
    * mind that this method will not work if the given {@link ParameterizedModel} contains parameter that share the same name,
    * since the map representation falls short in that case.
-   * 
+   *
    * @param parameterizedModel parameterizedModel to be described by the result
    * @param parameters         static parameter values.
    * @return a component parameterization that describes the given value.

@@ -22,7 +22,7 @@ public final class ConnectionProviderFactoryModelProperty implements ModelProper
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param connectionProviderFactory a {@link ConnectionProviderFactory}
    */
   public ConnectionProviderFactoryModelProperty(ConnectionProviderFactory connectionProviderFactory) {

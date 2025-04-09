@@ -391,7 +391,8 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       return (target != null)
           ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
               .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,
-                                                 expressionManager).apply(eventAfter))
+                                                 expressionManager)
+              .apply(eventAfter))
           : pub;
     }
 

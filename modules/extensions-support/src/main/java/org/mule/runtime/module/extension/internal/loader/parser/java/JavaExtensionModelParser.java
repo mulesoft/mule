@@ -168,7 +168,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                                                        value -> new Pair<>(value
                                                                            .getClassValue(sub -> sub.baseType()),
                                                                                            value.getClassArrayValue(sub -> sub
-                                                                                               .subTypes()))).collect(toList());
+                                                                                               .subTypes())))
+        .collect(toList());
 
     Set<Object> baseTypes = new HashSet<>();
     pairs.forEach(mapping -> {
@@ -198,7 +199,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                                                                      loadingContext.getTypeLoader()),
                                                    value -> parseNotifications(value, namespace,
                                                                                loadingContext.getTypeLoader()))
-                                                                                   .orElse(new LinkedList<>());
+        .orElse(new LinkedList<>());
   }
 
   private void parseImportedTypes() {
@@ -209,7 +210,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                                      container -> ((org.mule.sdk.api.annotation.ImportedTypes) container).value(),
                                                      value -> value.getClassValue(Import::type),
                                                      value -> value.getClassValue(org.mule.sdk.api.annotation.Import::type))
-                                                         .collect(toList());
+        .collect(toList());
 
     importedTypes = types.stream()
         .distinct()
@@ -228,7 +229,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                                 Export.class,
                                                 org.mule.sdk.api.annotation.Export.class,
                                                 export -> ExportInfo.fromLegacy(export),
-                                                export -> ExportInfo.fromSdkApi(export)).orElse(null);
+                                                export -> ExportInfo.fromSdkApi(export))
+        .orElse(null);
 
     if (info == null) {
       return;
@@ -257,10 +259,10 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                                   value.getArrayValue(PrivilegedExport::packages)),
                               value -> new Pair<>(value.getArrayValue(org.mule.sdk.api.annotation.PrivilegedExport::artifacts),
                                                   value.getArrayValue(org.mule.sdk.api.annotation.PrivilegedExport::packages)))
-                                                      .ifPresent(exported -> {
-                                                        privilegedExportedArtifacts = exported.getFirst();
-                                                        privilegedExportedPackages = exported.getSecond();
-                                                      });
+        .ifPresent(exported -> {
+          privilegedExportedArtifacts = exported.getFirst();
+          privilegedExportedPackages = exported.getSecond();
+        });
   }
 
   @Override
@@ -296,8 +298,8 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                extensionElement,
                                extensionElement,
                                loadingContext)
-                                   .filter(operation -> !requiresConfig(getDevelopmentFramework(), operation))
-                                   .collect(toList());
+        .filter(operation -> !requiresConfig(getDevelopmentFramework(), operation))
+        .collect(toList());
   }
 
   @Override

@@ -41,7 +41,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
 
   /**
    * .
-   * 
+   *
    * @param domainName name of the domain
    * @return the domain with the name domainName, null if there is no domain with domainName
    */

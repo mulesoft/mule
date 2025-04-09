@@ -36,7 +36,7 @@ public interface WithAlias extends WithAnnotations, WithName {
                                                                                 Alias.class.getName(),
                                                                                 org.mule.sdk.api.annotation.Alias.class.getName(),
                                                                                 getName())))
-                                                                                    .orElseGet(this::getName);
+        .orElseGet(this::getName);
   }
 
   /**
@@ -53,6 +53,6 @@ public interface WithAlias extends WithAnnotations, WithName {
                                                                                 Alias.class.getName(),
                                                                                 org.mule.sdk.api.annotation.Alias.class.getName(),
                                                                                 getName())))
-                                                                                    .orElse(EMPTY);
+        .orElse(EMPTY);
   }
 }

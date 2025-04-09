@@ -17,7 +17,7 @@ import java.util.Iterator;
 /**
  * A {@link MessageSequence} that retrieves elements from a {@link Collection}. Its estimated size is initially the size of the
  * collection, and decreases when elements are consumed using {@link #next()}
- * 
+ *
  * @author flbulgarelli
  * @param <T>
  */

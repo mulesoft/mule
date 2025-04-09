@@ -22,7 +22,7 @@ final class CompletableSourceCompletionCallback implements SourceCompletionCallb
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param callback a {@link CompletableFuture} to be completed through this callback
    */
   public CompletableSourceCompletionCallback(CompletableCallback<Void> callback) {

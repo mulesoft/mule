@@ -70,9 +70,9 @@ public class PipelineProcessingStrategyReactiveProcessorBuilderTestCase extends 
     ReactiveProcessor transform =
         pipelineProcessingStrategyReactiveProcessorFrom(reactiveProcessor, currentThread().getContextClassLoader(),
                                                         ARTIFACT_ID, ARTIFACT_TYPE)
-                                                            .withScheduler(flowDispatcherScheduler)
-                                                            .withProfilingService(profilingService)
-                                                            .build();
+            .withScheduler(flowDispatcherScheduler)
+            .withProfilingService(profilingService)
+            .build();
 
     createAndExecuteEnrichedTransformer(transform, coreEvent);
 

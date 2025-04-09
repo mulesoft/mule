@@ -27,7 +27,7 @@ public class OAuthCallbackValuesModelProperty implements ModelProperty {
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param callbackValues a {@link Map} in which the keys are {@link Field}s and the values are the expressions that will
    *                       generate their values
    */
@@ -44,7 +44,7 @@ public class OAuthCallbackValuesModelProperty implements ModelProperty {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @return {@code oauthCallbackValues}
    */
   @Override
@@ -54,7 +54,7 @@ public class OAuthCallbackValuesModelProperty implements ModelProperty {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @return {@code false}
    */
   @Override

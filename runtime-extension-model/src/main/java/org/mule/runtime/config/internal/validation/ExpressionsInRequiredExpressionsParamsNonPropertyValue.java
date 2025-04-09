@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 
 /**
  * Expressions are fixed for parameters that require expressions.
- * 
+ *
  * @since 4.5
  */
 public class ExpressionsInRequiredExpressionsParamsNonPropertyValue implements Validation {

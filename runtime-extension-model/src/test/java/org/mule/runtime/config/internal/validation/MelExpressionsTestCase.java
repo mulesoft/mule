@@ -41,7 +41,7 @@ public class MelExpressionsTestCase extends AbstractCoreValidationTestCase {
                                                                  "    </flow>\n" +
                                                                  "\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.isPresent(), is(false));
   }
@@ -63,7 +63,7 @@ public class MelExpressionsTestCase extends AbstractCoreValidationTestCase {
                                                                  "    </flow>\n" +
                                                                  "\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.isPresent(), is(true));
     assertThat(msg.get().getMessage(), is("MEL expressions are no longer supported."));

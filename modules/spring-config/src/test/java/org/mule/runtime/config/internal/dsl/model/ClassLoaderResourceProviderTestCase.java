@@ -51,15 +51,15 @@ public class ClassLoaderResourceProviderTestCase extends AbstractMuleTestCase {
   public void absolutePathResourceGetsLoaded() throws IOException {
     final Optional<URL> muleModulePropertiesUrl = list(getClass().getClassLoader()
         .getResources("META-INF/mule-module.properties"))
-            .stream()
-            .filter(url -> {
-              try {
-                return url.toURI().getScheme().equals("file") && !url.toURI().getPath().contains(".jar!");
-              } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-              }
-            })
-            .findAny();
+        .stream()
+        .filter(url -> {
+          try {
+            return url.toURI().getScheme().equals("file") && !url.toURI().getPath().contains(".jar!");
+          } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+          }
+        })
+        .findAny();
 
     File file = FileUtils.toFile(muleModulePropertiesUrl.get());
     verifyResourceGetsLoadedSuccessfully(file.getAbsolutePath());

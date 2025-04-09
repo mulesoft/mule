@@ -21,7 +21,7 @@ import java.util.Properties;
 
 /**
  * Describes an artifact with classifier {@code mule-plugin}, used within an Application or Domain.
- * 
+ *
  * @since 4.5
  */
 @NoExtend

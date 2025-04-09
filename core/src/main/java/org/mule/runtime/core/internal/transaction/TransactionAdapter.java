@@ -32,7 +32,7 @@ public interface TransactionAdapter extends SuspendableTransaction {
 
   /**
    * Set if the transaction should be rolled back in case of timeout, or not.
-   * 
+   *
    * @param rollbackIfTimeout
    */
   void setRollbackIfTimeout(boolean rollbackIfTimeout);

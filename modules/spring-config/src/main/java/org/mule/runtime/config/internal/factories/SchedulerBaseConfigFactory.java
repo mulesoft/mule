@@ -19,7 +19,7 @@ import org.springframework.beans.factory.FactoryBean;
 
 /**
  * Builds a base {@link SchedulerConfig} to be provided to the calls to {@link SchedulerService}.
- * 
+ *
  * @since 4.0
  */
 public class SchedulerBaseConfigFactory implements FactoryBean<SchedulerConfig> {

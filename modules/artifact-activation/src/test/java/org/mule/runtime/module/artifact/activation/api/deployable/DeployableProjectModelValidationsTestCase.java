@@ -91,7 +91,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                sharedLibraries,
-                               emptyMap()).validate();
+                               emptyMap())
+        .validate();
   }
 
   @Test
@@ -116,7 +117,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                sharedLibraries,
-                               emptyMap()).validate();
+                               emptyMap())
+        .validate();
   }
 
   @Test
@@ -154,7 +156,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               additionalPluginDependencies).validate();
+                               additionalPluginDependencies)
+        .validate();
   }
 
   @Test
@@ -186,7 +189,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               additionalPluginDependencies).validate();
+                               additionalPluginDependencies)
+        .validate();
   }
 
   @Test
@@ -220,7 +224,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               emptyMap()).validate();
+                               emptyMap())
+        .validate();
   }
 
   @Test
@@ -250,7 +255,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               emptyMap()).validate();
+                               emptyMap())
+        .validate();
 
   }
 
@@ -282,7 +288,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                new File("."),
                                dependencies,
                                emptySet(),
-                               emptyMap()).validate();
+                               emptyMap())
+        .validate();
 
   }
 
@@ -315,7 +322,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                  new File("."),
                                  dependencies,
                                  emptySet(),
-                                 emptyMap()).validate();
+                                 emptyMap())
+          .validate();
     }
   }
 
@@ -354,7 +362,8 @@ public class DeployableProjectModelValidationsTestCase extends AbstractMuleTestC
                                  new File("."),
                                  dependencies,
                                  emptySet(),
-                                 emptyMap()).validate();
+                                 emptyMap())
+          .validate();
     }
 
     if (oldValue == null) {

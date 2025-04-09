@@ -14,7 +14,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 /**
  * Basic attributes implementation that defines a generic {@link #toString()} method.
- * 
+ *
  * @since 4.0
  */
 public abstract class BaseAttributes implements Serializable {

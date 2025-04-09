@@ -626,7 +626,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       operationParametersResolutionTracer = componentTracerFactory.fromComponent(this, PARAMETERS_RESOLUTION_SPAN_NAME, "");
       resolverSet = new TracedResolverSet(muleContext,
                                           componentTracerFactory.fromComponent(this, VALUE_RESOLUTION_SPAN_NAME, ""))
-                                              .addAll(resolverSet.getResolvers());
+          .addAll(resolverSet.getResolvers());
       initialised = true;
     }
   }
@@ -676,7 +676,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                 .doOnNext(innerEventDispatcher(emitter))
                                                 .map(e -> Either.empty()),
                                             () -> emitter.complete(), e -> emitter.error(e)))
-                                                .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
+                .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
           });
         }
 

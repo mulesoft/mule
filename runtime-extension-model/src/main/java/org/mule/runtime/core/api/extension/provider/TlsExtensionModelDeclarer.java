@@ -75,7 +75,7 @@ class TlsExtensionModelDeclarer {
                     Reusable configuration element for TLS. A TLS context optionally defines a key store and a trust store.
                     The key store contains the private and public keys of this server/client.
                     The trust store contains certificates of the trusted servers/clients.""")
-                    .asComponentId();
+        .asComponentId();
     optionalStringParam(contextParams, "enabledProtocols", "A comma separated list of protocols enabled for this context.");
     optionalStringParam(contextParams, "enabledCipherSuites",
                         "A comma separated list of cipher suites enabled for this context.");

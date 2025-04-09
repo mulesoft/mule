@@ -43,7 +43,7 @@ public interface ArtifactContextFactory extends ConfigurationBuilder {
 
   /**
    * Creates a new {@link ArtifactContextFactory} based on the given ArtifactctAst and its creation parameters.
-   * 
+   *
    * @since 4.7
    */
   public static ArtifactContextFactory createArtifactContextFactory(ArtifactAst artifactAst,

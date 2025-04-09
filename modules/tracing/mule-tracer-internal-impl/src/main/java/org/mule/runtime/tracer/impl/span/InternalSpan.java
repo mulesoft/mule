@@ -118,7 +118,7 @@ public interface InternalSpan extends Span {
 
   /**
    * Allows customization (for example, data propagation) on the child {@link InternalSpan} by its parent {@link InternalSpan}.
-   * 
+   *
    * @param child The child {@link InternalSpan} to be customized.
    * @return Customized {@link InternalSpan}.
    */

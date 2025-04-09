@@ -77,7 +77,7 @@ public final class HttpResponseBuilder extends HttpMessageBuilder<HttpResponseBu
 
   /**
    * Discard this builder after calling this method.
-   * 
+   *
    * @return an {@link HttpResponse} as described
    */
   @Override

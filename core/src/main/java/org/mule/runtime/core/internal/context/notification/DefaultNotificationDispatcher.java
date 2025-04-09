@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 
 /**
  * Implementation of {@link NotificationDispatcher} that just forwards events to the {@link MuleContext}.
- * 
+ *
  * @since 4.0
  */
 public class DefaultNotificationDispatcher implements NotificationDispatcher {

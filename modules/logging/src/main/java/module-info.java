@@ -6,7 +6,7 @@
  */
 /**
  * Mule Logging Module.
- * 
+ *
  * @moduleGraph
  * @since 4.5
  */

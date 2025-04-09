@@ -78,7 +78,8 @@ public class SourceDefinitionParser extends ExtensionDefinitionParser {
       finalBuilder = finalBuilder
           .withSetterParameterDefinition("backPressureStrategy",
                                          fromSimpleParameter(BACK_PRESSURE_STRATEGY_PARAMETER_NAME,
-                                                             v -> toBackPressureStrategy((String) v)).build());
+                                                             v -> toBackPressureStrategy((String) v))
+                                             .build());
     }
 
     List<ParameterGroupModel> inlineGroups = getInlineGroups(sourceModel);

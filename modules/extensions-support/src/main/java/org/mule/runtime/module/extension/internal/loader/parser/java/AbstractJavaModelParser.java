@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * Base class for Java written extension model parsers
- * 
+ *
  * @since 4.5.0
  */
 abstract class AbstractJavaModelParser implements AdditionalPropertiesModelParser {

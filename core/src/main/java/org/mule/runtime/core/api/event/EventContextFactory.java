@@ -135,7 +135,7 @@ public interface EventContextFactory {
    * @param correlationId       See {@link EventContext#getCorrelationId()}.
    * @param externalCompletion  future that completes when source completes enabling termination of {@link BaseEventContext} to
    *                            depend on completion of source.
-   * 
+   *
    * @since 4.9
    */
   static EventContext create(FlowConstruct flow, EventContextService eventContextService, ComponentLocation location,

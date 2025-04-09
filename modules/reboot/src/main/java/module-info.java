@@ -6,7 +6,7 @@
  */
 /**
  * Bootstrap for the Mule CE Container.
- * 
+ *
  * @moduleGraph
  * @since 4.5
  */

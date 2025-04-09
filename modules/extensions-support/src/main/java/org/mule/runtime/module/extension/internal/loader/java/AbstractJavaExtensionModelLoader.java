@@ -182,9 +182,10 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
 
         return (Collection<DeclarationEnricher>) extensionType.getValueFromAnnotation((Class<DeclarationEnrichers>) annotation)
             .map(value -> withContextClassLoader(extensionClassLoader,
-                                                 () -> value.getClassArrayValue(DeclarationEnrichers::value)).stream()
-                                                     .map(type -> instantiateOrFail(type.getDeclaringClass().get()))
-                                                     .collect(toList()))
+                                                 () -> value.getClassArrayValue(DeclarationEnrichers::value))
+                .stream()
+                .map(type -> instantiateOrFail(type.getDeclaringClass().get()))
+                .collect(toList()))
             .orElse(emptyList());
       } catch (ClassNotFoundException e) {
         // Do nothing

@@ -226,7 +226,8 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   public void offerAndFailBetweenRealOfferAndCommitThenRecover() throws Exception {
     String logFilesDirectory = temporaryFolder.newFolder().getAbsolutePath();
     txLog = new TestTransactionLogger(logFilesDirectory,
-                                      muleContext.getObjectSerializer().getInternalProtocol()).failDuringLogCommit();
+                                      muleContext.getObjectSerializer().getInternalProtocol())
+        .failDuringLogCommit();
     final DefaultQueueStore outQueue = new DefaultQueueStore(QUEUE_NAME,
                                                              muleContext.getConfiguration().getWorkingDirectory(),
                                                              muleContext.getObjectSerializer().getInternalProtocol(),

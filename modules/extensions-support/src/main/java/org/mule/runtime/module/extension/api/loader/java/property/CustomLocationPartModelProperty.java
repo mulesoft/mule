@@ -11,9 +11,9 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 
 /**
  * Keeps Java API compatibility
- * 
+ *
  * @since 4.5
- * 
+ *
  * @deprecated Use {@link org.mule.runtime.core.internal.extension.CustomLocationPartModelProperty} instead.
  */
 @Deprecated

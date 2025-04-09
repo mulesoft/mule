@@ -6,7 +6,7 @@
  */
 /**
  * Definitions for Mule tracer.
- * 
+ *
  * @moduleGraph
  * @since 4.5
  */
@@ -15,7 +15,7 @@ module org.mule.runtime.tracer.api {
   requires transitive org.mule.runtime.profiling.api;
 
   requires org.mule.runtime.api;
-  
+
   exports org.mule.runtime.tracer.api;
   exports org.mule.runtime.tracer.api.context;
   exports org.mule.runtime.tracer.api.context.getter;

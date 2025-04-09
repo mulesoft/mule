@@ -40,9 +40,9 @@ public interface ParameterizableTypeElement extends Type, WithParameters {
                               org.mule.sdk.api.annotation.param.Connection.class,
                               org.mule.sdk.api.annotation.param.Config.class,
                               Config.class)
-                                  .stream()
-                                  .distinct()
-                                  .collect(toList());
+        .stream()
+        .distinct()
+        .collect(toList());
   }
 
   /**

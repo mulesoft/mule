@@ -57,7 +57,8 @@ public class OperationDoesNotHaveApikitRouterTestCase extends AbstractCoreValida
   @Description("Checks that no validation message is returned if there is no operation")
   public void withoutOperation() {
     final Optional<ValidationResultItem> msg = runValidation("OperationDoesNotHaveApikitRouterTestCase#withoutOperation",
-                                                             XML_NAMESPACE_DEF + XML_CLOSE).stream().findFirst();
+                                                             XML_NAMESPACE_DEF + XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -72,7 +73,8 @@ public class OperationDoesNotHaveApikitRouterTestCase extends AbstractCoreValida
                           "        <logger />" +
                           "    </operation:body>" +
                           "</operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -84,7 +86,8 @@ public class OperationDoesNotHaveApikitRouterTestCase extends AbstractCoreValida
                                                                  "<flow name=\"someFlow\">" +
                                                                  "    <apikit:router config-ref=\"router-config\" />" +
                                                                  "</flow>" +
-                                                                 XML_CLOSE).stream().findFirst();
+                                                                 XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -98,7 +101,8 @@ public class OperationDoesNotHaveApikitRouterTestCase extends AbstractCoreValida
                                                                  "        <apikit:router config-ref=\"router-config\" />" +
                                                                  "    </operation:body>" +
                                                                  "</operation:def>" +
-                                                                 XML_CLOSE).stream().findFirst();
+                                                                 XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(not(empty())));
     assertThat(msg.get().getMessage(),
                containsString("Usages of the component 'apikit:router' are not allowed inside a Mule SDK Operation Definition"));

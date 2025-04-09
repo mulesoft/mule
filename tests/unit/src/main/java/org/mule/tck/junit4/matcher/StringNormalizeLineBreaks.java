@@ -12,7 +12,7 @@ import org.hamcrest.TypeSafeMatcher;
 
 /**
  * A {@link Matcher<String>} that normalizes line-breaks on the {@link String} being matched.
- * 
+ *
  * For example, in Windows, the line-break character, configured in <code>System.getProperty("line.separator")</code> is "\r\n" ;
  * while on linux-based systems it's "\n".
  */

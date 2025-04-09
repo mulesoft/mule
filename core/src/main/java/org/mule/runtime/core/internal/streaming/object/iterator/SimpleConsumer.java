@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Basic implementation of {@link Consumer} that simply returns the objects returned by the underlying {@link Producer}
- * 
+ *
  * @since 3.5.0
  */
 public class SimpleConsumer<T> extends AbstractConsumer<T, T> {

@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * from <code>AbstractMessagingExceptionStrategy</code> (if you are creating a Messaging Exception Strategy) or
  * <code>AbstractSystemExceptionStrategy</code> (if you are creating a System Exception Strategy) rather than directly from this
  * class.
- * 
+ *
  * @deprecated Use either {@link AbstractDeclaredExceptionListener} or {@link DefaultExceptionListener}.
  */
 @NoExtend

@@ -31,7 +31,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 /**
  * Base class for populating constant bean definitions into a {@link Registry}.
- * 
+ *
  * @since 4.5
  */
 abstract class AbstractSpringMuleContextServiceConfigurator {

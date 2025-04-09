@@ -85,7 +85,7 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
         .thenReturn(bundleDescriptorLoaderMock);
     when(descriptorLoaderRepository.get(anyString(), ArgumentMatchers.any(),
                                         argThat(equalTo(ClassLoaderConfigurationLoader.class))))
-                                            .thenReturn(mock(ClassLoaderConfigurationLoader.class));
+        .thenReturn(mock(ClassLoaderConfigurationLoader.class));
 
     doNothing().when(artifactDescriptorValidator).validate(ArgumentMatchers.any());
 

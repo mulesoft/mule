@@ -75,7 +75,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Sets that system properties added to the JVM are considered in the hierarchy.
-   * 
+   *
    * @return this builder.
    */
   public ConfigurationPropertiesHierarchyBuilder withSystemProperties() {
@@ -85,7 +85,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Sets that environment properties (from OS) should be considered in the hierarchy.
-   * 
+   *
    * @return this builder.
    */
   public ConfigurationPropertiesHierarchyBuilder withEnvironmentProperties() {
@@ -95,7 +95,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Sets an external resource provider to get the file content to then use a File Configuration Property.
-   * 
+   *
    * @param resourceProvider the {@link ResourceProvider} to use to read the files to use when resolving a file-value property.
    * @return this builder.
    */
@@ -106,7 +106,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Sets an external resource provider classloader to get the file content to then use a File Configuration Property.
-   * 
+   *
    * @param classLoader the {@link ClassLoader} to use to read the files to use when resolving a file-value property.
    * @return this builder.
    * @since 4.8
@@ -120,7 +120,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
   /**
    * Sets a {@link ConfigurationPropertiesProvider} to use as application property, gotten from a custom provider (such as the
    * Secure Configuration Properties) or properties set with the configuration-properties tag.
-   * 
+   *
    * @param provider the {@link ConfigurationPropertiesProvider} to add to the hierarchy as Application Properties.
    * @return this builder.
    */
@@ -131,7 +131,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Creates and sets a {@link ConfigurationPropertiesProvider} to use as application property.
-   * 
+   *
    * @param artifactProperties the properties to add to the hierarchy as Application Properties.
    * @return this builder.
    */
@@ -142,7 +142,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Sets a supplier to retrieve the Global Properties from.
-   * 
+   *
    * @param globalPropertiesSupplier a {@link Supplier} of a {@link Map} of properties, to be used as Global/Default properties.
    * @return this builder.
    */
@@ -154,7 +154,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
   /**
    * Sets to consider the domain properties in the hierarchy, setting a previously resolved {@link ConfigurationProperty} to
    * reoslve.
-   * 
+   *
    * @param domainProperties the {@link ConfigurationProperties} previously generated for the domain, to be used in this
    *                         hierarchy.
    * @return this builder.
@@ -179,7 +179,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
   /**
    * Set that the {@link ConfigurationPropertiesResolver} to be built won't fail in case of resolving a property doesn't exist.
    * Instead of throwing a {@link PropertyNotFoundException}, it will return null.
-   * 
+   *
    * @return this builder.
    */
   public ConfigurationPropertiesHierarchyBuilder withoutFailuresIfPropertyNotPresent() {

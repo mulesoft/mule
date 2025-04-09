@@ -160,8 +160,8 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
           ? concat(Stream.of(classPath.split(pathSeparator)),
                    Stream.of(modulePath.split(pathSeparator)))
           : Stream.of(classPath.split(pathSeparator)))
-              .filter(StringUtils::isNotBlank)
-              .collect(toList());
+          .filter(StringUtils::isNotBlank)
+          .collect(toList());
 
       ClassLoader newClassLoader = new URLClassLoader(classPathEntries.stream().map(path -> {
         try {

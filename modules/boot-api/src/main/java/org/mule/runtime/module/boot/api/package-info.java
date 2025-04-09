@@ -7,7 +7,7 @@
 /**
  * This package defines the api for the launcher and server-plugins provided implementation. This is not intended to be used
  * outside of that context.
- * 
+ *
  * @since 4.6
  */
 package org.mule.runtime.module.boot.api;

@@ -70,7 +70,8 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   public ClasspathModuleDiscoverer(File temporaryFolder, String modulePropertiesResource) {
     this.serviceInterfaceToServiceFile =
         serviceInterface -> wrappingInIllegalStateException(() -> createTempFile(temporaryFolder.toPath(), serviceInterface,
-                                                                                 TMP_FOLDER_SUFFIX).toFile(),
+                                                                                 TMP_FOLDER_SUFFIX)
+            .toFile(),
                                                             serviceInterface);
     this.fileToResource =
         (serviceInterface, serviceFile) -> wrappingInIllegalStateException(() -> serviceFile.toURI().toURL(), serviceInterface);

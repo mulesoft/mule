@@ -51,11 +51,11 @@ public class ExtensionTypeWrapper<T> extends ComponentWrapper implements Extensi
                                      org.mule.sdk.api.annotation.Configurations.class,
                                      value -> value.getClassArrayValue(Configurations::value),
                                      value -> value.getClassArrayValue(org.mule.sdk.api.annotation.Configurations::value))
-                                         .map(types -> types.stream()
-                                             .map(type -> (ConfigurationElement) new ConfigurationWrapper(type.getDeclaringClass()
-                                                 .get(), typeLoader))
-                                             .collect(toList()))
-                                         .orElse(emptyList());
+        .map(types -> types.stream()
+            .map(type -> (ConfigurationElement) new ConfigurationWrapper(type.getDeclaringClass()
+                .get(), typeLoader))
+            .collect(toList()))
+        .orElse(emptyList());
   }
 
   /**

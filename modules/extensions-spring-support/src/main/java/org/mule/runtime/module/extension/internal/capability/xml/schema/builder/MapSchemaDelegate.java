@@ -96,7 +96,7 @@ final class MapSchemaDelegate {
        * element for the mule schema, or if it can only be declared as child of this element.
        *
        * If the map's value is another map, then a value attribute is created for the value map.
-       * 
+       *
        * @param objectType the item's type
        */
       @Override

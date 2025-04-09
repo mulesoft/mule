@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.routing.split;
 
 /**
  * An abstract implementation of a {@link MessageSequence}, that does not support {@link #remove()}
- * 
+ *
  * @author flbulgarelli
  * @param <PayloadType>
  */

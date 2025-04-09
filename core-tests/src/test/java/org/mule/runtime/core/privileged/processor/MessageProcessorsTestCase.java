@@ -288,7 +288,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                                 .from(applyWithChildContext(pub, eventPub -> Flux.from(eventPub)
                                                                     .contextWrite(ctx -> subscriberContextRecognizesChildContext(ctx)),
                                                                                             Optional.empty()))))
-                                                                                                .block();
+        .block();
 
     assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
     assertThat(completed.get(), is(true));
@@ -414,9 +414,9 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                   applyWithChildContextDontPropagateErrors(just(input), childWithStack,
                                                                                            Optional.empty()),
                                                   chain, Optional.empty()))
-                                                      .subscribe(e -> {
-                                                      },
-                                                                 handledError::set);
+        .subscribe(e -> {
+        },
+                   handledError::set);
 
     assertThat(handledError.get(), isA(MessagingException.class));
     assertThat(childFlowCallStack.get(), is(not(nullValue())));
@@ -493,7 +493,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                           pub -> applyWithChildContext(pub, eventPub -> eventPub,
                                                                                        Optional.empty()),
                                                           newChildContext(input, Optional.empty())))
-                                                              .block();
+        .block();
 
     assertThat(result, sameInstance(input));
   }
@@ -511,7 +511,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                                                 .handle(failWithExpected(expected)),
                                                                             Optional.empty())),
                                  newChildContext(input, Optional.empty())))
-                                     .block();
+        .block();
   }
 
   @Test
@@ -527,7 +527,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                                                                    .handle(failWithExpected(expected)),
                                                                                                Optional.empty())),
                                  newChildContext(input, Optional.empty())))
-                                     .block();
+        .block();
   }
 
   @Test
@@ -543,7 +543,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                                                    .handle(failWithExpected(expected)),
                                                                                Optional.empty())),
                                  newChildContext(input, Optional.empty())))
-                                     .block();
+        .block();
   }
 
   @Test
@@ -660,7 +660,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                                             Optional.empty()))
                                      .onErrorContinue(outerErrorConsumer),
                                  newChildContext(input, Optional.empty())))
-                                     .block();
+        .block();
   }
 
   private void nestedChildContextsProcessProcess(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,

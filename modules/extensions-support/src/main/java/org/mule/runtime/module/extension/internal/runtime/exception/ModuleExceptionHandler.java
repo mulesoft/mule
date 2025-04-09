@@ -140,7 +140,7 @@ public class ModuleExceptionHandler {
 
   /**
    * Suppresses MessagingExceptions if the {@link MuleRuntimeFeature#SUPPRESS_ERRORS} feature is enabled.
-   * 
+   *
    * @param throwable Throwable where the suppression will be done.
    * @return Throwable with the result of the suppression.
    * @see org.mule.runtime.api.exception.ExceptionHelper#suppressIfPresent

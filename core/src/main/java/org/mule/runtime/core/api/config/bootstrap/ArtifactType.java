@@ -16,7 +16,7 @@ import java.util.Set;
  * List the possible types of deployable artifacts
  *
  * @since 3.7.0
- * 
+ *
  * @deprecated Since 4.9 use {@link org.mule.runtime.api.artifact.ArtifactType} instead.
  */
 @Deprecated(since = "4.9")

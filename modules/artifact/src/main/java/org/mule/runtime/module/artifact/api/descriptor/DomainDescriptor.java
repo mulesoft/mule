@@ -16,7 +16,7 @@ import java.util.Set;
 
 /**
  * Represents the description of a domain.
- * 
+ *
  * @since 4.5
  */
 @NoExtend

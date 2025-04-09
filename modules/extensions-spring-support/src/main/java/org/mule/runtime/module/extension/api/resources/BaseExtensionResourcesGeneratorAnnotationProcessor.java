@@ -226,7 +226,7 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   private List<GeneratedResourceFactory> fetchResourceFactories() {
     return unmodifiableList(concat(loadGeneratedResourceFactories(),
                                    loadDslResourceFactories())
-                                       .collect(toList()));
+        .collect(toList()));
   }
 
   /**

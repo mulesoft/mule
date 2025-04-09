@@ -7,7 +7,7 @@
 
 /**
  * Mule Runtime Manifest.
- * 
+ *
  * @moduleGraph
  * @since 1.9
  */

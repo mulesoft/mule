@@ -170,13 +170,13 @@ public final class TestArtifactsCatalog extends ExternalResource {
     barUtils1_0JarFile = new JarFileBuilder("barUtils1",
                                             new JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java"))
                                                 .compile("bar-1.0.jar"))
-                                                    .getArtifactFile();
+        .getArtifactFile();
 
     barUtils2ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar2/BarUtils.java"));
     barUtils2_0JarFile =
         new JarFileBuilder("barUtils2",
                            new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar"))
-                               .getArtifactFile();
+            .getArtifactFile();
 
     barUtilsJavaxClassFile =
         new SingleClassCompiler().compile(getResourceFile("/packagetesting/javax/annotation/BarUtils.java"));

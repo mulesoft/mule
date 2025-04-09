@@ -19,7 +19,7 @@ import java.io.File;
  * Provides a way to obtain a {@link MuleDeployableModel} serialized in a JSON file.
  *
  * @param <M> the concrete type of model (application or model) to resolve.
- * 
+ *
  * @since 4.5
  */
 public interface ArtifactModelResolver<M extends MuleDeployableModel> {
@@ -40,7 +40,7 @@ public interface ArtifactModelResolver<M extends MuleDeployableModel> {
 
   /**
    * Loads and deserializes a {@code mule-artifact.json} file.
-   * 
+   *
    * @param artifactLocation the folder containing the {@code mule-artifact.json} file to deserialize.
    * @return the deserialized {@link MuleDeployableModel}.
    */

@@ -102,7 +102,7 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
         .openCursor(),
                                              Spliterator.ORDERED),
                       false)
-                          .collect(toList()),
+        .collect(toList()),
                equalTo(data));
     assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(List.class)));
     assertThat(event.getMessage().getPayload().getValue(), equalTo(data));

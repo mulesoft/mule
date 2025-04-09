@@ -241,7 +241,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     ExtendedExpressionManager expressionLanguage = mock(ExtendedExpressionManager.class);
     when(expressionLanguage.parseLogTemplate(anyString(), any(CoreEvent.class), eq(((Component) flow).getLocation()), any(
                                                                                                                           BindingContext.class)))
-                                                                                                                              .thenReturn("text to log");
+        .thenReturn("text to log");
     return expressionLanguage;
   }
 

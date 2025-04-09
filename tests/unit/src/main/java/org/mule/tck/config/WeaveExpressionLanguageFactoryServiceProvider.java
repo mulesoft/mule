@@ -17,7 +17,7 @@ import java.util.Iterator;
 
 /**
  * Provides a way to override how the {@link DefaultExpressionLanguageFactoryService} for DataWeave to use in tests is obtained.
- * 
+ *
  * @since 4.5
  */
 public interface WeaveExpressionLanguageFactoryServiceProvider {
@@ -25,7 +25,8 @@ public interface WeaveExpressionLanguageFactoryServiceProvider {
   public static DefaultExpressionLanguageFactoryService provideDefaultExpressionLanguageFactoryService() {
     final Iterator<WeaveExpressionLanguageFactoryServiceProvider> iterator =
         load(WeaveExpressionLanguageFactoryServiceProvider.class,
-             WeaveExpressionLanguageFactoryServiceProvider.class.getClassLoader()).iterator();
+             WeaveExpressionLanguageFactoryServiceProvider.class.getClassLoader())
+            .iterator();
 
     if (iterator.hasNext()) {
       return iterator.next().createDefaultExpressionLanguageFactoryService();
@@ -37,7 +38,8 @@ public interface WeaveExpressionLanguageFactoryServiceProvider {
   public static ExpressionLanguageMetadataService provideExpressionLanguageMetadataService() {
     final Iterator<WeaveExpressionLanguageFactoryServiceProvider> iterator =
         load(WeaveExpressionLanguageFactoryServiceProvider.class,
-             WeaveExpressionLanguageFactoryServiceProvider.class.getClassLoader()).iterator();
+             WeaveExpressionLanguageFactoryServiceProvider.class.getClassLoader())
+            .iterator();
 
     if (iterator.hasNext()) {
       return iterator.next().createExpressionLanguageMetadataService();

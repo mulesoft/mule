@@ -134,16 +134,16 @@ public class CustomStaticTypeUtils {
                                       .getStringValue(AttributesXmlType::schema),
                                                                                     outputXmlTypeAnnotationValueFetcher
                                                                                         .getStringValue(AttributesXmlType::qname))
-                                                                                            .map(type -> resolveType(type,
-                                                                                                                     outputType))
-                                                                                            .orElse(null),
+                                      .map(type -> resolveType(type,
+                                                               outputType))
+                                      .orElse(null),
                                   outputXmlTypeAnnotationValueFetcher -> getXmlType(outputXmlTypeAnnotationValueFetcher
                                       .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.AttributesXmlType::schema),
                                                                                     outputXmlTypeAnnotationValueFetcher
                                                                                         .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.AttributesXmlType::qname))
-                                                                                            .map(type -> resolveType(type,
-                                                                                                                     outputType))
-                                                                                            .orElse(null));
+                                      .map(type -> resolveType(type,
+                                                               outputType))
+                                      .orElse(null));
 
     if (result.isPresent()) {
       return result;
@@ -153,10 +153,10 @@ public class CustomStaticTypeUtils {
                                        org.mule.sdk.api.annotation.metadata.fixed.AttributesJsonType.class,
                                        outputJsonTypeAnnotationValueFetcher -> getJsonType(outputJsonTypeAnnotationValueFetcher
                                            .getStringValue(AttributesJsonType::schema))
-                                               .map(type -> resolveType(type, outputType)).orElse(null),
+                                           .map(type -> resolveType(type, outputType)).orElse(null),
                                        outputJsonTypeAnnotationValueFetcher -> getJsonType(outputJsonTypeAnnotationValueFetcher
                                            .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.AttributesJsonType::schema))
-                                               .map(type -> resolveType(type, outputType)).orElse(null));
+                                           .map(type -> resolveType(type, outputType)).orElse(null));
 
     if (result.isPresent()) {
       return result;
@@ -226,16 +226,16 @@ public class CustomStaticTypeUtils {
                                       .getStringValue(OutputXmlType::schema),
                                                                                     outputXmlTypeAnnotationValueFetcher
                                                                                         .getStringValue(OutputXmlType::qname))
-                                                                                            .map(type -> resolveType(type,
-                                                                                                                     outputType))
-                                                                                            .orElse(null),
+                                      .map(type -> resolveType(type,
+                                                               outputType))
+                                      .orElse(null),
                                   outputXmlTypeAnnotationValueFetcher -> getXmlType(outputXmlTypeAnnotationValueFetcher
                                       .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.OutputXmlType::schema),
                                                                                     outputXmlTypeAnnotationValueFetcher
                                                                                         .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.OutputXmlType::qname))
-                                                                                            .map(type -> resolveType(type,
-                                                                                                                     outputType))
-                                                                                            .orElse(null));
+                                      .map(type -> resolveType(type,
+                                                               outputType))
+                                      .orElse(null));
 
     if (result.isPresent()) {
       return result;
@@ -245,10 +245,10 @@ public class CustomStaticTypeUtils {
                                        org.mule.sdk.api.annotation.metadata.fixed.OutputJsonType.class,
                                        outputJsonTypeAnnotationValueFetcher -> getJsonType(outputJsonTypeAnnotationValueFetcher
                                            .getStringValue(OutputJsonType::schema))
-                                               .map(type -> resolveType(type, outputType)).orElse(null),
+                                           .map(type -> resolveType(type, outputType)).orElse(null),
                                        outputJsonTypeAnnotationValueFetcher -> getJsonType(outputJsonTypeAnnotationValueFetcher
                                            .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.OutputJsonType::schema))
-                                               .map(type -> resolveType(type, outputType)).orElse(null));
+                                           .map(type -> resolveType(type, outputType)).orElse(null));
 
     if (result.isPresent()) {
       return result;
@@ -318,16 +318,16 @@ public class CustomStaticTypeUtils {
                                       .getStringValue(InputXmlType::schema),
                                                                                     outputXmlTypeAnnotationValueFetcher
                                                                                         .getStringValue(InputXmlType::qname))
-                                                                                            .map(type -> resolveType(type,
-                                                                                                                     outputType))
-                                                                                            .orElse(null),
+                                      .map(type -> resolveType(type,
+                                                               outputType))
+                                      .orElse(null),
                                   outputXmlTypeAnnotationValueFetcher -> getXmlType(outputXmlTypeAnnotationValueFetcher
                                       .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.InputXmlType::schema),
                                                                                     outputXmlTypeAnnotationValueFetcher
                                                                                         .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.InputXmlType::qname))
-                                                                                            .map(type -> resolveType(type,
-                                                                                                                     outputType))
-                                                                                            .orElse(null));
+                                      .map(type -> resolveType(type,
+                                                               outputType))
+                                      .orElse(null));
 
     if (result.isPresent()) {
       return result;
@@ -337,10 +337,10 @@ public class CustomStaticTypeUtils {
                                        org.mule.sdk.api.annotation.metadata.fixed.InputJsonType.class,
                                        outputJsonTypeAnnotationValueFetcher -> getJsonType(outputJsonTypeAnnotationValueFetcher
                                            .getStringValue(InputJsonType::schema))
-                                               .map(type -> resolveType(type, outputType)).orElse(null),
+                                           .map(type -> resolveType(type, outputType)).orElse(null),
                                        outputJsonTypeAnnotationValueFetcher -> getJsonType(outputJsonTypeAnnotationValueFetcher
                                            .getStringValue(org.mule.sdk.api.annotation.metadata.fixed.InputJsonType::schema))
-                                               .map(type -> resolveType(type, outputType)).orElse(null));
+                                           .map(type -> resolveType(type, outputType)).orElse(null));
 
     if (result.isPresent()) {
       return result;

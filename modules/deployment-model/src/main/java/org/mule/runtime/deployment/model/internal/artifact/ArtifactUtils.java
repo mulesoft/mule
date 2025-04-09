@@ -12,7 +12,7 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
 /**
  * Helper methods for artifacts.
- * 
+ *
  * @since 4.1
  */
 public class ArtifactUtils {

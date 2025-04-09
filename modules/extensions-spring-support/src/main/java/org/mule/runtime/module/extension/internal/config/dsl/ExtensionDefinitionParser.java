@@ -416,8 +416,9 @@ public abstract class ExtensionDefinitionParser {
           try {
             parsingContext.registerObjectType(valueChild.getElementName(), valueChild.getPrefix(), objectType);
             new ObjectTypeParameterParser(definitionBuilder, objectType, getContextClassLoader(), dslResolver,
-                                          parsingContext, of(typeLoader)).parse()
-                                              .forEach(definition -> addDefinition(definition));
+                                          parsingContext, of(typeLoader))
+                .parse()
+                .forEach(definition -> addDefinition(definition));
           } catch (ConfigurationException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not create parser for map complex type"), e);
           }
@@ -655,8 +656,9 @@ public abstract class ExtensionDefinitionParser {
             try {
               parsingContext.registerObjectType(itemDsl.getElementName(), itemDsl.getPrefix(), objectType);
               new ObjectTypeParameterParser(definitionBuilder, objectType, getContextClassLoader(), dslResolver,
-                                            parsingContext, of(typeLoader)).parse()
-                                                .forEach(definition -> addDefinition(definition));
+                                            parsingContext, of(typeLoader))
+                  .parse()
+                  .forEach(definition -> addDefinition(definition));
             } catch (ConfigurationException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not create parser for collection complex type"), e);
             }
@@ -814,8 +816,9 @@ public abstract class ExtensionDefinitionParser {
         modelProperties.stream().noneMatch(m -> m.getName().equals(InfrastructureParameterModelProperty.NAME))) {
       try {
         new ObjectTypeParameterParser(definitionBuilder, elementName, elementNamespace, type, getContextClassLoader(),
-                                      dslResolver, parsingContext, of(typeLoader)).parse()
-                                          .forEach(this::addDefinition);
+                                      dslResolver, parsingContext, of(typeLoader))
+            .parse()
+            .forEach(this::addDefinition);
       } catch (Exception e) {
         throw new MuleRuntimeException(new ConfigurationException(e));
       }
@@ -879,8 +882,9 @@ public abstract class ExtensionDefinitionParser {
 
     try {
       new RouteComponentParser(definitionBuilder, routeModel, metadataType, getContextClassLoader(), routeDsl,
-                               dslResolver, parsingContext, of(typeLoader)).parse()
-                                   .forEach(this::addDefinition);
+                               dslResolver, parsingContext, of(typeLoader))
+          .parse()
+          .forEach(this::addDefinition);
     } catch (Exception e) {
       throw new MuleRuntimeException(new ConfigurationException(e));
     }
@@ -909,8 +913,9 @@ public abstract class ExtensionDefinitionParser {
                    new DefaultObjectParsingDelegate().parse("", null, dslElementSyntax));
       new TypedInlineParameterGroupParser(definitionBuilder, group, descriptor, getContextClassLoader(),
                                           dslElementSyntax,
-                                          dslResolver, parsingContext, of(typeLoader)).parse()
-                                              .forEach(this::addDefinition);
+                                          dslResolver, parsingContext, of(typeLoader))
+          .parse()
+          .forEach(this::addDefinition);
     } else {
       AttributeDefinition.Builder builder = fromChildConfiguration(Map.class);
       if (dslElementSyntax.isWrapped()) {
@@ -920,8 +925,9 @@ public abstract class ExtensionDefinitionParser {
       }
       addParameter(getChildKey(group.getName()), builder);
       new AnonymousInlineParameterGroupParser(definitionBuilder, group, getContextClassLoader(), dslElementSyntax,
-                                              dslResolver, parsingContext, of(typeLoader)).parse()
-                                                  .forEach(this::addDefinition);
+                                              dslResolver, parsingContext, of(typeLoader))
+          .parse()
+          .forEach(this::addDefinition);
     }
   }
 

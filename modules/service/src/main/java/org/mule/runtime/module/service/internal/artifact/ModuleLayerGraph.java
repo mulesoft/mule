@@ -25,7 +25,7 @@ import java.util.Set;
 
 /**
  * Graph that generates a string representation of the {@link ModuleLayer}s' hierarchy.
- * 
+ *
  * @since 4.6
  */
 public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
@@ -42,7 +42,7 @@ public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
 
   /**
    * Adds the id for a given Layer to use in the string representation.
-   * 
+   *
    * @param layer the ModuleLayer to set the id to.
    * @param id
    */

@@ -100,7 +100,8 @@ public abstract class AbstractCoreValidationTestCase {
             // nothing to do
           }
         }.loadExtensionModel(extensionDeclarer, builder(AbstractCoreValidationTestCase.class.getClassLoader(),
-                                                        nullDslResolvingContext()).build()))
+                                                        nullDslResolvingContext())
+            .build()))
         .withSchemaValidationsDisabled()
         .build();
   }

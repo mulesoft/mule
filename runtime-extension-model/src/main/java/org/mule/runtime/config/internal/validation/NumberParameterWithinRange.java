@@ -93,9 +93,9 @@ public class NumberParameterWithinRange implements Validation {
             return Optional.<ValidationResultItem>empty();
           }
         }))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(toList());
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(toList());
   }
 
   private boolean numberOffRange(ParameterModel paramModel, ComponentParameterAst paramAst) {

@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * A {@link Processor} that supports annotations.
- * 
+ *
  * @since 4.0
  */
 @NoImplement

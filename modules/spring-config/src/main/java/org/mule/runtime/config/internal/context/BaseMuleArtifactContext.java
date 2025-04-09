@@ -34,7 +34,7 @@ import org.springframework.context.support.AbstractRefreshableConfigApplicationC
 
 /**
  * Spring context specialization that contains just some standard constant beans for every Mule deployable artifact.
- * 
+ *
  * @since 4.5
  */
 public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicationContext {
@@ -99,7 +99,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
                                                  serviceDiscoverer,
                                                  originalRegistry,
                                                  enableLazyInit)
-                                                     .createArtifactServices();
+        .createArtifactServices();
   }
 
   private void registerInjectorProcessor(ConfigurableListableBeanFactory beanFactory) {

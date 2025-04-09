@@ -40,7 +40,7 @@ public class DefaultComponentBuildingDefinitionRegistryFactory implements Compon
     if (extensionModels != null) {
       getExtensionModelsComponentBuildingDefinitions(extensionModels, DslResolvingContext.getDefault(extensionModels),
                                                      dslSyntaxResolverLookup)
-                                                         .forEach(registry::register);
+          .forEach(registry::register);
     }
 
     for (ClassLoader pluginArtifactClassLoader : resolveContextArtifactPluginClassLoaders()) {

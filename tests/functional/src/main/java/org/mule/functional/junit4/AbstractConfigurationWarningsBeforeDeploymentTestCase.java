@@ -37,7 +37,7 @@ import org.junit.Before;
 /**
  * Base class for tests that verify the Artifact AST validations before deployment (packaging, design time, ...), where the system
  * properties or environment properties of the runtime environment are not available, but it may be referenced by the artifact.
- * 
+ *
  * @since 4.5
  */
 public abstract class AbstractConfigurationWarningsBeforeDeploymentTestCase extends AbstractConfigurationFailuresTestCase {

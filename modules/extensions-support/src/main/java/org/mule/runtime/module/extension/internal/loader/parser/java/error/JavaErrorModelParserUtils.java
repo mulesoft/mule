@@ -73,7 +73,7 @@ public final class JavaErrorModelParserUtils {
                                                                         extensionNamespace),
                                      value -> parseErrorTypeDefinitions(value
                                          .getClassValue(org.mule.sdk.api.annotation.error.ErrorTypes::value), extensionNamespace))
-                                             .orElse(new LinkedList<>());
+        .orElse(new LinkedList<>());
   }
 
   /**

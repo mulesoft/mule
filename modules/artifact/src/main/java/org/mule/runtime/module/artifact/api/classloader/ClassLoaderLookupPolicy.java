@@ -58,7 +58,7 @@ public interface ClassLoaderLookupPolicy {
    * @param lookupStrategy lookup strategies to use with the provided packages. Non null.
    * @return a new policy containing the lookup strategies from the original policy and the lookup strategies passed on the
    *         parameter.
-   * 
+   *
    * @since 4.5
    */
   ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy);
@@ -85,7 +85,7 @@ public interface ClassLoaderLookupPolicy {
    *                       it will be overridden or not depending on this value.
    * @return a new policy containing the lookup strategies from the original policy and the lookup strategies passed on the
    *         parameter.
-   * 
+   *
    * @since 4.5
    */
   ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite);

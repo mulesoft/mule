@@ -21,7 +21,7 @@ public interface ExtensionModelGenerator {
 
   /**
    * Generate the {@link ExtensionModel} for the artifact with the given {@code artifactPluginDescriptor}.
-   * 
+   *
    * @param discoveryRequest         the request that triggered the generation of this {@link ExtensionModel}.
    * @param artifactPluginDescriptor the descriptor of the plugin to generate the {@link ExtensionModel} for.
    * @param dependencies             the {@link ExtensionModel}s for the dependencies of {@code artifactPluginDescriptor}.

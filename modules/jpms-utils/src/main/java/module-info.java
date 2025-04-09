@@ -6,7 +6,7 @@
  */
 /**
  * This module provides JMPS utilities for use within the Mule Runtime.
- * 
+ *
  * @moduleGraph
  * @since 1.5
  */

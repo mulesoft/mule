@@ -12,7 +12,7 @@ import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 
 /**
  * Utils to allow test-runner to use the module discovery mechanism for the Mule container.
- * 
+ *
  * @since 4.6
  */
 public final class ContainerDiscovererHelper {

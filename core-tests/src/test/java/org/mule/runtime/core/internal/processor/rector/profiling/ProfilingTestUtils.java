@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * Utils for testing profiling.
- * 
+ *
  * @since 4.5.0
  */
 public class ProfilingTestUtils {

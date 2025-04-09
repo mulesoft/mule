@@ -84,7 +84,7 @@ public class TestConnectorConfig {
 
   /**
    * Count the number of outstanding {@link CoreEvent} in a queue.
-   * 
+   *
    * @param queueName name of the queue from which to count messages. Non empty
    * @return
    */

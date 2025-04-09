@@ -76,7 +76,7 @@ public final class ExtensionAnnotationProcessor {
 
   /**
    * Returns the name of the class represented by the {@code typeElement}
-   * 
+   *
    * @param typeElement           a {@link TypeElement}
    * @param processingEnvironment the {@link ProcessingEnvironment}
    * @return A class name

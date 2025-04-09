@@ -164,13 +164,13 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
                               org.mule.sdk.api.annotation.connectivity.oauth.AuthorizationCode.class,
                               this::getAuthorizationCodeGrantType,
                               this::getAuthorizationCodeGrantTypeFromSdk)
-                                  .ifPresent(grantTypes::add);
+        .ifPresent(grantTypes::add);
 
     mapReduceSingleAnnotation(element, CONNECTION_PROVIDER_NAME, element.getName(), ClientCredentials.class,
                               org.mule.sdk.api.annotation.connectivity.oauth.ClientCredentials.class,
                               this::getClientCredentialsGrantType,
                               this::getClientCredentialsGrantTypeFromSdk)
-                                  .ifPresent(grantTypes::add);
+        .ifPresent(grantTypes::add);
 
     return grantTypes.isEmpty() ? empty() : of(new OAuthModelProperty(grantTypes));
   }

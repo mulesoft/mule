@@ -45,7 +45,7 @@ public interface InternalMessage extends Message {
    * and Mule error code, plus any other related info
    *
    * @return The exception payload (if any) attached to this message
-   * 
+   *
    * @deprecated This field is no longer populated
    */
   @Deprecated
@@ -92,7 +92,7 @@ public interface InternalMessage extends Message {
     /**
      * @param exceptionPayload
      * @return this builder.
-     * 
+     *
      * @deprecated This field is no longer populated
      */
     @Deprecated

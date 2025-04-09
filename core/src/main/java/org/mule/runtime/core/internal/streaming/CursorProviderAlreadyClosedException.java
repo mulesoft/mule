@@ -20,7 +20,7 @@ import org.mule.runtime.api.streaming.CursorProvider;
 /**
  * This {@link RuntimeException} is thrown when it is trying to open a closed {@link CursorProvider}. It can contain optionally
  * the {@link ComponentLocation} where the Cursor was created.
- * 
+ *
  * @since 4.3.0
  */
 public class CursorProviderAlreadyClosedException extends RuntimeException {

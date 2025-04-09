@@ -54,7 +54,7 @@ public class NameHasValidCharactersTestCase extends AbstractCoreValidationTestCa
                                                                  "    </flow>\n" +
                                                                  "\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Invalid global element name 'flow/myFlow'. Problem is: Invalid character used in location. Invalid characters are /,[,],{,},#"));
@@ -81,7 +81,7 @@ public class NameHasValidCharactersTestCase extends AbstractCoreValidationTestCa
                                                                  "    </flow>\n" +
                                                                  "\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Invalid global element name '${someProperty}'. Problem is: Invalid character used in location. Invalid characters are /,[,],{,},#"));

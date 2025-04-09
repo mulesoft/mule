@@ -54,7 +54,8 @@ public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreVali
   @Description("Checks that no validation message is returned if there is no operation")
   public void withoutOperation() {
     final Optional<ValidationResultItem> msg = runValidation("OperationDoesNotHaveCoreRaiseErrorTestCase#withoutOperation",
-                                                             XML_NAMESPACE_DEF + XML_CLOSE).stream().findFirst();
+                                                             XML_NAMESPACE_DEF + XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -65,7 +66,8 @@ public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreVali
                                                              XML_NAMESPACE_DEF +
                                                                  "<operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/></operation:body></operation:def>"
                                                                  +
-                                                                 XML_CLOSE).stream().findFirst();
+                                                                 XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -78,7 +80,8 @@ public class OperationDoesNotHaveCoreRaiseErrorTestCase extends AbstractCoreVali
                                                                  +
                                                                  "    <raise-error type=\"APP:SOME\"/>" +
                                                                  "</operation:body></operation:def>" +
-                                                                 XML_CLOSE).stream().findFirst();
+                                                                 XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(not(empty())));
     assertThat(msg.get().getMessage(),
                containsString("Usages of the component 'raise-error' are not allowed inside a Mule SDK Operation Definition"));

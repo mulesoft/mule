@@ -69,8 +69,8 @@ public class CompilerUtils {
         ? concat(Stream.of(classPath.split(PATH_SEPARATOR)),
                  Stream.of(modulePath.split(PATH_SEPARATOR)))
         : Stream.of(classPath.split(PATH_SEPARATOR)))
-            .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
-            .collect(toList());
+        .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+        .collect(toList());
   }
 
   /**
@@ -482,7 +482,7 @@ public class CompilerUtils {
                 // skip armeria libs that causes a split package with reactor
                 .filter(cpe -> !cpe.contains("armeria")),
                    Stream.of(jarFiles).map(File::getAbsolutePath))
-                       .collect(joining(PATH_SEPARATOR));
+                .collect(joining(PATH_SEPARATOR));
       } else {
         fullClassPath = CLASS_PATH_ENTRIES.stream()
             .collect(joining(PATH_SEPARATOR));

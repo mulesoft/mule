@@ -51,8 +51,8 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
     this(descriptorLoaderClass -> {
       return stream(((Iterable) () -> load(descriptorLoaderClass,
                                            ServiceRegistryDescriptorLoaderRepository.class.getClassLoader())
-                                               .iterator())
-                                                   .spliterator(),
+          .iterator())
+          .spliterator(),
                     false);
     });
   }

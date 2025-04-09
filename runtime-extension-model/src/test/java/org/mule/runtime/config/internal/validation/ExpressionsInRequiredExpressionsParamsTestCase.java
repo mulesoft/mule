@@ -41,7 +41,7 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
                                                                  +
                                                                  "\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.isPresent(), is(true));
     assertThat(msg.get().getMessage(),
@@ -65,7 +65,7 @@ public class ExpressionsInRequiredExpressionsParamsTestCase extends AbstractCore
                           "    </flow>\n" +
                           "\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.isPresent(), is(false));
   }

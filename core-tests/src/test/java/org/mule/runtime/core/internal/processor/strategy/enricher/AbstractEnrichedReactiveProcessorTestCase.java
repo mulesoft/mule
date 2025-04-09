@@ -14,7 +14,7 @@ import reactor.test.StepVerifier;
 
 /**
  * General test logic for an enriched {@link ReactiveProcessor}
- * 
+ *
  * @since 4.4.0
  */
 public class AbstractEnrichedReactiveProcessorTestCase {

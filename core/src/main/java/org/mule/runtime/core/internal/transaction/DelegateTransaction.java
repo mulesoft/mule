@@ -33,9 +33,10 @@ public class DelegateTransaction extends AbstractTransaction {
 
   static {
     TX_FACTORY = stream(load(TransactionFactory.class,
-                             DelegateTransaction.class.getClassLoader()).spliterator(),
+                             DelegateTransaction.class.getClassLoader())
+        .spliterator(),
                         false)
-                            .findFirst();
+        .findFirst();
   }
 
   private SuspendableTransaction delegate = new NullTransaction();

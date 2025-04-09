@@ -157,7 +157,8 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
         // nothing to do
       }
     }.loadExtensionModel(extensionDeclarer, builder(currentThread().getContextClassLoader(),
-                                                    nullDslResolvingContext()).build());
+                                                    nullDslResolvingContext())
+        .build());
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {

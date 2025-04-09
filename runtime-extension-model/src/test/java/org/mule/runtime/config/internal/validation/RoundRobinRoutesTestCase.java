@@ -53,7 +53,7 @@ public class RoundRobinRoutesTestCase extends AbstractCoreValidationTestCase {
                                                                  "    </flow>\n" +
                                                                  "    \n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getValidation().getLevel(), is(WARN));
     assertThat(msg.get().getMessage(),

@@ -52,7 +52,7 @@ public class FlowRefPointsToExistingFlowTestCase extends AbstractCoreValidationT
                                                                  "        <flow-ref name=\"sub-flow-name\" />\n" +
                                                                  "    </flow>\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getMessage(), containsString("'flow-ref' is pointing to 'sub-flow-name' which does not exist"));
   }
@@ -70,7 +70,7 @@ public class FlowRefPointsToExistingFlowTestCase extends AbstractCoreValidationT
                                                                  "        <flow-ref name=\"#['sub-flow-name']\" />\n" +
                                                                  "    </flow>\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg, is(empty()));
   }

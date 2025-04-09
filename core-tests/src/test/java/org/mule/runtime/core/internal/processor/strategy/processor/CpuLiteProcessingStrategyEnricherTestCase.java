@@ -75,7 +75,7 @@ public class CpuLiteProcessingStrategyEnricherTestCase extends AbstractEnrichedR
     ReactiveProcessor transform =
         new CpuLiteAsyncNonBlockingProcessingStrategyEnricher(() -> scheduler, () -> scheduler, profilingService, ARTIFACT_ID,
                                                               ARTIFACT_TYPE)
-                                                                  .enrich(reactiveProcessor);
+            .enrich(reactiveProcessor);
 
     createAndExecuteEnrichedTransformer(transform, coreEvent);
 

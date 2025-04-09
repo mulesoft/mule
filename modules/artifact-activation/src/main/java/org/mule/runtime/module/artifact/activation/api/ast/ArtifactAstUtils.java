@@ -98,7 +98,7 @@ public final class ArtifactAstUtils {
    * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
-   * 
+   *
    * @since 4.8
    * @deprecated Use
    *             {@link #parseAndBuildAppExtensionModel(String, String[], AstXmlParserSupplier, Set, boolean, ClassLoader, MuleConfiguration, ExpressionLanguageMetadataService)}
@@ -138,7 +138,7 @@ public final class ArtifactAstUtils {
    * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
-   * 
+   *
    * @since 4.9
    */
   public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
@@ -179,7 +179,7 @@ public final class ArtifactAstUtils {
    * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
-   * 
+   *
    * @since 4.10
    */
   public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
@@ -221,7 +221,7 @@ public final class ArtifactAstUtils {
    * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
-   * 
+   *
    * @since 4.9
    */
   public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
@@ -262,7 +262,7 @@ public final class ArtifactAstUtils {
    * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
-   * 
+   *
    * @since 4.8
    * @deprecated Use
    *             {@link #parseAndBuildAppExtensionModel(String, Map, AstXmlParserSupplier, Set, boolean, ClassLoader, MuleConfiguration, ExpressionLanguageMetadataService)}
@@ -302,7 +302,7 @@ public final class ArtifactAstUtils {
    * @param expressionLanguageMetadataService the {@link ExpressionLanguageMetadataService} used to resolve types.
    * @return an {@link ArtifactAst}
    * @throws ConfigurationException it the app couldn't be parsed
-   * 
+   *
    * @since 4.9
    */
   public static ArtifactAst parseAndBuildAppExtensionModel(String artifactName,
@@ -370,7 +370,7 @@ public final class ArtifactAstUtils {
       throws ConfigurationException {
     return getExtensionModelLoadingMediator(muleConfiguration.getId(), muleConfiguration.getArtifactCoordinates(),
                                             expressionLanguageMetadataService)
-                                                .loadExtensionModel(ast, artifactClassLoader, extensionManager.getExtensions());
+        .loadExtensionModel(ast, artifactClassLoader, extensionManager.getExtensions());
   }
 
   private static MuleSdkExtensionModelLoadingMediator getExtensionModelLoadingMediator(String artifactId,

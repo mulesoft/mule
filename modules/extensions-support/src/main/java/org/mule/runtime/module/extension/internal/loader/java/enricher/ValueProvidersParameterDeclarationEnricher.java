@@ -414,9 +414,9 @@ public class ValueProvidersParameterDeclarationEnricher implements WalkingDeclar
                                                                                                                                                       .getName(),
                                                                                                                                                   org.mule.sdk.api.annotation.values.ValuePart.class
                                                                                                                                                       .getName())))
-                                                                                                                                                          .ifPresent(order -> parts
-                                                                                                                                                              .put(param,
-                                                                                                                                                                   order))));
+                .ifPresent(order -> parts
+                    .put(param,
+                         order))));
 
     return parts;
   }

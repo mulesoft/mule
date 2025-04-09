@@ -45,7 +45,7 @@ public abstract class AbstractReferenceParametersStereotypesValidations implemen
 
   /**
    * Determine whether this dependency must be analyzed or not.
-   * 
+   *
    * @param missingDependency the dependency to analyze
    * @return {@code true} if this dependency must be analyzed, {@code false} if not.
    */

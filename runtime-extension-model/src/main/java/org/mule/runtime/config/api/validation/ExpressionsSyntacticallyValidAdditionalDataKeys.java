@@ -10,7 +10,7 @@ import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
 /**
  * Provides constants for the keys of {@link ValidationResultItem#getAdditionalData()} for validation results for expressions.
- * 
+ *
  * @since 4.5
  */
 public interface ExpressionsSyntacticallyValidAdditionalDataKeys {

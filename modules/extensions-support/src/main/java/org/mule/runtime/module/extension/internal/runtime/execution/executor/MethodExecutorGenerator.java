@@ -221,7 +221,7 @@ public class MethodExecutorGenerator {
               .getInstrumentedType()
               .getDeclaredFields()
               .filter(named(TARGET_INSTANCE_FIELD_NAME)).getOnly())
-                  .write());
+              .write());
 
           for (int i = 0; i < method.getParameterTypes().length; ++i) {
             stackManipulationItems.add(MethodVariableAccess.REFERENCE.loadFrom(0));
@@ -231,7 +231,7 @@ public class MethodExecutorGenerator {
                 .getDeclaredFields()
                 .filter(named(getParameterFieldName(method.getParameters()[i])))
                 .getOnly())
-                    .write());
+                .write());
           }
 
           stackManipulationItems.add(VOID);

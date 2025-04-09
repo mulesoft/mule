@@ -54,7 +54,7 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
 
   /**
    * Loads the class with the specified <a href="#name">binary name</a> if defined on this class loader.
-   * 
+   *
    * @param name The <a href="#name">binary name</a> of the class
    * @return The resulting <tt>Class</tt> object
    * @throws ClassNotFoundException If the class was not found
@@ -89,7 +89,7 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
    *
    * public void doSomething(ArtifactClassLoader acl) { doSomething2(acl); //this requires an ArtifactClassLoader
    * doSomething3(acl.getDomainClassLoader()); //this requires a ClassLoader }
-   * 
+   *
    * @return class loader to use for this artifact.
    */
   ClassLoader getClassLoader();
@@ -102,7 +102,7 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
 
   /**
    * Sets the {@link ModuleLayerInformationSupplier} for this ClassLoader.
-   * 
+   *
    * @since 4.6.
    */
   void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier);

@@ -92,7 +92,8 @@ public class ProcessorChainExecutorTestCase extends AbstractMuleContextTestCase 
   public void testDoProcessOnErrorMessagingException() throws InterruptedException, MuleException {
     final String ERROR_PAYLOAD = "ERROR_PAYLOAD";
     doReturn(error(new MessagingException(createStaticMessage(""),
-                                          getEventBuilder().message(of(ERROR_PAYLOAD)).build()))).when(chain).apply(any());
+                                          getEventBuilder().message(of(ERROR_PAYLOAD)).build())))
+        .when(chain).apply(any());
     ImmutableProcessorChainExecutor chainExecutor =
         new ImmutableProcessorChainExecutor(mock(StreamingManager.class), coreEvent, chain);
 

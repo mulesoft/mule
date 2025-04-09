@@ -112,7 +112,7 @@ public class MulePluginDescriptorGenerator implements GeneratedResourceFactory, 
 
   /**
    * Prevent the generation of the mule-artifact.json to override any value set explicitly by the plugin developer
-   * 
+   *
    * @param builder
    */
   private void setMetadataFromSource(final MulePluginModelBuilder builder) {

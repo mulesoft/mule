@@ -69,7 +69,8 @@ class ComponentAstBasedElementModelFactory {
     return configuration.getModel(ParameterizedModel.class)
         .flatMap(model -> of((DslElementModel<T>) createElementModel(model,
                                                                      configuration.getGenerationInformation().getSyntax().get(),
-                                                                     configuration).build()));
+                                                                     configuration)
+            .build()));
   }
 
   private Optional<DslElementModel.Builder<ObjectType>> resolveBasedOnType(ObjectType type,

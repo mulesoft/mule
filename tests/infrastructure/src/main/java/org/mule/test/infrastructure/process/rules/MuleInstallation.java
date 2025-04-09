@@ -32,10 +32,10 @@ import org.junit.runners.model.Statement;
 /**
  * This is a JUnit rule to install Mule Runtime during tests. Usage:
  * <p>
- * 
+ *
  * <pre>
  * public class MuleRuntimeInstallationTest {
- * 
+ *
  *   &#064;Rule
  *   public MuleInstallation installation = new MuleInstallation(&quot;/path/to/packed/distribution.zip&quot;);
  *

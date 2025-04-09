@@ -19,7 +19,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * {@link ObjectProvider} implementation of the mule artifact so other DI plugins can access the artifact object.
- * 
+ *
  * @since 4.0
  */
 class MuleArtifactObjectProvider extends AbstractComponent implements ObjectProvider {

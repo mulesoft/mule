@@ -81,7 +81,7 @@ public final class NotificationModelParserUtils {
                                      value -> getEmittedNotifications(value.getClassArrayValue(Fires::value)),
                                      value -> getEmittedNotifications(value
                                          .getClassArrayValue(org.mule.sdk.api.annotation.notification.Fires::value)))
-                                             .orElse(emptyList());
+        .orElse(emptyList());
   }
 
   public static void declareEmittedNotifications(NotificationEmitterParser parser,

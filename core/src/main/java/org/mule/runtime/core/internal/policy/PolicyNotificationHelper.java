@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 /**
  * Helper to fire policy notifications from a specific policy
- * 
+ *
  * @since 4.0
  */
 public class PolicyNotificationHelper {
@@ -41,7 +41,7 @@ public class PolicyNotificationHelper {
 
   /**
    * Creates a event consumer that fires a notification using the specified action
-   * 
+   *
    * @param action the action the notification is created with
    * @return the created consumer
    */

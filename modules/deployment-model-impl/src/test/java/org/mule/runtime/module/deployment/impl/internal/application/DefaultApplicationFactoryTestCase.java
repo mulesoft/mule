@@ -139,7 +139,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     final File[] resourceFiles = new File[] {new File("mule-config.xml")};
     when(deployableArtifactDescriptorFactory
         .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class)))
-            .thenReturn(descriptor);
+        .thenReturn(descriptor);
 
     final ArtifactPluginDescriptor coreArtifactPluginDescriptor = new ArtifactPluginDescriptor(FAKE_ARTIFACT_PLUGIN);
     coreArtifactPluginDescriptor.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().build());
@@ -222,7 +222,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     descriptor.setArtifactLocation(new File("some/location"));
     when(deployableArtifactDescriptorFactory
         .createApplicationDescriptor(any(), any(), any(), any(DeployableArtifactDescriptorCreator.class)))
-            .thenReturn(descriptor);
+        .thenReturn(descriptor);
     expectedException.expect(DeploymentException.class);
     applicationFactory.createArtifact(new File(APP_NAME), empty());
   }

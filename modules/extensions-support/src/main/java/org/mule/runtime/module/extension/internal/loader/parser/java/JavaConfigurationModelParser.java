@@ -89,8 +89,8 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
                                      value -> value.getStringValue(Configuration::name),
                                      value -> value
                                          .getStringValue(org.mule.sdk.api.annotation.Configuration::name))
-                                             .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
-                                             .orElse(DEFAULT_CONFIG_NAME);
+        .map(name -> isBlank(name) ? DEFAULT_CONFIG_NAME : name)
+        .orElse(DEFAULT_CONFIG_NAME);
   }
 
   @Override

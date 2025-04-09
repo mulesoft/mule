@@ -25,12 +25,8 @@ import org.mule.api.annotation.Experimental;
  *                                allows configuring whether reconnecting or not. Default value is {@code true}.
  * @since 4.9.3, 4.10.0
  */
-@Experimental
-public record SseRetryConfig(boolean allowRetryDelayOverride, long initialRetryDelayMillis, boolean shouldRetryOnStreamEnd) {
+@Experimental public record SseRetryConfig(boolean allowRetryDelayOverride,long initialRetryDelayMillis,boolean shouldRetryOnStreamEnd){
 
-  public static final Long DEFAULT_RETRY_DELAY_MILLIS = 2000L;
+public static final Long DEFAULT_RETRY_DELAY_MILLIS=2000L;
 
-  public static SseRetryConfig defaultConfig() {
-    return new SseRetryConfig(true, DEFAULT_RETRY_DELAY_MILLIS, true);
-  }
-}
+public static SseRetryConfig defaultConfig(){return new SseRetryConfig(true,DEFAULT_RETRY_DELAY_MILLIS,true);}}

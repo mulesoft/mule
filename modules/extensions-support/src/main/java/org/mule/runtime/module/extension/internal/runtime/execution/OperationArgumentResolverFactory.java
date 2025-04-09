@@ -16,7 +16,7 @@ import java.util.function.Function;
 /**
  * Implementations provide a {@link Function} to get the parameters that will be passed to an operation from an
  * {@link OperationModel}.
- * 
+ *
  * @since 4.0
  */
 public interface OperationArgumentResolverFactory<T extends ComponentModel> {

@@ -17,7 +17,7 @@ public class NullTransactionHandle implements TransactionHandle {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @return {@code false}
    */
   @Override

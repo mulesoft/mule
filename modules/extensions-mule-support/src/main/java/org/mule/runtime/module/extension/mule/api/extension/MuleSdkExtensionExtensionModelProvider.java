@@ -30,7 +30,7 @@ public class MuleSdkExtensionExtensionModelProvider extends ExtensionModelLoader
           .loadExtensionModel(new MuleSdkExtensionExtensionModelDeclarer().declareExtensionModel(),
                               builder(MuleSdkExtensionExtensionModelProvider.class.getClassLoader(),
                                       nullDslResolvingContext())
-                                          .build()));
+                                  .build()));
 
   @Override
   protected void declareExtension(ExtensionLoadingContext context) {

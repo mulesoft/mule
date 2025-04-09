@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 /**
  * {@link AbstractConfigurationBuilder} implementation that delegates to {@link ArtifactAstConfigurationBuilder} using cached
  * {@link AstXmlParser} instances.
- * 
+ *
  * @since 4.5
  */
 public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurationBuilder

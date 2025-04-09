@@ -70,7 +70,7 @@ public class SingletonsAreNotRepeatedTestCase extends AbstractCoreValidationTest
                                                                  "\n" +
                                                                  "</mule>\n" +
                                                                  "")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString(format("The configuration element '%s' can only appear once",

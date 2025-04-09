@@ -12,7 +12,7 @@
  * @since 4.5
  */
 module org.mule.runtime.tracer.exporter.configuration.api {
-  
+
   exports org.mule.runtime.tracer.exporter.config.api;
 
 }

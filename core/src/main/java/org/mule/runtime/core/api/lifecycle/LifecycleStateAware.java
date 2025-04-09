@@ -14,7 +14,7 @@ import org.mule.runtime.core.internal.registry.Registry;
  *
  * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also deprecated. Use post processors for
  *             currently supported registries instead
- * 
+ *
  * @since 3.0
  */
 @Deprecated

@@ -41,7 +41,7 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
   /**
    * Creates a new serialization protocol to serialize/deserialize classes provided by any class loader defined in the provided
    * class loader repository.
-   * 
+   *
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    *
    */

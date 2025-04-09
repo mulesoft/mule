@@ -82,7 +82,7 @@ public interface ConfigurationPropertiesProviderFactory
   /**
    * Support of the old deprecated interface. This may happen only on environments where the runtime modules are uses as libs in
    * some tool, but not when inside the Runtime.
-   * 
+   *
    * @param providerFactoriesMap where the found providers will be added;
    */
   public static void loadDeprecatedProviderFactories(Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap) {

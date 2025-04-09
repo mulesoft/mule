@@ -70,8 +70,8 @@ public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTe
   public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
                                                                 discoverProvider(ApplicationDescriptorFactoryTestCase.class
                                                                     .getClassLoader()).getLocalRepositorySuppliers()
-                                                                        .environmentMavenRepositorySupplier().get()
-                                                                        .getAbsolutePath());
+                                                                    .environmentMavenRepositorySupplier().get()
+                                                                    .getAbsolutePath());
 
   private final ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
       mock(ApplicationClassLoaderBuilderFactory.class);
