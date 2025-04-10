@@ -188,7 +188,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
   private final boolean shareErrorTypeRepository;
 
-  @Parameterized.Parameters(name = "Parallel: {0} -  Share ErrorType repo {1} - Enable policy isolation {2} - Separate ClassLoader for policy isolation {3}")
+  @Parameterized.Parameters(
+      name = "Parallel: {0} -  Share ErrorType repo {1} - Enable policy isolation {2} - Separate ClassLoader for policy isolation {3}")
   public static List<Object[]> parameters() {
     // Only run without parallel deployment since this configuration does not affect policy deployment at all
     return asList(
