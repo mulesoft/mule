@@ -36,6 +36,7 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
@@ -318,7 +319,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     DeployableArtifactClassLoaderFactory<PolicyTemplateDescriptor> policyClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(new PolicyTemplateClassLoaderFactory());
     PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory =
-        new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory);
+        new ApplicationPolicyTemplateClassLoaderBuilderFactory(policyClassLoaderFactory, pluginClassLoadersFactory,
+                                                               (FilteringContainerClassLoader) containerClassLoader);
 
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
                                                        deployableArtifactDescriptorFactory,

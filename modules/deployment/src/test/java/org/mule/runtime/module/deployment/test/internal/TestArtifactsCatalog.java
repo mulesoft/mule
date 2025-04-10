@@ -77,6 +77,8 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static File barUtils1_0JarFile;
   public static File barUtils2ClassFile;
   public static File barUtils2_0JarFile;
+  public static File placeholderApiBuilderClassFile;
+  public static File placeholderInternalOperationClassFile;
   public static File barUtilsJavaxClassFile;
   public static File barUtilsJavaxJarFile;
   public static File barUtilsForbiddenJavaClassFile;
@@ -124,6 +126,14 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static File withLifecycleListenerExtensionJarFile;
   public static File withBrokenLifecycleListenerExtensionJarFile;
   public static File bridgeMethodExtensionJarFile;
+  public static File overriderClassFile;
+  public static File moduleOverriderClassFile;
+  public static File xercesJarFile;
+  public static File pluginClassFile;
+  public static File httpTestClassJarFile;
+  public static JarFileBuilder testOverriderLibrary;
+  public static JarFileBuilder jreExtensionLibrary;
+  public static ArtifactPluginFileBuilder testPlugin;
 
   private static TemporaryFolder compilerWorkFolder;
 
@@ -179,6 +189,37 @@ public final class TestArtifactsCatalog extends ExternalResource {
     barUtilsJavaxJarFile =
         new JarCompiler().compiling(getResourceFile("/packagetesting/javax/annotation/BarUtils.java"))
             .compile("bar-javax.jar");
+
+    placeholderApiBuilderClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/org/mule/extension/http/api/request/Builder.java"));
+    placeholderInternalOperationClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/org/mule/extension/http/internal/request/Operation.java"));
+
+    xercesJarFile = getResourceFile("/sources/jar/xercesImpl-2.11.0.jar");
+    overriderClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/OverrideMe.java"));
+    moduleOverriderClassFile = new SingleClassCompiler().compile(getResourceFile("/modules/org/foo/OverrideMe.java"));
+    testOverriderLibrary = new JarFileBuilder("test-overrider-library", new JarCompiler()
+        .compiling(getResourceFile("/override-library/org/foo/OverrideMe.java"))
+        .compile("test-overrider-library.jar"));
+    pluginClassFile = new SingleClassCompiler()
+        .compile(getResourceFile("/pluginlib/org/foo/OverrideMe.java"));
+    httpTestClassJarFile = new JarCompiler()
+        .compiling(
+                   getResourceFile("/org/foo/http/HttpExtension.java"),
+                   getResourceFile("/org/foo/http/HttpOperations.java"))
+        .compile("mule-foo-http-plugin-core-1.0.0.jar");
+    testPlugin = new ArtifactPluginFileBuilder("plugin1")
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
+        .containingClass(pluginClassFile, "org/foo/OverrideMe.class");
+    jreExtensionLibrary = new JarFileBuilder("jre-extension-library", new JarCompiler()
+        .targetJavaVersion(8)
+        .compiling(getResourceFile("/jre-extension-library/src/main/java/org/foo/OverrideMe.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/javax/annotation/JavaxExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/ietf/jgss/IetfExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/omg/test/OmgExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/w3c/dom/DomExtender.java"),
+                   getResourceFile("/jre-extension-library/src/main/java/org/xml/sax/SaxExtender.java"))
+        .compile("jre-extension-library.jar"));
 
     barUtilsForbiddenJavaClassFile = new SingleClassCompiler()
         .targetJavaVersion(8)
@@ -365,6 +406,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
    */
   public static ArtifactPluginFileBuilder echoPlugin;
   public static ArtifactPluginFileBuilder helloExtensionV1Plugin;
+  public static ArtifactPluginFileBuilder httpPlugin;
   public static ArtifactPluginFileBuilder helloExtensionV2Plugin;
   public static ArtifactPluginFileBuilder goodbyeExtensionV1Plugin;
   public static ArtifactPluginFileBuilder oracleExtensionPlugin;
@@ -395,6 +437,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static void initArtifactPluginFileBuilders() throws URISyntaxException {
     echoPlugin = createEchoPluginBuilder();
     helloExtensionV1Plugin = createHelloExtensionV1PluginFileBuilder();
+    httpPlugin = createHttpPluginFileBuilder();
     helloExtensionV2Plugin = createHelloExtensionV2PluginFileBuilder();
     bridgeMethodExtensionPlugin = createBridgeExtensionPluginFileBuilder();
     goodbyeExtensionV1Plugin = createGoodbyeExtensionV1PluginFileBuilder();
@@ -559,6 +602,26 @@ public final class TestArtifactsCatalog extends ExternalResource {
         .addProperty("version", "1.0.0");
     return new ArtifactPluginFileBuilder("helloExtensionPlugin-1.0.0")
         .dependingOn(new JarFileBuilder("helloExtensionV1", helloExtensionV1JarFile))
+        .describedBy((mulePluginModelBuilder.build()));
+  }
+
+  private static ArtifactPluginFileBuilder createHttpPluginFileBuilder() {
+    // Creates a test HTTP plugin artifact.
+    // Includes placeholder classes from both http/api/ and http/internal/ packages.
+    // Useful for testing classloading behavior that may differ between API and internal classes.
+    MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
+        .setMinMuleVersion(MIN_MULE_VERSION).setName("HTTP").setRequiredProduct(MULE)
+        .withBundleDescriptorLoader(createBundleDescriptorLoader("HTTP", MULE_PLUGIN_CLASSIFIER,
+                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, "1.0.0"));
+    mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
+        .build());
+    mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
+        .addProperty("type", "org.foo.http.HttpExtension")
+        .addProperty("version", "1.0.0");
+
+    return new ArtifactPluginFileBuilder("http-plugin-1.0.0")
+        .dependingOn(new JarFileBuilder("httpTestCode", httpTestClassJarFile))
+        .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.mule.extension.http.api")
         .describedBy((mulePluginModelBuilder.build()));
   }
 
