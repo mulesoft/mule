@@ -68,7 +68,9 @@ public class LifecycleUtils {
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
    * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
+   * @deprecated Use {@link #initialiseIfNeeded(Object, Injector)} instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException {
     initialiseIfNeeded(object, true, muleContext);
   }
@@ -87,7 +89,9 @@ public class LifecycleUtils {
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
    * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
+   * @deprecated Use {@link #initialiseIfNeeded(Object, Injector)} instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Object object, boolean inject, MuleContext muleContext) throws InitialisationException {
     checkArgument(muleContext != null, "muleContext cannot be null");
     object = unwrap(object);
@@ -135,7 +139,9 @@ public class LifecycleUtils {
    * @param objects     the list of objects to be initialised
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
+   * @deprecated Use {@link #initialiseIfNeeded(Collection, Injector) instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Collection<? extends Object> objects, MuleContext muleContext)
       throws InitialisationException {
     initialiseIfNeeded(objects, true, muleContext);
@@ -150,7 +156,9 @@ public class LifecycleUtils {
    * @param inject      whether it should perform dependency injection on the {@code object} before actually initialising it
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
+   * @deprecated Use {@link #initialiseIfNeeded(Collection, Injector) instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Collection<? extends Object> objects, boolean inject, MuleContext muleContext)
       throws InitialisationException {
     for (Object object : objects) {
@@ -270,9 +278,26 @@ public class LifecycleUtils {
    * @param errorMessage the message of the {@link Exception} to be thrown if the assertion fails
    * @throws IllegalStateException if the {@code muleContext} is stopped or stopping
    * @since 4.0
+   * @deprecated Use {@link #assertNotStopping(LifecycleState, String)} instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void assertNotStopping(MuleContext muleContext, String errorMessage) {
     if (muleContext.isStopping() || (muleContext.isStopped() && !muleContext.isStarting())) {
+      throw new IllegalStateException(errorMessage);
+    }
+  }
+
+  /**
+   * Verifies that the given {@code deploymentLifecycleState} is not stopped or in the process of stopping
+   *
+   * @param deploymentLifecycleState the {@link LifecycleState} of the deployment to test
+   * @param errorMessage             the message of the {@link Exception} to be thrown if the assertion fails
+   * @throws IllegalStateException if the {@code deploymentLifecycleState} is stopped or stopping
+   * @since 4.10
+   */
+  public static void assertNotStopping(LifecycleState deploymentLifecycleState, String errorMessage) {
+    if (deploymentLifecycleState.isStopping()
+        || (deploymentLifecycleState.isStopped() && !deploymentLifecycleState.isStarting())) {
       throw new IllegalStateException(errorMessage);
     }
   }
