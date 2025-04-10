@@ -173,10 +173,14 @@ public abstract class AbstractOSController {
     CommandLine commandLine = new CommandLine(muleBin);
     commandLine.addArgument(command);
     commandLine.addArguments(args, false);
-    return runSync(commandLine, null, null);
+    return runSync(commandLine, null);
   }
 
-  protected int runSync(CommandLine commandLine, ExecuteStreamHandler streamHandler, File workingDirectory) {
+  protected int runSync(CommandLine commandLine, ExecuteStreamHandler streamHandler) {
+    return runSync(commandLine, streamHandler, null);
+  }
+
+  private int runSync(CommandLine commandLine, ExecuteStreamHandler streamHandler, File workingDirectory) {
     Map<String, String> newEnv = copyEnvironmentVariables();
     return executeSyncCommand(commandLine, newEnv, streamHandler, timeout, workingDirectory);
   }
