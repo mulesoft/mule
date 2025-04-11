@@ -38,7 +38,8 @@ public class JavaOAuthDeclarationEnricherTestCase extends AbstractMuleTestCase {
     new JavaOAuthDeclarationEnricher().enrich(
                                               new DefaultExtensionLoadingContext(declarer,
                                                                                  builder(getClass().getClassLoader(),
-                                                                                         getDefault(emptySet())).build()));
+                                                                                         getDefault(emptySet()))
+                                                                                     .build()));
     declaration = declarer.getDeclaration();
   }
 

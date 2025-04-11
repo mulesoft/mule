@@ -41,7 +41,6 @@
         </surefire.args>
         <javaModuleName>org.mule.runtime.core.components</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <!--

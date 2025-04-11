@@ -15,7 +15,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
  * Constants for Mule XML DSL.
- * 
+ *
  * @since 4.0
  */
 @NoImplement

@@ -8,7 +8,7 @@ package org.mule.runtime.metrics.exporter.config.api;
 
 /**
  * Configuration to export metrics.
- * 
+ *
  * @since 4.5.0
  */
 public interface MeterExporterConfiguration {

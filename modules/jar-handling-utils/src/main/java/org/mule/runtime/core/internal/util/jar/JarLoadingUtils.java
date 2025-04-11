@@ -35,7 +35,7 @@ public class JarLoadingUtils {
 
   /**
    * Returns a JarURLConnection used in Mule Java 11+ runtime
-   * 
+   *
    * @return a JarURLConnection
    *
    * @throws MalformedURLException in case the schemaURI is malformed

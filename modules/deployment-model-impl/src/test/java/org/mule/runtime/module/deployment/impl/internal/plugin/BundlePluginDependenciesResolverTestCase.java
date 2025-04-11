@@ -335,7 +335,8 @@ public class BundlePluginDependenciesResolverTestCase extends AbstractMuleTestCa
 
     when(artifactDescriptorFactory
         .create(argThat(hasProperty("absolutePath", endsWith(latestBazPlugin.getBundleDescriptor().getArtifactFileName()))),
-                any(Optional.class))).thenReturn(latestBazPlugin);
+                any(Optional.class)))
+        .thenReturn(latestBazPlugin);
 
     final List<ArtifactPluginDescriptor> resolvedPluginDescriptors = dependenciesResolver.resolve(
                                                                                                   emptySet(),

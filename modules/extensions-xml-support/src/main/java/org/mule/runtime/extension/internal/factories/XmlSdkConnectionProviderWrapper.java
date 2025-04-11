@@ -57,9 +57,9 @@ import jakarta.inject.Inject;
 /**
  * Base class responsible of instantiating and managing lifecycle of the actual connection provider (the {@code delegate}) within
  * the XML-SDK connector.
- * 
+ *
  * @param <C> the actual type of connection of the {@code delegate}.
- * 
+ *
  * @since 4.7
  */
 public abstract class XmlSdkConnectionProviderWrapper<C> implements ConnectionProvider<C>, Lifecycle {

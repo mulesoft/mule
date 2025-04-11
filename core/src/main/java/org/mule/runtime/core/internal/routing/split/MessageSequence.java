@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 /**
  * A sequence of messages
- * 
+ *
  * @author flbulgarelli
  * @param <T> the message payload type
  */
@@ -20,21 +20,21 @@ public interface MessageSequence<T> extends Iterator<T> {
 
   /**
    * If the sequence is empty
-   * 
+   *
    * @return !hasNext()
    */
   boolean isEmpty();
 
   /**
    * The number of members of the sequence. If this is unknown, return UNKNOWN_SIZE.
-   * 
+   *
    * @return The estimated size of the sequence, or {@link #UNKNOWN_SIZE}, if it is unknown
    */
   Integer size();
 
   /**
    * Whether this sequence has more elements.
-   * 
+   *
    * @see Iterator#hasNext()
    */
   @Override

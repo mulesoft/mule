@@ -72,7 +72,7 @@ public class ArtifactPluginDescriptorFactory
                                                        muleArtifactLoaderDescriptor,
                                                        bundleDependencies,
                                                        ownerDescriptor)
-                                                           .createClassLoaderConfiguration();
+        .createClassLoaderConfiguration();
   }
 
   @Override

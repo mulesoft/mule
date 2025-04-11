@@ -25,7 +25,7 @@ import org.mule.runtime.deployment.model.internal.artifact.ImmutableArtifactCont
 /**
  * Base class providing a reusable template method that contains an {@link ArtifactAst} and delegates to
  * {@link ArtifactAstConfigurationBuilder} to create registry and populate the {@link MuleContext}.
- * 
+ *
  * @since 4.5
  */
 abstract class AbstractAstConfigurationProcessor implements ArtifactConfigurationProcessor {

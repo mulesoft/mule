@@ -567,8 +567,8 @@ public class MessageProcessors {
                                                         completeSuccessEitherIfNeeded(),
                                                         errorSwitchSinkSinkRef::error,
                                                         errorSwitchSinkSinkRef::complete)
-                                                            .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
-                                                                .andThen(MessageProcessors::toParentContext));
+                .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
+                    .andThen(MessageProcessors::toParentContext));
           }
         });
   }

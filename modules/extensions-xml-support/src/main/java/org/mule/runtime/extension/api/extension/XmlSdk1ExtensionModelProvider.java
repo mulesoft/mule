@@ -27,7 +27,7 @@ public class XmlSdk1ExtensionModelProvider extends ExtensionModelLoader {
       .loadExtensionModel(new XmlSdk1ExtensionModelDeclarer().createExtensionModel(),
                           builder(XmlSdk1ExtensionModelProvider.class.getClassLoader(),
                                   nullDslResolvingContext())
-                                      .build()));
+                              .build()));
 
   @Override
   protected void declareExtension(ExtensionLoadingContext context) {

@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * A {@link ProfilingDataConsumerDiscoveryStrategy} that aggregates multiple {@link ProfilingDataConsumerDiscoveryStrategy}
  * instances into a single one.
- * 
+ *
  * @since 4.5.0
  */
 public class CompositeProfilingDataConsumerDiscoveryStrategy implements ProfilingDataConsumerDiscoveryStrategy {

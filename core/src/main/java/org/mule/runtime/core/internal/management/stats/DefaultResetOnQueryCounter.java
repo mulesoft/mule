@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Default implementation of {@link ResetOnQueryCounter} that holds the counter in an {@link AtomicLong}.
- * 
+ *
  * @since 4.5
  */
 public class DefaultResetOnQueryCounter implements ResetOnQueryCounter {

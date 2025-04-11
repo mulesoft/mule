@@ -54,7 +54,7 @@ public class DeployableProjectModelVersionParseTestCase extends AbstractMuleTest
     DeployableProjectModel model =
         new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath),
                                                exportAllResourcesAndPackagesIfEmptyLoaderDescriptor, includeTestDependencies)
-                                                   .build();
+            .build();
 
     model.validate();
 

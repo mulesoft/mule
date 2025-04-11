@@ -248,7 +248,7 @@ final class LoggerContextConfigurer {
 
   /**
    * Checks whether the protocol of an {@link URL} is {@code "file"} or not.
-   * 
+   *
    * @param url the {@link URL}.
    * @return {@code true} if the protocol is {@code "file"}, or {@code false} otherwise.
    */

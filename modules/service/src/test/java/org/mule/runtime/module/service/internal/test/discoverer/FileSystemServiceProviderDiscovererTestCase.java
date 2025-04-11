@@ -96,7 +96,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
         .thenReturn(bundleDescriptorLoaderMock);
     when(descriptorLoaderRepository.get(anyString(), ArgumentMatchers.any(),
                                         argThat(equalTo(ClassLoaderConfigurationLoader.class))))
-                                            .thenReturn(mock(ClassLoaderConfigurationLoader.class));
+        .thenReturn(mock(ClassLoaderConfigurationLoader.class));
 
     doNothing().when(artifactDescriptorValidator).validate(ArgumentMatchers.any());
   }
@@ -120,7 +120,7 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
     when(serviceClassLoaderFactory.create(argThat(any(String.class)),
                                           argThat(any(ServiceDescriptor.class)), argThat(any(ClassLoader.class)), argThat(any(
                                                                                                                               ClassLoaderLookupPolicy.class))))
-                                                                                                                                  .thenReturn(serviceClassLoader);
+        .thenReturn(serviceClassLoader);
     final FileSystemServiceProviderDiscoverer serviceProviderDiscoverer =
         new FileSystemServiceProviderDiscoverer(containerClassLoader, serviceClassLoaderFactory, descriptorLoaderRepository,
                                                 builder());

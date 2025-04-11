@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 
 /**
  * Provides a way to create classLoaders for different artifact types.
- * 
+ *
  * @since 4.5
  */
 @NoImplement
@@ -80,7 +80,7 @@ public interface ArtifactClassLoaderResolver {
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
    * are already exported by their transitive dependencies nor any other dependency).
-   * 
+   *
    * @param descriptor                the descriptor of the domain to generate a class loader for.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
    *                                  created.
@@ -95,13 +95,13 @@ public interface ArtifactClassLoaderResolver {
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
    * are already exported by their transitive dependencies nor any other dependency).
-   * 
+   *
    * @param descriptor                the descriptor of the domain to generate a class loader for.
    * @param pluginClassLoaderResolver allows the user to provide a class loader for the given plugin, otherwise it will be
    *                                  created.
    * @param additionalClassloaderUrls a list of {@link URL} pointing to additional resources and classes
    * @return a class loader for a domain.
-   * 
+   *
    * @since 4.7
    */
   MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
@@ -141,7 +141,7 @@ public interface ArtifactClassLoaderResolver {
    * </p>
    * The given descriptor must have its dependencies' exported packages sanitized (i.e. dependencies must not have packages that
    * are already exported by their transitive dependencies nor any other dependency).
-   * 
+   *
    * @param descriptor        the descriptor of the application to generate a class loader for.
    * @param domainClassLoader the class loader of the domain the application belongs to.
    * @return a class loader for an application.
@@ -227,7 +227,7 @@ public interface ArtifactClassLoaderResolver {
    * The class loader for a plugin is based on the class loader of its owner artifact for some scenarios regarding exported
    * packages/resources. For that reason, a class loader for a plugin in one application may be different from the same plugin in
    * another application.
-   * 
+   *
    * @param ownerArtifactClassLoader  the class loader for the artifact that has the plugin dependency for the target class
    *                                  loader.
    * @param descriptor                the descriptor of the plugin to generate a class loader for.

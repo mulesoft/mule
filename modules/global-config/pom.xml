@@ -15,7 +15,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.global.config</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <!-- because this module requires transitive org.mule.runtime.maven.client.api -->
         <revapi.checkDependencies>true</revapi.checkDependencies>
     </properties>

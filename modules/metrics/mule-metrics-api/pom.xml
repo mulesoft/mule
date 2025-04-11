@@ -28,7 +28,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.metrics.api</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
 </project>

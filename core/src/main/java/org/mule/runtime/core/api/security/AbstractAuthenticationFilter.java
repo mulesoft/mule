@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides a framework to perform inbound or outbound authentication for messages.
- * 
+ *
  * @deprecated Mule Runtime no longer uses this.
  */
 @Deprecated

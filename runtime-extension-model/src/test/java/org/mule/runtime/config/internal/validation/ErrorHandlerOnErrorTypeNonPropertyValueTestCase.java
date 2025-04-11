@@ -58,7 +58,7 @@ public class ErrorHandlerOnErrorTypeNonPropertyValueTestCase extends AbstractCor
                           "        </error-handler>\n" +
                           "    </flow>\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.isPresent(), equalTo(false));
   }

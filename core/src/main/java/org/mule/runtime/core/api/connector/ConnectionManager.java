@@ -132,7 +132,7 @@ public interface ConnectionManager {
    *                              {@link MuleDeploymentPropertiesMULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY} deployment property.
    * @return a {@link ConnectionValidationResult}
    * @throws IllegalArgumentException if the {@code configurationInstance} doesn't have an associated {@link ConnectionProvider}
-   * 
+   *
    * @since 4.6
    */
   ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)

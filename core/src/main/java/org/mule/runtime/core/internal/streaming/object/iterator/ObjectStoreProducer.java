@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link Producer} to stream the contents of a {@link ObjectStore}
- * 
+ *
  * @since 3.5.0
  */
 public class ObjectStoreProducer<T extends Serializable> implements Producer<T> {

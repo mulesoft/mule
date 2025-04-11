@@ -15,7 +15,7 @@ import java.util.Map;
  * Implementations of this interface must provide a transformation between the parameters of source response function and a
  * {@link Message}. Such transformation is used to be able to execute the policy pipeline and handle the information to be sent by
  * the operation or modify it.
- * 
+ *
  * @since 4.0
  */
 public interface SourcePolicyParametersTransformer {
@@ -31,7 +31,7 @@ public interface SourcePolicyParametersTransformer {
    *
    * Such transformation must be done taking into account that all the useful information from the parameters must be accessible
    * through the created {@link Message}.
-   * 
+   *
    * @param parameters resolved set of parameters to be processed by the operation.
    * @return a new {@link Message} with all the useful content of the parameters.
    */

@@ -176,7 +176,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
       appenders.add(((org.apache.logging.log4j.core.util.Builder<ConsoleAppender>) ConsoleAppender.newBuilder()
           .setLayout(mock(Layout.class))
           .setName("Console"))
-              .build());
+          .build());
       when(rootLogger.getAppenders().values()).thenReturn(appenders);
 
       contextConfigurer.update(context);

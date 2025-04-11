@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 /**
  * This policy is basically a placeholder. It does not attempt to retry at all.
- * 
+ *
  * @deprecated Use {@link RetryPolicyTemplate#NO_RETRY_POLICY}.
  */
 @Deprecated

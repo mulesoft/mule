@@ -14,7 +14,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 /**
  * {@link ArtifactClassLoader} builder for class loaders required by {@link Application} artifacts
- * 
+ *
  * @since 4.5
  */
 public interface ApplicationClassLoaderBuilder {

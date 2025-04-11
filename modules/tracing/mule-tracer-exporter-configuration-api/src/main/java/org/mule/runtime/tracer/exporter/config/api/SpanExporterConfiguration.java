@@ -17,7 +17,7 @@ public interface SpanExporterConfiguration {
 
   /**
    * Returns the value of a configuration parameter.
-   * 
+   *
    * @param key the key of a configuration parameter.
    * @return the value associated to the {@param key} or null if not found.
    */

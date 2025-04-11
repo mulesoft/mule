@@ -42,7 +42,7 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
   public void repeatedGlobalNames() {
     final Optional<ValidationResultItem> msg = runValidation("NameIsNotRepeatedTestCase#repeatedGlobalNames",
                                                              getConfigDsl())
-                                                                 .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString(format("Two (or more) configuration elements have been defined with the same global name. Global name '%s' must be unique",
@@ -54,7 +54,7 @@ public class NameIsNotRepeatedTestCase extends AbstractCoreValidationTestCase {
   public void repeatedGlobalNamesAllReported() {
     final Optional<ValidationResultItem> msg = runValidation("NameIsNotRepeatedTestCase#repeatedGlobalNamesAllReported",
                                                              getConfigDsl())
-                                                                 .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getComponents(), hasSize(2));
   }

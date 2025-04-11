@@ -706,7 +706,8 @@ public final class XmlExtensionLoaderDelegate {
 
   private ExtensionModel createExtensionModel(ExtensionDeclarer declarer) {
     return TEMP_EXTENSION_MODEL_LOADER.loadExtensionModel(declarer, builder(currentThread().getContextClassLoader(),
-                                                                            nullDslResolvingContext()).build());
+                                                                            nullDslResolvingContext())
+        .build());
   }
 
   private void fillDeclarer(ExtensionDeclarer declarer, String name, String version, String category, String vendor,
@@ -892,7 +893,7 @@ public final class XmlExtensionLoaderDelegate {
   /**
    * Make the connectionProviderFactory for the XML SDK extension be just a delegate to the connectionProviderFactory of its used
    * connection provider.
-   * 
+   *
    * @param testConnectionGlobalElementOptional the connection from the XML SDK extension to use for connectivity testing.
    * @param configurationDeclarer               the declarer to get the config parameters from.
    * @param connectionProviderDeclarer          the declarer to enrich with the {@link ConnectionProviderFactory}, if any.

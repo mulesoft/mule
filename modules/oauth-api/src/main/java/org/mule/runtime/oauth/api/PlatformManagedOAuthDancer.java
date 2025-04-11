@@ -46,7 +46,7 @@ public interface PlatformManagedOAuthDancer {
 
   /**
    * Obtains a {@link PlatformManagedConnectionDescriptor} which describes the connection this dancer accesses
-   * 
+   *
    * @return a {@link CompletableFuture} which returns a {@link PlatformManagedConnectionDescriptor}
    */
   CompletableFuture<PlatformManagedConnectionDescriptor> getConnectionDescriptor();

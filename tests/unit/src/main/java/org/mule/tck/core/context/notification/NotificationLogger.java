@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Provides access to the notifications generated during a test run.
- * 
+ *
  * @param <T> the type of notifications to store.
  * @since 4.0
  */

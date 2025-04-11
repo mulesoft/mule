@@ -44,7 +44,7 @@ public class TestServicesUtils {
 
   /**
    * Provides a packaged mock {@link SchedulerService} implementation.
-   * 
+   *
    * @param tempFolder where to generate temporary files needed for compilation of the service classes.
    * @return the zip service file
    */

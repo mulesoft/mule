@@ -11,7 +11,7 @@ import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
 
 /**
  * A factory class for providing secret keys to an instance of {@link SecretKeyEncryptionStrategy}.
- * 
+ *
  * @see SecretKeyEncryptionStrategy
  */
 @NoImplement

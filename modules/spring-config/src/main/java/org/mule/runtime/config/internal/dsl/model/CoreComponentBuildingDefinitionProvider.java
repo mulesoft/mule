@@ -259,9 +259,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                    .withKey(PARAM_VALUE)
                                                    .withAttributeDefinition(fromSimpleParameter(PARAM_VALUE).build())
                                                    .build())
-                                                       .withIdentifier("set-variable")
-                                                       .withTypeDefinition(fromType(AddFlowVariableProcessor.class))
-                                                       .build());
+            .withIdentifier("set-variable")
+            .withTypeDefinition(fromType(AddFlowVariableProcessor.class))
+            .build());
 
     componentBuildingDefinitions.add(getCoreMuleMessageTransformerBaseBuilder()
         .withIdentifier("remove-variable")
@@ -562,14 +562,15 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("maxActive", fromSimpleParameter("maxActive").build())
         .withSetterParameterDefinition("maxIdle", fromSimpleParameter("maxIdle").build())
         .withSetterParameterDefinition("exhaustedAction", fromSimpleParameter("exhaustedAction",
-                                                                              PoolingProfile.POOL_EXHAUSTED_ACTIONS::get).build())
+                                                                              PoolingProfile.POOL_EXHAUSTED_ACTIONS::get)
+            .build())
         .withSetterParameterDefinition("maxWait", fromSimpleParameter("maxWait").build())
         .withSetterParameterDefinition("evictionCheckIntervalMillis", fromSimpleParameter("evictionCheckIntervalMillis").build())
         .withSetterParameterDefinition("minEvictionMillis", fromSimpleParameter("minEvictionMillis").build())
         .withSetterParameterDefinition("disabled", fromSimpleParameter("disabled").build())
         .withSetterParameterDefinition("initialisationPolicy", fromSimpleParameter("initialisationPolicy",
                                                                                    PoolingProfile.POOL_INITIALISATION_POLICIES::get)
-                                                                                       .build())
+            .build())
         .build());
 
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());

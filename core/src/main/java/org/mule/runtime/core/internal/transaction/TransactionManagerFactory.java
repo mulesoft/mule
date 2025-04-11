@@ -13,7 +13,7 @@ import jakarta.transaction.TransactionManager;
 
 /**
  * <code>TransactionManagerFactory</code> is a factory class for creating a transaction manager for the Mule container.
- * 
+ *
  * Since 4.6, cannot be used outside the container when running with Java 17+.
  */
 @NoImplement
@@ -21,7 +21,7 @@ public interface TransactionManagerFactory {
 
   /**
    * Creates of obtains the jta transaction manager to use for mule transactions
-   * 
+   *
    * @return the transaction manager to use
    * @throws Exception if the transaction manager cannot be located or created
    * @param config Mule configuration parameters

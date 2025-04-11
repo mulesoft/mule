@@ -73,7 +73,7 @@ public final class OperationMessageProcessorBuilder
     if (isPagedOperation) {
       resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth,
                                                      DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE)
-                                                         .orElse(null);
+          .orElse(null);
     }
 
     if (supportsOAuth) {

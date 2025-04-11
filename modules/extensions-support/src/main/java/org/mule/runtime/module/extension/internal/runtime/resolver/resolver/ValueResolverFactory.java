@@ -104,7 +104,7 @@ public class ValueResolverFactory {
    * said value is {@code not null}, then the {@link ValueResolver} obtained through the {@code resolverFunction} is returned.
    *
    * Otherwise, {@link Optional#empty()} is returned
-   * 
+   *
    * @param params              a {@link BiFunction} to obtain the value of a parameter in a specific group. The group <b>MUST</b>
    *                            be obtained through the {@code model}
    * @param parameterGroupModel a {@link ParameterGroupModel}

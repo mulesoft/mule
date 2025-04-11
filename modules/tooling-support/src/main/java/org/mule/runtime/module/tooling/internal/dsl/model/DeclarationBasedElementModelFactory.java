@@ -332,14 +332,14 @@ class DeclarationBasedElementModelFactory {
 
     concat(model.getConnectionProviders().stream(), currentExtension.getConnectionProviders()
         .stream())
-            .filter(c -> c.getName().equals(connection.getName()))
-            .findFirst()
-            .ifPresent(provider -> {
-              DslElementModel<ConnectionProviderModel> connectionProviderModel =
-                  createConnectionProviderModel(provider, connection);
-              connectionProviderModel.getConfiguration().ifPresent(configuration::withNestedComponent);
-              configElement.containing(connectionProviderModel);
-            });
+        .filter(c -> c.getName().equals(connection.getName()))
+        .findFirst()
+        .ifPresent(provider -> {
+          DslElementModel<ConnectionProviderModel> connectionProviderModel =
+              createConnectionProviderModel(provider, connection);
+          connectionProviderModel.getConfiguration().ifPresent(configuration::withNestedComponent);
+          configElement.containing(connectionProviderModel);
+        });
   }
 
   private <T extends ParameterizedModel> DslElementModel.Builder<T> createParameterizedElementModel(T model,

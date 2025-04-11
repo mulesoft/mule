@@ -102,7 +102,7 @@ public final class MuleExtensionModelProvider {
   private static ExtensionModelLoadingRequest loadingRequest() {
     return builder(MuleExtensionModelProvider.class.getClassLoader(),
                    nullDslResolvingContext())
-                       .build();
+        .build();
   }
 
   /**

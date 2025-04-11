@@ -22,7 +22,7 @@ import java.util.Optional;
 /**
  * {@link ConfigurationComponentLocator} implementation for using when the {@link ArtifactAst} of an application has not been
  * processed yet.
- * 
+ *
  * @since 4.5
  */
 public class BaseConfigurationComponentLocator implements ConfigurationComponentLocator {

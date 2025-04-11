@@ -18,7 +18,7 @@ public interface ComponentParameterizationMetadataCacheIdGenerator
    * {@code parameterName} of the given {@code component}. This method will take into account the values of the configured
    * {@link org.mule.runtime.api.metadata.MetadataKey} to provide an unique identifier of the {@code component} attributes type
    * definition.
-   * 
+   *
    * @param parameterization   the component parametrization to calculate the metadata key from.
    * @param parameterGroupName the name of the parameter group
    * @param parameterName      the name of the parameter

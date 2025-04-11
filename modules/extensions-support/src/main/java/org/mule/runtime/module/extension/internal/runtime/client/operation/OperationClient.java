@@ -258,7 +258,8 @@ public class OperationClient implements Lifecycle {
                                                  true,
                                                  reflectionCache,
                                                  expressionManager,
-                                                 "").getParametersAsResolverSet(operationModel, muleContext);
+                                                 "")
+          .getParametersAsResolverSet(operationModel, muleContext);
       absentResolverSet.initialise();
       absentParameterResolvers = absentResolverSet.getResolvers();
     } catch (Exception e) {
@@ -515,7 +516,7 @@ public class OperationClient implements Lifecycle {
     return getPagingResultTransformer(operationModel,
                                       extensionConnectionSupplier,
                                       supportsOAuth(extensionModel), getOperationConnectionTracer(componentTracerFactory))
-                                          .orElse(null);
+        .orElse(null);
   }
 
   private abstract static class EventCompletingCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T> {

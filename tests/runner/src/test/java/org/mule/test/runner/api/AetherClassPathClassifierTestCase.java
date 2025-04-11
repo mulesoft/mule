@@ -160,7 +160,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     when(dependencyResolver
         .resolveArtifact(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
-            .thenReturn(rootArtifactResult);
+        .thenReturn(rootArtifactResult);
 
     when(dependencyResolver.resolveDependencies(argThat(nullValue(Dependency.class)),
                                                 (List<Dependency>) argThat(hasItems(equalTo(compileMuleCoreDep),
@@ -169,7 +169,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                 (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                 argThat(instanceOf(DependencyFilter.class)),
                                                 argThat(equalTo(emptyList()))))
-                                                    .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
+        .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
     ArtifactsUrlClassification classification = classifier.classify(context);
 
@@ -211,7 +211,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(artifactDescriptorResult.getRepositories()).thenReturn(emptyList());
     when(dependencyResolver
         .readArtifactDescriptor(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
-            .thenReturn(artifactDescriptorResult);
+        .thenReturn(artifactDescriptorResult);
 
     File rootArtifactFile = temporaryFolder.newFile();
     File fooCoreArtifactFile = temporaryFolder.newFile();
@@ -223,7 +223,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     when(dependencyResolver
         .resolveArtifact(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
-            .thenReturn(rootArtifactResult);
+        .thenReturn(rootArtifactResult);
 
     when(dependencyResolver.resolveDependencies(argThat(nullValue(Dependency.class)),
                                                 (List<Dependency>) argThat(hasItems(equalTo(compileMuleCoreDep),
@@ -231,7 +231,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                 (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                 argThat(instanceOf(DependencyFilter.class)),
                                                 argThat(equalTo(emptyList()))))
-                                                    .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
+        .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
     URL url = temporaryFolder.newFile().toURI().toURL();
     List<URL> testRunnerUrls = newArrayList(url);
@@ -312,7 +312,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     when(dependencyResolver
         .resolveArtifact(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
-            .thenReturn(rootArtifactResult);
+        .thenReturn(rootArtifactResult);
 
     File derbyDriverFile = temporaryFolder.newFile();
     ArtifactResult artifactResult = mock(ArtifactResult.class);
@@ -354,11 +354,11 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     when(dependencyResolver
         .resolveArtifact(any(Artifact.class), any(List.class)))
-            .thenAnswer(invocation -> {
-              Artifact artifact = (Artifact) invocation.getArguments()[0];
-              artifact = artifact.setFile(temporaryFolder.newFile());
-              return new ArtifactResult(new ArtifactRequest(artifact, null, null)).setArtifact(artifact);
-            });
+        .thenAnswer(invocation -> {
+          Artifact artifact = (Artifact) invocation.getArguments()[0];
+          artifact = artifact.setFile(temporaryFolder.newFile());
+          return new ArtifactResult(new ArtifactRequest(artifact, null, null)).setArtifact(artifact);
+        });
 
     when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
         .thenReturn(APPLICATION);
@@ -384,7 +384,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                 argThat(equalTo(emptyList())),
                                                 argThat(instanceOf(DependencyFilter.class)),
                                                 argThat(equalTo(emptyList()))))
-                                                    .thenReturn(fooServiceUrls);
+        .thenReturn(fooServiceUrls);
 
     File rootArtifactFile = temporaryFolder.newFile();
 
@@ -394,7 +394,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     when(dependencyResolver
         .resolveArtifact(argThat(new ArtifactMatcher(rootArtifact.getGroupId(), rootArtifact.getArtifactId()))))
-            .thenReturn(rootArtifactResult);
+        .thenReturn(rootArtifactResult);
 
     File serviceArtifactFile = temporaryFolder.newFile();
     ArtifactResult serviceArtifactResult = mock(ArtifactResult.class);
@@ -403,7 +403,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
     when(dependencyResolver
         .resolveArtifact(argThat(new ArtifactMatcher(serviceArtifact.getGroupId(), serviceArtifact.getArtifactId()))))
-            .thenReturn(serviceArtifactResult);
+        .thenReturn(serviceArtifactResult);
 
     ArtifactDescriptorResult defaultArtifactDescriptorResult = noManagedDependencies();
 
@@ -419,7 +419,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                 (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                 argThat(instanceOf(DependencyFilter.class)),
                                                 argThat(equalTo(emptyList()))))
-                                                    .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
+        .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
     ArtifactsUrlClassification classification = classifier.classify(context);
 

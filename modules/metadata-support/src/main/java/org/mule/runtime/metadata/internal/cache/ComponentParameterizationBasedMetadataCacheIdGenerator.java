@@ -188,7 +188,8 @@ public class ComponentParameterizationBasedMetadataCacheIdGenerator implements C
 
       if (parameterization.getModel() instanceof ComponentModel) {
         resolveMetadataKeyParts(parameterization, (ComponentModel) parameterization.getModel(),
-                                typeInformation.shouldIncludeConfiguredMetadataKeys()).ifPresent(keyParts::add);
+                                typeInformation.shouldIncludeConfiguredMetadataKeys())
+            .ifPresent(keyParts::add);
       }
     } else {
       resolveComponentIdentifierMetadataCacheId(parameterization).ifPresent(keyParts::add);

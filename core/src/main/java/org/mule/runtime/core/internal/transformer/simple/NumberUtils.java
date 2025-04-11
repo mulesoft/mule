@@ -113,7 +113,7 @@ public class NumberUtils {
 
   /**
    * Raise an overflow exception for the given number and target class.
-   * 
+   *
    * @param number      the number we tried to convert
    * @param targetClass the target class we tried to convert to
    */

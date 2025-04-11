@@ -56,12 +56,12 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
     return getAnnotatedFieldsStream(configuration.getValue().getClass(), Inject.class,
                                     // Still need to support javax.inject for the time being...
                                     javax.inject.Inject.class)
-                                        .map(field -> {
-                                          Named name = field.getAnnotation(Named.class);
-                                          return name != null
-                                              ? Either.<Class<?>, String>right(name.value())
-                                              : javaxNamed(field);
-                                        }).toList();
+        .map(field -> {
+          Named name = field.getAnnotation(Named.class);
+          return name != null
+              ? Either.<Class<?>, String>right(name.value())
+              : javaxNamed(field);
+        }).toList();
   }
 
   // Still need to support javax.inject for the time being...

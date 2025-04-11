@@ -35,7 +35,7 @@ public final class Utils {
 
   /**
    * Creates an instance of {@link File} with the path specified in the parameter {@code resource}.
-   * 
+   *
    * @param resource the path to the file.
    * @return a {@link File} representing the resource.
    * @throws URISyntaxException if an error occurred while trying to convert the URI.
@@ -46,7 +46,7 @@ public final class Utils {
 
   /**
    * Same as {@link #getResourceFile(String)}, but creates the file as a child of the passed {@code tempFolder}.
-   * 
+   *
    * @param resource   path of the file to load.
    * @param tempFolder folder used as the parent.
    * @return a {@link File} representing the resource.
@@ -64,7 +64,7 @@ public final class Utils {
 
   /**
    * Simplified way to obtain a {@link MuleArtifactLoaderDescriptor}.
-   * 
+   *
    * @see MuleArtifactLoaderDescriptor
    *
    * @param artifactId               value to be the "artifactId" attribute.

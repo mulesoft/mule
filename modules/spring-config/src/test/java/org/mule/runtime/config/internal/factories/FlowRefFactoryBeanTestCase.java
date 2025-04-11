@@ -389,13 +389,13 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .get();
     BeanDefinition subFlowBeanDefinition = genericBeanDefinition(new ObjectFactoryClassRepository()
         .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class, Object.class))
-            .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
-            .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
-            .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
-            .addPropertyValue(IS_PROTOTYPE, subFlowComponentBuildingDefinition.isPrototype())
-            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
-            .setScope(BeanDefinition.SCOPE_PROTOTYPE)
-            .getBeanDefinition();
+        .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
+        .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
+        .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
+        .addPropertyValue(IS_PROTOTYPE, subFlowComponentBuildingDefinition.isPrototype())
+        .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
+        .setScope(BeanDefinition.SCOPE_PROTOTYPE)
+        .getBeanDefinition();
     beanFactory.registerSingleton(InitialSpanInfoProvider.class.getName(), new DummyComponentTracerFactory());
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
     // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)

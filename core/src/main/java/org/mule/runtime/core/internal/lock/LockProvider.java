@@ -21,7 +21,7 @@ public interface LockProvider {
 
   /**
    * Returns an instance of a {@link Lock}.
-   * 
+   *
    * @param lockId id that identifies the {@link Lock} instance
    * @return a {@link Lock} instance related to the lockId
    */

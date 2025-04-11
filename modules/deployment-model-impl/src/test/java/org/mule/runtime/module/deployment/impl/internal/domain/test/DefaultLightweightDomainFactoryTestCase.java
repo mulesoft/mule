@@ -63,8 +63,8 @@ public class DefaultLightweightDomainFactoryTestCase extends AbstractMuleTestCas
   public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
                                                                 discoverProvider(ApplicationDescriptorFactoryTestCase.class
                                                                     .getClassLoader()).getLocalRepositorySuppliers()
-                                                                        .environmentMavenRepositorySupplier().get()
-                                                                        .getAbsolutePath());
+                                                                    .environmentMavenRepositorySupplier().get()
+                                                                    .getAbsolutePath());
 
   private final DefaultDomainFactory domainFactory =
       new DefaultDomainFactory(new DomainDescriptorFactory(mock(ArtifactPluginDescriptorLoader.class),

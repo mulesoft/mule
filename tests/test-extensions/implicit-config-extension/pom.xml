@@ -19,6 +19,5 @@
     <properties>
         <javaModuleName>org.mule.test.extension.implicit.config</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 </project>

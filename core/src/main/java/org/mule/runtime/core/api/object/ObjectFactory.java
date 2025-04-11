@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 
 /**
  * <code>ObjectFactory</code> is a generic Factory interface.
- * 
+ *
  * @deprecated this will be removed in next major version
  */
 @Deprecated
@@ -22,7 +22,7 @@ public interface ObjectFactory extends Initialisable, Disposable {
   /**
    * Retrieve an instance of the object. This may create a new instance or look up an existing instance depending on the
    * implementation. If a new instance is created it will also be initialized by this method (Initilisable.initialise()).
-   * 
+   *
    * @param muleContext the current {@link org.mule.runtime.core.api.MuleContext} instance. This can be used for performing
    *                    registry look-ups applying processors to newly created objects or even firing custom notifications
    * @throws Exception if there is an exception thrown creating the new instance

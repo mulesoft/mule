@@ -37,7 +37,7 @@ public final class FileStoreCursorStreamConfig {
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param maxInMemorySize the maximum amount of data to be held in memory
    */
   public FileStoreCursorStreamConfig(DataSize maxInMemorySize) {

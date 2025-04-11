@@ -12,10 +12,6 @@
     <name>Mule Modules</name>
     <description>Modules which extend the Mule Core but do not qualify as Transports</description>
 
-    <properties>
-        <formatterConfigPath>../formatter.xml</formatterConfigPath>
-    </properties>
-
     <modules>
         <module>all-modules</module>
         <module>artifact</module>

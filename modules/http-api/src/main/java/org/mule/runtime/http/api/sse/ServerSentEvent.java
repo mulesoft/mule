@@ -15,7 +15,7 @@ import java.util.Optional;
  * Server-sent event (SSE).
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
- * 
+ *
  * @since 4.9.3, 4.10.0
  */
 @Experimental
@@ -39,7 +39,7 @@ public interface ServerSentEvent {
 
   /**
    * The server may set the reconnection delay.
-   * 
+   *
    * @return the new retry delay, if the server configured it.
    */
   Optional<Long> getRetryDelay();

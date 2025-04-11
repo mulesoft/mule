@@ -13,7 +13,7 @@ import org.mule.runtime.metrics.api.MeterProvider;
 
 /**
  * Provides summary information about the flows in the deployed application.
- * 
+ *
  * <strong>Private/Trigger flows</strong>
  * <ul>
  * <li>A flow is considered <b>trigger</b> when it contains a {@link MessageSource}.</li>
@@ -27,7 +27,7 @@ import org.mule.runtime.metrics.api.MeterProvider;
  * <li>A <b>declared</b> flow is a flow that exists in an application, regardless of its lifecycle state (it can be either
  * {@code started} or {@code stopped}).</li>
  * </ul>
- * 
+ *
  * @since 4.5
  */
 @NoImplement
@@ -54,7 +54,7 @@ public interface FlowsSummaryStatistics extends Statistics {
 
   /**
    * Returns the counter of trigger flows declared in the application.
-   * 
+   *
    * @return The number of declared trigger flows
    */
   int getDeclaredTriggerFlows();
@@ -68,7 +68,7 @@ public interface FlowsSummaryStatistics extends Statistics {
 
   /**
    * Returns the counter of ApiKit flows declared in the application.
-   * 
+   *
    * @return The number of declared ApiKit flows
    */
   int getDeclaredApikitFlows();

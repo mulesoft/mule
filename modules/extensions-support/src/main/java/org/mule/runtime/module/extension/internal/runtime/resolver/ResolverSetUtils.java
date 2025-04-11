@@ -192,7 +192,7 @@ public class ResolverSetUtils {
                       reflectionCache,
                       expressionManager,
                       parametersOwner)
-                          .getParametersAsResolverSet(model, muleContext);
+        .getParametersAsResolverSet(model, muleContext);
   }
 
   private static Map<String, ValueResolver> getParameterGroupValueResolvers(BiFunction<ParameterGroupModel, ParameterModel, Object> params,

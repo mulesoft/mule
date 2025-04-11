@@ -43,7 +43,8 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
     return new ApplicationDescriptorFactory(model, deploymentProperties, pluginModelResolver,
                                             pluginDescriptorResolver,
                                             ArtifactDescriptorValidatorBuilder.builder(), domainDescriptorResolver,
-                                            descriptorCreator).create();
+                                            descriptorCreator)
+        .create();
   }
 
   @Override
@@ -92,7 +93,8 @@ public class DefaultDeployableArtifactDescriptorFactory implements DeployableArt
 
     return new DomainDescriptorFactory(model, deploymentProperties, pluginModelResolver,
                                        pluginDescriptorResolver,
-                                       ArtifactDescriptorValidatorBuilder.builder(), descriptorCreator).create();
+                                       ArtifactDescriptorValidatorBuilder.builder(), descriptorCreator)
+        .create();
   }
 
   @Override

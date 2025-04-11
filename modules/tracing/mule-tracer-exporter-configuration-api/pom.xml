@@ -22,7 +22,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.tracer.exporter.configuration.api</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
 </project>

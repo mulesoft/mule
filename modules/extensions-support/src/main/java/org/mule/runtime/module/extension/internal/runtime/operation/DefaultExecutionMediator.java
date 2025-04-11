@@ -321,7 +321,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(muleConfiguration,
                                                                           notificationDispatcher,
                                                                           context.getTransactionConfig().orElseThrow()))
-                                                                              .execute(callback);
+          .execute(callback);
     } else {
       return ((ExecutionTemplate<T>) defaultExecutionTemplate)
           .execute(callback);

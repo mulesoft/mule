@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 /**
  * Implementation of {@link Consumer} that obtains a {@link List} from a {@link Producer} and returns the elements one by one.
  * This implementation is not thread-safe.
- * 
+ *
  * @since 3.5.0
  */
 @NoExtend

@@ -28,8 +28,8 @@ public abstract class AbstractSourceResultArgumentResolver<T> implements Argumen
 
   private static final Set<String> GENERATE_ERRORS = of(SOURCE_RESPONSE_GENERATE,
                                                         SOURCE_ERROR_RESPONSE_GENERATE)
-                                                            .map(ComponentIdentifier::getName)
-                                                            .collect(toSet());
+      .map(ComponentIdentifier::getName)
+      .collect(toSet());
 
   public AbstractSourceResultArgumentResolver(ArgumentResolver<Error> errorArgumentResolver) {
     this.errorArgumentResolver = errorArgumentResolver;

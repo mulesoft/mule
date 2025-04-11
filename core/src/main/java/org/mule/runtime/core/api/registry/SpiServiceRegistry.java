@@ -17,7 +17,7 @@ import java.util.ServiceLoader;
  * Implementation of {@link ServiceRegistry} that uses standard {@link java.util.ServiceLoader} to get the providers
  *
  * @since 3.7.0
- * 
+ *
  * @deprecated since 4.5, call {@link ServiceLoader#load(Class, ClassLoader)} directly to avoid requiring the module
  *             {@code org.mule.runtime.core} to have visibility on the service interfaces from the modules that use this utils.
  */

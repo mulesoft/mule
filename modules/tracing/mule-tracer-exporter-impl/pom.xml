@@ -28,7 +28,6 @@
         </surefire.args>
 
         <javaModuleName>org.mule.runtime.tracer.exporter.impl</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

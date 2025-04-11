@@ -82,7 +82,7 @@ public class DefaultExtensionModelLoaderRepository implements ExtensionModelLoad
    * them all to throw an exception with the detailed message.
    * <p/>
    * The exception, if thrown, will have the following message:
-   * 
+   *
    * <pre>
    *   There are several loaders that return the same ID when looking up providers for 'org.mule.runtime.module.artifact.ExtensionModelLoader'. Full error list:
    *   ID [some-id] is being returned by the following classes [org.foo.FooLoader, org.bar.BarLoader]

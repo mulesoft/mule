@@ -167,13 +167,13 @@ public class CompositeOperationPolicy
         .map(e -> Either.empty()), sinkRecorder::complete, sinkRecorder::error,
                                     shutdownTimeout, completionCallbackScheduler,
                                     operation.getDslSource()))
-                                        .map(result -> {
-                                          result.applyLeft(t -> {
-                                            throw propagate(t);
-                                          });
-                                          return result.getRight();
-                                        }).doOnNext(response -> from(response)
-                                            .setNextOperationResponse((InternalEvent) response));
+        .map(result -> {
+          result.applyLeft(t -> {
+            throw propagate(t);
+          });
+          return result.getRight();
+        }).doOnNext(response -> from(response)
+            .setNextOperationResponse((InternalEvent) response));
   }
 
   private static final class OperationDispatcher implements Consumer<CoreEvent> {

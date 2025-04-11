@@ -493,7 +493,7 @@ public class MuleExtensionUtils {
 
   /**
    * Resolves the {@link org.mule.runtime.extension.api.runtime.config.ConfigurationProvider} name for an extension.
-   * 
+   *
    * @param extensionModel                         The {@link ExtensionModel} of the extension.
    * @param configurationModel                     The {@link ConfigurationModel} of the extension.
    * @param extendedArtifactType                   The {@link ArtifactType} of the extended artifact.

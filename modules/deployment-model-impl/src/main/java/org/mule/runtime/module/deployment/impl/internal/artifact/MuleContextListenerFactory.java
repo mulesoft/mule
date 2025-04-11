@@ -15,7 +15,7 @@ public interface MuleContextListenerFactory {
 
   /**
    * Creates a context listener for a given artifact
-   * 
+   *
    * @param artifactName name of the artifact owning the listener. Non empty.
    * @return
    */

@@ -60,7 +60,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 /**
  * Generates a Spring context for the artifact of the provided {@link ArtifactAst}, and sets it as the registry in the
  * {@link MuleContext}.
- * 
+ *
  * @since 4.5
  */
 public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilder

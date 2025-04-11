@@ -57,7 +57,7 @@ public class XmlSdkConnectionProviderFactoryTestCase extends AbstractMuleTestCas
                                                                                    emptyList(),
                                                                                    emptyList(),
                                                                                    configurationFactory)
-                                                                                       .getObjectType();
+        .getObjectType();
 
     final Map<String, Method> gettersFrom = gettersFrom(connectionProviderObjectType);
     assertThat(gettersFrom, anEmptyMap());
@@ -70,7 +70,7 @@ public class XmlSdkConnectionProviderFactoryTestCase extends AbstractMuleTestCas
                                             emptyList(),
                                             asList(somePropertyParameterDeclaration),
                                             configurationFactory)
-                                                .getObjectType();
+            .getObjectType();
 
     final Map<String, Method> gettersFrom = gettersFrom(connectionProviderObjectType);
     assertThat(gettersFrom, aMapWithSize(1));
@@ -84,7 +84,7 @@ public class XmlSdkConnectionProviderFactoryTestCase extends AbstractMuleTestCas
                                             asList(somePropertyParameterDeclaration),
                                             emptyList(),
                                             configurationFactory)
-                                                .getObjectType();
+            .getObjectType();
 
     final Map<String, Method> gettersFrom = gettersFrom(connectionProviderObjectType);
     assertThat(gettersFrom, aMapWithSize(1));
@@ -98,7 +98,7 @@ public class XmlSdkConnectionProviderFactoryTestCase extends AbstractMuleTestCas
                                             asList(somePropertyParameterDeclaration),
                                             asList(somePropertyParameterDeclaration),
                                             configurationFactory)
-                                                .getObjectType();
+            .getObjectType();
 
     final Map<String, Method> gettersFrom = gettersFrom(connectionProviderObjectType);
     assertThat(gettersFrom, aMapWithSize(1));
@@ -112,7 +112,7 @@ public class XmlSdkConnectionProviderFactoryTestCase extends AbstractMuleTestCas
                                             emptyList(),
                                             asList(somePropertyParameterDeclaration),
                                             configurationFactory)
-                                                .getObjectType();
+            .getObjectType();
 
     final Map<String, Method> gettersFrom = gettersFrom(connectionProviderObjectType);
     assertThat(gettersFrom, aMapWithSize(1));
@@ -132,7 +132,7 @@ public class XmlSdkConnectionProviderFactoryTestCase extends AbstractMuleTestCas
                                             asList(somePropertyParameterDeclaration),
                                             emptyList(),
                                             configFactory)
-                                                .newInstance();
+            .newInstance();
 
     final Object somePropertyValueConnection = connectionProvider.getClass().getDeclaredMethod("getSomeProperty")
         .invoke(connectionProvider);

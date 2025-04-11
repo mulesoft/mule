@@ -39,7 +39,7 @@ public interface DomainRepository {
    *
    * @param descriptor Descriptor of the domain to find.
    * @return a {@link Domain} corresponding to the given descriptor or null is no such domain exists.
-   * 
+   *
    * @throws DomainNotFoundException           if didn't find any compatible domain.
    * @throws AmbiguousDomainReferenceException if multiple compatible domains were found for given descriptor.
    */

@@ -123,7 +123,7 @@ public class ParameterGroupExclusiveness implements Validation {
                                .map(scbk -> scbk.getParameterGroupModels().stream())
                                .orElse(Stream.empty())),
                     pmzd.getParameterGroupModels().stream())
-                        .collect(toList());
+          .collect(toList());
     } else {
       return pmzd.getParameterGroupModels();
     }

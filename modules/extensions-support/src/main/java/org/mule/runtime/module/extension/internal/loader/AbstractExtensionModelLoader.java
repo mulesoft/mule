@@ -57,7 +57,7 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
   /**
    * As part of our effort to remove the powermock dependency for the Java 17 upgrade("W-13116494"), we have temporarily
    * introduced this setter for test use only. We will need to refactor the class so that the field does not have to be static.
-   * 
+   *
    * @param value // TODO: W-13510775 Refactor AbstractExtensionModelLoader to make IGNORE_DISABLED not static
    */
   public static void setIgnoreDisabled(boolean value) {

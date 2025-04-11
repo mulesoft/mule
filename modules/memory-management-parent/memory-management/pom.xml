@@ -15,7 +15,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.memory.management</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

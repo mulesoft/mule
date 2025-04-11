@@ -121,7 +121,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
   /**
    * Provides the index of the graph(bucket) the current object should be added to
-   * 
+   *
    * @param currentObject current object that is going to be added to the graph(bucket)
    * @return index of the relevant dependency graph(bucket)
    */
@@ -136,7 +136,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
 
   /**
    * Provides the graph(bucket) the current object should be added to
-   * 
+   *
    * @param graphIndex index of the graph for the current object
    * @return relevant dependency graph(bucket)
    */
@@ -157,7 +157,7 @@ public class DependencyGraphLifecycleObjectSorter implements LifecycleObjectSort
   /**
    * The objects in each graph(bucket) will be sorted based on the topological order. By reversing the order, The object that
    * should be initialised/disposed first will come first.
-   * 
+   *
    * @return A list with all the objects sorted based on the lifecycle type
    */
   @Override

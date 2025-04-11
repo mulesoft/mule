@@ -127,8 +127,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   public SystemProperty repositoryLocation = new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
                                                                 discoverProvider(ApplicationDescriptorFactoryTestCase.class
                                                                     .getClassLoader()).getLocalRepositorySuppliers()
-                                                                        .environmentMavenRepositorySupplier().get()
-                                                                        .getAbsolutePath());
+                                                                    .environmentMavenRepositorySupplier().get()
+                                                                    .getAbsolutePath());
 
   @Rule
   public SystemProperty activeProfile = new SystemProperty("muleRuntimeConfig.maven.activeProfiles.0", "test");

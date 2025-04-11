@@ -49,7 +49,7 @@ import org.slf4j.Logger;
 
 /**
  * Utils for Properties Resolver Creation.
- * 
+ *
  * @since 4.5
  */
 public class PropertiesResolverUtils {
@@ -130,7 +130,7 @@ public class PropertiesResolverUtils {
    *                                       are just logged instead of rethrown.
    * @return A List with all the {@link ConfigurationPropertiesProvider} for Application Properties providers within the
    *         {@link ArtifactAst}.
-   * 
+   *
    * @since 4.8
    */
   public static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,

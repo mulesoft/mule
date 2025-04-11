@@ -13,7 +13,7 @@
  */
 @Deprecated
 module org.mule.runtime.deployment.model {
-  
+
   requires org.mule.runtime.api;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;

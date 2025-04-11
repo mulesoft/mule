@@ -50,7 +50,7 @@ import org.junit.rules.TestRule;
  *     database.stop();
  *     database.start();
  *   }
- * 
+ *
  * }
  * </pre>
  *

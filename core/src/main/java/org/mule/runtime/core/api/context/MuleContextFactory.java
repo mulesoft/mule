@@ -24,7 +24,7 @@ public interface MuleContextFactory {
 
   /**
    * Creates a new MuleContext using the given configurationBuilder
-   * 
+   *
    * @param configurationBuilders
    * @throws InitialisationException
    * @throws ConfigurationException
@@ -35,7 +35,7 @@ public interface MuleContextFactory {
   /**
    * Creates a new MuleContext using the {@link MuleContextBuilder} provided and configures it with the list of configuration
    * builder and c onfigures it with configurationBuilder
-   * 
+   *
    * @param configurationBuilder
    * @throws InitialisationException
    * @throws ConfigurationException
@@ -46,7 +46,7 @@ public interface MuleContextFactory {
   /**
    * Creates a new MuleContext using the {@link MuleContextBuilder} provided and configures it with the list of configuration
    * builders. Configuration builders will be invoked in the same or as provided in the List.
-   * 
+   *
    * @throws InitialisationException
    * @throws ConfigurationException
    */

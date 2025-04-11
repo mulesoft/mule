@@ -12,7 +12,7 @@ import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 /**
  * A {@link ModelProperty} intended to be used to signal that the parameter is resolved as part of an
  * {@link ExclusiveParametersModel}
- * 
+ *
  * @since 4.1
  */
 public class ExclusiveOptionalModelProperty implements ModelProperty {

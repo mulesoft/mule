@@ -93,7 +93,8 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                           "<set-payload value=\"10\"/>" +
                           "<logger level=\"WARN\" message=\"#[payload ++ 10]\"/>" +
                           "</operation:body></operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -110,7 +111,8 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                           "<logger level=\"WARN\" message=\"#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]\"/>"
                           +
                           "</operation:body></operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(CoreMatchers.not(empty())));
     assertThat(msg.get().getMessage(), containsString("Using an invalid function within a Mule SDK operation"));
   }
@@ -143,7 +145,8 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                           "<operation:def name=\"someOp\"><operation:body>" +
                           "<set-payload value=\"10\"/>" +
                           "</operation:body></operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -163,7 +166,8 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                           "<set-payload value=\"#[payload + 1]\"/>" +
                           "<set-variable value=\"#[someFunction(10)]\"/>" +
                           "</operation:body></operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -206,7 +210,8 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                           "<logger level=\"WARN\" message=\"#[%dw 2.0 import * from dw::core::Objects --- { 'keySet' : keySet({ 'a' : true, 'b' : 1}) }]\"/>"
                           +
                           "</operation:body></operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -222,7 +227,8 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                           "<set-payload value=\"10\"/>" +
                           "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
                           "</flow>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -238,7 +244,8 @@ public class MuleSDKOperationDoesNotHaveDeprecatedExpressionTestCase extends Abs
                           "<set-payload value=\"10\"/>" +
                           "<logger level=\"WARN\" message=\"#[%dw 2.0 --- { 'v' : Mule::lookup('someFlow') }]\"/>" +
                           "</operation:body></operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(CoreMatchers.not(empty())));
     Map<String, String> info = msg.get().getAdditionalData();
     assertThat(info.keySet(), hasSize(6));

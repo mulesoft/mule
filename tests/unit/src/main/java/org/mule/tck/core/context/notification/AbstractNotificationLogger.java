@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Generic support for notification listeners that store the received notifications to run assertions on them.
- * 
+ *
  * @param <T> the type of notifications to store.
  * @since 4.0
  */

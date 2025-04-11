@@ -67,8 +67,8 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     doReturn(singletonList((NotificationsProvider) () -> singletonMap("test:COMPLIANT",
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
-                                                                                   .when(registry)
-                                                                                   .lookupAllByType(NotificationsProvider.class);
+        .when(registry)
+        .lookupAllByType(NotificationsProvider.class);
 
     configurator.setEnabledNotifications(singletonList(new EnabledNotificationConfig(CompliantNotificationListener.class,
                                                                                      CompliantNotification.class)));
@@ -85,8 +85,8 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
                     (NotificationsProvider) () -> singletonMap("test:COMPLIANT",
                                                                new Pair(CompliantNotification.class,
                                                                         CompliantNotificationListener.class))))
-                                                                            .when(registry)
-                                                                            .lookupAllByType(NotificationsProvider.class);
+        .when(registry)
+        .lookupAllByType(NotificationsProvider.class);
 
     configurator.setEnabledNotifications(singletonList(new EnabledNotificationConfig(CompliantNotificationListener.class,
                                                                                      CompliantNotification.class)));
@@ -101,8 +101,8 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     doReturn(singletonList((NotificationsProvider) () -> singletonMap("test:COMPLIANT",
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
-                                                                                   .when(registry)
-                                                                                   .lookupAllByType(NotificationsProvider.class);
+        .when(registry)
+        .lookupAllByType(NotificationsProvider.class);
 
     final DisabledNotificationConfig disableNotificationConfig = new DisabledNotificationConfig();
     disableNotificationConfig.setEventClass(CompliantNotification.class);
@@ -117,8 +117,8 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     doReturn(singletonList((NotificationsProvider) () -> singletonMap("test:COMPLIANT",
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
-                                                                                   .when(registry)
-                                                                                   .lookupAllByType(NotificationsProvider.class);
+        .when(registry)
+        .lookupAllByType(NotificationsProvider.class);
 
     configurator.setEnabledNotifications(singletonList(new EnabledNotificationConfig(CompliantNotificationListener.class,
                                                                                      CompliantNotification.class)));
@@ -138,8 +138,8 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     doReturn(singletonList((NotificationsProvider) () -> singletonMap("test:COMPLIANT",
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
-                                                                                   .when(registry)
-                                                                                   .lookupAllByType(NotificationsProvider.class);
+        .when(registry)
+        .lookupAllByType(NotificationsProvider.class);
 
     final DisabledNotificationConfig disableNotificationConfig = new DisabledNotificationConfig();
     disableNotificationConfig.setEventName("test:COMPLIANT");
@@ -154,8 +154,8 @@ public class ServerNotificationManagerConfiguratorTestCase extends AbstractMuleT
     doReturn(singletonList((NotificationsProvider) () -> singletonMap("test:COMPLIANT",
                                                                       new Pair(CompliantNotification.class,
                                                                                CompliantNotificationListener.class))))
-                                                                                   .when(registry)
-                                                                                   .lookupAllByType(NotificationsProvider.class);
+        .when(registry)
+        .lookupAllByType(NotificationsProvider.class);
 
     final DisabledNotificationConfig disableNotificationConfig = new DisabledNotificationConfig();
     disableNotificationConfig.setInterfaceClass(CompliantNotificationListener.class);

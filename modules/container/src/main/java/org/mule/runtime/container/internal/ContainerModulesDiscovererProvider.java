@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This overrides the default class when running in a JVM that supports JPMS (9+), but has a fallback mechanism to provide the
  * previous implementation.
- * 
+ *
  * @since 4.6
  */
 public class ContainerModulesDiscovererProvider {

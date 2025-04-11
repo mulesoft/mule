@@ -15,9 +15,9 @@ import java.util.ListIterator;
 
 /**
  * {@code List<Result>} that decorates each of its delegate elements using a {@link PayloadMediaTypeResolver}
- * 
+ *
  * This allows to avoid preemptive decoration of an entire collection of {@link Result}
- * 
+ *
  * @since 4.2
  */
 public class MediaTypeDecoratedResultList extends MediaTypeDecoratedResultCollection implements List<Result> {

@@ -62,7 +62,8 @@ public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationT
                                                                  "    <flow name=\"otherFlow\">\n" +
                                                                  "        <flow-ref name=\"flow\"/>" +
                                                                  "     </flow>" +
-                                                                 XML_CLOSE).stream().findFirst();
+                                                                 XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -76,7 +77,8 @@ public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationT
                                                                  "    </flow>\n" +
                                                                  "    <operation:def name=\"someOp\"><operation:body><logger level=\"WARN\"/></operation:body></operation:def>"
                                                                  +
-                                                                 XML_CLOSE).stream().findFirst();
+                                                                 XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -92,7 +94,8 @@ public class OperationDoesNotHaveFlowRefTestCase extends AbstractCoreValidationT
                                                                  +
                                                                  "    <flow-ref name=\"flow\"/>" +
                                                                  "</operation:body></operation:def>" +
-                                                                 XML_CLOSE).stream().findFirst();
+                                                                 XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(not(empty())));
     assertThat(msg.get().getMessage(),
                containsString("Usages of the component 'flow-ref' are not allowed inside a Mule SDK Operation Definition"));

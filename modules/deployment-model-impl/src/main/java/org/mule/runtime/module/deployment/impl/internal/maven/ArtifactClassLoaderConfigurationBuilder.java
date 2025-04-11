@@ -135,16 +135,16 @@ public abstract class ArtifactClassLoaderConfigurationBuilder extends ClassLoade
           additionalDependenciesForArtifact.getAdditionalDependencies();
       findBundleDependency(additionalDependenciesForArtifact.getGroupId(), additionalDependenciesForArtifact.getArtifactId(),
                            of(MULE_PLUGIN))
-                               .ifPresent(pluginArtifactBundleDependency -> {
-                                 replaceBundleDependency(pluginArtifactBundleDependency,
-                                                         new BundleDependency.Builder(pluginArtifactBundleDependency)
-                                                             .setAdditionalDependencies(pluginAdditionalLibraries.stream()
-                                                                 .map(additionalDependency -> new BundleDependency.Builder()
-                                                                     .setDescriptor(convertBundleDescriptor(additionalDependency))
-                                                                     .build())
-                                                                 .collect(toList()))
-                                                             .build());
-                               });
+          .ifPresent(pluginArtifactBundleDependency -> {
+            replaceBundleDependency(pluginArtifactBundleDependency,
+                                    new BundleDependency.Builder(pluginArtifactBundleDependency)
+                                        .setAdditionalDependencies(pluginAdditionalLibraries.stream()
+                                            .map(additionalDependency -> new BundleDependency.Builder()
+                                                .setDescriptor(convertBundleDescriptor(additionalDependency))
+                                                .build())
+                                            .collect(toList()))
+                                        .build());
+          });
     });
   }
 

@@ -8,7 +8,7 @@ package org.mule.runtime.module.license.api;
 
 /**
  * Holds all the information required for doing the validation of a plugin license.
- * 
+ *
  * @since 4.0
  */
 public class PluginLicenseValidationRequest {
@@ -23,7 +23,7 @@ public class PluginLicenseValidationRequest {
 
   /**
    * Creates a new {@link PluginLicenseValidationRequest}
-   * 
+   *
    * @param entitlement         the required entitlement within the license
    * @param pluginVersion       the plugin version
    * @param pluginProvider      the plugin provider name

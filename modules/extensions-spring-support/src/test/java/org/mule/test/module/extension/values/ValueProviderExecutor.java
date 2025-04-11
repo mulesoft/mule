@@ -90,7 +90,7 @@ public class ValueProviderExecutor {
       if (parameterizedModel != actingParameter.getModel()) {
         return resultFrom(newFailure(new ValueResolvingException("The parameter model from the acting parameters "
             + "is different from the one provided in the session", INVALID_PARAMETER_VALUE))
-                .withFailureCode(INVALID_PARAMETER_VALUE).build());
+            .withFailureCode(INVALID_PARAMETER_VALUE).build());
       }
       LOGGER.debug("Resolve value provider: {} STARTED for component: {} {}", providerName, parameterizedModel.getName(),
                    loggingSuffix);

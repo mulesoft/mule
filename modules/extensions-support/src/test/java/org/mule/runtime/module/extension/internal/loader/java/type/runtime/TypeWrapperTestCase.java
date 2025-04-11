@@ -121,7 +121,7 @@ public class TypeWrapperTestCase extends AbstractMuleTestCase {
   public void getAnnotationsForMethodWrapper() {
     java.util.Optional<MethodElement> method = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(currentThread().getContextClassLoader())).getEnclosingMethods()
-            .filter(m -> m.getName().contains("childMethod")).findAny();
+        .filter(m -> m.getName().contains("childMethod")).findAny();
     assertThat(method.isPresent(), is(true));
     assertThat(method.get().getAnnotations().count(), is(1L));
     assertThat(method.get().getAnnotations()
@@ -133,7 +133,7 @@ public class TypeWrapperTestCase extends AbstractMuleTestCase {
   public void getAnnotationsForParameterWrapper() {
     java.util.Optional<MethodElement> method = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(currentThread().getContextClassLoader())).getEnclosingMethods()
-            .filter(m -> m.getName().contains("childMethod")).findAny();
+        .filter(m -> m.getName().contains("childMethod")).findAny();
     assertThat(method.isPresent(), is(true));
     assertThat(method.get().getParameters().size(), is(1));
     assertThat(method.get().getParameters().get(0).getAnnotations().count(), is(1L));
@@ -146,7 +146,7 @@ public class TypeWrapperTestCase extends AbstractMuleTestCase {
   public void getAnnotationsForFieldWrapper() {
     java.util.Optional<FieldElement> field = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(currentThread().getContextClassLoader())).getFields().stream()
-            .filter(f -> f.getName().contains("someField")).findAny();
+        .filter(f -> f.getName().contains("someField")).findAny();
     assertThat(field.isPresent(), is(true));
     assertThat(field.get().getAnnotations().count(), is(1L));
     assertThat(field.get().getAnnotations()
@@ -177,7 +177,7 @@ public class TypeWrapperTestCase extends AbstractMuleTestCase {
   public void isArray() {
     java.util.Optional<FieldElement> field = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(currentThread().getContextClassLoader())).getFields().stream()
-            .filter(f -> f.getName().contains("arrayOfStrings")).findAny();
+        .filter(f -> f.getName().contains("arrayOfStrings")).findAny();
     assertThat(field.isPresent(), is(true));
     assertThat(field.get().getType().isArray(), is(true));
     assertThat(field.get().getType().getArrayComponentType().get().getTypeName(), containsString("String"));
@@ -187,7 +187,7 @@ public class TypeWrapperTestCase extends AbstractMuleTestCase {
   public void listIsNotArray() {
     java.util.Optional<FieldElement> field = new TypeWrapper(ChildTestClass.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(currentThread().getContextClassLoader())).getFields().stream()
-            .filter(f -> f.getName().contains("listOfStrings")).findAny();
+        .filter(f -> f.getName().contains("listOfStrings")).findAny();
     assertThat(field.isPresent(), is(true));
     assertThat(field.get().getType().isArray(), is(false));
     assertThat(field.get().getType().getArrayComponentType().isPresent(), is(false));

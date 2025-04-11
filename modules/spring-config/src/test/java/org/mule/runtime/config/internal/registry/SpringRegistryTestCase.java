@@ -133,7 +133,7 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
 
   /**
    * This builds a SpringRegistry whose lifecycle can be invoked and tested.
-   * 
+   *
    * @param lifecycleInterceptor     The {@link LifecycleInterceptor} to be used.
    * @param singletonBeansToRegister key/value map of singleton beans that will be already registered in the returned
    *                                 {@link SpringRegistry}
@@ -177,7 +177,7 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     /**
      * A bean that implements {@link Stoppable} and {@link Disposable} lifecycle phases and can try to register a bean as part of
      * each of them.
-     * 
+     *
      * @param registrationExecutor Executor that will be used to register the beans (registrations happen on a different thread).
      * @param phaseUnderTest       The lifecycle phase where the bean registration should be attempted.
      */

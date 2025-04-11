@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * Implements singleton pattern to allow different splash-screen implementations following the concept of header, body, and
  * footer. Header and footer are reserved internally to Mule but body can be used to customize splash-screen output. External code
  * can e.g. hook into the start-up splash-screen as follows:
- * 
+ *
  * <pre>
  * <code>
  *   SplashScreen splashScreen = SplashScreen.getInstance(ServerStartupSplashScreen.class);
@@ -62,7 +62,7 @@ public abstract class SplashScreen {
 
   /**
    * Setting the header clears body and footer assuming a new splash-screen is built.
-   * 
+   *
    */
   final public void setHeader(MuleContext context) {
     header.clear();

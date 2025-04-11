@@ -8,14 +8,14 @@ package org.mule.runtime.module.boot.api;
 
 /**
  * Decouples the creation of the {@link MuleContainer} from the module requiring it.
- * 
+ *
  * @since 4.6
  */
 public interface MuleContainerProvider {
 
   /**
    * Creates an instance of a {@link MuleContainer}.
-   * 
+   *
    * @return a newly created {@link MuleContainer}.
    * @throws Exception
    */

@@ -76,7 +76,7 @@ public class ErrorHandlerOnErrorHasTypeOrWhen implements Validation {
           // last error handler should be the catch all, so that one is not validated
           && currentElemement(ehc -> errorHandler.directChildrenStream().limit(errorHandler.directChildrenStream().count() - 1)
               .anyMatch(comp -> comp.equals(ehc)))
-                  .test(h);
+              .test(h);
     };
   }
 

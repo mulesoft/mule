@@ -73,7 +73,8 @@ public final class JavaExternalLibModelParserUtils {
                                                builder::withCoordinates);
 
                                     return builder.build();
-                                  }).forEach(libraries::add);
+                                  })
+        .forEach(libraries::add);
 
     return libraries;
   }

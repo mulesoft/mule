@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This rules logs Mule server logs content in case of a test failure.
  * <p>
- * 
+ *
  * <pre>
  * public class MuleServerTestCase {
  *
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * }
  * </pre>
  *
- * 
+ *
  */
 public class MuleServerFailureLogger extends TestWatcher {
 

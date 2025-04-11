@@ -46,14 +46,14 @@ import java.util.function.Supplier;
 
 /**
  * Provides a way to create resolvers, configProviders and mediators to be used in design time.
- * 
+ *
  * @since 4.8
  */
 public interface ExtensionDesignTimeResolversFactory {
 
   /**
    * Creates a {@link ConnectionProviderValueResolver} for the provided parameters.
-   * 
+   *
    * @return a new {@link ConnectionProviderValueResolver}
    * @param <C> the generic type of the provider's connection object
    * @throws MuleException if the resolver cannot be created

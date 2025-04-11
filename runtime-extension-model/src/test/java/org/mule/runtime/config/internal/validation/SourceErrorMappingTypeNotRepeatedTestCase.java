@@ -67,7 +67,7 @@ public class SourceErrorMappingTypeNotRepeatedTestCase extends AbstractCoreValid
                           "    </flow>\n" +
                           "\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Repeated source types are not allowed. Offending types are 'ROUTING', 'EXPRESSION'."));

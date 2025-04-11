@@ -147,7 +147,7 @@ public interface RetryPolicyTemplate extends org.mule.runtime.api.retry.policy.R
 
   /**
    * Indicates whether current retry policy will asynchronously trigger a reconnection policy.
-   * 
+   *
    * @return true if the policy will be triggered asynchronously.
    */
   default boolean isAsync() {

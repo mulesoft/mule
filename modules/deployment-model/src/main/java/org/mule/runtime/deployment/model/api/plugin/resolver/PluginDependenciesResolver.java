@@ -13,7 +13,7 @@ import java.util.Set;
 
 /**
  * Resolves plugin dependencies to obtain a proper initialization order.
- * 
+ *
  * @since 4.5
  */
 public interface PluginDependenciesResolver {

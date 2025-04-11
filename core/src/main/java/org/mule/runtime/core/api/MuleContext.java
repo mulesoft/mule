@@ -117,7 +117,7 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * Gets the queue manager used by mule for queuing events. This is used for service queues.
-   * 
+   *
    * @deprecated Used only internally by Mule Runtime
    */
   @Deprecated
@@ -329,7 +329,7 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * @return the streamingManager used in this artifact.
-   * 
+   *
    * @since 4.5
    */
   default StreamingManager getStreamingManager() {

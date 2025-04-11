@@ -414,7 +414,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     // For the time being we only support going for the same "apply start phase" setting as in the original initialization
     // request.
     createComponentsAndApplyLifecycle(getRequestBuilder(currentComponentInitializationState.isApplyStartPhaseRequested(),
-                                                        true).build(componentModelPredicate));
+                                                        true)
+        .build(componentModelPredicate));
   }
 
   @Override

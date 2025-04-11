@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 
 /**
  * Expose information about the Mule instance:
- * 
+ *
  * <li><b>clusterid</b> <i>Cluster ID</i>
  * <li><b>home</b> <i>Home directory</i>
  * <li><b>nodeid</b> <i>Cluster Node ID</i>

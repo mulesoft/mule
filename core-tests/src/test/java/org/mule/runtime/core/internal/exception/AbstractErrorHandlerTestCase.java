@@ -125,10 +125,10 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
 
     when(errorTypeRepository
         .lookupErrorType(ComponentIdentifier.buildFromStringRepresentation("MULE:SUPPRESSED")))
-            .thenReturn(Optional.of(suppressedErrorType));
+        .thenReturn(Optional.of(suppressedErrorType));
     when(errorTypeRepository
         .lookupErrorType(ComponentIdentifier.buildFromStringRepresentation("MULE:UNSUPPRESSED")))
-            .thenReturn(Optional.of(unsuppressedErrorType));
+        .thenReturn(Optional.of(unsuppressedErrorType));
     when(errorTypeRepository
         .getSourceResponseErrorType()).thenReturn(sourceResponseErrorType);
 

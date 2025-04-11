@@ -54,7 +54,7 @@ public class TestServicesSetup extends ExternalResource {
 
   /**
    * Allows to override the scheduler service implementation to be used in the test suite.
-   * 
+   *
    * @param supplier a function that receives the folder where the service should be built and returns the artifact file.
    * @throws IOException if the temp folder for the service couldn't be created.
    */
@@ -64,7 +64,7 @@ public class TestServicesSetup extends ExternalResource {
 
   /**
    * Allows to override the expression language service implementation to be used in the test suite.
-   * 
+   *
    * @param supplier a function that receives the folder where the service should be built and returns the artifact file.
    * @throws IOException if the temp folder for the service couldn't be created.
    */
@@ -74,7 +74,7 @@ public class TestServicesSetup extends ExternalResource {
 
   /**
    * Allows to override the expression language metadata service implementation to be used in the test suite.
-   * 
+   *
    * @param supplier a function that receives the folder where the service should be built and returns the artifact file.
    * @throws IOException if the temp folder for the service couldn't be created.
    */
@@ -94,7 +94,7 @@ public class TestServicesSetup extends ExternalResource {
   /**
    * Copies the pre-built services to the services folder being used by the test. The first call to this method actually builds
    * the services.
-   * 
+   *
    * @param servicesFolder the {@code $MULE_HOME/services} folder.
    * @throws IOException if some sub-folder of the services folder couldn't be created.
    */

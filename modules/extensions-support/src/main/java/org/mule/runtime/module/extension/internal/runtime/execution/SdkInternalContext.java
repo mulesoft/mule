@@ -220,11 +220,13 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
     }
   }
 
-  public static final record OperationExecutionParams<M extends ComponentModel> (Optional<ConfigurationInstance> configuration,
-      Map<String, Object> parameters,
-      CoreEvent operationEvent,
+  public static final record OperationExecutionParams<M extends ComponentModel>(
+  Optional<ConfigurationInstance> configuration,
+      Map<String,Object>parameters,
+  CoreEvent operationEvent,
       ExecutorCallback callback,
-      ExecutionContextAdapter<M> executionContextAdapter) {
+  ExecutionContextAdapter<M> executionContextAdapter)
+  {
 
   }
 

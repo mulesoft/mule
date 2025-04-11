@@ -32,7 +32,7 @@ public class PropertyChecker {
    * WARNING: This method looks up a system property, which can lead to contention if many threads access the system properties at
    * the same time. It is recommended to read this value during initialization and keeping the result, rather than calling this
    * method repeatedly.
-   * 
+   *
    * @return the value of the property, or the default if not present
    */
   public boolean isEnabled() {

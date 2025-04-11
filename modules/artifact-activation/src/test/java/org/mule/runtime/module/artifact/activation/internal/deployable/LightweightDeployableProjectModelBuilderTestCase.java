@@ -64,16 +64,16 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
       new SystemProperty("muleRuntimeConfig.maven.repositoryLocation",
                          discoverProvider(LightweightDeployableProjectModelBuilderTestCase.class
                              .getClassLoader()).getLocalRepositorySuppliers()
-                                 .environmentMavenRepositorySupplier().get()
-                                 .getAbsolutePath());
+                             .environmentMavenRepositorySupplier().get()
+                             .getAbsolutePath());
 
   @Rule
   public SystemProperty settingsLocation =
       new SystemProperty("muleRuntimeConfig.maven.userSettingsLocation",
                          discoverProvider(LightweightDeployableProjectModelBuilderTestCase.class
                              .getClassLoader()).getSettingsSupplierFactory()
-                                 .environmentUserSettingsSupplier().get()
-                                 .getAbsolutePath());
+                             .environmentUserSettingsSupplier().get()
+                             .getAbsolutePath());
 
   @Before
   public void before() {
@@ -162,7 +162,8 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)
       throws URISyntaxException {
     DeployableProjectModel model = new TestLightweightDeployableProjectModelBuilder(getResourceFolder(deployablePath),
-                                                                                    false, mavenReactorResolver).build();
+                                                                                    false, mavenReactorResolver)
+        .build();
 
     model.validate();
 

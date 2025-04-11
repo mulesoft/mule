@@ -82,8 +82,8 @@ public final class ExtensionErrorsRegistrant {
            concat(extModel.getOperationModels().stream(),
                   extModel.getSourceModels().stream()))
 
-                      .map(model -> identifierFromModel(syntaxResolver, model))
-                      .forEach(identifier -> errorTypeLocator.addComponentExceptionMapper(identifier, mapping));
+        .map(model -> identifierFromModel(syntaxResolver, model))
+        .forEach(identifier -> errorTypeLocator.addComponentExceptionMapper(identifier, mapping));
   }
 
   private static ComponentIdentifier identifierFromModel(DslSyntaxResolver syntaxResolver, ConnectableComponentModel model) {

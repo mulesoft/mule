@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 /**
  * Discovers {@link MuleContainerModule} from java module descriptors.
- * 
+ *
  * @since 4.6
  */
 public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
@@ -117,8 +117,8 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
 
       this.exportedPackages = concat(getDirectExports(jpmsModule),
                                      resolveTransitiveExportedPackages(jpmsModule))
-                                         .filter(not(privilegedExportedPackages::contains))
-                                         .collect(toSet());
+          .filter(not(privilegedExportedPackages::contains))
+          .collect(toSet());
     }
 
     private Stream<String> getDirectExports(Module jpmsModule) {

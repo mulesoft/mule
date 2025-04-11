@@ -339,7 +339,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   /**
    * Configures convenient default values for the Mule configuration of the testing environment.
-   * 
+   *
    * @param muleConfiguration A {@link MuleConfiguration} to configure.
    */
   protected void configureMuleConfiguration(DefaultMuleConfiguration muleConfiguration) {

@@ -14,7 +14,7 @@ import java.util.List;
  * Bean dependency resolver interface.
  * <p/>
  * Implementation of this interface must resolve the dependencies between beans in the spring context.
- * 
+ *
  * @since 4.0
  */
 public interface BeanDependencyResolver {

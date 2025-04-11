@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /**
  * This {@link RuntimeException} is used for debugging purposes to track where a {@link Cursor} is closed.
- * 
+ *
  * @since 4.4.0, 4.3.1
  */
 public class ClosingCursorException extends IOException {

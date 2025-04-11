@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * This is useful for registering any Map of objects with the {@link Registry} via the {@link ConfigurationBuilder} interface.
- * 
+ *
  * @since 4.5
  */
 public final class ServiceCustomizationsConfigurationBuilder extends AbstractConfigurationBuilder {

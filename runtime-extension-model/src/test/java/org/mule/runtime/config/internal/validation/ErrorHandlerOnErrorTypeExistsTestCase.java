@@ -68,7 +68,7 @@ public class ErrorHandlerOnErrorTypeExistsTestCase extends AbstractCoreValidatio
                           "    </flow>\n" +
                           "\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.isPresent(), equalTo(false));
   }

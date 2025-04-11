@@ -117,7 +117,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
 
   /**
    * Resolves the value for one of the {@link ValueResolver} entries of this {@link ResolverSet}.
-   * 
+   *
    * @param entry                 A {@link ValueResolver} entry.
    * @param valueResolvingContext {@link ValueResolvingContext} that will be used to resolve the value.
    * @return The resolved value.

@@ -97,11 +97,11 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
     Set<ExtensionModel> extensionModels =
         new DefaultExtensionModelDiscoverer(new RepositoryLookupExtensionModelGenerator(artifactPluginDescriptor -> artifactClassLoader,
                                                                                         loaderRepository))
-                                                                                            .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(singletonList(descriptor),
-                                                                                                                                                                 emptySet(),
-                                                                                                                                                                 false,
-                                                                                                                                                                 false,
-                                                                                                                                                                 true));
+            .discoverPluginsExtensionModels(new DefaultExtensionDiscoveryRequest(singletonList(descriptor),
+                                                                                 emptySet(),
+                                                                                 false,
+                                                                                 false,
+                                                                                 true));
     assertThat(extensionDeclared.get(), is(true));
     assertThat(extensionModels.size(), is(1 + discoverRuntimeExtensionModels().size()));
     assertThat((extensionModels.stream()

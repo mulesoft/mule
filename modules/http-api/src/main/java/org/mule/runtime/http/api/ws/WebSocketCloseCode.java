@@ -44,55 +44,55 @@ public enum WebSocketCloseCode {
   MESSAGE_TOO_LARGE(1004),
   /**
    * Indicates termination due to inconsistent data in a message (e.g., non-UTF-8).
-   * 
+   *
    * @since 4.10.0
    */
   INVALID_PAYLOAD(1007),
   /**
    * Indicates termination due to a policy violation.
-   * 
+   *
    * @since 4.10.0
    */
   POLICY_VIOLATION(1008),
   /**
    * Indicates termination because the message is too big to process.
-   * 
+   *
    * @since 4.10.0
    */
   MESSAGE_TOO_BIG(1009),
   /**
    * Indicates client termination; expected extensions were not negotiated.
-   * 
+   *
    * @since 4.10.0
    */
   MISSING_EXTENSIONS(1010),
   /**
    * Indicates server termination due to an unexpected condition.
-   * 
+   *
    * @since 4.10.0
    */
   INTERNAL_SERVER_ERROR(1011),
   /**
    * Indicates that the service is restarted.
-   * 
+   *
    * @since 4.10.0
    */
   SERVICE_RESTARTED(1012),
   /**
    * Indicates that the service is experiencing overload.
-   * 
+   *
    * @since 4.10.0
    */
   TRY_AGAIN_LATER(1013),
   /**
    * Indicates the server, acting as a gateway, received an invalid response.
-   * 
+   *
    * @since 4.10.0
    */
   BAD_GATEWAY(1014),
   /**
    * Indicates any close code not explicitly defined in this enum.
-   * 
+   *
    * @since 4.10.0
    */
   UNKNOWN(-1);

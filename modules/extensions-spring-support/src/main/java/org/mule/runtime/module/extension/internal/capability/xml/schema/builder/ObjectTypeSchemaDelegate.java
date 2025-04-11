@@ -85,7 +85,7 @@ final class ObjectTypeSchemaDelegate {
    * vary depending on the properties of the type itself along with the properties associated to the parameter.
    * <p>
    * This method serves as a resolver for all that logic, creating the required element for the parameter with complex type.
-   * 
+   *
    * @param type        the {@link ObjectType} of the parameter for which the element is being created
    * @param paramSyntax the {@link DslElementSyntax} of the parameter for which the element is being created
    * @param paramDsl    the {@link ParameterDslConfiguration} associated to the parameter, if any is present.

@@ -13,7 +13,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 
 /**
  * Constants for Mule SDK DSL.
- * 
+ *
  * @since 4.5
  */
 @NoImplement

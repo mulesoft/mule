@@ -44,8 +44,8 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
     return concat(
                   collectElements(Sources.class, Sources::value),
                   collectElements(org.mule.sdk.api.annotation.Sources.class, org.mule.sdk.api.annotation.Sources::value))
-                      .map(s -> new SourceTypeWrapper(s, typeLoader))
-                      .collect(toList());
+        .map(s -> new SourceTypeWrapper(s, typeLoader))
+        .collect(toList());
   }
 
   /**
@@ -77,8 +77,8 @@ abstract class ComponentWrapper extends TypeWrapper implements ComponentElement 
                   collectElements(ConnectionProviders.class, ConnectionProviders::value),
                   collectElements(org.mule.sdk.api.annotation.connectivity.ConnectionProviders.class,
                                   org.mule.sdk.api.annotation.connectivity.ConnectionProviders::value))
-                                      .map(c -> new ConnectionProviderTypeWrapper(c, typeLoader))
-                                      .collect(toList());
+        .map(c -> new ConnectionProviderTypeWrapper(c, typeLoader))
+        .collect(toList());
   }
 
   protected <A extends Annotation> Stream<Class> collectElements(Class<A> annotationClass,

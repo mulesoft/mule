@@ -20,9 +20,9 @@ import org.hamcrest.TypeSafeMatcher;
  * reference is enqueued, because it means that there isn't any strong reference pointing to the referent object.
  *
  * Usage example:
- * 
+ *
  * <pre>
- * 
+ *
  * {
  *   &#64;code
  *   CollectableReference<String> collectableReference = new CollectableReference<>(new String("Hello world"));

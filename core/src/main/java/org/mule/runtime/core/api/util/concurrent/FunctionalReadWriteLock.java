@@ -27,7 +27,7 @@ public final class FunctionalReadWriteLock {
 
   /**
    * Functional interface for releasing a subject lock.
-   * 
+   *
    * @deprecated since 4.3.0 on grounds of performance overhead. Handle this manually instead
    */
   @FunctionalInterface

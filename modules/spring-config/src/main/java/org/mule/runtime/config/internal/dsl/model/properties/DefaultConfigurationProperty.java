@@ -14,7 +14,7 @@ import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
  * This exists to provide an adaptability layer between old properties support and the new mechanism introduced in 4.4.
  *
  * @since 4.5
- * 
+ *
  * @deprecated Use {@link org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty} instead.
  */
 @Deprecated

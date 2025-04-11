@@ -13,7 +13,7 @@ package org.mule.runtime.core.api.management.stats;
  * Multiple instances obtained from the same statistics object are independent.
  * <p>
  * Implementations are thread-safe.
- * 
+ *
  * @since 4.5
  */
 public interface ResetOnQueryCounter {
@@ -21,7 +21,7 @@ public interface ResetOnQueryCounter {
   /**
    * Returns the value of the counted events from the creation of this object or the last call to {@link #getAndReset()},
    * whichever happened last. Then sets the counter value to {@code 0}.
-   * 
+   *
    * @return the current count.
    */
   long getAndReset();
@@ -29,7 +29,7 @@ public interface ResetOnQueryCounter {
   /**
    * Returns the value of the counted events from the creation of this object or the last call to {@link #getAndReset()},
    * whichever happened last.
-   * 
+   *
    * @return the current count.
    */
   long get();

@@ -122,7 +122,7 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
                                      value -> value.getBooleanValue(ParameterGroup::showInDsl),
                                      value -> value
                                          .getBooleanValue(org.mule.sdk.api.annotation.param.ParameterGroup::showInDsl))
-                                             .orElse(false);
+        .orElse(false);
   }
 
   @Override
@@ -188,7 +188,7 @@ public class JavaDeclaredParameterGroupModelParser extends AbstractJavaParameter
                                      org.mule.sdk.api.annotation.param.ParameterGroup.class,
                                      value -> value.getStringValue(ParameterGroup::name),
                                      value -> value.getStringValue(org.mule.sdk.api.annotation.param.ParameterGroup::name))
-                                         .orElse(DEFAULT_GROUP_NAME);
+        .orElse(DEFAULT_GROUP_NAME);
   }
 
   private DisplayModel buildDisplayModel(String displayName) {

@@ -23,7 +23,7 @@ public final class ExceptionHandlerModelProperty implements ModelProperty {
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param exceptionHandlerFactory a non null {@link SdkExceptionHandlerFactory}
    */
   public ExceptionHandlerModelProperty(SdkExceptionHandlerFactory exceptionHandlerFactory) {

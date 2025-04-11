@@ -35,7 +35,7 @@ public final class ExpressionLanguageUtils {
       // just add the flow binding so that scripts referencing it are compiled fine
       addFlowNameBindingsToBuilder(from("(null)"),
                                    addEventBuindingsToBuilder(getNullEvent(), NULL_BINDING_CONTEXT))
-                                       .build();
+          .build();
 
   private ExpressionLanguageUtils() {}
 

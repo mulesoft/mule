@@ -24,7 +24,7 @@ public final class RoutingUtils {
 
   /**
    * Changes the {@link SourcePolicyContext} of the given event with a new instance (copy).
-   * 
+   *
    * @param event                  the event to change the {@link SourcePolicyContext}
    * @param featureFlaggingService The service to check if this change should be performed at all.
    */

@@ -86,9 +86,9 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                                                            resolverSet,
                                                                                            expressionManager,
                                                                                            muleContext)
-                                                                                               .createConfiguration(providerName,
-                                                                                                                    event,
-                                                                                                                    implicitConnectionProviderValueResolver));
+              .createConfiguration(providerName,
+                                   event,
+                                   implicitConnectionProviderValueResolver));
 
       if (resolverSet.isDynamic() || needsDynamicConnectionProvider(extensionModel, configurationModel,
                                                                     implicitConnectionProviderValueResolver)) {
