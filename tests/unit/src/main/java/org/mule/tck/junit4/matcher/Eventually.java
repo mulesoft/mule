@@ -6,6 +6,8 @@
  */
 package org.mule.tck.junit4.matcher;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import org.mule.tck.probe.Timeout;
 
 import java.util.concurrent.TimeUnit;
@@ -17,10 +19,10 @@ import org.hamcrest.Matcher;
 /**
  * Should the matcher be satisfied with delay?
  */
-public class Eventually<T> extends BaseMatcher {
+public class Eventually<T> extends BaseMatcher<T> {
 
   private final Matcher<T> matcher;
-  private TimeUnit timeUnit = TimeUnit.SECONDS;
+  private TimeUnit timeUnit = SECONDS;
   private int time = 10;
   private long interval = 1000;
 

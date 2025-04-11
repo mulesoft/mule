@@ -275,9 +275,13 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
   public void setConnectivityTesterFactory(ConnectivityTesterFactory connectivityTesterFactory) {
     this.connectivityTesterFactory = connectivityTesterFactory;
   }
-
-  @Inject
+  
   public void setInjector(Injector injector) {
     this.injector = injector;
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    setInjector(muleContext.getInjector());
   }
 }
