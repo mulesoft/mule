@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
+
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
@@ -77,6 +79,27 @@ public class LifecycleUtils {
 
   /**
    * The same as {@link #initialiseIfNeeded(Object)}, only that before checking for {@code object} being {@link Initialisable}, it
+   * uses the given {@code injector} to perform further initialization and dependency injection on the {@code object}.
+   *
+   * @param object   the object you're trying to initialise
+   * @param injector an {@link Injector} for the current artifact context
+   * @throws InitialisationException
+   * @throws IllegalArgumentException if {@code injector} is {@code null}
+   */
+  public static void initialiseIfNeeded(Object object, Injector injector) throws InitialisationException {
+    requireNonNull(injector, "injector cannot be null");
+    object = unwrap(object);
+
+    if (object == null) {
+      return;
+    }
+
+    doInject(object, injector);
+    initialiseIfNeeded(object);
+  }
+
+  /**
+   * The same as {@link #initialiseIfNeeded(Object)}, only that before checking for {@code object} being {@link Initialisable}, it
    * uses the given {@code muleContext} to perform further initialization.
    * <p>
    * It checks if the {@code object} implements {@link MuleContextAware}, in which case it will invoke
@@ -93,32 +116,37 @@ public class LifecycleUtils {
    */
   @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Object object, boolean inject, MuleContext muleContext) throws InitialisationException {
-    checkArgument(muleContext != null, "muleContext cannot be null");
-    object = unwrap(object);
-
-    if (object == null) {
-      return;
-    }
-
-    if (object instanceof MuleContextAware) {
-      ((MuleContextAware) object).setMuleContext(muleContext);
-    }
-
+    requireNonNull(muleContext, "muleContext cannot be null");
     if (inject) {
-      try {
-        muleContext.getInjector().inject(object);
-      } catch (MuleException e) {
-        I18nMessage message =
-            createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase",
-                                       object.getClass().getName()));
-        if (object instanceof Initialisable) {
-          throw new InitialisationException(message, e, (Initialisable) object);
-        }
-        throw new MuleRuntimeException(message, e);
-      }
-    }
+      final var injector = muleContext.getInjector();
+      initialiseIfNeeded(object, injector);
+    } else {
+      object = unwrap(object);
 
-    initialiseIfNeeded(object);
+      if (object == null) {
+        return;
+      }
+
+      if (object instanceof MuleContextAware) {
+        ((MuleContextAware) object).setMuleContext(muleContext);
+      }
+
+      initialiseIfNeeded(object);
+    }
+  }
+
+  private static void doInject(Object object, final Injector injector) throws InitialisationException {
+    try {
+      injector.inject(object);
+    } catch (MuleException e) {
+      I18nMessage message =
+          createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase",
+                                     object.getClass().getName()));
+      if (object instanceof Initialisable) {
+        throw new InitialisationException(message, e, (Initialisable) object);
+      }
+      throw new MuleRuntimeException(message, e);
+    }
   }
 
   /**
@@ -130,6 +158,20 @@ public class LifecycleUtils {
   public static void initialiseIfNeeded(Collection<? extends Object> objects) throws InitialisationException {
     for (Object object : objects) {
       initialiseIfNeeded(object);
+    }
+  }
+
+  /**
+   * For each item in the {@code objects} collection, it invokes {@link #initialiseIfNeeded(Object, Injector)}
+   *
+   * @param objects  the list of objects to be initialised
+   * @param injector an {@link Injector} for the current artifact context
+   * @throws InitialisationException
+   */
+  public static void initialiseIfNeeded(Collection<? extends Object> objects, Injector injector)
+      throws InitialisationException {
+    for (Object object : objects) {
+      initialiseIfNeeded(object, injector);
     }
   }
 
