@@ -44,7 +44,7 @@ public class TransactionalQueueManager extends AbstractQueueManager {
   @Override
   public QueueSession getQueueSession() {
     return new TransactionalQueueSession(this, queueXaResourceManager, queueXaResourceManager, xaTransactionRecoverer,
-                                         localTxTransactionJournal, getObjectSerializer(), getDeploymentLifecycleState());
+                                         localTxTransactionJournal, getDeploymentLifecycleState());
   }
 
   @Override

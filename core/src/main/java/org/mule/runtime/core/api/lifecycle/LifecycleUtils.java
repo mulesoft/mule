@@ -118,30 +118,11 @@ public class LifecycleUtils {
   @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Object object, boolean inject, MuleContext muleContext) throws InitialisationException {
     requireNonNull(muleContext, "muleContext cannot be null");
+    object = setMuleContextIfNeededFluent(object, muleContext);
     if (inject) {
-      object = unwrap(object);
-
-      if (object == null) {
-        return;
-      }
-
-      if (object instanceof MuleContextAware) {
-        ((MuleContextAware) object).setMuleContext(muleContext);
-      }
-
       final var injector = muleContext.getInjector();
       initialiseIfNeeded(object, injector);
     } else {
-      object = unwrap(object);
-
-      if (object == null) {
-        return;
-      }
-
-      if (object instanceof MuleContextAware) {
-        ((MuleContextAware) object).setMuleContext(muleContext);
-      }
-
       initialiseIfNeeded(object);
     }
   }
@@ -153,8 +134,8 @@ public class LifecycleUtils {
       I18nMessage message =
           createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase",
                                      object.getClass().getName()));
-      if (object instanceof Initialisable) {
-        throw new InitialisationException(message, e, (Initialisable) object);
+      if (object instanceof Initialisable initialisable) {
+        throw new InitialisationException(message, e, initialisable);
       }
       throw new MuleRuntimeException(message, e);
     }
@@ -228,8 +209,8 @@ public class LifecycleUtils {
    */
   public static void startIfNeeded(Object object) throws MuleException {
     object = unwrap(object);
-    if (object instanceof Startable) {
-      ((Startable) object).start();
+    if (object instanceof Startable startable) {
+      startable.start();
     }
   }
 
@@ -282,8 +263,8 @@ public class LifecycleUtils {
    */
   public static void stopIfNeeded(Object object) throws MuleException {
     object = unwrap(object);
-    if (object instanceof Stoppable) {
-      ((Stoppable) object).stop();
+    if (object instanceof Stoppable stoppable) {
+      stoppable.stop();
     }
   }
 
@@ -295,9 +276,9 @@ public class LifecycleUtils {
    */
   public static void disposeIfNeeded(Object object, Logger logger) {
     object = unwrap(object);
-    if (object instanceof Disposable) {
+    if (object instanceof Disposable disposable) {
       try {
-        ((Disposable) object).dispose();
+        disposable.dispose();
       } catch (Exception e) {
         if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
           throw e;
@@ -397,12 +378,28 @@ public class LifecycleUtils {
    *
    * @param object      the object to inject the {@link MuleContext} into.
    * @param muleContext the {@link MuleContext} in which the object is defined.
+   * @return {@code object} unwrapped
+   * @throws InitialisationException
+   */
+  public static Object setMuleContextIfNeededFluent(Object object, MuleContext muleContext) {
+    object = unwrap(object);
+    if (object != null && object instanceof MuleContextAware mca) {
+      mca.setMuleContext(muleContext);
+    }
+    return object;
+  }
+
+  /**
+   * Sets an objects {@link MuleContext} if it implements {@link MuleContextAware}.
+   *
+   * @param object      the object to inject the {@link MuleContext} into.
+   * @param muleContext the {@link MuleContext} in which the object is defined.
    * @throws InitialisationException
    */
   public static void setMuleContextIfNeeded(Object object, MuleContext muleContext) {
     object = unwrap(object);
-    if (object != null && object instanceof MuleContextAware) {
-      ((MuleContextAware) object).setMuleContext(muleContext);
+    if (object != null && object instanceof MuleContextAware mca) {
+      mca.setMuleContext(muleContext);
     }
   }
 
@@ -450,8 +447,8 @@ public class LifecycleUtils {
   }
 
   private static Object unwrap(Object value) {
-    if (value instanceof Optional) {
-      return ((Optional) value).orElse(null);
+    if (value instanceof Optional opt) {
+      return opt.orElse(null);
     }
 
     return value;

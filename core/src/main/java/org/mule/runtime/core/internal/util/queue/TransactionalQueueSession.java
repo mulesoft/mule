@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.api.util.queue.QueueSession;
@@ -37,8 +36,8 @@ public class TransactionalQueueSession extends AbstractQueueSession implements Q
   public TransactionalQueueSession(QueueProvider queueProvider, QueueXaResourceManager xaResourceManager,
                                    AbstractResourceManager resourceManager, XaTransactionRecoverer xaTransactionRecoverer,
                                    LocalTxQueueTransactionJournal localTxTransactionJournal,
-                                   ObjectSerializer objectSerializer, LifecycleState deploymentLifecycleState) {
-    super(queueProvider, objectSerializer, deploymentLifecycleState);
+                                   LifecycleState deploymentLifecycleState) {
+    super(queueProvider, deploymentLifecycleState);
     this.localTxTransactionJournal = localTxTransactionJournal;
     this.resourceManager = resourceManager;
     this.queueXaResource = new QueueXaResource(xaResourceManager, xaTransactionRecoverer, getQueueProvider());

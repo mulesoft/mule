@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueSession;
@@ -14,13 +13,11 @@ import org.mule.runtime.core.api.util.queue.QueueSession;
 public abstract class AbstractQueueSession implements QueueSession {
 
   private final QueueProvider queueProvider;
-  private final ObjectSerializer objectSerializer;
   private final LifecycleState deploymentLifecycleState;
 
-  public AbstractQueueSession(QueueProvider queueProvider, ObjectSerializer objectSerializer,
-                              LifecycleState deploymentLifecycleState) {
+  protected AbstractQueueSession(QueueProvider queueProvider,
+                                 LifecycleState deploymentLifecycleState) {
     this.queueProvider = queueProvider;
-    this.objectSerializer = objectSerializer;
     this.deploymentLifecycleState = deploymentLifecycleState;
   }
 
@@ -43,10 +40,6 @@ public abstract class AbstractQueueSession implements QueueSession {
 
   protected QueueProvider getQueueProvider() {
     return queueProvider;
-  }
-
-  protected ObjectSerializer getSerializer() {
-    return objectSerializer;
   }
 
   protected abstract QueueTransactionContext getTransactionalContext();
