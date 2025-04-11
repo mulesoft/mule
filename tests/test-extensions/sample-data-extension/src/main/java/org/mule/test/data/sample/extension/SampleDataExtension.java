@@ -30,8 +30,6 @@ import org.mule.test.data.sample.extension.source.ShowInDslParameterGroupListene
 import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
 import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListenerWithTwoBoundActingParameters;
 
-import org.checkerframework.checker.units.qual.A;
-
 @Extension(name = SampleDataExtension.EXTENSION_NAME)
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/sample-data", prefix = "sample-data")

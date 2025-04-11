@@ -10,6 +10,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Implementations must provide a way to wrap each element in a {@link CoreEvent}.
@@ -19,5 +20,7 @@ import java.util.List;
 public interface EventBuilderConfigurerList<T> extends List<T> {
 
   Iterator<EventBuilderConfigurer> eventBuilderConfigurerIterator();
+
+  Stream<EventBuilderConfigurer> eventBuilderConfigurerStream();
 
 }
