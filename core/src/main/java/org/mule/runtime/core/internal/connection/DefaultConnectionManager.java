@@ -24,8 +24,10 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
@@ -38,9 +40,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Implementation of {@link ConnectionManager} which manages connections opened on a specific application.
@@ -55,7 +57,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   private final Lock readLock = readWriteLock.readLock();
   private final Lock writeLock = readWriteLock.writeLock();
-  private final MuleContext muleContext;
+  private final Injector injector;
+  private final LifecycleState deploymentLifecycleState;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final PoolingProfile defaultPoolingProfile;
   private final ConnectionManagementStrategyFactory managementStrategyFactory;
@@ -71,10 +74,11 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
    */
   @Inject
   public DefaultConnectionManager(MuleContext muleContext) {
-    this.muleContext = muleContext;
+    this.deploymentLifecycleState = muleContext.getLifecycleManager().getState();
+    this.injector = muleContext.getInjector();
     this.defaultPoolingProfile = new PoolingProfile();
     this.retryPolicyTemplate = new NoRetryPolicyTemplate();
-    managementStrategyFactory = new ConnectionManagementStrategyFactory(defaultPoolingProfile, muleContext);
+    managementStrategyFactory = new ConnectionManagementStrategyFactory(defaultPoolingProfile, deploymentLifecycleState);
   }
 
   /**
@@ -84,9 +88,9 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
    */
   @Override
   public <C> void bind(Object owner, ConnectionProvider<C> connectionProvider) {
-    assertNotStopping(muleContext, "Mule is shutting down... cannot bind new connections");
+    assertNotStopping(deploymentLifecycleState, "Mule is shutting down... cannot bind new connections");
 
-    connectionProvider = new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext.getInjector());
+    connectionProvider = new DefaultConnectionProviderWrapper<>(connectionProvider, injector);
     ConnectionManagementStrategy<C> managementStrategy =
         managementStrategyFactory.getStrategy(connectionProvider, featureFlaggingService);
 
@@ -293,7 +297,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(retryPolicyTemplate, true, muleContext);
+    initialiseIfNeeded(retryPolicyTemplate, injector);
   }
 
   @Override

@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.api.util.queue.QueueSession;
-import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.internal.transaction.xa.AbstractResourceManager;
 import org.mule.runtime.core.internal.transaction.xa.AbstractTransactionContext;
-import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
+import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.internal.util.xa.XaTransactionRecoverer;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -35,14 +35,16 @@ public class TransactionalQueueSession extends AbstractQueueSession implements Q
 
   public TransactionalQueueSession(QueueProvider queueProvider, QueueXaResourceManager xaResourceManager,
                                    AbstractResourceManager resourceManager, XaTransactionRecoverer xaTransactionRecoverer,
-                                   LocalTxQueueTransactionJournal localTxTransactionJournal, MuleContext muleContext) {
-    super(queueProvider, muleContext);
+                                   LocalTxQueueTransactionJournal localTxTransactionJournal,
+                                   LifecycleState deploymentLifecycleState) {
+    super(queueProvider, deploymentLifecycleState);
     this.localTxTransactionJournal = localTxTransactionJournal;
     this.resourceManager = resourceManager;
     this.queueXaResource = new QueueXaResource(xaResourceManager, xaTransactionRecoverer, getQueueProvider());
     this.txContextReadWriteLock = new ReentrantReadWriteLock();
   }
 
+  @Override
   protected QueueTransactionContext getTransactionalContext() {
     if (singleResourceTxContext != null) {
       return singleResourceTxContext;
@@ -52,6 +54,7 @@ public class TransactionalQueueSession extends AbstractQueueSession implements Q
   }
 
   // Local transaction implementation
+  @Override
   public void begin() throws ResourceManagerException {
     final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
     writeLock.lock();
@@ -67,6 +70,7 @@ public class TransactionalQueueSession extends AbstractQueueSession implements Q
     }
   }
 
+  @Override
   public void commit() throws ResourceManagerException {
     final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
     writeLock.lock();
@@ -81,6 +85,7 @@ public class TransactionalQueueSession extends AbstractQueueSession implements Q
     }
   }
 
+  @Override
   public void rollback() throws ResourceManagerException {
     final ReentrantReadWriteLock.WriteLock writeLock = txContextReadWriteLock.writeLock();
     writeLock.lock();

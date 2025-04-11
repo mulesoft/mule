@@ -16,7 +16,6 @@ import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogRegex;
-import static org.mule.tck.MuleTestUtils.spyInjector;
 
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
@@ -35,6 +34,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 import static org.slf4j.event.Level.DEBUG;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -47,7 +47,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.internal.logger.CustomLogger;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -65,7 +65,7 @@ import org.mockito.junit.MockitoRule;
 
 import io.qameta.allure.Issue;
 
-public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase {
+public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleTestCase {
 
   private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
   private static final int MAX_ACTIVE = 2;
@@ -84,13 +84,12 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   private ConnectionHandler<Object> connection2;
 
   @Rule
-  public MockitoRule mockitorule = MockitoJUnit.rule();
+  public MockitoRule mockitorule = MockitoJUnit.rule().strictness(LENIENT);
 
   @Before
   public void before() throws Exception {
     poolingListener = mock(PoolingListener.class);
-    injector = spyInjector(muleContext);
-    muleContext.start();
+    injector = mock(Injector.class);
     resetConnectionProvider();
     logger.setLevel(DEBUG);
   }
@@ -342,13 +341,13 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   }
 
   private void initStrategy() {
-    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
+    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener,
                                                          ownerConfigName, f -> false);
   }
 
   private void initStrategyJmxDisabled() {
     // enable mule.commons.pool2.disableJmx feature flag
-    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
+    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener,
                                                          ownerConfigName, f -> true);
   }
 

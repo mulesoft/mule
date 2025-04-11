@@ -22,6 +22,7 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.time.TimeSupplier;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.internal.config.ConfigurationInstanceNotification;
@@ -62,20 +63,11 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   private ConfigurationStats configurationStats;
 
-  @Inject
   private TimeSupplier timeSupplier;
-
-  @Inject
   private NotificationDispatcher notificationFirer;
-
-  @Inject
   private ConnectionManagerAdapter connectionManager;
-
-  @Inject
   private ConnectivityTesterFactory connectivityTesterFactory;
-
-  @Inject
-  private MuleContext muleContext;
+  private Injector injector;
 
   private volatile boolean initialized = false;
   private volatile boolean started = false;
@@ -200,12 +192,12 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   private void doInitialise() throws InitialisationException {
     if (connectionProvider.isPresent()) {
-      initialiseIfNeeded(connectionProvider, true, muleContext);
+      initialiseIfNeeded(connectionProvider, injector);
       initialiseIfNeeded(connectionManager);
       connectionManager.bind(value, connectionProvider.get());
     }
 
-    initialiseIfNeeded(value, true, muleContext);
+    initialiseIfNeeded(value, injector);
   }
 
   /**
@@ -264,4 +256,32 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
     configurationStats = new DefaultMutableConfigurationStats(timeSupplier);
   }
 
+  @Inject
+  public void setTimeSupplier(TimeSupplier timeSupplier) {
+    this.timeSupplier = timeSupplier;
+  }
+
+  @Inject
+  public void setNotificationFirer(NotificationDispatcher notificationFirer) {
+    this.notificationFirer = notificationFirer;
+  }
+
+  @Inject
+  public void setConnectionManager(ConnectionManagerAdapter connectionManager) {
+    this.connectionManager = connectionManager;
+  }
+
+  @Inject
+  public void setConnectivityTesterFactory(ConnectivityTesterFactory connectivityTesterFactory) {
+    this.connectivityTesterFactory = connectivityTesterFactory;
+  }
+
+  public void setInjector(Injector injector) {
+    this.injector = injector;
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    setInjector(muleContext.getInjector());
+  }
 }

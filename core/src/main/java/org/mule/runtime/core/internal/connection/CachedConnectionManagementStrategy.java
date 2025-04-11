@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.unwrap;
 
@@ -15,7 +16,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 
 import java.util.concurrent.locks.Lock;
@@ -37,6 +38,7 @@ final class CachedConnectionManagementStrategy<C> extends ConnectionManagementSt
 
   private static final Logger LOGGER = getLogger(CachedConnectionManagementStrategy.class);
 
+  private LifecycleState deploymentLifecycleState;
   private final Lock connectionLock = new ReentrantLock();
   private LazyValue<ConnectionHandlerAdapter<C>> connectionHandler;
 
@@ -44,10 +46,10 @@ final class CachedConnectionManagementStrategy<C> extends ConnectionManagementSt
    * Creates a new instance
    *
    * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
-   * @param muleContext        the owning {@link MuleContext}
    */
-  CachedConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
-    super(connectionProvider, muleContext);
+  CachedConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, LifecycleState deploymentLifecycleState) {
+    super(connectionProvider);
+    this.deploymentLifecycleState = deploymentLifecycleState;
     lazyConnect();
   }
 
@@ -91,7 +93,7 @@ final class CachedConnectionManagementStrategy<C> extends ConnectionManagementSt
   }
 
   private ConnectionHandlerAdapter<C> createConnection() throws ConnectionException {
-    assertNotStopping(muleContext, "Mule is shutting down... Cannot establish new connections");
+    assertNotStopping(deploymentLifecycleState, "Mule is shutting down... Cannot establish new connections");
     return new CachedConnectionHandler<>(connectionProvider.connect(), this::invalidate, connectionProvider);
   }
 

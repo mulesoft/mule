@@ -16,8 +16,10 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueManager;
@@ -27,9 +29,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Abstract implementation for a QueueManager.
@@ -37,14 +39,16 @@ import org.slf4j.Logger;
  * Contains all the logic related to queue caching and queue configuration definition.
  */
 public abstract class AbstractQueueManager
-    implements QueueManager, QueueProvider, QueueStoreCacheListener, MuleContextAware, Initialisable, Disposable {
+    implements QueueManager, QueueProvider, QueueStoreCacheListener, Initialisable, Disposable {
 
   private static final Logger LOGGER = getLogger(AbstractQueueManager.class);
 
   private final Map<String, CacheAwareQueueStore> queues = new ConcurrentHashMap<>();
   private final Map<String, QueueConfiguration> queueConfigurations = new HashMap<>();
   private QueueConfiguration defaultQueueConfiguration = new DefaultQueueConfiguration();
-  private MuleContext muleContext;
+  private MuleConfiguration muleConfiguration;
+  private ObjectSerializer objectSerializer;
+  private LifecycleState deploymentLifecycleState;
 
   /**
    * {@inheritDoc}
@@ -95,14 +99,32 @@ public abstract class AbstractQueueManager
     return queues.computeIfAbsent(name, n -> new CacheAwareQueueStore(createQueueStore(n, config), this));
   }
 
-  @Override
   @Inject
-  public void setMuleContext(MuleContext context) {
-    this.muleContext = context;
+  public void setMuleConfiguration(MuleConfiguration muleConfiguration) {
+    this.muleConfiguration = muleConfiguration;
   }
 
-  protected MuleContext getMuleContext() {
-    return muleContext;
+  protected MuleConfiguration getMuleConfiguration() {
+    return muleConfiguration;
+  }
+
+  public void setObjectSerializer(ObjectSerializer objectSerializer) {
+    this.objectSerializer = objectSerializer;
+  }
+
+  protected ObjectSerializer getObjectSerializer() {
+    return objectSerializer;
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.deploymentLifecycleState = muleContext.getLifecycleManager().getState();
+    // Cannot inject this directly because there may be more than one, and the source of truth is the MuleContext.
+    setObjectSerializer(muleContext.getObjectSerializer());
+  }
+
+  public LifecycleState getDeploymentLifecycleState() {
+    return deploymentLifecycleState;
   }
 
   @Override

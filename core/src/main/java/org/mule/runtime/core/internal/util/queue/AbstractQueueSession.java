@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueSession;
 
 public abstract class AbstractQueueSession implements QueueSession {
 
   private final QueueProvider queueProvider;
-  private final MuleContext muleContext;
+  private final LifecycleState deploymentLifecycleState;
 
-  public AbstractQueueSession(QueueProvider queueProvider, MuleContext muleContext) {
+  protected AbstractQueueSession(QueueProvider queueProvider,
+                                 LifecycleState deploymentLifecycleState) {
     this.queueProvider = queueProvider;
-    this.muleContext = muleContext;
+    this.deploymentLifecycleState = deploymentLifecycleState;
   }
 
   @Override
@@ -35,15 +35,11 @@ public abstract class AbstractQueueSession implements QueueSession {
       public QueueTransactionContext getTransactionalContext() {
         return AbstractQueueSession.this.getTransactionalContext();
       }
-    }, muleContext);
+    }, deploymentLifecycleState);
   }
 
   protected QueueProvider getQueueProvider() {
     return queueProvider;
-  }
-
-  protected ObjectSerializer getSerializer() {
-    return muleContext.getObjectSerializer();
   }
 
   protected abstract QueueTransactionContext getTransactionalContext();

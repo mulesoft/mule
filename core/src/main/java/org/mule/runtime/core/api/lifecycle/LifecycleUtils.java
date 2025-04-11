@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
+
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,6 +24,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
@@ -68,9 +70,33 @@ public class LifecycleUtils {
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
    * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
+   * @deprecated Use {@link #initialiseIfNeeded(Object, Injector)} instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Object object, MuleContext muleContext) throws InitialisationException {
     initialiseIfNeeded(object, true, muleContext);
+  }
+
+  /**
+   * The same as {@link #initialiseIfNeeded(Object)}, only that before checking for {@code object} being {@link Initialisable}, it
+   * uses the given {@code injector} to perform further initialization and dependency injection on the {@code object}.
+   *
+   * @param object   the object you're trying to initialise
+   * @param injector an {@link Injector} for the current artifact context
+   * @throws InitialisationException
+   * @throws IllegalArgumentException if {@code injector} is {@code null}
+   * @since 4.10
+   */
+  public static void initialiseIfNeeded(Object object, Injector injector) throws InitialisationException {
+    requireNonNull(injector, "injector cannot be null");
+    object = unwrap(object);
+
+    if (object == null) {
+      return;
+    }
+
+    doInject(object, injector);
+    initialiseIfNeeded(object);
   }
 
   /**
@@ -87,34 +113,32 @@ public class LifecycleUtils {
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
    * @throws IllegalArgumentException if {@code MuleContext} is {@code null}
+   * @deprecated Use {@link #initialiseIfNeeded(Object, Injector)} instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Object object, boolean inject, MuleContext muleContext) throws InitialisationException {
-    checkArgument(muleContext != null, "muleContext cannot be null");
-    object = unwrap(object);
-
-    if (object == null) {
-      return;
-    }
-
-    if (object instanceof MuleContextAware) {
-      ((MuleContextAware) object).setMuleContext(muleContext);
-    }
-
+    requireNonNull(muleContext, "muleContext cannot be null");
+    object = setMuleContextIfNeededFluent(object, muleContext);
     if (inject) {
-      try {
-        muleContext.getInjector().inject(object);
-      } catch (MuleException e) {
-        I18nMessage message =
-            createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase",
-                                       object.getClass().getName()));
-        if (object instanceof Initialisable) {
-          throw new InitialisationException(message, e, (Initialisable) object);
-        }
-        throw new MuleRuntimeException(message, e);
-      }
+      final var injector = muleContext.getInjector();
+      initialiseIfNeeded(object, injector);
+    } else {
+      initialiseIfNeeded(object);
     }
+  }
 
-    initialiseIfNeeded(object);
+  private static void doInject(Object object, final Injector injector) throws InitialisationException {
+    try {
+      injector.inject(object);
+    } catch (MuleException e) {
+      I18nMessage message =
+          createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase",
+                                     object.getClass().getName()));
+      if (object instanceof Initialisable initialisable) {
+        throw new InitialisationException(message, e, initialisable);
+      }
+      throw new MuleRuntimeException(message, e);
+    }
   }
 
   /**
@@ -130,12 +154,29 @@ public class LifecycleUtils {
   }
 
   /**
+   * For each item in the {@code objects} collection, it invokes {@link #initialiseIfNeeded(Object, Injector)}
+   *
+   * @param objects  the list of objects to be initialised
+   * @param injector an {@link Injector} for the current artifact context
+   * @throws InitialisationException
+   * @since 4.10
+   */
+  public static void initialiseIfNeeded(Collection<? extends Object> objects, Injector injector)
+      throws InitialisationException {
+    for (Object object : objects) {
+      initialiseIfNeeded(object, injector);
+    }
+  }
+
+  /**
    * For each item in the {@code objects} collection, it invokes {@link #initialiseIfNeeded(Object, MuleContext)}
    *
    * @param objects     the list of objects to be initialised
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
+   * @deprecated Use {@link #initialiseIfNeeded(Collection, Injector) instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Collection<? extends Object> objects, MuleContext muleContext)
       throws InitialisationException {
     initialiseIfNeeded(objects, true, muleContext);
@@ -150,7 +191,9 @@ public class LifecycleUtils {
    * @param inject      whether it should perform dependency injection on the {@code object} before actually initialising it
    * @param muleContext a {@link MuleContext}
    * @throws InitialisationException
+   * @deprecated Use {@link #initialiseIfNeeded(Collection, Injector) instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void initialiseIfNeeded(Collection<? extends Object> objects, boolean inject, MuleContext muleContext)
       throws InitialisationException {
     for (Object object : objects) {
@@ -166,8 +209,8 @@ public class LifecycleUtils {
    */
   public static void startIfNeeded(Object object) throws MuleException {
     object = unwrap(object);
-    if (object instanceof Startable) {
-      ((Startable) object).start();
+    if (object instanceof Startable startable) {
+      startable.start();
     }
   }
 
@@ -220,8 +263,8 @@ public class LifecycleUtils {
    */
   public static void stopIfNeeded(Object object) throws MuleException {
     object = unwrap(object);
-    if (object instanceof Stoppable) {
-      ((Stoppable) object).stop();
+    if (object instanceof Stoppable stoppable) {
+      stoppable.stop();
     }
   }
 
@@ -233,9 +276,9 @@ public class LifecycleUtils {
    */
   public static void disposeIfNeeded(Object object, Logger logger) {
     object = unwrap(object);
-    if (object instanceof Disposable) {
+    if (object instanceof Disposable disposable) {
       try {
-        ((Disposable) object).dispose();
+        disposable.dispose();
       } catch (Exception e) {
         if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) != null) {
           throw e;
@@ -270,9 +313,26 @@ public class LifecycleUtils {
    * @param errorMessage the message of the {@link Exception} to be thrown if the assertion fails
    * @throws IllegalStateException if the {@code muleContext} is stopped or stopping
    * @since 4.0
+   * @deprecated Use {@link #assertNotStopping(LifecycleState, String)} instead.
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static void assertNotStopping(MuleContext muleContext, String errorMessage) {
     if (muleContext.isStopping() || (muleContext.isStopped() && !muleContext.isStarting())) {
+      throw new IllegalStateException(errorMessage);
+    }
+  }
+
+  /**
+   * Verifies that the given {@code deploymentLifecycleState} is not stopped or in the process of stopping
+   *
+   * @param deploymentLifecycleState the {@link LifecycleState} of the deployment to test
+   * @param errorMessage             the message of the {@link Exception} to be thrown if the assertion fails
+   * @throws IllegalStateException if the {@code deploymentLifecycleState} is stopped or stopping
+   * @since 4.10
+   */
+  public static void assertNotStopping(LifecycleState deploymentLifecycleState, String errorMessage) {
+    if (deploymentLifecycleState.isStopping()
+        || (deploymentLifecycleState.isStopped() && !deploymentLifecycleState.isStarting())) {
       throw new IllegalStateException(errorMessage);
     }
   }
@@ -318,12 +378,28 @@ public class LifecycleUtils {
    *
    * @param object      the object to inject the {@link MuleContext} into.
    * @param muleContext the {@link MuleContext} in which the object is defined.
+   * @return {@code object} unwrapped
+   * @throws InitialisationException
+   */
+  public static Object setMuleContextIfNeededFluent(Object object, MuleContext muleContext) {
+    object = unwrap(object);
+    if (object != null && object instanceof MuleContextAware mca) {
+      mca.setMuleContext(muleContext);
+    }
+    return object;
+  }
+
+  /**
+   * Sets an objects {@link MuleContext} if it implements {@link MuleContextAware}.
+   *
+   * @param object      the object to inject the {@link MuleContext} into.
+   * @param muleContext the {@link MuleContext} in which the object is defined.
    * @throws InitialisationException
    */
   public static void setMuleContextIfNeeded(Object object, MuleContext muleContext) {
     object = unwrap(object);
-    if (object != null && object instanceof MuleContextAware) {
-      ((MuleContextAware) object).setMuleContext(muleContext);
+    if (object != null && object instanceof MuleContextAware mca) {
+      mca.setMuleContext(muleContext);
     }
   }
 
@@ -371,8 +447,8 @@ public class LifecycleUtils {
   }
 
   private static Object unwrap(Object value) {
-    if (value instanceof Optional) {
-      return ((Optional) value).orElse(null);
+    if (value instanceof Optional opt) {
+      return opt.orElse(null);
     }
 
     return value;

@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.connection;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -25,14 +25,18 @@ import org.mule.tck.testmodels.fruit.Banana;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private Banana connection = new Banana();
 
@@ -40,14 +44,14 @@ public class CachedConnectionManagementStrategyTestCase extends AbstractMuleTest
   private ConnectionProvider<Banana> connectionProvider;
 
   @Mock
-  private MuleContext muleContext;
+  private LifecycleState deploymentLifecycleState;
 
   private CachedConnectionManagementStrategy<Banana> connectionStrategy;
 
   @Before
   public void before() throws Exception {
     when(connectionProvider.connect()).thenReturn(connection);
-    connectionStrategy = new CachedConnectionManagementStrategy<>(connectionProvider, muleContext);
+    connectionStrategy = new CachedConnectionManagementStrategy<>(connectionProvider, deploymentLifecycleState);
   }
 
   @Test
