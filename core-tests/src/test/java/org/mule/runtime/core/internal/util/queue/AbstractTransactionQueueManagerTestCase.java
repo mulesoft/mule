@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -20,7 +24,7 @@ import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;
 import org.mule.tck.core.util.queue.QueueTestComponent;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;
 import java.util.Random;
@@ -31,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import org.junit.Test;
 
-public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMuleTestCase {
 
   public static final int THREAD_EXECUTION_TIMEOUT = 2000;
   /**
@@ -592,7 +596,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
       });
       putExecutionThread.start();
-      if (!putExecutionLatch.await(THREAD_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS)) {
+      if (!putExecutionLatch.await(THREAD_EXECUTION_TIMEOUT, MILLISECONDS)) {
         fail("Thread executing put over queue was not executed");
       }
       o = q.poll(RECEIVE_TIMEOUT);

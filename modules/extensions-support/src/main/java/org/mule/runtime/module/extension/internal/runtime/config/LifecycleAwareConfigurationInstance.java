@@ -275,7 +275,7 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
   public void setConnectivityTesterFactory(ConnectivityTesterFactory connectivityTesterFactory) {
     this.connectivityTesterFactory = connectivityTesterFactory;
   }
-  
+
   public void setInjector(Injector injector) {
     this.injector = injector;
   }

@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.Component;
@@ -60,6 +63,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -72,9 +76,6 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
-
-  @Rule
-  public ExpectedException expected = ExpectedException.none();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private CoreEvent muleEvent;
@@ -151,9 +152,8 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
     operations = mock(HeisenbergOperations.class);
     when(operations.sayMyName(any(HeisenbergExtension.class))).thenThrow(exception);
 
-    expected.expect(SdkMethodInvocationException.class);
-    expected.expectCause(sameInstance(exception));
-    operationWithReturnValueAndWithoutParameters();
+    var thrown = assertThrows(SdkMethodInvocationException.class, () -> operationWithReturnValueAndWithoutParameters());
+    assertThat(thrown.getCause(), sameInstance(exception));
   }
 
   @Test

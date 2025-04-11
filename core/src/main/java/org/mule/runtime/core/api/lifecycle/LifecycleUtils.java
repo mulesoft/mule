@@ -85,6 +85,7 @@ public class LifecycleUtils {
    * @param injector an {@link Injector} for the current artifact context
    * @throws InitialisationException
    * @throws IllegalArgumentException if {@code injector} is {@code null}
+   * @since 4.10
    */
   public static void initialiseIfNeeded(Object object, Injector injector) throws InitialisationException {
     requireNonNull(injector, "injector cannot be null");
@@ -118,6 +119,16 @@ public class LifecycleUtils {
   public static void initialiseIfNeeded(Object object, boolean inject, MuleContext muleContext) throws InitialisationException {
     requireNonNull(muleContext, "muleContext cannot be null");
     if (inject) {
+      object = unwrap(object);
+
+      if (object == null) {
+        return;
+      }
+
+      if (object instanceof MuleContextAware) {
+        ((MuleContextAware) object).setMuleContext(muleContext);
+      }
+
       final var injector = muleContext.getInjector();
       initialiseIfNeeded(object, injector);
     } else {
@@ -167,6 +178,7 @@ public class LifecycleUtils {
    * @param objects  the list of objects to be initialised
    * @param injector an {@link Injector} for the current artifact context
    * @throws InitialisationException
+   * @since 4.10
    */
   public static void initialiseIfNeeded(Collection<? extends Object> objects, Injector injector)
       throws InitialisationException {

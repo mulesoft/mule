@@ -108,7 +108,6 @@ public abstract class AbstractQueueManager
     return muleConfiguration;
   }
 
-  // TODO Inject this, need to detect when the default is changed
   public void setObjectSerializer(ObjectSerializer objectSerializer) {
     this.objectSerializer = objectSerializer;
   }
@@ -120,6 +119,7 @@ public abstract class AbstractQueueManager
   @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.deploymentLifecycleState = muleContext.getLifecycleManager().getState();
+    // Cannot inject this directly because there may be more than one, and the source of truth is the MuleContext.
     setObjectSerializer(muleContext.getObjectSerializer());
   }
 

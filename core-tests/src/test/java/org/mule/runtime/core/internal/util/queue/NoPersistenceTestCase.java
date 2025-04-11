@@ -6,14 +6,23 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 
 public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase {
 
   @Override
   protected TransactionalQueueManager createQueueManager() throws Exception {
     TransactionalQueueManager mgr = new TransactionalQueueManager();
-    mgr.setMuleContext(muleContext);
+    MuleConfiguration mockConfiguration = mock(MuleConfiguration.class);
+    when(mockConfiguration.getMaxQueueTransactionFilesSizeInMegabytes()).thenReturn(500);
+
+    mgr.setMuleConfiguration(mockConfiguration);
+    mgr.setObjectSerializer(new JavaObjectSerializer(this.getClass().getClassLoader()));
     mgr.initialise();
     mgr.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, false));
     return mgr;
