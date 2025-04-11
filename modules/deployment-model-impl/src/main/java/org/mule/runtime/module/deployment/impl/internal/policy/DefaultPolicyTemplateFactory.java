@@ -132,7 +132,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     }
     Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
     for (ArtifactPluginDescriptor plugin : plugins) {
-      if (plugin.getName().equals("HTTP")) {
+      if (plugin.getName().equals("HTTP") || plugin.getName().equals("Sockets")) {
         return true;
       }
     }
