@@ -90,11 +90,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import jakarta.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import jakarta.inject.Inject;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -698,7 +697,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   private String getFlowStackElementLocation(FlowStackElement element) {
-    return element.getProcessorPath().split("@")[0].trim();
+    return element.getExecutingLocation().getLocation();
   }
 
   /**

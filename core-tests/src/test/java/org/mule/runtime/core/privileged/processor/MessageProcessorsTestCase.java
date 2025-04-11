@@ -31,6 +31,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 
@@ -41,10 +42,11 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -86,14 +88,13 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Issue;
 
@@ -104,10 +105,6 @@ import reactor.util.context.Context;
 
 @SmallTest
 public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
-
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private final RuntimeException exception = new IllegalArgumentException();
   private BaseEventContext eventContext;
@@ -258,12 +255,9 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processToApplyError() throws Exception {
-    thrown.expect(is(exception));
-    try {
-      processToApply(input, error);
-    } finally {
-      assertThat(from(responsePublisher).toFuture().isDone(), is(false));
-    }
+    var thrown = assertThrows(Exception.class, () -> processToApply(input, error));
+    assertThat(thrown, sameInstance(exception));
+    assertThat(from(responsePublisher).toFuture().isDone(), is(false));
   }
 
   @Test
@@ -271,7 +265,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     AtomicBoolean completed = new AtomicBoolean();
     ((BaseEventContext) (input.getContext())).onComplete((e, t) -> completed.set(true));
 
-    final CoreEvent result = processToApplyWithChildContext(input, publisher -> from(publisher));
+    final CoreEvent result = processToApplyWithChildContext(input, Mono::from);
     ((BaseEventContext) result.getContext()).success();
 
     assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
@@ -286,7 +280,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     final CoreEvent result = from(MessageProcessors.process(input,
                                                             pub -> Flux
                                                                 .from(applyWithChildContext(pub, eventPub -> Flux.from(eventPub)
-                                                                    .contextWrite(ctx -> subscriberContextRecognizesChildContext(ctx)),
+                                                                    .contextWrite((Function<Context, Context>) this::subscriberContextRecognizesChildContext),
                                                                                             Optional.empty()))))
                                                                                                 .block();
 
@@ -319,7 +313,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     ((BaseEventContext) (input.getContext())).onComplete((e, t) -> completed.set(true));
 
     final CoreEvent result = processToApplyWithChildContext(input, publisher -> from(publisher)
-        .flatMap(e -> Mono.from(processWithChildContext(e, p -> from(p), Optional.empty()))));
+        .flatMap(e -> Mono.from(processWithChildContext(e, (ReactiveProcessor) Mono::from, Optional.empty()))));
     ((BaseEventContext) result.getContext()).success();
 
     assertThat(((BaseEventContext) result.getContext()).isComplete(), is(true));
@@ -362,11 +356,14 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   @Issue("MULE-16892")
   public void handleErrorWithChildAndParentStack() throws Exception {
 
-    List<FlowStackElement> parentStack = asList(new FlowStackElement("flow", "processor"));
+    List<FlowStackElement> parentStack =
+        asList(new FlowStackElement("flow", "processor", mock(ComponentLocation.class), emptyMap()));
 
     List<FlowStackElement> childStack = asList(
-                                               new FlowStackElement("sub-flow-1", "processor-1"),
-                                               new FlowStackElement("sub-flow-2", "processor-2"));
+                                               new FlowStackElement("sub-flow-1", "processor-1", mock(ComponentLocation.class),
+                                                                    emptyMap()),
+                                               new FlowStackElement("sub-flow-2", "processor-2", mock(ComponentLocation.class),
+                                                                    emptyMap()));
 
     assertHandleErrorWithStack(parentStack, childStack);
   }
@@ -376,8 +373,10 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   public void handleErrorWithEmptyParentStack() throws Exception {
 
     List<FlowStackElement> childStack = asList(
-                                               new FlowStackElement("sub-flow-1", "processor-1"),
-                                               new FlowStackElement("sub-flow-2", "processor-2"));
+                                               new FlowStackElement("sub-flow-1", "processor-1", mock(ComponentLocation.class),
+                                                                    emptyMap()),
+                                               new FlowStackElement("sub-flow-2", "processor-2", mock(ComponentLocation.class),
+                                                                    emptyMap()));
 
     assertHandleErrorWithStack(EMPTY_LIST, childStack);
   }
@@ -464,7 +463,8 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   public void applyWithChildContextDontPropagateErrorInChainRegainsParentContext() throws Exception {
     Reference<EventContext> contextReference = new Reference<>();
 
-    ((DefaultFlowCallStack) input.getFlowCallStack()).push(new FlowStackElement("flow", "processor"));
+    ((DefaultFlowCallStack) input.getFlowCallStack())
+        .push(new FlowStackElement("flow", "processor", mock(ComponentLocation.class), emptyMap()));
 
     chain = createChain(error);
     Processor errorProcessor = chain;
@@ -502,48 +502,47 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
   public void applyWithinProcessError() {
     final NullPointerException expected = new NullPointerException();
 
-    thrown.expect(hasRootCause(sameInstance(expected)));
-
-    from(processWithChildContext(input,
-                                 pub -> Flux.from(pub)
-                                     .transform(ep -> applyWithChildContext(ep,
-                                                                            eventPub -> Flux.from(eventPub)
-                                                                                .handle(failWithExpected(expected)),
-                                                                            Optional.empty())),
-                                 newChildContext(input, Optional.empty())))
-                                     .block();
+    final var flux = from(processWithChildContext(input,
+                                                  pub -> Flux.from(pub)
+                                                      .transform(ep -> applyWithChildContext(ep,
+                                                                                             eventPub -> Flux.from(eventPub)
+                                                                                                 .handle(failWithExpected(expected)),
+                                                                                             Optional.empty())),
+                                                  newChildContext(input, Optional.empty())));
+    var thrown = assertThrows(Exception.class, () -> flux.block());
+    assertThat(thrown, hasRootCause(sameInstance(expected)));
   }
 
   @Test
   public void applyWithinProcessErrorDontPropagate() {
     final NullPointerException expected = new NullPointerException();
 
-    thrown.expect(hasRootCause(sameInstance(expected)));
-
-    from(processWithChildContext(input,
-                                 pub -> Flux.from(pub)
-                                     .transform(ep -> applyWithChildContextDontPropagateErrors(ep,
-                                                                                               eventPub -> Flux.from(eventPub)
-                                                                                                   .handle(failWithExpected(expected)),
-                                                                                               Optional.empty())),
-                                 newChildContext(input, Optional.empty())))
-                                     .block();
+    final var flux = from(processWithChildContext(input,
+                                                  pub -> Flux.from(pub)
+                                                      .transform(ep -> applyWithChildContextDontPropagateErrors(ep,
+                                                                                                                eventPub -> Flux
+                                                                                                                    .from(eventPub)
+                                                                                                                    .handle(failWithExpected(expected)),
+                                                                                                                Optional
+                                                                                                                    .empty())),
+                                                  newChildContext(input, Optional.empty())));
+    var thrown = assertThrows(Exception.class, () -> flux.block());
+    assertThat(thrown, hasRootCause(sameInstance(expected)));
   }
 
   @Test
   public void processWithinProcessError() {
     final NullPointerException expected = new NullPointerException();
 
-    thrown.expect(hasRootCause(sameInstance(expected)));
-
-    from(processWithChildContext(input,
-                                 pub -> Flux.from(pub)
-                                     .flatMap(event -> processWithChildContext(event,
-                                                                               eventPub -> Flux.from(eventPub)
-                                                                                   .handle(failWithExpected(expected)),
-                                                                               Optional.empty())),
-                                 newChildContext(input, Optional.empty())))
-                                     .block();
+    final var flux = from(processWithChildContext(input,
+                                                  pub -> Flux.from(pub)
+                                                      .flatMap(event -> processWithChildContext(event,
+                                                                                                eventPub -> Flux.from(eventPub)
+                                                                                                    .handle(failWithExpected(expected)),
+                                                                                                Optional.empty())),
+                                                  newChildContext(input, Optional.empty())));
+    var thrown = assertThrows(Exception.class, () -> flux.block());
+    assertThat(thrown, hasRootCause(sameInstance(expected)));
   }
 
   @Test
@@ -610,57 +609,64 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                BiConsumer<Throwable, Object> innerErrorConsumer) {
     final NullPointerException expected = new NullPointerException();
 
-    if (exceptionExpected) {
-      thrown.expect(hasRootCause(sameInstance(expected)));
-    }
+    var mono = just(input).transform(inputPub -> applyWithChildContext(inputPub,
+                                                                       pub -> Flux.from(pub)
+                                                                           .flatMap(event -> processWithChildContextDontComplete(event,
+                                                                                                                                 innerChain(innerErrorConsumer,
+                                                                                                                                            expected),
+                                                                                                                                 Optional
+                                                                                                                                     .empty()))
+                                                                           .onErrorContinue(outerErrorConsumer),
+                                                                       Optional.empty()));
 
-    just(input).transform(inputPub -> applyWithChildContext(inputPub,
-                                                            pub -> Flux.from(pub)
-                                                                .flatMap(event -> processWithChildContextDontComplete(event,
-                                                                                                                      innerChain(innerErrorConsumer,
-                                                                                                                                 expected),
-                                                                                                                      Optional
-                                                                                                                          .empty()))
-                                                                .onErrorContinue(outerErrorConsumer),
-                                                            Optional.empty()))
-        .block();
+    if (exceptionExpected) {
+      var thrown = assertThrows(Exception.class, () -> mono.block());
+      assertThat(thrown, hasRootCause(sameInstance(expected)));
+    } else {
+      mono.block();
+    }
   }
 
   private void nestedChildContextsApplyApply(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
                                              BiConsumer<Throwable, Object> innerErrorConsumer) {
     final NullPointerException expected = new NullPointerException();
 
-    if (exceptionExpected) {
-      thrown.expect(hasRootCause(sameInstance(expected)));
-    }
+    var mono = just(input).transform(inputPub -> applyWithChildContext(inputPub,
+                                                                       pub -> Flux.from(pub)
+                                                                           .transform(ep -> applyWithChildContext(ep,
+                                                                                                                  innerChain(innerErrorConsumer,
+                                                                                                                             expected),
+                                                                                                                  Optional
+                                                                                                                      .empty()))
+                                                                           .onErrorContinue(outerErrorConsumer),
+                                                                       Optional.empty()));
 
-    just(input).transform(inputPub -> applyWithChildContext(inputPub,
-                                                            pub -> Flux.from(pub)
-                                                                .transform(ep -> applyWithChildContext(ep,
-                                                                                                       innerChain(innerErrorConsumer,
-                                                                                                                  expected),
-                                                                                                       Optional.empty()))
-                                                                .onErrorContinue(outerErrorConsumer),
-                                                            Optional.empty()))
-        .block();
+    if (exceptionExpected) {
+      var thrown = assertThrows(Exception.class, () -> mono.block());
+      assertThat(thrown, hasRootCause(sameInstance(expected)));
+    } else {
+      mono.block();
+    }
   }
 
   private void nestedChildContextsProcessApply(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
                                                BiConsumer<Throwable, Object> innerErrorConsumer) {
     final NullPointerException expected = new NullPointerException();
 
-    if (exceptionExpected) {
-      thrown.expect(hasRootCause(sameInstance(expected)));
-    }
+    var mono = from(processWithChildContext(input,
+                                            pub -> Flux.from(pub)
+                                                .transform(ep -> applyWithChildContext(ep,
+                                                                                       innerChain(innerErrorConsumer, expected),
+                                                                                       Optional.empty()))
+                                                .onErrorContinue(outerErrorConsumer),
+                                            newChildContext(input, Optional.empty())));
 
-    from(processWithChildContext(input,
-                                 pub -> Flux.from(pub)
-                                     .transform(ep -> applyWithChildContext(ep,
-                                                                            innerChain(innerErrorConsumer, expected),
-                                                                            Optional.empty()))
-                                     .onErrorContinue(outerErrorConsumer),
-                                 newChildContext(input, Optional.empty())))
-                                     .block();
+    if (exceptionExpected) {
+      var thrown = assertThrows(Exception.class, () -> mono.block());
+      assertThat(thrown, hasRootCause(sameInstance(expected)));
+    } else {
+      mono.block();
+    }
   }
 
   private void nestedChildContextsProcessProcess(boolean exceptionExpected, BiConsumer<Throwable, Object> outerErrorConsumer,
@@ -678,9 +684,11 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                              newChildContext(input, Optional.empty())));
 
     if (exceptionExpected) {
-      thrown.expect(hasRootCause(sameInstance(expected)));
+      var thrown = assertThrows(Exception.class, () -> eventMono.block());
+      assertThat(thrown, hasRootCause(sameInstance(expected)));
+    } else {
+      eventMono.block();
     }
-    eventMono.block();
   }
 
   private ReactiveProcessor innerChain(BiConsumer<Throwable, Object> innerErrorConsumer, final NullPointerException expected) {
@@ -720,9 +728,10 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     assertThat(from(responsePublisher).toFuture().isDone(), is(true));
 
-    thrown.expectCause((is(instanceOf(MessagingException.class))));
-    thrown.expectCause(hasCause(is(exception)));
-    from(responsePublisher).block();
+    final var mono = from(responsePublisher);
+    var thrown = assertThrows(Exception.class, () -> mono.block());
+    assertThat(thrown.getCause(), is(instanceOf(MessagingException.class)));
+    assertThat(thrown.getCause(), hasCause(is(exception)));
   }
 
   @Test
@@ -737,9 +746,10 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     assertThat(from(responsePublisher).toFuture().isDone(), is(true));
 
-    thrown.expectCause((is(instanceOf(MessagingException.class))));
-    thrown.expectCause(hasCause(is(exception)));
-    from(responsePublisher).block();
+    final var mono = from(responsePublisher);
+    var thrown = assertThrows(Exception.class, () -> mono.block());
+    assertThat(thrown.getCause(), is(instanceOf(MessagingException.class)));
+    assertThat(thrown.getCause(), hasCause(is(exception)));
   }
 
   @Test
@@ -840,15 +850,14 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void processError() throws Exception {
-    thrown.expectCause((is(instanceOf(MessagingException.class))));
-    thrown.expectCause(hasCause(is(exception)));
-    try {
-      from(MessageProcessors.process(input, error)).block();
-    } finally {
-      assertThat(from(responsePublisher).toFuture().isDone(), is(true));
-      from(responsePublisher).toFuture()
-          .whenComplete((event, throwable) -> assertThat(throwable.getCause(), equalTo(exception)));
-    }
+    final var mono = from(MessageProcessors.process(input, error));
+    var thrown = assertThrows(Exception.class, () -> mono.block());
+    assertThat(thrown.getCause(), is(instanceOf(MessagingException.class)));
+    assertThat(thrown.getCause(), hasCause(is(exception)));
+
+    assertThat(from(responsePublisher).toFuture().isDone(), is(true));
+    from(responsePublisher).toFuture()
+        .whenComplete((event, throwable) -> assertThat(throwable.getCause(), equalTo(exception)));
   }
 
   @Test
@@ -864,9 +873,10 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     assertThat(from(responsePublisher).toFuture().isDone(), is(true));
 
-    thrown.expectCause((is(instanceOf(MessagingException.class))));
-    thrown.expectCause(hasCause(is(exception)));
-    from(responsePublisher).block();
+    final var mono = from(responsePublisher);
+    var thrown = assertThrows(Exception.class, () -> mono.block());
+    assertThat(thrown.getCause(), is(instanceOf(MessagingException.class)));
+    assertThat(thrown.getCause(), hasCause(is(exception)));
   }
 
   @Test
@@ -881,9 +891,10 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
 
     assertThat(from(responsePublisher).toFuture().isDone(), is(true));
 
-    thrown.expectCause((is(instanceOf(MessagingException.class))));
-    thrown.expectCause(hasCause(is(exception)));
-    from(responsePublisher).block();
+    final var mono = from(responsePublisher);
+    var thrown = assertThrows(Exception.class, () -> mono.block());
+    assertThat(thrown.getCause(), is(instanceOf(MessagingException.class)));
+    assertThat(thrown.getCause(), hasCause(is(exception)));
   }
 
   @Test

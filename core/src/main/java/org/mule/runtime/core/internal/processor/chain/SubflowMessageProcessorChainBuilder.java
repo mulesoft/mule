@@ -114,13 +114,14 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
+      setAnnotations(builder.getAnnotations());
 
       this.setComponentTracer(componentTracerFactory.fromComponent(builder, SUB_FLOW_MESSAGE_PROCESSOR_SPAN_NAME, ""));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
       ((DefaultFlowCallStack) event.getFlowCallStack())
-          .push(new FlowStackElement(subFlowName, SUB_FLOW, null));
+          .push(new FlowStackElement(subFlowName, SUB_FLOW, null, getLocation(), getAnnotations()));
     }
 
     private void popSubFlowFlowStackElement(CoreEvent event) {

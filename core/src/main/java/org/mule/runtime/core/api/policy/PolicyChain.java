@@ -44,9 +44,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import jakarta.inject.Inject;
-
 import org.reactivestreams.Publisher;
+
+import jakarta.inject.Inject;
 
 /**
  * Policy chain for handling the message processor associated to a policy.
@@ -175,7 +175,7 @@ public class PolicyChain extends AbstractComponent
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {
     return event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-        .push(new FlowStackElement(flowStackEntryName, getIdentifier(), null));
+        .push(new FlowStackElement(flowStackEntryName, getIdentifier(), null, getLocation(), getAnnotations()));
   }
 
   private Consumer<CoreEvent> popFlowFlowStackElement() {
