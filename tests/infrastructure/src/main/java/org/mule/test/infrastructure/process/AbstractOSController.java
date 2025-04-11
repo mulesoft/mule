@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -164,7 +165,8 @@ public abstract class AbstractOSController {
   public int installAgent(String... args) {
     CommandLine commandLine = new CommandLine(amcSetup);
     commandLine.addArguments(args, false);
-    return runSync(commandLine, null);
+    File workingDir = new File(amcSetup).getParentFile();
+    return runSync(commandLine, null, workingDir);
   }
 
   protected int runSync(String command, String... args) {
@@ -175,8 +177,12 @@ public abstract class AbstractOSController {
   }
 
   protected int runSync(CommandLine commandLine, ExecuteStreamHandler streamHandler) {
+    return runSync(commandLine, streamHandler, null);
+  }
+
+  private int runSync(CommandLine commandLine, ExecuteStreamHandler streamHandler, File workingDirectory) {
     Map<String, String> newEnv = copyEnvironmentVariables();
-    return executeSyncCommand(commandLine, newEnv, streamHandler, timeout);
+    return executeSyncCommand(commandLine, newEnv, streamHandler, timeout, workingDirectory);
   }
 
   protected Process runAsync(CommandLine commandLine, ExecuteStreamHandler streamHandler) {
@@ -185,10 +191,14 @@ public abstract class AbstractOSController {
   }
 
   private int executeSyncCommand(CommandLine commandLine, Map<String, String> newEnv, ExecuteStreamHandler streamHandler,
-                                 int timeout) {
+                                 int timeout, File workingDirectory) {
     Executor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
+
+    if (Objects.nonNull(workingDirectory)) {
+      executor.setWorkingDirectory(workingDirectory);
+    }
 
     setStreamHandler(executor, streamHandler);
     return doExecution(executor, commandLine, newEnv);
