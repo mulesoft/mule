@@ -13,6 +13,7 @@ import static org.mule.runtime.deployment.model.internal.tooling.ToolingRegionCl
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -30,8 +31,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.net.URL;
 import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * Given an {@link ArtifactPluginDescriptor} as a starting point, it will generate a {@link ArtifactClassLoader} capable of
@@ -104,16 +103,15 @@ public class ToolingPluginClassLoaderBuilder extends AbstractArtifactClassLoader
     setArtifactDescriptor(new ArtifactDescriptor(TOOLING_EXTENSION_MODEL));
     List<ArtifactPluginDescriptor> resolvedArtifactPluginDescriptors =
         pluginDependenciesResolver
-            .resolve(emptySet(), ImmutableList.<ArtifactPluginDescriptor>builder().add(artifactPluginDescriptor).build(), true);
+            .resolve(emptySet(), singletonList(artifactPluginDescriptor), true);
     this.addArtifactPluginDescriptors(resolvedArtifactPluginDescriptors
         .toArray(new ArtifactPluginDescriptor[resolvedArtifactPluginDescriptors.size()]));
     ArtifactClassLoader ownerArtifactClassLoader = super.build();
     ClassLoader parent = ownerArtifactClassLoader.getClassLoader().getParent();
-    if (!(parent instanceof RegionClassLoader)) {
+    if (!(parent instanceof final RegionClassLoader regionClassLoader)) {
       throw new DeploymentException(createStaticMessage(format("The parent of the current owner must be of type '%s' but found '%s'",
                                                                RegionClassLoader.class.getName(), parent.getClass().getName())));
     }
-    final RegionClassLoader regionClassLoader = (RegionClassLoader) parent;
     return new ToolingArtifactClassLoader(regionClassLoader,
                                           getPluginArtifactClassLoader(artifactPluginDescriptor,
                                                                        regionClassLoader.getArtifactPluginClassLoaders()));
