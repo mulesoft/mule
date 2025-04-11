@@ -6,18 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+
 import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
+
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -25,11 +27,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
-import static org.mule.tck.MuleTestUtils.spyInjector;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -41,33 +38,33 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.Injector;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
+import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.TestTimeSupplier;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -77,7 +74,7 @@ import org.mockito.verification.VerificationMode;
 
 @SmallTest
 @RunWith(Parameterized.class)
-public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleContextTestCase {
+public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleTestCase {
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
@@ -90,13 +87,10 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleCon
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
         {"With provider",
-            mock(ConnectionProvider.class, withSettings().extraInterfaces(Lifecycle.class, MuleContextAware.class))},
+            mock(ConnectionProvider.class, withSettings().extraInterfaces(Lifecycle.class))},
         {"Without provider", null}
     });
   }
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Mock
   private ConfigurationModel configurationModel;
@@ -119,31 +113,13 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleCon
 
   private final TestTimeSupplier timeSupplier = new TestTimeSupplier(currentTimeMillis());
 
-  @Override
-  protected Map<String, Object> getStartUpRegistryObjects() {
-    return singletonMap(OBJECT_TIME_SUPPLIER, timeSupplier);
-  }
-
-  @Override
-  protected ConfigurationBuilder getBuilder() throws Exception {
-    return new MinimalConfigurationBuilder() {
-
-      @Override
-      protected void doConfigure(MuleContext muleContext) throws Exception {
-        super.doConfigure(muleContext);
-        registerObject(OBJECT_CONNECTION_MANAGER, connectionManager, muleContext);
-      }
-    };
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     retryPolicyTemplate = createRetryTemplate();
     retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
 
+    injector = mock(Injector.class);
     configurationInstance = createConfigurationInstance();
-    injector = spyInjector(muleContext);
-    super.doSetUp();
   }
 
   protected RetryPolicyTemplate createRetryTemplate() {
@@ -160,11 +136,24 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleCon
       reset(connectionProvider.get());
     }
     setup(connectionManager);
-    return muleContext.getInjector().inject(new LifecycleAwareConfigurationInstance(NAME,
-                                                                                    configurationModel,
-                                                                                    value,
-                                                                                    configurationState,
-                                                                                    connectionProvider));
+
+    final var lifecycleAwareConfigurationInstance = new LifecycleAwareConfigurationInstance(NAME,
+                                                                                            configurationModel,
+                                                                                            value,
+                                                                                            configurationState,
+                                                                                            connectionProvider);
+    lifecycleAwareConfigurationInstance.setTimeSupplier(timeSupplier);
+    lifecycleAwareConfigurationInstance.setNotificationFirer(mock(NotificationDispatcher.class));
+    lifecycleAwareConfigurationInstance.setConnectionManager(connectionManager);
+    lifecycleAwareConfigurationInstance.setInjector(injector);
+
+    final var defaultConnectivityTesterFactory = new DefaultConnectivityTesterFactory();
+    defaultConnectivityTesterFactory.setLockFactory(lockId -> new ReentrantLock());
+    defaultConnectivityTesterFactory.setSchedulerService(new SimpleUnitTestSupportSchedulerService());
+    defaultConnectivityTesterFactory.setConnectionManager(connectionManager);
+    lifecycleAwareConfigurationInstance.setConnectivityTesterFactory(defaultConnectivityTesterFactory);
+
+    return lifecycleAwareConfigurationInstance;
   }
 
   private void setup(ConnectionManagerAdapter connectionManager) {

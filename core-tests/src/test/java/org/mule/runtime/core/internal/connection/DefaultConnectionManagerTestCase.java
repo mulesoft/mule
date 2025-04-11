@@ -38,6 +38,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -72,14 +73,16 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   private ConnectionProvider<Banana> testeableConnectionProvider;
 
-  @Mock
-  public ConfigurationInstance configurationInstance;
-
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
 
+  @Mock
+  public ConfigurationInstance configurationInstance;
+
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContextWithRegistry muleContext;
+
+  private LifecycleState muleContextLifecycleState;
 
   private DefaultConnectionManager connectionManager;
 
@@ -89,10 +92,12 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
     testeableConnectionProvider = mockConnectionProvider(ConnectionProvider.class);
     when(muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER)).thenReturn(connectionManager);
 
+    muleContextLifecycleState = muleContext.getLifecycleManager().getState();
+
     connectionManager = new DefaultConnectionManager(muleContext);
   }
 
-  private <T extends ConnectionProvider> T mockConnectionProvider(Class<T> type) throws Exception {
+  private <T extends ConnectionProvider<Banana>> T mockConnectionProvider(Class<T> type) throws Exception {
     final T connectionProvider = mock(type);
     when(connectionProvider.connect()).thenReturn(connection);
     when(connectionProvider.validate(connection)).thenReturn(success());
@@ -146,20 +151,20 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalStateException.class)
   public void bindWithStoppingMuleContext() throws Exception {
-    when(muleContext.isStopping()).thenReturn(true);
+    when(muleContextLifecycleState.isStopping()).thenReturn(true);
     connectionManager.bind(config, connectionProvider);
   }
 
   @Test(expected = IllegalStateException.class)
   public void bindWithStoppedMuleContext() throws Exception {
-    when(muleContext.isStopped()).thenReturn(true);
+    when(muleContextLifecycleState.isStopped()).thenReturn(true);
     connectionManager.bind(config, connectionProvider);
   }
 
   @Test
   public void bindWithStartingMuleContext() throws Exception {
-    when(muleContext.isStopped()).thenReturn(true);
-    when(muleContext.isStarting()).thenReturn(true);
+    when(muleContextLifecycleState.isStopped()).thenReturn(true);
+    when(muleContextLifecycleState.isStarting()).thenReturn(true);
     connectionManager.bind(config, connectionProvider);
     final ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
     assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));

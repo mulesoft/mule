@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.util.queue;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.util.queue.Queue;
 
 import java.io.Serializable;
@@ -25,15 +25,15 @@ public class TransactionAwareQueueStore implements Queue {
 
   private static final Logger LOGGER = getLogger(TransactionAwareQueueStore.class);
 
-  private final MuleContext muleContext;
+  private final LifecycleState deploymentLifecycleState;
   private final TransactionContextProvider transactionContextProvider;
   private final QueueStore queue;
 
   public TransactionAwareQueueStore(QueueStore queue, TransactionContextProvider transactionContextProvider,
-                                    MuleContext muleContext) {
+                                    LifecycleState deploymentLifecycleState) {
     this.queue = queue;
     this.transactionContextProvider = transactionContextProvider;
-    this.muleContext = muleContext;
+    this.deploymentLifecycleState = deploymentLifecycleState;
   }
 
   @Override
@@ -83,7 +83,7 @@ public class TransactionAwareQueueStore implements Queue {
         return queue.poll(timeout);
       }
     } catch (InterruptedException iex) {
-      if (!muleContext.isStopping()) {
+      if (!deploymentLifecycleState.isStopping()) {
         throw iex;
       }
       // if stopping, ignore

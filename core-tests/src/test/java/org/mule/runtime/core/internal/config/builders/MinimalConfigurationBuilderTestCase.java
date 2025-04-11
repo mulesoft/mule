@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.config.bootstrap.PropertiesBootstrapService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -67,6 +68,7 @@ public class MinimalConfigurationBuilderTestCase extends AbstractMuleTestCase {
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     when(muleContext.getInjector()).thenReturn(mock(Injector.class));
+    when(muleContext.getLifecycleManager()).thenReturn(new DefaultLifecycleManager<>("muleContext", muleContext));
   }
 
   @Test

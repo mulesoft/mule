@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionHandler;
+import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.exception.MuleException;
 
 /**
  * A {@link ConnectionHandlerAdapter} which adds no behavior.
@@ -23,8 +22,8 @@ import org.mule.runtime.api.connection.ConnectionHandler;
  */
 final class NullConnectionManagementStrategy<C> extends ConnectionManagementStrategy<C> {
 
-  public NullConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
-    super(connectionProvider, muleContext);
+  public NullConnectionManagementStrategy(ConnectionProvider<C> connectionProvider) {
+    super(connectionProvider);
   }
 
   /**

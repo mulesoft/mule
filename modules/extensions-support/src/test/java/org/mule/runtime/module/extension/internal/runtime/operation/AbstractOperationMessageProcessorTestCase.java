@@ -55,6 +55,7 @@ import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -127,6 +128,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -272,7 +275,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
                                                                                            .load(String.class), "someParam")));
     setRequires(operationModel, true, true);
     when(operationExecutorFactory.createExecutor(same(operationModel), anyMap())).thenReturn(operationExecutor);
-    when(((OperationArgumentResolverFactory) operationExecutor).createArgumentResolver(any())).thenReturn(ctx -> emptyMap());
+    when(operationExecutor.createArgumentResolver(any())).thenReturn(ctx -> emptyMap());
+    stubComponentExecutor(operationExecutor, "");
 
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(operationModel.getDisplayModel()).thenReturn(empty());
@@ -318,10 +322,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(outputMock.hasDynamicType()).thenReturn(true);
     when(operationModel.getOutput()).thenReturn(outputMock);
     when(operationModel.getOutputAttributes()).thenReturn(outputMock);
-
-    when(operationExecutorFactory.createExecutor(same(operationModel), anyMap())).thenReturn(operationExecutor);
-
-    stubComponentExecutor(operationExecutor, "");
 
     when(extensionManager.getExtensions()).thenReturn(Collections.singleton(extensionModel));
 

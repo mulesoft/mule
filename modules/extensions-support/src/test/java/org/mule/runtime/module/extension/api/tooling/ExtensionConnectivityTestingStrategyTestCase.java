@@ -7,34 +7,38 @@
 package org.mule.runtime.module.extension.api.tooling;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mule.tck.util.MuleContextUtils;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   private ExtensionConnectivityTestingStrategy connectivityTestingStrategy;
 
@@ -50,10 +54,11 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtendedExpressionManager expressionManager;
 
-  private ConnectionManager connectionManager = new DefaultConnectionManager(muleContext);
+  private ConnectionManager connectionManager;
 
   @Before
   public void createTestingInstance() throws MuleException {
+    connectionManager = new DefaultConnectionManager(muleContext);
     connectivityTestingStrategy = new ExtensionConnectivityTestingStrategy(connectionManager, muleContext);
     MuleContextUtils.mockContextWithServices().getInjector().inject(connectivityTestingStrategy);
   }

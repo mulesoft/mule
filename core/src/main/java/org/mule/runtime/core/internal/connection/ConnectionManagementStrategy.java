@@ -9,9 +9,8 @@ package org.mule.runtime.core.internal.connection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.Closeable;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.Closeable;
 
 /**
  * Strategy to implement different connection management mechanisms.
@@ -25,17 +24,14 @@ import org.mule.runtime.api.exception.MuleException;
 abstract class ConnectionManagementStrategy<C> implements Closeable {
 
   protected final ConnectionProvider<C> connectionProvider;
-  protected final MuleContext muleContext;
 
   /**
    * Creates a new instance
    *
    * @param connectionProvider the {@link ConnectionProvider} which will be used to manage the connections
-   * @param muleContext        the application's {@link MuleContext}
    */
-  ConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
+  ConnectionManagementStrategy(ConnectionProvider<C> connectionProvider) {
     this.connectionProvider = connectionProvider;
-    this.muleContext = muleContext;
   }
 
   /**

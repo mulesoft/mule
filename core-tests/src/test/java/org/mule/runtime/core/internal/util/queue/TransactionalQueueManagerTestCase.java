@@ -6,32 +6,49 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.tck.junit4.matcher.Eventually.eventually;
 import static org.mule.tck.util.CollectableReference.collectedByGc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
-import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.api.util.queue.QueueSession;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.CollectableReference;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
-public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCase {
+public class TransactionalQueueManagerTestCase extends AbstractMuleTestCase {
 
   private static final String TEST_QUEUE_NAME = "queue1";
 
+  private TransactionalQueueManager queueManager;
+
+  @Before
+  public void setUp() throws MuleException {
+    queueManager = new TransactionalQueueManager();
+    queueManager.setMuleConfiguration(new DefaultMuleConfiguration());
+    queueManager.setObjectSerializer(new JavaObjectSerializer(this.getClass().getClassLoader()));
+    queueManager.initialise();
+    queueManager.start();
+  }
+
+  @After
+  public void teardown() throws MuleException {
+    queueManager.stop();
+    queueManager.dispose();
+  }
+
   @Test
   public void allowChangingConfigurationOnDisposedQueue() throws Exception {
-    QueueManager queueManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER);
     queueManager.setQueueConfiguration(TEST_QUEUE_NAME, new DefaultQueueConfiguration(0, true));
     QueueSession queueSession = queueManager.getQueueSession();
     Queue queue = queueSession.getQueue(TEST_QUEUE_NAME);
@@ -43,7 +60,6 @@ public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCa
   public void clearRecoveryQueuesAfterRecovery() throws Exception {
     createDanglingTx();
 
-    QueueManager queueManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER);
     QueueSession queueSession = queueManager.getQueueSession();
     queueSession.getQueue(TEST_QUEUE_NAME).dispose();
 
@@ -53,16 +69,12 @@ public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCa
 
   @Test
   public void doNotCreateTwiceTheSameRecoveryQueue() {
-    TransactionalQueueManager queueManager =
-        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER);
     final RecoverableQueueStore recoveryQueue = queueManager.getRecoveryQueue(TEST_QUEUE_NAME);
     assertThat(recoveryQueue, is(queueManager.getRecoveryQueue(TEST_QUEUE_NAME)));
   }
 
   @Test
   public void doNotLeakQueueConfigurationAfterQueueDispose() {
-    TransactionalQueueManager queueManager =
-        ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER);
     CollectableReference<QueueConfiguration> collectableReference = new CollectableReference<>(new DefaultQueueConfiguration());
 
     QueueStore queueStore = queueManager.getQueue(TEST_QUEUE_NAME);
@@ -72,13 +84,7 @@ public class TransactionalQueueManagerTestCase extends AbstractMuleContextTestCa
     assertThat(collectableReference, is(eventually(collectedByGc())));
   }
 
-  @Override
-  protected boolean isStartContext() {
-    return true;
-  }
-
   private void createDanglingTx() throws InterruptedException, MuleException {
-    QueueManager queueManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER);
     queueManager.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, true));
     QueueSession queueSession = queueManager.getQueueSession();
     queueSession.getQueue(TEST_QUEUE_NAME).put("value");

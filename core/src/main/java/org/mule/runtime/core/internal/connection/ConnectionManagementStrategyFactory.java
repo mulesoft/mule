@@ -17,8 +17,9 @@ import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.lifecycle.LifecycleState;
 
 /**
  * Creates instances of {@link ConnectionManagementStrategy}
@@ -28,7 +29,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 final class ConnectionManagementStrategyFactory {
 
   private final PoolingProfile defaultPoolingProfile;
-  private final MuleContext muleContext;
+  private final LifecycleState deploymentLifecycleState;
 
   /**
    * Creates a new instance
@@ -36,9 +37,9 @@ final class ConnectionManagementStrategyFactory {
    * @param defaultPoolingProfile the {@link PoolingProfile} that will be used to configure the pool of connections
    * @param muleContext           the owning {@link MuleContext}
    */
-  ConnectionManagementStrategyFactory(PoolingProfile defaultPoolingProfile, MuleContext muleContext) {
+  ConnectionManagementStrategyFactory(PoolingProfile defaultPoolingProfile, LifecycleState deploymentLifecycleState) {
     this.defaultPoolingProfile = defaultPoolingProfile;
-    this.muleContext = muleContext;
+    this.deploymentLifecycleState = deploymentLifecycleState;
   }
 
   /**
@@ -65,11 +66,11 @@ final class ConnectionManagementStrategyFactory {
   }
 
   private <C> ConnectionManagementStrategy<C> cached(ConnectionProvider<C> connectionProvider) {
-    return new CachedConnectionManagementStrategy<>(connectionProvider, muleContext);
+    return new CachedConnectionManagementStrategy<>(connectionProvider, deploymentLifecycleState);
   }
 
   private <C> ConnectionManagementStrategy<C> withoutManagement(ConnectionProvider<C> connectionProvider) {
-    return new NullConnectionManagementStrategy<>(connectionProvider, muleContext);
+    return new NullConnectionManagementStrategy<>(connectionProvider);
   }
 
   private <C> ConnectionManagementStrategy<C> pooling(ConnectionProvider<C> connectionProvider,
@@ -85,7 +86,7 @@ final class ConnectionManagementStrategyFactory {
         : new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile,
                                                     (PoolingListener<C>) unwrapProviderWrapper(connectionProvider,
                                                                                                PoolingConnectionProvider.class),
-                                                    muleContext, ownerConfigName, featureFlaggingService);
+                                                    ownerConfigName, featureFlaggingService);
   }
 
   private <C> ConnectionManagementType getManagementType(ConnectionProvider<C> connectionProvider) {

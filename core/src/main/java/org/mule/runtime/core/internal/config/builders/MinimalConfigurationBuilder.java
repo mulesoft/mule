@@ -74,7 +74,6 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
-import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.DefaultArtifactEncoding;
@@ -350,7 +349,9 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   protected void configureQueueManager(MuleContext muleContext) throws RegistrationException {
-    QueueManager queueManager = new TransactionalQueueManager();
+    var queueManager = new TransactionalQueueManager();
+    queueManager.setMuleConfiguration(muleContext.getConfiguration());
+    queueManager.setMuleContext(muleContext);
     registerObject(OBJECT_QUEUE_MANAGER, queueManager, muleContext);
     registerObject(LOCAL_QUEUE_MANAGER_KEY, queueManager, muleContext);
   }
