@@ -165,7 +165,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock(lenient = true)
   protected CompletableComponentExecutorFactory operationExecutorFactory;
 
-  @Mock(lenient = true, answer = Answers.CALLS_REAL_METHODS)
+  @Mock(lenient = true)
   protected CompletableComponentExecutorOperationArgumentResolverFactory operationExecutor;
 
   @Mock(lenient = true)
@@ -440,8 +440,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Test
   public void initialise() throws Exception {
-    verify((Initialisable) operationExecutor).initialise();
     verify((MuleContextAware) operationExecutor, atLeastOnce()).setMuleContext(any(MuleContext.class));
+    verify((Initialisable) operationExecutor).initialise();
   }
 
   @Test
@@ -460,12 +460,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   public interface CompletableComponentExecutorOperationArgumentResolverFactory
       extends CompletableComponentExecutor, Lifecycle, MuleContextAware, OperationArgumentResolverFactory {
-
-    @Override
-    default void initialise() throws InitialisationException {
-      System.out.println("asdf");
-
-    }
 
   }
 

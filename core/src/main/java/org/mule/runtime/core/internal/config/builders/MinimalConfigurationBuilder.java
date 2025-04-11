@@ -146,7 +146,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     configureQueueManager(muleContext);
 
     registry.registerObject(OBJECT_MULE_CONTEXT, muleContext);
-    // registry.registerObject(OBJECT_MULE_CONFIGURATION, muleContext.getConfiguration());
 
     registerCustomServices(muleContext);
     registerObjectStoreManager(muleContext);
