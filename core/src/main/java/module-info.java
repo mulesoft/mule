@@ -175,6 +175,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.el;
   // for MuleFwk, MUnit, MTF, ApiGateway, Tracing and Validation
   exports org.mule.runtime.core.privileged.event;
+  // for MuleFwk, Munit
   exports org.mule.runtime.core.privileged.event.context;
   // for MuleFwk, MUnit, ApiKit, DataWeave and Validation
   exports org.mule.runtime.core.privileged.exception;

@@ -479,7 +479,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
       this.internalParameters = internalParameters;
 
-      this.itemSequenceInfo = Optional.ofNullable(itemSequenceInfo).orElse(Optional.empty()).orElse(null);
+      this.itemSequenceInfo = itemSequenceInfo.orElse(null);
       this.flowProcessMediatorContext = flowProcessMediatorContext;
       this.sdkInternalContext = sdkInternalContext;
       this.foreachInternalContext = foreachInternalContext;
