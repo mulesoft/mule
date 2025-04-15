@@ -1,0 +1,70 @@
+{
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.numberOfParametersChanged",
+            "old": "method java.io.Serializable org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>)",
+            "new": "method void org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>, java.io.Writer) throws java.io.IOException",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+            /*  "package": "org.mule.runtime.module.troubleshooting.api",
+            "classQualifiedName": "org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback",
+            "classSimpleName": "TroubleshootingOperationCallback",
+            "methodName": "execute",
+            "elementKind": "method",
+            "oldArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.9.0-rc1",
+            "oldArchiveRole": "primary",
+            "newArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.10.0-SNAPSHOT",
+            "newArchiveRole": "primary",
+            "breaksVersioningRules": "true",
+            */
+          
+          },
+          {
+            "ignore": true,
+            "code": "java.method.returnTypeChanged",
+            "old": "method java.io.Serializable org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>)",
+            "new": "method void org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>, java.io.Writer) throws java.io.IOException",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+            /*  "oldType": "java.io.Serializable",
+            "newType": "void",
+            "package": "org.mule.runtime.module.troubleshooting.api",
+            "classQualifiedName": "org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback",
+            "classSimpleName": "TroubleshootingOperationCallback",
+            "methodName": "execute",
+            "elementKind": "method",
+            "oldArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.9.0-rc1",
+            "oldArchiveRole": "primary",
+            "newArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.10.0-SNAPSHOT",
+            "newArchiveRole": "primary",
+            "breaksVersioningRules": "true",
+            */
+          
+          },
+          {
+            "ignore": true,
+            "code": "java.method.exception.checkedAdded",
+            "old": "method java.io.Serializable org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>)",
+            "new": "method void org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>, java.io.Writer) throws java.io.IOException",
+            "exception": "java.io.IOException",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+            /*  "package": "org.mule.runtime.module.troubleshooting.api",
+            "classQualifiedName": "org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback",
+            "classSimpleName": "TroubleshootingOperationCallback",
+            "methodName": "execute",
+            "elementKind": "method",
+            "oldArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.9.0-rc1",
+            "oldArchiveRole": "primary",
+            "newArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.10.0-SNAPSHOT",
+            "newArchiveRole": "primary",
+            "breaksVersioningRules": "true",
+            */
+          
+          }
+        ]
+      }
+    }
+  }
+}

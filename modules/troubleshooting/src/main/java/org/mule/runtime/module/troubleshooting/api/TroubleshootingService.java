@@ -30,6 +30,17 @@ public interface TroubleshootingService {
   List<TroubleshootingOperationDefinition> getAvailableOperations();
 
   /**
+   * Invokes all registered operations with the given parameters. User must respect the definitions retrieved with
+   * {@link #getAvailableOperations()}
+   *
+   * @param arguments A dictionary with the arguments.
+   * @return the return value of the operation.
+   * @throws TroubleshootingOperationException if it couldn't execute the operation because it wasn't available or there is an
+   *                                           error in the arguments.
+   */
+  Object executeAllOperations(Map<String, String> arguments) throws TroubleshootingOperationException;
+
+  /**
    * Invokes an operation with the given parameters. User must respect the definitions retrieved with
    * {@link #getAvailableOperations()}
    *

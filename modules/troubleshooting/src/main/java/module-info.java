@@ -14,9 +14,12 @@ module org.mule.runtime.troubleshooting {
 
   requires org.mule.runtime.api.annotations;
   requires org.mule.runtime.core;
+  requires org.mule.runtime.container;
   requires org.mule.runtime.deployment;
   requires org.mule.runtime.deployment.model;
+  requires org.mule.runtime.manifest;
 
+  requires org.apache.commons.lang3;
   requires org.json;
   requires com.google.gson;
 
