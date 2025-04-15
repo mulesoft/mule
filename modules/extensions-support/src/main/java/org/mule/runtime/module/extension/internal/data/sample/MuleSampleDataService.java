@@ -110,10 +110,14 @@ public class MuleSampleDataService implements SampleDataService {
                                                                                 componentModel,
                                                                                 new ResolvingComponent(extensionName,
                                                                                                        componentName),
-                                                                                muleContext,
                                                                                 artifactEncoding,
+                                                                                muleContext.getNotificationManager(),
                                                                                 new ReflectionCache(),
-                                                                                streamingManager);
+                                                                                muleContext.getExpressionManager(),
+                                                                                streamingManager,
+                                                                                muleContext.getInjector(),
+                                                                                muleContext.getSecurityManager(),
+                                                                                muleContext);
 
     ExtensionResolvingContext ctx = new ExtensionResolvingContext(configurationInstanceSupplier, connectionManager);
     try {

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
+import static org.mule.runtime.api.artifact.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
@@ -48,6 +49,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
 import static reactor.core.Exceptions.unwrap;
 
+import org.mule.runtime.api.artifact.ArtifactType;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -64,10 +67,13 @@ import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEv
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
@@ -89,6 +95,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransf
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
@@ -176,6 +183,15 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private NotificationDispatcher notificationDispatcher;
 
   @Mock
+  private ArtifactEncoding artifactEncoding;
+
+  @Mock
+  private ServerNotificationManager notificationManager;
+
+  @Mock
+  private SecurityManager securityManager;
+
+  @Mock
   private ConnectionManagerAdapter connectionManagerAdapter;
 
   @Mock
@@ -223,7 +239,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     when(operationContext.getTransactionConfig()).thenReturn(empty());
     when(operationContext.getRetryPolicyTemplate()).thenReturn(ofNullable(retryPolicy));
     when(operationContext.getCurrentScheduler()).thenReturn(IMMEDIATE_SCHEDULER);
-    when(operationContext.getMuleContext()).thenReturn(muleContext);
+    when(operationContext.getArtifactEncoding()).thenReturn(artifactEncoding);
+    when(operationContext.getNotificationManager()).thenReturn(notificationManager);
+    when(operationContext.getSecurityManager()).thenReturn(securityManager);
 
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("test-extension").build());
 
@@ -238,9 +256,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository(),
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            mock(ErrorTypeRepository.class),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             null,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -340,9 +359,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository(),
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            mock(ErrorTypeRepository.class),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             null,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -360,9 +380,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository(),
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            mock(ErrorTypeRepository.class),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             null,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -381,9 +402,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository(),
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            mock(ErrorTypeRepository.class),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -407,8 +429,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             operationModel,
                                             interceptorChain,
                                             errorTypeRepository,
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -430,8 +453,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             operationModel,
                                             interceptorChain,
                                             errorTypeRepository,
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -450,9 +474,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator(extensionModel,
                                             operationModel,
                                             interceptorChain,
-                                            muleContext.getErrorTypeRepository(),
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            mock(ErrorTypeRepository.class),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -476,8 +501,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             operationModel,
                                             interceptorChain,
                                             errorTypeRepository,
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -500,8 +526,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             operationModel,
                                             interceptorChain,
                                             errorTypeRepository,
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -523,8 +550,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             operationModel,
                                             interceptorChain,
                                             errorTypeRepository,
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -543,9 +571,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
     mediator = new DefaultExecutionMediator<>(extensionModel,
                                               operationModel,
                                               interceptorChain,
-                                              muleContext.getErrorTypeRepository(),
-                                              muleContext.getExecutionClassLoader(),
-                                              muleContext.getConfiguration(),
+                                              mock(ErrorTypeRepository.class),
+                                              this.getClass().getClassLoader(),
+                                              mock(MuleConfiguration.class),
+                                              APP,
                                               notificationDispatcher,
                                               failingTransformer,
                                               threadReleaseDataProducer, operationExecutionTracer, true);
@@ -568,8 +597,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             operationModel,
                                             interceptorChain,
                                             mockErrorModel(),
-                                            muleContext.getExecutionClassLoader(),
-                                            muleContext.getConfiguration(),
+                                            this.getClass().getClassLoader(),
+                                            mock(MuleConfiguration.class),
+                                            APP,
                                             notificationDispatcher,
                                             failingTransformer,
                                             threadReleaseDataProducer, operationExecutionTracer, true);
@@ -631,7 +661,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                                 of(mock(ConnectionProvider.class)));
     when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
 
-    assertThrows(IllegalStateException.class, () -> execute());
+    assertThrows(IllegalStateException.class, this::execute);
   }
 
   private void assertException(Consumer<Throwable> assertion) throws Throwable {

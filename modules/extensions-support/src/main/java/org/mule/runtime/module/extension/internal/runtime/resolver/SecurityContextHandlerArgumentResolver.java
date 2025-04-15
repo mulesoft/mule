@@ -22,7 +22,7 @@ public final class SecurityContextHandlerArgumentResolver implements ArgumentRes
   public AuthenticationHandler resolve(ExecutionContext executionContext) {
     ExecutionContextAdapter context = ((ExecutionContextAdapter) executionContext);
     return new DefaultAuthenticationHandler(context.getSecurityContext(),
-                                            context.getMuleContext().getSecurityManager(),
+                                            context.getSecurityManager(),
                                             context::setSecurityContext);
   }
 }

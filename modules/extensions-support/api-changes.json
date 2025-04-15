@@ -5,6 +5,28 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.returnTypeTypeParametersChanged",
+            "old": "method org.mule.runtime.core.api.streaming.CursorProviderFactory org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getCursorProviderFactory()",
+            "new": "method <T> org.mule.runtime.core.api.streaming.CursorProviderFactory<T> org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getCursorProviderFactory()",
+            "justification": "W-18278649: Decouple ExecutionContextAdapter from MuleContext"
+          },
+          {
+            "ignore": true,
+            "code": "java.generics.elementNowParameterized",
+            "old": "method org.mule.runtime.core.api.streaming.CursorProviderFactory org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getCursorProviderFactory()",
+            "new": "method <T> org.mule.runtime.core.api.streaming.CursorProviderFactory<T> org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getCursorProviderFactory()",
+            "justification": "W-18278649: Decouple ExecutionContextAdapter from MuleContext"
+          },
+          {
+            "ignore": true,
+            "code": "java.generics.formalTypeParameterAdded",
+            "old": "method org.mule.runtime.core.api.streaming.CursorProviderFactory org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getCursorProviderFactory()",
+            "new": "method <T> org.mule.runtime.core.api.streaming.CursorProviderFactory<T> org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getCursorProviderFactory()",
+            "typeParameter": "T",
+            "justification": "W-18278649: Decouple ExecutionContextAdapter from MuleContext"
+          },
+          {
+            "ignore": true,
             "code": "java.annotation.added",
             "old": "interface org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator",
             "new": "interface org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator",

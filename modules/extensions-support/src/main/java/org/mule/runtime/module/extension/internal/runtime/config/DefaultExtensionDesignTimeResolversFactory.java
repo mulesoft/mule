@@ -258,10 +258,14 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
     return new DefaultSampleDataProviderMediator(extensionModel,
                                                  componentModel,
                                                  component,
-                                                 muleContext,
                                                  artifactEncoding,
+                                                 muleContext.getNotificationManager(),
                                                  reflectionCache,
-                                                 streamingManager);
+                                                 expressionManager,
+                                                 streamingManager,
+                                                 muleContext.getInjector(),
+                                                 muleContext.getSecurityManager(),
+                                                 muleContext);
   }
 
   @Override

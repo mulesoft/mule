@@ -16,13 +16,17 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.SOU
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -58,10 +62,13 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
   private final SourceModel sourceModel;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
-  private final MuleContext muleContext;
+  private final ArtifactEncoding artifactEncoding;
+  private final ServerNotificationManager notificationManager;
+  private final SecurityManager securityManager;
   private final boolean async;
   private final GeneratedMethodComponentExecutor<SourceModel> executor;
   private final Component component;
+  private final MuleContext muleContext;
 
   /**
    * Creates a new instance
@@ -74,8 +81,13 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the owning source
    * @param streamingManager      the application's {@link StreamingManager}
    * @param component             the source {@link Component}
-   * @param muleContext           the current {@link MuleContext}
+   * @param artifactEncoding      the {@link ArtifactEncoding} of the artifact of the executing component.
+   * @param notificationManager   the {@link ServerNotificationManager} of the artifact of the executing component.
+   * @param injector              the injector for the current artifact deployment
+   * @param securityManager       the security manager used by the Mule instance to authenticate and authorise incoming and
+   *                              outgoing event traffic and service invocations
    * @param sourceCallbackModel   the callback's model
+   * @param muleContext           the current {@link MuleContext}
    */
   public DefaultSourceCallbackExecutor(ExtensionModel extensionModel,
                                        Optional<ConfigurationInstance> configurationInstance,
@@ -85,8 +97,12 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
                                        CursorProviderFactory cursorProviderFactory,
                                        StreamingManager streamingManager,
                                        Component component,
-                                       MuleContext muleContext,
-                                       SourceCallbackModelProperty sourceCallbackModel) {
+                                       ArtifactEncoding artifactEncoding,
+                                       ServerNotificationManager notificationManager,
+                                       Injector injector,
+                                       SecurityManager securityManager,
+                                       SourceCallbackModelProperty sourceCallbackModel,
+                                       MuleContext muleContext) {
 
     this.extensionModel = extensionModel;
     this.configurationInstance = configurationInstance;
@@ -94,15 +110,19 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
     this.component = component;
-    this.muleContext = muleContext;
+    this.artifactEncoding = artifactEncoding;
+    this.notificationManager = notificationManager;
+    this.securityManager = securityManager;
     executor =
         new GeneratedMethodComponentExecutor<>(getAllGroups(sourceModel, method, sourceCallbackModel), method, source);
     try {
-      initialiseIfNeeded(executor, true, muleContext);
+      initialiseIfNeeded(executor, injector);
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }
     async = Stream.of(method.getParameterTypes()).anyMatch(MuleExtensionUtils::isSourceCompletionCallbackType);
+
+    this.muleContext = muleContext;
   }
 
   /**
@@ -138,12 +158,15 @@ class DefaultSourceCallbackExecutor implements SourceCallbackExecutor {
                                                                                           parameters,
                                                                                           sourceModel,
                                                                                           event,
+                                                                                          artifactEncoding,
+                                                                                          notificationManager,
                                                                                           cursorProviderFactory,
                                                                                           streamingManager,
                                                                                           component,
                                                                                           null,
                                                                                           IMMEDIATE_SCHEDULER,
                                                                                           empty(),
+                                                                                          securityManager,
                                                                                           muleContext);
 
     executionContext.setVariable(SOURCE_CALLBACK_CONTEXT_PARAM, callbackContext);

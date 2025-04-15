@@ -8,22 +8,27 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -40,6 +45,7 @@ import java.util.NoSuchElementException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -70,7 +76,10 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
   private CoreEvent event;
 
   @Mock
-  private MuleContext muleContext;
+  private ArtifactEncoding artifactEncoding;
+
+  @Mock
+  private ServerNotificationManager notificationManager;
 
   @Mock
   private ExtensionManager extensionManager;
@@ -83,6 +92,9 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
   @Mock
   private StreamingManager streamingManager;
+
+  @Mock
+  private SecurityManager securityManager;
 
   @Mock
   private ConfigurationState configurationState;
@@ -110,8 +122,13 @@ public class DefaultExecutionContextTestCase extends AbstractMuleTestCase {
 
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configuration), resolverSetResult.asMap(), operationModel,
-                                      event, cursorProviderFactory, streamingManager, component,
-                                      retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(), muleContext);
+                                      event,
+                                      artifactEncoding,
+                                      notificationManager,
+                                      cursorProviderFactory, streamingManager, component,
+                                      retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(),
+                                      securityManager,
+                                      null);
   }
 
   @Test

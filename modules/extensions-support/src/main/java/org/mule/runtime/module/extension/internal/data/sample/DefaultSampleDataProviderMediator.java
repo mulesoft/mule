@@ -25,7 +25,11 @@ import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.NullCursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -54,12 +58,17 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
   private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
   private final Component component;
-  private final MuleContext muleContext;
   private final ReflectionCache reflectionCache;
+  private final ExpressionManager expressionManager;
   private final StreamingManager streamingManager;
   private final SampleDataProviderFactoryModelProperty sampleDataProperty;
   private final ReturnDelegate returnDelegate;
+  private final ArtifactEncoding artifactEncoding;
+  private final ServerNotificationManager notificationManager;
   private final CursorProviderFactory cursorProviderFactory = new NullCursorProviderFactory();
+  private final Injector injector;
+  private final SecurityManager securityManager;
+  private final MuleContext muleContext;
 
   /**
    * Creates a new instance of the mediator
@@ -70,18 +79,28 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
   public DefaultSampleDataProviderMediator(ExtensionModel extensionModel,
                                            ComponentModel componentModel,
                                            Component component,
-                                           MuleContext muleContext,
                                            ArtifactEncoding artifactEncoding,
+                                           ServerNotificationManager notificationManager,
                                            ReflectionCache reflectionCache,
-                                           StreamingManager streamingManager) {
+                                           ExpressionManager expressionManager,
+                                           StreamingManager streamingManager,
+                                           Injector injector,
+                                           SecurityManager securityManager,
+                                           MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
     this.component = component;
-    this.muleContext = muleContext;
+    this.artifactEncoding = artifactEncoding;
+    this.notificationManager = notificationManager;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
     this.streamingManager = streamingManager;
+    this.injector = injector;
+    this.securityManager = securityManager;
     sampleDataProperty = componentModel.getModelProperty(SampleDataProviderFactoryModelProperty.class).orElse(null);
     returnDelegate = new ValueReturnDelegate(componentModel, artifactEncoding);
+
+    this.muleContext = muleContext;
   }
 
   /**
@@ -137,7 +156,8 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
                                                                            connectionSupplier,
                                                                            configurationSupplier,
                                                                            reflectionCache,
-                                                                           muleContext,
+                                                                           expressionManager,
+                                                                           injector,
                                                                            componentModel);
 
       SampleDataProvider provider = factory.createSampleDataProvider();
@@ -159,12 +179,15 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
                                        emptyMap(),
                                        componentModel,
                                        getNullEvent(),
+                                       artifactEncoding,
+                                       notificationManager,
                                        cursorProviderFactory,
                                        streamingManager,
                                        component,
                                        new NoRetryPolicyTemplate(),
                                        IMMEDIATE_SCHEDULER,
                                        empty(),
+                                       securityManager,
                                        muleContext);
   }
 }

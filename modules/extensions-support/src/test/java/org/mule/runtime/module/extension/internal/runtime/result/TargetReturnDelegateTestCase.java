@@ -18,6 +18,7 @@ import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
@@ -43,7 +44,8 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @Override
   protected ReturnDelegate createReturnDelegate() {
-    return new TargetReturnDelegate(TARGET, "#[message]", componentModel, muleContext.getExpressionManager(),
+    return new TargetReturnDelegate(TARGET, "#[message]", componentModel,
+                                    muleContext.getExpressionManager(),
                                     artifactEncoding, streamingManager);
   }
 
@@ -79,7 +81,8 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   public void targetReturnDelegateShouldManageCursorStreamProvider() throws IOException {
     when(componentModel.supportsStreaming()).thenReturn(true);
 
-    delegate = new TargetReturnDelegate(TARGET, "#[payload.token]", componentModel, muleContext.getExpressionManager(),
+    delegate = new TargetReturnDelegate(TARGET, "#[payload.token]", componentModel,
+                                        muleContext.getExpressionManager(),
                                         artifactEncoding, streamingManager);
 
     MediaType mediaType = APPLICATION_JSON.withCharset(Charset.defaultCharset());
