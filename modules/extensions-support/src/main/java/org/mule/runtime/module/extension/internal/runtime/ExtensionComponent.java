@@ -828,7 +828,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                              expressionManager,
                                                                              streamingManager,
                                                                              muleContext.getInjector(),
-                                                                             muleContext.getSecurityManager(),
                                                                              muleContext);
         }
       }

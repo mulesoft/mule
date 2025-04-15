@@ -116,7 +116,6 @@ public class MuleSampleDataService implements SampleDataService {
                                                                                 muleContext.getExpressionManager(),
                                                                                 streamingManager,
                                                                                 muleContext.getInjector(),
-                                                                                muleContext.getSecurityManager(),
                                                                                 muleContext);
 
     ExtensionResolvingContext ctx = new ExtensionResolvingContext(configurationInstanceSupplier, connectionManager);

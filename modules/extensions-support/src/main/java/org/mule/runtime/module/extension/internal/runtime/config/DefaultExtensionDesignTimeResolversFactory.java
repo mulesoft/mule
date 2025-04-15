@@ -264,7 +264,6 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                  expressionManager,
                                                  streamingManager,
                                                  muleContext.getInjector(),
-                                                 muleContext.getSecurityManager(),
                                                  muleContext);
   }
 

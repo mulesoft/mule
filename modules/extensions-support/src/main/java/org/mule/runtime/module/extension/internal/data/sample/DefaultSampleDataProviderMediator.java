@@ -67,7 +67,6 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
   private final ServerNotificationManager notificationManager;
   private final CursorProviderFactory cursorProviderFactory = new NullCursorProviderFactory();
   private final Injector injector;
-  private final SecurityManager securityManager;
   private final MuleContext muleContext;
 
   /**
@@ -85,7 +84,6 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
                                            ExpressionManager expressionManager,
                                            StreamingManager streamingManager,
                                            Injector injector,
-                                           SecurityManager securityManager,
                                            MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
@@ -96,7 +94,6 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
     this.expressionManager = expressionManager;
     this.streamingManager = streamingManager;
     this.injector = injector;
-    this.securityManager = securityManager;
     sampleDataProperty = componentModel.getModelProperty(SampleDataProviderFactoryModelProperty.class).orElse(null);
     returnDelegate = new ValueReturnDelegate(componentModel, artifactEncoding);
 
@@ -187,7 +184,7 @@ public class DefaultSampleDataProviderMediator implements SampleDataProviderMedi
                                        new NoRetryPolicyTemplate(),
                                        IMMEDIATE_SCHEDULER,
                                        empty(),
-                                       securityManager,
+                                       null,
                                        muleContext);
   }
 }
