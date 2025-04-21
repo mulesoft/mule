@@ -33,6 +33,7 @@ import static java.util.Optional.of;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -111,8 +112,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
-
-import javax.inject.Inject;
 
 /**
  * {@link ExtensionsClient} delegate class for executing extension operations
@@ -290,12 +289,15 @@ public class OperationClient implements Lifecycle {
                                                                                     resolvedParams,
                                                                                     keyOperationModel,
                                                                                     contextEvent,
+                                                                                    artifactEncoding,
+                                                                                    muleContext.getNotificationManager(),
                                                                                     cursorProviderFactory,
                                                                                     streamingManager,
                                                                                     NULL_COMPONENT,
                                                                                     parameterizer.getRetryPolicyTemplate(),
                                                                                     IMMEDIATE_SCHEDULER,
                                                                                     empty(),
+                                                                                    muleContext.getSecurityManager(),
                                                                                     muleContext);
 
     return doExecute(context, shouldCompleteEvent);
@@ -483,6 +485,8 @@ public class OperationClient implements Lifecycle {
                                                                                 errorTypeRepository,
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 muleConfiguration,
+                                                                                ArtifactType.valueOf(muleContext.getArtifactType()
+                                                                                    .name()),
                                                                                 notificationDispatcher,
                                                                                 getResultTransformer(extensionConnectionSupplier,
                                                                                                      extensionModel,

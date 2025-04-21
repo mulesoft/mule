@@ -44,8 +44,10 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
@@ -58,11 +60,13 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -104,6 +108,12 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Mock
   protected ConnectionHandler connectionHandler;
 
+  @Mock
+  private ServerNotificationManager notificationManager;
+
+  @Mock
+  private SecurityManager securityManager;
+
   protected ArtifactEncoding artifactEncoding;
 
   protected ReturnDelegate delegate;
@@ -112,7 +122,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
   @Before
   public void before() throws MuleException {
-    artifactEncoding = () -> defaultCharset();
+    artifactEncoding = Charset::defaultCharset;
 
     streamingManager = new DefaultStreamingManager();
     LifecycleUtils.initialiseIfNeeded(streamingManager, muleContext);
@@ -129,11 +139,13 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
 
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);
-    when(operationContext.getMuleContext()).thenReturn(muleContext);
     when(operationContext.getComponentModel()).thenReturn(componentModel);
     when(operationContext.getComponent()).thenReturn(component);
     when(operationContext.getVariable(contains(CONNECTION_PARAM))).thenReturn(connectionHandler);
     when(operationContext.getCursorProviderFactory()).thenReturn(getCursorProviderFactory());
+    when(operationContext.getArtifactEncoding()).thenReturn(artifactEncoding);
+    when(operationContext.getNotificationManager()).thenReturn(notificationManager);
+    when(operationContext.getSecurityManager()).thenReturn(securityManager);
   }
 
   @After

@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.from;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -93,6 +94,9 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
   private OperationModel operationModel;
 
   @Mock
+  private ArtifactEncoding artifactEncoding;
+
+  @Mock
   private ExtensionManager extensionManager;
 
   @Mock
@@ -132,9 +136,14 @@ public class NonCompletableMethodOperationExecutorTestCase extends AbstractMuleC
     when(operationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(empty());
     operationContext =
         new DefaultExecutionContext<>(extensionModel, of(configurationInstance), parameters.asMap(), operationModel,
-                                      muleEvent, cursorProviderFactory,
+                                      muleEvent,
+                                      artifactEncoding,
+                                      muleContext.getNotificationManager(),
+                                      cursorProviderFactory,
                                       streamingManager, component,
-                                      retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(), muleContext);
+                                      retryPolicyTemplate, IMMEDIATE_SCHEDULER, empty(),
+                                      muleContext.getSecurityManager(),
+                                      muleContext);
     operationContext = spy(operationContext);
   }
 

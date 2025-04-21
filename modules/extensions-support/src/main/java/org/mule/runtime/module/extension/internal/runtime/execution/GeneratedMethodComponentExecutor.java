@@ -44,7 +44,7 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 
 public class GeneratedMethodComponentExecutor<M extends ComponentModel>
-    implements MuleContextAware, Lifecycle, OperationArgumentResolverFactory<M> {
+    implements Lifecycle, OperationArgumentResolverFactory<M> {
 
   private static class NoArgumentsResolverDelegate implements ArgumentResolverDelegate {
 
@@ -143,12 +143,9 @@ public class GeneratedMethodComponentExecutor<M extends ComponentModel>
     disposeIfNeeded(componentInstance, LOGGER);
   }
 
-  @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     muleContext = context;
-    if (componentInstance instanceof MuleContextAware) {
-      ((MuleContextAware) componentInstance).setMuleContext(context);
-    }
   }
 
   @Override
