@@ -46,7 +46,6 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
-import org.mule.tck.MuleTestUtils.TestDirectProcessingStrategy;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

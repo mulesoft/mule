@@ -10,12 +10,14 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import static java.nio.charset.Charset.defaultCharset;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -44,6 +46,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
@@ -52,6 +56,7 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.factory.InMemoryCursorStreamProviderFactory;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
 import org.mule.runtime.core.internal.streaming.bytes.SimpleByteBufferManager;
 import org.mule.runtime.core.internal.util.message.TransformingMessageList;
@@ -59,16 +64,19 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.util.MuleContextUtils.MocksInjector;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.After;
@@ -81,12 +89,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
-public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleContextTestCase {
+public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTestCase {
 
   public static final String HELLO_WORLD_MSG = "Hello world!";
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
+
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   @Mock(lenient = true)
   protected ExecutionContextAdapter operationContext;
@@ -114,6 +125,9 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   @Mock
   private SecurityManager securityManager;
 
+  @Mock
+  private StreamingGhostBuster ghostBuster;
+
   protected ArtifactEncoding artifactEncoding;
 
   protected ReturnDelegate delegate;
@@ -124,10 +138,20 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleCo
   public void before() throws MuleException {
     artifactEncoding = Charset::defaultCharset;
 
-    streamingManager = new DefaultStreamingManager();
-    LifecycleUtils.initialiseIfNeeded(streamingManager, muleContext);
+    MuleContext muleContext = mock(MuleContext.class);
+    when(muleContext.getExecutionClassLoader()).thenReturn(this.getClass().getClassLoader());
 
-    event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
+    Map<Class, Object> objects = new HashMap<>();
+    objects.put(StreamingGhostBuster.class, new StreamingGhostBuster());
+    objects.put(MuleContext.class, muleContext);
+    Injector injector = new MocksInjector(objects);
+    when(muleContext.getInjector()).thenReturn(injector);
+
+    streamingManager = new DefaultStreamingManager();
+    streamingManager.setMuleContext(muleContext);
+    LifecycleUtils.initialiseIfNeeded(streamingManager, injector);
+
+    event = eventBuilder().message(Message.builder().value("").attributesValue(attributes).build()).build();
 
     when(outputModel.getType()).thenReturn(BaseTypeBuilder.create(JAVA).voidType().build());
     when(outputModel.getModelProperty(any())).thenReturn(empty());

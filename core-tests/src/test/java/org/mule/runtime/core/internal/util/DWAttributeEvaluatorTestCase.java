@@ -13,6 +13,7 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -31,7 +32,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.util.attribute.AttributeEvaluator;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 import org.mule.tck.size.SmallTest;
 
 import java.io.InputStream;
@@ -46,7 +48,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
-public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
+public class DWAttributeEvaluatorTestCase extends AbstractMuleTestCase {
 
   private static final String HOST_PORT_JSON = "{\"host\":\"0.0.0.0\", \"port\" : 8081}";
   private static final String JSON_CAR = "{\n  \"color\": \"RED\",\n  \"price\": 1000\n}";
@@ -58,12 +60,15 @@ public class DWAttributeEvaluatorTestCase extends AbstractMuleContextTestCase {
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
 
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
+
   private final CoreEvent mockMuleEvent = mock(CoreEvent.class);
   private ExtendedExpressionManager expressionManager;
 
   @Before
   public void setUp() throws MuleException {
-    expressionManager = muleContext.getExpressionManager();
+    expressionManager = dw.getExpressionManager();
   }
 
   @Test

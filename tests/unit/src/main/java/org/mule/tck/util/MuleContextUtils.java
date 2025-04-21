@@ -70,6 +70,7 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -125,11 +126,11 @@ import jakarta.inject.Inject;
  */
 public class MuleContextUtils {
 
-  private static final class MocksInjector implements Injector {
+  public static final class MocksInjector implements Injector {
 
     private final Map<Class, Object> objects;
 
-    private MocksInjector(Map<Class, Object> objects) {
+    public MocksInjector(Map<Class, Object> objects) {
       this.objects = objects;
     }
 
@@ -430,7 +431,8 @@ public class MuleContextUtils {
    * Creates a basic event builder with its context already set.
    */
   public static <B extends CoreEvent.Builder> B eventBuilder() throws MuleException {
-    return eventBuilder(mockContextWithServices());
+    return (B) CoreEvent
+        .builder(create(mock(FlowConstruct.class), (EventContextService) null, TEST_CONNECTOR_LOCATION, null, empty()));
   }
 
   /**
@@ -439,7 +441,7 @@ public class MuleContextUtils {
   public static <B extends CoreEvent.Builder> B eventBuilder(MuleContext muleContext) throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
     ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(flowConstruct);
-    return (B) CoreEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
+    return (B) CoreEvent.builder(create(flowConstruct, (EventContextService) null, TEST_CONNECTOR_LOCATION, null, empty()));
   }
 
   public static void verifyRegistration(MuleContext muleContext, String registryKey, ArgumentCaptor captor) {

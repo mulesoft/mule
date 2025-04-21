@@ -6,26 +6,28 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.mock;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static org.mule.test.allure.AllureConstants.ScopeFeature.SCOPE;
-import static org.mule.test.allure.AllureConstants.ScopeFeature.ChoiceStory.CHOICE;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
+import static org.mule.test.allure.AllureConstants.RoutersFeature.ChoiceStory.CHOICE;
+
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThrows;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.el.ExpressionExecutionException;
@@ -38,26 +40,24 @@ import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 import org.mule.tck.processor.ContextPropagationChecker;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
-
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
-@Feature(SCOPE)
+@Feature(ROUTERS)
 @Story(CHOICE)
 public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
   @Rule
-  public ExpectedException thrown = none();
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   private ChoiceRouter choiceRouter;
 
@@ -70,7 +70,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     super.doSetUp();
     choiceRouter = new ChoiceRouter(new DummyComponentTracerFactory());
     choiceRouter.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
-    choiceRouter.setExpressionManager(muleContext.getExpressionManager());
+    choiceRouter.setExpressionManager(dw.getExpressionManager());
   }
 
   @After
@@ -132,7 +132,7 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
 
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
     assertThat(process(choiceRouter, zapEvent()).getMessage().getPayload().getValue(), is("zap:bar"));
-    assertThat((Map<String, Long>) routerStatistics.getRouted(), hasEntry(containsString(processor.toString()), is((long) 2)));
+    assertThat(routerStatistics.getRouted(), hasEntry(containsString(processor.toString()), is((long) 2)));
   }
 
   @Test
@@ -142,10 +142,9 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.addRoute("wat", mp);
     initialise();
 
-    thrown.expect(instanceOf(ExpressionRuntimeException.class));
-    thrown.expect(hasMessage(containsString("evaluating expression: \"wat\"")));
-    thrown.expectCause(instanceOf(ExpressionExecutionException.class));
-    process(choiceRouter, zapEvent());
+    var thrown = assertThrows(ExpressionRuntimeException.class, () -> process(choiceRouter, zapEvent()));
+    assertThat(thrown, hasMessage(containsString("evaluating expression: \"wat\"")));
+    assertThat(thrown.getCause(), instanceOf(ExpressionExecutionException.class));
   }
 
   @Test
@@ -158,8 +157,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.addRoute(payloadZapExpression(), mp);
     initialise();
 
-    thrown.expect(sameInstance(expected));
-    process(choiceRouter, zapEvent());
+    var thrown = assertThrows(Exception.class, () -> process(choiceRouter, zapEvent()));
+    assertThat(thrown, sameInstance(expected));
   }
 
   @Test
@@ -173,8 +172,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.setDefaultRoute(newChain(empty(), new TestMessageProcessor("bar")));
     initialise();
 
-    thrown.expect(sameInstance(expected));
-    process(choiceRouter, zapEvent());
+    var thrown = assertThrows(Exception.class, () -> process(choiceRouter, zapEvent()));
+    assertThat(thrown, sameInstance(expected));
   }
 
   @Test

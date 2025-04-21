@@ -6,6 +6,54 @@
           {
             "ignore": true,
             "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "new": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-18329891: Do not use AbstractMuleContextTestCase for tests just requiring DW"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+            "new": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-18329891: Do not use AbstractMuleContextTestCase for tests just requiring DW"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>",
+            "new": "class org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>",
+            "interface": "org.mule.runtime.core.api.context.MuleContextAware",
+            "justification": "W-18329891: Do not use AbstractMuleContextTestCase for tests just requiring DW"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "new": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-18329891: Do not use AbstractMuleContextTestCase for tests just requiring DW"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "new": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.exception.AbstractExceptionListener",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-18329891: Do not use AbstractMuleContextTestCase for tests just requiring DW"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "new": "method void org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+            "annotation": "@jakarta.inject.Inject",
+            "justification": "W-18329891: Do not use AbstractMuleContextTestCase for tests just requiring DW"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
             "old": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
             "new": "field org.mule.runtime.core.api.processor.AbstractMuleObjectOwner<T>.locator @ org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner",
             "annotation": "@jakarta.inject.Inject",

@@ -40,7 +40,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -49,26 +49,23 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.TransformersRegistry;
-import org.mule.runtime.core.internal.util.log.OneTimeWarning;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
   private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
 
-  private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
-                                                                 "Expression parsing is deprecated, regular expressions should be used instead.");
-
-  private MuleContext muleContext;
+  private MuleConfiguration muleConfiguration;
   private TransformersRegistry transformersRegistry;
+  private StreamingManager streamingManager;
 
   private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
@@ -288,7 +285,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   @Override
   public ValidationResult validate(String expression) {
-    if (!muleContext.getConfiguration().isValidateExpressions()) {
+    if (!muleConfiguration.isValidateExpressions()) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Validate expressions is turned off, no checking done for: " + expression);
       }
@@ -325,7 +322,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public List<ConstraintViolation> validate(String script, String nameIdentifier, ValidationPhase validationScopePhase,
                                             TypeBindings typeBindings, Optional<MetadataType> outputType) {
-    if (!muleContext.getConfiguration().isValidateExpressions()) {
+    if (!muleConfiguration.isValidateExpressions()) {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Validate expressions is turned off, no checking done for: " + script);
       }
@@ -353,9 +350,8 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                                                currentThread().getContextClassLoader());
   }
 
-  @Inject
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  public void setMuleConfiguration(MuleConfiguration muleConfiguration) {
+    this.muleConfiguration = muleConfiguration;
   }
 
   @Inject
@@ -363,8 +359,12 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     this.transformersRegistry = transformersRegistry;
   }
 
+  public void setStreamingManager(StreamingManager streamingManager) {
+    this.streamingManager = streamingManager;
+  }
+
   public StreamingManager getStreamingManager() {
-    return muleContext.getStreamingManager();
+    return streamingManager;
   }
 
   public void setExpressionLanguage(ExtendedExpressionLanguageAdaptor expressionLanguage) {

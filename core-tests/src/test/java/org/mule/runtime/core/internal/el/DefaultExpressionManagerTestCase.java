@@ -16,6 +16,7 @@ import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
 
@@ -29,6 +30,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +47,8 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -55,7 +58,6 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -67,7 +69,7 @@ import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
 @Story(SUPPORT_DW)
-public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCase {
+public class DefaultExpressionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String MY_VAR = "myVar";
 
@@ -75,7 +77,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   @Mock
   private StreamingManager streamingManager;
@@ -84,7 +86,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
 
   @Before
   public void configureExpressionManager() throws MuleException {
-    expressionManager = muleContext.getExpressionManager();
+    expressionManager = dw.getExpressionManager();
   }
 
   @Test
@@ -213,8 +215,8 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   public void parseCompatibility() throws MuleException {
     assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), TEST_CONNECTOR_LOCATION),
                is(format("this is %s", TEST_PAYLOAD)));
-    expectedException.expect(RuntimeException.class);
-    expressionManager.parse("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION);
+    assertThrows(RuntimeException.class,
+                 () -> expressionManager.parse("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION));
   }
 
   @Test
@@ -246,11 +248,12 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   @Test
   @Description("Verifies that XML content can be used for logging in DW.")
   public void parseLogXml() throws MuleException {
-    CoreEvent event = getEventBuilder().message(Message.builder().value("<?xml version='1.0' encoding='US-ASCII'?>\n"
-        + "<wsc_fields>\n"
-        + "  <operation>echo</operation>\n"
-        + "  <body_test>test</body_test>\n"
-        + "</wsc_fields>")
+    CoreEvent event = getEventBuilder().message(Message.builder().value("""
+        <?xml version='1.0' encoding='US-ASCII'?>
+        <wsc_fields>
+          <operation>echo</operation>
+          <body_test>test</body_test>
+        </wsc_fields>""")
         .mediaType(XML)
         .build())
         .build();

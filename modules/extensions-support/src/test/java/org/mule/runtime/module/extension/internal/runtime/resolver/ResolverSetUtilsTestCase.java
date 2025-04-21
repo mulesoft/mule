@@ -63,12 +63,14 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
 
+  // @Rule
+  // public DataWeaveExpressionLanguage dw = dataWeaveRule();
+
   @Mock
-  private ExtendedExpressionManager expressionManager;
+  public ExtendedExpressionManager el;
 
   @Before
   public void setUp() {
-    MuleExpressionLanguage el = expressionManager;
     when(el.evaluate(eq("#[payload]"), any(DataType.class), any(BindingContext.class)))
         .thenAnswer(inv -> inv.getArgument(2, BindingContext.class).lookup("payload").orElseThrow());
   }
@@ -161,7 +163,6 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
     ParameterizedModel pmzdModel = createModelWithExpressionParam(jsonType);
 
     String value = "#['hello me']";
-    MuleExpressionLanguage el = expressionManager;
     when(el.evaluate(eq(value), any(DataType.class), any(BindingContext.class)))
         .thenReturn(new TypedValue("hello me", STRING));
 
@@ -265,7 +266,7 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
   private MuleContext createMuleContext() {
     MuleContext muleContext = mock(MuleContext.class);
     when(muleContext.getInjector()).thenReturn(mock(Injector.class));
-    when(muleContext.getExpressionManager()).thenReturn(expressionManager);
+    when(muleContext.getExpressionManager()).thenReturn(el);
     return muleContext;
   }
 

@@ -6,27 +6,30 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
+
 import static java.lang.Integer.valueOf;
 import static java.lang.String.format;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExpressionLanguageTransformationValueResolverTestCase extends AbstractMuleContextTestCase {
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+public class ExpressionLanguageTransformationValueResolverTestCase extends AbstractMuleTestCase {
 
   private static final String STRING_VALUE = "Hello World!";
   private static final ValueResolvingContext NULL_VALUE_RESOLVING_CONTEXT =
@@ -37,7 +40,7 @@ public class ExpressionLanguageTransformationValueResolverTestCase extends Abstr
   private static final String POJO_DESCRIPTION_NAME = "description";
   private static final String POJO_DESCRIPTION_SCORE_NAME = "descriptionScore";
   private static final Integer POJO_DESCRIPTION_SCORE = 500;
-  private static final Map<String, Object> CUSTOM_POJO_MAP_REPRESENTATION = new HashMap<String, Object>() {
+  private static final Map<String, Object> CUSTOM_POJO_MAP_REPRESENTATION = new HashMap<>() {
 
     {
       put(POJO_DESCRIPTION_NAME, POJO_DESCRIPTION);
@@ -49,15 +52,14 @@ public class ExpressionLanguageTransformationValueResolverTestCase extends Abstr
       format("{ \"%s\" : \"%s\" , \"%s\": %s }", POJO_DESCRIPTION_NAME, POJO_DESCRIPTION, POJO_DESCRIPTION_SCORE_NAME,
              POJO_DESCRIPTION_SCORE);
 
-
   @Rule
-  public ExpectedException expected = none();
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   private ExtendedExpressionManager expressionManager;
 
-  @Override
-  protected void doSetUp() throws Exception {
-    expressionManager = muleContext.getExpressionManager();
+  @Before
+  public void setUp() throws Exception {
+    expressionManager = dw.getExpressionManager();
   }
 
   @Test

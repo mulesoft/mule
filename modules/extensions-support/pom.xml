@@ -44,6 +44,7 @@
             --add-exports=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.type.catalog=org.mule.runtime.core
             --add-exports=org.mule.runtime.extensions.support/org.mule.test.module.extension.internal.util.extension.privileged=org.mule.runtime.core
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.streaming=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
@@ -60,7 +61,8 @@
             --add-opens=org.mule.runtime.errors/org.mule.runtime.config.internal.error=ALL-UNNAMED
             --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.runtime.extensions.support
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.extensions.support
-            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el.dataweave=org.mule.runtime.extensions.support
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el.dataweave=org.mule.runtime.extensions.support,ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.transformer=ALL-UNNAMED
             ${surefire.test.unit.open.args}
         </surefire.args>
 

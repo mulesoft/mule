@@ -23,12 +23,12 @@ import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 
 import java.util.List;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import org.slf4j.Logger;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * Creates the default {@link org.mule.runtime.core.api.el.ExpressionManager}
@@ -60,6 +60,8 @@ public class DefaultExpressionManagerFactoryBean implements FactoryBean<Extended
     ExtendedExpressionLanguageAdaptor expressionLanguage = createExpressionLanguage();
     populateBindings(expressionLanguage);
     delegate.setExpressionLanguage(expressionLanguage);
+    delegate.setMuleConfiguration(muleContext.getConfiguration());
+    delegate.setStreamingManager(muleContext.getStreamingManager());
 
     muleContext.getInjector().inject(delegate);
     return (ExtendedExpressionManager) createClassLoaderInjectorInvocationHandler(delegate,

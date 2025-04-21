@@ -24,9 +24,9 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
-import jakarta.inject.Inject;
-
 import org.springframework.beans.factory.SmartFactoryBean;
+
+import jakarta.inject.Inject;
 
 /**
  * This class is a "SmartFactoryBean" which allows a few XML attributes to be set on the otherwise read-only MuleConfiguration. It
@@ -114,7 +114,8 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   }
 
   public void setCorrelationIdGeneratorExpression(String correlationIdGeneratorExpression) {
-    config.setDefaultCorrelationIdGenerator(new ExpressionCorrelationIdGenerator(muleContext, correlationIdGeneratorExpression));
+    config.setDefaultCorrelationIdGenerator(new ExpressionCorrelationIdGenerator(muleContext.getExpressionManager(),
+                                                                                 correlationIdGeneratorExpression));
   }
 
   public void setExtensions(List<ConfigurationExtension> extensions) {
@@ -124,9 +125,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   @Override
   public MuleConfiguration doGetObject() throws Exception {
     MuleConfiguration configuration = muleContext.getConfiguration();
-    if (configuration instanceof DefaultMuleConfiguration) {
-      DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
-
+    if (configuration instanceof DefaultMuleConfiguration defaultConfig) {
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
       defaultConfig.setShutdownTimeout(config.getShutdownTimeout());

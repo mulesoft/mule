@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import static java.util.Arrays.asList;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -15,11 +18,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.rules.ExpectedException.none;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -40,9 +42,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @SmallTest
 public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
@@ -50,18 +50,16 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
   public static final String FLOW_NAME = "flowName";
 
   private final MuleContext muleContext = mockContextWithServices();
-  private final Builder flowBuilder = new DefaultFlowBuilder(FLOW_NAME, muleContext, new ComponentInitialStateManager() {
+  private final Builder flowBuilder =
+      new DefaultFlowBuilder(FLOW_NAME, muleContext, muleContext.getStatistics(), new ComponentInitialStateManager() {
 
-    @Override
-    public boolean mustStartMessageSource(Component component) {
-      return true;
-    }
-  });
+        @Override
+        public boolean mustStartMessageSource(Component component) {
+          return true;
+        }
+      });
   private final ProcessingStrategyFactory defaultProcessingStrategyFactory = mock(ProcessingStrategyFactory.class);
   private final ProcessingStrategy processingStrategy = mock(ProcessingStrategy.class);
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Before
   public void setUp() throws Exception {
@@ -111,42 +109,36 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void cannotBuildFlowTwice() throws Exception {
     flowBuilder.build();
-    expectedException.expect(IllegalStateException.class);
-    flowBuilder.build();
+    assertThrows(IllegalStateException.class, () -> flowBuilder.build());
   }
 
   @Test
   public void cannotChangeMessageSourceAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    expectedException.expect(IllegalStateException.class);
-    flowBuilder.source(mock(MessageSource.class));
+    assertThrows(IllegalStateException.class, () -> flowBuilder.source(mock(MessageSource.class)));
   }
 
   @Test
   public void cannotChangeMessageProcessorsListAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    expectedException.expect(IllegalStateException.class);
-    flowBuilder.processors(asList(mock(Processor.class)));
+    assertThrows(IllegalStateException.class, () -> flowBuilder.processors(asList(mock(Processor.class))));
   }
 
   @Test
   public void cannotChangeMessageProcessorAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    expectedException.expect(IllegalStateException.class);
-    flowBuilder.processors(mock(Processor.class));
+    assertThrows(IllegalStateException.class, () -> flowBuilder.processors(mock(Processor.class)));
   }
 
   @Test
   public void cannotChangeExceptionListenerAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    expectedException.expect(IllegalStateException.class);
-    flowBuilder.messagingExceptionHandler(mock(FlowExceptionHandler.class));
+    assertThrows(IllegalStateException.class, () -> flowBuilder.messagingExceptionHandler(mock(FlowExceptionHandler.class)));
   }
 
   @Test
   public void cannotChangeProcessingStrategyFactoryAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    expectedException.expect(IllegalStateException.class);
-    flowBuilder.processingStrategyFactory(mock(ProcessingStrategyFactory.class));
+    assertThrows(IllegalStateException.class, () -> flowBuilder.processingStrategyFactory(mock(ProcessingStrategyFactory.class)));
   }
 }

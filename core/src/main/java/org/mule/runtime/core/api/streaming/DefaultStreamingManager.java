@@ -53,9 +53,9 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import java.io.Closeable;
 import java.io.InputStream;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 @NoExtend
 public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
@@ -72,7 +72,6 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private MutableStreamingStatistics statistics;
   private boolean initialised = false;
 
-  @Inject
   private MuleContext muleContext;
 
   @Inject
@@ -91,8 +90,8 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
       byteStreamingManager = createByteStreamingManager();
       objectStreamingManager = createObjectStreamingManager();
 
-      initialiseIfNeeded(byteStreamingManager, true, muleContext);
-      initialiseIfNeeded(objectStreamingManager, true, muleContext);
+      initialiseIfNeeded(objectStreamingManager, muleContext.getInjector());
+
       initialised = true;
     }
   }
@@ -237,5 +236,10 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
 
   protected ByteBufferManager getBufferManager() {
     return bufferManager;
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 }

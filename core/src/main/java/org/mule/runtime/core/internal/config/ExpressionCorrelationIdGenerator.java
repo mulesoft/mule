@@ -6,29 +6,27 @@
  */
 package org.mule.runtime.core.internal.config;
 
-import org.mule.runtime.api.el.CompiledExpression;
-import org.mule.runtime.api.el.ExpressionLanguageSession;
-import org.mule.runtime.api.el.ExpressionCompilationException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.CorrelationIdGenerator;
-import org.mule.runtime.core.api.el.ExpressionManager;
-
-import static java.lang.String.format;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import static java.lang.String.format;
+
+import org.mule.runtime.api.el.CompiledExpression;
+import org.mule.runtime.api.el.ExpressionCompilationException;
+import org.mule.runtime.api.el.ExpressionLanguageSession;
+import org.mule.runtime.core.api.config.CorrelationIdGenerator;
+import org.mule.runtime.core.api.el.ExpressionManager;
 
 public class ExpressionCorrelationIdGenerator implements CorrelationIdGenerator {
 
   private String expression;
 
-  private MuleContext context;
-
   private ExpressionManager manager;
   private CompiledExpression compiledExpression;
 
-  public ExpressionCorrelationIdGenerator(MuleContext context, String expression) {
+  public ExpressionCorrelationIdGenerator(ExpressionManager expressionManager, String expression) {
     this.expression = expression;
-    this.context = context;
+    this.manager = expressionManager;
   }
 
   @Override
@@ -47,7 +45,6 @@ public class ExpressionCorrelationIdGenerator implements CorrelationIdGenerator 
 
   // TODO (MULE-19231): remove this from here (won't be more necessary)
   public void initializeGenerator() {
-    manager = context.getExpressionManager();
     compiledExpression = manager.compile(expression, NULL_BINDING_CONTEXT);
     validateExpression();
   }

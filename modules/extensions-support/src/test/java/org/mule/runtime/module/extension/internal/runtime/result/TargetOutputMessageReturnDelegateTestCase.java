@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.result;
 
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getDefaultCursorStreamProviderFactory;
 
@@ -38,6 +39,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
@@ -51,12 +53,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
-public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleContextTestCase {
+public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleTestCase {
 
   private static final String TARGET = "myFlowVar";
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
+
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   private ExpressionManager expressionManager;
 
@@ -91,7 +96,7 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
 
   @Before
   public void before() throws MuleException {
-    expressionManager = muleContext.getExpressionManager();
+    expressionManager = dw.getExpressionManager();
     event = eventBuilder().message(Message.builder().value("").attributesValue(attributes).build()).build();
     when(operationContext.getEvent()).thenReturn(event);
     when(operationContext.getComponent()).thenReturn(component);

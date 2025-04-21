@@ -76,7 +76,8 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
    * @param muleContext context where the flow will be registered. Non null.
    */
   static Builder builder(String name, MuleContext muleContext) {
-    return new DefaultFlowBuilder(name, muleContext, ((DefaultMuleContext) muleContext).getRegistry().lookupObject(SERVICE_ID));
+    return new DefaultFlowBuilder(name, muleContext, muleContext.getStatistics(),
+                                  ((DefaultMuleContext) muleContext).getRegistry().lookupObject(SERVICE_ID));
   }
 
   interface Builder {
