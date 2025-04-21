@@ -15,10 +15,9 @@ import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.util.InjectableParameterResolver;
@@ -49,8 +48,8 @@ public class SampleDataProviderFactory {
   private final Field connectionField;
   private final Field configField;
   private final ReflectionCache reflectionCache;
-  private final MuleContext muleContext;
   private final ExpressionManager expressionManager;
+  private final Injector injector;
   private final ParameterizedModel parameterizedModel;
 
   public SampleDataProviderFactory(SampleDataProviderFactoryModelProperty factoryModelProperty,
@@ -60,7 +59,8 @@ public class SampleDataProviderFactory {
                                    Field connectionField,
                                    Field configField,
                                    ReflectionCache reflectionCache,
-                                   MuleContext muleContext,
+                                   ExpressionManager expressionManager,
+                                   Injector injector,
                                    ParameterizedModel parameterizedModel) {
     this.factoryModelProperty = factoryModelProperty;
     this.parameterValueResolver = parameterValueResolver;
@@ -69,8 +69,8 @@ public class SampleDataProviderFactory {
     this.connectionField = connectionField;
     this.configField = configField;
     this.reflectionCache = reflectionCache;
-    this.muleContext = muleContext;
-    this.expressionManager = muleContext.getExpressionManager();
+    this.expressionManager = expressionManager;
+    this.injector = injector;
     this.parameterizedModel = parameterizedModel;
   }
 
@@ -79,7 +79,7 @@ public class SampleDataProviderFactory {
 
     try {
       SampleDataProvider<T, A> resolver = instantiateClass(providerClass);
-      initialiseIfNeeded(resolver, true, muleContext);
+      initialiseIfNeeded(resolver, injector);
 
       InjectableParameterResolver injectableParameterResolver =
           new InjectableParameterResolver(parameterizedModel, parameterValueResolver, expressionManager,

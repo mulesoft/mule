@@ -25,6 +25,7 @@ import static java.util.function.Function.identity;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -78,6 +79,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final MuleConfiguration muleConfiguration;
+  private final ArtifactType artifactType;
   private final NotificationDispatcher notificationDispatcher;
   private final ResultTransformer resultTransformer;
   private final ClassLoader executionClassLoader;
@@ -93,6 +95,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   ErrorTypeRepository typeRepository,
                                   ClassLoader executionClassLoader,
                                   MuleConfiguration muleConfiguration,
+                                  ArtifactType artifactType,
                                   NotificationDispatcher notificationDispatcher,
                                   ResultTransformer resultTransformer,
                                   ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer,
@@ -102,6 +105,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     this.muleConfiguration = requireNonNull(muleConfiguration);
+    this.artifactType = requireNonNull(artifactType);
     this.notificationDispatcher = notificationDispatcher;
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
@@ -255,7 +259,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private void profileThreadRelease(ExecutionContextAdapter<M> context) {
     String threadName = currentThread().getName();
     String artifactId = muleConfiguration.getId();
-    String artifactType = getArtifactType(context.getMuleContext());
+    String artifactType = this.artifactType.getArtifactTypeAsString();
     threadReleaseDataProducer.triggerProfilingEvent(context
         .getEvent(), event -> new DefaultComponentThreadingProfilingEventContext(event, context
             .getComponent().getLocation(), threadName, artifactId, artifactType, currentTimeMillis()));

@@ -822,10 +822,13 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
                                                                              extensionModel,
                                                                              componentModel,
                                                                              this,
-                                                                             muleContext,
                                                                              artifactEncoding,
+                                                                             muleContext.getNotificationManager(),
                                                                              reflectionCache,
-                                                                             streamingManager);
+                                                                             expressionManager,
+                                                                             streamingManager,
+                                                                             muleContext.getInjector(),
+                                                                             muleContext);
         }
       }
     }

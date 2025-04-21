@@ -9,12 +9,15 @@ package org.mule.runtime.module.extension.api.runtime.privileged;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
@@ -72,13 +75,27 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
 
   /**
    * @return The {@link MuleContext} on which the operation is being executed
+   * @deprecated Use other getters form this to get the required object.
    */
+  @Deprecated(forRemoval = true, since = "4.10")
   MuleContext getMuleContext();
+
+  /**
+   * @return the {@link ArtifactEncoding} of the artifact of the executing component.
+   * @since 4.10
+   */
+  ArtifactEncoding getArtifactEncoding();
+
+  /**
+   * @return the {@link ServerNotificationManager} of the artifact of the executing component.
+   * @since 4.10
+   */
+  ServerNotificationManager getNotificationManager();
 
   /**
    * @return The {@link CursorProviderFactory} configured on the executing component
    */
-  CursorProviderFactory getCursorProviderFactory();
+  <T> CursorProviderFactory<T> getCursorProviderFactory();
 
   /**
    * @return The application's {@link StreamingManager}
@@ -118,6 +135,15 @@ public interface ExecutionContextAdapter<M extends ComponentModel> extends Event
    * @return the context for this session or null if the request is not secure.
    */
   SecurityContext getSecurityContext();
+
+  /**
+   * Gets the security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
+   * service invocations
+   *
+   * @return the security manager used by the Mule instance to authenticate and authorise incoming and outgoing event traffic and
+   *         service invocations
+   */
+  SecurityManager getSecurityManager();
 
   /**
    * @param currentScheduler the scheduler that was determined by the {@link ProcessingStrategy} to execute this component.

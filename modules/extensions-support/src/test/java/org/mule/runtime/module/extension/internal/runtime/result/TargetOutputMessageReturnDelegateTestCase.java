@@ -19,20 +19,25 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
@@ -70,6 +75,15 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
   private StreamingManager streamingManager;
 
   @Mock
+  private ArtifactEncoding artifactEncoding;
+
+  @Mock
+  private ServerNotificationManager notificationManager;
+
+  @Mock
+  private SecurityManager securityManager;
+
+  @Mock
   protected Object attributes;
 
   protected ReturnDelegate delegate;
@@ -78,11 +92,13 @@ public class TargetOutputMessageReturnDelegateTestCase extends AbstractMuleConte
   @Before
   public void before() throws MuleException {
     expressionManager = muleContext.getExpressionManager();
-    event = eventBuilder(muleContext).message(Message.builder().value("").attributesValue(attributes).build()).build();
+    event = eventBuilder().message(Message.builder().value("").attributesValue(attributes).build()).build();
     when(operationContext.getEvent()).thenReturn(event);
-    when(operationContext.getMuleContext()).thenReturn(muleContext);
     when(operationContext.getComponent()).thenReturn(component);
     when(operationContext.getCursorProviderFactory()).thenReturn(getDefaultCursorStreamProviderFactory());
+    when(operationContext.getArtifactEncoding()).thenReturn(artifactEncoding);
+    when(operationContext.getNotificationManager()).thenReturn(notificationManager);
+    when(operationContext.getSecurityManager()).thenReturn(securityManager);
     when(componentModel.getModelProperty(MediaTypeModelProperty.class)).thenReturn(empty());
   }
 

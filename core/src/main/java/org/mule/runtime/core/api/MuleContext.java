@@ -99,7 +99,7 @@ public interface MuleContext extends Lifecycle {
    * Gets the security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
    * service invocations
    *
-   * @return he security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
+   * @return the security manager used by this Mule instance to authenticate and authorise incoming and outgoing event traffic and
    *         service invocations
    */
   SecurityManager getSecurityManager();
