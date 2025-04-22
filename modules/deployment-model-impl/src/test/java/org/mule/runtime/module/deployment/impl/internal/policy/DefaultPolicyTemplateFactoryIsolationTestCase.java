@@ -15,6 +15,7 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POL
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
@@ -32,16 +33,19 @@ import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -80,9 +84,12 @@ public class DefaultPolicyTemplateFactoryIsolationTestCase extends AbstractMuleT
     ownPolicyClassLoader = mock(MuleDeployableArtifactClassLoader.class);
     when(policyClassLoader.getArtifactId()).thenReturn(POLICY_ID);
     when(ownPolicyClassLoader.getArtifactId()).thenReturn(POLICY_ID);
-    when(policyClassLoader.getArtifactPluginClassLoaders()).thenReturn(emptyList());
-    when(ownPolicyClassLoader.getArtifactPluginClassLoaders()).thenReturn(emptyList());
-    when(pluginDependenciesResolver.resolve(any(), any(), eq(false))).thenReturn(emptyList());
+
+    ArtifactClassLoader mockHttpPluginLoader = mock(ArtifactClassLoader.class);
+    when(mockHttpPluginLoader.getArtifactId()).thenReturn("plugin-loader-for-HTTP");
+    when(ownPolicyClassLoader.getArtifactPluginClassLoaders()).thenReturn(singletonList(mockHttpPluginLoader));
+    when(pluginDependenciesResolver.resolve(any(), any(), eq(false)))
+        .thenReturn(new ArrayList<>());
   }
 
   @Test
