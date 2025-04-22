@@ -36,7 +36,7 @@ import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -87,7 +87,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
   private ArtifactEncoding artifactEncoding;
 
   @Inject
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Inject
   private Registry registry;
@@ -200,6 +200,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                                           true,
                                                                           reflectionCache,
                                                                           expressionManager,
+                                                                          muleContext.getInjector(),
                                                                           parameterizedModel.getName(), artifactEncoding);
     return new DesignTimeParameterValueResolver(resolverSet,
                                                 parameterizedModel,
@@ -212,6 +213,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
       throws ConfigurationException, InitialisationException {
     final ParametersResolver parametersResolver = fromValues(values,
                                                              muleContext,
+                                                             muleContext.getInjector(),
                                                              true,
                                                              reflectionCache,
                                                              expressionManager,
@@ -232,7 +234,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
       if (model != null) {
         Optional<Class<Object>> clazz = getType(model.getType());
         if (clazz.isPresent()) {
-          resolver = new TypeSafeValueResolverWrapper(resolver, clazz.get());
+          resolver = new TypeSafeValueResolverWrapper<>(resolver, clazz.get());
         }
       }
 
@@ -246,8 +248,9 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
   @Override
   public ValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel) {
     return new DefaultValueProviderMediator(parameterizedModel,
-                                            () -> muleContext,
-                                            () -> reflectionCache);
+                                            () -> reflectionCache,
+                                            () -> expressionManager,
+                                            () -> muleContext.getInjector());
   }
 
   @Override

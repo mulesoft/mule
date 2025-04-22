@@ -34,9 +34,12 @@ import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.Reference;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
@@ -71,7 +74,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   private final ValueResolver<T> delegate;
   private final ValueResolver<T> fallback;
-  private final MuleContext muleContext;
+  private final Injector injector;
 
   /**
    * Creates a new instance
@@ -87,8 +90,10 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
   public static <T> ValueResolver<T> of(ValueResolver<T> delegate,
                                         MetadataType type,
                                         ReflectionCache reflectionCache,
-                                        ExpressionManager expressionManager,
+                                        TransformationService transformationService,
+                                        ExtendedExpressionManager expressionManager,
                                         MuleContext muleContext,
+                                        Injector injector,
                                         ObjectTypeParametersResolver parametersResolver) {
     checkArgument(delegate != null, "delegate cannot be null");
 
@@ -101,7 +106,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
         if (isMap(objectType)) {
           ValueResolver<?> fallback = MapValueResolver.of(clazz, emptyList(), emptyList(), reflectionCache, muleContext);
-          wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, muleContext));
+          wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, injector));
           return;
         }
 
@@ -130,7 +135,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
           Optional<String> defaultValue = getDefaultValue(objectField);
           // TODO MULE-13066 Extract ParameterResolver logic into a centralized resolver
           if (defaultValue.isPresent()) {
-            fieldResolver = getFieldDefaultValueValueResolver(objectField, muleContext);
+            fieldResolver = getFieldDefaultValueValueResolver(objectField, transformationService,
+                                                              expressionManager, injector);
           } else if (isFlattenedParameterGroup(objectField)) {
             DefaultObjectBuilder groupBuilder = new DefaultObjectBuilder<>(getType(objectField.getValue()), reflectionCache);
             resolverSet.add(field.getName(), new ObjectBuilderValueResolver<T>(groupBuilder, muleContext));
@@ -154,7 +160,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
               }
 
               fieldResolver = NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), nullSafeType, reflectionCache,
-                                                              expressionManager, muleContext, parametersResolver);
+                                                              transformationService,
+                                                              expressionManager, muleContext, injector, parametersResolver);
             }
 
             if (isConfigOverride(field)) {
@@ -174,14 +181,14 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
         wrappedResolver.set(new NullSafeValueResolverWrapper(delegate,
                                                              new ObjectBuilderValueResolver(objectBuilder, muleContext),
-                                                             muleContext));
+                                                             injector));
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
         Class collectionClass = getType(arrayType);
         ValueResolver<?> fallback = CollectionValueResolver.of(collectionClass, emptyList());
-        wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, muleContext));
+        wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, injector));
       }
 
       @Override
@@ -197,10 +204,10 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
     return wrappedResolver.get();
   }
 
-  private NullSafeValueResolverWrapper(ValueResolver<T> delegate, ValueResolver<T> fallback, MuleContext muleContext) {
+  private NullSafeValueResolverWrapper(ValueResolver<T> delegate, ValueResolver<T> fallback, Injector injector) {
     this.delegate = delegate;
     this.fallback = fallback;
-    this.muleContext = muleContext;
+    this.injector = injector;
   }
 
   @Override
@@ -216,8 +223,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(delegate, muleContext);
-    initialiseIfNeeded(fallback, muleContext);
+    initialiseIfNeeded(delegate, injector);
+    initialiseIfNeeded(fallback, injector);
   }
 
 }

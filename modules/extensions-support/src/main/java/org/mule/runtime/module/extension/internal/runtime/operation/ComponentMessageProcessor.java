@@ -911,11 +911,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       return false;
     }
 
-    if (muleContext.getExpressionManager().isExpression(target)) {
+    if (expressionManager.isExpression(target)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
                                                  componentModel.getName(),
                                                  "an expression", TARGET_PARAMETER_NAME));
-    } else if (!muleContext.getExpressionManager().isExpression(targetValue)) {
+    } else if (!expressionManager.isExpression(targetValue)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, getLocation().getRootContainerName(),
                                                  componentModel.getName(), "something that is not an expression",
                                                  TARGET_VALUE_PARAMETER_NAME));

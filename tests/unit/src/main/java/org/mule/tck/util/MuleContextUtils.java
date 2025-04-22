@@ -445,7 +445,10 @@ public class MuleContextUtils {
   }
 
   public static void verifyRegistration(MuleContext muleContext, String registryKey, ArgumentCaptor captor) {
-    MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
+    verifyRegistration(((MuleContextWithRegistry) muleContext).getRegistry(), registryKey, captor);
+  }
+
+  public static void verifyRegistration(MuleRegistry registry, String registryKey, ArgumentCaptor captor) {
     try {
       verify(registry).registerObject(eq(registryKey), captor.capture());
     } catch (RegistrationException e) {

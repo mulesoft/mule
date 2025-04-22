@@ -371,6 +371,7 @@
                                 <arg>--add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.error=org.mule.runtime.extensions.support</arg>
                                 <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.extensions.support</arg>
                                 <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el.dataweave=org.mule.runtime.extensions.support</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.registry=org.mule.runtime.extensions.support,ALL-UNNAMED</arg>
                             </compilerArgs>
                         </configuration>
                     </execution>

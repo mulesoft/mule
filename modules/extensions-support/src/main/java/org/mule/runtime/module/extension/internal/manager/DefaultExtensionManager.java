@@ -36,10 +36,12 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.util.version.JdkVersionUtils.JdkVersion;
 import org.mule.runtime.extension.api.property.ImplicitConfigNameModelProperty;
@@ -97,7 +99,10 @@ public final class DefaultExtensionManager implements ExtensionManager, Initiali
   private ReflectionCache reflectionCache;
 
   @Inject
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
+
+  @Inject
+  private ServerNotificationManager notificationManager;
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
@@ -115,8 +120,12 @@ public final class DefaultExtensionManager implements ExtensionManager, Initiali
   public void initialise() throws InitialisationException {
     if (initialised.compareAndSet(false, true)) {
       extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
-      extensionActivator = new ExtensionActivator(muleContext);
-      initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
+      extensionActivator = new ExtensionActivator(((MuleContextWithRegistry) muleContext).getRegistry(),
+                                                  muleContext.getInjector(),
+                                                  expressionManager,
+                                                  notificationManager,
+                                                  muleContext.getExecutionClassLoader());
+      initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext.getInjector());
       resolveJdkValidator();
     }
   }

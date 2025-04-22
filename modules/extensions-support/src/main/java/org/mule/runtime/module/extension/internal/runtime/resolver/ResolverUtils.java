@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.util.Optional.empty;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -15,6 +14,8 @@ import static org.mule.runtime.module.extension.internal.loader.java.property.st
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
+
+import static java.util.Optional.empty;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
@@ -27,10 +28,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
-import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnnotation;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
@@ -54,42 +56,60 @@ public class ResolverUtils {
 
   }
 
-  static ValueResolver<?> getFieldDefaultValueValueResolver(ObjectFieldType field, MuleContext muleContext) {
+  static ValueResolver<?> getFieldDefaultValueValueResolver(ObjectFieldType field,
+                                                            TransformationService transformationService,
+                                                            ExtendedExpressionManager expressionManager,
+                                                            Injector injector) {
     Optional<String> defaultValue = getDefaultValue(field);
     checkArgument(defaultValue.isPresent(), "No default value available for field :" + field.getKey().getName());
-    return getExpressionBasedValueResolver(defaultValue.get(), field.getValue(), muleContext);
+    return getExpressionBasedValueResolver(defaultValue.get(), field.getValue(), transformationService, expressionManager,
+                                           injector);
   }
 
   static ValueResolver<?> getFieldDefaultValueValueResolver(MetadataType fieldType, String defaultValue,
-                                                            MuleContext muleContext) {
-    return getExpressionBasedValueResolver(defaultValue, fieldType, muleContext);
+                                                            TransformationService transformationService,
+                                                            ExtendedExpressionManager expressionManager,
+                                                            Injector injector) {
+    return getExpressionBasedValueResolver(defaultValue, fieldType, transformationService, expressionManager, injector);
   }
 
   public static ValueResolver<?> getExpressionBasedValueResolver(String expression, MetadataType metadataType,
-                                                                 MuleContext muleContext) {
+                                                                 TransformationService transformationService,
+                                                                 ExtendedExpressionManager expressionManager,
+                                                                 Injector injector) {
     return getExpressionBasedValueResolver(expression,
                                            () -> isTypedValue(metadataType),
                                            () -> isParameterResolver(metadataType),
                                            empty(),
                                            metadataType,
-                                           muleContext);
+                                           transformationService,
+                                           expressionManager,
+                                           injector);
   }
 
   static ValueResolver<?> getExpressionBasedValueResolver(String expression, ParameterModel operationModel,
-                                                          MuleContext muleContext) {
+                                                          TransformationService transformationService,
+                                                          ExtendedExpressionManager expressionManager,
+                                                          Injector injector) {
     MetadataType metadataType = operationModel.getType();
     return getExpressionBasedValueResolver(expression,
                                            () -> isTypedValue(metadataType),
                                            () -> isParameterResolver(metadataType),
                                            getStackedTypesModelProperty(operationModel.getModelProperties()),
                                            metadataType,
-                                           muleContext);
+                                           transformationService,
+                                           expressionManager,
+                                           injector);
   }
 
-  static ValueResolver<?> getDefaultValueResolver(ParameterModel parameter, MuleContext muleContext) {
+  static ValueResolver<?> getDefaultValueResolver(ParameterModel parameter,
+                                                  TransformationService transformationService,
+                                                  ExtendedExpressionManager expressionManager,
+                                                  Injector injector) {
     Object defaultValue = parameter.getDefaultValue();
     if (defaultValue instanceof String) {
-      return getExpressionBasedValueResolver((String) defaultValue, parameter, muleContext);
+      return getExpressionBasedValueResolver((String) defaultValue, parameter, transformationService, expressionManager,
+                                             injector);
     } else if (defaultValue != null) {
       return new StaticValueResolver<>(defaultValue);
     }
@@ -259,7 +279,9 @@ public class ResolverUtils {
                                                                   BooleanSupplier isParameterResolver,
                                                                   Optional<StackedTypesModelProperty> stackedTypesModelProperty,
                                                                   MetadataType type,
-                                                                  MuleContext muleContext) {
+                                                                  TransformationService transformationService,
+                                                                  ExtendedExpressionManager expressionManager,
+                                                                  Injector injector) {
 
     try {
       ValueResolver resolver;
@@ -271,33 +293,33 @@ public class ResolverUtils {
       } else if (isTypedValue.getAsBoolean()) {
         ExpressionTypedValueValueResolver<Object> valueResolver =
             new ExpressionTypedValueValueResolver<>(expression, getType(type));
-        valueResolver.setTransformationService(muleContext.getTransformationService());
-        valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
+        valueResolver.setTransformationService(transformationService);
+        valueResolver.setExtendedExpressionManager(expressionManager);
         resolver = valueResolver;
       } else if (isParameterResolver.getAsBoolean()) {
         ExpressionBasedParameterResolverValueResolver<Object> valueResolver =
             new ExpressionBasedParameterResolverValueResolver<>(expression, getType(type), toDataType(type));
-        valueResolver.setTransformationService(muleContext.getTransformationService());
-        valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
+        valueResolver.setTransformationService(transformationService);
+        valueResolver.setExtendedExpressionManager(expressionManager);
         resolver = valueResolver;
-      } else if (muleContext.getExpressionManager().isExpression(expression)) {
+      } else if (expressionManager.isExpression(expression)) {
         if (type.getAnnotation(LiteralTypeAnnotation.class).isPresent()) {
           resolver = new StaticLiteralValueResolver<Object>(expression, getType(type));
         } else {
           TypeSafeExpressionValueResolver<Object> valueResolver =
               new TypeSafeExpressionValueResolver<>(expression, getType(type), toDataType(type));
-          valueResolver.setTransformationService(muleContext.getTransformationService());
-          valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
+          valueResolver.setTransformationService(transformationService);
+          valueResolver.setExtendedExpressionManager(expressionManager);
           resolver = valueResolver;
         }
       } else {
         TypeSafeValueResolverWrapper typeSafeValueResolverWrapper =
             new TypeSafeValueResolverWrapper<>(new StaticValueResolver<>(expression), getType(type));
-        typeSafeValueResolverWrapper.setTransformationService(muleContext.getTransformationService());
+        typeSafeValueResolverWrapper.setTransformationService(transformationService);
         resolver = typeSafeValueResolverWrapper;
       }
 
-      initialiseIfNeeded(resolver, muleContext);
+      initialiseIfNeeded(resolver, injector);
       return resolver;
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);

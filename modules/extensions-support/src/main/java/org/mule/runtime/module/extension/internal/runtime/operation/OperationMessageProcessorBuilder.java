@@ -14,7 +14,7 @@ import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CO
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
@@ -45,7 +45,7 @@ public final class OperationMessageProcessorBuilder
                                           OperationModel operation,
                                           List<EnrichedErrorMapping> errorMappings,
                                           ReflectionCache reflectionCache,
-                                          ExpressionManager expressionManager,
+                                          ExtendedExpressionManager expressionManager,
                                           ExtensionConnectionSupplier extensionConnectionSupplier,
                                           ComponentTracerFactory<CoreEvent> componentTracerFactory,
                                           MuleContext muleContext) {

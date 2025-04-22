@@ -11,7 +11,6 @@ import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static org.mule.runtime.module.extension.internal.lifecycle.ExtensionOnMuleContextDisposedNotificationListener.registerLifecycleListenerForOnContextDisposed;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSubtypeClasses;
@@ -28,10 +27,12 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.DefaultExpressionModuleBuilder;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
@@ -51,19 +52,31 @@ import java.util.stream.Stream;
  */
 public final class ExtensionActivator implements Startable, Stoppable {
 
-  private final MuleContext muleContext;
+  private final MuleRegistry muleRegistry;
+  private final Injector injector;
+  private final ExtendedExpressionManager expressionManager;
+  private final ServerNotificationManager notificationManager;
+  private final ClassLoader executionClassLoader;
   private final Set<Class<? extends Enum>> enumTypes = new HashSet<>();
   private final List<Object> lifecycleAwareElements = new LinkedList<>();
 
-  ExtensionActivator(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  ExtensionActivator(MuleRegistry muleRegistry,
+                     Injector injector,
+                     ExtendedExpressionManager expressionManager,
+                     ServerNotificationManager notificationManager,
+                     ClassLoader executionClassLoader) {
+    this.muleRegistry = muleRegistry;
+    this.injector = injector;
+    this.expressionManager = expressionManager;
+    this.notificationManager = notificationManager;
+    this.executionClassLoader = executionClassLoader;
   }
 
   void activateExtension(ExtensionModel extensionModel) {
     registerEnumTransformers(extensionModel);
     registerAsModuleDefinition(extensionModel);
-    registerLifecycleListenerForOnContextDisposed(muleContext.getNotificationManager(),
-                                                  muleContext.getExecutionClassLoader(),
+    registerLifecycleListenerForOnContextDisposed(notificationManager,
+                                                  executionClassLoader,
                                                   extensionModel);
   }
 
@@ -81,7 +94,7 @@ public final class ExtensionActivator implements Startable, Stoppable {
           if (enumTypes.add(enumClass)) {
             try {
               StringToEnum stringToEnum = new StringToEnum(enumClass);
-              registerObject(muleContext, stringToEnum.getName(), stringToEnum);
+              muleRegistry.registerObject(stringToEnum.getName(), stringToEnum);
             } catch (MuleException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not register transformer for enum "
                   + enumClass.getName()), e);
@@ -98,8 +111,8 @@ public final class ExtensionActivator implements Startable, Stoppable {
     ExpressionModule expressionModule = extensionAsModuleDefinition(extensionModel);
     try {
       final BindingContext bindingContext = new DefaultBindingContextBuilder().addModule(expressionModule).build();
-      registerObject(muleContext, extensionModel.getName() + "GlobalBindingContextProvider",
-                     (GlobalBindingContextProvider) () -> bindingContext);
+      muleRegistry.registerObject(extensionModel.getName() + "GlobalBindingContextProvider",
+                                  (GlobalBindingContextProvider) () -> bindingContext);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
     }
@@ -125,9 +138,9 @@ public final class ExtensionActivator implements Startable, Stoppable {
 
   private void addExtensionFunctions(Stream<FunctionModel> functions, ExpressionModule.Builder module) {
     final FunctionParameterDefaultValueResolverFactory valueResolverFactory = (defaultValue, type) -> context -> {
-      ExtendedExpressionManager em = muleContext.getExpressionManager();
       String value = String.valueOf(defaultValue);
-      return em.isExpression(value) ? em.evaluate(value, type, context) : new TypedValue<>(defaultValue, type);
+      return expressionManager.isExpression(value) ? expressionManager.evaluate(value, type, context)
+          : new TypedValue<>(defaultValue, type);
     };
 
     functions.forEach(function -> function.getModelProperty(FunctionExecutorModelProperty.class).ifPresent(mp -> {
@@ -140,7 +153,7 @@ public final class ExtensionActivator implements Startable, Stoppable {
   @Override
   public void start() throws MuleException {
     for (Object element : lifecycleAwareElements) {
-      initialiseIfNeeded(element, muleContext);
+      initialiseIfNeeded(element, injector);
       startIfNeeded(element);
     }
   }

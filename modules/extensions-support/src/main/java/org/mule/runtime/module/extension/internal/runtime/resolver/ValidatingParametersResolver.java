@@ -15,9 +15,10 @@ import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
@@ -38,10 +39,13 @@ import java.util.Optional;
  */
 final class ValidatingParametersResolver extends ParametersResolver {
 
-  ValidatingParametersResolver(MuleContext muleContext, Map<String, ?> parameters,
-                               ReflectionCache reflectionCache, ExpressionManager expressionManager,
+  ValidatingParametersResolver(MuleContext muleContext,
+                               Injector injector,
+                               Map<String, ?> parameters,
+                               ReflectionCache reflectionCache,
+                               ExtendedExpressionManager expressionManager,
                                String parameterOwner) {
-    super(muleContext, parameters, reflectionCache, expressionManager, parameterOwner);
+    super(muleContext, injector, parameters, reflectionCache, expressionManager, parameterOwner);
   }
 
   @Override

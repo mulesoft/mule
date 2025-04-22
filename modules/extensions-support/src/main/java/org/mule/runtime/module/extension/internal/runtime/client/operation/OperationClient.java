@@ -69,9 +69,10 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -132,9 +133,10 @@ public class OperationClient implements Lifecycle {
   private final ValueReturnDelegate returnDelegate;
   private final StreamingManager streamingManager;
   private final ExtensionManager extensionManager;
-  private final ExpressionManager expressionManager;
+  private final ExtendedExpressionManager expressionManager;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
+  private final Injector injector;
   private final ResolverSet resolverSet;
   private final ArtifactEncoding artifactEncoding;
 
@@ -147,13 +149,14 @@ public class OperationClient implements Lifecycle {
 
   public static OperationClient from(OperationKey key,
                                      ExtensionManager extensionManager,
-                                     ExpressionManager expressionManager,
+                                     ExtendedExpressionManager expressionManager,
                                      ExtensionConnectionSupplier extensionConnectionSupplier,
                                      ErrorTypeRepository errorTypeRepository,
                                      StreamingManager streamingManager,
                                      ReflectionCache reflectionCache,
                                      ComponentTracerFactory<CoreEvent> componentTracerFactory,
                                      MuleContext muleContext,
+                                     Injector injector,
                                      MuleConfiguration muleConfiguration,
                                      ArtifactEncoding artifactEncoding,
                                      NotificationDispatcher notificationDispatcher) {
@@ -167,7 +170,10 @@ public class OperationClient implements Lifecycle {
                                                        errorTypeRepository,
                                                        reflectionCache,
                                                        componentTracerFactory,
-                                                       muleContext,
+                                                       injector,
+                                                       muleContext.getExecutionClassLoader(),
+                                                       ArtifactType.valueOf(muleContext.getArtifactType()
+                                                           .name()),
                                                        muleConfiguration,
                                                        notificationDispatcher),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache),
@@ -177,6 +183,7 @@ public class OperationClient implements Lifecycle {
                                expressionManager,
                                reflectionCache,
                                muleContext,
+                               injector,
                                artifactEncoding);
   }
 
@@ -187,9 +194,10 @@ public class OperationClient implements Lifecycle {
                           ValueReturnDelegate returnDelegate,
                           StreamingManager streamingManager,
                           ExtensionManager extensionManager,
-                          ExpressionManager expressionManager,
+                          ExtendedExpressionManager expressionManager,
                           ReflectionCache reflectionCache,
                           MuleContext muleContext,
+                          Injector injector,
                           ArtifactEncoding artifactEncoding) {
     this.extensionModel = extensionModel;
     this.operationModel = new FilteredOperationModel(operationModel);
@@ -201,6 +209,7 @@ public class OperationClient implements Lifecycle {
     this.expressionManager = expressionManager;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
+    this.injector = injector;
     this.artifactEncoding = artifactEncoding;
     resolverSet = createResolverSet();
   }
@@ -247,6 +256,7 @@ public class OperationClient implements Lifecycle {
                                                         true,
                                                         reflectionCache,
                                                         expressionManager,
+                                                        injector,
                                                         "",
                                                         factory, artifactEncoding);
 
@@ -254,6 +264,7 @@ public class OperationClient implements Lifecycle {
 
       ResolverSet absentResolverSet = fromValues(emptyMap(),
                                                  muleContext,
+                                                 injector,
                                                  true,
                                                  reflectionCache,
                                                  expressionManager,
@@ -440,8 +451,8 @@ public class OperationClient implements Lifecycle {
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(mediator, true, muleContext);
-    initialiseIfNeeded(executor, true, muleContext);
+    initialiseIfNeeded(mediator, injector);
+    initialiseIfNeeded(executor, injector);
   }
 
   @Override
@@ -468,7 +479,9 @@ public class OperationClient implements Lifecycle {
                                                                            ErrorTypeRepository errorTypeRepository,
                                                                            ReflectionCache reflectionCache,
                                                                            ComponentTracerFactory<CoreEvent> componentTracerFactory,
-                                                                           MuleContext muleContext,
+                                                                           Injector injector,
+                                                                           ClassLoader executionClassLoader,
+                                                                           ArtifactType artifactType,
                                                                            MuleConfiguration muleConfiguration,
                                                                            NotificationDispatcher notificationDispatcher) {
 
@@ -483,10 +496,9 @@ public class OperationClient implements Lifecycle {
                                                                                                                   reflectionCache,
                                                                                                                   DUMMY_COMPONENT_TRACER_INSTANCE),
                                                                                 errorTypeRepository,
-                                                                                muleContext.getExecutionClassLoader(),
+                                                                                executionClassLoader,
                                                                                 muleConfiguration,
-                                                                                ArtifactType.valueOf(muleContext.getArtifactType()
-                                                                                    .name()),
+                                                                                artifactType,
                                                                                 notificationDispatcher,
                                                                                 getResultTransformer(extensionConnectionSupplier,
                                                                                                      extensionModel,
@@ -497,7 +509,7 @@ public class OperationClient implements Lifecycle {
                                                                                 false);
 
     try {
-      initialiseIfNeeded(mediator, true, muleContext);
+      initialiseIfNeeded(mediator, injector);
       startIfNeeded(mediator);
 
       return mediator;

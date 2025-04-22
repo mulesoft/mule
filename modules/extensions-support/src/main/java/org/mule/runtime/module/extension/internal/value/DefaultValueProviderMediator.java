@@ -21,7 +21,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.value.Value;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProviderMediator;
@@ -46,8 +47,9 @@ import java.util.function.Supplier;
 public final class DefaultValueProviderMediator<T extends ParameterizedModel & EnrichableModel> implements ValueProviderMediator {
 
   private final T containerModel;
-  private final Supplier<MuleContext> muleContext;
   private final Supplier<ReflectionCache> reflectionCache;
+  private final Supplier<ExpressionManager> expressionManager;
+  private final Supplier<Injector> injector;
   private final Supplier<Object> nullSupplier = () -> null;
 
   /**
@@ -56,11 +58,14 @@ public final class DefaultValueProviderMediator<T extends ParameterizedModel & E
    * @param containerModel container model which is a {@link ParameterizedModel} and {@link EnrichableModel}
    * @param muleContext    context to be able to initialize {@link ValueProvider} if necessary
    */
-  public DefaultValueProviderMediator(T containerModel, Supplier<MuleContext> muleContext,
-                                      Supplier<ReflectionCache> reflectionCache) {
+  public DefaultValueProviderMediator(T containerModel,
+                                      Supplier<ReflectionCache> reflectionCache,
+                                      Supplier<ExpressionManager> expressionManager,
+                                      Supplier<Injector> injector) {
     this.containerModel = containerModel;
-    this.muleContext = muleContext;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
+    this.injector = injector;
   }
 
   /**
@@ -177,6 +182,7 @@ public final class DefaultValueProviderMediator<T extends ParameterizedModel & E
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
+  @Override
   public Set<Value> getValues(String parameterName, ParameterValueResolver parameterValueResolver, String targetSelector,
                               Supplier<Object> connectionSupplier, Supplier<Object> configurationSupplier,
                               ConnectionProvider connectionProvider)
@@ -225,21 +231,15 @@ public final class DefaultValueProviderMediator<T extends ParameterizedModel & E
 
   private Set<Value> resolveValues(List<ParameterModel> parameters, ValueProviderFactoryModelProperty factoryModelProperty,
                                    ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
-                                   Supplier<Object> configurationSupplier)
-      throws ValueResolvingException {
-    return resolveValues(parameters, factoryModelProperty, parameterValueResolver, connectionSupplier, configurationSupplier,
-                         null);
-  }
-
-  private Set<Value> resolveValues(List<ParameterModel> parameters, ValueProviderFactoryModelProperty factoryModelProperty,
-                                   ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                    Supplier<Object> configurationSupplier, String targerSelector)
       throws ValueResolvingException {
     try {
       ValueProvider valueProvider =
           factoryModelProperty
               .createFactory(parameterValueResolver, connectionSupplier, configurationSupplier, reflectionCache.get(),
-                             muleContext.get(), containerModel)
+                             expressionManager.get(),
+                             injector.get(),
+                             containerModel)
               .createValueProvider();
 
       Set<org.mule.sdk.api.values.Value> valueSet = valueProvider.resolve();

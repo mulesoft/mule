@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
@@ -62,13 +63,14 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                                    ConfigurationModel configurationModel,
                                                                    CoreEvent event,
                                                                    ReflectionCache reflectionCache,
-                                                                   ExpressionManager expressionManager) {
+                                                                   ExtendedExpressionManager expressionManager) {
     if (configurationModel == null || !canBeUsedImplicitly(configurationModel)) {
       throw new IllegalStateException("Could not find a config for extension '" + extensionModel.getName()
           + "' and none can be created automatically. Please define one");
     }
     Callable<ResolverSet> resolverSetCallable =
-        () -> buildImplicitResolverSet(configurationModel, reflectionCache, expressionManager, muleContext);
+        () -> buildImplicitResolverSet(configurationModel, reflectionCache, muleContext.getTransformationService(),
+                                       expressionManager, muleContext, muleContext.getInjector());
     ClassLoader pluginClassloader = getClassLoader(extensionModel);
     final ResolverSet resolverSet = withContextClassLoader(pluginClassloader, resolverSetCallable);
     try {
@@ -110,6 +112,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
                                                                                                             .<ConnectionManager>lookupByName(OBJECT_CONNECTION_MANAGER)
                                                                                                             .get(),
                                                                                                         reflectionCache,
+                                                                                                        expressionManager,
                                                                                                         muleContext))
           .orElseGet(() -> new StaticConfigurationProvider(providerName, extensionModel,
                                                            configurationModel, configurationInstance,

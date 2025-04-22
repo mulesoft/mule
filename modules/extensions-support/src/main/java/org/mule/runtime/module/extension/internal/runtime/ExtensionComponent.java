@@ -806,7 +806,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       synchronized (this) {
         if (valueProviderMediator == null) {
           valueProviderMediator =
-              new DefaultValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+              new DefaultValueProviderMediator<>(componentModel, () -> reflectionCache, () -> expressionManager,
+                                                 () -> muleContext.getInjector());
         }
       }
     }

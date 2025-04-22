@@ -6,18 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
@@ -43,7 +44,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected final ExtensionModel extensionModel;
   protected final M operationModel;
   protected final ReflectionCache reflectionCache;
-  protected final ExpressionManager expressionManager;
+  protected final ExtendedExpressionManager expressionManager;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
 
   private final MuleContext muleContext;
@@ -61,7 +62,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
                                           ReflectionCache reflectionCache,
-                                          ExpressionManager expressionManager,
+                                          ExtendedExpressionManager expressionManager,
                                           ExtensionConnectionSupplier extensionConnectionSupplier,
                                           MuleContext muleContext) {
     this.muleContext = requireNonNull(muleContext, "muleContext cannot be null");
@@ -94,12 +95,14 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected ResolverSet getArgumentsResolverSet() throws ConfigurationException {
     final ResolverSet parametersResolverSet =
         ParametersResolver
-            .fromValues(parameters, muleContext, reflectionCache, expressionManager, operationModel.getName())
+            .fromValues(parameters, muleContext, muleContext.getInjector(), reflectionCache, expressionManager,
+                        operationModel.getName())
             .getParametersAsResolverSet(operationModel, muleContext);
 
     final ResolverSet childsResolverSet =
         ParametersResolver
-            .fromValues(parameters, muleContext, reflectionCache, expressionManager, operationModel.getName())
+            .fromValues(parameters, muleContext, muleContext.getInjector(), reflectionCache, expressionManager,
+                        operationModel.getName())
             .getNestedComponentsAsResolverSet(operationModel);
 
     return parametersResolverSet.merge(childsResolverSet);

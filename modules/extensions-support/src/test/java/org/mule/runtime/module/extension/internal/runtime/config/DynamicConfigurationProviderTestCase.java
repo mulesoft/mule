@@ -6,18 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
+
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MINUTES;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -27,11 +34,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
@@ -43,8 +45,8 @@ import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -59,17 +61,17 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import com.google.common.collect.ImmutableList;
 
 @SmallTest
 public class DynamicConfigurationProviderTestCase extends AbstractConfigurationProviderTestCase<HeisenbergExtension> {
@@ -78,9 +80,6 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule().silent();
-
-  @Rule
-  public ExpectedException expected = none();
 
   @Mock
   private ResolverSet resolverSet;
@@ -95,7 +94,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   private ConnectionProviderResolver connectionProviderResolver;
 
   @Mock
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   private ExpirationPolicy expirationPolicy;
 
@@ -312,16 +311,13 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     when(connectionProviderResolver.resolve(any())).thenReturn(new Pair<>(connProvider, mock(ResolverSetResult.class)));
 
-    expected.expectCause(hasMessage(is(InitialisationException.class.getName() + ": " + expectedExceptionMessage)));
+    var thrown = assertThrows(Exception.class, () -> provider.get(event));
+    assertThat(thrown.getCause(), hasMessage(is(InitialisationException.class.getName() + ": " + expectedExceptionMessage)));
 
-    try {
-      provider.get(event);
-    } finally {
-      verify(connProvider).initialise();
-      verify(connProvider, never()).start();
-      verify(connProvider, never()).stop();
-      verify(connProvider).dispose();
-    }
+    verify(connProvider).initialise();
+    verify(connProvider, never()).start();
+    verify(connProvider, never()).stop();
+    verify(connProvider).dispose();
   }
 
   @Test
@@ -329,10 +325,9 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     final String expectedExceptionMessage = "Init failed!";
     doThrow(new ConfigurationException(createStaticMessage(expectedExceptionMessage))).when(connectionProviderResolver)
         .resolve(any());
-    expected.expect(MuleRuntimeException.class);
-    expected.expectCause(instanceOf(ConfigurationException.class));
-    expected.expectCause(hasMessage(is(expectedExceptionMessage)));
-    provider.get(event);
+    var thrown = assertThrows(MuleRuntimeException.class, () -> provider.get(event));
+    assertThat(thrown.getCause(), instanceOf(ConfigurationException.class));
+    assertThat(thrown.getCause(), hasMessage(is(expectedExceptionMessage)));
   }
 
   @Test
@@ -343,16 +338,13 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
     when(connectionProviderResolver.resolve(any())).thenReturn(new Pair<>(connProvider, resolverSetResult));
 
-    expected.expectCause(sameInstance(toThrow));
+    var thrown = assertThrows(Exception.class, () -> provider.get(event));
+    assertThat(thrown.getCause(), sameInstance(toThrow));
 
-    try {
-      provider.get(event);
-    } finally {
-      verify(connProvider).initialise();
-      verify(connProvider).start();
-      verify(connProvider).stop();
-      verify(connProvider).dispose();
-    }
+    verify(connProvider).initialise();
+    verify(connProvider).start();
+    verify(connProvider).stop();
+    verify(connProvider).dispose();
   }
 
 }

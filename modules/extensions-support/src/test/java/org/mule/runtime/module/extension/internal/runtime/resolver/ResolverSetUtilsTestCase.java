@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.BindingContext;
-import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
@@ -63,9 +62,6 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
 
-  // @Rule
-  // public DataWeaveExpressionLanguage dw = dataWeaveRule();
-
   @Mock
   public ExtendedExpressionManager el;
 
@@ -90,11 +86,14 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
 
     ResolverSet resolvers = getResolverSetFromParameters(pmzdModel,
                                                          (pgm, pm) -> componentParameterization,
-                                                         createMuleContext(),
+                                                         mock(MuleContext.class),
                                                          true,
                                                          new ReflectionCache(),
-                                                         null, "",
-                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
+                                                         el,
+                                                         mock(Injector.class),
+                                                         "",
+                                                         new ValueResolverFactory(),
+                                                         new DefaultArtifactEncoding(null));
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
 
@@ -115,11 +114,14 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
 
     ResolverSet resolvers = getResolverSetFromParameters(pmzdModel,
                                                          (pgm, pm) -> value,
-                                                         createMuleContext(),
+                                                         mock(MuleContext.class),
                                                          true,
                                                          new ReflectionCache(),
-                                                         null, "",
-                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
+                                                         el,
+                                                         mock(Injector.class),
+                                                         "",
+                                                         new ValueResolverFactory(),
+                                                         new DefaultArtifactEncoding(null));
 
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
@@ -140,11 +142,14 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
 
     ResolverSet resolvers = getResolverSetFromParameters(pmzdModel,
                                                          (pgm, pm) -> value,
-                                                         createMuleContext(),
+                                                         mock(MuleContext.class),
                                                          true,
                                                          new ReflectionCache(),
-                                                         null, "",
-                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
+                                                         el,
+                                                         mock(Injector.class),
+                                                         "",
+                                                         new ValueResolverFactory(),
+                                                         new DefaultArtifactEncoding(null));
 
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
@@ -168,11 +173,14 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
 
     ResolverSet resolvers = getResolverSetFromParameters(pmzdModel,
                                                          (pgm, pm) -> value,
-                                                         createMuleContext(),
+                                                         mock(MuleContext.class),
                                                          true,
                                                          new ReflectionCache(),
-                                                         null, "",
-                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
+                                                         el,
+                                                         mock(Injector.class),
+                                                         "",
+                                                         new ValueResolverFactory(),
+                                                         new DefaultArtifactEncoding(null));
 
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
@@ -194,11 +202,14 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
 
     ResolverSet resolvers = getResolverSetFromParameters(pmzdModel,
                                                          (pgm, pm) -> value,
-                                                         createMuleContext(),
+                                                         mock(MuleContext.class),
                                                          true,
                                                          new ReflectionCache(),
-                                                         null, "",
-                                                         new ValueResolverFactory(), new DefaultArtifactEncoding(null));
+                                                         el,
+                                                         mock(Injector.class),
+                                                         "",
+                                                         new ValueResolverFactory(),
+                                                         new DefaultArtifactEncoding(null));
 
     ValueResolver<?> paramResolver = resolvers.getResolvers().get("paramName");
     Object resolvedValue = paramResolver.resolve(null);
@@ -261,13 +272,6 @@ public class ResolverSetUtilsTestCase extends AbstractMuleTestCase {
     ParameterizedModel pojoModel = mock(ParameterizedModel.class);
     when(pojoModel.getParameterGroupModels()).thenReturn(singletonList(pojoParamGroupModel));
     return pojoModel;
-  }
-
-  private MuleContext createMuleContext() {
-    MuleContext muleContext = mock(MuleContext.class);
-    when(muleContext.getInjector()).thenReturn(mock(Injector.class));
-    when(muleContext.getExpressionManager()).thenReturn(el);
-    return muleContext;
   }
 
   public static class MyPojo {

@@ -11,7 +11,6 @@ import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 import static org.mule.tck.util.MuleContextUtils.verifyRegistration;
 
 import static java.util.Collections.emptySet;
@@ -20,9 +19,9 @@ import static java.util.Optional.empty;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.collection.IsEmptyIterable.emptyIterable;
+import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_MOCKS;
@@ -31,13 +30,15 @@ import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
+import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -75,12 +76,16 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
                                                                  getDefault(emptySet()),
                                                                  attributes);
 
-    ExtensionActivator extensionActivator = new ExtensionActivator(mockMuleContext());
+    ExtensionActivator extensionActivator = new ExtensionActivator(mock(MuleRegistry.class),
+                                                                   mock(Injector.class),
+                                                                   mock(ExtendedExpressionManager.class),
+                                                                   mock(ServerNotificationManager.class),
+                                                                   this.getClass().getClassLoader());
     extensionActivator.activateExtension(extensionModel);
-    assertThat(extensionActivator.getEnumTypes().size(), is(greaterThan(0)));
+    assertThat(extensionActivator.getEnumTypes(), not(emptyIterable()));
 
     extensionActivator.stop();
-    assertThat(extensionActivator.getEnumTypes(), hasSize(0));
+    assertThat(extensionActivator.getEnumTypes(), emptyIterable());
   }
 
   @Test
@@ -96,19 +101,23 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = extensionWithTypes(singleton(mockType));
 
     // Given a mule context
-    MuleContext muleContext = mockMuleContext();
+    final var registry = mock(MuleRegistry.class);
 
     // When the extension activator activates that extension model
-    ExtensionActivator extensionActivator = new ExtensionActivator(muleContext);
+    ExtensionActivator extensionActivator = new ExtensionActivator(registry,
+                                                                   mock(Injector.class),
+                                                                   mock(ExtendedExpressionManager.class),
+                                                                   mock(ServerNotificationManager.class),
+                                                                   this.getClass().getClassLoader());
     extensionActivator.activateExtension(extensionModel);
 
     // Then a global binding context is registered in the mule context registry, and it contains the type
     ArgumentCaptor<GlobalBindingContextProvider> bcProviderCaptor = forClass(GlobalBindingContextProvider.class);
     String registryKey = MOCK_EXTENSION_NAME + "GlobalBindingContextProvider";
-    verifyRegistration(muleContext, registryKey, bcProviderCaptor);
+    verifyRegistration(registry, registryKey, bcProviderCaptor);
     BindingContext bindingContext = bcProviderCaptor.getValue().getBindingContext();
 
-    assertThat(bindingContext.modules().size(), is(1));
+    assertThat(bindingContext.modules(), iterableWithSize(1));
     ExpressionModule module = bindingContext.modules().stream().findAny().get();
     assertThat(module.declaredTypes(), contains(mockType));
   }
