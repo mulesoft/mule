@@ -152,7 +152,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
   public ResolverSet getParametersAsResolverSet(ParameterizedModel model, MuleContext muleContext) throws ConfigurationException {
     List<ParameterGroupModel> inlineGroups = getInlineGroups(model.getParameterGroupModels());
     List<ParameterModel> flatParameters = getFlatParameters(inlineGroups, model.getAllParameterModels());
-    ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters, muleContext);
+    ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters);
     for (ParameterGroupModel group : inlineGroups) {
       getInlineGroupResolver(group, resolverSet, muleContext);
     }
@@ -161,7 +161,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
 
   public ResolverSet getNestedComponentsAsResolverSet(ComponentModel model) {
     List<? extends NestableElementModel> nestedComponents = model.getNestedComponents();
-    ResolverSet resolverSet = new ResolverSet(muleContext);
+    ResolverSet resolverSet = new ResolverSet(injector);
     nestedComponents.forEach(nc -> resolverSet.add(nc.getName(), toValueResolver(parameters.get(nc.getName()))));
     return resolverSet;
   }
@@ -176,7 +176,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
       throws ConfigurationException {
     List<ParameterGroupModel> inlineGroups = getInlineGroups(groups);
     List<ParameterModel> allParameters = groups.stream().flatMap(g -> g.getParameterModels().stream()).collect(toList());
-    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, allParameters), context);
+    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, allParameters));
     for (ParameterGroupModel group : inlineGroups) {
       getInlineGroupResolver(group, resolverSet, context);
     }
@@ -211,21 +211,20 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
         }
       });
 
-      resolverSet.add(groupKey, MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext));
+      resolverSet.add(groupKey, MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, injector));
     }
   }
 
-  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameters, MuleContext context)
+  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameters)
       throws ConfigurationException {
-    ResolverSet resolverSet = new ResolverSet(context);
+    ResolverSet resolverSet = new ResolverSet(injector);
     return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameters, resolverSet);
   }
 
-  public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels,
-                                                MuleContext muleContext)
+  public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels)
       throws ConfigurationException {
-    ResolverSet resolverSet = new ResolverSet(muleContext);
-    return getResolverSet(Optional.empty(), groups, parameterModels, resolverSet);
+    ResolverSet resolverSet = new ResolverSet(injector);
+    return getResolverSet(empty(), groups, parameterModels, resolverSet);
   }
 
   protected ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
@@ -473,7 +472,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
     value.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
                                                          (ValueResolver<Object>) toValueResolver(entryValue)));
     return MapValueResolver.of(value.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()), reflectionCache,
-                               muleContext);
+                               injector);
   }
 
   private ValueResolver<?> getCollectionResolver(Collection<?> collection) {

@@ -228,7 +228,7 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
         parameterizedModel.getAllParameterModels().stream()
             .collect(toMap(ParameterModel::getName, identity()));
 
-    ResolverSet typeSafeResolverSet = new ResolverSet(muleContext);
+    ResolverSet typeSafeResolverSet = new ResolverSet(muleContext.getInjector());
     typeUnsafeResolverSet.getResolvers().forEach((paramName, resolver) -> {
       ParameterModel model = paramModels.get(paramName);
       if (model != null) {

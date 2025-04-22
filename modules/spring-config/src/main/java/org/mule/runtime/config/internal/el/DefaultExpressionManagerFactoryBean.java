@@ -61,7 +61,6 @@ public class DefaultExpressionManagerFactoryBean implements FactoryBean<Extended
     populateBindings(expressionLanguage);
     delegate.setExpressionLanguage(expressionLanguage);
     delegate.setMuleConfiguration(muleContext.getConfiguration());
-    delegate.setStreamingManager(muleContext.getStreamingManager());
 
     muleContext.getInjector().inject(delegate);
     return (ExtendedExpressionManager) createClassLoaderInjectorInvocationHandler(delegate,

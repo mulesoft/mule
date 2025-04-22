@@ -359,6 +359,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     this.transformersRegistry = transformersRegistry;
   }
 
+  @Inject
   public void setStreamingManager(StreamingManager streamingManager) {
     this.streamingManager = streamingManager;
   }

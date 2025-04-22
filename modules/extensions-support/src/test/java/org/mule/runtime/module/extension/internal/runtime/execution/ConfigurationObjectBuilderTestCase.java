@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.execution;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -19,6 +19,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -32,13 +33,15 @@ import org.mule.tck.size.SmallTest;
 import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String NAME_VALUE = "name";
@@ -48,12 +51,15 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
   public static final ParameterModel descriptionParameterModel = getParameter("description", String.class);
 
   public static ResolverSet createResolverSet() throws Exception {
-    ResolverSet resolverSet = new ResolverSet(mock(MuleContext.class));
+    ResolverSet resolverSet = new ResolverSet(mock(Injector.class));
     resolverSet.add(nameParameterModel.getName(), getResolver(NAME_VALUE));
     resolverSet.add(descriptionParameterModel.getName(), getResolver(DESCRIPTION_VALUE));
 
     return resolverSet;
   }
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ConfigurationModel configurationModel;

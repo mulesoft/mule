@@ -120,9 +120,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
   protected final AtomicReference<ClassLoader> executedClassloader = new AtomicReference<>();
   protected CursorStreamProviderFactory cursorStreamProviderFactory;
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
-
   @Mock
   protected ExtensionModel extensionModel;
 
@@ -220,7 +217,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
 
   @Before
   public void before() throws Exception {
-    openMocks(this).close();;
+    openMocks(this).close();
     spyInjector(muleContext);
     notificationDispatcher = getNotificationDispatcher(muleContext);
     reset(muleContext.getSchedulerService());
@@ -236,7 +233,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     sourceAdapter = createSourceAdapter();
 
     when(sourceAdapterFactory.createAdapter(any(), any(), any(), any(), anyBoolean())).thenReturn(sourceAdapter);
-    when(sourceAdapterFactory.getSourceParameters()).thenReturn(new ResolverSet(muleContext));
+    when(sourceAdapterFactory.getSourceParameters()).thenReturn(new ResolverSet(muleContext.getInjector()));
 
     mockExceptionEnricher(sourceModel, null);
     when(sourceModel.requiresConnection()).thenReturn(true);

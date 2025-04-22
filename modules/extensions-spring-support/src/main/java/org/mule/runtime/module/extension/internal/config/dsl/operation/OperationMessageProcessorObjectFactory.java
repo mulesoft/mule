@@ -11,7 +11,6 @@ import static java.util.Collections.emptyList;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -19,7 +18,6 @@ import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessagePro
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessorBuilder;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
@@ -36,10 +34,6 @@ public class OperationMessageProcessorObjectFactory
 
   private List<EnrichedErrorMapping> errorMappings = emptyList();
 
-  @Inject
-  private ReflectionCache reflectionCache;
-  @Inject
-  private ExpressionManager expressionManager;
   @Inject
   private ExtensionConnectionSupplier extensionConnectionSupplier;
   @Inject

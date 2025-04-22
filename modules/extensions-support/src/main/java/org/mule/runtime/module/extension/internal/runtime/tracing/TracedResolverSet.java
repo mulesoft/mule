@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.tracing;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
@@ -25,9 +25,9 @@ public class TracedResolverSet extends ResolverSet {
 
   private final ComponentTracer<CoreEvent> valueResolutionTracer;
 
-  public TracedResolverSet(MuleContext muleContext,
+  public TracedResolverSet(Injector injector,
                            ComponentTracer<CoreEvent> valueResolutionTracer) {
-    super(muleContext);
+    super(injector);
     this.valueResolutionTracer = valueResolutionTracer;
   }
 

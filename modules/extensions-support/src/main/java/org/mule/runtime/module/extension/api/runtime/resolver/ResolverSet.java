@@ -8,12 +8,17 @@ package org.mule.runtime.module.extension.api.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult.newBuilder;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
+
+import static java.util.Objects.requireNonNull;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 
@@ -39,10 +44,18 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
 
   private final Map<String, ValueResolver<?>> resolvers = new LinkedHashMap<>();
   private boolean dynamic = false;
-  private final MuleContext muleContext;
+  private final Injector injector;
 
+  /**
+   * @deprecated Use {@link #ResolverSet(Injector)} instead. 
+   */
+  @Deprecated(forRemoval = true, since = "4.10")
   public ResolverSet(MuleContext muleContext) {
-    this.muleContext = muleContext;
+    this.injector = muleContext.getInjector();
+  }
+  
+  public ResolverSet(Injector injector) {
+    this.injector = injector;
   }
 
   /**
@@ -56,7 +69,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    */
   public ResolverSet add(String key, ValueResolver resolver) {
     checkArgument(!isBlank(key), "A key for a ValueResolver cannot be blank");
-    checkArgument(resolver != null, "Resolver cannot be null");
+    requireNonNull(resolver, "Resolver cannot be null");
 
     if (resolvers.put(key, resolver) != null) {
       throw new IllegalStateException("A value was already given for key " + key);
@@ -138,7 +151,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    * @throws IllegalArgumentException if the given {@code resolverSet} is {@code null}
    */
   public ResolverSet merge(ResolverSet resolverSet) {
-    ResolverSet newResolverSet = new ResolverSet(muleContext);
+    ResolverSet newResolverSet = new ResolverSet(injector);
     newResolverSet.addAll(resolvers);
     newResolverSet.addAll(resolverSet.getResolvers());
     return newResolverSet;
@@ -150,6 +163,6 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
 
   @Override
   public void initialise() throws InitialisationException {
-    initialiseIfNeeded(resolvers.values(), muleContext);
+    initialiseIfNeeded(resolvers.values(), injector);
   }
 }

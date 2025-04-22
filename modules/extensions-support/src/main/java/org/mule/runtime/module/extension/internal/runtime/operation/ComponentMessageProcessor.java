@@ -606,10 +606,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       }
       returnDelegate = createReturnDelegate();
       valueReturnDelegate = getValueReturnDelegate();
-      initialiseIfNeeded(resolverSet, muleContext);
+      initialiseIfNeeded(resolverSet, muleContext.getInjector());
       componentExecutor = createComponentExecutor();
       executionMediator = createExecutionMediator();
-      initialiseIfNeeded(componentExecutor, true, muleContext);
+      // Some privileged cinnectors might be using MuleContextAware still, so this needs to use the full MuleContext instead of
+      // just the injector
+      initialiseIfNeeded(componentExecutor, muleContext);
 
       ComponentLocation componentLocation = getLocation();
       if (componentLocation != null) {
@@ -620,7 +622,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       if (nestedChain != null) {
         LOGGER.debug("Initializing nested chain ({}) of component '{}'...", nestedChain, processorPath);
-        initialiseIfNeeded(nestedChain, muleContext);
+        initialiseIfNeeded(nestedChain, muleContext.getInjector());
       }
 
       initProcessingStrategy();
@@ -628,7 +630,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       // Since the tracing feature is Component aware at all levels, we cannot do this wrapping earlier (for example, at component
       // building time)
       operationParametersResolutionTracer = componentTracerFactory.fromComponent(this, PARAMETERS_RESOLUTION_SPAN_NAME, "");
-      resolverSet = new TracedResolverSet(muleContext,
+      resolverSet = new TracedResolverSet(muleContext.getInjector(),
                                           componentTracerFactory.fromComponent(this, VALUE_RESOLUTION_SPAN_NAME, ""))
                                               .addAll(resolverSet.getResolvers());
       initialised = true;
@@ -646,7 +648,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     } else {
       LOGGER.debug("Initializing own processing strategy ({}) of component '{}'...", processingStrategy, processorPath);
       ownedProcessingStrategy = true;
-      initialiseIfNeeded(processingStrategy, muleContext);
+      initialiseIfNeeded(processingStrategy, muleContext.getInjector());
     }
   }
 

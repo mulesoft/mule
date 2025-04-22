@@ -75,7 +75,7 @@ public class AnonymousInlineParameterGroupParser extends ParameterGroupParser {
     @Override
     public Object getObject() throws Exception {
       ResolverSet resolverSet =
-          this.getParametersResolver().getParametersAsResolverSet(singletonList(group), group.getParameterModels(), muleContext);
+          this.getParametersResolver().getParametersAsResolverSet(singletonList(group), group.getParameterModels());
 
       List<ValueResolver<Object>> keyResolvers = new LinkedList<>();
       List<ValueResolver<Object>> valueResolvers = new LinkedList<>();
@@ -83,7 +83,7 @@ public class AnonymousInlineParameterGroupParser extends ParameterGroupParser {
         keyResolvers.add(new StaticValueResolver<>(key));
         valueResolvers.add((ValueResolver<Object>) value);
       });
-      return MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext);
+      return MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext.getInjector());
     }
 
     @Override

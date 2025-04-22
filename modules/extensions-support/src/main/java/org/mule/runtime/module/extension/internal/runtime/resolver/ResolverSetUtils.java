@@ -641,7 +641,7 @@ public class ResolverSetUtils {
       valueResolvers.add(valueValueResolverFunction.apply(mapEntry.getValue()));
     }
 
-    return MapValueResolver.of(mapClass, keyResolvers, valueResolvers, reflectionCache, muleContext);
+    return MapValueResolver.of(mapClass, keyResolvers, valueResolvers, reflectionCache, injector);
   }
 
   private static boolean acceptsReferences(ParameterModel parameterModel) {

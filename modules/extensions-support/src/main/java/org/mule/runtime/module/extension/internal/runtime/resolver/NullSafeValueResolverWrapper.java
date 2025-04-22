@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
@@ -22,6 +18,12 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getNullSafeDefaultImplementedType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isConfigOverride;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -105,7 +107,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
         Class clazz = getType(objectType);
 
         if (isMap(objectType)) {
-          ValueResolver<?> fallback = MapValueResolver.of(clazz, emptyList(), emptyList(), reflectionCache, muleContext);
+          ValueResolver<?> fallback = MapValueResolver.of(clazz, emptyList(), emptyList(), reflectionCache, injector);
           wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, injector));
           return;
         }
@@ -124,7 +126,7 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
           return;
         }
 
-        ResolverSet resolverSet = new ResolverSet(muleContext);
+        ResolverSet resolverSet = new ResolverSet(injector);
         for (Field field : getFields(clazz)) {
           ValueResolver<?> fieldResolver = null;
           ObjectFieldType objectField = objectType.getFieldByName(getAlias(field)).orElse(null);

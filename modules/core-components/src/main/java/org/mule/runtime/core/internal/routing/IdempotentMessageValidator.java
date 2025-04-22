@@ -83,7 +83,7 @@ public class IdempotentMessageValidator extends AbstractComponent
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
-  private volatile ObjectStore<String> store;
+  private ObjectStore<String> store;
   private ObjectStore<String> privateStore;
   private String storePrefix;
 

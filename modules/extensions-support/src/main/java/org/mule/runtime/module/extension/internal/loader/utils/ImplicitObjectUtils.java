@@ -53,7 +53,7 @@ public final class ImplicitObjectUtils {
                                                      ExtendedExpressionManager expressionManager,
                                                      MuleContext muleContext,
                                                      Injector injector) {
-    ResolverSet resolverSet = new ResolverSet(muleContext);
+    ResolverSet resolverSet = new ResolverSet(injector);
     ParametersResolver parametersResolver =
         ParametersResolver.fromDefaultValues(model, muleContext, injector, reflectionCache, expressionManager);
 

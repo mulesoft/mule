@@ -15,6 +15,9 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Objects.requireNonNull;
 
+import static org.apache.commons.lang3.JavaVersion.JAVA_21;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtMost;
+
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -384,7 +387,11 @@ public class LifecycleUtils {
   public static Object setMuleContextIfNeededFluent(Object object, MuleContext muleContext) {
     object = unwrap(object);
     if (object != null && object instanceof MuleContextAware mca) {
-      mca.setMuleContext(muleContext);
+      if (isJavaVersionAtMost(JAVA_21)) {
+        mca.setMuleContext(muleContext);
+      } else {
+        throw new UnsupportedOperationException("Remove usage of MuleContextAware for " + object.getClass().getName());
+      }
     }
     return object;
   }

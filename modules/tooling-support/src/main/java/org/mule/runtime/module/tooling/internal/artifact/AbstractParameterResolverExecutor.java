@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.asDataWeaveExpression;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
@@ -21,7 +22,7 @@ import org.mule.runtime.app.declaration.api.ParameterGroupElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
@@ -36,13 +37,13 @@ import java.util.Map;
 public class AbstractParameterResolverExecutor {
 
   protected final MuleContext muleContext;
-  protected final ExpressionManager expressionManager;
+  protected final ExtendedExpressionManager expressionManager;
   protected final ReflectionCache reflectionCache;
   protected final ArtifactHelper artifactHelper;
 
   public static final String INVALID_PARAMETER_VALUE = "INVALID_PARAMETER_VALUE";
 
-  public AbstractParameterResolverExecutor(MuleContext muleContext, ExpressionManager expressionManager,
+  public AbstractParameterResolverExecutor(MuleContext muleContext, ExtendedExpressionManager expressionManager,
                                            ReflectionCache reflectionCache, ArtifactHelper artifactHelper) {
     this.muleContext = muleContext;
     this.expressionManager = expressionManager;
@@ -60,6 +61,7 @@ public class AbstractParameterResolverExecutor {
       final ResolverSet resolverSet =
           ParametersResolver.fromValues(parametersMap,
                                         muleContext,
+                                        muleContext.getInjector(),
                                         reflectionCache,
                                         expressionManager,
                                         parameterizedModel.getName())

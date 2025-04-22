@@ -7,12 +7,12 @@
 package org.mule.runtime.module.extension.internal.config.dsl.source;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 
@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.base.Joiner;
+
 import org.slf4j.Logger;
 
 
@@ -156,7 +157,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
       return getParametersResolver().getParametersAsResolverSet(callbackModel.get(), muleContext);
     }
 
-    return new ResolverSet(muleContext);
+    return new ResolverSet(muleContext.getInjector());
   }
 
   private SourceAdapterFactory getSourceAdapterFactory(ResolverSet nonCallbackParameters,
@@ -180,7 +181,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
 
   private ConfigurationProvider getConfigurationProvider() {
     return parameters.values().stream()
-        .filter(v -> v instanceof ConfigurationProvider)
+        .filter(ConfigurationProvider.class::isInstance)
         .map(v -> ((ConfigurationProvider) v)).findAny()
         .orElse(null);
   }

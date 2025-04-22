@@ -19,6 +19,7 @@ import static java.util.Optional.ofNullable;
 import static com.google.common.base.Throwables.propagateIfPossible;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.ResolvingFailure;
@@ -28,7 +29,7 @@ import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
@@ -57,7 +58,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
   private final ConnectionManager connectionManager;
 
   public ValueProviderExecutor(MuleContext muleContext, ConnectionManager connectionManager,
-                               ExpressionManager expressionManager, ReflectionCache reflectionCache,
+                               ExtendedExpressionManager expressionManager, ReflectionCache reflectionCache,
                                ArtifactHelper artifactHelper) {
     super(muleContext, expressionManager, reflectionCache, artifactHelper);
     this.connectionManager = connectionManager;
@@ -151,8 +152,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
           .withFailureCode(INVALID_PARAMETER_VALUE).build());
     } catch (ExecutorExceptionWrapper e) {
       Throwable cause = e.getCause();
-      if (cause instanceof ValueResolvingException) {
-        ValueResolvingException valueResolvingException = (ValueResolvingException) cause;
+      if (cause instanceof ValueResolvingException valueResolvingException) {
         if (LOGGER.isWarnEnabled()) {
           LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s %s",
                              valueResolvingException.getFailureCode(),
@@ -214,13 +214,14 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
     return parameterizedModel.getAllParameterModels().stream()
         .filter(parameterModel -> parameterModel.getValueProviderModel()
             .map(vpm -> vpm.getProviderName().equals(providerName)).orElse(false))
-        .findFirst().flatMap(parameterModel -> parameterModel.getValueProviderModel());
+        .findFirst().flatMap(ParameterModel::getValueProviderModel);
   }
 
   private DefaultValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel) {
     return new DefaultValueProviderMediator(parameterizedModel,
-                                            () -> muleContext,
-                                            () -> reflectionCache);
+                                            () -> reflectionCache,
+                                            () -> expressionManager,
+                                            () -> muleContext.getInjector());
   }
 
   private Optional<String> getConfigRef(ParameterizedElementDeclaration component) {

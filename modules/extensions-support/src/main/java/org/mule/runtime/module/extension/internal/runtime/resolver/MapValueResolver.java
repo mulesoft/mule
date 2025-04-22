@@ -11,11 +11,13 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -41,7 +43,7 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
   private final Class<? extends Map> mapType;
   private final List<ValueResolver<V>> valueResolvers;
   private final List<ValueResolver<K>> keyResolvers;
-  private final MuleContext muleContext;
+  private final Injector injector;
 
   /**
    * Creates a new instance
@@ -49,30 +51,31 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
    * @param mapType        the {@link Class} for a concrete {@link Map} type with a default constructor
    * @param keyResolvers   a not {@code null} {@link List} of resolvers for map key params
    * @param valueResolvers a not {@code null} {@link List} of resolvers for map value params
-   * @param muleContext    the artifact {@link MuleContext} that will be used for initialisation of resolvers
+   * @param injector       the injector for the artifact that will be used for initialisation of resolvers
    */
   public MapValueResolver(Class<? extends Map> mapType, List<ValueResolver<K>> keyResolvers,
-                          List<ValueResolver<V>> valueResolvers, ReflectionCache reflectionCache, MuleContext muleContext) {
+                          List<ValueResolver<V>> valueResolvers, ReflectionCache reflectionCache, Injector injector) {
     checkInstantiable(mapType, reflectionCache);
-    checkArgument(keyResolvers != null && valueResolvers != null, "resolvers cannot be null");
+    requireNonNull(keyResolvers, "resolvers cannot be null");
+    requireNonNull(valueResolvers, "resolvers cannot be null");
     checkArgument(keyResolvers.size() == valueResolvers.size(), "exactly one valueResolver for each keyResolver is required");
 
     this.mapType = mapType;
     this.keyResolvers = keyResolvers;
     this.valueResolvers = valueResolvers;
-    this.muleContext = muleContext;
+    this.injector = injector;
   }
 
   public static <K, V> MapValueResolver<K, V> of(Class<? extends Map> mapType, List<ValueResolver<K>> keyResolvers,
                                                  List<ValueResolver<V>> valueResolvers, ReflectionCache reflectionCache,
-                                                 MuleContext muleContext) {
+                                                 Injector injector) {
 
     if (ConcurrentMap.class.equals(mapType)) {
-      return new MapValueResolver<>(ConcurrentHashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext);
+      return new MapValueResolver<>(ConcurrentHashMap.class, keyResolvers, valueResolvers, reflectionCache, injector);
     } else if (Map.class.equals(mapType)) {
-      return new MapValueResolver<>(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext);
+      return new MapValueResolver<>(HashMap.class, keyResolvers, valueResolvers, reflectionCache, injector);
     } else {
-      return new MapValueResolver<>(mapType, keyResolvers, valueResolvers, reflectionCache, muleContext);
+      return new MapValueResolver<>(mapType, keyResolvers, valueResolvers, reflectionCache, injector);
     }
   }
 
@@ -114,7 +117,7 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
 
   private Map<K, V> instantiateMap() {
     try {
-      return mapType.newInstance();
+      return mapType.getConstructor().newInstance();
     } catch (Exception e) {
       throw new RuntimeException("Could not create instance of " + mapType.getName(), e);
     }
@@ -123,7 +126,7 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>>, I
   @Override
   public void initialise() throws InitialisationException {
     for (ValueResolver<V> valueResolver : valueResolvers) {
-      initialiseIfNeeded(valueResolver, true, muleContext);
+      initialiseIfNeeded(valueResolver, injector);
     }
   }
 
