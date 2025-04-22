@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.config.ExpressionCorrelationIdGenerator;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
@@ -39,6 +40,9 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   @Inject
   private Registry registry;
@@ -114,7 +118,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   }
 
   public void setCorrelationIdGeneratorExpression(String correlationIdGeneratorExpression) {
-    config.setDefaultCorrelationIdGenerator(new ExpressionCorrelationIdGenerator(muleContext.getExpressionManager(),
+    config.setDefaultCorrelationIdGenerator(new ExpressionCorrelationIdGenerator(expressionManager,
                                                                                  correlationIdGeneratorExpression));
   }
 

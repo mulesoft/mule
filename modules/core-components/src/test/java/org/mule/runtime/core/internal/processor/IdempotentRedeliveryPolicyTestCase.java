@@ -26,7 +26,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -69,6 +70,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -77,9 +79,7 @@ import org.reactivestreams.Publisher;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -107,9 +107,6 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   private final InMemoryObjectStore inMemoryObjectStore = spy(new InMemoryObjectStore());
   private CoreEvent event;
   private ExpressionManager expressionManager;
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   @Override
   protected Map<String, Object> getStartUpRegistryObjects() {
@@ -216,8 +213,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   public void multipleObjectStoreConfigurationShouldRaiseException() throws Exception {
     irp.setObjectStore(mockObjectStore);
     irp.setPrivateObjectStore(mockObjectStore);
-    expectedException.expect(InitialisationException.class);
-    irp.initialise();
+    assertThrows(InitialisationException.class, () -> irp.initialise());
   }
 
   @Test
@@ -380,7 +376,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
     @Override
     public Map<String, RedeliveryCounter> retrieveAll() throws ObjectStoreException {
       return store.entrySet().stream().collect(
-                                               toMap(entry -> entry.getKey(),
+                                               toMap(Entry::getKey,
                                                      entry -> (RedeliveryCounter) serializer.getExternalProtocol()
                                                          .deserialize((byte[]) entry.getValue())));
     }

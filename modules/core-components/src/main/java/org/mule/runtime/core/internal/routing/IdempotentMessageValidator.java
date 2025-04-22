@@ -40,7 +40,8 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -48,10 +49,10 @@ import org.mule.runtime.core.internal.routing.split.DuplicateMessageException;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
-import org.slf4j.Logger;
 
 /**
  * <code>IdempotentMessageValidator</code> ensures that only unique messages are passed on. It does this by checking the unique ID
@@ -63,11 +64,17 @@ import org.slf4j.Logger;
  * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
 public class IdempotentMessageValidator extends AbstractComponent
-    implements Processor, MuleContextAware, Lifecycle {
+    implements Processor, Lifecycle {
 
   private static final Logger LOGGER = getLogger(IdempotentMessageValidator.class);
 
-  protected MuleContext muleContext;
+  private MuleContext muleContext;
+
+  @Inject
+  private MuleConfiguration configuration;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   @Inject
   @Named(OBJECT_STORE_MANAGER)
@@ -76,18 +83,18 @@ public class IdempotentMessageValidator extends AbstractComponent
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
-  protected volatile ObjectStore<String> store;
-  protected ObjectStore<String> privateStore;
-  protected String storePrefix;
+  private volatile ObjectStore<String> store;
+  private ObjectStore<String> privateStore;
+  private String storePrefix;
 
-  protected String idExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
-  protected String valueExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
+  private String idExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
+  private String valueExpression = format("%s%s%s", DEFAULT_EXPRESSION_PREFIX, CORRELATION_ID, DEFAULT_EXPRESSION_POSTFIX);
 
   private CompiledExpression compiledIdExpression;
   private CompiledExpression compiledValueExpression;
   private boolean rethrowEnabled;
 
-  @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
@@ -100,15 +107,15 @@ public class IdempotentMessageValidator extends AbstractComponent
   public void initialise() throws InitialisationException {
     if (storePrefix == null) {
       storePrefix =
-          format("%s.%s.%s.%s", muleContext.getConfiguration().getId(), getLocation().getRootContainerName(),
+          format("%s.%s.%s.%s", configuration.getId(), getLocation().getRootContainerName(),
                  this.getClass().getName(), UUID.randomUUID());
     }
     setupObjectStore();
     if (featureFlaggingService.isEnabled(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR)) {
       setRethrowEnabled(true);
     }
-    compiledIdExpression = compile(idExpression, muleContext.getExpressionManager());
-    compiledValueExpression = compile(valueExpression, muleContext.getExpressionManager());
+    compiledIdExpression = compile(idExpression, expressionManager);
+    compiledValueExpression = compile(valueExpression, expressionManager);
   }
 
   private void setupObjectStore() throws InitialisationException {
@@ -125,7 +132,7 @@ public class IdempotentMessageValidator extends AbstractComponent
         this.store = privateStore;
       }
     }
-    initialiseIfNeeded(store, true, muleContext);
+    initialiseIfNeeded(store, muleContext.getInjector());
   }
 
   @Override
@@ -181,7 +188,7 @@ public class IdempotentMessageValidator extends AbstractComponent
 
   private boolean accept(CoreEvent event) {
     BindingContext bindingContext = event.asBindingContext();
-    try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
+    try (ExpressionLanguageSession session = expressionManager.openSession(bindingContext)) {
       String id = getIdForEvent(session);
       String value = getValueForEvent(session);
 
@@ -211,7 +218,7 @@ public class IdempotentMessageValidator extends AbstractComponent
 
   private boolean acceptWithRethrowExceptionsInIdempotentMessageValidator(CoreEvent event) throws MuleException {
     BindingContext bindingContext = event.asBindingContext();
-    try (ExpressionLanguageSession session = muleContext.getExpressionManager().openSession(bindingContext)) {
+    try (ExpressionLanguageSession session = expressionManager.openSession(bindingContext)) {
       String id = getIdForEvent(session);
       String value = getValueForEvent(session);
 

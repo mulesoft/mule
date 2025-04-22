@@ -142,7 +142,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.addRoute("wat", mp);
     initialise();
 
-    var thrown = assertThrows(ExpressionRuntimeException.class, () -> process(choiceRouter, zapEvent()));
+    final var zapEvent = zapEvent();
+    var thrown = assertThrows(ExpressionRuntimeException.class, () -> process(choiceRouter, zapEvent));
     assertThat(thrown, hasMessage(containsString("evaluating expression: \"wat\"")));
     assertThat(thrown.getCause(), instanceOf(ExpressionExecutionException.class));
   }
@@ -157,7 +158,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.addRoute(payloadZapExpression(), mp);
     initialise();
 
-    var thrown = assertThrows(Exception.class, () -> process(choiceRouter, zapEvent()));
+    final var zapEvent = zapEvent();
+    var thrown = assertThrows(Exception.class, () -> process(choiceRouter, zapEvent));
     assertThat(thrown, sameInstance(expected));
   }
 
@@ -172,7 +174,8 @@ public class ChoiceRouterTestCase extends AbstractReactiveProcessorTestCase {
     choiceRouter.setDefaultRoute(newChain(empty(), new TestMessageProcessor("bar")));
     initialise();
 
-    var thrown = assertThrows(Exception.class, () -> process(choiceRouter, zapEvent()));
+    final var zapEvent = zapEvent();
+    var thrown = assertThrows(Exception.class, () -> process(choiceRouter, zapEvent));
     assertThat(thrown, sameInstance(expected));
   }
 

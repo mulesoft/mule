@@ -9,25 +9,31 @@ package org.mule.runtime.module.tooling.internal.artifact.params;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
 import static org.mule.runtime.module.tooling.internal.artifact.params.ParameterExtractor.asDataWeaveExpression;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-public class ParameterExtractorCorrectDWTestCase extends AbstractMuleContextTestCase {
+public class ParameterExtractorCorrectDWTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   private ExpressionManager expressionManager;
 
   @Before
   public void setUp() throws Exception {
-    expressionManager = muleContext.getExpressionManager();
+    expressionManager = dw.getExpressionManager();
   }
 
   @Test

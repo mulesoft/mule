@@ -115,30 +115,35 @@ public class DefaultFlowBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void cannotChangeMessageSourceAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    assertThrows(IllegalStateException.class, () -> flowBuilder.source(mock(MessageSource.class)));
+    final var source = mock(MessageSource.class);
+    assertThrows(IllegalStateException.class, () -> flowBuilder.source(source));
   }
 
   @Test
   public void cannotChangeMessageProcessorsListAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    assertThrows(IllegalStateException.class, () -> flowBuilder.processors(asList(mock(Processor.class))));
+    final var processors = asList(mock(Processor.class));
+    assertThrows(IllegalStateException.class, () -> flowBuilder.processors(processors));
   }
 
   @Test
   public void cannotChangeMessageProcessorAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    assertThrows(IllegalStateException.class, () -> flowBuilder.processors(mock(Processor.class)));
+    final var processors = mock(Processor.class);
+    assertThrows(IllegalStateException.class, () -> flowBuilder.processors(processors));
   }
 
   @Test
   public void cannotChangeExceptionListenerAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    assertThrows(IllegalStateException.class, () -> flowBuilder.messagingExceptionHandler(mock(FlowExceptionHandler.class)));
+    final var errorHandler = mock(FlowExceptionHandler.class);
+    assertThrows(IllegalStateException.class, () -> flowBuilder.messagingExceptionHandler(errorHandler));
   }
 
   @Test
   public void cannotChangeProcessingStrategyFactoryAfterFlowBuilt() throws Exception {
     flowBuilder.build();
-    assertThrows(IllegalStateException.class, () -> flowBuilder.processingStrategyFactory(mock(ProcessingStrategyFactory.class)));
+    final var psFactory = mock(ProcessingStrategyFactory.class);
+    assertThrows(IllegalStateException.class, () -> flowBuilder.processingStrategyFactory(psFactory));
   }
 }

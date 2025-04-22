@@ -12,6 +12,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import static java.nio.charset.Charset.defaultCharset;
@@ -37,25 +38,26 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 import org.mule.tck.size.SmallTest;
 
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 
-import jakarta.activation.MimeTypeParseException;
-
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import jakarta.activation.MimeTypeParseException;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
-public abstract class AbstractAddVariablePropertyProcessorTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractAddVariablePropertyProcessorTestCase extends AbstractMuleTestCase {
 
   public static final Charset ENCODING = US_ASCII;
   public static final String PLAIN_STRING_KEY = "someText";
@@ -63,6 +65,12 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   public static final String EXPRESSION = "#['someValue']";
   public static final String NULL_EXPRESSION = "#[null]";
   public static final Charset CUSTOM_ENCODING = UTF_8;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   @Mock(lenient = true)
   private StreamingManager streamingManager;
@@ -80,9 +88,9 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   public void setUpTest() throws Exception {
     when(streamingManager.manage(any(CursorProvider.class), any(EventContext.class))).thenAnswer(inv -> inv.getArgument(0));
 
-    addVariableProcessor.setExpressionManager(muleContext.getExpressionManager());
+    addVariableProcessor.setExpressionManager(dw.getExpressionManager());
     addVariableProcessor.setStreamingManager(streamingManager);
-    addVariableProcessor.setArtifactEncoding(() -> defaultCharset());
+    addVariableProcessor.setArtifactEncoding(Charset::defaultCharset);
 
     message = of("");
     event = createTestEvent(message);
@@ -104,7 +112,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
   }
 
   protected CoreEvent createTestEvent(Message message) throws MuleException {
-    return eventBuilder(muleContext).message(message).build();
+    return eventBuilder().message(message).build();
   }
 
   @Test

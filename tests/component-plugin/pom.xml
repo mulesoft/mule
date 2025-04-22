@@ -13,7 +13,7 @@
     <description>Mule test framework components (TCK)</description>
 
     <properties>
-        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+        <surefire.args>${surefire.args.base}</surefire.args>
 
         <javaModuleName>org.mule.test.component.plugin</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
