@@ -19,8 +19,8 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-import org.mule.runtime.container.internal.IsolatedPolicyClassLoader;
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
+import org.mule.runtime.container.internal.IsolatedPolicyClassLoader;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
@@ -28,7 +28,6 @@ import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.plugin.DefaultArtifactPlugin;
 import org.mule.runtime.module.license.api.LicenseValidator;
@@ -67,7 +66,6 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
   public PolicyTemplate createArtifact(Application application, PolicyTemplateDescriptor descriptor) {
     MuleDeployableArtifactClassLoader ownPolicyClassLoader;
     MuleDeployableArtifactClassLoader policyClassLoader;
-    RegionClassLoader regionClassLoader;
     MuleDeployableArtifactClassLoader parentClassLoader;
     FilteringContainerClassLoader containerClassLoader =
         policyTemplateClassLoaderBuilderFactory.getFilteringContainerClassLoader();
@@ -166,8 +164,24 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     Set<ArtifactPluginDescriptor> providedArtifactPluginsDescriptors =
         providedArtifactPlugins.stream().map(Artifact::getDescriptor).collect(toSet());
 
-    return pluginDependenciesResolver.resolve(providedArtifactPluginsDescriptors, new ArrayList<>(descriptor.getPlugins()),
-                                              false);
+    // create a list of resolved plugins
+    List<ArtifactPluginDescriptor> resolvedPlugins = pluginDependenciesResolver.resolve(providedArtifactPluginsDescriptors,
+                                                                                        new ArrayList<>(descriptor.getPlugins()),
+                                                                                        false);
+
+    // add missing HTTP/Sockets plugins if required
+    if (hasRequiredPlugin(descriptor)) {
+      Set<String> resolvedNames = resolvedPlugins.stream()
+          .map(ArtifactPluginDescriptor::getName)
+          .collect(toSet());
+
+      descriptor.getPlugins().stream()
+          .filter(plugin -> (plugin.getName().equals("HTTP") || plugin.getName().equals("Sockets")) &&
+              !resolvedNames.contains(plugin.getName()))
+          .forEach(resolvedPlugins::add);
+    }
+
+    return resolvedPlugins;
   }
 
   private List<ArtifactPlugin> createArtifactPluginList(MuleDeployableArtifactClassLoader policyClassLoader,
