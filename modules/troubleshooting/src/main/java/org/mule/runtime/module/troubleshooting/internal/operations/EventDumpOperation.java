@@ -97,7 +97,7 @@ public class EventDumpOperation implements TroubleshootingOperation {
     final var currentlyActiveFlowStacks = eventContextService.getCurrentlyActiveFlowStacks();
 
     for (FlowStackEntry fs : currentlyActiveFlowStacks) {
-      writer.write(format("\"%s\"" + lineSeparator() + "%s",
+      writer.write(format("\"%s\"%n%s",
                           fs.getEventId(),
                           fs.getFlowCallStack().toString().indent(4)));
       writer.write(lineSeparator());

@@ -43,8 +43,6 @@ public class BasicInfoOperation implements TroubleshootingOperation {
 
   private static final TroubleshootingOperationDefinition definition = createOperationDefinition();
 
-  public BasicInfoOperation() {}
-
   @Override
   public TroubleshootingOperationDefinition getDefinition() {
     return definition;
