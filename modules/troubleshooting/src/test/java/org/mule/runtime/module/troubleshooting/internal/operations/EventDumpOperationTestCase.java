@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.module.troubleshooting.internal.operations;
 
-import static com.google.gson.JsonParser.parseString;
-import static java.util.Optional.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTestUtils.mockApplication;
 import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTestUtils.mockDeploymentService;
 import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTestUtils.mockFlowStackEntry;
@@ -20,9 +14,15 @@ import static org.mule.runtime.module.troubleshooting.internal.operations.EventD
 import static org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation.EVENT_DUMP_OPERATION_DESCRIPTION;
 import static org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation.EVENT_DUMP_OPERATION_NAME;
 
-import com.google.gson.JsonElement;
-import org.junit.Before;
-import org.junit.Test;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
@@ -30,8 +30,13 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class EventDumpOperationTestCase {
 
@@ -51,7 +56,7 @@ public class EventDumpOperationTestCase {
   public void definitionHasCorrectNameDescriptionAndNumberOfArguments() {
     assertThat(eventDumpOperation.getDefinition().getName(), is(EVENT_DUMP_OPERATION_NAME));
     assertThat(eventDumpOperation.getDefinition().getDescription(), is(EVENT_DUMP_OPERATION_DESCRIPTION));
-    assertThat(eventDumpOperation.getDefinition().getArgumentDefinitions().size(), is(1));
+    assertThat(eventDumpOperation.getDefinition().getArgumentDefinitions(), iterableWithSize(1));
   }
 
   @Test
@@ -63,30 +68,43 @@ public class EventDumpOperationTestCase {
   }
 
   @Test
-  public void whenNoApplicationIsPassedItReturnsAllApplications() {
-    Map<String, String> argumentsWithoutApplication = new HashMap<>();
-    Object result = eventDumpOperation.getCallback().execute(argumentsWithoutApplication);
+  public void whenNoApplicationIsPassedItReturnsAllApplications() throws IOException {
+    final var writer = new StringWriter();
+    eventDumpOperation.getCallback().execute(emptyMap(), writer);
+    Object result = writer.toString();
 
-    JsonElement resultJson = parseString((String) result);
-    JsonElement expectedJson =
-        parseString("{\"app1\":[{\"eventId\":\"EventId\",\"serverId\":\"ServerId\",\"flowCallStack\":[\"MockFlow(MockLocation)\"]}],\"app2\":[]}");
-    assertThat(resultJson, is(equalTo(expectedJson)));
+    var expected = """
+        Active Events for application 'app1'
+        ------------------------------------
+
+        "EventId"
+            <FlowCallStack>
+
+        Active Events for application 'app2'
+        ------------------------------------
+
+        """;
+    assertThat(result, is(equalTo(expected)));
   }
 
   @Test
-  public void whenApplicationIsPassedItReturnsOnlyThePassedOne() {
+  public void whenApplicationIsPassedItReturnsOnlyThePassedOne() throws IOException {
     Map<String, String> argumentsWithApplication = new HashMap<>();
     argumentsWithApplication.put(APPLICATION_ARGUMENT_NAME, "app1");
-    Object result = eventDumpOperation.getCallback().execute(argumentsWithApplication);
+    final var writer = new StringWriter();
+    eventDumpOperation.getCallback().execute(argumentsWithApplication, writer);
+    String result = writer.toString();
 
-    JsonElement resultJson = parseString((String) result);
-    JsonElement expectedJson =
-        parseString("{\"app1\":[{\"eventId\":\"EventId\",\"serverId\":\"ServerId\",\"flowCallStack\":[\"MockFlow(MockLocation)\"]}]}");
-    assertThat(resultJson, is(equalTo(expectedJson)));
+    var expected = """
+        "EventId"
+            <FlowCallStack>
+
+        """;
+    assertThat(result, is(equalTo(expected)));
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void whenTheEventContextServiceIsNotPresentItRaisesAnException() {
+  public void whenTheEventContextServiceIsNotPresentItRaisesAnException() throws IOException {
     for (Application application : deploymentService.getApplications()) {
       Registry registry = application.getArtifactContext().getRegistry();
       when(registry.lookupByName(EventContextService.REGISTRY_KEY)).thenReturn(empty());
@@ -94,6 +112,7 @@ public class EventDumpOperationTestCase {
 
     Map<String, String> arguments = new HashMap<>();
     arguments.put(APPLICATION_ARGUMENT_NAME, "app1");
-    eventDumpOperation.getCallback().execute(arguments);
+    final var writer = new StringWriter();
+    eventDumpOperation.getCallback().execute(arguments, writer);
   }
 }
