@@ -14,6 +14,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
@@ -37,20 +39,24 @@ import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLang
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
+import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
 
-import jakarta.inject.Inject;
+import com.google.common.collect.ImmutableMap;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+
+import jakarta.inject.Inject;
 
 /**
  * This class configures the basic services available in a {@code MuleContext} that are independent of the artifact config.
@@ -70,6 +76,12 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   @Deprecated
   public static final String DISABLE_TRANSFORMERS_SUPPORT =
       BaseSpringMuleContextServiceConfigurator.class.getName() + ".disableTransformersSupport";
+
+  // Do not use static field. BeanDefinitions are reused and produce weird behaviour
+  private final ImmutableMap<String, BeanDefinition> defaultContextServices = ImmutableMap.<String, BeanDefinition>builder()
+      .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
+      .put(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class))
+      .build();
 
   private final MuleContext muleContext;
   private final ArtifactType artifactType;
@@ -98,6 +110,8 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
     registerConstantBeanDefinition(OBJECT_ARTIFACT_ENCODING, originalRegistry.lookupObject(OBJECT_ARTIFACT_ENCODING));
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
+
+    registerContextServices(defaultContextServices, e -> true);
 
     // Instances of the repository and locator need to be injected into another objects before actually determining the possible
     // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual

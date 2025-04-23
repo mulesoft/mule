@@ -23,7 +23,10 @@ import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 
 import java.lang.reflect.InvocationHandler;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -50,6 +53,13 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
 
   protected static BeanDefinition getBeanDefinition(Class<?> beanType) {
     return getBeanDefinitionBuilder(beanType).getBeanDefinition();
+  }
+
+  protected void registerContextServices(Map<String, BeanDefinition> contextServices,
+                                         Predicate<Entry<String, BeanDefinition>> servicesFilter) {
+    contextServices.entrySet().stream()
+        .filter(servicesFilter)
+        .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
   }
 
   protected void registerConstantBeanDefinition(String serviceId, Object impl) {

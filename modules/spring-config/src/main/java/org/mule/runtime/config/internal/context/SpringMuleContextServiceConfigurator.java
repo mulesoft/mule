@@ -61,8 +61,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_RESOURCE_LO
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STATISTICS;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_FACTORY_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
@@ -101,7 +99,6 @@ import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
-import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.DefaultFeatureManagementService;
@@ -124,7 +121,6 @@ import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
 import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInterceptorManager;
 import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
-import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
@@ -232,8 +228,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
       .put(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER, getBeanDefinition(MessageProcessingFlowTraceManager.class))
       .put(OBJECT_COMPONENT_INITIAL_STATE_MANAGER, getBeanDefinition(DefaultComponentInitialStateManager.class))
-      .put(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class))
-      .put(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class))
       .put(OBJECT_TRANSFORMATION_SERVICE, getBeanDefinition(ExtendedTransformationService.class))
       .put(OBJECT_CLUSTER_SERVICE, getBeanDefinition(DefaultClusterService.class))
       .put(OBJECT_CONNECTIVITY_TESTER_FACTORY, getBeanDefinition(DefaultConnectivityTesterFactory.class))
@@ -312,9 +306,13 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     registerBeanDefinition(MULE_ARTIFACT_METER_PROVIDER_KEY, resolveArtifactIdMeterProvider());
     loadServiceConfigurators();
 
-    registerContextServices(defaultContextServices);
+    registerContextServices(defaultContextServices,
+                            service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)
+                                || artifactType.equals(POLICY));
     if (isAddToolingObjectsToRegistry()) {
-      registerContextServices(toolingContextServices);
+      registerContextServices(toolingContextServices,
+                              service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)
+                                  || artifactType.equals(POLICY));
     }
 
     createBootstrapBeanDefinitions();
@@ -331,13 +329,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     if (valueOf(artifactProperties.getOrDefault(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY, FALSE.toString()))) {
       registerConstantBeanDefinition(OBJECT_ARTIFACT_AST, artifactAst);
     }
-  }
-
-  private void registerContextServices(Map<String, BeanDefinition> contextServices) {
-    contextServices.entrySet().stream()
-        .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)
-            || artifactType.equals(POLICY))
-        .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
   }
 
   private void loadServiceConfigurators() {
