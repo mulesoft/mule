@@ -130,11 +130,15 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
     }
     Set<ArtifactPluginDescriptor> plugins = descriptor.getPlugins();
     for (ArtifactPluginDescriptor plugin : plugins) {
-      if (plugin.getName().equals("HTTP") || plugin.getName().equals("Sockets")) {
+      if (isRequiredPlugin(plugin)) {
         return true;
       }
     }
     return false;
+  }
+
+  private boolean isRequiredPlugin(ArtifactPluginDescriptor plugin) {
+    return plugin.getName().equals("HTTP") || plugin.getName().equals("Sockets");
   }
 
   // Need all the plugins that the policy itself depends on, while keeping a relationship with the appropriate classloader.
@@ -176,7 +180,7 @@ public class DefaultPolicyTemplateFactory implements PolicyTemplateFactory {
           .collect(toSet());
 
       descriptor.getPlugins().stream()
-          .filter(plugin -> (plugin.getName().equals("HTTP") || plugin.getName().equals("Sockets")) &&
+          .filter(plugin -> isRequiredPlugin(plugin) &&
               !resolvedNames.contains(plugin.getName()))
           .forEach(resolvedPlugins::add);
     }
