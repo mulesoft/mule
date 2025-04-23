@@ -11,6 +11,8 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader.instantiateServiceProvider;
 import static org.mule.runtime.module.service.api.discoverer.ServiceAssembly.lazyBuilder;
 
+import static java.security.AccessController.doPrivileged;
+import static java.security.AccessController.getContext;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
@@ -30,6 +32,8 @@ import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
 import java.io.File;
+import java.security.AccessControlContext;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -38,6 +42,8 @@ import java.util.function.Supplier;
  * Discovers services artifacts from the {@link MuleFoldersUtil#SERVICES_FOLDER} folder.
  */
 public class FileSystemServiceProviderDiscoverer implements ServiceProviderDiscoverer {
+
+  private static final AccessControlContext ACCESS_CONTROL_CTX = getContext();
 
   private final ArtifactClassLoader apiClassLoader;
   private final ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory;
@@ -139,14 +145,8 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
     List<ServiceAssembly> assemblies = new ArrayList<>(serviceDescriptors.size());
     for (ServiceDescriptor serviceDescriptor : serviceDescriptors) {
 
-      final Supplier<ClassLoader> serviceClassLoader = new LazyValue<>(() -> {
-        try {
-          return createClassLoader(serviceClassLoaderFactory,
-                                   serviceDescriptor);
-        } catch (ArtifactClassloaderCreationException e) {
-          throw new MuleRuntimeException(e);
-        }
-      });
+      final Supplier<ClassLoader> serviceClassLoader =
+          new LazyValue<>(() -> createClassLoader(serviceClassLoaderFactory, serviceDescriptor));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
         try {
@@ -171,14 +171,18 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
   }
 
   private ClassLoader createClassLoader(ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
-                                        ServiceDescriptor serviceDescriptor)
-      throws ArtifactClassloaderCreationException {
-    return (ClassLoader) serviceClassLoaderFactory
-        .create(getServiceArtifactId(serviceDescriptor),
-                serviceDescriptor,
-                apiClassLoader.getClassLoader(),
-                apiClassLoader
-                    .getClassLoaderLookupPolicy());
+                                        ServiceDescriptor serviceDescriptor) {
+    return doPrivileged((PrivilegedAction<ClassLoader>) () -> {
+      try {
+        return (ClassLoader) serviceClassLoaderFactory
+            .create(getServiceArtifactId(serviceDescriptor),
+                    serviceDescriptor,
+                    apiClassLoader.getClassLoader(),
+                    apiClassLoader.getClassLoaderLookupPolicy());
+      } catch (ArtifactClassloaderCreationException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }, ACCESS_CONTROL_CTX);
   }
 
   private String getServiceArtifactId(ServiceDescriptor serviceDescriptor) {
