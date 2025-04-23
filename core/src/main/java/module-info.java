@@ -18,7 +18,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged",
         "org.mule.runtime.core.privileged.el",
         "org.mule.runtime.core.privileged.event",
-        "org.mule.runtime.core.privileged.event.context",
         "org.mule.runtime.core.privileged.exception",
         "org.mule.runtime.core.privileged.execution",
         "org.mule.runtime.core.privileged.interception",
@@ -176,7 +175,8 @@ module org.mule.runtime.core {
   // for MuleFwk, MUnit, MTF, ApiGateway, Tracing and Validation
   exports org.mule.runtime.core.privileged.event;
   // for Kryo
-  exports org.mule.runtime.core.privileged.event.context;
+  exports org.mule.runtime.core.privileged.event.context to
+      com.mulesoft.mule.runtime.kryo;
   // for MuleFwk, MUnit, ApiKit, DataWeave and Validation
   exports org.mule.runtime.core.privileged.exception;
   // for test-components
