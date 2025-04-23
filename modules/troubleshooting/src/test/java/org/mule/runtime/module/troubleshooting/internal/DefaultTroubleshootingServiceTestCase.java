@@ -14,9 +14,12 @@ import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTe
 import static org.mule.runtime.module.troubleshooting.internal.operations.BasicInfoOperation.BASIC_INFO_OPERATION_NAME;
 import static org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation.EVENT_DUMP_OPERATION_NAME;
 
+import static java.util.Collections.emptyMap;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
+import static org.hamcrest.core.StringContains.containsString;
 
 import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -62,14 +65,29 @@ public class DefaultTroubleshootingServiceTestCase {
     assertThat(operationNames, containsInAnyOrder(BASIC_INFO_OPERATION_NAME, EVENT_DUMP_OPERATION_NAME, TEST_OPERATION_NAME));
   }
 
+  @Test
+  public void tryToExecuteAllOperations() throws TroubleshootingOperationException {
+    var result = troubleshootingService.executeAllOperations(emptyMap());
+
+    assertThat(result, containsString("""
+        Basic Info
+        =========="""));
+    assertThat(result, containsString("""
+        Events
+        ======"""));
+    assertThat(result, containsString("""
+        Test
+        ===="""));
+  }
+
   @Test(expected = TroubleshootingOperationException.class)
   public void tryToExecuteAnUnableOperationThrowsException() throws TroubleshootingOperationException {
-    troubleshootingService.executeOperation("notExistingOperation", new HashMap<>());
+    troubleshootingService.executeOperation("notExistingOperation", emptyMap());
   }
 
   @Test(expected = TroubleshootingOperationException.class)
   public void missingRequiredParameter() throws TroubleshootingOperationException {
-    troubleshootingService.executeOperation(TEST_OPERATION_NAME, new HashMap<>());
+    troubleshootingService.executeOperation(TEST_OPERATION_NAME, emptyMap());
   }
 
   @Test(expected = TroubleshootingOperationException.class)

@@ -90,8 +90,8 @@ public class BasicInfoOperation implements TroubleshootingOperation {
       writer.write("  Arch:      %s".formatted(getProperty("os.arch")) + lineSeparator());
 
       writer.write(lineSeparator());
-      final var runningTime = ProcessHandle.current() // ProcessHandle
-          .info() // ProcessHandle.Info
+      final var runningTime = ProcessHandle.current()
+          .info()
           .startInstant()
           .map(i -> between(i, now()))
           .map(d -> formatDuration(d.toMillis(), "d'd' HH:mm:ss.SSS"))

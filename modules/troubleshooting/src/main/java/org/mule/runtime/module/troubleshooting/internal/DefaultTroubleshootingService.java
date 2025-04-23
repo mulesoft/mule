@@ -10,8 +10,6 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.time.ZonedDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
-import static java.util.Collections.emptyMap;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.apache.commons.lang3.StringUtils.join;
@@ -36,7 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Executors;
 
 public class DefaultTroubleshootingService implements TroubleshootingService {
 
@@ -46,16 +43,6 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
   public DefaultTroubleshootingService(DeploymentService deploymentService) {
     registerOperation(new BasicInfoOperation());
     registerOperation(new EventDumpOperation(deploymentService));
-
-
-
-    Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
-      try {
-        System.out.println(executeAllOperations(emptyMap()));
-      } catch (TroubleshootingOperationException e) {
-        e.printStackTrace();
-      }
-    }, 5, 10, SECONDS);
   }
 
   @Override
@@ -80,7 +67,7 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
   }
 
   @Override
-  public Object executeAllOperations(Map<String, String> arguments) throws TroubleshootingOperationException {
+  public String executeAllOperations(Map<String, String> arguments) throws TroubleshootingOperationException {
     final var writer = new StringWriter();
     writeHeader(writer);
 
@@ -91,7 +78,7 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
   }
 
   @Override
-  public Object executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException {
+  public String executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException {
     final var writer = new StringWriter();
     writeHeader(writer);
 

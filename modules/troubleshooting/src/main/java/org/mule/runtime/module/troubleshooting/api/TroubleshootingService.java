@@ -38,7 +38,7 @@ public interface TroubleshootingService {
    * @throws TroubleshootingOperationException if it couldn't execute the operation because it wasn't available or there is an
    *                                           error in the arguments.
    */
-  Object executeAllOperations(Map<String, String> arguments) throws TroubleshootingOperationException;
+  String executeAllOperations(Map<String, String> arguments) throws TroubleshootingOperationException;
 
   /**
    * Invokes an operation with the given parameters. User must respect the definitions retrieved with
@@ -50,7 +50,7 @@ public interface TroubleshootingService {
    * @throws TroubleshootingOperationException if it couldn't execute the operation because it wasn't available or there is an
    *                                           error in the arguments.
    */
-  Object executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException;
+  String executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException;
 
   /**
    * Registers a new {@link TroubleshootingOperation}.

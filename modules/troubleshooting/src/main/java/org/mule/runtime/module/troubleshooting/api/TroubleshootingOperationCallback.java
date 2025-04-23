@@ -15,14 +15,17 @@ import java.util.Map;
 /**
  * Internal interface to the troubleshooting operation callbacks.
  *
- * @since 4.5
+ * @since 4.5, refactored in 4.10
  */
 @Experimental
 public interface TroubleshootingOperationCallback {
 
   /**
-   * The operation logic. The troubleshooting operations should be able to be triggered from an external client, so the
-   * implementation of each operation callback should write an object representation that can be un-marshaled.
+   * The operation logic.
+   * <p>
+   * The troubleshooting operations should be able to be triggered from an external client.
+   * <p>
+   * The implementation of each operation callback should write a human-readable result.
    *
    * @param arguments    A dictionary with the argument names and values.
    * @param resultWriter A writer to write the result to.

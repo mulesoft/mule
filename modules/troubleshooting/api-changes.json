@@ -5,43 +5,24 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.returnTypeChangedCovariantly",
+            "old": "method java.lang.Object org.mule.runtime.module.troubleshooting.api.TroubleshootingService::executeOperation(java.lang.String, java.util.Map<java.lang.String, java.lang.String>) throws org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationException",
+            "new": "method java.lang.String org.mule.runtime.module.troubleshooting.api.TroubleshootingService::executeOperation(java.lang.String, java.util.Map<java.lang.String, java.lang.String>) throws org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationException",
+            "justification": "W-18346941: Refactor troubleshooting operations to use a writer"
+          },
+          {
+            "ignore": true,
             "code": "java.method.numberOfParametersChanged",
             "old": "method java.io.Serializable org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>)",
             "new": "method void org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>, java.io.Writer) throws java.io.IOException",
-            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-            /*  "package": "org.mule.runtime.module.troubleshooting.api",
-            "classQualifiedName": "org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback",
-            "classSimpleName": "TroubleshootingOperationCallback",
-            "methodName": "execute",
-            "elementKind": "method",
-            "oldArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.9.0-rc1",
-            "oldArchiveRole": "primary",
-            "newArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.10.0-SNAPSHOT",
-            "newArchiveRole": "primary",
-            "breaksVersioningRules": "true",
-            */
-          
+            "justification": "W-18346941: Refactor troubleshooting operations to use a writer"
           },
           {
             "ignore": true,
             "code": "java.method.returnTypeChanged",
             "old": "method java.io.Serializable org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>)",
             "new": "method void org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>, java.io.Writer) throws java.io.IOException",
-            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-            /*  "oldType": "java.io.Serializable",
-            "newType": "void",
-            "package": "org.mule.runtime.module.troubleshooting.api",
-            "classQualifiedName": "org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback",
-            "classSimpleName": "TroubleshootingOperationCallback",
-            "methodName": "execute",
-            "elementKind": "method",
-            "oldArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.9.0-rc1",
-            "oldArchiveRole": "primary",
-            "newArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.10.0-SNAPSHOT",
-            "newArchiveRole": "primary",
-            "breaksVersioningRules": "true",
-            */
-          
+            "justification": "W-18346941: Refactor troubleshooting operations to use a writer"
           },
           {
             "ignore": true,
@@ -49,19 +30,7 @@
             "old": "method java.io.Serializable org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>)",
             "new": "method void org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback::execute(java.util.Map<java.lang.String, java.lang.String>, java.io.Writer) throws java.io.IOException",
             "exception": "java.io.IOException",
-            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
-            /*  "package": "org.mule.runtime.module.troubleshooting.api",
-            "classQualifiedName": "org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback",
-            "classSimpleName": "TroubleshootingOperationCallback",
-            "methodName": "execute",
-            "elementKind": "method",
-            "oldArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.9.0-rc1",
-            "oldArchiveRole": "primary",
-            "newArchive": "org.mule.runtime:mule-module-troubleshooting:jar:4.10.0-SNAPSHOT",
-            "newArchiveRole": "primary",
-            "breaksVersioningRules": "true",
-            */
-          
+            "justification": "W-18346941: Refactor troubleshooting operations to use a writer"
           }
         ]
       }
