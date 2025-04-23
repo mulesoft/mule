@@ -60,10 +60,9 @@ public class ResolverUtils {
                                                             TransformationService transformationService,
                                                             ExtendedExpressionManager expressionManager,
                                                             Injector injector) {
-    Optional<String> defaultValue = getDefaultValue(field);
-    checkArgument(defaultValue.isPresent(), "No default value available for field :" + field.getKey().getName());
-    return getExpressionBasedValueResolver(defaultValue.get(), field.getValue(), transformationService, expressionManager,
-                                           injector);
+    return getExpressionBasedValueResolver(getDefaultValue(field)
+        .orElseThrow(() -> new IllegalArgumentException("No default value available for field :" + field.getKey().getName())),
+                                           field.getValue(), transformationService, expressionManager, injector);
   }
 
   static ValueResolver<?> getFieldDefaultValueValueResolver(MetadataType fieldType, String defaultValue,
@@ -73,10 +72,10 @@ public class ResolverUtils {
     return getExpressionBasedValueResolver(defaultValue, fieldType, transformationService, expressionManager, injector);
   }
 
-  public static ValueResolver<?> getExpressionBasedValueResolver(String expression, MetadataType metadataType,
-                                                                 TransformationService transformationService,
-                                                                 ExtendedExpressionManager expressionManager,
-                                                                 Injector injector) {
+  public static <T> ValueResolver<T> getExpressionBasedValueResolver(String expression, MetadataType metadataType,
+                                                                     TransformationService transformationService,
+                                                                     ExtendedExpressionManager expressionManager,
+                                                                     Injector injector) {
     return getExpressionBasedValueResolver(expression,
                                            () -> isTypedValue(metadataType),
                                            () -> isParameterResolver(metadataType),
@@ -107,8 +106,8 @@ public class ResolverUtils {
                                                   ExtendedExpressionManager expressionManager,
                                                   Injector injector) {
     Object defaultValue = parameter.getDefaultValue();
-    if (defaultValue instanceof String) {
-      return getExpressionBasedValueResolver((String) defaultValue, parameter, transformationService, expressionManager,
+    if (defaultValue instanceof String defaultStringValue) {
+      return getExpressionBasedValueResolver(defaultStringValue, parameter, transformationService, expressionManager,
                                              injector);
     } else if (defaultValue != null) {
       return new StaticValueResolver<>(defaultValue);
@@ -275,13 +274,13 @@ public class ResolverUtils {
         .build(), typedValue.getByteLength());
   }
 
-  private static ValueResolver<?> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,
-                                                                  BooleanSupplier isParameterResolver,
-                                                                  Optional<StackedTypesModelProperty> stackedTypesModelProperty,
-                                                                  MetadataType type,
-                                                                  TransformationService transformationService,
-                                                                  ExtendedExpressionManager expressionManager,
-                                                                  Injector injector) {
+  private static <T> ValueResolver<T> getExpressionBasedValueResolver(String expression, BooleanSupplier isTypedValue,
+                                                                      BooleanSupplier isParameterResolver,
+                                                                      Optional<StackedTypesModelProperty> stackedTypesModelProperty,
+                                                                      MetadataType type,
+                                                                      TransformationService transformationService,
+                                                                      ExtendedExpressionManager expressionManager,
+                                                                      Injector injector) {
 
     try {
       ValueResolver resolver;

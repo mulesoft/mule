@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.loader.utils;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.getExpressionBasedValueResolver;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContainerName;
 
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -70,21 +69,8 @@ public final class ImplicitObjectUtils {
                                                         parametersResolver));
       } else {
         groupModel.getParameterModels().forEach(parameterModel -> {
-          Object defaultValue = parameterModel.getDefaultValue();
-          ValueResolver<?> resolver;
-          if (defaultValue instanceof String) {
-            resolver = getExpressionBasedValueResolver((String) defaultValue, parameterModel.getType(), transformationService,
-                                                       expressionManager, injector);
-          } else {
-            resolver = new StaticValueResolver<>(null);
-          }
-
-          if (parameterModel.getModelProperty(NullSafeModelProperty.class).isPresent()) {
-            MetadataType metadataType = parameterModel.getModelProperty(NullSafeModelProperty.class).get().defaultType();
-            resolver =
-                NullSafeValueResolverWrapper.of(resolver, metadataType, reflectionCache, transformationService, expressionManager,
-                                                muleContext, injector, parametersResolver);
-          }
+          ValueResolver<?> resolver = parameterResolver(reflectionCache, transformationService, expressionManager, muleContext,
+                                                        injector, parametersResolver, parameterModel);
 
           resolverSet.add(parameterModel.getName(), resolver);
         });
@@ -92,5 +78,27 @@ public final class ImplicitObjectUtils {
     }
 
     return resolverSet;
+  }
+
+  private static <T> ValueResolver<T> parameterResolver(ReflectionCache reflectionCache,
+                                                        TransformationService transformationService,
+                                                        ExtendedExpressionManager expressionManager, MuleContext muleContext,
+                                                        Injector injector, ParametersResolver parametersResolver,
+                                                        ParameterModel parameterModel) {
+    Object defaultValue = parameterModel.getDefaultValue();
+    ValueResolver<T> resolver;
+    if (defaultValue instanceof String defaultStringValue) {
+      resolver = getExpressionBasedValueResolver(defaultStringValue, parameterModel.getType(), transformationService,
+                                                 expressionManager, injector);
+    } else {
+      resolver = new StaticValueResolver<>(null);
+    }
+
+    return parameterModel.getModelProperty(NullSafeModelProperty.class)
+        .map(NullSafeModelProperty::defaultType)
+        .map(metadataType -> NullSafeValueResolverWrapper.of(resolver, metadataType, reflectionCache, transformationService,
+                                                             expressionManager,
+                                                             muleContext, injector, parametersResolver))
+        .orElse(resolver);
   }
 }

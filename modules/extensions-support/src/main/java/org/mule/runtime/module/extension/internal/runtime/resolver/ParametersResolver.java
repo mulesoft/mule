@@ -362,37 +362,43 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
     final boolean isParameterGroup = isFlattenedParameterGroup(objectType);
     objectType.getFields().forEach(field -> {
       final String key = getLocalPart(field);
-      ValueResolver<?> valueResolver = null;
       Field objectField = getField(objectClass, key);
-
-      if (parameters.containsKey(key)) {
-        valueResolver = toValueResolver(parameters.get(key));
-      } else if (!isParameterGroup) {
-        valueResolver = getDefaultValue(field).isPresent()
-            ? getFieldDefaultValueValueResolver(field, muleContext.getTransformationService(), expressionManager, injector)
-            : null;
-      }
-
-      Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
-      if (nullSafe.isPresent()) {
-        ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
-        MetadataType type =
-            getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
-        valueResolver =
-            NullSafeValueResolverWrapper.of(delegate, type, reflectionCache,
-                                            muleContext.getTransformationService(),
-                                            expressionManager, muleContext, injector, this);
-      }
-
-      if (field.getAnnotation(ConfigOverrideTypeAnnotation.class).isPresent()) {
-        valueResolver =
-            ConfigOverrideValueResolverWrapper.of(valueResolver != null ? valueResolver : new StaticValueResolver<>(null),
-                                                  key, objectField.getType(), reflectionCache, muleContext,
-                                                  objectClass.getName());
-      }
+      ValueResolver<?> valueResolver = resolveObjectFieldParameter(objectClass, objectField, field, key, isParameterGroup);
 
       addPropertyResolver(builder, valueResolver, field, objectField);
     });
+  }
+
+  private ValueResolver<?> resolveObjectFieldParameter(final Class<?> objectClass, Field objectField, ObjectFieldType field,
+                                                       final String key, final boolean isParameterGroup) {
+    ValueResolver<?> valueResolver = null;
+
+    if (parameters.containsKey(key)) {
+      valueResolver = toValueResolver(parameters.get(key));
+    } else if (!isParameterGroup) {
+      valueResolver = getDefaultValue(field).isPresent()
+          ? getFieldDefaultValueValueResolver(field, muleContext.getTransformationService(), expressionManager, injector)
+          : null;
+    }
+
+    Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
+    if (nullSafe.isPresent()) {
+      ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
+      MetadataType type =
+          getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
+      valueResolver =
+          NullSafeValueResolverWrapper.of(delegate, type, reflectionCache,
+                                          muleContext.getTransformationService(),
+                                          expressionManager, muleContext, injector, this);
+    }
+
+    if (field.getAnnotation(ConfigOverrideTypeAnnotation.class).isPresent()) {
+      valueResolver =
+          ConfigOverrideValueResolverWrapper.of(valueResolver != null ? valueResolver : new StaticValueResolver<>(null),
+                                                key, objectField.getType(), reflectionCache, muleContext,
+                                                objectClass.getName());
+    }
+    return valueResolver;
   }
 
   protected void addPropertyResolver(DefaultObjectBuilder builder, ValueResolver<?> valueResolver, ObjectFieldType field,
@@ -425,8 +431,8 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
    * @param value the value to expose
    * @return a {@link ValueResolver}
    */
-  private ValueResolver<?> toValueResolver(Object value) {
-    return toValueResolver(value, null);
+  private <T> ValueResolver<T> toValueResolver(Object value) {
+    return (ValueResolver<T>) toValueResolver(value, null);
   }
 
   /**
@@ -477,7 +483,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
 
   private ValueResolver<?> getCollectionResolver(Collection<?> collection) {
     return CollectionValueResolver.of(collection.getClass(),
-                                      collection.stream().map(p -> toValueResolver(p)).toList());
+                                      collection.stream().map(this::toValueResolver).toList());
   }
 
   protected Map<String, ?> getParameters() {

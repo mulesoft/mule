@@ -107,8 +107,10 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
         Class clazz = getType(objectType);
 
         if (isMap(objectType)) {
-          ValueResolver<?> fallback = MapValueResolver.of(clazz, emptyList(), emptyList(), reflectionCache, injector);
-          wrappedResolver.set(new NullSafeValueResolverWrapper(delegate, fallback, injector));
+          wrappedResolver.set(new NullSafeValueResolverWrapper(
+                                                               delegate, MapValueResolver.of(clazz, emptyList(), emptyList(),
+                                                                                             reflectionCache, injector),
+                                                               injector));
           return;
         }
 

@@ -221,7 +221,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
     return new DefaultValueProviderMediator(parameterizedModel,
                                             () -> reflectionCache,
                                             () -> expressionManager,
-                                            () -> muleContext.getInjector());
+                                            muleContext::getInjector);
   }
 
   private Optional<String> getConfigRef(ParameterizedElementDeclaration component) {

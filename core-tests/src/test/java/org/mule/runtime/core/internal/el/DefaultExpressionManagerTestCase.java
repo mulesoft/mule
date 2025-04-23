@@ -215,8 +215,9 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleTestCase {
   public void parseCompatibility() throws MuleException {
     assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), TEST_CONNECTOR_LOCATION),
                is(format("this is %s", TEST_PAYLOAD)));
+    final var testEvent = testEvent();
     assertThrows(RuntimeException.class,
-                 () -> expressionManager.parse("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION));
+                 () -> expressionManager.parse("this is #[payload]", testEvent, TEST_CONNECTOR_LOCATION));
   }
 
   @Test
