@@ -47,13 +47,18 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   private final Injector injector;
 
   /**
-   * @deprecated Use {@link #ResolverSet(Injector)} instead. 
+   * @deprecated Use {@link #ResolverSet(Injector)} instead.
    */
   @Deprecated(forRemoval = true, since = "4.10")
   public ResolverSet(MuleContext muleContext) {
     this.injector = muleContext.getInjector();
   }
-  
+
+  /**
+   * @param injector the injector for the deployment to inject dependencies into the resolvers.
+   * 
+   * @since 4.10
+   */
   public ResolverSet(Injector injector) {
     this.injector = injector;
   }

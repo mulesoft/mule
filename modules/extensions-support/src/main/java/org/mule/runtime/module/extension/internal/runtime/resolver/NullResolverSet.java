@@ -10,6 +10,7 @@ import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
@@ -23,7 +24,7 @@ public class NullResolverSet extends ResolverSet {
   public static final ResolverSet INSTANCE = new NullResolverSet();
 
   private NullResolverSet() {
-    super(null);
+    super((Injector) null);
   }
 
   @Override
