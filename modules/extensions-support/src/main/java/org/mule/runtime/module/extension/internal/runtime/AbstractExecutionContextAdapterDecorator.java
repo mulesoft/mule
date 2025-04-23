@@ -8,13 +8,16 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.transaction.TransactionConfig;
@@ -128,6 +131,16 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   }
 
   @Override
+  public ArtifactEncoding getArtifactEncoding() {
+    return decorated.getArtifactEncoding();
+  }
+
+  @Override
+  public ServerNotificationManager getNotificationManager() {
+    return decorated.getNotificationManager();
+  }
+
+  @Override
   public CursorProviderFactory getCursorProviderFactory() {
     return decorated.getCursorProviderFactory();
   }
@@ -150,6 +163,11 @@ public abstract class AbstractExecutionContextAdapterDecorator<M extends Compone
   @Override
   public Optional<RetryPolicyTemplate> getRetryPolicyTemplate() {
     return decorated.getRetryPolicyTemplate();
+  }
+
+  @Override
+  public SecurityManager getSecurityManager() {
+    return decorated.getSecurityManager();
   }
 }
 

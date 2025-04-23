@@ -162,6 +162,8 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.core,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config;
+  exports org.mule.runtime.module.extension.internal.runtime.execution.deprecated to
+      org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.execution.executor to
       org.mule.runtime.core,
       org.mule.runtime.extensions.xml.support;

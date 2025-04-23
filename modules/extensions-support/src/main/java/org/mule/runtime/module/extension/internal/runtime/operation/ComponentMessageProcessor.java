@@ -66,6 +66,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.ArtifactEncoding;
@@ -586,8 +587,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                             CoreEvent event, Scheduler currentScheduler) {
 
     return new DefaultExecutionContext<>(extensionModel, configuration, resolvedParameters, componentModel, event,
+                                         artifactEncoding,
+                                         muleContext.getNotificationManager(),
                                          getCursorProviderFactory(), streamingManager, this,
                                          retryPolicyResolver.apply(configuration), currentScheduler, transactionConfig,
+                                         muleContext.getSecurityManager(),
                                          muleContext);
   }
 
@@ -1088,6 +1092,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         muleConfiguration,
+                                        ArtifactType.valueOf(muleContext.getArtifactType().name()),
                                         notificationDispatcher,
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),

@@ -21,7 +21,7 @@ public class SdkNotificationHandlerArgumentResolver implements ArgumentResolver<
   @Override
   public NotificationEmitter resolve(ExecutionContext executionContext) {
     ExecutionContextAdapter adaptedExecutionContext = (ExecutionContextAdapter) executionContext;
-    return new DefaultNotificationEmitter(adaptedExecutionContext.getMuleContext().getNotificationManager(),
+    return new DefaultNotificationEmitter(adaptedExecutionContext.getNotificationManager(),
                                           adaptedExecutionContext.getEvent(),
                                           adaptedExecutionContext.getComponent(),
                                           adaptedExecutionContext.getComponentModel());

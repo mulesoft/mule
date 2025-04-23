@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.Integer.min;
-
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
@@ -16,6 +13,9 @@ import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_GROW;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolStatus;
+
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.Integer.min;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -25,7 +25,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.MuleContext;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -59,13 +58,12 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
    * @param connectionProvider     the {@link ConnectionProvider} used to manage the connections
    * @param poolingProfile         the {@link PoolingProfile} which configures the {@link #pool}
    * @param poolingListener        a {@link PoolingListener}
-   * @param muleContext            the application's {@link MuleContext}
    * @param featureFlaggingService the {@link FeatureFlaggingService}
    */
   PoolingConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, PoolingProfile poolingProfile,
-                                      PoolingListener<C> poolingListener, MuleContext muleContext, String ownerConfigName,
+                                      PoolingListener<C> poolingListener, String ownerConfigName,
                                       FeatureFlaggingService featureFlaggingService) {
-    super(connectionProvider, muleContext);
+    super(connectionProvider);
     this.poolingProfile = poolingProfile;
     this.poolingListener = poolingListener;
     this.poolId = ownerConfigName.concat("-").concat(generateId());

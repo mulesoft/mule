@@ -23,7 +23,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.runtime.operation.ComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
@@ -38,6 +37,8 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
+import jakarta.inject.Inject;
+
 /**
  * Implementation of {@link ComponentExecutor} which works by using reflection to invoke a method from a class.
  *
@@ -46,7 +47,7 @@ import org.slf4j.Logger;
  */
 @Deprecated
 public class ReactiveMethodOperationExecutor<M extends ComponentModel>
-    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, MuleContextAware, Lifecycle {
+    implements ComponentExecutor<M>, OperationArgumentResolverFactory<M>, Lifecycle {
 
   private static final Logger LOGGER = getLogger(ReactiveMethodOperationExecutor.class);
 
@@ -106,7 +107,7 @@ public class ReactiveMethodOperationExecutor<M extends ComponentModel>
     disposeIfNeeded(executor, LOGGER);
   }
 
-  @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     muleContext = context;
     executor.setMuleContext(muleContext);

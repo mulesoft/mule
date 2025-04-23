@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.util.queue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -27,9 +27,9 @@ public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTest
     MuleConfiguration mockConfiguration = mock(MuleConfiguration.class);
     when(mockConfiguration.getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
     when(mockConfiguration.getMaxQueueTransactionFilesSizeInMegabytes()).thenReturn(100);
-    ((DefaultMuleContext) muleContext).setMuleConfiguration(mockConfiguration);
 
-    mgr.setMuleContext(muleContext);
+    mgr.setMuleConfiguration(mockConfiguration);
+    mgr.setObjectSerializer(new JavaObjectSerializer(this.getClass().getClassLoader()));
     mgr.initialise();
     mgr.setDefaultQueueConfiguration(new DefaultQueueConfiguration(0, true));
     return mgr;

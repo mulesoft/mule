@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.sampledata;
 
-import static com.google.common.base.Throwables.propagateIfPossible;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.sampledata.SampleDataFailure.Builder.newFailure;
 import static org.mule.runtime.api.sampledata.SampleDataResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
+import static com.google.common.base.Throwables.throwIfInstanceOf;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -98,8 +100,11 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
           .withFailureCode(INVALID_PARAMETER_VALUE).build());
     } catch (ExecutorExceptionWrapper e) {
       Throwable cause = e.getCause();
-      if (cause instanceof SampleDataException) {
-        SampleDataException sampleDataException = (SampleDataException) cause;
+      if (cause == null) {
+        throw new MuleRuntimeException(e);
+      }
+
+      if (cause instanceof SampleDataException sampleDataException) {
         if (LOGGER.isWarnEnabled()) {
           LOGGER.warn(format("Get sample data has FAILED with code: %s for component: %s", sampleDataException.getFailureCode(),
                              componentModel.getName()),
@@ -109,10 +114,11 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
         failureBuilder.withFailureCode(sampleDataException.getFailureCode());
         return resultFrom(failureBuilder.build());
       }
-      propagateIfPossible(cause, MuleRuntimeException.class);
+
+      throwIfInstanceOf(e, MuleRuntimeException.class);
       throw new MuleRuntimeException(cause);
     } catch (Exception e) {
-      propagateIfPossible(e, MuleRuntimeException.class);
+      throwIfInstanceOf(e, MuleRuntimeException.class);
       throw new MuleRuntimeException(e);
     } finally {
       if (LOGGER.isDebugEnabled()) {

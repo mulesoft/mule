@@ -19,6 +19,6 @@ public final class DefaultEncodingArgumentResolver implements ArgumentResolver<S
 
   @Override
   public String resolve(ExecutionContext executionContext) {
-    return ((ExecutionContextAdapter) executionContext).getMuleContext().getConfiguration().getDefaultEncoding();
+    return ((ExecutionContextAdapter) executionContext).getArtifactEncoding().getDefaultEncoding().name();
   }
 }

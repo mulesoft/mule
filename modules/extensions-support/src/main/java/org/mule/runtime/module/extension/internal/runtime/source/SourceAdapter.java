@@ -40,6 +40,7 @@ import static reactor.core.publisher.Mono.create;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -153,6 +154,9 @@ public class SourceAdapter implements Lifecycle, Restartable {
   private ErrorTypeLocator errorTypeLocator;
 
   @Inject
+  private ArtifactEncoding artifactEncoding;
+
+  @Inject
   private MuleContext muleContext;
 
   public SourceAdapter(ExtensionModel extensionModel, SourceModel sourceModel,
@@ -235,14 +239,20 @@ public class SourceAdapter implements Lifecycle, Restartable {
                                                    SourceCallbackModelProperty sourceCallbackModel,
                                                    SourceCallbackExecutor then) {
     SourceCallbackExecutor executor = method
-        .map(m -> (SourceCallbackExecutor) new DefaultSourceCallbackExecutor(extensionModel, configurationInstance,
+        .map(m -> (SourceCallbackExecutor) new DefaultSourceCallbackExecutor(extensionModel,
+                                                                             configurationInstance,
                                                                              sourceModel,
                                                                              sourceInvokationTarget.get(),
-                                                                             m, cursorProviderFactory,
+                                                                             m,
+                                                                             cursorProviderFactory,
                                                                              streamingManager,
                                                                              component,
-                                                                             muleContext,
-                                                                             sourceCallbackModel))
+                                                                             artifactEncoding,
+                                                                             muleContext.getNotificationManager(),
+                                                                             muleContext.getInjector(),
+                                                                             muleContext.getSecurityManager(),
+                                                                             sourceCallbackModel,
+                                                                             muleContext))
         .orElse(NullSourceCallbackExecutor.INSTANCE);
 
     if (then != null) {

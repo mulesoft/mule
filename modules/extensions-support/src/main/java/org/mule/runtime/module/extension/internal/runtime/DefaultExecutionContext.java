@@ -12,16 +12,22 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
+import static org.apache.commons.lang3.JavaVersion.JAVA_22;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.event.InternalEvent;
@@ -50,6 +56,9 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   private final MuleContext muleContext;
   private CoreEvent event;
   private SecurityContext securityContext;
+  private final SecurityManager securityManager;
+  private final ArtifactEncoding artifactEncoding;
+  private final ServerNotificationManager notificationManager;
   private final CursorProviderFactory cursorProviderFactory;
   private final StreamingManager streamingManager;
   private final Optional<TransactionConfig> transactionConfig;
@@ -64,10 +73,14 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * @param parameters            the parameters that the operation will use
    * @param componentModel        the {@link ComponentModel} for the component being executed
    * @param event                 the current {@link CoreEvent}
+   * @param artifactEncoding      the {@link ArtifactEncoding} of the artifact of the executing component.
+   * @param notificationManager   the {@link ServerNotificationManager} of the artifact of the executing component.
    * @param cursorProviderFactory the {@link CursorProviderFactory} that was configured on the executed component
    * @param streamingManager      the application's {@link StreamingManager}
    * @param component             the {@link Component component} executing
    * @param retryPolicyTemplate   the reconnection strategy to use in case of connectivity problems
+   * @param securityManager       the security manager used by the Mule instance to authenticate and authorise incoming and
+   *                              outgoing event traffic and service invocations
    * @param muleContext           the current {@link MuleContext}
    */
   public DefaultExecutionContext(ExtensionModel extensionModel,
@@ -75,26 +88,32 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
                                  Map<String, Object> parameters,
                                  M componentModel,
                                  CoreEvent event,
+                                 ArtifactEncoding artifactEncoding,
+                                 ServerNotificationManager notificationManager,
                                  CursorProviderFactory cursorProviderFactory,
                                  StreamingManager streamingManager,
                                  Component component,
                                  RetryPolicyTemplate retryPolicyTemplate,
                                  Scheduler currentScheduler,
                                  Optional<TransactionConfig> transactionConfig,
+                                 SecurityManager securityManager,
                                  MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.configuration = configuration;
     this.event = event;
+    this.artifactEncoding = artifactEncoding;
+    this.notificationManager = notificationManager;
     this.securityContext = event.getSecurityContext();
     this.componentModel = componentModel;
     this.parameters = parameters;
     this.cursorProviderFactory = cursorProviderFactory;
     this.streamingManager = streamingManager;
-    this.muleContext = muleContext;
     this.component = component;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.currentScheduler = currentScheduler;
     this.transactionConfig = transactionConfig;
+    this.securityManager = securityManager;
+    this.muleContext = muleContext;
   }
 
   /**
@@ -237,14 +256,6 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
    * {@inheritDoc}
    */
   @Override
-  public MuleContext getMuleContext() {
-    return muleContext;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public CursorProviderFactory getCursorProviderFactory() {
     return cursorProviderFactory;
   }
@@ -255,6 +266,26 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   @Override
   public Optional<TransactionConfig> getTransactionConfig() {
     return transactionConfig;
+  }
+
+  @Override
+  public MuleContext getMuleContext() {
+    // force connectors using this to migrate away eventually.
+    if (isJavaVersionAtLeast(JAVA_22)) {
+      throw new UnsupportedOperationException("Use other getters form this to get the required object.");
+    }
+
+    return muleContext;
+  }
+
+  @Override
+  public ArtifactEncoding getArtifactEncoding() {
+    return artifactEncoding;
+  }
+
+  @Override
+  public ServerNotificationManager getNotificationManager() {
+    return notificationManager;
   }
 
   /**
@@ -287,6 +318,11 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   @Override
   public Optional<RetryPolicyTemplate> getRetryPolicyTemplate() {
     return ofNullable(retryPolicyTemplate);
+  }
+
+  @Override
+  public SecurityManager getSecurityManager() {
+    return securityManager;
   }
 
   private void addContextToOriginalEvent(CoreEvent originalEvent, CoreEvent updatedEvent) {

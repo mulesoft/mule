@@ -44,13 +44,13 @@ public class TransactionalQueueManager extends AbstractQueueManager {
   @Override
   public QueueSession getQueueSession() {
     return new TransactionalQueueSession(this, queueXaResourceManager, queueXaResourceManager, xaTransactionRecoverer,
-                                         localTxTransactionJournal, getMuleContext());
+                                         localTxTransactionJournal, getDeploymentLifecycleState());
   }
 
   @Override
   protected DefaultQueueStore createQueueStore(String name, QueueConfiguration config) {
-    return new DefaultQueueStore(name, getMuleContext().getConfiguration().getWorkingDirectory(),
-                                 getMuleContext().getObjectSerializer().getInternalProtocol(), config);
+    return new DefaultQueueStore(name, getMuleConfiguration().getWorkingDirectory(),
+                                 getObjectSerializer().getInternalProtocol(), config);
   }
 
   @Override
@@ -65,14 +65,14 @@ public class TransactionalQueueManager extends AbstractQueueManager {
 
   @Override
   public void initialise() throws InitialisationException {
-    String workingDirectory = getMuleContext().getConfiguration().getWorkingDirectory();
-    int queueTransactionFilesSizeInMegabytes = getMuleContext().getConfiguration().getMaxQueueTransactionFilesSizeInMegabytes();
+    String workingDirectory = getMuleConfiguration().getWorkingDirectory();
+    int queueTransactionFilesSizeInMegabytes = getMuleConfiguration().getMaxQueueTransactionFilesSizeInMegabytes();
     localTxTransactionJournal = new LocalTxQueueTransactionJournal(workingDirectory + File.separator + "queue-tx-log",
-                                                                   getMuleContext().getObjectSerializer().getInternalProtocol(),
+                                                                   getObjectSerializer().getInternalProtocol(),
                                                                    queueTransactionFilesSizeInMegabytes);
     localTxQueueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(localTxTransactionJournal, this);
     xaTransactionJournal = new XaTxQueueTransactionJournal(workingDirectory + File.separator + "queue-xa-tx-log",
-                                                           getMuleContext().getObjectSerializer().getInternalProtocol(),
+                                                           getObjectSerializer().getInternalProtocol(),
                                                            queueTransactionFilesSizeInMegabytes);
     xaTransactionRecoverer = new XaTransactionRecoverer(xaTransactionJournal, this);
   }
