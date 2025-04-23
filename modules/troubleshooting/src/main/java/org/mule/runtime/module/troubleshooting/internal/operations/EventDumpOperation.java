@@ -12,6 +12,7 @@ import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
 import org.mule.runtime.core.api.event.EventContextService;
+import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
@@ -70,7 +71,7 @@ public class EventDumpOperation implements TroubleshootingOperation {
 
   private static void writeFlowStacksFor(Application application, Writer writer)
       throws IOException {
-    final var appsTitle = "Active Events for application '" + application + "'";
+    final var appsTitle = "Active Events for application '" + application.getArtifactName() + "'";
     writer.write(appsTitle + lineSeparator());
     writer.write(leftPad("", appsTitle.length(), "-") + lineSeparator());
     writer.write(lineSeparator());
@@ -95,16 +96,12 @@ public class EventDumpOperation implements TroubleshootingOperation {
 
     final var currentlyActiveFlowStacks = eventContextService.getCurrentlyActiveFlowStacks();
 
-    // sort(currentlyActiveFlowStacks, (fsA, fsB) -> fsA.getExecutingTime().compareTo(fsB.getExecutingTime()));
-    //
-    // for (FlowStackEntry fs : currentlyActiveFlowStacks) {
-    // writer.write(format("\"%s\", running for: %s, state: %s" + lineSeparator() + "%s",
-    // fs.getEventId(),
-    // formatDuration(fs.getExecutingTime().toMillis(), "mm:ss.SSS"),
-    // fs.getState().name(),
-    // fs.getFlowCallStack().toStringWithElapsedTime().indent(4)));
-    // writer.write(lineSeparator());
-    // }
+    for (FlowStackEntry fs : currentlyActiveFlowStacks) {
+      writer.write(format("\"%s\"" + lineSeparator() + "%s",
+                          fs.getEventId(),
+                          fs.getFlowCallStack().toString().indent(4)));
+      writer.write(lineSeparator());
+    }
   }
 
   private static TroubleshootingOperationDefinition createOperationDefinition() {

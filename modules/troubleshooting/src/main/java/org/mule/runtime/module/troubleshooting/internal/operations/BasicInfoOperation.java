@@ -14,6 +14,8 @@ import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
 import static java.lang.System.lineSeparator;
+import static java.time.Duration.between;
+import static java.time.Instant.now;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -24,8 +26,6 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallb
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingOperationDefinition;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -67,6 +67,7 @@ public class BasicInfoOperation implements TroubleshootingOperation {
       writer.write(lineSeparator());
 
       // get the properties sorted alphabetically
+      writer.write("System Properties:" + lineSeparator());
       Map<String, String> muleProperties = getProperties().stringPropertyNames().stream()
           .filter(property -> property.startsWith(SYSTEM_PROPERTY_PREFIX))
           .collect(toMap(identity(), System::getProperty, (v1, v2) -> v1, TreeMap::new));
@@ -92,7 +93,7 @@ public class BasicInfoOperation implements TroubleshootingOperation {
       final var runningTime = ProcessHandle.current() // ProcessHandle
           .info() // ProcessHandle.Info
           .startInstant()
-          .map(i -> Duration.between(i, Instant.now()))
+          .map(i -> between(i, now()))
           .map(d -> formatDuration(d.toMillis(), "d'd' HH:mm:ss.SSS"))
           .orElse("n/a");
       writer.write("Running time: %s".formatted(runningTime));
