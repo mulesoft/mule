@@ -172,6 +172,9 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
 
   private ClassLoader createClassLoader(ArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
                                         ServiceDescriptor serviceDescriptor) {
+    // NOTE: We have to use this doPrivileged() here to set the AccessControlContext, even if it is deprecated. We need to do it
+    // because otherwise it will be calculated based on the full stack (see AccessController#getContext), and it causes
+    // MuleApplicationClassLoader leaks.
     return doPrivileged((PrivilegedAction<ClassLoader>) () -> {
       try {
         return (ClassLoader) serviceClassLoaderFactory
