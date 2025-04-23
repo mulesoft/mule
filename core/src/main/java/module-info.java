@@ -215,6 +215,9 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.execution to
       org.mule.runtime.properties.config,
       org.mule.runtime.spring.config;
+  // for Kryo
+  exports org.mule.runtime.core.privileged.event.context to
+      com.mulesoft.mule.runtime.kryo;
   // for MuleFwk, MUnit, ApiKit, DataWeave and Validation
   exports org.mule.runtime.core.privileged.exception;
   // for MUnit
@@ -627,6 +630,7 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.execution to
       spring.core;
   opens org.mule.runtime.core.internal.event to
+      com.mulesoft.mule.runtime.kryo,
       kryo.shaded;
   opens org.mule.runtime.core.internal.lock to
       org.mule.runtime.core.components,
