@@ -442,7 +442,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   @After
   public void undeployApps() {
     if (deploymentService != null) {
-      deploymentService.getApplications().forEach(app -> undeploy(deploymentService, app.getArtifactName()));
+      deploymentService.getApplications().forEach(app -> {
+        // app.getArtifactClassLoader().dispose();
+        undeploy(deploymentService, app.getArtifactName());
+      });
     }
     TestApplicationFactory.after();
   }
