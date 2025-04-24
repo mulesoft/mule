@@ -9,8 +9,11 @@ package org.mule.runtime.module.launcher;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 
+import static java.util.Collections.emptyMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -22,8 +25,6 @@ import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerSe
 import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.tooling.api.ToolingService;
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
@@ -40,8 +41,6 @@ import org.mockito.InOrder;
 
 @SmallTest
 public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
-
-  private static final String APP_NAME = "testApp";
 
   // Required to run the test, otherwise we need to configure a fake mule
   // folder with a conf/log4j2.xml
@@ -60,10 +59,6 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
 
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
 
-  private final TroubleshootingService troubleshootingService = mock(TroubleshootingService.class);
-
-  private final ToolingService toolingService = mock(ToolingService.class);
-
   @Before
   public void setUp() throws Exception {
     coreExtensionManager = mock(MuleCoreExtensionManagerServer.class);
@@ -72,8 +67,9 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
   }
 
   private DefaultMuleContainer createMuleContainer() throws InitialisationException {
-    return new DefaultMuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-                                    extensionModelLoaderRepository, troubleshootingService);
+    return new DefaultMuleContainer(deploymentService, repositoryService, coreExtensionManager, serviceManager,
+                                    extensionModelLoaderRepository,
+                                    emptyMap());
   }
 
   @Test
@@ -82,8 +78,9 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
 
     verify(coreExtensionManager).setDeploymentService(deploymentService);
     verify(coreExtensionManager).setRepositoryService(repositoryService);
-    verify(coreExtensionManager).setToolingService(toolingService);
     verify(coreExtensionManager).setServiceRepository(serviceManager);
+    verify(coreExtensionManager).setContainerServices(anyMap());
+
     verify(coreExtensionManager).initialise();
     verify(coreExtensionManager).start();
   }

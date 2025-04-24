@@ -99,6 +99,11 @@
             <artifactId>mule-module-deployment</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-launcher</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Add logging libraries required by maven-client -->
         <dependency>

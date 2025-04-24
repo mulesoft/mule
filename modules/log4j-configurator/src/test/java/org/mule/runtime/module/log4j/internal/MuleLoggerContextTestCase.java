@@ -11,8 +11,8 @@ import static org.mule.tck.util.CollectableReference.collectedByGc;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
 
 import org.mule.functional.logging.TestAppender;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -21,8 +21,6 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.util.CollectableReference;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Appender;
@@ -31,12 +29,17 @@ import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class MuleLoggerContextTestCase extends AbstractMuleTestCase {

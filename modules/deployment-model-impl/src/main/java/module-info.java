@@ -44,12 +44,16 @@ module org.mule.runtime.deployment.model.impl {
 
   exports org.mule.runtime.module.deployment.impl.internal to
       org.mule.runtime.deployment,
-      org.mule.runtime.launcher;
+      org.mule.runtime.launcher,
+      org.mule.runtime.tooling.support,
+      org.mule.runtime.troubleshooting;
   exports org.mule.runtime.module.deployment.impl.internal.application to
       org.mule.runtime.deployment,
+      org.mule.runtime.launcher,
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.deployment.impl.internal.artifact to
       org.mule.runtime.deployment,
+      org.mule.runtime.launcher,
       org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.module.deployment.impl.internal.classloader to

@@ -20,8 +20,6 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.repository.api.RepositoryService;
-import org.mule.runtime.module.tooling.api.ToolingService;
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -94,16 +92,6 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
   }
 
   /**
-   * @param toolingService tooling service used on the container
-   * @return same builder instance
-   */
-  public T withToolingService(ToolingService toolingService) {
-    registerObject(ToolingService.class.getName(), toolingService);
-
-    return getThis();
-  }
-
-  /**
    * @param artifactClassLoaderManager tracks all the artifact classloaders created on the container
    * @return same builder instance
    */
@@ -115,12 +103,6 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
 
   public T withEventContextService(EventContextService eventContextService) {
     registerObject(EventContextService.class.getName(), eventContextService);
-
-    return getThis();
-  }
-
-  public T withTroubleshootingService(TroubleshootingService troubleshootingService) {
-    registerObject(TroubleshootingService.class.getName(), troubleshootingService);
 
     return getThis();
   }
@@ -154,7 +136,7 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
    * @param key   name of the object to be registered
    * @param value object to register
    */
-  protected final void registerObject(String key, Object value) {
+  public final void registerObject(String key, Object value) {
     if (value == null) {
       return;
     }

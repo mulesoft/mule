@@ -45,11 +45,21 @@ module org.mule.runtime.deployment {
   exports org.mule.runtime.module.deployment.internal.processor to
       org.mule.runtime.launcher;
 
-  exports org.mule.runtime.module.deployment.internal.singleapp to org.mule.runtime.launcher, spring.beans, org.mule.runtime.deployment.test;
-  exports org.mule.runtime.module.deployment.internal to org.mule.runtime.deployment.test, org.mule.runtime.launcher, spring.beans;
+  exports org.mule.runtime.module.deployment.internal.singleapp to
+      org.mule.runtime.launcher,
+      spring.beans,
+      org.mule.runtime.deployment.test;
+  exports org.mule.runtime.module.deployment.internal to
+      org.mule.runtime.deployment.test,
+      org.mule.runtime.launcher,
+      spring.beans;
 
-  opens org.mule.runtime.module.deployment.internal.singleapp to spring.core, org.mule.runtime.deployment.test;
-  opens org.mule.runtime.module.deployment.internal to org.mule.runtime.deployment.test, spring.core;
+  opens org.mule.runtime.module.deployment.internal.singleapp to
+      spring.core,
+      org.mule.runtime.deployment.test;
+  opens org.mule.runtime.module.deployment.internal to
+      org.mule.runtime.deployment.test,
+      spring.core;
 
 
 

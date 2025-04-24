@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceBuilder.deploymentServiceBuilder;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.launcher.privileged.ContainerServiceProvider.loadContainerServiceProviders;
 import static org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory.createAndInstall;
 import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.configureSelector;
 import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
@@ -59,14 +60,12 @@ import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
-import org.mule.runtime.module.tooling.api.ToolingService;
-import org.mule.runtime.module.tooling.internal.DefaultToolingService;
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
-import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingService;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.spi.LoggerContextFactory;
@@ -89,15 +88,14 @@ public class DefaultMuleContainer implements MuleContainer {
 
   protected final DeploymentService deploymentService;
   private final RepositoryService repositoryService;
-  private final ToolingService toolingService;
   private final MuleCoreExtensionManagerServer coreExtensionManager;
-  private final TroubleshootingService troubleshootingService;
   private ServerLockFactory muleLockFactory;
   private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
       .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
       .withActionOnMuleArtifactDeployment(getDefaultReconfigurationAction())
       .withAdditionalResourceDirectory("")
       .build();
+  private Map<Class, Object> containerServices = new HashMap<>();
 
   private static MuleLog4jContextFactory log4jContextFactory;
 
@@ -127,18 +125,20 @@ public class DefaultMuleContainer implements MuleContainer {
 
     this.deploymentService = resolveDeploymentService();
 
-    this.troubleshootingService = new DefaultTroubleshootingService(deploymentService);
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
-    this.toolingService = new DefaultToolingService(artifactResourcesRegistry.getDomainRepository(),
-                                                    artifactResourcesRegistry.getDomainFactory(),
-                                                    artifactResourcesRegistry.getApplicationFactory(),
-                                                    artifactResourcesRegistry.getToolingApplicationDescriptorFactory());
-    this.coreExtensionManager = new DefaultMuleCoreExtensionManagerServer(
-                                                                          new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
-                                                                              .getContainerClassLoader()),
-                                                                          new ReflectionMuleCoreExtensionDependencyResolver());
+    this.coreExtensionManager =
+        new DefaultMuleCoreExtensionManagerServer(new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
+            .getContainerClassLoader()),
+                                                  new ReflectionMuleCoreExtensionDependencyResolver());
     this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
+
+    loadContainerServiceProviders()
+        .forEach(containerServiceProvider -> {
+          setService(containerServiceProvider.getServiceInterface(),
+                     containerServiceProvider.getServiceImplementation(deploymentService,
+                                                                       artifactResourcesRegistry));
+        });
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
   }
@@ -156,9 +156,9 @@ public class DefaultMuleContainer implements MuleContainer {
    * Configure the server.
    */
   DefaultMuleContainer(DeploymentService deploymentService, RepositoryService repositoryService,
-                       ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
+                       MuleCoreExtensionManagerServer coreExtensionManager,
                        ServiceManager serviceManager, ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                       TroubleshootingService troubleshootingService)
+                       Map<Class, Object> containerServices)
       throws IllegalArgumentException, InitialisationException {
     init();
 
@@ -167,8 +167,7 @@ public class DefaultMuleContainer implements MuleContainer {
     this.repositoryService = repositoryService;
     this.serviceManager = serviceManager;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
-    this.toolingService = toolingService;
-    this.troubleshootingService = troubleshootingService;
+    this.containerServices = containerServices;
   }
 
   protected void init() throws IllegalArgumentException, InitialisationException {
@@ -220,10 +219,9 @@ public class DefaultMuleContainer implements MuleContainer {
       coreExtensionManager.setDeploymentService(deploymentService);
       coreExtensionManager.setRepositoryService(repositoryService);
       coreExtensionManager.setArtifactClassLoaderManager(artifactResourcesRegistry.getArtifactClassLoaderManager());
-      coreExtensionManager.setToolingService(toolingService);
       coreExtensionManager.setServiceRepository(serviceManager);
-      coreExtensionManager.setTroubleshootingService(troubleshootingService);
       coreExtensionManager.setServerLockFactory(muleLockFactory);
+      coreExtensionManager.setContainerServices(containerServices);
 
       // Waits for all bootstrapping configurations to be ready before progressing any further
       if (!configurationsReady.get()) {
@@ -234,7 +232,7 @@ public class DefaultMuleContainer implements MuleContainer {
 
       coreExtensionManager.initialise();
       coreExtensionManager.start();
-      toolingService.initialise();
+      initialiseIfNeeded(containerServices);
 
       startIfNeeded(extensionModelLoaderRepository);
       deploymentService.start();
@@ -337,9 +335,7 @@ public class DefaultMuleContainer implements MuleContainer {
       serviceManager.stop();
     }
 
-    if (toolingService != null) {
-      toolingService.stop();
-    }
+    stopIfNeeded(containerServices);
 
     LoggerContextFactory defaultLogManagerFactory = getFactory();
     if (defaultLogManagerFactory instanceof MuleLog4jContextFactory) {
@@ -416,6 +412,10 @@ public class DefaultMuleContainer implements MuleContainer {
    */
   public ArtifactClassLoader getContainerClassLoader() {
     return artifactResourcesRegistry.getContainerClassLoader();
+  }
+
+  public <S> void setService(Class<S> serviceInterface, S serviceInstance) {
+    containerServices.put(serviceInterface, serviceInstance);
   }
 }
 
