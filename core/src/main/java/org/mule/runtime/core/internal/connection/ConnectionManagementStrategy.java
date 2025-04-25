@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.Closeable;
  *
  * @since 1.0
  */
-abstract class ConnectionManagementStrategy<C> implements Closeable {
+public abstract class ConnectionManagementStrategy<C> implements Closeable {
 
   protected final ConnectionProvider<C> connectionProvider;
 
@@ -30,7 +30,7 @@ abstract class ConnectionManagementStrategy<C> implements Closeable {
    *
    * @param connectionProvider the {@link ConnectionProvider} which will be used to manage the connections
    */
-  ConnectionManagementStrategy(ConnectionProvider<C> connectionProvider) {
+  protected ConnectionManagementStrategy(ConnectionProvider<C> connectionProvider) {
     this.connectionProvider = connectionProvider;
   }
 
@@ -42,7 +42,7 @@ abstract class ConnectionManagementStrategy<C> implements Closeable {
    * @return a {@link ConnectionHandler}
    * @throws ConnectionException if an exception was found trying to obtain the connection
    */
-  abstract ConnectionHandler<C> getConnectionHandler() throws ConnectionException;
+  public abstract ConnectionHandler<C> getConnectionHandler() throws ConnectionException;
 
   /**
    * Closes all connections and resources allocated through {@code this} instance.

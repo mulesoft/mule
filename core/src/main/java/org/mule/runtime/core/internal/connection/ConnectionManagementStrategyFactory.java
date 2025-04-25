@@ -21,6 +21,8 @@ import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 
+import java.util.Optional;
+
 /**
  * Creates instances of {@link ConnectionManagementStrategy}
  *
@@ -30,6 +32,7 @@ final class ConnectionManagementStrategyFactory {
 
   private final PoolingProfile defaultPoolingProfile;
   private final LifecycleState deploymentLifecycleState;
+  private final Optional<XAConnectionManagementStrategyFactory> xaConnectionManagementStrategyFactory;
 
   /**
    * Creates a new instance
@@ -37,9 +40,11 @@ final class ConnectionManagementStrategyFactory {
    * @param defaultPoolingProfile the {@link PoolingProfile} that will be used to configure the pool of connections
    * @param muleContext           the owning {@link MuleContext}
    */
-  ConnectionManagementStrategyFactory(PoolingProfile defaultPoolingProfile, LifecycleState deploymentLifecycleState) {
+  ConnectionManagementStrategyFactory(PoolingProfile defaultPoolingProfile, LifecycleState deploymentLifecycleState,
+                                      Optional<XAConnectionManagementStrategyFactory> xaConnectionManagementStrategyFactory) {
     this.defaultPoolingProfile = defaultPoolingProfile;
     this.deploymentLifecycleState = deploymentLifecycleState;
+    this.xaConnectionManagementStrategyFactory = xaConnectionManagementStrategyFactory;
   }
 
   /**
