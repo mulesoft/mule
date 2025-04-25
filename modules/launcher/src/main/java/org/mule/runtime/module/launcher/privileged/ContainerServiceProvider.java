@@ -24,7 +24,7 @@ import java.util.ServiceLoader.Provider;
  */
 public interface ContainerServiceProvider<S> {
 
-  public static Collection<ContainerServiceProvider> loadContainerServiceProviders() {
+  static Collection<ContainerServiceProvider> loadContainerServiceProviders() {
     return load(ContainerServiceProvider.class, ContainerServiceProvider.class.getClassLoader())
         .stream()
         .map(Provider::get)
@@ -34,14 +34,14 @@ public interface ContainerServiceProvider<S> {
   /**
    * @return the interface that declares the functionality provided by the provided service.
    */
-  public Class<S> getServiceInterface();
+  Class<S> getServiceInterface();
 
   /**
    * @param deploymentService
    * @param artifactResourcesRegistry
    * @return the instance of the service implementation.
    */
-  public S getServiceImplementation(DeploymentService deploymentService, MuleArtifactResourcesRegistry artifactResourcesRegistry);
+  S getServiceImplementation(DeploymentService deploymentService, MuleArtifactResourcesRegistry artifactResourcesRegistry);
 
   /**
    * Injects the required dependencies into {@code forInject}.
@@ -49,6 +49,6 @@ public interface ContainerServiceProvider<S> {
    * @param extension
    * @param forInject
    */
-  public void inject(MuleCoreExtension extension, S forInject);
+  void inject(MuleCoreExtension extension, S forInject);
 
 }

@@ -14,6 +14,11 @@ import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 
+/**
+ * Registers a {@link ToolingService} as a container service.
+ * 
+ * @since 4.10
+ */
 public class ToolingSupportContainerServiceProvider implements ContainerServiceProvider<ToolingService> {
 
   @Override

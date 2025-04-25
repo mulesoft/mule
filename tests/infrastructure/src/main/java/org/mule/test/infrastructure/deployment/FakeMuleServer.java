@@ -166,7 +166,6 @@ public class FakeMuleServer {
     coreExtensionManager =
         new DefaultMuleCoreExtensionManagerServer(() -> coreExtensions, new ReflectionMuleCoreExtensionDependencyResolver());
     coreExtensionManager.setDeploymentService(deploymentService);
-    // coreExtensionManager.setToolingService(toolingService);
     coreExtensionManager.setArtifactClassLoaderManager(muleArtifactResourcesRegistry.getArtifactClassLoaderManager());
     coreExtensionManager.setRepositoryService(repositoryService);
     coreExtensionManager.setServiceRepository(serviceManager);

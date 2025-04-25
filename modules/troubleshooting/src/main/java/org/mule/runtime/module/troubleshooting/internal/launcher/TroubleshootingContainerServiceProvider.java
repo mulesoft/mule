@@ -14,6 +14,11 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingServiceAware;
 import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingService;
 
+/**
+ * Registers a {@link TroubleshootingService} as a container service.
+ * 
+ * @since 4.10
+ */
 public class TroubleshootingContainerServiceProvider implements ContainerServiceProvider<TroubleshootingService> {
 
   @Override
