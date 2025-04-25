@@ -24,7 +24,7 @@ import java.util.ServiceLoader.Provider;
  */
 public interface ContainerServiceProvider<S> {
 
-  Collection<ContainerServiceProvider> loadContainerServiceProviders() {
+  static Collection<ContainerServiceProvider> loadContainerServiceProviders() {
     return load(ContainerServiceProvider.class, ContainerServiceProvider.class.getClassLoader())
         .stream()
         .map(Provider::get)
