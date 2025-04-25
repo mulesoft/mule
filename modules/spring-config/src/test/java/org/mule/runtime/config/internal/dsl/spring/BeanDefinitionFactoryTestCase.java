@@ -11,6 +11,7 @@ import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromUndefinedSimpleAttributes;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,6 +42,7 @@ import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
+import io.qameta.allure.Issue;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.junit.Before;
@@ -50,82 +52,70 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
 public class BeanDefinitionFactoryTestCase extends AbstractMuleTestCase {
 
-  private static Field descriptorsCacheField;
-  private static PropertyUtilsBean propertyUtilsBean;
+  private static Map<?, ?> descriptorsCache;
 
-  // A test class extending ConfigurableObjectProvider
-  private Class<?> clazz = TestObjectProvider.class;
-
-  private ComponentBuildingDefinitionRegistry definitionRegistry;
-  private BeanDefinitionRegistry registry;
-  private Map<ComponentAst, SpringComponentModel> springComponentModels;
-  private ComponentAst ast;
+  private ComponentBuildingDefinition<?> buildingDefinition;
+  private BeanDefinitionRegistry beanDefinitionRegistry;
+  private ComponentAst componentAst;
 
   @BeforeClass
   public static void setUpClass() throws Exception {
-    descriptorsCacheField = PropertyUtilsBean.class.getDeclaredField("descriptorsCache");
+    Field descriptorsCacheField = PropertyUtilsBean.class.getDeclaredField("descriptorsCache");
     descriptorsCacheField.setAccessible(true);
-    propertyUtilsBean = BeanUtilsBean.getInstance().getPropertyUtils();
+    PropertyUtilsBean propertyUtilsBean = BeanUtilsBean.getInstance().getPropertyUtils();
+
+    descriptorsCache = (Map<?, ?>) descriptorsCacheField.get(propertyUtilsBean);
   }
 
   @Before
-  public void setUp() throws Exception {
-    // A mock identifier
-    ComponentIdentifier componentIdentifier = buildFromStringRepresentation("test:component");
+  public void setUp() {
+    // A mock identifier.
+    ComponentIdentifier componentIdentifier = buildFromStringRepresentation("mock:component");
 
-    // To trigger the EagerObjectCreator usage, we need a setter for an undefined simple attribute
-    SetterAttributeDefinition setterDef =
-        new SetterAttributeDefinition("undefinedSimpleAttribute", fromUndefinedSimpleAttributes().build());
+    // To trigger the EagerObjectCreator usage, we need a setter for an undefined simple attribute.
+    SetterAttributeDefinition setterDef = new SetterAttributeDefinition("attr", fromUndefinedSimpleAttributes().build());
 
-    // The mock building definition
-    ComponentBuildingDefinition<?> buildingDefinition = mock(ComponentBuildingDefinition.class);
+    // The mock building definition.
+    buildingDefinition = mock(ComponentBuildingDefinition.class);
     when(buildingDefinition.getComponentIdentifier()).thenReturn(componentIdentifier);
     when(buildingDefinition.getSetterParameterDefinitions()).thenReturn(singletonList(setterDef));
-    when(buildingDefinition.getTypeDefinition()).thenReturn(fromType(clazz));
+    when(buildingDefinition.getTypeDefinition()).thenReturn(fromType(TestObjectProvider.class));
 
-    // Create the registry containing the above definition
-    definitionRegistry = new ComponentBuildingDefinitionRegistry();
-    definitionRegistry.register(buildingDefinition);
-
-    // Create Spring component model
-    SpringComponentModel componentModel = new SpringComponentModel();
-    componentModel.setType(clazz);
+    // Create a Spring component model with the test type.
+    SpringComponentModel springComponentModel = new SpringComponentModel();
+    springComponentModel.setType(TestObjectProvider.class);
 
     // Create mock AST
-    ast = mock(ComponentAst.class);
+    componentAst = mock(ComponentAst.class);
     ComponentLocation location = mock(ComponentLocation.class);
-    when(ast.getIdentifier()).thenReturn(componentIdentifier);
-    when(ast.getMetadata()).thenReturn(EMPTY_METADATA);
-    when(ast.getLocation()).thenReturn(location);
-    componentModel.setComponent(ast);
+    when(componentAst.getIdentifier()).thenReturn(componentIdentifier);
+    when(componentAst.getMetadata()).thenReturn(EMPTY_METADATA);
+    when(componentAst.getLocation()).thenReturn(location);
+    springComponentModel.setComponent(componentAst);
 
-    registry = mock(BeanDefinitionRegistry.class);
-    springComponentModels = new HashMap<>();
+    beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
   }
 
   @Test
-  public void testEagerObjectCreation() throws Exception {
-    // Create the factory
+  @Issue("W-18350339")
+  public void testEagerObjectCreation() {
+    // Registry with only the test building definition.
+    ComponentBuildingDefinitionRegistry definitionRegistry = new ComponentBuildingDefinitionRegistry();
+    definitionRegistry.register(buildingDefinition);
+
+    // Create a factory.
     BeanDefinitionFactory factory =
         new BeanDefinitionFactory("test-artifact", definitionRegistry, false, false);
 
-    // Process the request
-    factory.resolveComponent(springComponentModels,
-                             Collections.emptyList(),
-                             ast,
-                             registry,
+    // Resolve the component for the test bean's AST.
+    factory.resolveComponent(new HashMap<>(), emptyList(), componentAst, beanDefinitionRegistry,
                              new SpringConfigurationComponentLocator());
 
-    // Check that the descriptorsCache has one entry
-    Map<?, ?> descriptorsCache = getCachedDescriptors();
-    assertThat("descriptorsCache should have the test entry", descriptorsCache, hasKey(clazz));
+    // Check that the descriptorsCache has the entry for our test class
+    assertThat("descriptorsCache should have the test entry", descriptorsCache, hasKey(TestObjectProvider.class));
 
     factory.close();
     assertThat("descriptorsCache should be empty", descriptorsCache, is(anEmptyMap()));
-  }
-
-  private static Map<?, ?> getCachedDescriptors() throws IllegalAccessException {
-    return (Map<?, ?>) descriptorsCacheField.get(propertyUtilsBean);
   }
 
   public static class TestObjectProvider implements ConfigurableObjectProvider {
