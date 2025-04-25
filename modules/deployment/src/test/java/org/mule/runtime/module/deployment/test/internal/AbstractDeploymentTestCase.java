@@ -8,7 +8,6 @@ package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.api.discoverer.ModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -173,6 +172,7 @@ import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -191,6 +191,7 @@ import java.util.function.Supplier;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.apache.logging.log4j.LogManager;
+import org.junit.AfterClass;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
 
@@ -273,6 +274,21 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static Latch undeployLatch = new Latch();
 
+  /**
+   * Disables the default cache behavior for JAR URLConnections in the JVM.
+   * <p>
+   * By default, Java URLConnections cache references to open JAR files,
+   * which can cause file locks on Windows and prevent the deletion of JAR files
+   * during artifact undeployment. Setting {@code useCaches} to {@code false}
+   * globally for the "jar" protocol avoids this problem in tests.
+   * <p>
+   * This method must be called once before running tests that create or delete JAR files dynamically.
+   */
+  @BeforeClass
+  public static void disableJarCache() {
+    JarURLConnection.setDefaultUseCaches("jar", false);
+  }
+
   @BeforeClass
   public static void beforeClass() throws IllegalAccessException {
     internalIsRunningTests =
@@ -280,7 +296,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true, true);
   }
 
-  @BeforeClass
+  @AfterClass
   public static void afterClass() throws IllegalAccessException {
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", internalIsRunningTests,
                              true);
