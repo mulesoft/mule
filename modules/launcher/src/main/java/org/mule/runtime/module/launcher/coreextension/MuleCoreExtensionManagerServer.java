@@ -52,6 +52,6 @@ public interface MuleCoreExtensionManagerServer
    *                          interface as key.
    * @since 4.10
    */
-  <S> void setContainerServices(Map<Class, Object> containerServices);
+  void setContainerServices(Map<Class, Object> containerServices);
 
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.module.launcher.privileged.ContainerServiceProvider.loadContainerServiceProviders;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -27,7 +28,6 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.deployment.internal.DeploymentListenerAdapter;
-import org.mule.runtime.module.launcher.privileged.ContainerServiceProvider;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 
@@ -148,11 +148,10 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
     for (MuleCoreExtension extension : orderedCoreExtensions) {
 
-      ContainerServiceProvider.loadContainerServiceProviders()
-          .forEach(containerServiceProvider -> {
-            final var forInject = containerServices.get(containerServiceProvider.getServiceInterface());
-            containerServiceProvider.inject(extension, forInject);
-          });
+      loadContainerServiceProviders()
+          .forEach(containerServiceProvider -> containerServiceProvider.inject(extension,
+                                                                               containerServices.get(containerServiceProvider
+                                                                                   .getServiceInterface())));
 
 
       if (extension instanceof DeploymentServiceAware) {
@@ -192,7 +191,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   }
 
   private Injector createContainerInjector() {
-    final var injectorBuilder = new ContainerInjectorBuilder()
+    final var injectorBuilder = new ContainerInjectorBuilder<>()
         .withDeploymentService(deploymentService)
         .withRepositoryService(repositoryService)
         .withServiceRepository(serviceRepository)
@@ -200,9 +199,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         .withArtifactClassLoaderManager(artifactClassLoaderManager)
         .withEventContextService(eventContextService)
         .withServerLockFactory(serverLockFactory);
-    containerServices.forEach((k, v) -> {
-      injectorBuilder.registerObject(k.getName(), v);
-    });
+    containerServices.forEach((k, v) -> injectorBuilder.registerObject(k.getName(), v));
 
     return injectorBuilder.build();
   }
@@ -238,7 +235,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   }
 
   @Override
-  public <S> void setContainerServices(Map<Class, Object> containerServices) {
+  public void setContainerServices(Map<Class, Object> containerServices) {
     this.containerServices = containerServices;
   }
 

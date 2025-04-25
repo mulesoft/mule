@@ -134,11 +134,9 @@ public class DefaultMuleContainer implements MuleContainer {
     this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
 
     loadContainerServiceProviders()
-        .forEach(containerServiceProvider -> {
-          setService(containerServiceProvider.getServiceInterface(),
+        .forEach(containerServiceProvider -> setService(containerServiceProvider.getServiceInterface(),
                      containerServiceProvider.getServiceImplementation(deploymentService,
-                                                                       artifactResourcesRegistry));
-        });
+                                                                                                          artifactResourcesRegistry)));
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
   }
