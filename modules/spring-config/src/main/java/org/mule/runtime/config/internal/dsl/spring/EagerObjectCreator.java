@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
+
 import static org.apache.commons.beanutils.BeanUtils.setProperty;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -28,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 /**
  * Creates objects form the DSL representation which are required before any other object. Such objects do not support full DI
@@ -99,5 +102,15 @@ class EagerObjectCreator extends BeanDefinitionCreator<CreateComponentBeanDefini
 
       return true;
     }).orElse(false);
+  }
+
+  /**
+   * The method {@link #handleRequest(Map, CreateComponentBeanDefinitionRequest)} uses commons-beanutils's
+   * {@link BeanUtils#setProperty}. That method introspects the bean's class and caches soft references to the methods and types
+   * from the bean. Some involved type might be loaded by a plugin's classloader, and then we need to clean those soft references
+   * when the corresponding artifact is closed/disposed to avoid classloader leaks.
+   */
+  public static void clearInternalCaches() {
+    BeanUtilsBean.getInstance().getPropertyUtils().clearDescriptors();
   }
 }
