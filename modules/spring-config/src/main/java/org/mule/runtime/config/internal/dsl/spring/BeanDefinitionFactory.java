@@ -15,6 +15,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDE
 import static org.mule.runtime.config.api.properties.PropertiesResolverUtils.loadProviderFactories;
 import static org.mule.runtime.config.internal.dsl.XmlConstants.buildRawParamKeyForDocAttribute;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
+import static org.mule.runtime.config.internal.dsl.spring.EagerObjectCreator.clearInternalCaches;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ANNOTATIONS_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.DESCRIPTION_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.DOC_DESCRIPTION_IDENTIFIER;
@@ -79,7 +80,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -206,6 +206,13 @@ public class BeanDefinitionFactory {
                                    paramsModels, registry, componentLocator,
                                    nestedComp -> resolveComponent(springComponentModels, nestedHierarchy, nestedComp,
                                                                   registry, componentLocator));
+  }
+
+  /**
+   * Disposal method to be called once it is no longer used to avoid leaks.
+   */
+  public void close() {
+    clearInternalCaches();
   }
 
   private List<SpringComponentModel> resolveParameterGroup(Map<ComponentAst, SpringComponentModel> springComponentModels,
