@@ -54,6 +54,7 @@
             --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.param=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el.function=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.processor.strategy=ALL-UNNAMED
+            --add-opens=org.apache.commons.beanutils/org.apache.commons.beanutils=org.mule.runtime.spring.config
             ${surefire.test.unit.open.args}
         </surefire.args>
 
