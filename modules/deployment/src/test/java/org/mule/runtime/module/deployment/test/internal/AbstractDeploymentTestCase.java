@@ -279,8 +279,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   /**
    * Disables the JAR URLConnection cache to imitate the behavior of the Mule runtime.
    * <p>
-   * This prevents file locking issues when JARs are dynamically loaded and deleted during tests, ensuring consistency with the
-   * runtime environment, particularly on Windows systems.
+   * The Mule Container disables JAR URL caching to avoid file locking issues (particularly on Windows systems) when loading and
+   * unloading JAR-based artifacts during deployment and undeployment operations. This method ensures tests mimic that behavior.
    */
   @BeforeClass
   public static void disableJarCache() {
