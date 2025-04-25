@@ -14,7 +14,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.troubleshooting</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <revapi.failOnUnresolvedArtifacts>false</revapi.failOnUnresolvedArtifacts>
     </properties>
 

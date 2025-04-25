@@ -13,7 +13,6 @@
 
     <properties>
         <javaModuleName>org.mule.test.allure</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

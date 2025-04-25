@@ -17,7 +17,6 @@
     <properties>
         <javaModuleName>org.mule.test.extension.localisation</javaModuleName>
         <testExtensionModelLoaderId>crafted-localisation-properties</testExtensionModelLoaderId>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

@@ -16,7 +16,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.license.api</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

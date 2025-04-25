@@ -13,10 +13,6 @@
     <packaging>pom</packaging>
     <name>Parent Pom for Mule Test Extension</name>
 
-    <properties>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-    </properties>
-
     <modules>
         <module>petstore-extension</module>
         <module>heisenberg-extension</module>
