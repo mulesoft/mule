@@ -225,6 +225,7 @@ module org.mule.runtime.core {
       org.mule.runtime.tooling.support,
       org.mule.test.unit;
   exports org.mule.runtime.core.internal.connection to
+      com.mulesoft.mule.runtime.bti,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
