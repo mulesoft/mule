@@ -28,11 +28,8 @@ import org.mule.runtime.module.extension.privileged.component.ComponentIntercept
 import org.mule.runtime.module.extension.privileged.component.DynamicallyComponent;
 import org.mule.runtime.module.extension.privileged.component.DynamicallySerializableComponent;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -138,10 +135,6 @@ public final class AnnotatedObjectInvocationHandler {
         .intercept(SuperMethodCall.INSTANCE
             .andThen(invoke(COMPONENT_ADDITIONAL_INTERCEPTOR_SET_OBJ).on(annotatedObjectAdditionalInvocationHandler).withThis()));
 
-    // Preload .class resource with caching disabled to avoid JarFile locking issues on Windows.
-    // Without this, URLClassLoader may retain open handles to the JAR, breaking deleteDirectory() in tests.
-    preloadClassResourceWithoutCaching(clazz);
-
     return builder.make().load(classLoader).getLoaded();
   }
 
@@ -159,29 +152,5 @@ public final class AnnotatedObjectInvocationHandler {
    */
   public static <T, A> T removeDynamicAnnotations(A annotated) {
     return AnnotatedObjectInvocationHandlerInterceptors.removeDynamicAnnotations(annotated);
-  }
-
-  /**
-   * Preloads the `.class` resource for the given class with caching disabled in the {@link URLConnection},
-   * to prevent the underlying {@code JarFile} from being cached and locked by the JVM.
-   * <p>
-   * This is particularly important on Windows, where open {@code JarFile}s can prevent file deletion,
-   * causing issues in test environments that rely on cleaning up deployed artifacts.
-   * </p>
-   *
-   * @param clazz the class whose `.class` resource should be preloaded without caching
-   */
-  private static void preloadClassResourceWithoutCaching(Class<?> clazz) {
-    String resourceName = clazz.getName().replace('.', '/') + ".class";
-    URL resource = clazz.getClassLoader().getResource(resourceName);
-    if (resource != null) {
-      try {
-        URLConnection conn = resource.openConnection();
-        conn.setUseCaches(false);
-        conn.getInputStream().close();
-      } catch (IOException e) {
-        LOGGER.warn("Unable to load resource " + resourceName, e);
-      }
-    }
   }
 }
