@@ -135,7 +135,7 @@ public class DefaultMuleContainer implements MuleContainer {
 
     loadContainerServiceProviders()
         .forEach(containerServiceProvider -> setService(containerServiceProvider.getServiceInterface(),
-                     containerServiceProvider.getServiceImplementation(deploymentService,
+                                                        containerServiceProvider.getServiceImplementation(deploymentService,
                                                                                                           artifactResourcesRegistry)));
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
