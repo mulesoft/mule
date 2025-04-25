@@ -35,6 +35,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -65,7 +66,10 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
   private final ReconnectionConfig defaultReconnectionConfig = defaultReconnectionConfig();
 
   @Inject
-  protected FeatureFlaggingService featureFlaggingService;
+  private Optional<XAConnectionManagementStrategyFactory> xaConnectionManagementStrategyFactory;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   /**
    * Creates a new instance
@@ -78,7 +82,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
     this.injector = muleContext.getInjector();
     this.defaultPoolingProfile = new PoolingProfile();
     this.retryPolicyTemplate = new NoRetryPolicyTemplate();
-    managementStrategyFactory = new ConnectionManagementStrategyFactory(defaultPoolingProfile, deploymentLifecycleState);
+    managementStrategyFactory = new ConnectionManagementStrategyFactory(defaultPoolingProfile, deploymentLifecycleState,
+                                                                        xaConnectionManagementStrategyFactory);
   }
 
   /**
