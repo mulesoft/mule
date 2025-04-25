@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceBuilder.deploymentServiceBuilder;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.launcher.util.JarURLConnectionUtils.disableJarURLConnectionCache;
 import static org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory.createAndInstall;
 import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.configureSelector;
 import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
@@ -172,8 +173,10 @@ public class DefaultMuleContainer implements MuleContainer {
   }
 
   protected void init() throws IllegalArgumentException, InitialisationException {
-    // set our own UrlStreamHandlerFactory to become more independent of system
-    // properties
+    // Disable JAR URLConnection caching globally to prevent file locking issues
+    disableJarURLConnectionCache();
+
+    // set our own UrlStreamHandlerFactory to become more independent of system properties
     MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
     MuleArtifactUrlStreamHandler.register();
 

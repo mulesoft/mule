@@ -277,14 +277,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static Latch undeployLatch = new Latch();
 
   /**
-   * Disables the default caching behavior for JAR URLConnections in the JVM.
+   * Disables the JAR URLConnection cache to imitate the behavior of the Mule runtime.
    * <p>
-   * By default, Java URLConnections cache references to open JAR files,
-   * which can cause file locks on Windows and prevent the deletion of JAR files
-   * during artifact undeployment. Setting {@code useCaches} to {@code false}
-   * globally for the "jar" protocol avoids this problem in tests.
-   * <p>
-   * This method must be called once before running tests that dynamically create or delete JAR files.
+   * This prevents file locking issues when JARs are dynamically loaded and deleted during tests, ensuring consistency with the
+   * runtime environment, particularly on Windows systems.
    */
   @BeforeClass
   public static void disableJarCache() {
