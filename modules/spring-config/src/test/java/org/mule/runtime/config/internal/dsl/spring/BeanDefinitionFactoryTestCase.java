@@ -98,7 +98,7 @@ public class BeanDefinitionFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-18350339")
-  public void testEagerObjectCreation() {
+  public void eagerObjectCreationPopulatesACacheThatIsClearedOnFactoryClose() {
     // Registry with only the test building definition.
     ComponentBuildingDefinitionRegistry definitionRegistry = new ComponentBuildingDefinitionRegistry();
     definitionRegistry.register(buildingDefinition);
