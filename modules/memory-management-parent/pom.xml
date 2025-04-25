@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.16-SNAPSHOT</version>
+        <version>4.6.17-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-memory-management-parent</artifactId>
     <packaging>pom</packaging>
