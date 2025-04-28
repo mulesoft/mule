@@ -8,7 +8,6 @@ package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.container.api.discoverer.ModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
@@ -173,6 +172,7 @@ import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -191,6 +191,7 @@ import java.util.function.Supplier;
 import com.github.valfirst.slf4jtest.TestLogger;
 
 import org.apache.logging.log4j.LogManager;
+import org.junit.AfterClass;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
 
@@ -269,9 +270,31 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     return asList(false, true);
   }
 
+  private static boolean jarCacheDefaultValue;
+
   private static Boolean internalIsRunningTests;
 
   protected static Latch undeployLatch = new Latch();
+
+  /**
+   * Disables the JAR URLConnection cache to imitate the behavior of the Mule runtime.
+   * <p>
+   * The Mule Container disables JAR URL caching to avoid file locking issues (particularly on Windows systems) when loading and
+   * unloading JAR-based artifacts during deployment and undeployment operations. This method ensures tests mimic that behavior.
+   */
+  @BeforeClass
+  public static void disableJarCache() {
+    jarCacheDefaultValue = JarURLConnection.getDefaultUseCaches("jar");
+    JarURLConnection.setDefaultUseCaches("jar", false);
+  }
+
+  /**
+   * Restores the default caching behavior for JAR URLConnections after tests complete.
+   */
+  @AfterClass
+  public static void restoreJarCacheDefaultValue() {
+    JarURLConnection.setDefaultUseCaches("jar", jarCacheDefaultValue);
+  }
 
   @BeforeClass
   public static void beforeClass() throws IllegalAccessException {
@@ -280,7 +303,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", true, true);
   }
 
-  @BeforeClass
+  @AfterClass
   public static void afterClass() throws IllegalAccessException {
     writeDeclaredStaticField(TestComponentBuildingDefinitionProvider.class, "internalIsRunningTests", internalIsRunningTests,
                              true);
