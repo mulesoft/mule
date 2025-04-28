@@ -5,6 +5,8 @@
  * LICENSE.txt file.
  */
 
+import org.mule.runtime.module.launcher.privileged.ContainerServiceProvider;
+
 /**
  * Mule Container Launcher module.
  * 
@@ -26,9 +28,7 @@ module org.mule.runtime.launcher {
   requires org.mule.runtime.manifest;
   requires org.mule.runtime.repository;
   requires org.mule.runtime.service;
-  requires org.mule.runtime.tooling.support;
   requires org.mule.runtime.tls;
-  requires org.mule.runtime.troubleshooting;
 
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
@@ -36,9 +36,15 @@ module org.mule.runtime.launcher {
   // Embedded uses this
   exports org.mule.runtime.module.launcher;
 
+  exports org.mule.runtime.module.launcher.privileged to
+      org.mule.runtime.tooling.support,
+      org.mule.runtime.troubleshooting;
+
   exports org.mule.runtime.module.launcher.coreextension to
       org.mule.runtime.core,
       com.mulesoft.mule.runtime.plugin;
+
+  uses ContainerServiceProvider;
 
   provides org.mule.runtime.module.boot.api.MuleContainerProvider with
       org.mule.runtime.module.launcher.LauncherMuleContainerProvider;

@@ -4,6 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+import org.mule.runtime.module.launcher.privileged.ContainerServiceProvider;
+import org.mule.runtime.module.tooling.internal.launcher.ToolingSupportContainerServiceProvider;
+
 /**
  * This modules provides a set of services for tooling applications.
  *
@@ -19,12 +23,14 @@ module org.mule.runtime.tooling.support {
   requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.container;
   requires org.mule.runtime.core;
+  requires org.mule.runtime.deployment;
   requires org.mule.runtime.deployment.model;
   requires org.mule.runtime.deployment.model.impl;
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.extensions.support;
   requires org.mule.runtime.global.config;
+  requires org.mule.runtime.launcher;
   requires org.mule.runtime.license.api;
   requires org.mule.runtime.manifest;
   requires org.mule.runtime.maven.client.api;
@@ -56,5 +62,7 @@ module org.mule.runtime.tooling.support {
       with org.mule.runtime.module.tooling.internal.dsl.model.DefaultArtifactDeclarationXmlSerializer;
   provides org.mule.runtime.config.api.dsl.model.DslElementModelFactory
       with org.mule.runtime.module.tooling.internal.dsl.model.DefaultDslElementModelFactory;
+  provides ContainerServiceProvider
+      with ToolingSupportContainerServiceProvider;
 
 }

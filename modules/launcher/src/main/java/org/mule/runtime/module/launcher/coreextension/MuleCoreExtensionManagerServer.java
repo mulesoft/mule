@@ -14,15 +14,14 @@ import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
-import org.mule.runtime.module.tooling.api.ToolingServiceAware;
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingServiceAware;
+
+import java.util.Map;
 
 /**
  * Manages lifecycle and dependency injection for {@link MuleCoreExtension}
  */
 public interface MuleCoreExtensionManagerServer
-    extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ToolingServiceAware, ArtifactClassLoaderManagerAware,
-    TroubleshootingServiceAware {
+    extends Lifecycle, DeploymentServiceAware, RepositoryServiceAware, ArtifactClassLoaderManagerAware {
 
   /**
    * Allows {@link EventContextService} injection.
@@ -45,4 +44,14 @@ public interface MuleCoreExtensionManagerServer
    * @since 4.6.0
    */
   void setServerLockFactory(ServerLockFactory serverLockFactory);
+
+  /**
+   * Allows injection of arbitrary objects.
+   * 
+   * @param containerServices the actual implementation of the ContainerServices to use for injection, with the implemented
+   *                          interface as key.
+   * @since 4.10
+   */
+  void setContainerServices(Map<Class, Object> containerServices);
+
 }

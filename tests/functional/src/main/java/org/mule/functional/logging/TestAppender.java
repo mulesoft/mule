@@ -32,7 +32,7 @@ public class TestAppender extends AbstractAppender {
   }
 
   public void ensure(Expectation... expectationsToCheck) {
-    Set s = new HashSet();
+    Set<Expectation> s = new HashSet<>();
     s.addAll(Arrays.asList(expectationsToCheck));
     ensure(s);
   }

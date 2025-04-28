@@ -8,6 +8,8 @@ package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.module.launcher.privileged.ContainerServiceProvider.loadContainerServiceProviders;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -28,13 +30,12 @@ import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.deployment.internal.DeploymentListenerAdapter;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
-import org.mule.runtime.module.tooling.api.ToolingService;
-import org.mule.runtime.module.tooling.api.ToolingServiceAware;
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -47,12 +48,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   private List<MuleCoreExtension> coreExtensions = new LinkedList<>();
   private DeploymentService deploymentService;
   private RepositoryService repositoryService;
-  private ToolingService toolingService;
   private List<MuleCoreExtension> orderedCoreExtensions;
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private ServiceRepository serviceRepository;
   private EventContextService eventContextService;
-  private TroubleshootingService troubleshootingService;
+  private Map<Class, Object> containerServices = new HashMap<>();
 
   private List<MuleCoreExtension> initializedCoreExtensions = new ArrayList<>();
   private List<MuleCoreExtension> startedCoreExtensions = new ArrayList<>();
@@ -147,16 +147,19 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
     Injector simpleRegistry = createContainerInjector();
 
     for (MuleCoreExtension extension : orderedCoreExtensions) {
+
+      loadContainerServiceProviders()
+          .forEach(containerServiceProvider -> containerServiceProvider.inject(extension,
+                                                                               containerServices.get(containerServiceProvider
+                                                                                   .getServiceInterface())));
+
+
       if (extension instanceof DeploymentServiceAware) {
         ((DeploymentServiceAware) extension).setDeploymentService(deploymentService);
       }
 
       if (extension instanceof RepositoryServiceAware) {
         ((RepositoryServiceAware) extension).setRepositoryService(repositoryService);
-      }
-
-      if (extension instanceof ToolingServiceAware) {
-        ((ToolingServiceAware) extension).setToolingService(toolingService);
       }
 
       if (extension instanceof ArtifactDeploymentListener) {
@@ -188,17 +191,17 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   }
 
   private Injector createContainerInjector() {
-    return new ContainerInjectorBuilder()
+    final var injectorBuilder = new ContainerInjectorBuilder<>()
         .withDeploymentService(deploymentService)
-        .withTroubleshootingService(troubleshootingService)
         .withRepositoryService(repositoryService)
         .withServiceRepository(serviceRepository)
         .withCoreExtensions(coreExtensions)
         .withArtifactClassLoaderManager(artifactClassLoaderManager)
         .withEventContextService(eventContextService)
-        .withToolingService(toolingService)
-        .withServerLockFactory(serverLockFactory)
-        .build();
+        .withServerLockFactory(serverLockFactory);
+    containerServices.forEach((k, v) -> injectorBuilder.registerObject(k.getName(), v));
+
+    return injectorBuilder.build();
   }
 
   @Override
@@ -209,11 +212,6 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   @Override
   public void setRepositoryService(RepositoryService repositoryService) {
     this.repositoryService = repositoryService;
-  }
-
-  @Override
-  public void setToolingService(ToolingService toolingService) {
-    this.toolingService = toolingService;
   }
 
   @Override
@@ -232,13 +230,13 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   }
 
   @Override
-  public void setTroubleshootingService(TroubleshootingService troubleshootingService) {
-    this.troubleshootingService = troubleshootingService;
+  public void setServerLockFactory(ServerLockFactory serverLockFactory) {
+    this.serverLockFactory = serverLockFactory;
   }
 
   @Override
-  public void setServerLockFactory(ServerLockFactory serverLockFactory) {
-    this.serverLockFactory = serverLockFactory;
+  public void setContainerServices(Map<Class, Object> containerServices) {
+    this.containerServices = containerServices;
   }
 
   /**
