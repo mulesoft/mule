@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
+import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderBuilder;
 
 /**
@@ -19,4 +20,11 @@ public interface PolicyTemplateClassLoaderBuilderFactory {
    * @return a new builder instance.
    */
   PolicyTemplateClassLoaderBuilder createArtifactClassLoaderBuilder();
+
+  /**
+   * Retrieves the filtering container class loader.
+   *
+   * @return The filtering container class loader.
+   */
+  FilteringContainerClassLoader getFilteringContainerClassLoader();
 }
