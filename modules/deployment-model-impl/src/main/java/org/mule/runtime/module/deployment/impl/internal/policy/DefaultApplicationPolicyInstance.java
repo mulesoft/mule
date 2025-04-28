@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
@@ -38,6 +39,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProce
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplate;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
@@ -112,8 +114,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
             .setArtifactPlugins(getFeatureFlaggedArtifactPlugins(template.getDescriptor()))
             .setParentArtifact(application)
             .setExtensionManagerFactory(new PolicyExtensionManagerFactory(application, template, extensionModelLoaderRepository,
-                                                                          isFeatureEnabled(ENABLE_POLICY_ISOLATION,
-                                                                                           template.getDescriptor())))
+                                                                          isPolicyIsolationEnabled(template.getDescriptor())))
             .setMuleContextListener(muleContextListener)
             .setArtifactCoordinates(template.getDescriptor().getBundleDescriptor())
             .setMemoryManagementService(new ArtifactMemoryManagementService(DefaultMemoryManagementService.getInstance()));
@@ -136,13 +137,18 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
     }
   }
 
+  private boolean isPolicyIsolationEnabled(PolicyTemplateDescriptor descriptor) {
+    return isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) &&
+        isFeatureEnabled(SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION, descriptor);
+  }
+
   /**
    * Applies the {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature to the policy artifact plugins list.
    *
    * @return The policy artifact plugins.
    */
   private List<ArtifactPlugin> getFeatureFlaggedArtifactPlugins(ArtifactDescriptor policyArtifactDescriptor) {
-    if (isFeatureEnabled(ENABLE_POLICY_ISOLATION, policyArtifactDescriptor)) {
+    if (isPolicyIsolationEnabled((PolicyTemplateDescriptor) policyArtifactDescriptor)) {
       // Returns all the artifact plugins that the policy depends on.
       return template.getOwnArtifactPlugins();
     } else {
