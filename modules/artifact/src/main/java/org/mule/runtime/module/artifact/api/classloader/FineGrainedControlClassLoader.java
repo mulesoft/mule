@@ -43,6 +43,11 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
   static {
     registerAsParallelCapable();
+
+    // Disables the default caching behavior of {@link JarURLConnection} for the "jar" protocol.
+    // By default, Java caches open JAR file handles when resolving resources via {@link JarURLConnection}. This can cause file
+    // locking issues, especially on Windows platforms, preventing the deletion or modification of JAR files during the
+    // un-deployment of applications or extensions.
     setDefaultUseCaches("jar", false);
   }
 
