@@ -44,7 +44,7 @@ public class ByteBuddySpringCacheInstrumentator {
   /**
    * Instrument Spring ConcurrentReferenceHashMap cache instances in order to register them into a
    * {@link ByteBuddySpringCachesManager} that offers a cache cleanup feature.
-   * 
+   *
    * @see ByteBuddySpringCachesManager#clearCaches()
    */
   public static void instrumentSpringCachesForCleanup() {

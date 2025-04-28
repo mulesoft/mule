@@ -19,7 +19,6 @@
     <properties>
         <javaModuleName>org.mule.test.extension.heisenberg</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

@@ -20,7 +20,6 @@
             ${surefire.args.base}
         </surefire.args>
         
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <javaModuleName>org.mule.runtime.metrics.exporter.impl</javaModuleName>
     </properties>
 

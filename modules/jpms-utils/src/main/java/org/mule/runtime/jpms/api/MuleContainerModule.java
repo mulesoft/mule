@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * Defines a module on the Mule container
- * 
+ *
  * @since 4.6 (extracted from org.mule.runtime.container.api.MuleModule)
  */
 public interface MuleContainerModule {

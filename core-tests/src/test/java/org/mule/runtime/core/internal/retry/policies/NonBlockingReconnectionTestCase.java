@@ -71,7 +71,7 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
                                                  e -> exhausted.set(true),
                                                  identity(),
                                                  retryScheduler))
-                                                     .block();
+        .block();
 
     assertThat(value, is(1));
     assertNoRetry();
@@ -104,7 +104,7 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
                                                  e -> exhausted.set(true),
                                                  identity(),
                                                  retryScheduler))
-                                                     .block();
+        .block();
 
     assertThat(value, is(RETRIES + 1));
     assertRetry();
@@ -128,7 +128,7 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
                                    e -> exhausted.set(true),
                                    identity(),
                                    retryScheduler))
-                                       .block();
+          .block();
     } catch (Exception e) {
       assertThat(e, instanceOf(IllegalArgumentException.class));
 
@@ -152,7 +152,7 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
                                    e -> exhausted.set(true),
                                    ConnectionException::new,
                                    retryScheduler))
-                                       .block();
+          .block();
     } catch (Throwable e) {
       e = unwrap(e);
       assertThat(e, instanceOf(ConnectionException.class));
@@ -178,7 +178,7 @@ public class NonBlockingReconnectionTestCase extends AbstractMuleContextTestCase
                                    e -> exhausted.set(true),
                                    identity(),
                                    retryScheduler))
-                                       .block();
+          .block();
     } catch (Exception e) {
       assertThat(e, instanceOf(IllegalArgumentException.class));
 

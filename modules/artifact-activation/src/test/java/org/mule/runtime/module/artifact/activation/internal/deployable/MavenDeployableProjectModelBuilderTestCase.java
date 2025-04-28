@@ -118,7 +118,8 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     DeployableProjectModel refreshedDeployableProjectModel =
         forMavenRefreshProject(deployableProjectModel.getProjectStructure().get(), deployableProjectModel.getDescriptor(), false,
                                deployableProjectModel.getDependencies(), deployableProjectModel.getSharedLibraries(),
-                               deployableProjectModel.getAdditionalPluginDependencies()).build();
+                               deployableProjectModel.getAdditionalPluginDependencies())
+            .build();
     validateBasicProjectModel(refreshedDeployableProjectModel);
   }
 
@@ -129,7 +130,8 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     DeployableProjectModel refreshedDeployableProjectModel =
         forMavenRefreshProject(deployableProjectModel.getProjectStructure().get(), deployableProjectModel.getDescriptor(), false,
                                deployableProjectModel.getDependencies(), deployableProjectModel.getSharedLibraries(),
-                               deployableProjectModel.getAdditionalPluginDependencies(), null).build();
+                               deployableProjectModel.getAdditionalPluginDependencies(), null)
+            .build();
     validateBasicProjectModel(refreshedDeployableProjectModel);
   }
 
@@ -350,7 +352,7 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     DeployableProjectModel model =
         new MavenDeployableProjectModelBuilder(getDeployableFolder(deployablePath),
                                                exportAllResourcesAndPackagesIfEmptyLoaderDescriptor, includeTestDependencies)
-                                                   .build();
+            .build();
 
     model.validate();
 

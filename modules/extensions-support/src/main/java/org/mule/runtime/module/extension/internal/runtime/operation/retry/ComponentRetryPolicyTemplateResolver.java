@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 /**
  * Resolves a retry policy template for a component processor. If the component processor has a retry policy template (for example
  * if it is overridden in the operation), it returns it. Otherwise it retrieves the policy template from the operation.
- * 
+ *
  * @since 4.4.0, 4.3.1
  */
 public class ComponentRetryPolicyTemplateResolver implements RetryPolicyTemplateResolver {

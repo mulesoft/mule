@@ -57,7 +57,8 @@ public class OperationDoesNotHaveApikitConsoleTestCase extends AbstractCoreValid
   @Description("Checks that no validation message is returned if there is no operation")
   public void withoutOperation() {
     final Optional<ValidationResultItem> msg = runValidation("OperationDoesNotHaveApikitConsoleTestCase#withoutOperation",
-                                                             XML_NAMESPACE_DEF + XML_CLOSE).stream().findFirst();
+                                                             XML_NAMESPACE_DEF + XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -72,7 +73,8 @@ public class OperationDoesNotHaveApikitConsoleTestCase extends AbstractCoreValid
                           "        <logger />" +
                           "    </operation:body>" +
                           "</operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -84,7 +86,8 @@ public class OperationDoesNotHaveApikitConsoleTestCase extends AbstractCoreValid
                                                                  "<flow name=\"someFlow\">" +
                                                                  "    <apikit:console config-ref=\"console-config\" />" +
                                                                  "</flow>" +
-                                                                 XML_CLOSE).stream().findFirst();
+                                                                 XML_CLOSE)
+        .stream().findFirst();
     assertThat(msg, is(empty()));
   }
 
@@ -99,7 +102,8 @@ public class OperationDoesNotHaveApikitConsoleTestCase extends AbstractCoreValid
                           "        <apikit:console config-ref=\"console-config\" />" +
                           "    </operation:body>" +
                           "</operation:def>" +
-                          XML_CLOSE).stream().findFirst();
+                          XML_CLOSE)
+            .stream().findFirst();
     assertThat(msg, is(not(empty())));
     assertThat(msg.get().getMessage(),
                containsString("Usages of the component 'apikit:console' are not allowed inside a Mule SDK Operation Definition"));

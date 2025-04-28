@@ -14,7 +14,7 @@ import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 /**
  * Provides utilities for creating multi-parent/composite classloaders.
- * 
+ *
  * @since 4.5
  */
 public class MultiParentClassLoaderUtils {
@@ -44,7 +44,7 @@ public class MultiParentClassLoaderUtils {
    * If {@code deploymentClassLoader} is the container classlaoder, the container classlaoder will be returned.
    * <p>
    * If this is called more than once the same classloader, the same instance will be returned.
-   * 
+   *
    * @param deploymentClassLoader a classloader that has visibility on classes specific for a deployment.
    * @return a classloader with visibility on the Mule Container classloader and {@code deploymentClassLoader}.
    */

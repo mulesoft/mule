@@ -20,7 +20,7 @@ public interface MuleTogglzFeatureScope {
 
   /**
    * The scope type.
-   * 
+   *
    * @see MuleTogglzFeatureScopeType
    *
    * @return the scope type

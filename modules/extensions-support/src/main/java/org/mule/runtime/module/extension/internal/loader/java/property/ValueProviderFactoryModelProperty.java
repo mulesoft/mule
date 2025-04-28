@@ -61,7 +61,7 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   /**
    * Creates a new builder to be able to easily build a {@link ValueProviderFactoryModelProperty}
-   * 
+   *
    * @param valuesProvider the {@link Class} of a {@link ValueProvider} implementation
    *
    * @return a new {@link ValueProviderFactoryModelPropertyBuilder}

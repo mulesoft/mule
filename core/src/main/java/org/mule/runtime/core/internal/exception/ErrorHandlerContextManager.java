@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  * Manages context information. If present, an instance of this class is stored as an {@link InternalEvent} internal parameter,
  * under the {@link ErrorHandlerContextManager#ERROR_HANDLER_CONTEXT} key. It's {@link ErrorHandlerContext} instances are created
  * and used by OnError handlers when handling a {@link MessagingException}.
- * 
+ *
  * @see org.mule.runtime.core.api.exception.FlowExceptionHandler
  * @see org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler
  * @since 4.3.0
@@ -33,7 +33,7 @@ public class ErrorHandlerContextManager {
 
   /**
    * The key used to store a {@link ErrorHandlerContextManager} as an {@link InternalEvent} internal parameter.
-   * 
+   *
    * @see InternalEvent#getInternalParameter(String)
    */
   public static final String ERROR_HANDLER_CONTEXT = "error.context";
@@ -41,7 +41,7 @@ public class ErrorHandlerContextManager {
 
   /**
    * Extracts an {@link ErrorHandlerContextManager} instance from the given {@link CoreEvent}.
-   * 
+   *
    * @param event The given {@link CoreEvent}.
    * @return an {@link ErrorHandlerContextManager} or {@code null} if none was set on the event.
    */
@@ -52,7 +52,7 @@ public class ErrorHandlerContextManager {
   /**
    * <p>
    * Used by OnError handlers to obtain it's current {@link ErrorHandlerContext}.
-   * 
+   *
    * @param handler   The onError handler making this call.
    *                  </p>
    *                  <p>
@@ -68,7 +68,7 @@ public class ErrorHandlerContextManager {
 
   /**
    * Used by OnError handlers to store its {@link ErrorHandlerContext} when handling a {@link MessagingException}.
-   * 
+   *
    * @param handler         The OnError handler invoking this method.
    * @param exception       The {@link MessagingException} being handled.
    * @param successCallback Callback that will be invoked if the exception is successfully handled by the OnError handler.
@@ -99,7 +99,7 @@ public class ErrorHandlerContextManager {
    * <p>
    * Note that {@link #addContext(FlowExceptionHandler, MessagingException, Consumer, Consumer)} must be previously invoked.
    * </p>
-   * 
+   *
    * @param handler The OnErrorHandler invoking this method.
    * @param result  The {@link CoreEvent} resulting from the handling.
    */
@@ -128,7 +128,7 @@ public class ErrorHandlerContextManager {
    * <p>
    * Note that {@link #addContext(FlowExceptionHandler, MessagingException, Consumer, Consumer)} must be previously invoked.
    * </p>
-   * 
+   *
    * @param handler   The On Error handler invoking this method.
    * @param exception The {@link MessagingException} resultant from the handling attempt.
    */
@@ -153,7 +153,7 @@ public class ErrorHandlerContextManager {
   /**
    * Constructs the key that will be used to store a {@link ErrorHandlerContextManager} instance as an {@link CoreEvent} internal
    * parameter.
-   * 
+   *
    * @param event   The {@link CoreEvent} where the {@link ErrorHandlerContextManager} instance will be stored.
    * @param handler The OnError handler requesting an {@link ErrorHandlerContext} storage.
    * @return The key that will be used to store a {@link ErrorHandlerContextManager} instance.

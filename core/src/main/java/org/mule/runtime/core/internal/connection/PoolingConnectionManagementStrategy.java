@@ -54,7 +54,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param connectionProvider     the {@link ConnectionProvider} used to manage the connections
    * @param poolingProfile         the {@link PoolingProfile} which configures the {@link #pool}
    * @param poolingListener        a {@link PoolingListener}

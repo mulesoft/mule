@@ -20,7 +20,6 @@
         <!-- because this module requires transitive org.apache.logging.log4j -->
         <revapi.checkDependencies>true</revapi.checkDependencies>
         <mule.module.maven.plugin.fillOptionalPackages>true</mule.module.maven.plugin.fillOptionalPackages>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

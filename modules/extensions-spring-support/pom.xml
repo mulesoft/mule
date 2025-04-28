@@ -29,7 +29,6 @@
 
         <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <mule.runtime.version>${project.version}</mule.runtime.version>
     </properties>
 

@@ -26,13 +26,13 @@ import org.junit.runners.parameterized.TestWithParameters;
  * valid when a flaky test fails on the continuous integration server but not locally.
  * <p>
  * To use this tool annotate the @{@link Parameterized} test class with
- * 
+ *
  * <pre>
  *         &#64;UseParametersRunnerFactory(FlakinessDetectorTestRunnerWithParametersFactory.class)
  * </pre>
  *
  * And then annotate the flaky test class or flaky test method with
- * 
+ *
  * <pre>
  *         &#64;FlakyTest(times= n) // where n is the number of times you want the test executed
  * </pre>

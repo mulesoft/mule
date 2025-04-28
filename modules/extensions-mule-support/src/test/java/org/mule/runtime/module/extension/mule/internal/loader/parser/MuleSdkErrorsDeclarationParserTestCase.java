@@ -220,7 +220,7 @@ public class MuleSdkErrorsDeclarationParserTestCase extends AbstractMuleTestCase
     when(errorsComponentAst.getIdentifier()).thenReturn(MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_IDENTIFIER);
     when(errorsComponentAst.directChildrenStreamByIdentifier(MULE_SDK_EXTENSION_DSL_NAMESPACE,
                                                              MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME))
-                                                                 .thenReturn(Stream.of(errorsAsts));
+        .thenReturn(Stream.of(errorsAsts));
 
     // Control check: it is important that the "other" component's identifier does not match the errors component's
     assertThat(errorsComponentAst.getIdentifier().equals(someOtherComponentAst.getIdentifier()), is(false));

@@ -14,7 +14,7 @@ import org.mule.runtime.http.api.sse.ServerSentEvent;
  * An observer of server-sent events.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
- * 
+ *
  * @since 4.9.3, 4.10.0
  */
 @Experimental
@@ -23,7 +23,7 @@ public interface SseListener {
 
   /**
    * Method to be invoked for each received {@link ServerSentEvent}.
-   * 
+   *
    * @param event the received event.
    */
   void onEvent(ServerSentEvent event);

@@ -58,7 +58,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
 
   /**
    * Default method used in other sorters to resolve bean dependencies
-   * 
+   *
    * @param beanName the name of the bean to resolve dependencies
    * @return
    */
@@ -82,7 +82,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
 
   /**
    * Provides only direct dependencies/required components for the object provided
-   * 
+   *
    * @return direct children(required components) of the current object If the component is already visited for the current
    *         bucket, we don't need to get dependencies again, return emptyList If the component is already visited for any other
    *         buckets, but not for this bucket, return the dependencies already saved If it was never visited before, get direct
@@ -147,7 +147,7 @@ public class DependencyGraphBeanDependencyResolver implements BeanDependencyReso
 
   /**
    * Delegates the task to the three different resolvers
-   * 
+   *
    * @param beanName      current object(bean)'s name
    * @param object        current object
    * @param node          a node for the current objects to add direct children

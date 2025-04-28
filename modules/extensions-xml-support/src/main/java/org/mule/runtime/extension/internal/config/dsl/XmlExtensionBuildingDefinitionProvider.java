@@ -132,7 +132,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
                                            fromMultipleDefinitions(paramsDefinitions
                                                .toArray(
                                                         new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
-                                                            .build())
+                                               .build())
             .build());
       }
 
@@ -171,7 +171,7 @@ public class XmlExtensionBuildingDefinitionProvider implements ExtensionBuilding
                                        fromMultipleDefinitions(paramsDefinitions
                                            .toArray(
                                                     new KeyAttributeDefinitionPair[paramsDefinitions.size()]))
-                                                        .build())
+                                           .build())
         .withSetterParameterDefinition("extensionModel", fromFixedValue(extensionModel).build())
         .withSetterParameterDefinition("operationModel", fromFixedValue(operationModel).build())
         .withSetterParameterDefinition(MESSAGE_PROCESSORS,

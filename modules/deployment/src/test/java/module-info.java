@@ -38,7 +38,7 @@ open module org.mule.runtime.deployment.test {
   requires org.mule.runtime.spring.config;
   requires org.mule.sdk.api;
   requires org.mule.runtime.jpms.utils;
-  
+
   requires org.mule.runtime.service;
   requires org.mule.runtime.extensions.xml.support;
   requires org.mule.runtime.license.api;

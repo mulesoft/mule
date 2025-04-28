@@ -36,7 +36,7 @@ import java.util.function.BiFunction;
 /**
  * {@link ExtensionManagerFactory} that defers the decision of the {@link ExtensionManager} implementation until the MuleContext
  * is available, in order to apply the {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature flag.
- * 
+ *
  * @since 4.5
  */
 class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
@@ -108,7 +108,7 @@ class PolicyExtensionManagerFactory implements ExtensionManagerFactory {
   /**
    * HTTP and Sockets extension models must be added if found in the parent artifact extensions (backward compatibility for API
    * Gateway).
-   * 
+   *
    * @return Set containing the parent artifact HTTP and Sockets extension models (if present).
    */
   private Set<ExtensionModel> getInheritedExtensionModels() {

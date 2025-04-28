@@ -68,9 +68,9 @@ public final class JavaStereotypeModelParserUtils {
                                                                           value -> value.getClassValue(Stereotype::value),
                                                                           value -> value
                                                                               .getClassValue(org.mule.sdk.api.annotation.param.stereotype.Stereotype::value))
-                                                                                  .flatMap(type -> type.getDeclaringClass())
-                                                                                  .map(SdkStereotypeDefinitionAdapter::from)
-                                                                                  .orElse(null);
+        .flatMap(type -> type.getDeclaringClass())
+        .map(SdkStereotypeDefinitionAdapter::from)
+        .orElse(null);
 
     if (isValidator(annotatedElement)) {
       if (stereotypeDefinition != null) {
@@ -125,8 +125,8 @@ public final class JavaStereotypeModelParserUtils {
                   getAllowedTypeStream(element,
                                        org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes.class,
                                        org.mule.sdk.api.annotation.param.stereotype.AllowedStereotypes::value))
-                                           .map(type -> factory.createStereotype(from(type.getDeclaringClass().get())))
-                                           .collect(toList());
+        .map(type -> factory.createStereotype(from(type.getDeclaringClass().get())))
+        .collect(toList());
   }
 
   /**

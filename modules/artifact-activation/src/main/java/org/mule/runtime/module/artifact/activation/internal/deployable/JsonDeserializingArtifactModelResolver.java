@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 
 /**
  * Defines a template method for loading deployableModels for different kinds of deployable artifacts.
- * 
+ *
  * @param <M> the concrete type of model to resolve
  */
 public final class JsonDeserializingArtifactModelResolver<M extends MuleDeployableModel>

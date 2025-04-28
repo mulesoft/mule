@@ -104,7 +104,7 @@ public final class ChainErrorHandlingUtils {
 
   /**
    * Finds or Creates an {@link Error} based on a provided {@link EventProcessingException}.
-   * 
+   *
    * @param exception        Provided {@link EventProcessingException}.
    * @param errorTypeLocator An error type locator that will be used to infer the {@link Error#getErrorType()} value if the
    *                         provided {@link EventProcessingException} does not declare it.

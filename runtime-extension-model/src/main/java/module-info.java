@@ -10,7 +10,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
  * Extension model for the core Mule Runtime components.
  *
  * @provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider
- * 
+ *
  * @moduleGraph
  * @since 4.5
  */
@@ -34,7 +34,7 @@ module org.mule.runtime.extension.model {
   requires transitive org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.dependency.graph;
   requires org.mule.runtime.errors;
-  
+
   requires com.google.common;
   requires com.google.gson;
   requires org.apache.commons.lang3;

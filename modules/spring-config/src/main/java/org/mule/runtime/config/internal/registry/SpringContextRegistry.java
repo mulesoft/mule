@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * Registry that wraps a Spring {@link ApplicationContext}.
- * 
+ *
  * @since 4.5
  */
 public interface SpringContextRegistry extends Registry {

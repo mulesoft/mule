@@ -11,7 +11,7 @@ import java.util.Properties;
 
 /**
  * Describes an artifact that is deployable on the container
- * 
+ *
  * @deprecated From 4.5, use org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor instead.
  */
 @Deprecated

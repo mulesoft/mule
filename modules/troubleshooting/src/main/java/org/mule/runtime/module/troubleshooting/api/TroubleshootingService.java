@@ -54,14 +54,14 @@ public interface TroubleshootingService {
 
   /**
    * Registers a new {@link TroubleshootingOperation}.
-   * 
+   *
    * @param operation the operation to be registered.
    */
   void registerOperation(TroubleshootingOperation operation);
 
   /**
    * Unregisters a new {@link TroubleshootingOperation}.
-   * 
+   *
    * @param name the name of the operation to be registered.
    */
   void unregisterOperation(String name);

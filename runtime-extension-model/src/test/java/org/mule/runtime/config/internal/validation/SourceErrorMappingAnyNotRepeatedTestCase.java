@@ -65,7 +65,7 @@ public class SourceErrorMappingAnyNotRepeatedTestCase extends AbstractCoreValida
                           "    </flow>\n" +
                           "\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Only one mapping for 'ANY' or an empty source type is allowed."));

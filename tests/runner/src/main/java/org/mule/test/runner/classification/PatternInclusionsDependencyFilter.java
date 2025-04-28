@@ -15,7 +15,7 @@ import java.util.Collection;
  * classifier attribute.
  * <p/>
  * Format for inclusions is:
- * 
+ *
  * <pre>
  * [groupId]:[artifactId]:[extension]:[classifier]:[version]
  * </pre>

@@ -126,7 +126,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
     return new UntilSuccessfulRouter(this, publisher, nestedChain, processingStrategy, expressionManager, shouldRetry, timer,
                                      maxRetries, millisBetweenRetries, suppressErrors)
-                                         .getDownstreamPublisher();
+        .getDownstreamPublisher();
   }
 
 

@@ -38,7 +38,7 @@ public class ContextSelectorWrapper implements ContextSelector {
 
   /**
    * Changes the delegate.
-   * 
+   *
    * @param delegate         the new delegate {@link ContextSelector}.
    * @param delegateDisposer a callback used to dispose the delegate.
    */

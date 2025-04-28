@@ -25,7 +25,6 @@
 
         <javaModuleName>org.mule.runtime.extensions.mule.support</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <!-- prevent error with transitive dependency on mule-api -->
         <revapi.checkDependencies>true</revapi.checkDependencies>
     </properties>

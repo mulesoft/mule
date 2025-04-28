@@ -10,7 +10,7 @@ import org.mule.runtime.core.internal.registry.Registry;
 
 /**
  * An object processor that will get called during the inject phase
- * 
+ *
  * @deprecated as of 3.7.0 since these are only used by {@link Registry} which is also deprecated. Use post processors for
  *             currently supported registries instead
  */

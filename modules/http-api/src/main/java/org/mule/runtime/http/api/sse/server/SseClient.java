@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * Server-side abstraction of a connected client.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
- * 
+ *
  * @since 4.9.3, 4.10.0
  */
 @Experimental

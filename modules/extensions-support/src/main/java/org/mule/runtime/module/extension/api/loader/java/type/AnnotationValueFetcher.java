@@ -29,7 +29,7 @@ public interface AnnotationValueFetcher<A extends Annotation> {
 
   /**
    * Returns a {@link List} of {@link E} values of an {@link Annotation} property
-   * 
+   *
    * @param function A function which executes the logic of retrieving the property value.
    * @param <E>      The array type.
    * @return The list with the values
@@ -92,7 +92,7 @@ public interface AnnotationValueFetcher<A extends Annotation> {
 
   /**
    * Returns a {@link AnnotationValueFetcher} from an {@link Annotation} inside the current {@link Annotation}
-   * 
+   *
    * @param function A function which executes the logic of retrieving the property value.
    * @param <E>      The {@link Annotation} type
    * @return The {@link AnnotationValueFetcher} wrapping the inner annotation
@@ -101,7 +101,7 @@ public interface AnnotationValueFetcher<A extends Annotation> {
 
   /**
    * Returns a list of {@link AnnotationValueFetcher} from an {@link Annotation} inside the current {@link Annotation}
-   * 
+   *
    * @param function A function which executes the logic of retrieving the property value.
    * @param <E>      The {@link Annotation} type
    * @return The list {@link AnnotationValueFetcher} wrapping the inner annotations

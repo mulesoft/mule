@@ -33,14 +33,14 @@ public interface ErrorMetrics {
 
   /**
    * Measures an {@link Error}.
-   * 
+   *
    * @param value An {@link Error} to be measured.
    */
   void measure(Error value);
 
   /**
    * Measures a {@link Throwable}. Strictly avoid calling this method when {@link #measure(Error)} is an option.
-   * 
+   *
    * @param value An {@link Error} to be measured.
    */
   void measure(Throwable value);

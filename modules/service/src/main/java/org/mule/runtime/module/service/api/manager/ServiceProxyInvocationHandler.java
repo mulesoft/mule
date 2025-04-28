@@ -13,7 +13,7 @@ import java.lang.reflect.Proxy;
 
 /**
  * Provides access to the actual service wrapped within a {@link Proxy}.
- * 
+ *
  * @since 4.5
  */
 public interface ServiceProxyInvocationHandler extends InvocationHandler {

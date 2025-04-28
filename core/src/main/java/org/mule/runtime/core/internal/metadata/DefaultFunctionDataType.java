@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.metadata;
 
 /**
  * This is kept for backwards compatibility with persistent serialized data.
- * 
+ *
  * @since 4.0
  */
 public class DefaultFunctionDataType extends org.mule.runtime.core.privileged.metadata.DefaultFunctionDataType {

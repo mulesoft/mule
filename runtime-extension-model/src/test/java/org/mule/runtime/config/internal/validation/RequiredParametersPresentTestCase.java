@@ -53,7 +53,7 @@ public class RequiredParametersPresentTestCase extends AbstractCoreValidationTes
                                                                  "    </flow>\n" +
                                                                  "    \n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString(format("Element <flow-ref> is missing required parameter 'name'.")));
@@ -76,7 +76,7 @@ public class RequiredParametersPresentTestCase extends AbstractCoreValidationTes
                           "    <test:other-config name=\"cfg\" count=\"${other.count}\"/>\n" +
                           "\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.map(r -> r.getMessage()).orElse(null), msg.isPresent(), is(false));
   }

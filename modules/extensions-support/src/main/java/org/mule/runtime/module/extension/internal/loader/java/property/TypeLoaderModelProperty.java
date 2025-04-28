@@ -13,7 +13,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 /**
  * Provides access to the same {@link ClassTypeLoader} used when loading the extension when using the {@link ExtensionModel} at a
  * later time.
- * 
+ *
  * @since 4.9
  */
 public class TypeLoaderModelProperty implements ModelProperty {

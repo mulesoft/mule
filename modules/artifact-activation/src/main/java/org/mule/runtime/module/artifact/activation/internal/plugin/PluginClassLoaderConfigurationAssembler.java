@@ -60,7 +60,7 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
 
     Collection<PluginPatchesResolver> resolverRegistered = stream(((Iterable<PluginPatchesResolver>) () -> ServiceLoader
         .load(PluginPatchesResolver.class, this.getClass().getClassLoader()).iterator()).spliterator(), false)
-            .collect(toList());
+        .collect(toList());
     if (resolverRegistered.size() > 1) {
       throw new MuleRuntimeException(
                                      createStaticMessage("There is more than 1 PluginPatchesResolver implementation registered: "
@@ -94,21 +94,21 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
               && !bundleDependency.getAdditionalDependenciesList().isEmpty())
           .forEach(bundleDependency -> processPluginAdditionalDependenciesURIs(bundleDependency,
                                                                                classLoaderConfigurationBuilder)
-                                                                                   .forEach(uri -> {
-                                                                                     final URL dependencyArtifactUrl;
-                                                                                     try {
-                                                                                       dependencyArtifactUrl = uri.toURL();
-                                                                                     } catch (MalformedURLException e) {
-                                                                                       throw new ArtifactActivationException(createStaticMessage(format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
-                                                                                                                                                        PluginClassLoaderConfigurationAssembler.this.bundleDependency
-                                                                                                                                                            .getDescriptor()
-                                                                                                                                                            .getArtifactFileName(),
-                                                                                                                                                        uri)),
-                                                                                                                             e);
-                                                                                     }
-                                                                                     dependenciesArtifactsUrls
-                                                                                         .add(dependencyArtifactUrl);
-                                                                                   }));
+              .forEach(uri -> {
+                final URL dependencyArtifactUrl;
+                try {
+                  dependencyArtifactUrl = uri.toURL();
+                } catch (MalformedURLException e) {
+                  throw new ArtifactActivationException(createStaticMessage(format("There was an exception obtaining the URL for the artifact [%s], file [%s]",
+                                                                                   PluginClassLoaderConfigurationAssembler.this.bundleDependency
+                                                                                       .getDescriptor()
+                                                                                       .getArtifactFileName(),
+                                                                                   uri)),
+                                                        e);
+                }
+                dependenciesArtifactsUrls
+                    .add(dependencyArtifactUrl);
+              }));
     }
 
     return dependenciesArtifactsUrls;

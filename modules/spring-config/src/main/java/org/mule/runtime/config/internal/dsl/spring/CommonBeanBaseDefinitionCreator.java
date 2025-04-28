@@ -125,9 +125,9 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(objectFactoryType, componentModel.getType()))
-            .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
-            .addPropertyValue(IS_PROTOTYPE, componentBuildingDefinition.isPrototype())
-            .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()));
+        .addPropertyValue(IS_SINGLETON, !componentBuildingDefinition.isPrototype())
+        .addPropertyValue(IS_PROTOTYPE, componentBuildingDefinition.isPrototype())
+        .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> !componentModel.getBeanDefinition().isLazyInit()));
 
   }
 
@@ -142,7 +142,7 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
                                                            final BeanDefinitionBuilderHelper beanDefinitionBuilderHelper) {
     new ComponentConfigurationBuilder<>(springComponentModels, ownerComponent, componentModel, createBeanDefinitionRequest,
                                         beanDefinitionBuilderHelper, disableTrimWhitespaces)
-                                            .processConfiguration();
+        .processConfiguration();
 
   }
 

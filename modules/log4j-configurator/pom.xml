@@ -23,7 +23,6 @@
 
         <javaModuleName>org.mule.runtime.log4j</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

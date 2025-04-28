@@ -16,12 +16,12 @@ import java.io.IOException;
  * Configure indirect key stores. TLS/SSL connections are made on behalf of an entity, which can be anonymous or identified by a
  * certificate - this interface specifies how a keystore can be used to provide the certificates (and associated private keys)
  * necessary for identification.
- * 
+ *
  * <p>
  * The information specified in this interface is used to configure a key store indirectly. For more information see the
  * documentation for the connector or protocol in question. The comments in {@link TlsConfiguration} may also be useful.
  * </p>
- * 
+ *
  * <p>
  * <em>Programmers:</em> this information, once stored in and retrieved from properties via {@link TlsPropertiesMapper}, will
  * provide a key manager factory via the {@link TlsDirectKeyStore} interface implemented by {@link TlsConfiguration}. This can be

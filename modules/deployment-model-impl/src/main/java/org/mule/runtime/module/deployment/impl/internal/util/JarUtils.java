@@ -70,7 +70,7 @@ public final class JarUtils {
 
   /**
    * Gets all the URL of files within a directory
-   * 
+   *
    * @param file      the jar file
    * @param directory the directory within the jar file
    * @return a collection of URLs to files within the directory {@code directory}. Empty collection if the directory does not

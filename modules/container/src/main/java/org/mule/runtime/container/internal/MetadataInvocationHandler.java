@@ -22,7 +22,7 @@ import java.util.List;
  * Extends {@link InvocationHandler} to provide and expose metadata about the inner object implementation.
  * <p>
  * This allows for nested object {@link Proxy}ies to work as expected.
- * 
+ *
  * @since 4.0
  */
 public abstract class MetadataInvocationHandler<T> implements InvocationHandler {
@@ -59,7 +59,7 @@ public abstract class MetadataInvocationHandler<T> implements InvocationHandler 
 
   /**
    * Performs the actual invocation on the proxied {@link Object}, or delegates the call to an inner proxy.
-   * 
+   *
    * See {@link InvocationHandler#invoke(Object, Method, Object[])}
    */
   protected Object doInvoke(Object proxy, Method method, Object[] args) throws Throwable {

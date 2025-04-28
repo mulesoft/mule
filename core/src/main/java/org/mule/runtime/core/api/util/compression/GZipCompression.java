@@ -36,7 +36,7 @@ public final class GZipCompression implements CompressionStrategy {
   /**
    * Determines if a byte array is compressed. The java.util.zip GZip implementaiton does not expose the GZip header so it is
    * difficult to determine if a string is compressed.
-   * 
+   *
    * @param bytes an array of bytes
    * @return true if the array is compressed or false otherwise
    * @throws java.io.IOException if the byte array couldn't be read
@@ -51,7 +51,7 @@ public final class GZipCompression implements CompressionStrategy {
 
   /**
    * Used for compressing a byte array into a new byte array using GZIP
-   * 
+   *
    * @param bytes An array of bytes to compress
    * @return a compressed byte array
    * @throws java.io.IOException if it fails to write to a GZIPOutputStream
@@ -104,7 +104,7 @@ public final class GZipCompression implements CompressionStrategy {
 
   /**
    * Used for uncompressing a byte array into a uncompressed byte array using GZIP
-   * 
+   *
    * @param bytes An array of bytes to uncompress
    * @return an uncompressed byte array
    * @throws java.io.IOException if it fails to read from a GZIPInputStream

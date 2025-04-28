@@ -10,7 +10,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
  * The result of processing a {@link CoreEvent} through a policy chain.
- * 
+ *
  * @since 4.3.0
  */
 public interface SourcePolicyResult {

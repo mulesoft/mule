@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 /**
  * <code>Statistics</code> TODO
- * 
+ *
  */
 @NoImplement
 public interface Statistics extends Serializable {

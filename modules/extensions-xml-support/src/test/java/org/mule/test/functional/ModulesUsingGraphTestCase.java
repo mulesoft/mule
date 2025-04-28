@@ -27,7 +27,7 @@ import org.junit.runners.Parameterized;
  * of modules that will be feed in several orders, proving that the topological order while macro expanding do work accordingly.
  * <p/>
  * The current application graph dependencies with plugins to macro expand is as follow:
- * 
+ *
  * <pre>
  *   +---------------------------------------------+
  *   |                                             |

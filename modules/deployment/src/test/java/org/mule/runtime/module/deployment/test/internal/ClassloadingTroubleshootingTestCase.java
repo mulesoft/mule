@@ -192,7 +192,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     ApplicationFileBuilder applicationFileBuilder = createApplicationFileBuilder(useLightWeightPackage);
     addJmsPropertiesResourceFile(
                                  addOverride2Library(applicationFileBuilder, useLightWeightPackage))
-                                     .dependingOn(domainFileBuilder);
+        .dependingOn(domainFileBuilder);
 
     deployDomainAndApplication(domainFileBuilder, applicationFileBuilder);
 

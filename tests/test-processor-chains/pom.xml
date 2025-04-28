@@ -13,7 +13,6 @@
 
     <properties>
         <javaModuleName>org.mule.test.processor.chains</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

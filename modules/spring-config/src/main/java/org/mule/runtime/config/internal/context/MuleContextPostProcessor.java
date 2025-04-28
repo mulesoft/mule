@@ -15,7 +15,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 /**
  * Responsible for passing in the MuleContext instance for all objects in the registry that want it. For an object to get an
  * instance of the MuleContext it must implement MuleContextAware.
- * 
+ *
  * @see MuleContextAware
  * @see org.mule.runtime.core.api.MuleContext
  *

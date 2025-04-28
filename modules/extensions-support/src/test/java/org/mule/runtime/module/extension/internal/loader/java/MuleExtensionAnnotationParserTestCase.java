@@ -74,7 +74,7 @@ public class MuleExtensionAnnotationParserTestCase {
                                                    .getStringValue(org.mule.runtime.extension.api.annotation.Extension::name),
                                                ann -> ann.getStringValue(Extension::name),
                                                () -> new IllegalModelDefinitionException("oops"))
-                                                   .orElse(null);
+        .orElse(null);
 
     assertThat(extensionName, equalTo(SDK_EXTENSION_NAME));
 
@@ -84,7 +84,7 @@ public class MuleExtensionAnnotationParserTestCase {
                                         ann -> ann.getStringValue(org.mule.runtime.extension.api.annotation.Extension::name),
                                         ann -> ann.getStringValue(Extension::name),
                                         () -> new IllegalModelDefinitionException("oops"))
-                                            .orElse(null);
+        .orElse(null);
 
     assertThat(extensionName, equalTo(LEGACY_EXTENSION_NAME));
   }

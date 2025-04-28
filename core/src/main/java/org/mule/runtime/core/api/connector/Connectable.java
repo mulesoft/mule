@@ -17,14 +17,14 @@ public interface Connectable extends Lifecycle {
   /**
    * Make the connection to the underlying transport. The fact that this object is connected or not should have no influence on
    * the lifecycle, especially the start / stop state if applicable.
-   * 
+   *
    * @throws Exception
    */
   void connect() throws Exception;
 
   /**
    * Disconnect the from the underlying transport
-   * 
+   *
    * @throws Exception
    */
   void disconnect() throws Exception;
@@ -48,7 +48,7 @@ public interface Connectable extends Lifecycle {
    * </ul>
    * Callers should then check for {@link RetryContext#isOk()}. The failure, if any, will be provided via the
    * {@link RetryContext#getLastFailure()}.
-   * 
+   *
    * @return same retry context with status info set and any failures populated
    * @throws Exception if the connector fails to connect @param retryContext
    */

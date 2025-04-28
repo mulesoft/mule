@@ -20,7 +20,7 @@ import org.mockito.plugins.PluginSwitch;
  * When you want to enable any plugin, just call {@link #enablePlugins(List)} and contrarily to disable any previously enabled
  * ones call {@link #disablePlugins(List)}. Be aware that besides enabling this class, you have to declare also the plugins as
  * usual, by placing the proper files in <code>mockito-extensions/</code>
- * 
+ *
  * @see PluginSwitch
  *
  * @since 4.4.0, 4.3.1

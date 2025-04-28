@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 /**
  * Implementation of this interface are responsible of processing the configuration files of a Mule artifact and create an
  * {@link ArtifactContext}.
- * 
+ *
  * @since 4.0
  */
 @NoImplement
@@ -23,9 +23,9 @@ public interface ArtifactConfigurationProcessor {
 
   /**
    * Discovers a {@link ArtifactConfigurationProcessor} using SPI. One and only one must be present in the classpath.
-   * 
+   *
    * @return an {@link ArtifactConfigurationProcessor} discovered using SPI.
-   * 
+   *
    * @deprecated Pass the instance to use instead of relying on SPI for discovery.
    */
   @Deprecated
@@ -35,7 +35,7 @@ public interface ArtifactConfigurationProcessor {
 
   /**
    * Creates an {@link ArtifactContext} for an artifact based on the configuration files of the artifact.
-   * 
+   *
    * @param artifactContextConfiguration the configuration of the artifact.
    * @return an {@link ArtifactContext}
    * @throws ConfigurationException if there was a problem processing the configuration of the artifact.

@@ -16,7 +16,7 @@ import java.util.Iterator;
  * {@link Iterator} that also extends {@link Closeable} and {@link HasSize}.
  *
  * The {@link Iterator#remove()} operation is not allowed for this iterator.
- * 
+ *
  * @param <T> the type of elements returned by this iterator
  */
 @NoImplement

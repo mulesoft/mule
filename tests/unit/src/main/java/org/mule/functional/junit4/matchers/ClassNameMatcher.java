@@ -12,7 +12,7 @@ import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Matcher to check the class name of an {@link Object}
- * 
+ *
  * @param <T> the type of {@link Object} to match
  */
 public class ClassNameMatcher<T> extends TypeSafeMatcher<T> {

@@ -192,7 +192,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   /**
    * Retrieves the nearest {@link RegionClassLoader} in the ancestors chain of the given class loader (including itself).
-   * 
+   *
    * @param classLoader A class loader.
    * @return The nearest {@link RegionClassLoader} in the ancestors chain of the given class loader. Will be null if not found.
    */

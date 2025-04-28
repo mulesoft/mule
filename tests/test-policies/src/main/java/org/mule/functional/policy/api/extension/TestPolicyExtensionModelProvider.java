@@ -29,7 +29,7 @@ public final class TestPolicyExtensionModelProvider extends ExtensionModelLoader
       .loadExtensionModel(new TestPolicyExtensionModelDeclarer().createExtensionModel(),
                           builder(TestPolicyExtensionModelProvider.class.getClassLoader(),
                                   nullDslResolvingContext())
-                                      .build()));
+                              .build()));
 
   @Override
   protected void declareExtension(ExtensionLoadingContext context) {

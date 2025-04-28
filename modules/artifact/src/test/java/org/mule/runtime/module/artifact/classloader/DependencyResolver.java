@@ -28,7 +28,7 @@ public class DependencyResolver {
 
   /**
    * Resolves the specified artifact from the given GAV coordinates.
-   * 
+   *
    * @param groupId    Group ID for the artifact.
    * @param artifactId Artifact ID.
    * @param version    Version of the artifact.

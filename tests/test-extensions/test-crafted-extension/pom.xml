@@ -17,7 +17,6 @@
     <properties>
         <javaModuleName>org.mule.test.extension.crafted </javaModuleName>
         <testExtensionModelLoaderId>crafted</testExtensionModelLoaderId>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
 </project>

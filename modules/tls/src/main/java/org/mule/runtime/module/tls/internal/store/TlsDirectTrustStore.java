@@ -14,7 +14,7 @@ import javax.net.ssl.TrustManagerFactory;
  * Configure direct trust stores. TLS/SSL connections are made to trusted systems - the public certificates of trusted systems are
  * stored in a keystore (called a trust store) and used to verify that the connection made to a remote system "really is" the
  * expected identity.
- * 
+ *
  * <p>
  * The information specified in this interface may be used to configure a trust store directly, or the values in the
  * {@link TlsIndirectTrustStore} may be stored as property values and used later, or both. It may therefore be specific to a
@@ -61,7 +61,7 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore {
   /**
    * If the trust store is undefined and the trust store generated via System properties then the key store certificates defined
    * via <b>TODO</b> can be used as a source of trust information.
-   * 
+   *
    * @return true if the key store data should <em>not</em> be used when a trust store is otherwise undefined
    */
   boolean isExplicitTrustStoreOnly();
@@ -69,7 +69,7 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore {
   /**
    * If the trust store is undefined and the trust store generated via System properties then the key store certificates defined
    * via <b>TODO</b> can be used as a source of trust information.
-   * 
+   *
    * @param explicitTrustStoreOnly true if the key store data should <em>not<em> be used when a trust store is otherwise undefined
    */
   void setExplicitTrustStoreOnly(boolean explicitTrustStoreOnly);
@@ -77,7 +77,7 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore {
   /**
    * If a server socket is constructed directly (see {@link TlsConfiguration}) then this flag will control whether client
    * authenticatin is required. This does not apply to client connections.
-   * 
+   *
    * @return true if clients must be authenticated
    */
   boolean isRequireClientAuthentication();
@@ -85,7 +85,7 @@ public interface TlsDirectTrustStore extends TlsIndirectTrustStore {
   /**
    * If a server socket is constructed directly (see {@link TlsConfiguration}) then this flag will control whether client
    * authenticatin is required. This does not apply to client connections.
-   * 
+   *
    * @param requireClientAuthentication true if clients must be authenticated
    */
   void setRequireClientAuthentication(boolean requireClientAuthentication);

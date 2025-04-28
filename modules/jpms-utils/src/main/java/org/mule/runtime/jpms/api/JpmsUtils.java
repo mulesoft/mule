@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 
 /**
  * Utilities related to how Mule uses the Java Module system.
- * 
+ *
  * @since 4.5
  */
 public final class JpmsUtils {
@@ -164,7 +164,7 @@ public final class JpmsUtils {
   }
 
   /**
-   * 
+   *
    * Search for packages using the JRE's module architecture. (Java 9 and above).
    *
    * @param packages where to add new found packages
@@ -191,7 +191,7 @@ public final class JpmsUtils {
   /**
    * Creates a {@link ModuleLayer} for the given {@code modulePathEntries} and with the given {@code parent}, and returns a
    * classLoader from which its modules can be read.
-   * 
+   *
    * @param modulePathEntries the URLs from which to find the modules
    * @param parent            the parent class loader for delegation
    * @return a new classLoader.
@@ -230,7 +230,7 @@ public final class JpmsUtils {
   /**
    * Creates two {@link ModuleLayer}s for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild} and with
    * the given {@code parent}, and returns a classLoader from which the child modules can be read.
-   * 
+   *
    * @param modulePathEntriesParent the URLs from which to find the modules of the parent
    * @param modulePathEntriesChild  the URLs from which to find the modules of the child
    * @param childClassLoaderFactory how the classLoader for the child is created, if moduleLayers are not used

@@ -15,7 +15,6 @@
 
     <properties>
         <javaModuleName>org.mule.test.extension.classloading.sdk.api</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
 </project>

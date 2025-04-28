@@ -167,7 +167,8 @@ public class JavaParameterModelParser implements ParameterModelParser, HasExtens
                                      sdkContentAnnotationValueFetcher -> sdkContentAnnotationValueFetcher
                                          .getBooleanValue(org.mule.sdk.api.annotation.param.Content::primary)
                                              ? ParameterRole.PRIMARY_CONTENT
-                                             : ParameterRole.CONTENT).orElse(ParameterRole.BEHAVIOUR);
+                                             : ParameterRole.CONTENT)
+        .orElse(ParameterRole.BEHAVIOUR);
   }
 
   @Override
@@ -254,7 +255,7 @@ public class JavaParameterModelParser implements ParameterModelParser, HasExtens
                                                                         value
                                                                             .getStringValue(org.mule.sdk.api.annotation.param.reference.ConfigReference::namespace),
                                                                         CONFIG))
-                                                                            .collect(toList());
+            .collect(toList());
 
     if (stereotypes.isEmpty()) {
       stereotypes = mapReduceSingleAnnotation(
@@ -271,9 +272,9 @@ public class JavaParameterModelParser implements ParameterModelParser, HasExtens
                                                   .stream()
                                                   .filter(type -> type.getDeclaringClass().isPresent())
                                                   .map(type -> from(type.getDeclaringClass().get())))
-                                                      .map(stream -> stream.map(def -> factory.createStereotype(def))
-                                                          .collect(toList()))
-                                                      .orElse(new LinkedList<>());
+          .map(stream -> stream.map(def -> factory.createStereotype(def))
+              .collect(toList()))
+          .orElse(new LinkedList<>());
     }
 
     stereotypes.addAll(type.getAnnotation(StereotypeTypeAnnotation.class)

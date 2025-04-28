@@ -36,7 +36,7 @@ public interface ErrorMetricsFactory {
 
   /**
    * Returns an {@link ErrorMetrics} implementation.
-   * 
+   *
    * @param errorMetricsMeter {@link Meter} that will be used for creating all {@link ErrorMetrics} instruments.
    * @return An {@link ErrorMetrics} implementation.
    */
@@ -44,7 +44,7 @@ public interface ErrorMetricsFactory {
 
   /**
    * Returns an {@link ErrorMetrics} implementation.
-   * 
+   *
    * @param errorMetricsMeter {@link Meter} that will be used for creating all {@link ErrorMetrics} instruments.
    * @param errorIdProvider   {@link ErrorIdProvider} that will be used to create the error IDs of the measured errors.
    * @return An {@link ErrorMetrics} implementation.

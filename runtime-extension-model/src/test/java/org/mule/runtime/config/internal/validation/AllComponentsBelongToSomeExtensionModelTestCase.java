@@ -49,7 +49,7 @@ public class AllComponentsBelongToSomeExtensionModelTestCase extends AbstractCor
                           "    <some:thing name=\"theSomething\" />\n" +
                           "\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
     assertThat(msg.get().getMessage(), containsString("The component 'some:thing' doesn't belong to any extension model"));
   }
 }

@@ -79,7 +79,7 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
    *      lifecycleManager.applyPhase(registry.lookupObjects(Object.class), Startable.PHASE_NAME);
    *  }
    * </code>
-   * 
+   *
    * @param lifecycleManager the lifecycleManager for the current context
    * @throws Exception if anything goes wrong. Usually this is an exeption bubbled up from calling a lifecycle method on an object
    *                   in the registry

@@ -134,7 +134,7 @@ public final class StreamingUtils {
    * @param cursorProviderFactory a nullable {@link CursorStreamProviderFactory}
    * @param eventContext          the root context of the event on which the {@code value} was generated
    * @return the {@code value} or a {@link CursorProvider}
-   * 
+   *
    * @deprecated Use {@link #streamingContent(Object, CursorProviderFactory, EventContext, ComponentLocation)}
    */
   @Deprecated

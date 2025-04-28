@@ -16,7 +16,7 @@ import org.apache.commons.lang3.Validate;
 /**
  * A {@link MessageSequence} that delegates its {@link #hasNext()} and {@link #next()} methods to an {@link Iterator}, and has no
  * estimated size
- * 
+ *
  * @author flbulgarelli
  */
 public final class IteratorMessageSequence extends AbstractMessageSequence {

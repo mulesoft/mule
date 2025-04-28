@@ -49,7 +49,7 @@ public class OpenTelemetryExportQueueMetrics implements MetricExporter {
 
   /**
    * Logs a warning message if the amount of dropped spans has increased since the last call to this method.
-   * 
+   *
    * @param metricData Metric data about the dropped spans.
    */
   private void checkForDroppedSpans(MetricData metricData) {
@@ -71,7 +71,7 @@ public class OpenTelemetryExportQueueMetrics implements MetricExporter {
 
   /**
    * Logs a warning message if the amount of dropped spans has increased since the last call to this method.
-   * 
+   *
    * @param currentDroppedSpans Current amount of dropped spans.
    */
   private void logIfRelevant(long currentDroppedSpans) {

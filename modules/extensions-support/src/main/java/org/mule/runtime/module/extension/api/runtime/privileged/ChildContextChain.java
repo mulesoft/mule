@@ -16,14 +16,14 @@ import java.util.function.Consumer;
 /**
  * Extension of @{link Chain} that adds the feature to execute the chain with a child context
  * ({@link org.mule.runtime.core.internal.event.DefaultEventContext#child})
- * 
+ *
  * @since 4.4.0
  */
 public interface ChildContextChain extends Chain {
 
   /**
    * Key for annotation to be used to set the location of the owner of this {@link ChildContextChain}.
-   * 
+   *
    * @since 4.7
    */
   QName CHAIN_OWNER_LOCATION_KEY = new QName("http://www.mulesoft.org/schema/mule/parser-metadata", "CHAIN_OWNER_LOCATION");

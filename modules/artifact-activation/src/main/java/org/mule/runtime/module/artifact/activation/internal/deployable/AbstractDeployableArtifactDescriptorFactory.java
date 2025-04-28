@@ -167,7 +167,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
    * @param ownerDescriptor          descriptor of the artifact that owns the plugin.
    * @param pluginBundleDependencies plugin dependencies on a bundle.
    * @param sharedPluginDependencies the dependencies on the deployable artifact that are shared to plugins.
-   * 
+   *
    * @return a descriptor for a plugin.
    */
   private ArtifactPluginDescriptor createPluginDescriptor(BundleDependency bundleDependency,
@@ -181,6 +181,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
                                                pluginBundleDependencies,
                                                sharedPluginDependencies,
                                                ArtifactDescriptorValidatorBuilder.builder())
-                                                   .create();
+        .create();
   }
 }

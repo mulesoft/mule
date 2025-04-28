@@ -34,14 +34,14 @@ public interface ComponentTracer<T extends Event> {
 
   /**
    * Starts a {@link Span} associated to the {@link Component}.
-   * 
+   *
    * @param event the {@link Event} that has hit the {@link Component}.
    */
   void endCurrentSpan(T event);
 
   /**
    * Adds an attibute to the current {@link Span} associated to the {@link Component}.
-   * 
+   *
    * @param event the {@link Event} that has hit the {@link Component}.
    */
   void addCurrentSpanAttribute(T event, String key, String value);

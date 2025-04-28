@@ -31,7 +31,7 @@ public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
 
   /**
    * Apply a {@link ProcessingStrategy} to the Processors of the target {@link MessageProcessorChain}.
-   * 
+   *
    * @param processingStrategy the strategy to apply for each {@link Processor} in the target {@link MessageProcessorChain}.
    */
   void setProcessingStrategy(ProcessingStrategy processingStrategy);

@@ -642,17 +642,17 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
   /**
    * Stubs a Policy, instead of mocking it. Mocking a policy would imply invocation interceptions of the form:
-   * 
+   *
    * <pre>
    * {@code
    * when(mockedCall).thenAnswer(invocation -> {
    *    // Invocation arguments access
    * }));}
    * </pre>
-   * 
+   *
    * This can be problematic given that references to that arguments are maintained at the mocks and the
    * {@link DefaultPolicyManager} functioning can be unexpectedly affected.
-   * 
+   *
    * @see DefaultPolicyManager
    * @return A {@link Policy} stub.
    */

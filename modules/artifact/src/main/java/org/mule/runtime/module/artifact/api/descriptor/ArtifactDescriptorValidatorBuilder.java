@@ -96,7 +96,7 @@ public final class ArtifactDescriptorValidatorBuilder {
 
   /**
    * Sets a validation for artifact version, {@link ArtifactDescriptor} should define its version in a particular format.
-   * 
+   *
    * @return this
    */
   public ArtifactDescriptorValidatorBuilder validateVersionFormat() {
@@ -117,9 +117,9 @@ public final class ArtifactDescriptorValidatorBuilder {
 
   /**
    * Sets a validation for the supportedJavaVersions of the artifact against the currently running JVM.
-   * 
+   *
    * @return this
-   * 
+   *
    * @since 4.6
    */
   public ArtifactDescriptorValidatorBuilder validateSupportedJavaVersions() {

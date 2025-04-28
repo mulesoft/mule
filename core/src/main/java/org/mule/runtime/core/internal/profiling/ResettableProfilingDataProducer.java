@@ -22,7 +22,7 @@ public interface ResettableProfilingDataProducer<T extends ProfilingEventContext
 
   /**
    * Resets {@link ProfilingDataProducer} modifying internal status.
-   * 
+   *
    * @see DefaultProfilingService
    */
   void reset();

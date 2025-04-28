@@ -11,7 +11,7 @@ import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorL
 
 /**
  * Factory to create instances of {@link DescriptorLoaderRepository}.
- * 
+ *
  * @since 4.5
  */
 public class DescriptorLoaderRepositoryFactory {

@@ -86,7 +86,7 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @param buildFor
    */
   @Override

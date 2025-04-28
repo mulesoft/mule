@@ -194,7 +194,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
   /**
    * The {@link ArtifactCoordinates} for the deployed app
-   * 
+   *
    * @since 4.5.0
    */
   private ArtifactCoordinates artifactCoordinates;

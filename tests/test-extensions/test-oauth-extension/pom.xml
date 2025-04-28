@@ -18,7 +18,6 @@
 
     <properties>
         <javaModuleName>org.mule.test.extension.oauth</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

@@ -19,7 +19,7 @@ public interface MeterExporter {
 
   /**
    * Registers a {@link Meter} whose instruments will be eventually exported.
-   * 
+   *
    * @param meter the meter to register.
    */
   void registerMeterToExport(Meter meter);

@@ -58,16 +58,16 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
         ? concat(Stream.of(classPath.split(pathSeparator)),
                  Stream.of(modulePath.split(pathSeparator)))
         : Stream.of(classPath.split(pathSeparator)))
-            .filter(StringUtils::isNotBlank)
-            .filter(pathEntry -> {
-              final String[] split = pathEntry.split(fileSeparator);
-              final String fileName = split[split.length - 1];
+        .filter(StringUtils::isNotBlank)
+        .filter(pathEntry -> {
+          final String[] split = pathEntry.split(fileSeparator);
+          final String fileName = split[split.length - 1];
 
-              return fileName.startsWith("mule-service-weave") && fileName.endsWith("mule-service.jar");
-            })
-            .map(pathEntry -> new File(pathEntry))
-            .findAny()
-            .map(IsolatedWeaveExpressionLanguageFactoryServiceProvider::createWeaveServiceClassLoaderFromExplodedServiceDir);
+          return fileName.startsWith("mule-service-weave") && fileName.endsWith("mule-service.jar");
+        })
+        .map(pathEntry -> new File(pathEntry))
+        .findAny()
+        .map(IsolatedWeaveExpressionLanguageFactoryServiceProvider::createWeaveServiceClassLoaderFromExplodedServiceDir);
   });
 
   @Override

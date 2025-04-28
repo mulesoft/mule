@@ -23,7 +23,7 @@ public interface ReturnHandler<T> {
 
   /**
    * Creates a {@link Message.Builder from a given value}
-   * 
+   *
    * @param value The value to create the {@link Message.Builder} from
    * @return A Message Builder with the value.
    */

@@ -327,7 +327,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                       disposeIfNeeded(errorRouter, LOGGER);
                                       clearRouterInGlobalErrorHandler(messagingExceptionHandler);
                                     }))
-                                        .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
+        .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
   }
 
   private boolean recreateRouter(ContextView ctx) {

@@ -57,7 +57,7 @@ public final class ExtensionModelTestUtils {
 
   /**
    * Gets the {@link OperationModel} of an operation from within the {@link ExtensionModel}, by matching the name.
-   * 
+   *
    * @param extensionModel the {@link ExtensionModel} containing the operation.
    * @param operationName  the name of the {@link OperationModel} being searched.
    * @return an {@link OperationModel} with the given name.
@@ -71,7 +71,7 @@ public final class ExtensionModelTestUtils {
 
   /**
    * Gets the errors as string for a given {@link ExtensionModel}. The output strings have the format "NAMESPACE:TYPE".
-   * 
+   *
    * @param extensionModel the {@link ExtensionModel}.
    * @return a set of strings "NAMESPACE:TYPE" for all the errors in the given {@link ExtensionModel}.
    */
@@ -81,7 +81,7 @@ public final class ExtensionModelTestUtils {
 
   /**
    * Gets the errors as string for a given {@link OperationModel}. The output strings have the format "NAMESPACE:TYPE".
-   * 
+   *
    * @param operationModel the {@link OperationModel}.
    * @return a set of strings "NAMESPACE:TYPE" for all the errors in the given {@link OperationModel}.
    */
@@ -93,7 +93,7 @@ public final class ExtensionModelTestUtils {
    * Asserts that the {@link OperationModel} with name {@code operationName} within the {@link ExtensionModel} has the expected
    * set of errors, passed in the parameter {@code expectedSetOfErrors}. The expected errors are passed as Strings, and they must
    * have the format "NAMESPACE:TYPE".
-   * 
+   *
    * @param extensionModel      the {@link ExtensionModel} containing the operation. If doesn't contain the operation, this method
    *                            will raise a {@link IllegalArgumentException}.
    * @param operationName       the name of the {@link OperationModel}.
@@ -113,7 +113,7 @@ public final class ExtensionModelTestUtils {
 
   /**
    * Provides a convenient way to create a set initialized to contain several elements.
-   * 
+   *
    * @param a elements to add to the resulting {@link Set}.
    * @return a {@link Set} containing all the passed arguments.
    * @param <T> the class of the objects in the set.
@@ -124,7 +124,7 @@ public final class ExtensionModelTestUtils {
 
   /**
    * Creates a MuleSDK plugin's {@link ExtensionModel} for the file passed in the parameter {@code extensionFile}.
-   * 
+   *
    * @param extensionFile name of the file declaring an extension with the MuleSDK.
    * @param classLoader   classLoader to be used to load the plugin.
    * @param dependencies  set of extension models available for the {@link DslResolvingContext}.

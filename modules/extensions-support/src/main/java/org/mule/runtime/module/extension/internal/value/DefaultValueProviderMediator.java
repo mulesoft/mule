@@ -86,7 +86,7 @@ public final class DefaultValueProviderMediator<T extends ParameterizedModel & E
    * @param parameterValueResolver parameter resolver required if the associated {@link ValueProvider} requires the value of
    *                               parameters from the same parameter container.
    * @param targetSelector         the target path of the field of the parameter.
-   * 
+   *
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */
@@ -127,7 +127,7 @@ public final class DefaultValueProviderMediator<T extends ParameterizedModel & E
    *                               {@link ValueProvider}
    * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
    *                               {@link ValueProvider}
-   * 
+   *
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */

@@ -62,7 +62,7 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
    * that those phases were actually being applied to the ConfigurationPropertiesProviders when creating or clearing an
    * ApplicationModel. keep in mind that this extension is only intended for testing purposes and this behaviour will not be
    * replicated for any productive code.
-   * 
+   *
    * @param configurationAttributeKey
    * @return an Optional with the value of the given key or {@link Optional#empty()} otherwise.
    */

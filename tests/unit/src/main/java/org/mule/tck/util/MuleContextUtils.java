@@ -389,7 +389,7 @@ public class MuleContextUtils {
 
   /**
    * Adds an extension model to a mocked {@link MuleContext}.
-   * 
+   *
    * @param muleContext    the mocked {@link MuleContext}.
    * @param extensionModel the {@link ExtensionModel} to be added.
    */

@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 /**
  * @deprecated This is here just for backwards compatibility of preexisting serialized objects.
- * 
+ *
  */
 @Deprecated
 public interface MuleSession extends Serializable {

@@ -264,8 +264,8 @@ public class BeanDefinitionFactory {
     return param.getValue()
         .reduce(expr -> resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent,
                                                              param, registry, componentLocator)
-                                                                 .map(Collections::singletonList)
-                                                                 .orElse(emptyList()),
+            .map(Collections::singletonList)
+            .orElse(emptyList()),
                 v -> resolveParamBeanDefinitionFixedValue(springComponentModels, componentHierarchy, paramOwnerComponent,
                                                           param, registry, componentLocator));
   }
@@ -299,7 +299,7 @@ public class BeanDefinitionFactory {
                                                    emptySet(), registry, componentLocator,
                                                    nestedComp -> resolveComponent(springComponentModels, componentHierarchy,
                                                                                   nestedComp, registry, componentLocator))
-                                                                                      .ifPresent(model::set);
+            .ifPresent(model::set);
       }
 
       @Override
@@ -311,7 +311,7 @@ public class BeanDefinitionFactory {
           // references to a list defined elsewhere
           resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
                                                componentLocator)
-                                                   .ifPresent(model::set);
+              .ifPresent(model::set);
         }
       }
 
@@ -326,7 +326,7 @@ public class BeanDefinitionFactory {
             // references to a map defined elsewhere
             resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
                                                  componentLocator)
-                                                     .ifPresent(model::set);
+                .ifPresent(model::set);
           }
           return;
         }
@@ -350,7 +350,7 @@ public class BeanDefinitionFactory {
                                                      childParamsModels, registry, componentLocator,
                                                      nestedComp -> resolveComponent(springComponentModels, componentHierarchy,
                                                                                     nestedComp, registry, componentLocator))
-                                                                                        .ifPresent(model::set);
+              .ifPresent(model::set);
         }
       }
 
@@ -372,7 +372,7 @@ public class BeanDefinitionFactory {
       public void visitSimpleType(SimpleType simpleType) {
         resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
                                              componentLocator)
-                                                 .ifPresent(model::set);
+            .ifPresent(model::set);
       }
     });
 

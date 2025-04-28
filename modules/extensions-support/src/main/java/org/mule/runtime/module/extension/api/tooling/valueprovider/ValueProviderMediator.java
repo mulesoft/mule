@@ -37,7 +37,7 @@ public interface ValueProviderMediator {
    *                               {@link ValueProvider}
    * @param configurationSupplier  supplier of connection instances related to the container and used, if necessary, by the
    *                               {@link ValueProvider}
-   * 
+   *
    * @return a {@link Set} of {@link Value} correspondent to the given parameter
    * @throws ValueResolvingException if an error occurs resolving {@link Value values}
    */

@@ -20,7 +20,7 @@ public interface OutputHandler {
   /**
    * Write the event payload to the stream. Depending on the underlying transport, attachements and message properties may be
    * written to the stream here too.
-   * 
+   *
    * @param event the current event
    * @param out   the output stream to write to
    * @throws IOException in case of error

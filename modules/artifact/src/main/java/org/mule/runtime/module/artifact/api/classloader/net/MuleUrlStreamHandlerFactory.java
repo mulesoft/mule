@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Client classes can register a subclass of {@link URLStreamHandler} for a given protocol. This implementation first checks its
  * registered handlers before resorting to the default mechanism.
  * <p>
- * 
+ *
  * @see java.net.URL#URL(String, String, int, String)
  */
 @NoInstantiate
@@ -48,7 +48,7 @@ public final class MuleUrlStreamHandlerFactory extends Object implements URLStre
      * When running under surefire, this class will be loaded by different class loaders and will be running in multiple "main"
      * thread objects. Thus, there is no way for this class to register a globally available variable to store the info whether
      * our custom UrlStreamHandlerFactory was already registered.
-     * 
+     *
      * The only way to accomplish this is to catch the Error that is thrown by URL when trying to re-register the custom
      * UrlStreamHandlerFactory.
      */

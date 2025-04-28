@@ -476,10 +476,11 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
                                                    Map<String, MuleSdkOperationModelParser> operationModelParsersByName) {
     for (FilteringCharacteristic<?> characteristic : characteristics) {
       getOperationsAstRecursiveStream(operationModelParsersByName, characteristic::filterComponent,
-                                      characteristic::ignoreComponent).anyMatch(operationAst -> {
-                                        characteristic.computeFrom(operationAst);
-                                        return characteristic.hasDefinitiveValue();
-                                      });
+                                      characteristic::ignoreComponent)
+          .anyMatch(operationAst -> {
+            characteristic.computeFrom(operationAst);
+            return characteristic.hasDefinitiveValue();
+          });
     }
     characteristics.stream().filter(c -> !c.hasValue()).forEach(Characteristic::setWithDefault);
   }

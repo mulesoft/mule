@@ -70,7 +70,7 @@ public class SourceErrorMappingAnyLastTestCase extends AbstractCoreValidationTes
                                                                  "    </flow>\n" +
                                                                  "\n" +
                                                                  "</mule>")
-                                                                     .stream().findFirst();
+        .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("Only the last error mapping can have 'ANY' or an empty source type."));

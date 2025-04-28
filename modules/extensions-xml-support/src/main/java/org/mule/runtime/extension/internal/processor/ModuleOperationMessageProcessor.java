@@ -260,7 +260,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
                                                                  .transformDeferred(nestedChain)
                                                                  .doOnNext(event -> ((DefaultFlowCallStack) event
                                                                      .getFlowCallStack())
-                                                                         .pop()),
+                                                                     .pop()),
                                                              ofNullable(getLocation()),
                                                              errorHandler()))
         // 1. Store the current error handler into the subscription context, so it can be retrieved later

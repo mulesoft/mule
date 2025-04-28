@@ -49,7 +49,7 @@ public class SetVariableVariableNameValidationTestCase extends AbstractCoreValid
                           "       <set-variable value=\"specialValue\" variableName=\"#[vars.targetName]\"/>\n" +
                           "   </flow>\n" +
                           "</mule>")
-                              .stream().findFirst();
+            .stream().findFirst();
 
     assertThat(msg.get().getMessage(),
                containsString("An expression value was given for parameter 'variableName' but it doesn't support expressions"));

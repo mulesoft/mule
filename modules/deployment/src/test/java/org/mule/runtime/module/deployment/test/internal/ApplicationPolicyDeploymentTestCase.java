@@ -743,7 +743,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
                                                                                            helloExtensionV1Plugin)
-                                                                                               .dependingOn(exceptionThrowingPluginImportingDomain);
+        .dependingOn(exceptionThrowingPluginImportingDomain);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();

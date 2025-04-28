@@ -100,7 +100,7 @@ public final class ErrorBuilder {
   /**
    * Given a {@link MuleException}, sets the <code>description</code> field with the message of it's root cause, taking into
    * account possible suppressions.
-   * 
+   *
    * @param muleException (must be the result of a
    *                      {@link org.mule.runtime.api.exception.ExceptionHelper#getRootMuleException(Throwable)} call.
    */
@@ -119,7 +119,7 @@ public final class ErrorBuilder {
   /**
    * Assigns to the <code>suppressedErrors</code> field all the {@link Error} instances that the given {@link MuleException}
    * inform as suppressed.
-   * 
+   *
    * @param muleException Given {@link MuleException}.
    * @see SuppressedMuleException
    */

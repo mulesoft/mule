@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 /**
  * Implementation of {@link ArtifactConfigurationProcessor} that reads the serialized AST available in the artifact and delegates
  * to {@link ArtifactAstConfigurationBuilder} to create registry and populate the {@link MuleContext}.
- * 
+ *
  * @since 4.5
  */
 public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConfigurationProcessor

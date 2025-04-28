@@ -6,7 +6,7 @@
  */
 /**
  * Container Wrapper for Tanuki integration
- * 
+ *
  * @moduleGraph
  * @since 4.5
  */

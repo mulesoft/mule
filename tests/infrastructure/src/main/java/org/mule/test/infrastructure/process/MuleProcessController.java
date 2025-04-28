@@ -81,7 +81,7 @@ public class MuleProcessController {
                     additionalMuleParamsProperties.entrySet()
                         .stream()
                         .map(e -> e.getKey() + (isEmpty(e.getValue()) ? "" : "=" + e.getValue())))
-                            .toArray(String[]::new);
+          .toArray(String[]::new);
     }
 
     getController().start(args);

@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 
 /**
  * Properties or configs used to enable MEL support are not present.
- * 
+ *
  * @since 4.7
  */
 public class MelNotEnabled implements ArtifactValidation {

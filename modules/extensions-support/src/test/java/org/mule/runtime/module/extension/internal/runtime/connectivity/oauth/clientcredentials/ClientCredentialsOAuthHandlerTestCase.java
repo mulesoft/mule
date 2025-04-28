@@ -97,7 +97,7 @@ public class ClientCredentialsOAuthHandlerTestCase {
     when(mockOAuthService.get()).thenReturn(mockOAuthServiceInstance);
     when(mockOAuthServiceInstance.clientCredentialsGrantTypeDancerBuilder(
                                                                           any(), any(), any()))
-                                                                              .thenReturn(mockDancerBuilder);
+        .thenReturn(mockDancerBuilder);
 
     when(mockDancerBuilder.name(anyString())).thenReturn(mockDancerBuilder);
     when(mockDancerBuilder.encoding(any())).thenReturn(mockDancerBuilder);

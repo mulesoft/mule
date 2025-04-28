@@ -328,9 +328,9 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     public ReactiveProcessor onPipeline(ReactiveProcessor pipeline) {
       return pipelineProcessingStrategyReactiveProcessorFrom(pipeline, executionClassloader, getArtifactId(muleContext),
                                                              getArtifactType(muleContext))
-                                                                 .withScheduler(decorateScheduler(getFlowDispatcherScheduler()))
-                                                                 .withProfilingService(getProfilingService())
-                                                                 .build();
+          .withScheduler(decorateScheduler(getFlowDispatcherScheduler()))
+          .withProfilingService(getProfilingService())
+          .build();
     }
 
     @Override

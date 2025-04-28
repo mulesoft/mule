@@ -14,7 +14,7 @@ import java.util.Optional;
 
 /**
  * Adapts an {@link ErrorModelParser} into an {@link ErrorTypeDefinition}
- * 
+ *
  * @param <E> the definition's generic type
  * @since 4.5.0
  */

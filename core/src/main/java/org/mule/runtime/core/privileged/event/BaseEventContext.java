@@ -204,7 +204,7 @@ public interface BaseEventContext extends EventContext {
 
   /**
    * @return a unique id with the if of this context as prefix
-   * 
+   *
    * @since 4.10, 4.9.4, 4.6.16, 4.4.0-202505
    */
   String nextChildId();

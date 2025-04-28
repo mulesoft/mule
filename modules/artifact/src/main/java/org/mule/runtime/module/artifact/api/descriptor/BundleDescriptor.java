@@ -79,7 +79,7 @@ public final class BundleDescriptor implements ArtifactCoordinates {
 
   /**
    * @return any metadata associated the bundle.
-   * 
+   *
    * @since 4.5
    */
   public Map<String, Object> getMetadata() {

@@ -6,7 +6,7 @@
  */
 /**
  * Implementation for the tracer exporter
- * 
+ *
  * @moduleGraph
  * @since 4.6
  */

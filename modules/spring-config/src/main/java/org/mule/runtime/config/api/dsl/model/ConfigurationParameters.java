@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Representation of the DSL configuration parameters of a component.
- * 
+ *
  * @since 4.1
  */
 @NoImplement
@@ -22,7 +22,7 @@ public interface ConfigurationParameters {
 
   /**
    * Gets the value of a simple parameter as an string.
-   * 
+   *
    * @param parameterName parameter name, same as in the config.
    * @return the parameter value as an string.
    */
@@ -30,7 +30,7 @@ public interface ConfigurationParameters {
 
   /**
    * Gets all the configuration of a complex parameter type with an specific {@link ComponentIdentifier}.
-   * 
+   *
    * @param componentIdentifier the component identifier of the parameter.
    * @return the complex parameter with the given {@link ComponentIdentifier}
    */
@@ -38,7 +38,7 @@ public interface ConfigurationParameters {
 
   /**
    * Gets all the complex parameters and they related identifier
-   * 
+   *
    * @return all the complex parameters.
    */
   List<Pair<ComponentIdentifier, ConfigurationParameters>> getComplexConfigurationParameters();
