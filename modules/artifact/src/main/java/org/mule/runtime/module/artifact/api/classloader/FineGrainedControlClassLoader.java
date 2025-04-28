@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CL
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.net.URLConnection.setDefaultUseCaches;
 import static java.util.Objects.requireNonNull;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -42,6 +43,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
   static {
     registerAsParallelCapable();
+    setDefaultUseCaches("jar", false);
   }
 
   private static final Logger LOGGER = getLogger(FineGrainedControlClassLoader.class);

@@ -10,12 +10,14 @@ import static java.lang.System.lineSeparator;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupStrategy.PARENT_ONLY;
 import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
@@ -44,6 +46,23 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
+
+  /**
+   * Test to validate that we DO set useCache to false when loading resources from application, plugins as this could generate
+   * file descriptor leaks once the application is undeployed.
+   */
+  @Test
+  public void useCacheSetToFalseForJarUrlConnection() throws Exception {
+    URLClassLoader parent = new URLClassLoader(new URL[0], Thread.currentThread().getContextClassLoader());
+
+    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(CHILD_ONLY);
+    FineGrainedControlClassLoader ext =
+        new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
+
+    URL url = ext.getResource(TEST_CLASS_PACKAGE);
+    assertThat(url.openConnection().getUseCaches(), is(false));
+  }
 
   @Test
   public void usesParentOnlyLookup() throws Exception {
