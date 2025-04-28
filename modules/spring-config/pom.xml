@@ -40,6 +40,7 @@
             --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.dsl.spring=net.bytebuddy
             --add-opens=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=ALL-UNNAMED
             --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.internal.registry=org.mule.runtime.core
+            --add-opens=org.apache.commons.beanutils/org.apache.commons.beanutils=org.mule.runtime.spring.config
             ${surefire.args.base}
         </surefire.args>
 

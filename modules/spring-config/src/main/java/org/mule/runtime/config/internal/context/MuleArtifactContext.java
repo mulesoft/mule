@@ -478,6 +478,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       } catch (Exception e) {
         LOGGER.warn("Spring caches cleanup failed", e);
       }
+      beanDefinitionFactory.close();
     }
   }
 
