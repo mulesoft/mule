@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsNull.nullValue;
 
 import org.mule.runtime.api.serialization.SerializationProtocol;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-public abstract class AbstractSerializerProtocolContractTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractSerializerProtocolContractTestCase extends AbstractMuleTestCase {
 
   /**
    * This class is added to get rid of mockito spy, tried replacing it with mockito-inline, that still does not work in Java 17

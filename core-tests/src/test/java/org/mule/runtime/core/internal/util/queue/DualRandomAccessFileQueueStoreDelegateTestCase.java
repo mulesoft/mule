@@ -6,15 +6,12 @@
  */
 package org.mule.runtime.core.internal.util.queue;
 
-import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.serialization.ObjectSerializer;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -40,13 +37,11 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
   @Rule
   public TemporaryFolder workingDirectory = new TemporaryFolder();
 
-  private MuleContext mockMuleContext;
+  private ObjectSerializer objectSerializer;
 
   @Before
   public void before() {
-    mockMuleContext = mock(MuleContext.class);
-    when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
-    addJavaSerializerToMockMuleContext(mockMuleContext);
+    objectSerializer = new JavaObjectSerializer(this.getClass().getClassLoader());
   }
 
   @Test
@@ -64,13 +59,9 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
   @Ignore("MULE-13581")
   public void readQueueFileMessagesInOrder() throws Exception {
     MuleTestUtils.testWithSystemProperty(DualRandomAccessFileQueueStoreDelegate.MAX_LENGTH_PER_FILE_PROPERTY_KEY,
-                                         String.valueOf(MAXIMUM_NUMBER_OF_BYTES), new MuleTestUtils.TestCallback() {
-
-                                           @Override
-                                           public void run() throws Exception {
-                                             int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
-                                             verifyNextMessage(lastInsertedMessageIndex);
-                                           }
+                                         String.valueOf(MAXIMUM_NUMBER_OF_BYTES), () -> {
+                                           int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
+                                           verifyNextMessage(lastInsertedMessageIndex);
                                          });
   }
 
@@ -78,14 +69,10 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
   @Ignore("MULE-13581")
   public void readQueueFileMessagesInOrderWhenControlFileIsCorrupted() throws Exception {
     MuleTestUtils.testWithSystemProperty(DualRandomAccessFileQueueStoreDelegate.MAX_LENGTH_PER_FILE_PROPERTY_KEY,
-                                         String.valueOf(MAXIMUM_NUMBER_OF_BYTES), new MuleTestUtils.TestCallback() {
-
-                                           @Override
-                                           public void run() throws Exception {
-                                             int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
-                                             corruptQueueControlData();
-                                             verifyNextMessage(lastInsertedMessageIndex);
-                                           }
+                                         String.valueOf(MAXIMUM_NUMBER_OF_BYTES), () -> {
+                                           int lastInsertedMessageIndex = writeDataUntilSecondFileContainsNextMessages();
+                                           corruptQueueControlData();
+                                           verifyNextMessage(lastInsertedMessageIndex);
                                          });
   }
 
@@ -152,7 +139,7 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
   private void createAndDisposeQueue(String queueName) throws IOException {
     DualRandomAccessFileQueueStoreDelegate queue =
         new DualRandomAccessFileQueueStoreDelegate(queueName, workingDirectory.getRoot().getAbsolutePath(),
-                                                   mockMuleContext.getObjectSerializer().getInternalProtocol(),
+                                                   objectSerializer.getInternalProtocol(),
                                                    1);
     queue.dispose();
   }
@@ -163,7 +150,7 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
 
   private DualRandomAccessFileQueueStoreDelegate createTestQueueStore() {
     return new DualRandomAccessFileQueueStoreDelegate(TEST_QUEUE_NAME, workingDirectory.getRoot().getAbsolutePath(),
-                                                      mockMuleContext.getObjectSerializer().getInternalProtocol(),
+                                                      objectSerializer.getInternalProtocol(),
                                                       0);
   }
 

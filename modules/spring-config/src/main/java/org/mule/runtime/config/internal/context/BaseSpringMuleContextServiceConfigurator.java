@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.context;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
+import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_ENCODING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
@@ -30,6 +31,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
+import org.mule.runtime.config.internal.bean.DefaultObjectSerializerDelegate;
 import org.mule.runtime.config.internal.el.DataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.el.DefaultExpressionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.SchedulerBaseConfigFactory;
@@ -47,10 +49,10 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
 
-import jakarta.inject.Inject;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+
+import jakarta.inject.Inject;
 
 /**
  * This class configures the basic services available in a {@code MuleContext} that are independent of the artifact config.
@@ -125,6 +127,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
     registerBeanDefinition(OBJECT_SCHEDULER_BASE_CONFIG, getBeanDefinition(SchedulerBaseConfigFactory.class));
 
     registerConstantBeanDefinition(OBJECT_REGISTRY, getServiceLocator());
+    registerBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME, getBeanDefinition(DefaultObjectSerializerDelegate.class));
 
     createRuntimeServices();
     createBootstrapBeanDefinitions();

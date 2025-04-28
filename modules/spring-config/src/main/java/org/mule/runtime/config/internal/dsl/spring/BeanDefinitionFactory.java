@@ -10,8 +10,6 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
-import static org.mule.runtime.config.api.dsl.CoreDslConstants.CONFIGURATION_IDENTIFIER;
 import static org.mule.runtime.config.api.properties.PropertiesResolverUtils.loadProviderFactories;
 import static org.mule.runtime.config.internal.dsl.XmlConstants.buildRawParamKeyForDocAttribute;
 import static org.mule.runtime.config.internal.dsl.spring.ComponentModelHelper.addAnnotation;
@@ -80,6 +78,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -285,7 +284,7 @@ public class BeanDefinitionFactory {
 
         if (values != null) {
           values.stream()
-              .filter(child -> child instanceof ComponentAst)
+              .filter(ComponentAst.class::isInstance)
               .forEach(child -> resolveComponentBeanDefinition(springComponentModels, updatedHierarchy, (ComponentAst) child,
                                                                emptyList(),
                                                                registry, componentLocator,
@@ -334,9 +333,7 @@ public class BeanDefinitionFactory {
         final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentHierarchy);
         updatedHierarchy.add(paramOwnerComponent);
 
-        if (complexValue instanceof ComponentAst) {
-          final ComponentAst child = (ComponentAst) complexValue;
-
+        if (complexValue instanceof final ComponentAst child) {
           List<SpringComponentModel> childParamsModels = new ArrayList<>();
 
           child.getModel(ParameterizedModel.class)
@@ -480,8 +477,7 @@ public class BeanDefinitionFactory {
                                                                final ComponentIdentifier paramComponentIdentifier) {
     if (param.getValue().getValue().isPresent()) {
       Object valueObject = param.getValue().getValue().get();
-      if (valueObject instanceof ComponentAst) {
-        ComponentAst valueAst = (ComponentAst) valueObject;
+      if (valueObject instanceof ComponentAst valueAst) {
         return valueAst.getIdentifier();
       }
     }
@@ -577,7 +573,6 @@ public class BeanDefinitionFactory {
 
     // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
     // how core constructs are processed.
-    processMuleConfiguration(springComponentModels, component, registry);
     processMuleSecurityManager(springComponentModels, component, registry);
 
     componentBuildingDefinitionRegistry.getBuildingDefinition(component.getIdentifier())
@@ -652,21 +647,6 @@ public class BeanDefinitionFactory {
     }
 
     return stringBuilder.toString();
-  }
-
-  private void processMuleConfiguration(Map<ComponentAst, SpringComponentModel> springComponentModels,
-                                        ComponentAst component, BeanDefinitionRegistry registry) {
-    if (component.getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-      ComponentParameterAst objectSerializerRefParam = component.getParameter(DEFAULT_GROUP_NAME, OBJECT_SERIALIZER_REF);
-      if (objectSerializerRefParam != null) {
-        String defaultObjectSerializer = objectSerializerRefParam.getResolvedRawValue();
-        if (defaultObjectSerializer != null && !defaultObjectSerializer.equals(DEFAULT_OBJECT_SERIALIZER_NAME)
-            && !registry.isAlias(DEFAULT_OBJECT_SERIALIZER_NAME)) {
-          registry.removeBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME);
-          registry.registerAlias(defaultObjectSerializer, DEFAULT_OBJECT_SERIALIZER_NAME);
-        }
-      }
-    }
   }
 
   private void processMuleSecurityManager(Map<ComponentAst, SpringComponentModel> springComponentModels,

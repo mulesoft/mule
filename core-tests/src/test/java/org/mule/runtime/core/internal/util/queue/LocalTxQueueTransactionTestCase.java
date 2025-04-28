@@ -7,7 +7,6 @@
 package org.mule.runtime.core.internal.util.queue;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import static java.lang.System.currentTimeMillis;
@@ -16,37 +15,35 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.api.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.api.util.queue.QueueConfiguration;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.internal.util.journal.queue.LocalTxQueueTransactionRecoverer;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +51,7 @@ import org.junit.rules.TemporaryFolder;
 
 import org.mockito.stubbing.Answer;
 
-public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase {
+public class LocalTxQueueTransactionTestCase extends AbstractMuleTestCase {
 
   public static final String QUEUE_NAME = "inQueue";
   private static final int TIMEOUT = 10;
@@ -66,6 +63,8 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+  private ObjectSerializer serializer;
+
   private LocalTxQueueTransactionJournal txLog;
   private DefaultQueueStore inQueue;
   private PersistentQueueTransactionContext persistentTransactionContext;
@@ -73,28 +72,19 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   private LocalTxQueueTransactionContext localTxTransactionContext;
 
   @Before
-  public void setUp() {
-    currentMuleContext.set(muleContext);
-  }
+  public void setUp() throws Exception {
+    serializer = new JavaObjectSerializer(this.getClass().getClassLoader());
 
-  @After
-  public void teardown() {
-    currentMuleContext.set(null);
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
-    ((DefaultMuleConfiguration) muleContext.getConfiguration()).setWorkingDirectory(temporaryFolder.getRoot().getAbsolutePath());
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(),
-                                               muleContext.getObjectSerializer().getInternalProtocol());
+                                               serializer.getInternalProtocol());
     QueueConfiguration queueConfiguration = new DefaultQueueConfiguration(0, true);
     inQueue = new DefaultQueueStore(QUEUE_NAME,
-                                    muleContext.getConfiguration().getWorkingDirectory(),
-                                    muleContext.getObjectSerializer().getInternalProtocol(),
+                                    temporaryFolder.getRoot().getAbsolutePath(),
+                                    serializer.getInternalProtocol(),
                                     queueConfiguration);
     delayedQueue = new DelayedQueueStore(QUEUE_NAME,
-                                         muleContext.getConfiguration().getWorkingDirectory(),
-                                         muleContext.getObjectSerializer().getInternalProtocol(),
+                                         temporaryFolder.getRoot().getAbsolutePath(),
+                                         serializer.getInternalProtocol(),
                                          queueConfiguration, QUEUE_DELAY_MILLIS);
 
     persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createRecoverOnlyQueueProvider(inQueue));
@@ -112,13 +102,6 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     return new LocalTxQueueTransactionContext(txLog, provider, lock);
   }
 
-  @Override
-  protected void configureMuleContext(MuleContextBuilder contextBuilder) {
-    DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
-    muleConfiguration.setWorkingDirectory(temporaryFolder.getRoot().getAbsolutePath());
-    contextBuilder.setMuleConfiguration(muleConfiguration);
-  }
-
   @Test
   public void pollAndFailThenRecover() throws Exception {
     inQueue.offer(testEvent(), 0, TIMEOUT);
@@ -127,7 +110,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     assertThat(value, notNullValue());
     txLog.close();
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(),
-                                               muleContext.getObjectSerializer().getInternalProtocol());
+                                               serializer.getInternalProtocol());
 
     queueTransactionRecoverer.recover();
     CoreEvent muleEvent = (CoreEvent) inQueue.poll(TIMEOUT);
@@ -138,7 +121,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   @Test
   public void pollAndFailThenRecoverWithTwoElements() throws Exception {
     final String MESSAGE_CONTENT_2 = TEST_PAYLOAD + "2";
-    CoreEvent testEvent2 = eventBuilder(muleContext).message(of(MESSAGE_CONTENT_2)).build();
+    CoreEvent testEvent2 = eventBuilder().message(of(MESSAGE_CONTENT_2)).build();
 
     inQueue.offer(testEvent(), 0, TIMEOUT);
     inQueue.offer(testEvent2, 0, TIMEOUT);
@@ -147,7 +130,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     assertThat(value, notNullValue());
     txLog.close();
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(),
-                                               muleContext.getObjectSerializer().getInternalProtocol());
+                                               serializer.getInternalProtocol());
     queueTransactionRecoverer.recover();
     CoreEvent muleEvent = (CoreEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
@@ -165,7 +148,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     persistentTransactionContext.poll(inQueue, TIMEOUT);
     txLog.close();
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(),
-                                               muleContext.getObjectSerializer().getInternalProtocol());
+                                               serializer.getInternalProtocol());
     queueTransactionRecoverer.recover();
     CoreEvent muleEvent = (CoreEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
@@ -207,15 +190,15 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   @Test
   public void offerAndFailThenRecover() throws Exception {
     final DefaultQueueStore outQueue = new DefaultQueueStore(QUEUE_NAME,
-                                                             muleContext.getConfiguration().getWorkingDirectory(),
-                                                             muleContext.getObjectSerializer().getInternalProtocol(),
+                                                             temporaryFolder.getRoot().getAbsolutePath(),
+                                                             serializer.getInternalProtocol(),
                                                              new DefaultQueueConfiguration(0, true));
     persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createRecoverOnlyQueueProvider(outQueue));
     persistentTransactionContext.offer(outQueue, testEvent(), TIMEOUT);
     assertThat(outQueue.poll(TIMEOUT), nullValue());
     txLog.close();
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.newFolder().getAbsolutePath(),
-                                               muleContext.getObjectSerializer().getInternalProtocol());
+                                               serializer.getInternalProtocol());
     queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createRecoverOnlyQueueProvider(outQueue));
     queueTransactionRecoverer.recover();
     Serializable muleEvent = outQueue.poll(TIMEOUT);
@@ -226,10 +209,10 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
   public void offerAndFailBetweenRealOfferAndCommitThenRecover() throws Exception {
     String logFilesDirectory = temporaryFolder.newFolder().getAbsolutePath();
     txLog = new TestTransactionLogger(logFilesDirectory,
-                                      muleContext.getObjectSerializer().getInternalProtocol()).failDuringLogCommit();
+                                      serializer.getInternalProtocol()).failDuringLogCommit();
     final DefaultQueueStore outQueue = new DefaultQueueStore(QUEUE_NAME,
-                                                             muleContext.getConfiguration().getWorkingDirectory(),
-                                                             muleContext.getObjectSerializer().getInternalProtocol(),
+                                                             temporaryFolder.getRoot().getAbsolutePath(),
+                                                             serializer.getInternalProtocol(),
                                                              new DefaultQueueConfiguration(0, true));
     persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createRecoverOnlyQueueProvider(outQueue));
     persistentTransactionContext.offer(outQueue, testEvent(), TIMEOUT);
@@ -241,7 +224,7 @@ public class LocalTxQueueTransactionTestCase extends AbstractMuleContextTestCase
     }
     txLog.close();
     txLog = new TestTransactionLogger(logFilesDirectory,
-                                      muleContext.getObjectSerializer().getInternalProtocol());
+                                      serializer.getInternalProtocol());
     queueTransactionRecoverer = new LocalTxQueueTransactionRecoverer(txLog, createRecoverOnlyQueueProvider(outQueue));
     queueTransactionRecoverer.recover();
     Serializable muleEvent = outQueue.poll(TIMEOUT);

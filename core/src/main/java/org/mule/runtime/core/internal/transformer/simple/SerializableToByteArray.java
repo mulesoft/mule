@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -18,6 +19,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String to a byte array. If <code>Message</code> is
@@ -63,13 +65,10 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
     this.priorityWeighting = priorityWeighting;
   }
 
+  @Inject
+  @Named(DEFAULT_OBJECT_SERIALIZER_NAME)
   public void setObjectSerializer(ObjectSerializer objectSerializer) {
     this.objectSerializer = objectSerializer;
-  }
-
-  @Inject
-  public void setMuleContext(MuleContext context) {
-    setObjectSerializer(context.getObjectSerializer());
   }
 
 }
