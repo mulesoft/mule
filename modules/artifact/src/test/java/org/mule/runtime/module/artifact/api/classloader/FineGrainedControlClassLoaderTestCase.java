@@ -20,7 +20,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mockito.Mockito.mock;
@@ -75,7 +74,7 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
     FineGrainedControlClassLoader ext =
         new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
 
-    assertEquals(EXPECTED_PARENT_MESSAGE, invokeTestClassMethod(ext));
+    assertThat(invokeTestClassMethod(ext), is(EXPECTED_PARENT_MESSAGE));
   }
 
   @Test
@@ -108,7 +107,7 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
     FineGrainedControlClassLoader ext =
         new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
 
-    assertEquals(EXPECTED_PARENT_MESSAGE, invokeTestClassMethod(ext));
+    assertThat(invokeTestClassMethod(ext), is(EXPECTED_PARENT_MESSAGE));
   }
 
   @Test
@@ -123,7 +122,7 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
     FineGrainedControlClassLoader ext =
         new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
 
-    assertEquals(EXPECTED_CHILD_MESSAGE, invokeTestClassMethod(ext));
+    assertThat(invokeTestClassMethod(ext), is(EXPECTED_CHILD_MESSAGE));
   }
 
   @Test
@@ -157,7 +156,7 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
     FineGrainedControlClassLoader ext =
         new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
 
-    assertEquals(EXPECTED_CHILD_MESSAGE, invokeTestClassMethod(ext));
+    assertThat(invokeTestClassMethod(ext), is(EXPECTED_CHILD_MESSAGE));
   }
 
   @Test
@@ -169,11 +168,11 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
 
     FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
 
-    assertEquals(EXPECTED_PARENT_MESSAGE, invokeTestClassMethod(ext));
+    assertThat(invokeTestClassMethod(ext), is(EXPECTED_PARENT_MESSAGE));
   }
 
   @Test
-  public void usesChildFirstThenParentLookupAndFails() throws Exception {
+  public void usesChildFirstThenParentLookupAndFails() {
     ClassLoader parent = currentThread().getContextClassLoader();
 
     final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
@@ -215,8 +214,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   }
 
   private String invokeTestClassMethod(ClassLoader loader) throws Exception {
-    Class cls = loader.loadClass(TEST_CLASS_NAME);
+    Class<?> cls = loader.loadClass(TEST_CLASS_NAME);
     Method method = cls.getMethod("hi");
-    return (String) method.invoke(cls.newInstance());
+    return (String) method.invoke(cls.getDeclaredConstructor().newInstance());
   }
 }
