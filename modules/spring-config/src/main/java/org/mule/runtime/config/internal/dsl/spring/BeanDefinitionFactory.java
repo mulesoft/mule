@@ -278,6 +278,24 @@ public class BeanDefinitionFactory {
     AtomicReference<SpringComponentModel> model = new AtomicReference<>();
     param.getModel().getType().accept(new MetadataTypeVisitor() {
 
+      private void doVisitCollectionType(Map<ComponentAst, SpringComponentModel> springComponentModels,
+                                         List<ComponentAst> componentHierarchy,
+                                         ComponentAst paramOwnerComponent,
+                                         ComponentParameterAst param,
+                                         BeanDefinitionRegistry registry,
+                                         SpringConfigurationComponentLocator componentLocator,
+                                         AtomicReference<SpringComponentModel> model,
+                                         Object complexValue) {
+        if (complexValue instanceof List listComplexValue) {
+          visitMultipleChildren(listComplexValue);
+        } else {
+          // references to a list defined elsewhere
+          resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
+                                               componentLocator)
+                                                   .ifPresent(model::set);
+        }
+      }
+
       protected void visitMultipleChildren(List<Object> values) {
         final List<ComponentAst> updatedHierarchy = new ArrayList<>(componentHierarchy);
         updatedHierarchy.add(paramOwnerComponent);
@@ -304,14 +322,8 @@ public class BeanDefinitionFactory {
       @Override
       public void visitArrayType(ArrayType arrayType) {
         final Object complexValue = param.getValue().getRight();
-        if (complexValue instanceof List) {
-          visitMultipleChildren((List) complexValue);
-        } else {
-          // references to a list defined elsewhere
-          resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
-                                               componentLocator)
-                                                   .ifPresent(model::set);
-        }
+        doVisitCollectionType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry, componentLocator,
+                              model, complexValue);
       }
 
       @Override
@@ -319,14 +331,8 @@ public class BeanDefinitionFactory {
         final Object complexValue = param.getValue().getRight();
 
         if (isMap(objectType)) {
-          if (complexValue instanceof List) {
-            visitMultipleChildren((List) complexValue);
-          } else {
-            // references to a map defined elsewhere
-            resolveParamBeanDefinitionSimpleType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry,
-                                                 componentLocator)
-                                                     .ifPresent(model::set);
-          }
+          doVisitCollectionType(springComponentModels, componentHierarchy, paramOwnerComponent, param, registry, componentLocator,
+                                model, complexValue);
           return;
         }
 

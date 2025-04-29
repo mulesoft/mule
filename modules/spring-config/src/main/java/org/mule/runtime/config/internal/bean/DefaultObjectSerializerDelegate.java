@@ -11,23 +11,25 @@ import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.config.api.bean.ObjectSerializerDelegate;
 import org.mule.runtime.core.api.MuleContext;
 
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import jakarta.inject.Inject;
 
-/**
- * @since 4.10
- */
 public class DefaultObjectSerializerDelegate implements ObjectSerializerDelegate {
 
-  private ObjectSerializer delegate;
+  private ReadWriteLock delegateLock = new ReentrantReadWriteLock();
+
+  private volatile ObjectSerializer delegate;
 
   @Override
   public SerializationProtocol getInternalProtocol() {
-    return delegate.getInternalProtocol();
+    return getDelegate().getInternalProtocol();
   }
 
   @Override
   public SerializationProtocol getExternalProtocol() {
-    return delegate.getExternalProtocol();
+    return getDelegate().getExternalProtocol();
   }
 
   @Inject
@@ -37,11 +39,21 @@ public class DefaultObjectSerializerDelegate implements ObjectSerializerDelegate
 
   @Override
   public void setDelegate(ObjectSerializer delegate) {
-    this.delegate = delegate;
+    delegateLock.writeLock().lock();
+    try {
+      this.delegate = delegate;
+    } finally {
+      delegateLock.writeLock().unlock();
+    }
   }
 
   @Override
   public ObjectSerializer getDelegate() {
-    return delegate;
+    delegateLock.readLock().lock();
+    try {
+      return delegate;
+    } finally {
+      delegateLock.readLock().unlock();
+    }
   }
 }
