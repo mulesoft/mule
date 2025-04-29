@@ -6,25 +6,34 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 
+import org.junit.Rule;
 import org.junit.Test;
 
-public class ExpressionEvaluatorTestCase extends AbstractMuleContextTestCase {
+public class ExpressionEvaluatorTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   @Test
   public void handleNullEvent() throws MuleException {
-    TypedValue evaluate = muleContext.getExpressionManager().evaluate("%dw 2.0\noutput application/json\n---\n{a: 1}");
+    TypedValue evaluate = dw.getExpressionManager().evaluate("%dw 2.0\noutput application/json\n---\n{a: 1}");
     ByteArrayBasedCursorStreamProvider value = (ByteArrayBasedCursorStreamProvider) evaluate.getValue();
-    String expected = "{\n" +
-        "  \"a\": 1\n" +
-        "}";
+    String expected = """
+        {
+          "a": 1
+        }""";
     assertThat(IOUtils.toString(value), is(expected));
   }
 }

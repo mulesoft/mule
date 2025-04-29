@@ -21,8 +21,9 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
@@ -48,7 +49,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
   @Inject
   private ReflectionCache reflectionCache;
   @Inject
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
   @Inject
   private MuleContext muleContext;
 
@@ -83,8 +84,8 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
       ConfigurationInstance configuration;
       CoreEvent initialiserEvent = null;
       try {
-        initialiserEvent = getInitialiserEvent(muleContext);
-        initialiseIfNeeded(resolverSet, true, muleContext);
+        initialiserEvent = NullEventFactory.getNullEvent();
+        initialiseIfNeeded(resolverSet, muleContext.getInjector());
         ConfigurationInstanceFactory configurationFactory = new ConfigurationInstanceFactory(extensionModel,
                                                                                              configurationModel,
                                                                                              resolverSet,
@@ -112,6 +113,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                                                             .<ConnectionManager>lookupByName(OBJECT_CONNECTION_MANAGER)
                                                                                                             .get(),
                                                                                                         reflectionCache,
+                                                                                                        expressionManager,
                                                                                                         muleContext))
           .orElseGet(() -> new StaticConfigurationProvider(name, extensionModel,
                                                            configurationModel, configuration,

@@ -18,31 +18,29 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 
 import java.util.List;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
 
 /**
  * An object that owns Mule objects and delegates startup/shutdown events to them.
  */
 public abstract class AbstractMuleObjectOwner<T> extends AbstractComponent
-    implements Lifecycle, MuleContextAware {
+    implements Lifecycle {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage
-  @Inject
   protected MuleContext muleContext;
 
   @Inject
   protected ConfigurationComponentLocator locator;
 
-  @Override
+  @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
     setMuleContextIfNeeded(getOwnedObjects(), muleContext);
@@ -54,9 +52,7 @@ public abstract class AbstractMuleObjectOwner<T> extends AbstractComponent
 
   @Override
   public void initialise() throws InitialisationException {
-    // TODO MULE-10764 This shouldn't happen here.
-    setMuleContext(muleContext);
-    initialiseIfNeeded(getOwnedObjects(), true, muleContext);
+    initialiseIfNeeded(getOwnedObjects(), muleContext.getInjector());
   }
 
   @Override

@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
@@ -45,9 +44,10 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.store.ObjectStore;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.ConfigOverrideTypeAnnotation;
 import org.mule.runtime.extension.api.declaration.type.annotation.ExclusiveOptionalsTypeAnnotation;
@@ -85,45 +85,62 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ParametersResolver implements ObjectTypeParametersResolver {
 
   private final MuleContext muleContext;
+  private final Injector injector;
   private final Map<String, ?> parameters;
   private final ReflectionCache reflectionCache;
-  private final ExpressionManager expressionManager;
+  private final ExtendedExpressionManager expressionManager;
   private final String parameterOwner;
 
-  protected ParametersResolver(MuleContext muleContext, Map<String, ?> parameters,
-                               ReflectionCache reflectionCache, ExpressionManager expressionManager, String parameterOwner) {
+  protected ParametersResolver(MuleContext muleContext,
+                               Injector injector,
+                               Map<String, ?> parameters,
+                               ReflectionCache reflectionCache,
+                               ExtendedExpressionManager expressionManager,
+                               String parameterOwner) {
     this.muleContext = muleContext;
+    this.injector = injector;
     this.parameters = parameters;
     this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
     this.parameterOwner = parameterOwner;
   }
 
-  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext,
-                                              ReflectionCache reflectionCache, ExpressionManager expressionManager,
+  public static ParametersResolver fromValues(Map<String, ?> parameters,
+                                              MuleContext muleContext,
+                                              Injector injector,
+                                              ReflectionCache reflectionCache,
+                                              ExtendedExpressionManager expressionManager,
                                               String parameterOwner) {
-    return fromValues(parameters, muleContext, true, reflectionCache, expressionManager, parameterOwner);
+    return fromValues(parameters, muleContext, injector, true, reflectionCache, expressionManager, parameterOwner);
   }
 
-  public static ParametersResolver fromValues(Map<String, ?> parameters, MuleContext muleContext, boolean disableValidations,
-                                              ReflectionCache reflectionCache, ExpressionManager expressionManager,
+  public static ParametersResolver fromValues(Map<String, ?> parameters,
+                                              MuleContext muleContext,
+                                              Injector injector,
+                                              boolean disableValidations,
+                                              ReflectionCache reflectionCache,
+                                              ExtendedExpressionManager expressionManager,
                                               String parameterOwner) {
     if (disableValidations) {
-      return new ParametersResolver(muleContext, parameters, reflectionCache, expressionManager, parameterOwner);
+      return new ParametersResolver(muleContext, injector, parameters, reflectionCache, expressionManager, parameterOwner);
     } else {
-      return new ValidatingParametersResolver(muleContext, parameters, reflectionCache, expressionManager, parameterOwner);
+      return new ValidatingParametersResolver(muleContext, injector, parameters, reflectionCache, expressionManager,
+                                              parameterOwner);
     }
   }
 
-  public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel, MuleContext muleContext,
-                                                     ReflectionCache reflectionCache, ExpressionManager expressionManager) {
+  public static ParametersResolver fromDefaultValues(ParameterizedModel parameterizedModel,
+                                                     MuleContext muleContext,
+                                                     Injector injector,
+                                                     ReflectionCache reflectionCache,
+                                                     ExtendedExpressionManager expressionManager) {
     List<ParameterModel> allParameterModels = parameterizedModel.getAllParameterModels();
     Map<String, Object> parameterValues = forSize(allParameterModels.size());
     for (ParameterModel model : allParameterModels) {
       parameterValues.put(model.getName(), model.getDefaultValue());
     }
 
-    return new ParametersResolver(muleContext, parameterValues, reflectionCache, expressionManager,
+    return new ParametersResolver(muleContext, injector, parameterValues, reflectionCache, expressionManager,
                                   parameterizedModel.getName());
   }
 
@@ -135,7 +152,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
   public ResolverSet getParametersAsResolverSet(ParameterizedModel model, MuleContext muleContext) throws ConfigurationException {
     List<ParameterGroupModel> inlineGroups = getInlineGroups(model.getParameterGroupModels());
     List<ParameterModel> flatParameters = getFlatParameters(inlineGroups, model.getAllParameterModels());
-    ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters, muleContext);
+    ResolverSet resolverSet = getParametersAsResolverSet(model, flatParameters);
     for (ParameterGroupModel group : inlineGroups) {
       getInlineGroupResolver(group, resolverSet, muleContext);
     }
@@ -144,7 +161,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
 
   public ResolverSet getNestedComponentsAsResolverSet(ComponentModel model) {
     List<? extends NestableElementModel> nestedComponents = model.getNestedComponents();
-    ResolverSet resolverSet = new ResolverSet(muleContext);
+    ResolverSet resolverSet = new ResolverSet(injector);
     nestedComponents.forEach(nc -> resolverSet.add(nc.getName(), toValueResolver(parameters.get(nc.getName()))));
     return resolverSet;
   }
@@ -159,7 +176,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
       throws ConfigurationException {
     List<ParameterGroupModel> inlineGroups = getInlineGroups(groups);
     List<ParameterModel> allParameters = groups.stream().flatMap(g -> g.getParameterModels().stream()).collect(toList());
-    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, allParameters), context);
+    ResolverSet resolverSet = getParametersAsResolverSet(model, getFlatParameters(inlineGroups, allParameters));
     for (ParameterGroupModel group : inlineGroups) {
       getInlineGroupResolver(group, resolverSet, context);
     }
@@ -179,7 +196,9 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
     } else if (descriptor.isPresent()) {
       resolverSet.add(groupKey,
                       NullSafeValueResolverWrapper.of(new StaticValueResolver<>(null), descriptor.get().getMetadataType(),
-                                                      reflectionCache, expressionManager, muleContext, this));
+                                                      reflectionCache,
+                                                      muleContext.getTransformationService(),
+                                                      expressionManager, muleContext, injector, this));
     } else {
       List<ValueResolver<Object>> keyResolvers = new LinkedList<>();
       List<ValueResolver<Object>> valueResolvers = new LinkedList<>();
@@ -192,21 +211,20 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
         }
       });
 
-      resolverSet.add(groupKey, MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, muleContext));
+      resolverSet.add(groupKey, MapValueResolver.of(HashMap.class, keyResolvers, valueResolvers, reflectionCache, injector));
     }
   }
 
-  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameters, MuleContext context)
+  public ResolverSet getParametersAsResolverSet(ParameterizedModel model, List<ParameterModel> parameters)
       throws ConfigurationException {
-    ResolverSet resolverSet = new ResolverSet(context);
+    ResolverSet resolverSet = new ResolverSet(injector);
     return getResolverSet(Optional.of(model), model.getParameterGroupModels(), parameters, resolverSet);
   }
 
-  public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels,
-                                                MuleContext muleContext)
+  public ResolverSet getParametersAsResolverSet(List<ParameterGroupModel> groups, List<ParameterModel> parameterModels)
       throws ConfigurationException {
-    ResolverSet resolverSet = new ResolverSet(muleContext);
-    return getResolverSet(Optional.empty(), groups, parameterModels, resolverSet);
+    ResolverSet resolverSet = new ResolverSet(injector);
+    return getResolverSet(empty(), groups, parameterModels, resolverSet);
   }
 
   protected ResolverSet getResolverSet(Optional<ParameterizedModel> model, List<ParameterGroupModel> groups,
@@ -236,7 +254,7 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
       resolver = toValueResolver(parameters.get(parameterName), parameter);
     } else {
       // TODO MULE-13066 Extract ParameterResolver logic into a centralized resolver
-      resolver = getDefaultValueResolver(parameter, muleContext);
+      resolver = getDefaultValueResolver(parameter, muleContext.getTransformationService(), expressionManager, injector);
     }
 
     if (isNullSafe(parameter)) {
@@ -245,7 +263,10 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
           parameter.getModelProperty(NullSafeModelProperty.class).map(NullSafeModelProperty::defaultType);
       if (type.isPresent()) {
         resolver =
-            NullSafeValueResolverWrapper.of(delegate, type.get(), reflectionCache, expressionManager, this.muleContext, this);
+            NullSafeValueResolverWrapper.of(delegate, type.get(), reflectionCache,
+                                            muleContext.getTransformationService(),
+                                            expressionManager, this.muleContext, injector,
+                                            this);
       }
     }
 
@@ -341,39 +362,50 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
     final boolean isParameterGroup = isFlattenedParameterGroup(objectType);
     objectType.getFields().forEach(field -> {
       final String key = getLocalPart(field);
-      ValueResolver<?> valueResolver = null;
       Field objectField = getField(objectClass, key);
-
-      if (parameters.containsKey(key)) {
-        valueResolver = toValueResolver(parameters.get(key));
-      } else if (!isParameterGroup) {
-        valueResolver = getDefaultValue(field).isPresent() ? getFieldDefaultValueValueResolver(field, muleContext) : null;
-      }
-
-      Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
-      if (nullSafe.isPresent()) {
-        ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
-        MetadataType type =
-            getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
-        valueResolver = NullSafeValueResolverWrapper.of(delegate, type, reflectionCache, expressionManager, muleContext, this);
-      }
-
-      if (field.getAnnotation(ConfigOverrideTypeAnnotation.class).isPresent()) {
-        valueResolver =
-            ConfigOverrideValueResolverWrapper.of(valueResolver != null ? valueResolver : new StaticValueResolver<>(null),
-                                                  key, objectField.getType(), reflectionCache, muleContext,
-                                                  objectClass.getName());
-      }
+      ValueResolver<?> valueResolver = resolveObjectFieldParameter(objectClass, objectField, field, key, isParameterGroup);
 
       addPropertyResolver(builder, valueResolver, field, objectField);
     });
+  }
+
+  private ValueResolver<?> resolveObjectFieldParameter(final Class<?> objectClass, Field objectField, ObjectFieldType field,
+                                                       final String key, final boolean isParameterGroup) {
+    ValueResolver<?> valueResolver = null;
+
+    if (parameters.containsKey(key)) {
+      valueResolver = toValueResolver(parameters.get(key));
+    } else if (!isParameterGroup) {
+      valueResolver = getDefaultValue(field).isPresent()
+          ? getFieldDefaultValueValueResolver(field, muleContext.getTransformationService(), expressionManager, injector)
+          : null;
+    }
+
+    Optional<NullSafeTypeAnnotation> nullSafe = field.getAnnotation(NullSafeTypeAnnotation.class);
+    if (nullSafe.isPresent()) {
+      ValueResolver<?> delegate = valueResolver != null ? valueResolver : new StaticValueResolver<>(null);
+      MetadataType type =
+          getMetadataType(nullSafe.get().getType(), ExtensionsTypeLoaderFactory.getDefault().createTypeLoader());
+      valueResolver =
+          NullSafeValueResolverWrapper.of(delegate, type, reflectionCache,
+                                          muleContext.getTransformationService(),
+                                          expressionManager, muleContext, injector, this);
+    }
+
+    if (field.getAnnotation(ConfigOverrideTypeAnnotation.class).isPresent()) {
+      valueResolver =
+          ConfigOverrideValueResolverWrapper.of(valueResolver != null ? valueResolver : new StaticValueResolver<>(null),
+                                                key, objectField.getType(), reflectionCache, muleContext,
+                                                objectClass.getName());
+    }
+    return valueResolver;
   }
 
   protected void addPropertyResolver(DefaultObjectBuilder builder, ValueResolver<?> valueResolver, ObjectFieldType field,
                                      Field objectField) {
     if (valueResolver != null) {
       try {
-        initialiseIfNeeded(valueResolver, true, muleContext);
+        initialiseIfNeeded(valueResolver, injector);
         builder.addPropertyResolver(objectField, valueResolver);
       } catch (InitialisationException e) {
         throw new MuleRuntimeException(e);
@@ -399,8 +431,8 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
    * @param value the value to expose
    * @return a {@link ValueResolver}
    */
-  private ValueResolver<?> toValueResolver(Object value) {
-    return toValueResolver(value, null);
+  private <T> ValueResolver<T> toValueResolver(Object value) {
+    return (ValueResolver<T>) toValueResolver(value, null);
   }
 
   /**
@@ -446,12 +478,12 @@ public class ParametersResolver implements ObjectTypeParametersResolver {
     value.forEach((key, entryValue) -> normalizedMap.put((ValueResolver<Object>) toValueResolver(key),
                                                          (ValueResolver<Object>) toValueResolver(entryValue)));
     return MapValueResolver.of(value.getClass(), copyOf(normalizedMap.keySet()), copyOf(normalizedMap.values()), reflectionCache,
-                               muleContext);
+                               injector);
   }
 
   private ValueResolver<?> getCollectionResolver(Collection<?> collection) {
     return CollectionValueResolver.of(collection.getClass(),
-                                      collection.stream().map(p -> toValueResolver(p)).collect(toImmutableList()));
+                                      collection.stream().map(this::toValueResolver).toList());
   }
 
   protected Map<String, ?> getParameters() {

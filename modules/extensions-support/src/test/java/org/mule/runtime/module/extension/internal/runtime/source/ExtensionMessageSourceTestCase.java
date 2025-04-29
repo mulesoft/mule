@@ -28,6 +28,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -209,15 +210,14 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE);
     MuleException e = new DefaultMuleException(connectionException);
     doThrow(e).when(source).onStart(any());
-    if (!this.retryPolicyTemplate.isAsync()) {
-      expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
-      expectedException.expectCause(is(connectionException));
-    } else {
-      expectedException.none();
-    }
 
     messageSource.initialise();
-    messageSource.start();
+    if (!this.retryPolicyTemplate.isAsync()) {
+      var thrown = assertThrows(RetryPolicyExhaustedException.class, () -> messageSource.start());
+      assertThat(thrown.getCause(), is(connectionException));
+    } else {
+      messageSource.start();
+    }
   }
 
   @Test
@@ -262,17 +262,16 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     doThrow(e).when(source).onStart(any());
     doThrow(new NullPointerException()).when(source).onStop();
 
+    messageSource.initialise();
+
     // Non async retries will make the test thread fail.
     if (!this.retryPolicyTemplate.isAsync()) {
-      expectedException.expect(is(instanceOf(RetryPolicyExhaustedException.class)));
-      expectedException.expectCause(is(connectionException));
-    }
+      var thrown = assertThrows(RetryPolicyExhaustedException.class, () -> messageSource.start());
+      assertThat(thrown.getCause(), is(connectionException));
+    } else {
+      messageSource.start();
 
-    messageSource.initialise();
-    messageSource.start();
-
-    // Async retries will fail on a different thread but must send an error notification.
-    if (this.retryPolicyTemplate.isAsync()) {
+      // Async retries will fail on a different thread but must send an error notification.
       latch.await(TEST_TIMEOUT, SECONDS);
       assertThat(notifications.get(0).getException(), is(instanceOf(RetryPolicyExhaustedException.class)));
       assertThat(notifications.get(0).getException().getCause(), is(connectionException));
@@ -374,8 +373,11 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
   public void startFailsWithRandomException() throws Exception {
     Exception e = new RuntimeException();
     doThrow(e).when(source).onStart(sourceCallback);
+    initialise();
+
     if (!this.retryPolicyTemplate.isAsync()) {
-      expectedException.expect(exhaustedBecauseOf(new BaseMatcher<Throwable>() {
+      var thrown = assertThrows(Exception.class, () -> messageSource.start());
+      assertThat(thrown, exhaustedBecauseOf(new BaseMatcher<Throwable>() {
 
         private final Matcher<Exception> exceptionMatcher = hasCause(sameInstance(e));
 
@@ -390,11 +392,9 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
         }
       }));
     } else {
-      expectedException.none();
+      messageSource.start();
     }
 
-    initialise();
-    messageSource.start();
 
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
       verify(source, times(3)).onStart(sourceCallback);
@@ -516,7 +516,9 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
 
     Exception e = new RuntimeException();
     doThrow(e).when(source).onStop();
-    expectedException.expect(new BaseMatcher<Throwable>() {
+
+    var thrown = assertThrows(Exception.class, () -> stop());
+    assertThat(thrown, new BaseMatcher<Throwable>() {
 
       @Override
       public boolean matches(Object item) {
@@ -539,13 +541,9 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     Exception e = new RuntimeException();
     doThrow(e).when(configurationProvider).get(any(CoreEvent.class));
 
-    expectedException.expectCause(sameInstance(e));
-
-    try {
-      messageSource.stop();
-    } finally {
-      verify(source).onStop();
-    }
+    var thrown = assertThrows(Exception.class, () -> messageSource.stop());
+    assertThat(thrown.getCause(), sameInstance(e));
+    verify(source).onStop();
   }
 
   @Test

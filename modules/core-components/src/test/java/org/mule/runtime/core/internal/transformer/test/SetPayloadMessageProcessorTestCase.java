@@ -6,25 +6,30 @@
  */
 package org.mule.runtime.core.internal.transformer.test;
 
-import static java.nio.charset.StandardCharsets.UTF_16;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.SetPayloadStory.SET_PAYLOAD;
+
+import static java.nio.charset.StandardCharsets.UTF_16;
+
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcessor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 
 import java.nio.charset.Charset;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -32,7 +37,7 @@ import io.qameta.allure.Story;
 
 @Feature(CORE_COMPONENTS)
 @Story(SET_PAYLOAD)
-public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestCase {
+public class SetPayloadMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private static final String PLAIN_TEXT = "This is a plain text";
   private static final String EXPRESSION = "#[vars.testVariable]";
@@ -40,10 +45,13 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
   private SetPayloadMessageProcessor setPayloadMessageProcessor;
 
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
+
   @Before
   public void setUp() throws Exception {
     setPayloadMessageProcessor = new SetPayloadMessageProcessor();
-    setPayloadMessageProcessor.setExpressionManager(muleContext.getExpressionManager());
+    setPayloadMessageProcessor.setExpressionManager(dw.getExpressionManager());
   }
 
   @Test

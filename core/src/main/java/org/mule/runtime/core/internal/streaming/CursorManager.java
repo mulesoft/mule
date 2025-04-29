@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
-import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.STREAMING_VERBOSE_PROPERTY;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
+import static java.lang.Boolean.getBoolean;
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.Cursor;
 import org.mule.runtime.api.streaming.CursorProvider;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.core.internal.streaming.bytes.ManagedCursorStreamProvider;
@@ -41,7 +41,7 @@ public class CursorManager {
    */
   public CursorManager(MutableStreamingStatistics statistics, StreamingGhostBuster ghostBuster) {
     this.statistics = statistics instanceof NullStreamingStatistics ? null : statistics;
-    this.ghostBuster = ghostBuster;
+    this.ghostBuster = requireNonNull(ghostBuster);
   }
 
   /**
@@ -58,9 +58,9 @@ public class CursorManager {
 
     ManagedCursorProvider managedProvider;
     if (innerDelegate instanceof CursorStreamProvider) {
-      managedProvider = new ManagedCursorStreamProvider((IdentifiableCursorProvider<CursorStream>) identifiable, statistics);
+      managedProvider = new ManagedCursorStreamProvider(identifiable, statistics);
     } else if (innerDelegate instanceof CursorIteratorProvider) {
-      managedProvider = new ManagedCursorIteratorProvider((IdentifiableCursorProvider<CursorIterator>) identifiable, statistics);
+      managedProvider = new ManagedCursorIteratorProvider(identifiable, statistics);
     } else {
       throw new MuleRuntimeException(createStaticMessage("Unknown cursor provider type: " + innerDelegate.getClass().getName()));
     }

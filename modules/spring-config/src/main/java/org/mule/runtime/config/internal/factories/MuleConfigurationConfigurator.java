@@ -18,15 +18,16 @@ import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.config.ExpressionCorrelationIdGenerator;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
-import jakarta.inject.Inject;
-
 import org.springframework.beans.factory.SmartFactoryBean;
+
+import jakarta.inject.Inject;
 
 /**
  * This class is a "SmartFactoryBean" which allows a few XML attributes to be set on the otherwise read-only MuleConfiguration. It
@@ -39,6 +40,9 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private ExpressionManager expressionManager;
 
   @Inject
   private Registry registry;
@@ -114,7 +118,8 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   }
 
   public void setCorrelationIdGeneratorExpression(String correlationIdGeneratorExpression) {
-    config.setDefaultCorrelationIdGenerator(new ExpressionCorrelationIdGenerator(muleContext, correlationIdGeneratorExpression));
+    config.setDefaultCorrelationIdGenerator(new ExpressionCorrelationIdGenerator(expressionManager,
+                                                                                 correlationIdGeneratorExpression));
   }
 
   public void setExtensions(List<ConfigurationExtension> extensions) {
@@ -124,9 +129,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   @Override
   public MuleConfiguration doGetObject() throws Exception {
     MuleConfiguration configuration = muleContext.getConfiguration();
-    if (configuration instanceof DefaultMuleConfiguration) {
-      DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
-
+    if (configuration instanceof DefaultMuleConfiguration defaultConfig) {
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
       defaultConfig.setShutdownTimeout(config.getShutdownTimeout());

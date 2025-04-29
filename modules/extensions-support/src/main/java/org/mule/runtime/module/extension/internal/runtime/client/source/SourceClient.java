@@ -12,7 +12,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
@@ -20,6 +19,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.ArtifactEncoding;
@@ -33,8 +33,9 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.util.collection.SmallMap;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
@@ -59,9 +60,9 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 /**
  * {@link ExtensionsClient} delegate class for creating and operating message sources
@@ -80,9 +81,10 @@ public class SourceClient<T, A> implements Lifecycle {
   private final StreamingManager streamingManager;
   private final ErrorTypeLocator errorTypeLocator;
   private final ReflectionCache reflectionCache;
-  private final ExpressionManager expressionManager;
+  private final ExtendedExpressionManager expressionManager;
   private final NotificationDispatcher notificationDispatcher;
   private final MuleContext muleContext;
+  private final Injector injector;
   private final ClassLoader extensionClassloader;
 
   private ExtensionMessageSource source;
@@ -100,9 +102,10 @@ public class SourceClient<T, A> implements Lifecycle {
                       StreamingManager streamingManager,
                       ErrorTypeLocator errorTypeLocator,
                       ReflectionCache reflectionCache,
-                      ExpressionManager expressionManager,
+                      ExtendedExpressionManager expressionManager,
                       NotificationDispatcher notificationDispatcher,
-                      MuleContext muleContext) {
+                      MuleContext muleContext,
+                      Injector injector) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
     this.sourceParameterizerConsumer = sourceParameterizerConsumer;
@@ -114,6 +117,7 @@ public class SourceClient<T, A> implements Lifecycle {
     this.expressionManager = expressionManager;
     this.notificationDispatcher = notificationDispatcher;
     this.muleContext = muleContext;
+    this.injector = injector;
 
     extensionClassloader = getClassLoader(extensionModel);
   }
@@ -144,7 +148,7 @@ public class SourceClient<T, A> implements Lifecycle {
 
     source.setAnnotations(SmallMap.of(LOCATION_KEY, DefaultComponentLocation.from(sourceModel.getName())));
     source.setListener(event -> event);
-    initialiseIfNeeded(source, true, muleContext);
+    initialiseIfNeeded(source, injector);
     source.setMessageProcessingManager(new ExtensionsClientMessageProcessingManager(this, handlerConsumer));
     messagingExceptionResolver = new MessagingExceptionResolver(source);
   }
@@ -175,6 +179,7 @@ public class SourceClient<T, A> implements Lifecycle {
                                                                             true,
                                                                             reflectionCache,
                                                                             expressionManager,
+                                                                            injector,
                                                                             "", artifactEncoding);
 
       resolverSet.initialise();

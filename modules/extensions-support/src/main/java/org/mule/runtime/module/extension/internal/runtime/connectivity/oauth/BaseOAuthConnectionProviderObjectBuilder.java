@@ -123,8 +123,9 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
     }
 
     MapValueResolver result =
-        new MapValueResolver(HashMap.class, staticKeyResolvers, staticValueResolvers, getReflectionCache(), muleContext);
-    initialiseIfNeeded(result, muleContext);
+        new MapValueResolver(HashMap.class, staticKeyResolvers, staticValueResolvers, getReflectionCache(),
+                             muleContext.getInjector());
+    initialiseIfNeeded(result, muleContext.getInjector());
 
     return result;
   }

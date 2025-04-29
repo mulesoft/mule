@@ -42,7 +42,9 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -76,6 +78,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   private final ConnectionManager connectionManager;
   private final ConfigurationInstance configuration;
   private final ReflectionCache reflectionCache;
+  private final ExtendedExpressionManager expressionManager;
 
   ConfigurationProviderToolingAdapter(String name,
                                       ExtensionModel extensionModel,
@@ -84,10 +87,12 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
                                       MuleMetadataService metadataService,
                                       ConnectionManager connectionManager,
                                       ReflectionCache reflectionCache,
+                                      ExtendedExpressionManager expressionManager,
                                       MuleContext muleContext) {
     super(name, extensionModel, configurationModel, configuration, muleContext);
     this.configuration = configuration;
     this.reflectionCache = reflectionCache;
+    this.expressionManager = expressionManager;
 
     this.connectionManager = connectionManager;
     this.metadataService = metadataService;
@@ -145,7 +150,7 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
     return new DefaultMetadataContext(() -> {
       CoreEvent fakeEvent = null;
       try {
-        fakeEvent = getInitialiserEvent(muleContext);
+        fakeEvent = NullEventFactory.getNullEvent();
         return of(get(fakeEvent));
       } finally {
         if (fakeEvent != null) {
@@ -163,8 +168,10 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   public Set<Value> getConfigValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConfigurationModel configurationModel = getConfigurationModel();
-      return new DefaultValueProviderMediator<>(configurationModel, () -> muleContext, () -> reflectionCache)
-          .getValues(parameterName, getParameterValueResolver(configuration.getValue(), configurationModel));
+      return new DefaultValueProviderMediator<>(configurationModel, () -> reflectionCache, () -> expressionManager,
+                                                muleContext::getInjector)
+                                                    .getValues(parameterName, getParameterValueResolver(configuration.getValue(),
+                                                                                                        configurationModel));
     }, getExtensionModel());
   }
 
@@ -172,8 +179,11 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   public Set<Value> getConfigValues(String parameterName, String targetSelector) throws ValueResolvingException {
     return valuesWithClassLoader(() -> {
       ConfigurationModel configurationModel = getConfigurationModel();
-      return new DefaultValueProviderMediator<>(configurationModel, () -> muleContext, () -> reflectionCache)
-          .getValues(parameterName, targetSelector, getParameterValueResolver(configuration.getValue(), configurationModel));
+      return new DefaultValueProviderMediator<>(configurationModel, () -> reflectionCache, () -> expressionManager,
+                                                muleContext::getInjector)
+                                                    .getValues(parameterName, targetSelector,
+                                                               getParameterValueResolver(configuration.getValue(),
+                                                                                         configurationModel));
     }, getExtensionModel());
   }
 
@@ -192,7 +202,8 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   public Set<Value> getConnectionValues(String parameterName) throws ValueResolvingException {
     return valuesWithClassLoader(() -> withConnectionProviderInfo((connection, model) -> {
       DefaultValueProviderMediator<ConnectionProviderModel> valueProviderMediator =
-          new DefaultValueProviderMediator<>(model, () -> muleContext, () -> reflectionCache);
+          new DefaultValueProviderMediator<>(model, () -> reflectionCache, () -> expressionManager,
+                                             muleContext::getInjector);
       return valueProviderMediator.getValues(parameterName, getParameterValueResolver(connection, model));
     }), getExtensionModel());
   }
@@ -201,7 +212,8 @@ public final class ConfigurationProviderToolingAdapter extends StaticConfigurati
   public Set<Value> getConnectionValues(String parameterName, String targetSelector) throws ValueResolvingException {
     return valuesWithClassLoader(() -> withConnectionProviderInfo((connection, model) -> {
       DefaultValueProviderMediator<ConnectionProviderModel> valueProviderMediator =
-          new DefaultValueProviderMediator<>(model, () -> muleContext, () -> reflectionCache);
+          new DefaultValueProviderMediator<>(model, () -> reflectionCache, () -> expressionManager,
+                                             muleContext::getInjector);
       return valueProviderMediator.getValues(parameterName, targetSelector, getParameterValueResolver(connection, model));
     }), getExtensionModel());
   }

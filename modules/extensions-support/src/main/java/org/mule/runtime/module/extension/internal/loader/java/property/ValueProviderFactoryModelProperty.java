@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.property;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
 import org.mule.runtime.api.value.Value;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -50,8 +51,8 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
                                             List<InjectableParameterInfo> injectableParameters,
                                             Field connectionField,
                                             Field configField) {
-    checkNotNull(valueProvider, "Values Provider Class parameter can't be null");
-    checkNotNull(injectableParameters, "injectableParameters parameter can't be null");
+    requireNonNull(valueProvider, "Values Provider Class parameter can't be null");
+    requireNonNull(injectableParameters, "injectableParameters parameter can't be null");
 
     this.valuesProvider = valueProvider;
     this.injectableParameters = injectableParameters;
@@ -126,10 +127,11 @@ public final class ValueProviderFactoryModelProperty implements ModelProperty {
 
   public ValueProviderFactory createFactory(ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                                             Supplier<Object> configurationSupplier, ReflectionCache reflectionCache,
-                                            MuleContext muleContext,
+                                            ExpressionManager expressionManager,
+                                            Injector injector,
                                             ParameterizedModel parameterizedModel) {
     return new ValueProviderFactory(this, parameterValueResolver, connectionSupplier, configurationSupplier, connectionField,
-                                    configField, reflectionCache, muleContext, parameterizedModel);
+                                    configField, reflectionCache, expressionManager, injector, parameterizedModel);
   }
 
   /**

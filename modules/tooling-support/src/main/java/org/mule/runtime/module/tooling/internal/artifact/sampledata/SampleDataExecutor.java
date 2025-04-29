@@ -31,7 +31,7 @@ import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingException;
@@ -56,8 +56,11 @@ public class SampleDataExecutor extends AbstractParameterResolverExecutor {
 
   private final SampleDataService sampleDataService;
 
-  public SampleDataExecutor(MuleContext muleContext, ExpressionManager expressionManager,
-                            SampleDataService sampleDataService, ReflectionCache reflectionCache, ArtifactHelper artifactHelper) {
+  public SampleDataExecutor(MuleContext muleContext,
+                            ExtendedExpressionManager expressionManager,
+                            SampleDataService sampleDataService,
+                            ReflectionCache reflectionCache,
+                            ArtifactHelper artifactHelper) {
     super(muleContext, expressionManager, reflectionCache, artifactHelper);
     this.sampleDataService = sampleDataService;
   }

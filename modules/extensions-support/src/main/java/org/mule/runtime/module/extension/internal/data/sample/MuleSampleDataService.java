@@ -29,7 +29,9 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
+import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
@@ -57,6 +59,8 @@ public class MuleSampleDataService implements SampleDataService {
   private ConfigurationComponentLocator componentLocator;
   private ExtensionManager extensionManager;
   private MuleContext muleContext;
+  private ServerNotificationManager notificationManager;
+  private ExpressionManager expressionManager;
   private ArtifactEncoding artifactEncoding;
   private StreamingManager streamingManager;
   private ConnectionManager connectionManager;
@@ -111,9 +115,9 @@ public class MuleSampleDataService implements SampleDataService {
                                                                                 new ResolvingComponent(extensionName,
                                                                                                        componentName),
                                                                                 artifactEncoding,
-                                                                                muleContext.getNotificationManager(),
+                                                                                notificationManager,
                                                                                 new ReflectionCache(),
-                                                                                muleContext.getExpressionManager(),
+                                                                                expressionManager,
                                                                                 streamingManager,
                                                                                 muleContext.getInjector(),
                                                                                 muleContext);
@@ -165,6 +169,16 @@ public class MuleSampleDataService implements SampleDataService {
   @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Inject
+  public void setNotificationManager(ServerNotificationManager notificationManager) {
+    this.notificationManager = notificationManager;
+  }
+
+  @Inject
+  public void setExpressionManager(ExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 
   @Inject

@@ -22,14 +22,6 @@
             org.mule.runtime.jpms.utils
         </surefire.add.modules>
         <surefire.args>
-            -XX:+IgnoreUnrecognizedVMOptions
-            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.value.cache=org.mule.runtime.tooling.support
-            --add-exports=org.mule.runtime.metadata.support/org.mule.runtime.metadata.internal=org.mule.runtime.tooling.support
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
-            --add-opens=org.mule.runtime.tooling.support/org.mule.runtime.module.tooling.internal=ALL-UNNAMED
             ${surefire.module.args}
         </surefire.args>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>

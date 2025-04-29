@@ -9,14 +9,12 @@ package org.mule.runtime.module.extension.internal.config.dsl.construct;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessageProcessorObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ConstructMessageProcessorBuilder;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import jakarta.inject.Inject;
@@ -30,10 +28,6 @@ public class ConstructMessageProcessorObjectFactory
     extends ComponentMessageProcessorObjectFactory<ConstructModel, ConstructMessageProcessor> {
 
   @Inject
-  private ReflectionCache reflectionCache;
-  @Inject
-  private ExpressionManager expressionManager;
-  @Inject
   private ExtensionConnectionSupplier extensionConnectionSupplier;
   @Inject
   private ComponentTracerFactory<CoreEvent> componentTracerFactory;
@@ -46,7 +40,8 @@ public class ConstructMessageProcessorObjectFactory
 
   @Override
   protected ConstructMessageProcessorBuilder getMessageProcessorBuilder() {
-    return new ConstructMessageProcessorBuilder(extensionModel, componentModel,
+    return new ConstructMessageProcessorBuilder(extensionModel,
+                                                componentModel,
                                                 reflectionCache,
                                                 expressionManager,
                                                 extensionConnectionSupplier,

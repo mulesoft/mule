@@ -40,7 +40,7 @@ import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedMetadataCa
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
-import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
@@ -54,11 +54,11 @@ import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public class InternalDeclarationSession implements DeclarationSession {
 
@@ -80,7 +80,7 @@ public class InternalDeclarationSession implements DeclarationSession {
   private ConnectionManager connectionManager;
 
   @Inject
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Inject
   @Named(SAMPLE_DATA_SERVICE_KEY)

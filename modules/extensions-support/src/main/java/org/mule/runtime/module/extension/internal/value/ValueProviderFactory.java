@@ -16,7 +16,7 @@ import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILUR
 import static java.lang.String.format;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
@@ -45,14 +45,16 @@ public class ValueProviderFactory {
   private final Field connectionField;
   private final Field configField;
   private final ReflectionCache reflectionCache;
-  private final MuleContext muleContext;
-  private ExpressionManager expressionManager;
+  private final ExpressionManager expressionManager;
+  private final Injector injector;
   private ParameterizedModel parameterizedModel;
 
   public ValueProviderFactory(ValueProviderFactoryModelProperty factoryModelProperty,
                               ParameterValueResolver parameterValueResolver, Supplier<Object> connectionSupplier,
                               Supplier<Object> configurationSupplier, Field connectionField, Field configField,
-                              ReflectionCache reflectionCache, MuleContext muleContext,
+                              ReflectionCache reflectionCache,
+                              ExpressionManager expressionManager,
+                              Injector injector,
                               ParameterizedModel parameterizedModel) {
     this.factoryModelProperty = factoryModelProperty;
     this.parameterValueResolver = parameterValueResolver;
@@ -61,8 +63,8 @@ public class ValueProviderFactory {
     this.connectionField = connectionField;
     this.configField = configField;
     this.reflectionCache = reflectionCache;
-    this.muleContext = muleContext;
-    this.expressionManager = muleContext.getExpressionManager();
+    this.expressionManager = expressionManager;
+    this.injector = injector;
     this.parameterizedModel = parameterizedModel;
   }
 
@@ -71,7 +73,7 @@ public class ValueProviderFactory {
 
     try {
       Object resolver = instantiateClass(resolverClass);
-      initialiseIfNeeded(resolver, true, muleContext);
+      initialiseIfNeeded(resolver, injector);
 
       InjectableParameterResolver injectableParameterResolver =
           new InjectableParameterResolver(parameterizedModel, parameterValueResolver, expressionManager,

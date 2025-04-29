@@ -37,6 +37,9 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.simple=ALL-UNNAMED
             --add-opens=org.mule.runtime.errors/org.mule.runtime.config.internal.error=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.el.dataweave=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.transformer=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.args>
         <javaModuleName>org.mule.runtime.core.components</javaModuleName>

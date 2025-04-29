@@ -48,6 +48,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
@@ -105,10 +106,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
   private MuleContext muleContext;
 
   @Inject
-  private ExpressionManager expressionManager;
-
-  @Inject
-  private ExtensionManager extensionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Inject
   private ArtifactEncoding artifactEncoding;
@@ -250,6 +248,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
                                           false,
                                           new ReflectionCache(),
                                           expressionManager,
+                                          muleContext.getInjector(),
                                           this.toString(), artifactEncoding);
   }
 

@@ -25,6 +25,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
@@ -85,7 +86,7 @@ public final class ConfigurationCreationUtils {
                                                                   Optional<ExpirationPolicy> expirationPolicy,
                                                                   Optional<ConnectionProviderValueResolver> connectionProviderResolver,
                                                                   ConfigurationProviderFactory configurationProviderFactory,
-                                                                  ExpressionManager expressionManager,
+                                                                  ExtendedExpressionManager expressionManager,
                                                                   ReflectionCache reflectionCache,
                                                                   String parametersOwner,
                                                                   DslSyntaxResolver dslSyntaxResolver,
@@ -99,6 +100,7 @@ public final class ConfigurationCreationUtils {
                                                                false,
                                                                reflectionCache,
                                                                expressionManager,
+                                                               muleContext.getInjector(),
                                                                parametersOwner, artifactEncoding);
 
       final ConnectionProviderValueResolver connectionResolver = connectionProviderResolver
@@ -159,7 +161,7 @@ public final class ConfigurationCreationUtils {
                                                                                    ExtensionModel extensionModel,
                                                                                    ConnectionProviderSettings settings,
                                                                                    ConfigurationProperties configurationProperties,
-                                                                                   ExpressionManager expressionManager,
+                                                                                   ExtendedExpressionManager expressionManager,
                                                                                    ReflectionCache reflectionCache,
                                                                                    String parametersOwner,
                                                                                    DslSyntaxResolver dslSyntaxResolver,
@@ -174,6 +176,7 @@ public final class ConfigurationCreationUtils {
                                                                                 false,
                                                                                 reflectionCache,
                                                                                 expressionManager,
+                                                                                muleContext.getInjector(),
                                                                                 parametersOwner, artifactEncoding);
 
     BaseConnectionProviderObjectBuilder builder;

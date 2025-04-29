@@ -43,6 +43,7 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
@@ -115,7 +116,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private ReflectionCache reflectionCache;
 
   @Inject
-  private ExpressionManager expressionManager;
+  private ExtendedExpressionManager expressionManager;
 
   @Inject
   private StreamingManager streamingManager;
@@ -185,7 +186,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                                          reflectionCache,
                                                          expressionManager,
                                                          notificationDispatcher,
-                                                         muleContext);
+                                                         muleContext,
+                                                         muleContext.getInjector());
 
     try {
       initialiseIfNeeded(sourceClient, true, muleContext);
@@ -238,6 +240,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   reflectionCache,
                                   componentTracerFactory,
                                   muleContext,
+                                  muleContext.getInjector(),
                                   muleConfiguration,
                                   artifactEncoding,
                                   notificationDispatcher);

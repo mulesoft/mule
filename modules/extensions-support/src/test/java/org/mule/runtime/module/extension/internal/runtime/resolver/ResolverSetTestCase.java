@@ -6,15 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
+
+import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
+
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
@@ -26,16 +29,16 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class ResolverSetTestCase extends AbstractMuleTestCase {
 
   private static final String NAME = "MG";
@@ -44,6 +47,9 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   private ResolverSet set;
   private Map<ParameterModel, ValueResolver> mapping;
 
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
+
   @Mock
   private CoreEvent event;
 
@@ -51,7 +57,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   private ValueResolvingContext resolvingContext;
 
   @Mock
-  private MuleContext muleContext;
+  private Injector injector;
 
   @Before
   public void before() throws Exception {
@@ -60,7 +66,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
     mapping.put(getParameter("age", Integer.class), getResolver(AGE));
 
     when(resolvingContext.getEvent()).thenReturn(event);
-    when(resolvingContext.getConfig()).thenReturn(Optional.empty());
+    when(resolvingContext.getConfig()).thenReturn(empty());
 
     set = buildSet(mapping);
   }
@@ -76,7 +82,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
     set.add(null, getResolver(null));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void addNullresolver() throws Exception {
     set.add("blah", null);
   }
@@ -113,13 +119,13 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   }
 
   private ResolverSet buildSet(Map<ParameterModel, ValueResolver> mapping) {
-    ResolverSet set = new ResolverSet(muleContext);
+    ResolverSet set = new ResolverSet(injector);
     mapping.forEach((key, value) -> set.add(key.getName(), value));
 
     return set;
   }
 
   private ValueResolver getResolver(Object value) throws Exception {
-    return ExtensionsTestUtils.getResolver(value, resolvingContext, false, MuleContextAware.class, Lifecycle.class);
+    return ExtensionsTestUtils.getResolver(value, resolvingContext, false, Lifecycle.class);
   }
 }

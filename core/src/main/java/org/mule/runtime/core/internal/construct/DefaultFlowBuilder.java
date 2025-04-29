@@ -13,6 +13,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -54,6 +55,7 @@ public class DefaultFlowBuilder implements Builder {
 
   private final String name;
   private final MuleContext muleContext;
+  private final AllStatistics statistics;
   private final ComponentInitialStateManager componentInitialStateManager;
   private MessageSource source;
   private List<Processor> processors = emptyList();
@@ -69,14 +71,18 @@ public class DefaultFlowBuilder implements Builder {
    *
    * @param name                         name of the flow to be created. Non empty.
    * @param muleContext                  context where the flow will be associated with. Non null.
+   * @param statistics                   the statitics gathering object
    * @param componentInitialStateManager component state manager used by the flow to determine what components must be started or
    *                                     not. Not null.
    */
-  public DefaultFlowBuilder(String name, MuleContext muleContext, ComponentInitialStateManager componentInitialStateManager) {
+  public DefaultFlowBuilder(String name, MuleContext muleContext, AllStatistics statistics,
+                            ComponentInitialStateManager componentInitialStateManager) {
     checkArgument(isNotEmpty(name), "name cannot be empty");
-    checkArgument(muleContext != null, "muleContext cannot be null");
-    checkArgument(componentInitialStateManager != null, "componentInitialStateManager cannot be null");
+    requireNonNull(muleContext, "muleContext cannot be null");
+    requireNonNull(statistics, "statistics cannot be null");
+    requireNonNull(componentInitialStateManager, "componentInitialStateManager cannot be null");
 
+    this.statistics = statistics;
     this.componentInitialStateManager = componentInitialStateManager;
     this.name = name;
     this.muleContext = muleContext;
@@ -182,8 +188,6 @@ public class DefaultFlowBuilder implements Builder {
   @Override
   public Flow build() {
     checkImmutable();
-
-    AllStatistics statistics = muleContext.getStatistics();
 
     flow = new DefaultFlow(name, muleContext, source, processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency,

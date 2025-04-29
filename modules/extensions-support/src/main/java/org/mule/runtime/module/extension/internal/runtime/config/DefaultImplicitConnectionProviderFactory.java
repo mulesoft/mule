@@ -21,6 +21,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
@@ -47,7 +48,7 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
 
   public DefaultImplicitConnectionProviderFactory(ExtensionModel extensionModel, ConfigurationModel configurationModel,
                                                   ReflectionCache reflectionCache,
-                                                  ExpressionManager expressionManager,
+                                                  ExtendedExpressionManager expressionManager,
                                                   MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.muleContext = muleContext;
@@ -63,7 +64,8 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
                                                    "Configuration '%s' of extension '%s' does not define a connection provider and none can be created automatically. Please define one.",
                                                    configurationModel.getName(), extensionModel.getName()));
           }
-          resolverSet = buildImplicitResolverSet(connectionProviderModel, reflectionCache, expressionManager, muleContext);
+          resolverSet = buildImplicitResolverSet(connectionProviderModel, reflectionCache, muleContext.getTransformationService(),
+                                                 expressionManager, muleContext, muleContext.getInjector());
           resolverSetProvider = () -> resolverSet;
         }
         return resolverSet;

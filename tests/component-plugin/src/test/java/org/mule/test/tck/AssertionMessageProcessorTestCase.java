@@ -6,22 +6,23 @@
  */
 package org.mule.test.tck;
 
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.el.ValidationResult.success;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
 import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.el.ValidationResult.success;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.functional.api.component.AssertionMessageProcessor;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -29,13 +30,14 @@ import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
 public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   protected FlowConstruct flowConstruct;
@@ -43,8 +45,8 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
   protected final String TRUE_EXPRESSION = "trueExpression";
   protected final String FALSE_EXPRESSION = "falseExpression";
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  protected MuleContext muleContext;
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   protected CoreEvent mockEvent;
@@ -56,7 +58,6 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
   public void initialise() {
     when(mockEvent.getMessage()).thenReturn(muleMessage);
     expressionManager = mock(ExtendedExpressionManager.class);
-    when(expressionManager.isValid(anyString())).thenReturn(true);
     when(expressionManager.validate(anyString())).thenReturn(success());
     when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(CoreEvent.class), any(ComponentLocation.class),
                                            anyBoolean(),
@@ -67,11 +68,7 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
                                            anyBoolean()))
                                                .thenReturn(false);
 
-    when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-
     flowConstruct = mock(FlowConstruct.class);
-    when(flowConstruct.getMuleContext()).thenReturn(muleContext);
-    when(flowConstruct.getName()).thenReturn("MockedFlowConstruct");
   }
 
   @Test

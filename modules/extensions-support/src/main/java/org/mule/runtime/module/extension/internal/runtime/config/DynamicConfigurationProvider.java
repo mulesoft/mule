@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
@@ -18,6 +16,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
+
+import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -34,6 +36,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.value.Value;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -87,7 +90,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
   private final Lock cacheReadLock = cacheLock.readLock();
   private final Lock cacheWriteLock = cacheLock.writeLock();
   private final ReflectionCache reflectionCache;
-  private final ExpressionManager expressionManager;
+  private final ExtendedExpressionManager expressionManager;
 
   /**
    * Creates a new instance
@@ -109,7 +112,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                       ConnectionProviderValueResolver connectionProviderResolver,
                                       ExpirationPolicy expirationPolicy,
                                       ReflectionCache reflectionCache,
-                                      ExpressionManager expressionManager,
+                                      ExtendedExpressionManager expressionManager,
                                       MuleContext muleContext) {
     super(name, extension, config, muleContext);
     this.configurationInstanceFactory =
@@ -149,7 +152,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     ConfigurationInstance configuration;
     cacheReadLock.lock();
     try {
-      configuration = cache.computeIfAbsent(resolverSetResult, (r) -> createConfiguration(r, event));
+      configuration = cache.computeIfAbsent(resolverSetResult, r -> createConfiguration(r, event));
       updateUsageStatistic(configuration);
       return configuration;
     } catch (WrappingRuntimeException e) {
@@ -276,8 +279,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    */
   @Override
   public Set<Value> getConfigValues(String parameterName) throws ValueResolvingException {
-    return valuesWithClassLoader(() -> new DefaultValueProviderMediator<>(getConfigurationModel(), () -> muleContext,
-                                                                          () -> reflectionCache)
+    return valuesWithClassLoader(() -> new DefaultValueProviderMediator<>(getConfigurationModel(),
+                                                                          () -> reflectionCache,
+                                                                          () -> expressionManager,
+                                                                          muleContext::getInjector)
                                                                               .getValues(parameterName,
                                                                                          new ResolverSetBasedParameterResolver(resolverSet,
                                                                                                                                getConfigurationModel(),
@@ -291,8 +296,10 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    */
   @Override
   public Set<Value> getConfigValues(String parameterName, String targetSelector) throws ValueResolvingException {
-    return valuesWithClassLoader(() -> new DefaultValueProviderMediator<>(getConfigurationModel(), () -> muleContext,
-                                                                          () -> reflectionCache)
+    return valuesWithClassLoader(() -> new DefaultValueProviderMediator<>(getConfigurationModel(),
+                                                                          () -> reflectionCache,
+                                                                          () -> expressionManager,
+                                                                          muleContext::getInjector)
                                                                               .getValues(parameterName, targetSelector,
                                                                                          new ResolverSetBasedParameterResolver(resolverSet,
                                                                                                                                getConfigurationModel(),
@@ -315,8 +322,9 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                                          UNKNOWN));
 
       return new DefaultValueProviderMediator<>(connectionProviderModel,
-                                                () -> muleContext,
-                                                () -> reflectionCache)
+                                                () -> reflectionCache,
+                                                () -> expressionManager,
+                                                muleContext::getInjector)
                                                     .getValues(parameterName,
                                                                new ResolverSetBasedParameterResolver(resolverSet,
                                                                                                      connectionProviderModel,
@@ -338,8 +346,9 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
                                                          UNKNOWN));
 
       return new DefaultValueProviderMediator<>(connectionProviderModel,
-                                                () -> muleContext,
-                                                () -> reflectionCache)
+                                                () -> reflectionCache,
+                                                () -> expressionManager,
+                                                muleContext::getInjector)
                                                     .getValues(parameterName, targetSelector,
                                                                new ResolverSetBasedParameterResolver(resolverSet,
                                                                                                      connectionProviderModel,
@@ -350,7 +359,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private Optional<ConnectionProviderModel> getConnectionProviderModel() {
     return this.connectionProviderResolver.getObjectBuilder()
-        .filter(ob -> ob instanceof BaseConnectionProviderObjectBuilder)
+        .filter(BaseConnectionProviderObjectBuilder.class::isInstance)
         .map(ob -> ((BaseConnectionProviderObjectBuilder) ob).providerModel);
   }
 

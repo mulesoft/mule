@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import static java.util.Optional.empty;
@@ -15,18 +16,18 @@ import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.api.el.ExpressionManagerSession;
+import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.core.api.Injector;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -35,7 +36,8 @@ import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
@@ -54,7 +56,7 @@ import org.mockito.junit.MockitoRule;
 import io.qameta.allure.Issue;
 
 @SmallTest
-public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTestCase {
+public class NullSafeValueResolverWrapperTestCase extends AbstractMuleTestCase {
 
   // Creating new rule with recommended Strictness setting
   @Rule
@@ -67,12 +69,19 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   private ObjectTypeParametersResolver objectTypeParametersResolver;
 
   @Mock
-  private ExpressionManager expressionManager;
+  private TransformationService transformationService;
+
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
+
+  private ExtendedExpressionManager expressionManager;
 
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
   @Before
   public void setUp() {
+    expressionManager = dw.getExpressionManager();
+
     when(event.getError()).thenReturn(empty());
     when(event.getAuthentication()).thenReturn(empty());
     Message msg = of(null);
@@ -83,17 +92,12 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
   @Test
   public void testMapType() throws Exception {
-    assertExpected(new StaticValueResolver(null), toMetadataType(HashMap.class), false, new HashMap<>());
+    assertExpected(new StaticValueResolver<>(null), toMetadataType(HashMap.class), false, new HashMap<>());
   }
 
   @Test
   public void testPojoType() throws Exception {
-    ExpressionManagerSession session = mock(ExpressionManagerSession.class);
-    when(session.evaluate(any(CompiledExpression.class), any(DataType.class)))
-        .thenAnswer(inv -> new TypedValue<>(5, inv.getArgument(1)));
-    when(expressionManager.openSession(any())).thenReturn(session);
-
-    assertExpected(new StaticValueResolver(null), toMetadataType(DynamicPojo.class), true, new DynamicPojo(5));
+    assertExpected(new StaticValueResolver<>(null), toMetadataType(DynamicPojo.class), true, new DynamicPojo(5));
 
     verify(event, times(1)).asBindingContext();
   }
@@ -101,42 +105,44 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
   @Test
   @Issue("W-14954976")
   public void testPojoTypeWithLiteralExpression() throws Exception {
-    ExpressionManagerSession session = mock(ExpressionManagerSession.class);
-    when(session.evaluate(any(CompiledExpression.class), any(DataType.class)))
-        .thenAnswer(inv -> new TypedValue<>(5, inv.getArgument(1)));
-    when(expressionManager.openSession(any())).thenReturn(session);
-
-    assertExpected(new StaticValueResolver(null),
+    assertExpected(new StaticValueResolver<>(null),
                    toMetadataType(DynamicPojoWithLiteralParam.class),
                    false,
-                   new DynamicPojoWithLiteralParam(new ImmutableLiteral("#[5]", Integer.class)));
+                   new DynamicPojoWithLiteralParam(new ImmutableLiteral<>("#[5]", Integer.class)));
 
     verify(event, times(1)).asBindingContext();
   }
 
   @Test
   public void testPojoWithStaticDefaultValue() throws Exception {
-    assertExpected(new StaticValueResolver(null), toMetadataType(NonDynamicPojo.class), false, new NonDynamicPojo(false));
+    when(transformationService.transform(anyString(), any(), any()))
+        .then(inv -> Boolean.valueOf(inv.getArgument(0, String.class)));
+
+    assertExpected(new StaticValueResolver<>(null), toMetadataType(NonDynamicPojo.class), false, new NonDynamicPojo(false));
   }
 
   @Test
   public void testPojoWithMap() throws Exception {
     DynamicPojoWithMap pojo = new DynamicPojoWithMap();
     pojo.setMap(new HashMap<>());
-    assertExpected(new StaticValueResolver(null), toMetadataType(DynamicPojoWithMap.class), false, pojo);
+    assertExpected(new StaticValueResolver<>(null), toMetadataType(DynamicPojoWithMap.class), false, pojo);
   }
 
   @Test
   public void testNullSafeSdkAndLegacyAnnotation() throws Exception {
     PojoUsingSdkApiAndLegacyApi pojo = new PojoUsingSdkApiAndLegacyApi();
     pojo.setParameters(new ASimplePojo(), new ASimplePojo());
-    assertExpected(new StaticValueResolver(null), toMetadataType(PojoUsingSdkApiAndLegacyApi.class), false, pojo);
+    assertExpected(new StaticValueResolver<>(null), toMetadataType(PojoUsingSdkApiAndLegacyApi.class), false, pojo);
   }
 
   private void assertExpected(ValueResolver valueResolver, MetadataType type, boolean isDynamic, Object expected)
       throws Exception {
-    ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache, expressionManager,
-                                                             muleContext, objectTypeParametersResolver);
+    ValueResolver resolver = NullSafeValueResolverWrapper.of(valueResolver, type, reflectionCache,
+                                                             transformationService,
+                                                             expressionManager,
+                                                             mock(MuleContext.class),
+                                                             mock(Injector.class),
+                                                             objectTypeParametersResolver);
     ValueResolvingContext ctx = ValueResolvingContext.builder(event)
         .withExpressionManager(expressionManager)
         .build();
@@ -166,8 +172,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof DynamicPojo) {
-        DynamicPojo that = (DynamicPojo) o;
+      if (o instanceof DynamicPojo that) {
         return time == that.time;
       }
       return false;
@@ -202,8 +207,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof DynamicPojoWithLiteralParam) {
-        DynamicPojoWithLiteralParam that = (DynamicPojoWithLiteralParam) o;
+      if (o instanceof DynamicPojoWithLiteralParam that) {
         return time.getLiteralValue().equals(that.time.getLiteralValue());
       }
       return false;
@@ -235,8 +239,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof DynamicPojoWithMap) {
-        DynamicPojoWithMap that = (DynamicPojoWithMap) o;
+      if (o instanceof DynamicPojoWithMap that) {
         return Objects.equals(map, that.map);
       }
       return false;
@@ -271,8 +274,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof NonDynamicPojo) {
-        NonDynamicPojo that = (NonDynamicPojo) o;
+      if (o instanceof NonDynamicPojo that) {
         return Objects.equals(staticDefaultValue, that.staticDefaultValue);
       }
       return false;
@@ -305,8 +307,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof PojoUsingSdkApiAndLegacyApi) {
-        PojoUsingSdkApiAndLegacyApi that = (PojoUsingSdkApiAndLegacyApi) o;
+      if (o instanceof PojoUsingSdkApiAndLegacyApi that) {
         return Objects.equals(parameter1, that.parameter1) && Objects.equals(parameter2, that.parameter2);
       }
       return false;
@@ -326,8 +327,7 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof ASimplePojo) {
-        ASimplePojo that = (ASimplePojo) o;
+      if (o instanceof ASimplePojo that) {
         return Objects.equals(this.parameter, that.parameter);
       }
       return false;

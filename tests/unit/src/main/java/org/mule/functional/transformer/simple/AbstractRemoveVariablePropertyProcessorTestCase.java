@@ -6,34 +6,38 @@
  */
 package org.mule.functional.transformer.simple;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.util.Arrays.asList;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.tck.junit4.rule.DataWeaveExpressionLanguage.dataWeaveRule;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
+import static java.nio.charset.StandardCharsets.US_ASCII;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.processor.simple.AbstractRemoveVariablePropertyProcessor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.DataWeaveExpressionLanguage;
 import org.mule.tck.size.SmallTest;
 
 import java.nio.charset.Charset;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 @SmallTest
-public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends AbstractMuleContextTestCase {
+public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends AbstractMuleTestCase {
 
   public static final Charset ENCODING = US_ASCII;
   public static final String PLAIN_STRING_KEY = "someText";
   public static final String EXPRESSION = "#['someText']";
   public static final String EXPRESSION_VALUE = "expressionValueResult";
   public static final String NULL_EXPRESSION = "#[null]";
+
+  @Rule
+  public DataWeaveExpressionLanguage dw = dataWeaveRule();
 
   private Message message;
   private CoreEvent event;
@@ -48,11 +52,11 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     message = of("");
     event = createTestEvent(message);
 
-    removeVariableProcessor.setExpressionManager(muleContext.getExpressionManager());
+    removeVariableProcessor.setExpressionManager(dw.getExpressionManager());
   }
 
   protected CoreEvent createTestEvent(final Message message) throws MuleException {
-    return eventBuilder(muleContext)
+    return eventBuilder()
         .addVariable(PLAIN_STRING_KEY, EXPRESSION_VALUE)
         .message(message)
         .build();
