@@ -114,7 +114,7 @@ class ExtensionPluginMetadataGenerator {
     final DefaultMuleContext muleContext = new DefaultMuleContext() {
 
       private final LazyValue<SimpleRegistry> registryCreator =
-          new LazyValue<>(() -> new SimpleRegistry(this, new MuleLifecycleInterceptor()));
+          new LazyValue<>(() -> new SimpleRegistry(this, new MuleLifecycleInterceptor(), getConfiguration()));
 
       @Override
       public MuleRegistry getRegistry() {

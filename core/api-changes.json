@@ -3,6 +3,24 @@
     "revapi": {
       "differences": {
         "differences": [
+{
+  "ignore": true,
+  "code": "java.annotation.attributeAdded",
+  "old": "method org.mule.runtime.core.api.config.builders.RegistryBootstrap org.mule.runtime.core.api.config.builders.RegistryBootstrap::defaultRegistryBoostrap(org.mule.runtime.core.api.config.bootstrap.ArtifactType, org.mule.runtime.core.api.MuleContext)",
+  "new": "method org.mule.runtime.core.api.config.builders.RegistryBootstrap org.mule.runtime.core.api.config.builders.RegistryBootstrap::defaultRegistryBoostrap(org.mule.runtime.core.api.config.bootstrap.ArtifactType, org.mule.runtime.core.api.MuleContext)",
+  "annotation": "@java.lang.Deprecated(forRemoval = true, since = \"4.8\")",
+  "attribute": "forRemoval",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+},
+{
+  "ignore": true,
+  "code": "java.annotation.attributeAdded",
+  "old": "method org.mule.runtime.core.api.config.builders.RegistryBootstrap org.mule.runtime.core.api.config.builders.RegistryBootstrap::defaultRegistryBoostrap(org.mule.runtime.core.api.config.bootstrap.ArtifactType, org.mule.runtime.core.api.MuleContext)",
+  "new": "method org.mule.runtime.core.api.config.builders.RegistryBootstrap org.mule.runtime.core.api.config.builders.RegistryBootstrap::defaultRegistryBoostrap(org.mule.runtime.core.api.config.bootstrap.ArtifactType, org.mule.runtime.core.api.MuleContext)",
+  "annotation": "@java.lang.Deprecated(forRemoval = true, since = \"4.8\")",
+  "attribute": "since",
+  "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+},
           {
             "ignore": true,
             "code": "java.annotation.added",

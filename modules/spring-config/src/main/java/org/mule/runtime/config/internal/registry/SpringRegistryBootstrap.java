@@ -11,11 +11,11 @@ import static org.mule.runtime.core.internal.transformer.TransformerUtils.genera
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap;

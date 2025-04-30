@@ -90,6 +90,15 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
                                                                                              new String[] {configuration},
                                                                                              getExpressionLanguageMetadataService());
     configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);
+    configurationBuilder.addServiceConfigurator(new ServiceConfigurator() {
+
+      @Override
+      public void configure(CustomizationService customizationService) {
+        customizationService.registerCustomServiceImpl(OBJECT_CLASSLOADER_REPOSITORY,
+                                                       mock(ClassLoaderRepository.class),
+                                                       true);
+      }
+    });
     builders.add(configurationBuilder);
     builders.add(testServicesConfigurationBuilder);
     configurationBuilder.addServiceConfigurator(new ServiceConfigurator() {

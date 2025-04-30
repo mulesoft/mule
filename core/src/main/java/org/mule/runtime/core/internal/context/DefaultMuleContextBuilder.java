@@ -114,7 +114,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   protected void configureRegistry(DefaultMuleContext muleContext) {
     final SimpleRegistry registry =
         new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor(),
-                           featureFlaggingService == null ? of(createFeatureFlaggingService(muleContext))
+                           featureFlaggingService == null
+                               ? of(createFeatureFlaggingService(muleContext, muleContext.getConfiguration()))
                                : featureFlaggingService);
     muleContext.setRegistry(registry);
     muleContext.setInjector(registry);

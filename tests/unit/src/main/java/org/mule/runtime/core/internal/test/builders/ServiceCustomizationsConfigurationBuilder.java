@@ -32,7 +32,7 @@ public final class ServiceCustomizationsConfigurationBuilder extends AbstractCon
     if (objects != null && objects.size() > 0) {
       CustomizationService customizationService = muleContext.getCustomizationService();
       objects.entrySet()
-          .forEach(e -> customizationService.registerCustomServiceImpl(e.getKey(), e.getValue()));
+          .forEach(e -> customizationService.registerCustomServiceImpl(e.getKey(), e.getValue(), true));
     }
   }
 }

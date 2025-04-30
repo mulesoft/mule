@@ -8,11 +8,12 @@ package org.mule.runtime.core.internal.config.bootstrap;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
-import org.mule.runtime.core.api.util.StringUtils;
 
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Defines a bootstrap property for a transformer

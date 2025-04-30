@@ -164,7 +164,7 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testLifecycleStateOutOfSequenceDisposeFirstWithTransientRegistryDirectly() throws Exception {
-    SimpleRegistry reg = new SimpleRegistry(muleContext, new MuleLifecycleInterceptor());
+    SimpleRegistry reg = new SimpleRegistry(muleContext, new MuleLifecycleInterceptor(), muleContext.getConfiguration());
 
     reg.fireLifecycle(Disposable.PHASE_NAME);
 
@@ -228,7 +228,7 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
   @Test
   @Issue("W-14547712")
   public void lifecycleCallbackOnRegistryWithoutMuleContext() throws Exception {
-    final SimpleRegistry registry = new SimpleRegistry(null);
+    final SimpleRegistry registry = new SimpleRegistry(null, null);
 
     final InterfaceBasedTracker lifecycleTracker = new InterfaceBasedTracker();
     registry.registerObject("_testLifecycle", lifecycleTracker);

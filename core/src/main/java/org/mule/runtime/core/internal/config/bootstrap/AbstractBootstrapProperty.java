@@ -8,7 +8,9 @@ package org.mule.runtime.core.internal.config.bootstrap;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import static java.util.Objects.requireNonNull;
+
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 
 import java.util.Set;
@@ -28,8 +30,8 @@ public class AbstractBootstrapProperty {
    * @param artifactTypes defines what is the artifact this bootstrap object applies to
    */
   public AbstractBootstrapProperty(BootstrapService service, Set<ArtifactType> artifactTypes) {
-    checkArgument(service != null, "service cannot be null");
-    checkArgument(artifactTypes != null, "artifactTypes cannot be null");
+    requireNonNull(service, "service cannot be null");
+    requireNonNull(artifactTypes, "artifactTypes cannot be null");
     checkArgument(!artifactTypes.isEmpty(), "artifactTypes cannot be empty");
 
     this.artifactTypes = artifactTypes;

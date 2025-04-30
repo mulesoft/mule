@@ -42,7 +42,7 @@ public class ContainerServiceConfigurator implements ServiceConfigurator {
       if (!isEmpty(contract)) {
         name += " - " + contract;
       }
-      customizationService.registerCustomServiceImpl(name, service);
+      customizationService.registerCustomServiceImpl(name, service, true);
     });
   }
 }

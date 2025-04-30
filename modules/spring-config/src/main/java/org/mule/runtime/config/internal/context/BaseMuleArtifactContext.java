@@ -12,10 +12,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.config.privileged.spring.ByteBuddySpringCacheInstrumentator;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
+import org.mule.runtime.config.privileged.spring.ByteBuddySpringCacheInstrumentator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -94,7 +94,7 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
     super.customizeBeanFactory(beanFactory);
     new BaseSpringMuleContextServiceConfigurator(muleContext,
                                                  configurationProperties,
-                                                 artifactType,
+                                                 artifactType.getArtifactType(),
                                                  beanFactory,
                                                  serviceDiscoverer,
                                                  originalRegistry,

@@ -89,7 +89,7 @@ class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceC
                                                   MemoryManagementService memoryManagementService) {
     super(muleContext, coreFunctionsProvider, configurationProperties, artifactProperties,
           addToolingObjectsToRegistry,
-          artifactType,
+          artifactType.getArtifactType(),
           artifactAst,
           beanDefinitionRegistry,
           serviceLocator, resourceLocator, memoryManagementService);
