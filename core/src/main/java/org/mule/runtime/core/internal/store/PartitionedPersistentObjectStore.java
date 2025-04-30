@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.store;
 
+import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -13,11 +15,9 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.PartitionableExpirableObjectStore;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.util.store.PersistentObjectStorePartition;
@@ -30,12 +30,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 public class PartitionedPersistentObjectStore<T extends Serializable> extends AbstractPartitionableObjectStore<T>
-    implements PartitionableExpirableObjectStore<T>, InternalComponent, MuleContextAware {
+    implements PartitionableExpirableObjectStore<T>, InternalComponent {
 
   private static final Logger LOGGER = getLogger(PartitionedPersistentObjectStore.class);
   public static final String OBJECT_STORE_DIR = "objectstore";
@@ -207,11 +208,15 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     }
   }
 
-  @Override
   @Inject
-  public void setMuleContext(MuleContext context) {
-    muleConfiguration = context.getConfiguration();
-    serializer = context.getObjectSerializer();
+  public void setMuleConfiguration(MuleConfiguration muleConfiguration) {
+    this.muleConfiguration = muleConfiguration;
+  }
+
+  @Inject
+  @Named(DEFAULT_OBJECT_SERIALIZER_NAME)
+  public void setSerializer(ObjectSerializer serializer) {
+    this.serializer = serializer;
   }
 
   @Override

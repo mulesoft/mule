@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.util.queue;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -32,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * Abstract implementation for a QueueManager.
@@ -108,6 +110,8 @@ public abstract class AbstractQueueManager
     return muleConfiguration;
   }
 
+  @Inject
+  @Named(DEFAULT_OBJECT_SERIALIZER_NAME)
   public void setObjectSerializer(ObjectSerializer objectSerializer) {
     this.objectSerializer = objectSerializer;
   }
@@ -119,8 +123,6 @@ public abstract class AbstractQueueManager
   @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.deploymentLifecycleState = muleContext.getLifecycleManager().getState();
-    // Cannot inject this directly because there may be more than one, and the source of truth is the MuleContext.
-    setObjectSerializer(muleContext.getObjectSerializer());
   }
 
   public LifecycleState getDeploymentLifecycleState() {

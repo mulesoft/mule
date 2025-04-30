@@ -13,27 +13,25 @@ import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.api.store.ObjectStoreException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import org.hamcrest.core.Is;
 
-import org.mockito.Answers;
-
-public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
+public abstract class QueueStoreTestCase extends AbstractMuleTestCase {
 
   public static final String VALUE = "value";
   public static final String ANOTHER_VALUE = "value2";
@@ -44,6 +42,13 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+  private ObjectSerializer serializer;
+
+  @Before
+  public void setUp() {
+    serializer = new JavaObjectSerializer(this.getClass().getClassLoader());
+  }
 
   @Test
   public void offerAndPollSingleValue() throws InterruptedException, ObjectStoreException {
@@ -126,7 +131,7 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
     QueueStore queue = createQueue();
     ArrayList<CoreEvent> events = new ArrayList<>(NUMBER_OF_ITEMS);
     for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
-      CoreEvent testEvent = eventBuilder(muleContext).message(of("some data")).build();
+      CoreEvent testEvent = eventBuilder().message(of("some data")).build();
       events.add(testEvent);
       queue.offer(testEvent, 0, NUMBER_OF_ITEMS);
 
@@ -142,12 +147,8 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
   }
 
   protected QueueStore createQueueWithCapacity(int capacity) {
-    MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS);
-    when(mockMuleContext.getConfiguration().getWorkingDirectory()).thenReturn(temporaryFolder.getRoot().getAbsolutePath());
-    when(mockMuleContext.getExecutionClassLoader()).thenReturn(muleContext.getExecutionClassLoader());
-    when(mockMuleContext.getObjectSerializer()).thenReturn(muleContext.getObjectSerializer());
-    QueueStore queue = createQueueInfoDelegate(capacity, mockMuleContext.getConfiguration().getWorkingDirectory(),
-                                               mockMuleContext.getObjectSerializer().getInternalProtocol());
+    QueueStore queue = createQueueInfoDelegate(capacity, temporaryFolder.getRoot().getAbsolutePath(),
+                                               serializer.getInternalProtocol());
     return queue;
   }
 

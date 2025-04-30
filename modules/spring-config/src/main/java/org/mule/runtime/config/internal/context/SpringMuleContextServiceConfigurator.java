@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.context;
 import static org.mule.runtime.api.config.custom.ServiceConfigurator.lookupServiceConfigurators;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
-import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
@@ -301,7 +300,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
 
   protected void createArtifactServices() {
     registerBeanDefinition(OBJECT_MULE_CONTEXT, createMuleContextDefinition());
-    registerConstantBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME, muleContext.getObjectSerializer());
     // This configurationProperties will contain the properties configured in the app itself, taking precedence over the base one
     // from the base registry
     registerConstantBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
@@ -494,5 +492,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     }
     return getConstantObjectBeanDefinition(ErrorMetricsFactory.NO_OP);
   }
+
 
 }

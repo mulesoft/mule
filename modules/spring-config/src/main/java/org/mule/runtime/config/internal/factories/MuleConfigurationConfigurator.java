@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLI
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.time.TimeSupplier;
+import org.mule.runtime.config.internal.bean.DefaultObjectSerializerDelegate;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
@@ -24,9 +25,9 @@ import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
 import java.util.List;
 
-import jakarta.inject.Inject;
-
 import org.springframework.beans.factory.SmartFactoryBean;
+
+import jakarta.inject.Inject;
 
 /**
  * This class is a "SmartFactoryBean" which allows a few XML attributes to be set on the otherwise read-only MuleConfiguration. It
@@ -39,6 +40,9 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private DefaultObjectSerializerDelegate objectSerializerDelegate;
 
   @Inject
   private Registry registry;
@@ -64,6 +68,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
 
     if (configuredSerializer != null) {
       configuration.setDefaultObjectSerializer(configuredSerializer);
+      objectSerializerDelegate.setDelegate(configuredSerializer);
       if (muleContext instanceof DefaultMuleContext) {
         ((DefaultMuleContext) muleContext).setObjectSerializer(configuredSerializer);
       }
@@ -124,9 +129,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   @Override
   public MuleConfiguration doGetObject() throws Exception {
     MuleConfiguration configuration = muleContext.getConfiguration();
-    if (configuration instanceof DefaultMuleConfiguration) {
-      DefaultMuleConfiguration defaultConfig = (DefaultMuleConfiguration) configuration;
-
+    if (configuration instanceof DefaultMuleConfiguration defaultConfig) {
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
       defaultConfig.setShutdownTimeout(config.getShutdownTimeout());

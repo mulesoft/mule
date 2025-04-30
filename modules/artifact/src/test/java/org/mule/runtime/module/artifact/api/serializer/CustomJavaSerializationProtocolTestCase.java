@@ -7,8 +7,6 @@
 package org.mule.runtime.module.artifact.api.serializer;
 
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.SerializationFeature.SERIALIZATION;
@@ -39,7 +37,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Optional;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,23 +60,11 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
   private ClassLoaderRepository classLoaderRepository;
 
   @Before
-  public void setUp() {
-    currentMuleContext.set(muleContext);
-  }
-
-  @After
-  public void teardown() {
-    currentMuleContext.set(null);
-  }
-
-  @Override
-  protected void doSetUp() throws Exception {
+  public void setUp() throws Exception {
     classLoaderRepository = mock(ClassLoaderRepository.class);
     when(classLoaderRepository.getId(getClass().getClassLoader())).thenReturn(empty());
     when(classLoaderRepository.getId(null)).thenReturn(empty());
     serializationProtocol = new CustomJavaSerializationProtocol(classLoaderRepository, this.getClass().getClassLoader());
-
-    initialiseIfNeeded(serializationProtocol, true, muleContext);
   }
 
   @Test(expected = SerializationException.class)
@@ -111,7 +96,7 @@ public class CustomJavaSerializationProtocolTestCase extends AbstractSerializerP
     final Object payload = echoTestClass.newInstance();
     setObjectName(payload);
 
-    CoreEvent event = eventBuilder(muleContext).message(of(payload)).build();
+    CoreEvent event = eventBuilder().message(of(payload)).build();
     byte[] bytes = serializationProtocol.serialize(event.getMessage());
 
     InternalMessage message = serializationProtocol.deserialize(bytes);

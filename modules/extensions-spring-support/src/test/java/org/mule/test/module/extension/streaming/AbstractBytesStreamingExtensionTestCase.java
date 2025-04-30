@@ -26,6 +26,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -47,9 +48,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -57,6 +55,9 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
@@ -105,6 +106,9 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
 
   @Inject
   private StreamingManager streamingManager;
+
+  @Inject
+  private ObjectSerializer objectSerializer;
 
   @Rule
   public SystemProperty configName;
@@ -273,8 +277,8 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
         .withPayload(factory.of(testEvent().getContext(), new ByteArrayInputStream(data.getBytes()), from("objectToStream")))
         .run().getMessage().getPayload().getValue();
 
-    byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);
-    bytes = muleContext.getObjectSerializer().getInternalProtocol().deserialize(bytes);
+    byte[] bytes = objectSerializer.getInternalProtocol().serialize(provider);
+    bytes = objectSerializer.getInternalProtocol().deserialize(bytes);
     assertThat(new String(bytes, Charset.defaultCharset()), equalTo(data));
   }
 
@@ -285,8 +289,8 @@ public abstract class AbstractBytesStreamingExtensionTestCase extends AbstractSt
         .withPayload(data)
         .run().getMessage().getPayload().getValue();
 
-    byte[] bytes = muleContext.getObjectSerializer().getInternalProtocol().serialize(provider);
-    bytes = muleContext.getObjectSerializer().getInternalProtocol().deserialize(bytes);
+    byte[] bytes = objectSerializer.getInternalProtocol().serialize(provider);
+    bytes = objectSerializer.getInternalProtocol().deserialize(bytes);
     assertThat(new String(bytes, Charset.defaultCharset()), equalTo(data));
   }
 
