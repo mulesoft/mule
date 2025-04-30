@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.6.16-rc1</version>
+        <version>4.6.16</version>
     </parent>
     <artifactId>mule-tests-unit</artifactId>
     <packaging>jar</packaging>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-tracer-internal-impl</artifactId>
-            <version>4.6.16-rc1</version>
+            <version>4.6.16</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
