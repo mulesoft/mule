@@ -1178,6 +1178,7 @@ public interface AllureConstants {
 
   interface ObjectSerializer {
 
+    String DEFAULT_OBJECT_SERIALIZER = "Default object serializer";
     String CUSTOM_OBJECT_SERIALIZER = "Custom object serializer";
   }
 

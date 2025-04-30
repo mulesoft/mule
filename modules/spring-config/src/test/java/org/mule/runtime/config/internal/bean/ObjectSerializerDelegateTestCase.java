@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.config.internal.bean;
 
+import static org.mule.test.allure.AllureConstants.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER;
+import static org.mule.test.allure.AllureConstants.SerializationFeature.SERIALIZATION;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
@@ -18,6 +21,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(SERIALIZATION)
+@Story(DEFAULT_OBJECT_SERIALIZER)
 public class ObjectSerializerDelegateTestCase extends AbstractMuleTestCase {
 
   @Test
