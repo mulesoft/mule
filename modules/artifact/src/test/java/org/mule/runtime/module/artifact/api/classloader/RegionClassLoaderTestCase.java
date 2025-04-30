@@ -25,12 +25,6 @@ import static java.util.Collections.list;
 import static java.util.Collections.singleton;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -39,6 +33,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.test.TestArtifactClassLoader;
@@ -57,12 +55,10 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Test;
-
-import org.hamcrest.CoreMatchers;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.hamcrest.CoreMatchers;
+import org.junit.Test;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_CLASSLOADERS)
@@ -704,6 +700,11 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     URL result = regionClassLoader.findResource(resource);
 
     assertThat(result, is(expectedResult));
+
+    if (expectedResult != null) {
+      // useCaches should be false
+      assertThat(result.openConnection().getUseCaches(), is(false));
+    }
   }
 
   public static class TestApplicationClassLoader extends TestArtifactClassLoader {
