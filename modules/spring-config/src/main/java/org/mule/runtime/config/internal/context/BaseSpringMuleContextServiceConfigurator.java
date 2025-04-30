@@ -15,6 +15,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
@@ -22,8 +24,11 @@ import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBo
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 
 import static java.lang.Boolean.getBoolean;
+import static java.util.Map.entry;
+import static java.util.Map.ofEntries;
 import static java.util.Optional.of;
 
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -38,12 +43,13 @@ import org.mule.runtime.config.internal.factories.SchedulerBaseConfigFactory;
 import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
+import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -73,6 +79,11 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   public static final String DISABLE_TRANSFORMERS_SUPPORT =
       BaseSpringMuleContextServiceConfigurator.class.getName() + ".disableTransformersSupport";
 
+  // Do not use static field. BeanDefinitions are reused and produce weird behaviour
+  private final Map<String, BeanDefinition> baseContextServices =
+      ofEntries(entry(OBJECT_STREAMING_MANAGER, getBeanDefinition(DefaultStreamingManager.class)),
+                entry(OBJECT_STREAMING_GHOST_BUSTER, getBeanDefinition(StreamingGhostBuster.class)));
+
   private final MuleContext muleContext;
   private final ArtifactType artifactType;
   private final ConfigurationProperties configurationProperties;
@@ -100,6 +111,8 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
     registerConstantBeanDefinition(OBJECT_ARTIFACT_ENCODING, originalRegistry.lookupObject(OBJECT_ARTIFACT_ENCODING));
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
+
+    registerContextServices(baseContextServices, artifactType);
 
     // Instances of the repository and locator need to be injected into another objects before actually determining the possible
     // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual
