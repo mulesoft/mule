@@ -33,6 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -77,17 +78,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 import org.mockito.ArgumentCaptor;
-
 import io.qameta.allure.Issue;
-
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -199,9 +196,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     final PolicyPointcutParameters policyParams1 = mock(PolicyPointcutParameters.class);
     final PolicyPointcutParameters policyParams2 = mock(PolicyPointcutParameters.class);
 
-    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
-    final PolicyChain policyChain = policy.getPolicyChain();
-    when(policyChain.onChainError(any())).thenReturn(policyChain);
+    final Policy policy = spy(stubPolicy("policyStub"));
 
     when(policyProvider.findSourceParameterizedPolicies(policyParams1)).thenReturn(asList(policy));
     when(policyProvider.findSourceParameterizedPolicies(policyParams2)).thenReturn(asList(policy));
@@ -233,9 +228,9 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   public void sourceDifferentPolicyForDifferentFlowSameParams() {
     final PolicyPointcutParameters policyParams = mock(PolicyPointcutParameters.class);
 
-    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
-    final PolicyChain policyChain = policy.getPolicyChain();
-    when(policyChain.onChainError(any())).thenReturn(policyChain);
+    final Policy policy = spy(stubPolicy("policyStub"));
+    // final PolicyChain policyChain = policy.getPolicyChain();
+    // when(policyChain.onChainError(any())).thenReturn(policyChain);
 
     when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(policy));
     clearPolicyManagerCaches();
@@ -260,9 +255,9 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   public void sourceSamePolicyForDifferentFlowSameParams() {
     final PolicyPointcutParameters policyParams = mock(PolicyPointcutParameters.class);
 
-    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final Policy policy = spy(stubPolicy("policyStub"));
     final PolicyChain policyChain = policy.getPolicyChain();
-    when(policyChain.onChainError(any())).thenReturn(policyChain);
+    // when(policyChain.onChainError(any(Consumer.class))).thenReturn(policyChain);
 
     when(policyProvider.findSourceParameterizedPolicies(policyParams)).thenReturn(asList(policy));
     clearPolicyManagerCaches();
@@ -569,7 +564,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void cachesEvictedWhileLookingForPolicies() throws InterruptedException {
-    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final Policy policy = stubPolicy("policyStub");
     when(policyProvider.isSourcePoliciesAvailable()).thenReturn(true);
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
     clearPolicyManagerCaches();
@@ -614,7 +609,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
   @Test
   @Issue("MULE-18929")
   public void cachesEvictedDoesntIncreaseActivePoliciesCount() throws InterruptedException {
-    final Policy policy = mock(Policy.class, RETURNS_DEEP_STUBS);
+    final Policy policy = stubPolicy("policyStub");
     when(policyProvider.isSourcePoliciesAvailable()).thenReturn(true);
     when(policyProvider.findSourceParameterizedPolicies(any())).thenReturn(asList(policy));
     clearPolicyManagerCaches();
@@ -651,7 +646,8 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
    * </pre>
    * 
    * This can be problematic given that references to that arguments are maintained at the mocks and the
-   * {@link DefaultPolicyManager} functioning can be unexpectedly affected.
+   * {@link DefaultPolicyManager} functioning can be unexpectedly affected. Also, reactive chains including a mocked
+   * {@link Policy} are unusable in integration tests like this one.
    * 
    * @see DefaultPolicyManager
    * @return A {@link Policy} stub.
