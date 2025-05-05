@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.context;
 
+import static org.mule.runtime.api.artifact.ArtifactType.DOMAIN;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_ENCODING;
@@ -112,6 +113,9 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
 
+    if (!artifactType.equals(DOMAIN)) {
+      loadServiceConfigurators();
+    }
     registerContextServices(baseContextServices, artifactType);
 
     // Instances of the repository and locator need to be injected into another objects before actually determining the possible
@@ -181,7 +185,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
       final CustomService customService = customServices.get(serviceName);
       // TODO MULE-19927 get these form a more specific place and avoid this filter
-      if (isServiceRuntimeProvided(customService)) {
+      if (customService.isBaseContext() && isServiceRuntimeProvided(customService)) {
         final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
 
         registerBeanDefinition(serviceName, beanDefinition);

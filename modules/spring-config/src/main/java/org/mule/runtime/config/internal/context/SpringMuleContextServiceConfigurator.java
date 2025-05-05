@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.context;
 
-import static org.mule.runtime.api.config.custom.ServiceConfigurator.lookupServiceConfigurators;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
@@ -312,11 +311,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     }
   }
 
-  private void loadServiceConfigurators() {
-    lookupServiceConfigurators(this.getClass().getClassLoader())
-        .forEach(customizationInfo -> customizationInfo.configure(getCustomizationService()));
-  }
-
   private void createCustomServices() {
     final Map<String, CustomService> customServices = getCustomizationService().getCustomServices();
     for (String serviceName : customServices.keySet()) {
@@ -328,7 +322,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       final CustomService customService = customServices.get(serviceName);
 
       // TODO MULE-19927 avoid this filter
-      if (!isServiceRuntimeProvided(customService)) {
+      if (!customService.isBaseContext() && !isServiceRuntimeProvided(customService)) {
         final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
 
         registerBeanDefinition(serviceName, beanDefinition);

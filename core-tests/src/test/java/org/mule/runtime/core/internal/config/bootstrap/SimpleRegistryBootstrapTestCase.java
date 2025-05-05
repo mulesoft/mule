@@ -18,11 +18,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
@@ -40,7 +38,7 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleTestCase {
 
   @Test
   public void registerOnlyAppPropertiesType() throws Exception {
-    final Registry registry = new SimpleRegistry(mock(MuleContext.class));
+    final Registry registry = new SimpleRegistry(null, null);
     createTestRegistryBootstrap(APP, registry);
     assertThat(registry.lookupObject(String.class), notNullValue());
     assertThat(registry.lookupObject(Properties.class), nullValue());
@@ -50,7 +48,7 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleTestCase {
 
   @Test
   public void registerOnlyDomainPropertiesType() throws Exception {
-    final Registry registry = new SimpleRegistry(mock(MuleContext.class));
+    final Registry registry = new SimpleRegistry(null, null);
     createTestRegistryBootstrap(DOMAIN, registry);
     assertThat(registry.lookupObject(String.class), nullValue());
     assertThat(registry.lookupObject(Properties.class), notNullValue());
@@ -60,7 +58,7 @@ public class SimpleRegistryBootstrapTestCase extends AbstractMuleTestCase {
 
   @Test
   public void registerOnlyPolicyPropertiesType() throws Exception {
-    final Registry registry = new SimpleRegistry(mock(MuleContext.class));
+    final Registry registry = new SimpleRegistry(null, null);
     createTestRegistryBootstrap(POLICY, registry);
     assertThat(registry.lookupObject(String.class), nullValue());
     assertThat(registry.lookupObject(Properties.class), nullValue());

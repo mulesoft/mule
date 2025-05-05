@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.context;
 
 import static org.mule.runtime.api.artifact.ArtifactType.APP;
 import static org.mule.runtime.api.artifact.ArtifactType.POLICY;
+import static org.mule.runtime.api.config.custom.ServiceConfigurator.lookupServiceConfigurators;
 import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXCEPTION_LOCATION_PROVIDER;
@@ -93,6 +94,11 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
         .orElse(beanDefinition);
 
     beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
+  }
+
+  protected void loadServiceConfigurators() {
+    lookupServiceConfigurators(this.getClass().getClassLoader())
+        .forEach(customizationInfo -> customizationInfo.configure(getCustomizationService()));
   }
 
   protected boolean isServiceRuntimeProvided(final CustomService<?> customService) {

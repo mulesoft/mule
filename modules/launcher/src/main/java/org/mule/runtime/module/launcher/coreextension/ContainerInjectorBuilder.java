@@ -119,7 +119,7 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
    * @return an injector witht the provided configuration
    */
   public Injector build() {
-    SimpleRegistry injector = new SimpleRegistry(null);
+    SimpleRegistry injector = new SimpleRegistry(null, null);
 
     try {
       injector.registerObjects(objectsToRegister);
