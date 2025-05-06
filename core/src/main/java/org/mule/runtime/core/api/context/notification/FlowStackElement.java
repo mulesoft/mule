@@ -35,8 +35,8 @@ public class FlowStackElement implements Serializable {
 
   private final String flowName;
   private final String processorPath;
-  private final ComponentLocation executingLocation;
-  private final String executingComponentSourceLocation;
+  private final transient ComponentLocation executingLocation;
+  private final transient Map<QName, Object> executingComponentAnnotations;
   private final long creationTime;
   private final transient ComponentIdentifier chainIdentifier;
 
@@ -50,7 +50,7 @@ public class FlowStackElement implements Serializable {
     this.flowName = flowName;
     this.processorPath = processorPath;
     this.executingLocation = requireNonNull(executingLocation);
-    this.executingComponentSourceLocation = (String) executingComponentAnnotations.get(SOURCE_LOCATION_ANNOTATION_KEY);
+    this.executingComponentAnnotations = executingComponentAnnotations;
     this.creationTime = now().toEpochMilli();
     this.chainIdentifier = chainIdentifier;
   }
@@ -87,11 +87,21 @@ public class FlowStackElement implements Serializable {
   }
 
   /**
+   * @return the annotations of the component on this execution point.
+   * @since 4.10
+   */
+  public Map<QName, Object> getExecutingComponentAnnotations() {
+    return executingComponentAnnotations;
+  }
+
+  /**
    * @return the location within the artifact source for the component on this execution point.
    * @since 4.10
    */
   public String getExecutingComponentSourceLocation() {
-    return executingComponentSourceLocation;
+    return executingComponentAnnotations != null
+        ? (String) executingComponentAnnotations.get(SOURCE_LOCATION_ANNOTATION_KEY)
+        : null;
   }
 
   /**

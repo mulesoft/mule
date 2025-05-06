@@ -69,8 +69,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-
-import jakarta.inject.Inject;
+import java.util.function.Predicate;
 
 import javax.xml.namespace.QName;
 
@@ -91,6 +90,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import jakarta.inject.Inject;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
@@ -172,10 +172,10 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
     // for subflows, we create a new one, so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
-      if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
-        SubflowMessageProcessorChainBuilder chainBuilder = (SubflowMessageProcessorChainBuilder) referencedFlow;
+      if (referencedFlow instanceof SubflowMessageProcessorChainBuilder chainBuilder) {
+        chainBuilder.setAnnotations(getAnnotations());
         chainBuilder.withComponentTracerFactory(componentTracerFactory);
-        locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(c -> c instanceof Flow).map(c -> (Flow) c)
+        locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(Flow.class::isInstance).map(c -> (Flow) c)
             .ifPresent(f -> {
               ProcessingStrategy callerFlowPs = f.getProcessingStrategy();
               chainBuilder.setProcessingStrategy(new ProcessingStrategy() {
@@ -225,8 +225,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   }
 
   private Component getReferencedProcessor(String name) {
-    if (applicationContext instanceof MuleArtifactContext) {
-      MuleArtifactContext muleArtifactContext = (MuleArtifactContext) applicationContext;
+    if (applicationContext instanceof MuleArtifactContext muleArtifactContext) {
       try {
         BeanDefinition processorBeanDefinition = muleArtifactContext.getBeanFactory().getBeanDefinition(name);
         if (processorBeanDefinition.isPrototype()) {
@@ -271,15 +270,13 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   private void processBeanValue(String rootContainerName, Object value) {
     if (value instanceof BeanDefinition) {
       updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) value);
-    } else if (value instanceof ManagedList) {
-      ManagedList managedList = (ManagedList) value;
+    } else if (value instanceof ManagedList managedList) {
       for (Object itemValue : managedList) {
         if (itemValue instanceof BeanDefinition) {
           updateBeanDefinitionRootContainerName(rootContainerName, (BeanDefinition) itemValue);
         }
       }
-    } else if (value instanceof ManagedMap) {
-      ManagedMap managedMap = (ManagedMap) value;
+    } else if (value instanceof ManagedMap managedMap) {
       managedMap.forEach((key, mapValue) -> processBeanValue(rootContainerName, mapValue));
     }
   }
@@ -342,15 +339,16 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       // This onErrorResume here is intended to handle the recursive error when it happens during subscription
       // If a recursion is found, do a fallback that avoids prebuilding the whole chain.
-      final Flux<CoreEvent> resumed = pub.onErrorResume(t -> t instanceof RecursiveFlowRefException, t -> {
-        recursionFound = true;
-        LOGGER.warn(t.toString());
-        return from(publisher).transform(recursiveFallback);
-      });
+      final Flux<CoreEvent> resumed =
+          pub.onErrorResume((Predicate<? super Throwable>) RecursiveFlowRefException.class::isInstance, t -> {
+            recursionFound = true;
+            LOGGER.warn(t.toString());
+            return from(publisher).transform(recursiveFallback);
+          });
 
       return resumed
           // Same as above, but to avoid building excessive long chains because of nested sub-flows
-          .onErrorResume(t -> t instanceof DeepSubFlowNestingFlowRefException, t -> {
+          .onErrorResume((Predicate<? super Throwable>) DeepSubFlowNestingFlowRefException.class::isInstance, t -> {
             LOGGER.debug(t.toString());
             return from(publisher).transform(recursiveFallback);
           });
