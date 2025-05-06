@@ -69,7 +69,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import javax.xml.namespace.QName;
 
@@ -173,7 +172,6 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
     // for subflows, we create a new one, so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
       if (referencedFlow instanceof SubflowMessageProcessorChainBuilder chainBuilder) {
-        chainBuilder.setAnnotations(getAnnotations());
         chainBuilder.withComponentTracerFactory(componentTracerFactory);
         locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(Flow.class::isInstance).map(c -> (Flow) c)
             .ifPresent(f -> {
@@ -340,7 +338,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       // This onErrorResume here is intended to handle the recursive error when it happens during subscription
       // If a recursion is found, do a fallback that avoids prebuilding the whole chain.
       final Flux<CoreEvent> resumed =
-          pub.onErrorResume((Predicate<? super Throwable>) RecursiveFlowRefException.class::isInstance, t -> {
+          pub.onErrorResume(RecursiveFlowRefException.class::isInstance, t -> {
             recursionFound = true;
             LOGGER.warn(t.toString());
             return from(publisher).transform(recursiveFallback);
@@ -348,7 +346,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
 
       return resumed
           // Same as above, but to avoid building excessive long chains because of nested sub-flows
-          .onErrorResume((Predicate<? super Throwable>) DeepSubFlowNestingFlowRefException.class::isInstance, t -> {
+          .onErrorResume(DeepSubFlowNestingFlowRefException.class::isInstance, t -> {
             LOGGER.debug(t.toString());
             return from(publisher).transform(recursiveFallback);
           });

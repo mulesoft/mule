@@ -90,7 +90,8 @@ public class FlowStackElement implements Serializable {
    * @return the annotations of the component on this execution point.
    * @since 4.10
    */
-  public Map<QName, Object> getExecutingComponentAnnotations() {
+  // is NOT a getter so it is not serialized by DW!
+  public Map<QName, Object> executingComponentAnnotations() {
     return executingComponentAnnotations;
   }
 
