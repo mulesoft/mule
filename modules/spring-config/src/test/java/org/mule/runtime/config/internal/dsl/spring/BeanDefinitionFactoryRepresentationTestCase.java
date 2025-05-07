@@ -6,17 +6,25 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.resolveProcessorRepresentation;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.FLOW_STACK;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.ast.internal.DefaultComponentMetadataAst;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
+@Feature(LOGGING)
+@Story(FLOW_STACK)
 public class BeanDefinitionFactoryRepresentationTestCase extends AbstractMuleTestCase {
 
   @Test

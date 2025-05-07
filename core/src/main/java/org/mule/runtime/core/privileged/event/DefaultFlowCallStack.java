@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX
 import static java.lang.Integer.getInteger;
 import static java.lang.System.lineSeparator;
 
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
@@ -19,8 +20,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
+
+import javax.xml.namespace.QName;
 
 /**
  * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting information
@@ -46,7 +50,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
   }
 
   private DefaultFlowCallStack(final Deque<FlowStackElement> innerStack) {
-    this.innerStack = ((ArrayDeque) innerStack).clone();
+    this.innerStack = ((ArrayDeque<FlowStackElement>) innerStack).clone();
   }
 
   /**
@@ -75,11 +79,13 @@ public class DefaultFlowCallStack implements FlowCallStack {
    *
    * @param processorPath the path to mark as invoked.
    */
-  public void pushCurrentProcessorPath(String processorPath) {
+  public void pushCurrentProcessorPath(String processorPath,
+                                       ComponentLocation location, Map<QName, Object> annotations) {
     if (!innerStack.isEmpty()) {
       synchronized (innerStack) {
         FlowStackElement stackElement = innerStack.pop();
-        innerStack.push(new FlowStackElement(stackElement.getFlowName(), stackElement.getChainIdentifier(), processorPath));
+        innerStack.push(new FlowStackElement(stackElement.getFlowName(), stackElement.getChainIdentifier(), processorPath,
+                                             location, annotations));
       }
     }
   }
@@ -131,6 +137,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
    * Same as {@link #toString()} but including the milliseconds elapsed between its creation and now
    * ({@link FlowStackElement#getElapsedTimeLong()}.
    */
+  @Override
   public String toStringWithElapsedTime() {
     return doToString(FlowStackElement::toStringWithElapsedTime);
   }

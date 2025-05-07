@@ -36,13 +36,14 @@ import static reactor.core.publisher.Mono.just;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
+import org.mule.runtime.core.privileged.exception.MessagingException;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -114,7 +115,7 @@ public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCa
     // ReactiveProcessor flowProcessor = null;
     final CoreEvent event = quickCopy(initialEvent, singletonMap(POLICY_NEXT_OPERATION, new SoftReference<>(flowProcessor)));
     ((DefaultFlowCallStack) (event.getFlowCallStack()))
-        .push(new FlowStackElement("policy", null));
+        .push(new FlowStackElement("policy", null, mock(ComponentLocation.class), emptyMap()));
 
     SourcePolicyContext sourcePolicyCtx = SourcePolicyContext.from(event);
     sourcePolicyCtx.configure(new MessageSourceResponseParametersProcessor() {
