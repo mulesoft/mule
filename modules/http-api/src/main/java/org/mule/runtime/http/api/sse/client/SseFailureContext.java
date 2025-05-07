@@ -30,7 +30,7 @@ public interface SseFailureContext {
   Throwable error();
 
   /**
-   * @return the SSE connection failure response.
+   * @return the response, in case it is not a valid SSE handshake response.
    */
   HttpResponse response();
 
