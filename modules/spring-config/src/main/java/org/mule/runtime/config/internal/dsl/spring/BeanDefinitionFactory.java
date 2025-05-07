@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.Component.NS_MULE_PARSER_METADATA;
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.REPRESENTATION_ANNOTATION_KEY;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -76,6 +77,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import javax.xml.namespace.QName;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -615,21 +618,49 @@ public class BeanDefinitionFactory {
         });
 
     addAnnotation(LOCATION_KEY, component.getLocation(), springComponentModel);
-    addAnnotation(REPRESENTATION_ANNOTATION_KEY, resolveProcessorRepresentation(artifactId,
-                                                                                component.getLocation(),
-                                                                                component.getMetadata()),
+    addAnnotation(REPRESENTATION_ANNOTATION_KEY,
+                  resolveProcessorRepresentation(artifactId,
+                                                 component.getLocation(),
+                                                 component.getMetadata()),
                   springComponentModel);
+    // do not use the constant, since this may be deployed on an environment with an older api
+    addAnnotation(new QName(NS_MULE_PARSER_METADATA, "sourceLocation"),
+                  resolveProcessorSourceLocation(component.getMetadata()),
+                  springComponentModel);
+  }
+
+  /**
+   * Generates a reduced representation of a flow element to be logged in a standard way.
+   *
+   * @param metadata the metadata of the component to get the source location from
+   * @return a string representation of the source location of the component located in {@code processorPath}.
+   * 
+   * @since 4.10
+   */
+  public static String resolveProcessorSourceLocation(ComponentMetadataAst metadata) {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    String sourceFile = metadata.getFileName().orElse(null);
+    if (sourceFile != null) {
+      stringBuilder
+          .append(sourceFile)
+          .append(":")
+          .append(metadata.getStartLine().orElse(-1));
+    }
+
+    return stringBuilder.toString();
   }
 
   /**
    * Generates a representation of a flow element to be logged in a standard way.
    *
-   * @param appId
-   * @param processorPath
-   * @param element
-   * @return
+   * @param appId         the name of the artifact.
+   * @param processorPath the location of the component within the artifact
+   * @param metadata      the metadata of the component to get the source location from
+   * @return a string representation of the source location of the component located in {@code processorPath}.
    */
-  public static String resolveProcessorRepresentation(String appId, ComponentLocation processorPath,
+  public static String resolveProcessorRepresentation(String appId,
+                                                      ComponentLocation processorPath,
                                                       ComponentMetadataAst metadata) {
     StringBuilder stringBuilder = new StringBuilder();
 

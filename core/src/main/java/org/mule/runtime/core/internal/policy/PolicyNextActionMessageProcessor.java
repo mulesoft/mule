@@ -39,8 +39,8 @@ import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.exception.MessagingException;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.lang.ref.Reference;
@@ -48,9 +48,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import jakarta.inject.Inject;
-
 import org.reactivestreams.Publisher;
+
+import jakarta.inject.Inject;
 
 /**
  * Next-operation message processor implementation.
@@ -88,7 +88,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
   private MessageProcessorChain nextDispatchAsChain;
 
   private final Map<ComponentLocation, Boolean> locationsCache = new SmallMap<>();
-  private final Map<Pair<ComponentLocation, String>, Boolean> subFlowLocationsCache = new SmallMap<>();
+  private final Map<Pair<ComponentLocation, FlowStackElement>, Boolean> subFlowLocationsCache = new SmallMap<>();
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
@@ -139,7 +139,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
             .onFlowError(event, getPolicyId(), SourcePolicyContext.from(event).getParametersTransformer()));
       }
 
-    }, notificationHelper, getLocation());
+    }, notificationHelper, getLocation(), getAnnotations());
   }
 
   private Boolean isWithinSourcePolicy(final ComponentLocation location) {
@@ -152,7 +152,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
     if (elements.size() == 0) {
       return false;
     }
-    return subFlowLocationsCache.computeIfAbsent(new Pair<>(loc, elements.get(0).getProcessorPath()), pair -> {
+    return subFlowLocationsCache.computeIfAbsent(new Pair<>(loc, elements.get(0)), pair -> {
       if (pair.getFirst().getParts().size() < 1) {
         return false;
       }
@@ -162,7 +162,8 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         return false;
       }
 
-      return isSubflowWithinASoucePolicy(builderFromStringRepresentation(pair.getSecond().split(" ")[0]).build());
+      return isSubflowWithinASoucePolicy(builderFromStringRepresentation(pair.getSecond().getExecutingLocation().getLocation())
+          .build());
     });
   }
 
@@ -206,7 +207,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
 
   private Consumer<CoreEvent> pushAfterNextFlowStackElement() {
     return event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-        .push(new FlowStackElement(toPolicyLocation(getLocation()), null));
+        .push(new FlowStackElement(toPolicyLocation(getLocation()), null, getLocation(), getAnnotations()));
   }
 
   private static String toPolicyLocation(ComponentLocation componentLocation) {

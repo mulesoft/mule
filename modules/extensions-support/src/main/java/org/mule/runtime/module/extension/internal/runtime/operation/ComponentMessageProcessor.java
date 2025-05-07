@@ -452,7 +452,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       if (location != null) {
         ((DefaultFlowCallStack) event.getFlowCallStack())
-            .pushCurrentProcessorPath(resolvedProcessorRepresentation);
+            .pushCurrentProcessorPath(resolvedProcessorRepresentation, getLocation(), getAnnotations());
 
         ExecutorCallback effectiveCallback =
             isTargetWithPolicies(event) ? getExecutionCallbackForPolicyAndOperationWithTarget(event, executorCallback)
