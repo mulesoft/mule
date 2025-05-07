@@ -60,7 +60,6 @@
 
         <javaModuleName>org.mule.runtime.spring.config</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

@@ -13,7 +13,6 @@
     <properties>
         <surefire.args>${surefire.args.base}</surefire.args>
         <javaModuleName>org.mule.test.functional</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

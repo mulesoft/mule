@@ -23,7 +23,6 @@
 
         <javaModuleName>org.mule.runtime.launcher</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

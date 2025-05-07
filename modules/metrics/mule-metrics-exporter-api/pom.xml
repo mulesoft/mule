@@ -14,7 +14,6 @@
     <description>Definitions for Mule Metrics Exporter Api</description>
     
     <properties>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <javaModuleName>org.mule.runtime.metrics.exporter.api</javaModuleName>
     </properties>
     

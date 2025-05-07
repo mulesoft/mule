@@ -16,6 +16,9 @@ target/
 *.idea
 *.mule_ide/
 
+# VSCode files
+.vscode
+
 # Mac
 .DS_Store
 

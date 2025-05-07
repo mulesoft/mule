@@ -34,7 +34,6 @@
 
         <javaModuleName>org.mule.runtime.artifact</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

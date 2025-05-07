@@ -17,7 +17,6 @@
         <surefire.args>${surefire.test.unit.open.args}</surefire.args>
 
         <javaModuleName>org.mule.test.policies</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

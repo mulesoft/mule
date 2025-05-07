@@ -65,7 +65,6 @@
         </surefire.args>
 
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

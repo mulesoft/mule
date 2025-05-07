@@ -23,8 +23,6 @@
         </surefire.args>
 
         <javaModuleName>org.mule.test.runner</javaModuleName>
-        
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

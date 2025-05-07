@@ -17,7 +17,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.http.api</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
