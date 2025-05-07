@@ -8,7 +8,6 @@ package org.mule.runtime.config.internal.dsl.spring;
 
 import static org.mule.runtime.api.component.Component.Annotations.NAME_ANNOTATION_KEY;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.resolveProcessorSourceLocation;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.FLOW_STACK;
 
@@ -29,8 +28,7 @@ public class BeanDefinitionFactoryRepresentationSourceLocationTestCase extends A
 
   @Test
   public void withFailingProcessorNoPathResolver() {
-    assertThat(resolveProcessorSourceLocation(from("Mock@1"),
-                                              DefaultComponentMetadataAst.builder()
+    assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
                                                   .setFileName("unknown")
                                                   .build()),
                is("unknown:-1"));
@@ -38,8 +36,7 @@ public class BeanDefinitionFactoryRepresentationSourceLocationTestCase extends A
 
   @Test
   public void withFailingProcessorPathResolver() {
-    assertThat(resolveProcessorSourceLocation(from("flow/processor"),
-                                              DefaultComponentMetadataAst.builder()
+    assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
                                                   .setFileName("muleApp.xml")
                                                   .setStartLine(10)
                                                   .build()),
@@ -48,8 +45,7 @@ public class BeanDefinitionFactoryRepresentationSourceLocationTestCase extends A
 
   @Test
   public void withFailingProcessorNotPathResolver() {
-    assertThat(resolveProcessorSourceLocation(from("Mock@1"),
-                                              DefaultComponentMetadataAst.builder()
+    assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
                                                   .setFileName("unknown")
                                                   .build()),
                is("unknown:-1"));
@@ -57,8 +53,7 @@ public class BeanDefinitionFactoryRepresentationSourceLocationTestCase extends A
 
   @Test
   public void withAnnotatedFailingProcessorNoPathResolver() {
-    assertThat(resolveProcessorSourceLocation(from("Mock@1"),
-                                              DefaultComponentMetadataAst.builder()
+    assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
                                                   .setFileName("muleApp.xml")
                                                   .setStartLine(10)
                                                   .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
@@ -68,8 +63,7 @@ public class BeanDefinitionFactoryRepresentationSourceLocationTestCase extends A
 
   @Test
   public void withAnnotatedFailingProcessorPathResolver() {
-    assertThat(resolveProcessorSourceLocation(from("flow/processor"),
-                                              DefaultComponentMetadataAst.builder()
+    assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
                                                   .setFileName("muleApp.xml")
                                                   .setStartLine(10)
                                                   .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
@@ -79,8 +73,7 @@ public class BeanDefinitionFactoryRepresentationSourceLocationTestCase extends A
 
   @Test
   public void withAnnotatedFailingProcessorNotPathResolver() {
-    assertThat(resolveProcessorSourceLocation(from("Mock@1"),
-                                              DefaultComponentMetadataAst.builder()
+    assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
                                                   .setFileName("muleApp.xml")
                                                   .setStartLine(10)
                                                   .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
