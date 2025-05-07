@@ -115,8 +115,8 @@ public interface BaseEventContext extends EventContext {
   boolean isTerminated();
 
   /**
-   * 
    * @return {@code true} if the response of {@code this} context is done.
+   * @since 4.10
    */
   boolean isResponseDone();
 

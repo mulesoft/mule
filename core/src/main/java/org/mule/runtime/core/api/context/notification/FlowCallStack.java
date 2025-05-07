@@ -38,6 +38,8 @@ public interface FlowCallStack extends Serializable, Cloneable {
   /**
    * Same as {@link #toString()} but including the milliseconds elapsed between its creation and now
    * ({@link FlowStackElement#getElapsedTimeLong()}.
+   * 
+   * @since 4.10
    */
   String toStringWithElapsedTime();
 
