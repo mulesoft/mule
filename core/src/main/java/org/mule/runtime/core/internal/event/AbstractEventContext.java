@@ -309,7 +309,8 @@ public abstract class AbstractEventContext implements SpanContextAware, BaseEven
     return exceptionHandler;
   }
 
-  private boolean isResponseDone() {
+  @Override
+  public boolean isResponseDone() {
     return stateCtx.get() >= STATE_RESPONSE_RECEIVED;
   }
 

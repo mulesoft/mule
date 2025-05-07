@@ -7,6 +7,7 @@
 package org.mule.tck.util;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -72,8 +73,28 @@ public class FlowTraceUtils {
     }
   }
 
+  public static Matcher<FlowStackElement> isFlowStackElement(final String executingLocation) {
+    return isFlowStackElement(equalTo(executingLocation));
+  }
+
+  public static Matcher<FlowStackElement> isFlowStackElement(final Matcher<String> executingLocationMatcher) {
+    return new TypeSafeMatcher<>() {
+
+      @Override
+      protected boolean matchesSafely(FlowStackElement flowStackElement) {
+        return executingLocationMatcher.matches(flowStackElement.getExecutingLocation().getLocation());
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("<");
+        executingLocationMatcher.describeTo(description);
+      }
+    };
+  }
+
   public static Matcher<FlowStackElement> isFlowStackElement(final String flowName, final String executingMessageProcessor) {
-    return new TypeSafeMatcher<FlowStackElement>() {
+    return new TypeSafeMatcher<>() {
 
       @Override
       protected boolean matchesSafely(FlowStackElement flowStackElement) {
@@ -94,7 +115,7 @@ public class FlowTraceUtils {
   }
 
   public static Matcher<FlowStackElement> withChainIdentifier(final ComponentIdentifier chainIdentifier) {
-    return new TypeSafeMatcher<FlowStackElement>() {
+    return new TypeSafeMatcher<>() {
 
       @Override
       protected boolean matchesSafely(FlowStackElement flowStackElement) {

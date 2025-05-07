@@ -8,7 +8,88 @@
             "code": "java.method.added",
             "new": "method org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getFlowSummaryStatisticsV2()",
             "justification": "W-18456190: Improving computation of flows summary statistics"
-          }
+          },
+		  {
+		    "ignore": true,
+		    "code": "java.method.numberOfParametersChanged",
+		    "old": "method void org.mule.runtime.core.api.context.notification.FlowStackElement::<init>(java.lang.String, java.lang.String)",
+		    "new": "method void org.mule.runtime.core.api.context.notification.FlowStackElement::<init>(java.lang.String, java.lang.String, org.mule.runtime.api.component.location.ComponentLocation, java.util.Map<javax.xml.namespace.QName, java.lang.Object>)",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.method.numberOfParametersChanged",
+		    "old": "method void org.mule.runtime.core.api.context.notification.FlowStackElement::<init>(java.lang.String, org.mule.runtime.api.component.ComponentIdentifier, java.lang.String)",
+		    "new": "method void org.mule.runtime.core.api.context.notification.FlowStackElement::<init>(java.lang.String, org.mule.runtime.api.component.ComponentIdentifier, java.lang.String, org.mule.runtime.api.component.location.ComponentLocation, java.util.Map<javax.xml.namespace.QName, java.lang.Object>)",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.method.added",
+		    "new": "method java.util.Map<javax.xml.namespace.QName, java.lang.Object> org.mule.runtime.core.api.context.notification.FlowStackElement::executingComponentAnnotations()",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.method.added",
+		    "new": "method java.lang.String org.mule.runtime.core.api.context.notification.FlowStackElement::getExecutingComponentSourceLocation()",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.method.added",
+		    "new": "method org.mule.runtime.api.component.location.ComponentLocation org.mule.runtime.core.api.context.notification.FlowStackElement::getExecutingLocation()",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.method.added",
+		    "new": "method java.lang.String org.mule.runtime.core.api.context.notification.FlowStackElement::toStringEventDumpFormat()",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.annotation.added",
+		    "old": "class org.mule.runtime.core.api.context.notification.FlowStackElement",
+		    "new": "class org.mule.runtime.core.api.context.notification.FlowStackElement",
+		    "annotation": "@org.mule.api.annotation.NoExtend",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.annotation.added",
+		    "old": "class org.mule.runtime.core.api.context.notification.FlowStackElement",
+		    "new": "class org.mule.runtime.core.api.context.notification.FlowStackElement",
+		    "annotation": "@org.mule.api.annotation.NoInstantiate",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.class.added",
+		    "new": "enum org.mule.runtime.core.api.event.EventContextService.EventContextState",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.annotation.added",
+		    "old": "interface org.mule.runtime.core.api.event.EventContextService.FlowStackEntry",
+		    "new": "interface org.mule.runtime.core.api.event.EventContextService.FlowStackEntry",
+		    "annotation": "@org.mule.api.annotation.NoImplement",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.method.defaultMethodAddedToInterface",
+		    "new": "method java.time.Instant org.mule.runtime.api.event.EventContext::getStartTime() @ org.mule.runtime.core.privileged.event.BaseEventContext",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  },
+		  {
+		    "ignore": true,
+		    "code": "java.method.numberOfParametersChanged",
+		    "old": "method void org.mule.runtime.core.privileged.event.DefaultFlowCallStack::pushCurrentProcessorPath(java.lang.String)",
+		    "new": "method void org.mule.runtime.core.privileged.event.DefaultFlowCallStack::pushCurrentProcessorPath(java.lang.String, org.mule.runtime.api.component.location.ComponentLocation, java.util.Map<javax.xml.namespace.QName, java.lang.Object>)",
+		    "justification": "W-18267133: Improvements for FlowStack"
+		  }
         ]
       }
     }
