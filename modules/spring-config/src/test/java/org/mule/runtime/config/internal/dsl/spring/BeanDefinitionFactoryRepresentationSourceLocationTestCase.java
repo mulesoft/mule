@@ -29,55 +29,55 @@ public class BeanDefinitionFactoryRepresentationSourceLocationTestCase extends A
   @Test
   public void withFailingProcessorNoPathResolver() {
     assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
-                                                  .setFileName("unknown")
-                                                  .build()),
+        .setFileName("unknown")
+        .build()),
                is("unknown:-1"));
   }
 
   @Test
   public void withFailingProcessorPathResolver() {
     assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
-                                                  .setFileName("muleApp.xml")
-                                                  .setStartLine(10)
-                                                  .build()),
+        .setFileName("muleApp.xml")
+        .setStartLine(10)
+        .build()),
                is("muleApp.xml:10"));
   }
 
   @Test
   public void withFailingProcessorNotPathResolver() {
     assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
-                                                  .setFileName("unknown")
-                                                  .build()),
+        .setFileName("unknown")
+        .build()),
                is("unknown:-1"));
   }
 
   @Test
   public void withAnnotatedFailingProcessorNoPathResolver() {
     assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
-                                                  .setFileName("muleApp.xml")
-                                                  .setStartLine(10)
-                                                  .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
-                                                  .build()),
+        .setFileName("muleApp.xml")
+        .setStartLine(10)
+        .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
+        .build()),
                is("muleApp.xml:10"));
   }
 
   @Test
   public void withAnnotatedFailingProcessorPathResolver() {
     assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
-                                                  .setFileName("muleApp.xml")
-                                                  .setStartLine(10)
-                                                  .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
-                                                  .build()),
+        .setFileName("muleApp.xml")
+        .setStartLine(10)
+        .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
+        .build()),
                is("muleApp.xml:10"));
   }
 
   @Test
   public void withAnnotatedFailingProcessorNotPathResolver() {
     assertThat(resolveProcessorSourceLocation(DefaultComponentMetadataAst.builder()
-                                                  .setFileName("muleApp.xml")
-                                                  .setStartLine(10)
-                                                  .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
-                                                  .build()),
+        .setFileName("muleApp.xml")
+        .setStartLine(10)
+        .putDocAttribute(NAME_ANNOTATION_KEY.getLocalPart(), "Mock Component")
+        .build()),
                is("muleApp.xml:10"));
   }
 
