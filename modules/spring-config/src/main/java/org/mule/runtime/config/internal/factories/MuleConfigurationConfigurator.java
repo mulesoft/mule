@@ -8,13 +8,11 @@ package org.mule.runtime.config.internal.factories;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.GRACEFUL_SHUTDOWN_DEFAULT_TIMEOUT;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 
 import static java.lang.Long.parseLong;
 import static java.lang.System.getProperty;
 import static java.lang.System.getenv;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.time.TimeSupplier;
 import org.mule.runtime.config.internal.bean.DefaultObjectSerializerDelegate;
@@ -49,7 +47,8 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   @Inject
   private DefaultObjectSerializerDelegate objectSerializerDelegate;
 
-  private Registry registry;
+  @Inject
+  private TimeSupplier timeSupplier;
 
   // We instantiate DefaultMuleConfiguration to make sure we get the default values for
   // any properties not set by the user.
@@ -174,18 +173,12 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
       return config.getDynamicConfigExpiration();
     }
 
-    return registry.lookupByName(OBJECT_TIME_SUPPLIER)
-        .map(ts -> DynamicConfigExpiration.getDefault((TimeSupplier) ts)).orElse(config.getDynamicConfigExpiration());
+    return DynamicConfigExpiration.getDefault(timeSupplier);
   }
 
   @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
-  }
-
-  @Inject
-  public void setRegistry(Registry registry) {
-    this.registry = registry;
   }
 
 }

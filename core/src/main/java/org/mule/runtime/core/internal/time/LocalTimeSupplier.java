@@ -7,9 +7,11 @@
 package org.mule.runtime.core.internal.time;
 
 import static java.lang.System.currentTimeMillis;
+import static java.time.Instant.now;
 
 import org.mule.runtime.api.time.TimeSupplier;
 
+import java.time.Instant;
 import java.util.function.Supplier;
 
 /**
@@ -32,5 +34,10 @@ public class LocalTimeSupplier implements TimeSupplier {
   @Override
   public long getAsLong() {
     return currentTimeMillis();
+  }
+
+  @Override
+  public Instant getAsInstant() {
+    return now();
   }
 }

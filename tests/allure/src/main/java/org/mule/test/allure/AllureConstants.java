@@ -1322,4 +1322,16 @@ public interface AllureConstants {
 
     String MULE_MANIFEST = "Mule Manifest";
   }
+
+  interface SupportabilityFeature {
+
+    String SUPPORTABILITY = "Mule Runtime Supportability";
+
+    interface SupportabilityStory {
+
+      String ALERTS = "Alerts";
+      String DIAF_FORMAT = "DIAF Format";
+
+    }
+  }
 }

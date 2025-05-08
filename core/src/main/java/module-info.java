@@ -206,6 +206,9 @@ module org.mule.runtime.core {
   // for test-components
   exports org.mule.runtime.core.privileged.transaction;
 
+  exports org.mule.runtime.core.internal.alert to
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
       spring.beans;

@@ -61,13 +61,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STATISTICS;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_FACTORY_LOCATOR;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.SDK_OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
@@ -123,7 +120,6 @@ import org.mule.runtime.core.internal.processor.interceptor.DefaultProcessorInte
 import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
-import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
@@ -155,7 +151,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,16 +172,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringMuleContextServiceConfigurator.class);
 
-  private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES = ImmutableSet.<String>builder()
-      .add(OBJECT_SECURITY_MANAGER)
-      .add(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER)
-      .add(OBJECT_MULE_STREAM_CLOSER_SERVICE)
-      .add(OBJECT_PROCESSING_TIME_WATCHER)
-      .add(OBJECT_POLICY_MANAGER)
-      .add(OBJECT_EXCEPTION_LOCATION_PROVIDER)
-      .add(OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER)
-      .build();
-
   private static final ImmutableMap<String, String> OBJECT_STORE_NAME_TO_LOCAL_OBJECT_STORE_NAME =
       ImmutableMap.<String, String>builder()
           .put(BASE_IN_MEMORY_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_IN_MEMORY)
@@ -202,7 +187,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
   private final ImmutableMap<String, BeanDefinition> defaultContextServices = ImmutableMap.<String, BeanDefinition>builder()
       .put(OBJECT_TRANSACTION_MANAGER, getBeanDefinition(TransactionManagerFactoryBean.class))
       .put(OBJECT_EXTENSION_MANAGER, getBeanDefinition(ExtensionManagerFactoryBean.class))
-      .put(OBJECT_TIME_SUPPLIER, getBeanDefinition(LocalTimeSupplier.class))
       .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DelegateConnectionManagerAdapter.class))
       .put(OBJECT_MULE_CONFIGURATION, getBeanDefinition(MuleConfigurationConfigurator.class))
       .put(OBJECT_TRANSACTION_FACTORY_LOCATOR, getBeanDefinition(TransactionFactoryLocator.class))
@@ -315,9 +299,9 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       loadServiceConfigurators();
     }
 
-    registerContextServices(defaultContextServices);
+    registerContextServices(defaultContextServices, artifactType.getArtifactType());
     if (isAddToolingObjectsToRegistry()) {
-      registerContextServices(toolingContextServices);
+      registerContextServices(toolingContextServices, artifactType.getArtifactType());
     }
 
     createBootstrapBeanDefinitions();
@@ -334,13 +318,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     if (valueOf(artifactProperties.getOrDefault(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY, FALSE.toString()))) {
       registerConstantBeanDefinition(OBJECT_ARTIFACT_AST, artifactAst);
     }
-  }
-
-  private void registerContextServices(Map<String, BeanDefinition> contextServices) {
-    contextServices.entrySet().stream()
-        .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)
-            || artifactType.equals(POLICY))
-        .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
   }
 
   private void createCustomServices() {
