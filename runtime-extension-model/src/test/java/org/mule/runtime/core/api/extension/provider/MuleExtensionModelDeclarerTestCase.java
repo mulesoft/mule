@@ -6,25 +6,31 @@
  */
 package org.mule.runtime.core.api.extension.provider;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.api.util.MuleSystemProperties.PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE;
-import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
+import static org.mule.runtime.core.extension.ComponentConfigurerTestUtils.createMockedFactory;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
-import static java.util.stream.Collectors.toList;
+import static java.util.Arrays.asList;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.empty;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.mule.runtime.api.meta.model.declaration.fluent.*;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
+import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
+
+import java.util.Collection;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -40,64 +46,79 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class MuleExtensionModelDeclarerTestCase {
 
-  private final String expectedResult;
-
-  private String isDoNotSupportExpressionsOriginalValue;
-  private final String isDoNotSupportExpressionsValue;
   private String isParseTemplateUseLegacyDefaultTargetValueOriginalValue;
   private final String isParseTemplateUseLegacyDefaultTargetValue;
 
-  public MuleExtensionModelDeclarerTestCase(String isDoNotSupportExpressions, String expectedResult,
-                                            String isParseTemplateUseLegacyDefaultTargetValue) {
-    this.isDoNotSupportExpressionsValue = isDoNotSupportExpressions;
-    this.expectedResult = expectedResult;
+  @Parameterized.Parameters(
+      name = "Use parseTemplate legacy default target value: {0}")
+  public static Collection<Object[]> data() {
+    return asList(new Object[][] {
+        {"true"},
+        {"false"}
+    });
+  }
+
+  public MuleExtensionModelDeclarerTestCase(String isParseTemplateUseLegacyDefaultTargetValue) {
     this.isParseTemplateUseLegacyDefaultTargetValue = isParseTemplateUseLegacyDefaultTargetValue;
   }
 
   // TODO W-13974116: Remove circular dependency when adding org.mule.tests:mule-tests-unit to this module
   @Before
   public void setUp() {
-    isDoNotSupportExpressionsOriginalValue =
-        setProperty(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY, isDoNotSupportExpressionsValue);
     isParseTemplateUseLegacyDefaultTargetValueOriginalValue =
         setProperty(PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE, isParseTemplateUseLegacyDefaultTargetValue);
   }
 
   @After
   public void tearDown() {
-    if (isDoNotSupportExpressionsOriginalValue == null) {
-      clearProperty(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY);
-    } else {
-      setProperty(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY, isDoNotSupportExpressionsOriginalValue);
-
-    }
     if (isParseTemplateUseLegacyDefaultTargetValueOriginalValue == null) {
       clearProperty(PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE);
     } else {
-      setProperty(PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE, isDoNotSupportExpressionsOriginalValue);
+      setProperty(PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE, isParseTemplateUseLegacyDefaultTargetValueOriginalValue);
     }
   }
 
   @Test
   @Issue("W-13965819")
   public void whenIsParseTemplateUseLegacyDefaultTargetValueTheTargetValueIsMessage() {
-    MuleExtensionModelDeclarer muleExtensionModelDeclarer =
-        new MuleExtensionModelDeclarer(mock(ComponentMetadataConfigurerFactory.class));
-    ExtensionDeclarer extensionDeclarer = muleExtensionModelDeclarer.createExtensionModel();
-    OperationDeclaration parseTemplateOperation = extensionDeclarer.getDeclaration().getOperations().stream()
-        .filter(operationDeclaration -> operationDeclaration.getName().equals("parseTemplate")).findFirst().get();
+    // We want to assert over the ExtensionModel and not the ExtensionDeclarer, because the enrichers may be doing overrides that
+    // we don't expect
+    // We also can't use MuleExtensionModelProvider#getExtensionModel because that one caches the result in the class and we need
+    // to recreate it with and without the property
+    ExtensionModel muleExtensionModel = new TestExtensionModelLoader()
+        .loadExtensionModel(new MuleExtensionModelDeclarer(createMockedFactory()).createExtensionModel(), loadingRequest());
+    OperationModel parseTemplateOperation = muleExtensionModel.getOperationModel("parseTemplate").get();
     assertTargetValueParameter(parseTemplateOperation);
   }
 
-  private void assertTargetValueParameter(OperationDeclaration parseTemplateOperation) {
+  private void assertTargetValueParameter(OperationModel parseTemplateOperation) {
+    ParameterModel targetValueParam = parseTemplateOperation.getParameterGroupModels().stream()
+        .filter(op -> op.getName().equals(OUTPUT))
+        .findFirst()
+        .flatMap(pgm -> pgm.getParameter(TARGET_VALUE_PARAMETER_NAME))
+        .get();
+
     if (parseBoolean(isParseTemplateUseLegacyDefaultTargetValue)) {
-      assertThat(parseTemplateOperation.getParameterGroup(ParameterGroupModel.OUTPUT).getParameters().stream()
-          .filter(parameterDeclaration -> parameterDeclaration.getName().equals("targetValue")).findFirst().get()
-          .getDefaultValue(),
-                 equalTo("#[message]"));
+      assertThat(targetValueParam.getDefaultValue(), equalTo("#[message]"));
     } else {
-      assertThat(parseTemplateOperation.getParameterGroup(ParameterGroupModel.OUTPUT).getParameters().stream()
-          .filter(parameterDeclaration -> parameterDeclaration.getName().equals("targetValue")).collect(toList()), is(empty()));
+      assertThat(targetValueParam.getDefaultValue(), equalTo("#[payload]"));
+    }
+  }
+
+  private static ExtensionModelLoadingRequest loadingRequest() {
+    return builder(MuleExtensionModelProvider.class.getClassLoader(), nullDslResolvingContext()).build();
+  }
+
+  private static final class TestExtensionModelLoader extends ExtensionModelLoader {
+
+    @Override
+    protected void declareExtension(ExtensionLoadingContext context) {
+      // nothing to do
+    }
+
+    @Override
+    public String getId() {
+      return "test";
     }
   }
 }
