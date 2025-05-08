@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.alert;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.api.alert.AlertingSupport;
@@ -32,7 +33,8 @@ public class DefaultAlertingSupport implements AlertingSupport {
 
   @Override
   public <T> void triggerAlert(String alertName, T alertData) {
-    final var buffer = timedBuffersPerAlert.computeIfAbsent(alertName, k -> new TimedDataBuffer<>(timeSupplier));
+    final var buffer = timedBuffersPerAlert.computeIfAbsent(requireNonNull(alertName, "'alertName' cannot be null"),
+                                                            k -> new TimedDataBuffer<>(timeSupplier));
 
     buffer.put(alertData);
   }

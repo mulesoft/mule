@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.ALERT_BACKPRESSURE_TRIGGERED;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createAndThrowIfNeeded;
+
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
-import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createAndThrowIfNeeded;
 
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -61,6 +63,8 @@ class BackPressureStrategySelector {
           sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
           currentThread().interrupt();
+          abstractPipeline.getAlertingSupport().triggerAlert(ALERT_BACKPRESSURE_TRIGGERED,
+                                                             ree.getReason().name() + " - " + abstractPipeline.getName());
           createAndThrowIfNeeded(abstractPipeline, ree.getReason(), ree);
         }
       }
@@ -82,6 +86,8 @@ class BackPressureStrategySelector {
             .debug("failDropStrategy - @ " + event.getContext().getOriginatingLocation().getRootContainerName() + ": " + reason);
       }
 
+      abstractPipeline.getAlertingSupport().triggerAlert(ALERT_BACKPRESSURE_TRIGGERED,
+                                                         reason.name() + " - " + abstractPipeline.getName());
       throw abstractPipeline.getBackPressureExceptions().get(reason);
     }
   }
