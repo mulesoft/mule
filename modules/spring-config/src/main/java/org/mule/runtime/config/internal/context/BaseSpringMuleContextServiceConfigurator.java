@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.config.internal.context;
 
+import static java.lang.Boolean.getBoolean;
+import static java.util.Map.entry;
+import static java.util.Map.ofEntries;
+
 import static org.mule.runtime.api.artifact.ArtifactType.DOMAIN;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
@@ -24,9 +28,6 @@ import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBo
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 
-import static java.lang.Boolean.getBoolean;
-import static java.util.Map.entry;
-import static java.util.Map.ofEntries;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.artifact.ArtifactType;
@@ -185,7 +186,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
       final CustomService customService = customServices.get(serviceName);
       // TODO MULE-19927 get these form a more specific place and avoid this filter
-      if (customService.isBaseContext() && isServiceRuntimeProvided(customService)) {
+      if (customService.isBaseContext() || isServiceRuntimeProvided(customService)) {
         final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
 
         registerBeanDefinition(serviceName, beanDefinition);
