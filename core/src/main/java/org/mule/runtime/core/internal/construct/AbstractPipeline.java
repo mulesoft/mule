@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.management.stats.ApiKitStatsUtils.isApiKitFlow;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
+import static org.mule.runtime.core.internal.construct.FlowBackPressureException.ALERT_BACKPRESSURE_TRIGGERED;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.KEY_ON_NEXT_ERROR_STRATEGY;
@@ -39,6 +40,7 @@ import static java.util.stream.Collectors.toMap;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.alert.AlertingSupport;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
@@ -136,6 +138,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
 
+  private AlertingSupport alertingSupport;
   private ComponentTracerFactory componentTracerFactory;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
@@ -151,6 +154,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       interceptorManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InterceptorManager.class);
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
       componentTracerFactory = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(ComponentTracerFactory.class);
+      alertingSupport = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(AlertingSupport.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
@@ -408,6 +412,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private void sinkEmit(CoreEvent event) {
     final BackPressureReason emitFailReason = sink.emit(event);
     if (emitFailReason != null) {
+      alertingSupport.triggerAlert(ALERT_BACKPRESSURE_TRIGGERED, emitFailReason.name() + " - " + getName());
       notifyBackpressureException(event, backPressureExceptions.get(emitFailReason));
     }
   }
@@ -676,6 +681,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   @Override
   public ProcessingStrategyFactory getProcessingStrategyFactory() {
     return processingStrategyFactory;
+  }
+
+  public AlertingSupport getAlertingSupport() {
+    return alertingSupport;
   }
 
   @Override
