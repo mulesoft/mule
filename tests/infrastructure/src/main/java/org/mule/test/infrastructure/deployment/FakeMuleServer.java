@@ -38,7 +38,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
@@ -167,7 +166,6 @@ public class FakeMuleServer {
     coreExtensionManager =
         new DefaultMuleCoreExtensionManagerServer(() -> coreExtensions, new ReflectionMuleCoreExtensionDependencyResolver());
     coreExtensionManager.setDeploymentService(deploymentService);
-    coreExtensionManager.setToolingService(toolingService);
     coreExtensionManager.setArtifactClassLoaderManager(muleArtifactResourcesRegistry.getArtifactClassLoaderManager());
     coreExtensionManager.setRepositoryService(repositoryService);
     coreExtensionManager.setServiceRepository(serviceManager);

@@ -23,8 +23,8 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static reactor.core.publisher.Mono.from;
@@ -36,11 +36,13 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.EventContextFactory;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -62,9 +64,7 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -106,6 +106,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   private final AtomicReference<Throwable> childErrorValue = new AtomicReference<>();
   private final AtomicBoolean childCompletion = new AtomicBoolean();
 
+  private ObjectSerializer serializer;
 
   public DefaultEventContextTestCase(String name, Supplier<DefaultEventContext> context,
                                      Function<CompletableFuture<Void>, BaseEventContext> contextWithCompletion,
@@ -119,6 +120,8 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   public void setup() {
     this.parent = context.get();
     setupParentListeners(parent);
+
+    this.serializer = new JavaObjectSerializer(this.getClass().getClassLoader());
   }
 
   private BaseEventContext addChild(BaseEventContext parent) {
@@ -606,8 +609,8 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
   public void deserializedChild() throws Exception {
     child = addChild(parent);
 
-    byte[] bytes = muleContext.getObjectSerializer().getExternalProtocol().serialize(child);
-    child = muleContext.getObjectSerializer().getExternalProtocol().deserialize(bytes);
+    byte[] bytes = serializer.getExternalProtocol().serialize(child);
+    child = serializer.getExternalProtocol().deserialize(bytes);
     setupChildListeners(child);
 
     child.success(testEvent());
@@ -621,8 +624,8 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
       throws Exception {
     child = addChild(parent);
 
-    byte[] bytes = muleContext.getObjectSerializer().getExternalProtocol().serialize(parent);
-    parent = muleContext.getObjectSerializer().getExternalProtocol().deserialize(bytes);
+    byte[] bytes = serializer.getExternalProtocol().serialize(parent);
+    parent = serializer.getExternalProtocol().deserialize(bytes);
     setupParentListeners(parent);
 
     parent.success(testEvent());

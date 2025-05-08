@@ -8,6 +8,7 @@ package org.mule.tck.util;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsEqual.equalTo;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
@@ -20,11 +21,11 @@ import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.concurrent.CountDownLatch;
 
-import jakarta.inject.Inject;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+
+import jakarta.inject.Inject;
 
 public class FlowTraceUtils {
 
@@ -72,8 +73,28 @@ public class FlowTraceUtils {
     }
   }
 
+  public static Matcher<FlowStackElement> isFlowStackElement(final String executingLocation) {
+    return isFlowStackElement(equalTo(executingLocation));
+  }
+
+  public static Matcher<FlowStackElement> isFlowStackElement(final Matcher<String> executingLocationMatcher) {
+    return new TypeSafeMatcher<>() {
+
+      @Override
+      protected boolean matchesSafely(FlowStackElement flowStackElement) {
+        return executingLocationMatcher.matches(flowStackElement.getExecutingLocation().getLocation());
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("<");
+        executingLocationMatcher.describeTo(description);
+      }
+    };
+  }
+
   public static Matcher<FlowStackElement> isFlowStackElement(final String flowName, final String executingMessageProcessor) {
-    return new TypeSafeMatcher<FlowStackElement>() {
+    return new TypeSafeMatcher<>() {
 
       @Override
       protected boolean matchesSafely(FlowStackElement flowStackElement) {
@@ -94,7 +115,7 @@ public class FlowTraceUtils {
   }
 
   public static Matcher<FlowStackElement> withChainIdentifier(final ComponentIdentifier chainIdentifier) {
-    return new TypeSafeMatcher<FlowStackElement>() {
+    return new TypeSafeMatcher<>() {
 
       @Override
       protected boolean matchesSafely(FlowStackElement flowStackElement) {

@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.internal.transformer.simple;
 
+import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
+
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.OutputHandler;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
@@ -22,6 +23,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /** <code>ObjectToOutputHandler</code> converts a byte array into a String. */
 public class ObjectToOutputHandler extends AbstractTransformer implements DiscoverableTransformer {
@@ -78,12 +80,10 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
     this.priorityWeighting = priorityWeighting;
   }
 
+  @Inject
+  @Named(DEFAULT_OBJECT_SERIALIZER_NAME)
   public void setObjectSerializer(ObjectSerializer objectSerializer) {
     this.objectSerializer = objectSerializer;
   }
 
-  @Inject
-  public void setMuleContext(MuleContext context) {
-    setObjectSerializer(context.getObjectSerializer());
-  }
 }

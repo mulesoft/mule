@@ -7,10 +7,9 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
@@ -134,8 +133,7 @@ public interface MuleConfiguration {
   <T> T getExtension(final Class<T> extensionType);
 
   /**
-   * Returns the default instance of {@link ObjectSerializer} to be used. This instance will be accessible through
-   * {@link MuleContext#getObjectSerializer()}.
+   * Returns the default instance of {@link ObjectSerializer} to be used. This instance will be accessible through injection.
    * <p/>
    * If not provided, if defaults to an instance of {@link ObjectSerializer}
    *

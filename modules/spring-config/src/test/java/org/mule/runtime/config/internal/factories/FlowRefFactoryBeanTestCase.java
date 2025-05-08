@@ -33,12 +33,12 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -102,6 +102,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -117,9 +118,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.mockito.MockSettings;
 import org.mockito.stubbing.Answer;
@@ -129,16 +128,12 @@ import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 import jakarta.inject.Inject;
-
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
 
 @SmallTest
 public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private static final Logger LOGGER = getLogger(FlowRefFactoryBeanTestCase.class);
 
@@ -194,10 +189,16 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     // Referenced flow lifecycle checks mocking
     when(flowLifeCycleState.isStarted()).thenReturn(true);
     when(targetFlow.getLifecycleState()).thenReturn(flowLifeCycleState);
+    when(targetFlow.getLocation()).thenReturn(mock(ComponentLocation.class));
+    when(targetFlow.getAnnotations()).thenReturn(singletonMap(LOCATION_KEY, mock(ComponentLocation.class)));
     // Referenced subflow mocking
     List<Processor> targetSubFlowProcessors = singletonList(targetSubFlowProcessor);
     when(targetSubFlow.getMessageProcessors()).thenReturn(targetSubFlowProcessors);
+    when(targetSubFlow.getLocation()).thenReturn(mock(ComponentLocation.class));
+    when(targetSubFlow.getAnnotations()).thenReturn(singletonMap(LOCATION_KEY, mock(ComponentLocation.class)));
     targetSubFlowChainBuilder.chain(targetSubFlowProcessors);
+    targetSubFlowChainBuilder.setAnnotations(singletonMap(LOCATION_KEY, mock(ComponentLocation.class)));
+
     when(targetSubFlow.apply(any(Publisher.class))).thenReturn(just(result));
     when(targetSubFlowProcessor.apply(any())).thenAnswer(successAnswer());
   }
@@ -343,6 +344,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
     when(targetSubFlowChain.getMessageProcessors()).thenReturn(targetSubFlowProcessors);
     SubflowMessageProcessorChainBuilder chainBuilder = new SubflowMessageProcessorChainBuilder();
     chainBuilder.chain(targetSubFlowProcessors);
+    chainBuilder.setAnnotations(singletonMap(LOCATION_KEY, mock(ComponentLocation.class)));
 
     FlowRefFactoryBean flowRefFactoryBean = createDynamicFlowRefFactoryBean(targetSubFlowChain, chainBuilder, applicationContext);
     final Processor flowRefProcessor = getFlowRefProcessor(flowRefFactoryBean);
@@ -363,8 +365,9 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
                                                                                  eq(NULL_BINDING_CONTEXT), any(CoreEvent.class),
                                                                                  any(ComponentLocation.class), eq(true));
 
-    expectedException.expect(instanceOf(RoutePathNotFoundException.class));
-    getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT, "flow", applicationContext)).process(testEvent());
+    final var flowRefProcessor = getFlowRefProcessor(createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT, "flow", applicationContext));
+    final var testEvent = testEvent();
+    assertThrows(RoutePathNotFoundException.class, () -> flowRefProcessor.process(testEvent));
   }
 
   @Test()
@@ -391,6 +394,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         .getObjectFactoryClass(SubflowMessageProcessorChainFactoryBean.class, Object.class))
             .addPropertyValue("name", PARSED_DYNAMIC_REFERENCED_FLOW)
             .addPropertyValue("messageProcessors", subFlowProcessorBeanDefinition)
+            .addPropertyValue("annotations", new HashMap<>(singletonMap(LOCATION_KEY, mock(ComponentLocation.class))))
             .addPropertyValue(IS_SINGLETON, !subFlowComponentBuildingDefinition.isPrototype())
             .addPropertyValue(IS_PROTOTYPE, subFlowComponentBuildingDefinition.isPrototype())
             .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))

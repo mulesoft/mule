@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_R
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
@@ -146,6 +147,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     configureQueueManager(muleContext);
 
     registry.registerObject(OBJECT_MULE_CONTEXT, muleContext);
+    registry.registerObject(OBJECT_MULE_CONFIGURATION, muleContext.getConfiguration());
 
     registerCustomServices(muleContext);
     registerObjectStoreManager(muleContext);
@@ -319,6 +321,11 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     }
 
     var service = serviceImpl.orElseThrow();
+    try {
+      muleContext.getInjector().inject(service);
+    } catch (MuleException e) {
+      throw new RegistrationException(e);
+    }
     if (service instanceof MuleContextAware) {
       ((MuleContextAware) service).setMuleContext(muleContext);
     }

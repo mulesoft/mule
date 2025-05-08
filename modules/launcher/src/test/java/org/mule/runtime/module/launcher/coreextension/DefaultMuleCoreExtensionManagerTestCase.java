@@ -39,7 +39,6 @@ import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
-import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -50,8 +49,6 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import jakarta.inject.Inject;
-
 import org.junit.Test;
 
 import org.mockito.InOrder;
@@ -59,6 +56,8 @@ import org.mockito.InOrder;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+
+import jakarta.inject.Inject;
 
 @SmallTest
 @Feature(CORE_EXTENSIONS)
@@ -80,7 +79,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   @Test
   public void injectsDeploymentServiceAwareCoreExtension() throws Exception {
-    Consumer<DeploymentService> setServiceFunction = (service) -> coreExtensionManager.setDeploymentService(service);
+    Consumer<DeploymentService> setServiceFunction = service -> coreExtensionManager.setDeploymentService(service);
     BiConsumer<List<TestDeploymentServiceAwareExtension>, DeploymentService> verificationFunction =
         (extensions, service) -> verify(extensions.get(0)).setDeploymentService(service);
     testServiceInjection(DeploymentService.class, TestDeploymentServiceAwareExtension.class, setServiceFunction,
@@ -89,7 +88,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   @Test
   public void injectRepositoryServiceAwareCoreExtension() throws Exception {
-    Consumer<RepositoryService> setServiceFunction = (service) -> coreExtensionManager.setRepositoryService(service);
+    Consumer<RepositoryService> setServiceFunction = service -> coreExtensionManager.setRepositoryService(service);
     BiConsumer<List<TestRepositoryServiceAwareExtension>, RepositoryService> verificationFunction =
         (extensions, service) -> verify(extensions.get(0)).setRepositoryService(service);
     testServiceInjection(RepositoryService.class, TestRepositoryServiceAwareExtension.class, setServiceFunction,
@@ -99,7 +98,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
   @Test
   public void initializesDeploymentListenerCoreExtension() throws Exception {
 
-    Consumer<DeploymentService> setServiceFunction = (service) -> coreExtensionManager.setDeploymentService(service);
+    Consumer<DeploymentService> setServiceFunction = service -> coreExtensionManager.setDeploymentService(service);
     BiConsumer<List<TestDeploymentListenerExtension>, DeploymentService> verificationFunction =
         (extensions, service) -> verify(service).addDeploymentListener(extensions.get(0));
     testServiceInjection(DeploymentService.class, TestDeploymentListenerExtension.class, setServiceFunction,
@@ -108,7 +107,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   @Test
   public void injectsCoreExtensionsAwareCoreExtension() throws Exception {
-    Consumer<DeploymentService> setServiceFunction = (service) -> {
+    Consumer<DeploymentService> setServiceFunction = service -> {
     };
     BiConsumer<List<TestCoreExtensionsAwareExtension>, DeploymentService> verificationFunction =
         (extensions, service) -> verify(extensions.get(0)).setCoreExtensions(new ArrayList<>(extensions));
@@ -135,7 +134,7 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
   @Test
   public void injectsCoreExtensionsOnExtension() throws Exception {
-    Consumer<DeploymentService> setServiceFunction = (service) -> {
+    Consumer<DeploymentService> setServiceFunction = service -> {
     };
     BiConsumer<List<TestCoreExtensionsExtension>, DeploymentService> verificationFunction =
         (extensions, service) -> verify(extensions.get(0), atLeastOnce()).setCoreExtensions(new ArrayList<>(extensions));
@@ -145,23 +144,13 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
   @Test
   public void injectsArtifactClassLoaderManagerOnExtension() throws Exception {
     Consumer<ArtifactClassLoaderManager> setServiceFunction =
-        (service) -> coreExtensionManager.setArtifactClassLoaderManager(service);
+        service -> coreExtensionManager.setArtifactClassLoaderManager(service);
 
     BiConsumer<List<TestArtifactClassLoaderManagerExtension>, ArtifactClassLoaderManager> verificationFunction =
         (extensions, service) -> verify(extensions.get(0), atLeastOnce()).setArtifactClassLoaderManager(same(service));
 
     testServiceInjection(ArtifactClassLoaderManager.class, TestArtifactClassLoaderManagerExtension.class, setServiceFunction,
                          verificationFunction);
-  }
-
-  @Test
-  public void injectsToolingServiceOnExtension() throws Exception {
-    Consumer<ToolingService> setServiceFunction = coreExtensionManager::setToolingService;
-
-    BiConsumer<List<TestToolingServiceExtension>, ToolingService> verificationFunction =
-        (extensions, service) -> verify(extensions.get(0), atLeastOnce()).setToolingService(service);
-
-    testServiceInjection(ToolingService.class, TestToolingServiceExtension.class, setServiceFunction, verificationFunction);
   }
 
   @Test
@@ -495,12 +484,6 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
     @Inject
     void setArtifactClassLoaderManager(ArtifactClassLoaderManager artifactClassLoaderManager);
-  }
-
-  public interface TestToolingServiceExtension extends MuleCoreExtension {
-
-    @Inject
-    void setToolingService(ToolingService toolingService);
   }
 
   public interface InjectedTestServiceExtension extends MuleCoreExtension {

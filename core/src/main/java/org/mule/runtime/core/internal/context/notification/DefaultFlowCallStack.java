@@ -82,7 +82,8 @@ public class DefaultFlowCallStack implements FlowCallStack {
     if (!innerStack.isEmpty()) {
       synchronized (innerStack) {
         FlowStackElement stackElement = innerStack.pop();
-        innerStack.push(new FlowStackElement(stackElement.getFlowName(), stackElement.getChainIdentifier(), processorPath));
+        innerStack
+            .push(new FlowStackElement(stackElement.getFlowName(), stackElement.getChainIdentifier(), processorPath, null, null));
       }
     }
   }
@@ -130,6 +131,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
     return doToString(FlowStackElement::toString);
   }
 
+  @Override
   public String toStringWithElapsedTime() {
     return doToString(FlowStackElement::toStringWithElapsedTime);
   }

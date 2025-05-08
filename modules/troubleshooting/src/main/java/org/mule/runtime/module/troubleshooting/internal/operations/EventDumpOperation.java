@@ -10,7 +10,10 @@ import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 
 import static org.apache.commons.lang3.StringUtils.leftPad;
+import static org.apache.commons.lang3.time.DurationFormatUtils.formatDuration;
 
+import org.mule.runtime.core.api.context.notification.FlowCallStack;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -97,11 +100,28 @@ public class EventDumpOperation implements TroubleshootingOperation {
     final var currentlyActiveFlowStacks = eventContextService.getCurrentlyActiveFlowStacks();
 
     for (FlowStackEntry fs : currentlyActiveFlowStacks) {
-      writer.write(format("\"%s\"%n%s",
+      writer.write(format("\"%s\", running for: %s, state: %s%n%s",
                           fs.getEventId(),
-                          fs.getFlowCallStack().toString().indent(4)));
+                          formatDuration(fs.getExecutingTime().toMillis(), "mm:ss.SSS"),
+                          fs.getState().name(),
+                          flowCallStackString(fs.getFlowCallStack()).indent(4)));
       writer.write(lineSeparator());
     }
+  }
+
+  // put this logic here so the current representation of stacks that is logged is not modified.
+  private static String flowCallStackString(FlowCallStack flowCallStack) {
+    StringBuilder stackString = new StringBuilder(256);
+
+    int i = 0;
+    final var flowStackElements = flowCallStack.getElements();
+    for (FlowStackElement flowStackElement : flowStackElements) {
+      stackString.append("at ").append(flowStackElement.toStringEventDumpFormat());
+      if (++i != flowCallStack.getElements().size()) {
+        stackString.append(lineSeparator());
+      }
+    }
+    return stackString.toString();
   }
 
   private static TroubleshootingOperationDefinition createOperationDefinition() {

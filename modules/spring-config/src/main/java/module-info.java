@@ -74,6 +74,7 @@ module org.mule.runtime.spring.config {
   requires jakarta.transaction;
 
   exports org.mule.runtime.config.api;
+  exports org.mule.runtime.config.api.bean;
   exports org.mule.runtime.config.api.dsl;
   exports org.mule.runtime.config.api.dsl.model;
   exports org.mule.runtime.config.api.dsl.model.properties;
