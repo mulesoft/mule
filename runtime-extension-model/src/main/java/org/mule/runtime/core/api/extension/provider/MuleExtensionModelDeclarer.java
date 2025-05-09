@@ -19,9 +19,11 @@ import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.MU
 import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE;
 import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE_OR_NONE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.CONNECTION;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.api.util.MuleSystemProperties.isParseTemplateUseLegacyDefaultTargetValue;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_SCHEMA_LOCATION;
@@ -70,6 +72,9 @@ import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JA
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DISPLAY_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
@@ -577,6 +582,19 @@ public class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
+
+    // This is an override in case the legacy default is needed. Otherwise, the TargetParameterDeclarationEnricher takes care.
+    if (isParseTemplateUseLegacyDefaultTargetValue()) {
+      parseTemplate.onParameterGroup(OUTPUT)
+          .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
+          .ofType(STRING_TYPE)
+          .defaultingTo("#[message]")
+          .withExpressionSupport(REQUIRED)
+          .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
+          .withRole(BEHAVIOUR)
+          .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
+          .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
+    }
 
     parseTemplate.onDefaultParameterGroup().withExclusiveOptionals(of("content", "location"), true);
   }
