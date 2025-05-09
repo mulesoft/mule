@@ -16,7 +16,6 @@
     <properties>
         <javaModuleName>org.mule.test.extension.classloading</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

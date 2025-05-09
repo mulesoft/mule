@@ -21,7 +21,6 @@
         <surefire.args>${surefire.module.args}</surefire.args>
 
         <javaModuleName>org.mule.runtime.tls</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>

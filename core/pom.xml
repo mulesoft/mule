@@ -18,7 +18,6 @@
         <skipExportTests>false</skipExportTests>
         <!-- because this module requires transitive jakarta.jms.api -->
         <revapi.checkDependencies>true</revapi.checkDependencies>
-        <formatterConfigPath>../formatter.xml</formatterConfigPath>
 
         <mule.version>${project.version}</mule.version>
     </properties>

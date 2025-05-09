@@ -22,7 +22,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.metrics.internal.impl</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

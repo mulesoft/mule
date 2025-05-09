@@ -15,7 +15,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.tracer.configuration.api</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
 </project>

@@ -12,7 +12,6 @@
     <name>Mule Tests</name>
 
     <properties>
-        <formatterConfigPath>../formatter.xml</formatterConfigPath>
         <skipMuleModuleMojos>true</skipMuleModuleMojos>
     </properties>
 
