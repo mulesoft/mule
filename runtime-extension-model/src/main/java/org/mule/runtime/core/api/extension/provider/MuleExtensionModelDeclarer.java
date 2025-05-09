@@ -130,7 +130,6 @@ import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.core.internal.extension.AllowsExpressionWithoutMarkersModelProperty;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.internal.extension.ForEachChainInputTypeResolver;
-import org.mule.runtime.core.internal.extension.TargetModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder;
@@ -584,6 +583,7 @@ public class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
 
+    // This is an override in case the legacy default is needed. Otherwise, the TargetParameterDeclarationEnricher takes care.
     if (isParseTemplateUseLegacyDefaultTargetValue()) {
       parseTemplate.onParameterGroup(OUTPUT)
           .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
@@ -593,8 +593,7 @@ public class MuleExtensionModelDeclarer {
           .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
           .withRole(BEHAVIOUR)
           .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
-          .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
-          .withModelProperty(new TargetModelProperty());
+          .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
     }
 
     parseTemplate.onDefaultParameterGroup().withExclusiveOptionals(of("content", "location"), true);
