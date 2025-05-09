@@ -130,6 +130,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+
 import org.slf4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -664,7 +665,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                     getConfigurationProperties(),
                                                     artifactProperties,
                                                     addToolingObjectsToRegistry,
-                                                    getArtifactType(),
+                                                    getArtifactType().getArtifactType(),
                                                     getApplicationModel(),
                                                     beanFactory,
                                                     getServiceDiscoverer(),

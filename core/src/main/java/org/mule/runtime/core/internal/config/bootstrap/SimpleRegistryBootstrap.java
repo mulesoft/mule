@@ -10,10 +10,10 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformerNotI
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;

@@ -108,22 +108,27 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   @Override
   public void configure(CustomizationService customizationService) {
     customizationService.registerCustomServiceImpl(schedulerService.getName(),
-                                                   spy(schedulerService));
+                                                   spy(schedulerService),
+                                                   true);
     if (mockExpressionExecutor) {
       customizationService.registerCustomServiceImpl(MOCK_EXPR_EXECUTOR,
-                                                     createMockExpressionExecutor());
+                                                     createMockExpressionExecutor(),
+                                                     true);
     } else {
       initCachedExprLanguageFactory();
       customizationService.registerCustomServiceImpl(MOCK_EXPR_EXECUTOR,
-                                                     cachedExprLanguageFactory);
+                                                     cachedExprLanguageFactory,
+                                                     true);
     }
     if (mockHttpService) {
-      customizationService.registerCustomServiceImpl(MOCK_HTTP_SERVICE, mockHttpService());
+      customizationService.registerCustomServiceImpl(MOCK_HTTP_SERVICE, mockHttpService(),
+                                                     true);
     }
 
     if (mockExpressionLanguageMetadataService) {
       customizationService.registerCustomServiceImpl(MOCK_EXPRESSION_LANGUAGE_METADATA_SERVICE,
-                                                     expressionLanguageMetadataService);
+                                                     expressionLanguageMetadataService,
+                                                     true);
     }
   }
 
@@ -147,7 +152,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     }
 
     overriddenDefaultServices.forEach((serviceId, serviceImpl) -> {
-      ((MuleContextWithRegistry) muleContext).getCustomizationService().overrideDefaultServiceImpl(serviceId, serviceImpl);
+      muleContext.getCustomizationService().overrideDefaultServiceImpl(serviceId, serviceImpl);
     });
   }
 
