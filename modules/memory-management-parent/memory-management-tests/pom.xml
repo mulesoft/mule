@@ -16,7 +16,6 @@
 
     <properties>
         <javaModuleName>org.mule.test.memory.management</javaModuleName>
-        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

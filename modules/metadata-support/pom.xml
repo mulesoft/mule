@@ -16,7 +16,6 @@
     <properties>
         <javaModuleName>org.mule.runtime.metadata.support</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>

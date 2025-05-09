@@ -181,7 +181,6 @@
         <mule.app.plugins.maven.plugin.version>1.10.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
-        <formatterConfigPath>formatter.xml</formatterConfigPath>
         <oldMuleArtifactVersion>4.9.0-rc1</oldMuleArtifactVersion>
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
@@ -312,10 +311,6 @@
                         <compilerCompliance>${javaVersion}</compilerCompliance>
                         <compilerSource>${javaVersion}</compilerSource>
                         <compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
-                        <configFile>${basedir}/${formatterConfigPath}</configFile>
-                        <configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
-                        <aggregator>false</aggregator>
-                        <executionRoot>true</executionRoot>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -516,10 +511,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>

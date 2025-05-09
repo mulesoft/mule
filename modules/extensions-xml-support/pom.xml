@@ -26,7 +26,6 @@
 
         <javaModuleName>org.mule.runtime.extensions.xml.support</javaModuleName>
         <skipExportTests>false</skipExportTests>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
