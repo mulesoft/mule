@@ -56,6 +56,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.IsIterableContaining.hasItem;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -898,6 +899,18 @@ public class CoreExtensionModelTestCase {
     assertThat(mimeType.getName(), is("mimeType"));
     assertThat(mimeType.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(mimeType.getType(), is(instanceOf(StringType.class)));
+  }
+
+  @Test
+  public void parseTemplate() {
+    OperationModel parseTemplateOperation = coreExtensionModel.getOperationModel("parseTemplate").get();
+    ParameterModel targetValueParam = parseTemplateOperation.getParameterGroupModels().stream()
+        .filter(op -> op.getName().equals(OUTPUT))
+        .findFirst()
+        .flatMap(pgm -> pgm.getParameter(TARGET_VALUE_PARAMETER_NAME))
+        .get();
+
+    assertThat(targetValueParam.getDefaultValue(), CoreMatchers.equalTo("#[payload]"));
   }
 
   @Test

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
+import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -13,6 +14,8 @@ import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
+import static org.mule.runtime.api.util.MuleSystemProperties.PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE;
+import static org.mule.runtime.api.util.MuleSystemProperties.isParseTemplateUseLegacyDefaultTargetValue;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
@@ -28,6 +31,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.internal.interception.HasParamsAsTemplateProcessor;
 import org.mule.runtime.core.privileged.processor.simple.SimpleMessageProcessor;
 
@@ -37,6 +41,8 @@ import java.nio.charset.Charset;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -44,7 +50,18 @@ import javax.inject.Inject;
  */
 public class ParseTemplateProcessor extends SimpleMessageProcessor implements HasParamsAsTemplateProcessor {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ParseTemplateProcessor.class);
+
   private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+  private static final String LEGACY_DEFAULT_TARGET_VALUE = "#[" + MESSAGE + "]";
+
+  private static final Once.RunOnce LOG_LEGACY_DEFAULT_WARN = Once.of(() -> {
+    // Logs a warning to discourage the usage of this compatibility property
+    LOGGER.warn("Property '{}' is enabled, using legacy default targetValue for parse-template component: '{}'. "
+        + "Consider updating the expressions that rely on this behavior and removing the property.",
+                PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE,
+                LEGACY_DEFAULT_TARGET_VALUE);
+  });
 
   private ExtendedExpressionManager expressionManager;
 
@@ -76,6 +93,10 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor implements Ha
 
     if (targetValue != null) {
       targetValueExpression = compile(targetValue, expressionManager);
+    }
+
+    if (isParseTemplateUseLegacyDefaultTargetValue() && LEGACY_DEFAULT_TARGET_VALUE.equals(targetValue)) {
+      LOG_LEGACY_DEFAULT_WARN.runOnce();
     }
   }
 
@@ -110,7 +131,8 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor implements Ha
   }
 
   private void evaluateCorrectArguments() {
-    if (target == null && !isSanitizedPayload(sanitize(targetValue))) {
+    if (target == null && !(isSanitizedPayload(sanitize(targetValue))
+        || isParseTemplateUseLegacyDefaultTargetValue() && LEGACY_DEFAULT_TARGET_VALUE.equals(targetValue))) {
       throw new IllegalArgumentException("Can't define a targetValue with no target");
     }
   }
