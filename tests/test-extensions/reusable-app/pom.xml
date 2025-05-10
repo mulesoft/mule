@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.9.5-SNAPSHOT</version>
+        <version>4.9.5-rc1</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
