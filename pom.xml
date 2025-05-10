@@ -169,7 +169,7 @@
         <muleExtensionsApiVersion>1.9.5-rc1</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.9.5-rc1</muleHttpPolicyApiVersion>
-        <mulePolicyApiVersion>1.9.5-SNAPSHOT</mulePolicyApiVersion>
+        <mulePolicyApiVersion>1.9.5-rc1</mulePolicyApiVersion>
         <muleApiVersion>1.9.5-rc1</muleApiVersion>
         <muleMetadataModelVersion>1.9.5-rc1</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
