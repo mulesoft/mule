@@ -1,4 +1,250 @@
 {
+  "4.10.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.LogBuilder::log(java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.LogBuilder::log(java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.LogBuilder::log(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.LogBuilder::log(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::debug(java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::debug(java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::debug(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::debug(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::debug(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::debug(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::debug(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::debug(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::error(java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::error(java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::error(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::error(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::error(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::error(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::error(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::error(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::fatal(java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::fatal(java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::fatal(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::fatal(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::fatal(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::fatal(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::fatal(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::fatal(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::info(java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::info(java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::info(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::info(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::info(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::info(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::info(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::info(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::log(org.apache.logging.log4j.Level, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::log(org.apache.logging.log4j.Level, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::log(org.apache.logging.log4j.Level, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::log(org.apache.logging.log4j.Level, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::log(org.apache.logging.log4j.Level, org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::log(org.apache.logging.log4j.Level, org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::log(org.apache.logging.log4j.Level, org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::log(org.apache.logging.log4j.Level, org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::trace(java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::trace(java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::trace(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::trace(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::trace(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::trace(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::trace(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::trace(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method org.apache.logging.log4j.message.EntryMessage org.apache.logging.log4j.Logger::traceEntry(java.lang.String, java.lang.Object[])",
+            "new": "method org.apache.logging.log4j.message.EntryMessage org.apache.logging.log4j.Logger::traceEntry(java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method org.apache.logging.log4j.message.EntryMessage org.apache.logging.log4j.Logger::traceEntry(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method org.apache.logging.log4j.message.EntryMessage org.apache.logging.log4j.Logger::traceEntry(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::warn(java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::warn(java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::warn(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::warn(java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::warn(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.Logger::warn(org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.Logger::warn(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.Logger::warn(org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.spi.ExtendedLogger::logIfEnabled(java.lang.String, org.apache.logging.log4j.Level, org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "new": "method void org.apache.logging.log4j.spi.ExtendedLogger::logIfEnabled(java.lang.String, org.apache.logging.log4j.Level, org.apache.logging.log4j.Marker, java.lang.String, java.lang.Object[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
+            "old": "method void org.apache.logging.log4j.spi.ExtendedLogger::logIfEnabled(java.lang.String, org.apache.logging.log4j.Level, org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "new": "method void org.apache.logging.log4j.spi.ExtendedLogger::logIfEnabled(java.lang.String, org.apache.logging.log4j.Level, org.apache.logging.log4j.Marker, java.lang.String, org.apache.logging.log4j.util.Supplier<?>[])",
+            "justification": "W-17264514: Update dependency org.revapi:revapi-java to v0.28.4"
+          }
+        ]
+      }
+    }
+  },
   "4.7.0": {
     "revapi": {
       "differences": {
