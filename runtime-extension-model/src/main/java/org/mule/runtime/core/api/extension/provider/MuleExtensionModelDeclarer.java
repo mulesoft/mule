@@ -1166,7 +1166,6 @@ public class MuleExtensionModelDeclarer {
         .withOptionalParameter("shutdownTimeout")
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
-        .defaultingTo("5000")
         .describedAs("""
             The time in milliseconds to wait for any in-progress work to finish running before Mule shuts down. \
             After this threshold has been reached, Mule starts stopping schedulers and interrupting threads, \
@@ -1175,7 +1174,8 @@ public class MuleExtensionModelDeclarer {
             payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown.\
              The value you specify is applied to services and separately to dispatchers, so the default value of \
             5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after \
-            shutdown is initiated.""");
+            shutdown is initiated.\
+             The default value of 5000 can be overridden with the 'mule.gracefulShutdown.defaultTimeout' system property.""");
 
     params
         .withOptionalParameter("maxQueueTransactionFilesSize")
