@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
-import org.mule.runtime.module.artifact.internal.classloader.ExtendedClassLoaderConfigurationAttributes;
 
 import java.util.Map;
+
+import org.apache.commons.collections4.map.AbstractMapDecorator;
 
 /**
  * Allows to extends the attributes defined for a {@link ClassLoaderConfiguration} when it is being loaded by
@@ -20,7 +22,7 @@ import java.util.Map;
  *
  * @since 4.2.0
  */
-public class PluginExtendedClassLoaderConfigurationAttributes extends ExtendedClassLoaderConfigurationAttributes {
+public class PluginExtendedClassLoaderConfigurationAttributes extends AbstractMapDecorator {
 
   private ArtifactDescriptor deployableArtifactDescriptor;
 
@@ -33,7 +35,7 @@ public class PluginExtendedClassLoaderConfigurationAttributes extends ExtendedCl
   public PluginExtendedClassLoaderConfigurationAttributes(Map originalAttributes,
                                                           ArtifactDescriptor deployableArtifactDescriptor) {
     super(originalAttributes);
-    checkNotNull(deployableArtifactDescriptor, "deployableArtifactDescriptor cannot be null");
+    requireNonNull(deployableArtifactDescriptor, "deployableArtifactDescriptor cannot be null");
     this.deployableArtifactDescriptor = deployableArtifactDescriptor;
   }
 

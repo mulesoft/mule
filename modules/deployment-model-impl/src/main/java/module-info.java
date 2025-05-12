@@ -37,6 +37,7 @@ module org.mule.runtime.deployment.model.impl {
   requires com.google.common;
   requires com.google.gson;
   requires org.apache.commons.beanutils;
+  requires org.apache.commons.collections4;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires mule.classloader.model;

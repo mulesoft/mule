@@ -29,6 +29,7 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.artifact=ALL-UNNAMED
             --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.base=ALL-UNNAMED
             --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.proxy=org.mule.runtime.container
             --add-opens=org.mule.runtime.errors/org.mule.runtime.config.internal.error=ALL-UNNAMED

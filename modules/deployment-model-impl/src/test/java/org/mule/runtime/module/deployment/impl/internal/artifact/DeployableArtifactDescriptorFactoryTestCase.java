@@ -28,10 +28,13 @@ import static java.util.stream.Stream.of;
 
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
@@ -42,11 +45,10 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
+
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -80,21 +82,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.hamcrest.TypeSafeMatcher;
 
 import io.qameta.allure.Issue;
 
@@ -135,9 +133,6 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Rule
   public TemporaryFolder muleHome = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   private List<File> installedArtifactFiles;
 
@@ -528,7 +523,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     // urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(0));
 
-    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasSize(35));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasSize(36));
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(),
                hasItems("org.apache.commons.collections4",
                         "org.apache.commons.io"));
@@ -647,23 +642,29 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void missingRequiredProduct() throws Exception {
     String artifactName = "no-required-product";
-    requiredProductValidationExpectedException(artifactName);
-    createArtifactDescriptor(getArtifactRootFolder() + "/" + artifactName);
+    var thrown =
+        assertThrows(IllegalStateException.class, () -> createArtifactDescriptor(getArtifactRootFolder() + "/" + artifactName));
+    assertThat(thrown.getMessage(),
+               containsString(format("Invalid artifact descriptor: \"%s\". Mandatory field \"requiredProduct\" is missing or has an invalid value. Valid values are MULE, MULE_EE",
+                                     artifactName)));
   }
 
   @Test
   public void wrongRequiredProductValue() throws Exception {
     String artifactName = "bad-required-product";
-    requiredProductValidationExpectedException(artifactName);
-    createArtifactDescriptor(getArtifactRootFolder() + separator + artifactName);
+    var thrown = assertThrows(IllegalStateException.class,
+                              () -> createArtifactDescriptor(getArtifactRootFolder() + separator + artifactName));
+    assertThat(thrown.getMessage(),
+               containsString(format("Invalid artifact descriptor: \"%s\". Mandatory field \"requiredProduct\" is missing or has an invalid value. Valid values are MULE, MULE_EE",
+                                     artifactName)));
   }
 
   @Test
   public void descriptorWithNoRevisionVersion() throws Exception {
-    expectedException.expect(IllegalStateException.class);
-    expectedException
-        .expectMessage("Artifact no-revision-artifact version 1.0 must contain a revision number. The version format must be x.y.z and the z part is missing");
-    createArtifactDescriptor(getArtifactRootFolder() + separator + "no-revision-artifact");
+    var thrown = assertThrows(IllegalStateException.class,
+                              () -> createArtifactDescriptor(getArtifactRootFolder() + separator + "no-revision-artifact"));
+    assertThat(thrown.getMessage(),
+               containsString("Artifact no-revision-artifact version 1.0 must contain a revision number. The version format must be x.y.z and the z part is missing"));
   }
 
   @Test
@@ -738,13 +739,6 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   private void installArtifactInRepo(File artifact) throws IOException {
     installedArtifactFiles.addAll(installArtifact(artifact, new File(repositoryLocation.getValue())));
-  }
-
-  private void requiredProductValidationExpectedException(String appName) {
-    expectedException.expect(IllegalStateException.class);
-    expectedException.expectMessage(Matchers
-        .containsString(format("Invalid artifact descriptor: \"%s\". Mandatory field \"requiredProduct\" is missing or has an invalid value. Valid values are MULE, MULE_EE",
-                               appName)));
   }
 
   protected abstract String getArtifactRootFolder();
