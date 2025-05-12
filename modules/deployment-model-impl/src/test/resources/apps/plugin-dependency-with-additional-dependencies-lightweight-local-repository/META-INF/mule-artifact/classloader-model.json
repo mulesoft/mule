@@ -46,6 +46,7 @@
             "org.apache.commons.collections4",
             "org.apache.commons.collections4.bag",
             "org.apache.commons.collections4.bidimap",
+            "org.apache.commons.collections4.bloomfilter",
             "org.apache.commons.collections4.collection",
             "org.apache.commons.collections4.comparators",
             "org.apache.commons.collections4.functors",
