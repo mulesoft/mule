@@ -82,7 +82,7 @@ public class MinimalConfigurationBuilderTestCase extends AbstractMuleTestCase {
         .thenReturn(singletonList(new PropertiesBootstrapService(this.getClass().getClassLoader(),
                                                                  properties)));
     when(customizationService.getOverriddenService(SERVICE_ID))
-        .thenReturn(of(new CustomService<>(SERVICE_ID, si -> si.overrideServiceImpl(overridenService))));
+        .thenReturn(of(new CustomService<>(SERVICE_ID, si -> si.overrideServiceImpl(overridenService), false)));
 
     final MinimalConfigurationBuilder minimalConfigurationBuilder = new MinimalConfigurationBuilder();
 
@@ -102,7 +102,7 @@ public class MinimalConfigurationBuilderTestCase extends AbstractMuleTestCase {
         .thenReturn(singletonList(new PropertiesBootstrapService(this.getClass().getClassLoader(),
                                                                  properties)));
     when(customizationService.getOverriddenService(SERVICE_ID))
-        .thenReturn(of(new CustomService<>(SERVICE_ID, ServiceInterceptor::remove)));
+        .thenReturn(of(new CustomService<>(SERVICE_ID, ServiceInterceptor::remove, false)));
 
     final MinimalConfigurationBuilder minimalConfigurationBuilder = new MinimalConfigurationBuilder();
 

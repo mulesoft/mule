@@ -12,14 +12,16 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_B
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.config.WeaveExpressionLanguageFactoryServiceProvider.provideDefaultExpressionLanguageFactoryService;
 
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
@@ -108,22 +110,27 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
   @Override
   public void configure(CustomizationService customizationService) {
     customizationService.registerCustomServiceImpl(schedulerService.getName(),
-                                                   spy(schedulerService));
+                                                   spy(schedulerService),
+                                                   true);
     if (mockExpressionExecutor) {
       customizationService.registerCustomServiceImpl(MOCK_EXPR_EXECUTOR,
-                                                     createMockExpressionExecutor());
+                                                     createMockExpressionExecutor(),
+                                                     true);
     } else {
       initCachedExprLanguageFactory();
       customizationService.registerCustomServiceImpl(MOCK_EXPR_EXECUTOR,
-                                                     cachedExprLanguageFactory);
+                                                     cachedExprLanguageFactory,
+                                                     true);
     }
     if (mockHttpService) {
-      customizationService.registerCustomServiceImpl(MOCK_HTTP_SERVICE, mockHttpService());
+      customizationService.registerCustomServiceImpl(MOCK_HTTP_SERVICE, mockHttpService(),
+                                                     true);
     }
 
     if (mockExpressionLanguageMetadataService) {
       customizationService.registerCustomServiceImpl(MOCK_EXPRESSION_LANGUAGE_METADATA_SERVICE,
-                                                     expressionLanguageMetadataService);
+                                                     expressionLanguageMetadataService,
+                                                     true);
     }
   }
 
@@ -147,7 +154,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     }
 
     overriddenDefaultServices.forEach((serviceId, serviceImpl) -> {
-      ((MuleContextWithRegistry) muleContext).getCustomizationService().overrideDefaultServiceImpl(serviceId, serviceImpl);
+      muleContext.getCustomizationService().overrideDefaultServiceImpl(serviceId, serviceImpl);
     });
   }
 

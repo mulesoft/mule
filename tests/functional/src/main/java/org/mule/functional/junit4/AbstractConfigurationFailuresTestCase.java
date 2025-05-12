@@ -6,6 +6,7 @@
  */
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLASSLOADER_REPOSITORY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -18,10 +19,13 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
+import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -36,6 +40,7 @@ import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.extension.internal.loader.java.CraftedExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -87,6 +92,15 @@ public abstract class AbstractConfigurationFailuresTestCase extends AbstractMule
     configurationBuilder.addServiceConfigurator(testServicesConfigurationBuilder);
     builders.add(configurationBuilder);
     builders.add(testServicesConfigurationBuilder);
+    configurationBuilder.addServiceConfigurator(new ServiceConfigurator() {
+
+      @Override
+      public void configure(CustomizationService customizationService) {
+        customizationService.registerCustomServiceImpl(OBJECT_CLASSLOADER_REPOSITORY,
+                                                       mock(ClassLoaderRepository.class),
+                                                       true);
+      }
+    });
     builders.add(new TestPolicyProviderConfigurationBuilder());
     final Latch contextStartedLatch = new Latch();
     builders.add(new TestNotificationListenerRegistryConfigurationBuilder(contextStartedLatch));

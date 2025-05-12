@@ -10,7 +10,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
-import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -25,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -69,7 +67,9 @@ public class TestServicesMuleContextConfigurator implements ServiceConfigurator 
     serviceRepository.getServices().forEach(service -> servicesByName.put(getServiceName(service), service));
 
     servicesByName.entrySet().stream()
-        .forEach(entry -> customizationService.registerCustomServiceImpl(entry.getKey(), entry.getValue()));
+        .forEach(entry -> customizationService.registerCustomServiceImpl(entry.getKey(),
+                                                                         entry.getValue(),
+                                                                         true));
   }
 
   public String getServiceName(Service service) {

@@ -473,11 +473,15 @@ public class ArtifactContextBuilder {
             }
             if (classLoaderRepository != null) {
               serviceConfigurators.add(customizationService -> customizationService
-                  .registerCustomServiceImpl(OBJECT_CLASSLOADER_REPOSITORY, classLoaderRepository));
+                  .registerCustomServiceImpl(OBJECT_CLASSLOADER_REPOSITORY,
+                                             classLoaderRepository,
+                                             true));
             }
             if (policyProvider != null) {
               serviceConfigurators.add(customizationService -> customizationService
-                  .registerCustomServiceImpl(OBJECT_POLICY_PROVIDER, policyProvider));
+                  .registerCustomServiceImpl(OBJECT_POLICY_PROVIDER,
+                                             policyProvider,
+                                             true));
             }
             ArtifactContextConfiguration.ArtifactContextConfigurationBuilder artifactContextConfigurationBuilder =
                 ArtifactContextConfiguration.builder()

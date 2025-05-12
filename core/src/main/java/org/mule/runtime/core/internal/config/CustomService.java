@@ -26,6 +26,7 @@ public class CustomService<T> {
 
   private final String serviceId;
   private final Class<T> serviceClass;
+  private final boolean baseContext;
   private final Consumer<ServiceInterceptor<T>> serviceImplInterceptorConsumer;
 
   /**
@@ -33,10 +34,11 @@ public class CustomService<T> {
    *
    * @param serviceClass the service class.
    */
-  public CustomService(String serviceId, Class<T> serviceClass) {
+  public CustomService(String serviceId, Class<T> serviceClass, boolean baseContext) {
     this.serviceId = serviceId;
     this.serviceClass = serviceClass;
     this.serviceImplInterceptorConsumer = null;
+    this.baseContext = baseContext;
   }
 
   /**
@@ -44,10 +46,11 @@ public class CustomService<T> {
    *
    * @param serviceImplInterceptorConsumer the {@link Consumer} for the {@link ServiceInterceptor}.
    */
-  public CustomService(String serviceId, Consumer<ServiceInterceptor<T>> serviceImplInterceptorConsumer) {
+  public CustomService(String serviceId, Consumer<ServiceInterceptor<T>> serviceImplInterceptorConsumer, boolean baseContext) {
     this.serviceId = serviceId;
     this.serviceImplInterceptorConsumer = serviceImplInterceptorConsumer;
     this.serviceClass = null;
+    this.baseContext = baseContext;
   }
 
   /**
@@ -73,6 +76,16 @@ public class CustomService<T> {
     serviceImplInterceptorConsumer.accept(serviceInterceptor);
 
     return serviceInterceptor.isRemove() ? empty() : ofNullable(serviceInterceptor.getNewServiceImpl());
+  }
+
+  /**
+   * @return {@code true} if this service has to bee present in the base Context, {@code false} if it may depend on artifact
+   *         specific objects.
+   * 
+   * @since 4.10
+   */
+  public boolean isBaseContext() {
+    return baseContext;
   }
 
   private static class DefaultServiceInterceptor<T> implements ServiceInterceptor<T> {
