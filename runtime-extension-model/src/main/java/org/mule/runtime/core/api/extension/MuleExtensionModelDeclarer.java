@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.core.api.extension;
 
-import static com.google.common.collect.ImmutableSet.of;
-
-import static java.lang.Boolean.getBoolean;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -82,11 +77,16 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SERIALIZER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+
+import static java.lang.Boolean.getBoolean;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
+import static com.google.common.collect.ImmutableSet.of;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -1086,7 +1086,6 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("shutdownTimeout")
         .ofType(INTEGER_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
-        .defaultingTo("5000")
         .describedAs("The time in milliseconds to wait for any in-progress work to finish running before Mule shuts down. "
             + "After this threshold has been reached, Mule starts stopping schedulers and interrupting threads, "
             + "and messages can be lost. If you have a very large number of services in the same Mule instance, "
@@ -1094,7 +1093,8 @@ class MuleExtensionModelDeclarer {
             + "payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown."
             + " The value you specify is applied to services and separately to dispatchers, so the default value of "
             + "5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after "
-            + "shutdown is initiated.");
+            + "shutdown is initiated."
+            + "The default value of 5000 can be overridden with the 'mule.gracefulShutdown.defaultTimeout' system property.");
 
     params
         .withOptionalParameter("maxQueueTransactionFilesSize")

@@ -8,8 +8,8 @@ package org.mule.runtime.config;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -41,7 +41,5 @@ public class SchemaDefaultsTestCase extends AbstractMuleContextTestCase {
         .numberValueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='defaultResponseTimeout']/@default").intValue());
     assertEquals(muleContext.getConfiguration().getDefaultTransactionTimeout(), configurationType
         .numberValueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='defaultTransactionTimeout']/@default").intValue());
-    assertEquals(muleContext.getConfiguration().getShutdownTimeout(), configurationType
-        .numberValueOf("xsd:complexContent/xsd:extension/xsd:attribute[@name='shutdownTimeout']/@default").intValue());
   }
 }
