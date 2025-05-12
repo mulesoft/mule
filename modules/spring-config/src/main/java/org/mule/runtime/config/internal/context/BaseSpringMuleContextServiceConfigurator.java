@@ -101,6 +101,10 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
 
+    if (!artifactType.equals(ArtifactType.DOMAIN)) {
+      loadServiceConfigurators();
+    }
+
     // Instances of the repository and locator need to be injected into another objects before actually determining the possible
     // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual
     // values to be provided at a later time.
@@ -167,8 +171,9 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
       }
 
       final CustomService customService = customServices.get(serviceName);
-      // TODO MULE-19927 get these form a more specific place and avoid this filter
-      if (isServiceRuntimeProvided(customService)) {
+      if (customService.isBaseContext()
+          // TODO MULE-19927 get these form a more specific place and avoid this filter
+          || isServiceRuntimeProvided(customService)) {
         final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
 
         registerBeanDefinition(serviceName, beanDefinition);

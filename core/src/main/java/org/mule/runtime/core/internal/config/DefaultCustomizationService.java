@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.internal.config;
 
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.api.config.custom.CustomizationService;
+
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class DefaultCustomizationService implements InternalCustomizationService
   public <T> void overrideDefaultServiceImpl(String serviceId, T serviceImpl) {
     muleContextDefaultServices
         .put(serviceId,
-             new CustomService<T>(serviceId, serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl)));
+             new CustomService<>(serviceId, serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl), false));
   }
 
   /**
@@ -40,7 +42,7 @@ public class DefaultCustomizationService implements InternalCustomizationService
    */
   @Override
   public <T> void interceptDefaultServiceImpl(String serviceId, Consumer<ServiceInterceptor<T>> serviceInterceptor) {
-    muleContextDefaultServices.put(serviceId, new CustomService<>(serviceId, serviceInterceptor));
+    muleContextDefaultServices.put(serviceId, new CustomService<>(serviceId, serviceInterceptor, false));
   }
 
   /**
@@ -48,7 +50,7 @@ public class DefaultCustomizationService implements InternalCustomizationService
    */
   @Override
   public <T> void overrideDefaultServiceClass(String serviceId, Class<T> serviceClass) {
-    muleContextDefaultServices.put(serviceId, new CustomService<T>(serviceId, serviceClass));
+    muleContextDefaultServices.put(serviceId, new CustomService<>(serviceId, serviceClass, false));
   }
 
   /**
@@ -61,18 +63,29 @@ public class DefaultCustomizationService implements InternalCustomizationService
 
   @Override
   public <T> void registerCustomServiceImpl(String serviceId, T serviceImpl) {
+    registerCustomServiceImpl(serviceId, serviceImpl, false);
+  }
+
+  @Override
+  public <T> void registerCustomServiceImpl(String serviceId, T serviceImpl, boolean baseContext) {
     checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
-    checkArgument(serviceImpl != null, "serviceImpl cannot be null");
-    customServices
-        .put(serviceId,
-             new CustomService<T>(serviceId, serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl)));
+    requireNonNull(serviceImpl, "serviceImpl cannot be null");
+    customServices.put(serviceId,
+                       new CustomService<>(serviceId,
+                                           serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl),
+                                           baseContext));
   }
 
   @Override
   public <T> void registerCustomServiceClass(String serviceId, Class<T> serviceClass) {
+    registerCustomServiceClass(serviceId, serviceClass, false);
+  }
+
+  @Override
+  public <T> void registerCustomServiceClass(String serviceId, Class<T> serviceClass, boolean baseContext) {
     checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
-    checkArgument(serviceClass != null, "serviceClass cannot be null");
-    customServices.put(serviceId, new CustomService<T>(serviceId, serviceClass));
+    requireNonNull(serviceClass, "serviceClass cannot be null");
+    customServices.put(serviceId, new CustomService<>(serviceId, serviceClass, baseContext));
   }
 
   @Override
