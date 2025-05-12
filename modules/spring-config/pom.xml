@@ -37,7 +37,7 @@
             --add-exports=org.mule.runtime.errors/org.mule.runtime.config.internal.error=ALL-UNNAMED
               --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation=ALL-UNNAMED
               --add-opens=org.mule.runtime.artifact.ast.xmlParser/org.mule.runtime.ast.api.xml=org.mule.runtime.spring.config
-            --add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.utils=org.mule.runtime.core,org.mule.runtime.service,org.mule.runtime.container
+            --add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.utils=org.mule.runtime.core,org.mule.runtime.service,org.mule.runtime.container,spring.beans
               --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.dsl.spring=net.bytebuddy
               --add-opens=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=ALL-UNNAMED
               --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.internal.registry=org.mule.runtime.core

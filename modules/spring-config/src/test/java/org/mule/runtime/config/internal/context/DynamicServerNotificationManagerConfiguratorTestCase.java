@@ -10,12 +10,11 @@ import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_REGISTRY_BO
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_MANAGER;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertSame;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.internal.SpringXmlConfigurationBuilder;
+import org.mule.runtime.config.utils.AppParserConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -39,11 +38,12 @@ public class DynamicServerNotificationManagerConfiguratorTestCase extends Abstra
 
   @Override
   protected ConfigurationBuilder getBuilder() throws Exception {
-    return new SpringXmlConfigurationBuilder(new String[] {"./dynamic-server-notification-manager-test.xml"}, emptyMap());
+    return new AppParserConfigurationBuilder(new String[] {"./dynamic-server-notification-manager-test.xml"});
   }
 
   @Test
   public void testRegistryHasNoGenericServerNotificationManagerIfDynamicConfigIsPresent() {
     assertSame(((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(OBJECT_NOTIFICATION_MANAGER), null);
   }
+
 }
