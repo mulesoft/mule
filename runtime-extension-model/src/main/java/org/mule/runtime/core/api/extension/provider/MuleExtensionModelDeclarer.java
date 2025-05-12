@@ -1175,7 +1175,7 @@ public class MuleExtensionModelDeclarer {
              The value you specify is applied to services and separately to dispatchers, so the default value of \
             5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after \
             shutdown is initiated.\
-             The default value of 5000 can be overridden with the 'mule.gracefuleShutdown.defaultTimeout' system property.""");
+             The default value of 5000 can be overridden with the 'mule.gracefulShutdown.defaultTimeout' system property.""");
 
     params
         .withOptionalParameter("maxQueueTransactionFilesSize")
