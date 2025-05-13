@@ -43,8 +43,10 @@ import org.springframework.beans.factory.SmartFactoryBean;
 public class MuleConfigurationConfigurator extends AbstractComponentFactory<MuleConfiguration>
     implements SmartFactoryBean<MuleConfiguration> {
 
+  @Inject
   private MuleContext muleContext;
 
+  @Inject
   private Registry registry;
 
   // We instantiate DefaultMuleConfiguration to make sure we get the default values for
@@ -175,14 +177,11 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
         .map(ts -> DynamicConfigExpiration.getDefault((TimeSupplier) ts)).orElse(config.getDynamicConfigExpiration());
   }
 
-  @Inject
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
-
-  @Inject
+  
   public void setRegistry(Registry registry) {
     this.registry = registry;
   }
-
 }
