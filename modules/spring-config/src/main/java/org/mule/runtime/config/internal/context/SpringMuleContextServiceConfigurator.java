@@ -299,9 +299,11 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       loadServiceConfigurators();
     }
 
-    registerContextServices(defaultContextServices, artifactType.getArtifactType());
-    if (isAddToolingObjectsToRegistry()) {
-      registerContextServices(toolingContextServices, artifactType.getArtifactType());
+    if (!artifactType.equals(ArtifactType.DOMAIN)) {
+      registerContextServices(defaultContextServices);
+      if (isAddToolingObjectsToRegistry()) {
+        registerContextServices(toolingContextServices);
+      }
     }
 
     createBootstrapBeanDefinitions();
