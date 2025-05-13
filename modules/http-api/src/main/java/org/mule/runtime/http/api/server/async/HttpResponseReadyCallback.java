@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.http.api.server.async;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
+import org.mule.runtime.http.api.sse.server.SseClient;
 
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -45,4 +47,12 @@ public interface HttpResponseReadyCallback {
    */
   Writer startResponse(HttpResponse response, ResponseStatusCallback responseStatusCallback, Charset encoding);
 
+  /**
+   * Starts a response with an SSE stream and returns a {@link SseClient} to send the corresponding events.
+   * 
+   * @return the {@link SseClient} to send the events.
+   * @since 4.9.6, 4.10.0
+   */
+  @Experimental
+  SseClient startSseResponse();
 }
