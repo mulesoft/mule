@@ -43,10 +43,8 @@ import org.springframework.beans.factory.SmartFactoryBean;
 public class MuleConfigurationConfigurator extends AbstractComponentFactory<MuleConfiguration>
     implements SmartFactoryBean<MuleConfiguration> {
 
-  @Inject
   private MuleContext muleContext;
 
-  @Inject
   private Registry registry;
 
   // We instantiate DefaultMuleConfiguration to make sure we get the default values for
@@ -56,7 +54,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   private boolean explicitDynamicConfigExpiration;
 
   private OptionalLong shutdownTimeout = OptionalLong.empty();
-  
+
   @Override
   public boolean isEagerInit() {
     return true;
@@ -137,18 +135,18 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
 
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
-            defaultConfig.setShutdownTimeout(shutdownTimeout
-                                                        .orElseGet(() -> {
-                                                          final String defaultValue = getProperty(GRACEFUL_SHUTDOWN_DEFAULT_TIMEOUT,
-                                                                                                  getenv(GRACEFUL_SHUTDOWN_DEFAULT_TIMEOUT.toUpperCase()
-                                                                                                      .replaceAll("\\.", "_")));
-                                              
-                                                          if (defaultValue == null) {
-                                                            return 5000L;
-                                                          }
-                                              
-                                                          return parseLong(defaultValue);
-                                                        }));
+      defaultConfig.setShutdownTimeout(shutdownTimeout
+          .orElseGet(() -> {
+            final String defaultValue = getProperty(GRACEFUL_SHUTDOWN_DEFAULT_TIMEOUT,
+                                                    getenv(GRACEFUL_SHUTDOWN_DEFAULT_TIMEOUT.toUpperCase()
+                                                        .replaceAll("\\.", "_")));
+
+            if (defaultValue == null) {
+              return 5000L;
+            }
+
+            return parseLong(defaultValue);
+          }));
       defaultConfig.setDefaultErrorHandlerName(config.getDefaultErrorHandlerName());
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
@@ -175,6 +173,16 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
 
     return registry.lookupByName(OBJECT_TIME_SUPPLIER)
         .map(ts -> DynamicConfigExpiration.getDefault((TimeSupplier) ts)).orElse(config.getDynamicConfigExpiration());
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  @Inject
+  public void setRegistry(Registry registry) {
+    this.registry = registry;
   }
 
 }
