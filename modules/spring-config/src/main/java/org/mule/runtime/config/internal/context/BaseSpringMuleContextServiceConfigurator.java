@@ -101,9 +101,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
 
-    if (!artifactType.equals(ArtifactType.DOMAIN)) {
-      loadServiceConfigurators();
-    }
+    loadServiceConfigurators();
 
     // Instances of the repository and locator need to be injected into another objects before actually determining the possible
     // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual
