@@ -157,6 +157,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -173,10 +175,7 @@ import jakarta.inject.Inject;
  */
 public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
 
-  private final MuleContextWithRegistry muleContext;
-  private final ArtifactType artifactType;
-  private final ArtifactAst artifactAst;
-  private final ResourceLocator resourceLocator;
+  private static final Logger LOGGER = LoggerFactory.getLogger(SpringMuleContextServiceConfigurator.class);
 
   private static final ImmutableSet<String> APPLICATION_ONLY_SERVICES = ImmutableSet.<String>builder()
       .add(OBJECT_SECURITY_MANAGER)
@@ -193,6 +192,11 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
           .put(BASE_IN_MEMORY_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_IN_MEMORY)
           .put(BASE_PERSISTENT_OBJECT_STORE_KEY, OBJECT_LOCAL_STORE_PERSISTENT)
           .build();
+
+  private final MuleContextWithRegistry muleContext;
+  private final ArtifactType artifactType;
+  private final ArtifactAst artifactAst;
+  private final ResourceLocator resourceLocator;
 
   // Do not use static field. BeanDefinitions are reused and produce weird behaviour
   private final ImmutableMap<String, BeanDefinition> defaultContextServices = ImmutableMap.<String, BeanDefinition>builder()
@@ -307,7 +311,9 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     registerConstantBeanDefinition(OBJECT_RESOURCE_LOCATOR, resourceLocator);
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
     registerBeanDefinition(MULE_ARTIFACT_METER_PROVIDER_KEY, resolveArtifactIdMeterProvider());
-    loadServiceConfigurators();
+    if (!artifactType.equals(ArtifactType.DOMAIN)) {
+      loadServiceConfigurators();
+    }
 
     registerContextServices(defaultContextServices);
     if (isAddToolingObjectsToRegistry()) {
@@ -352,6 +358,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
           && !isServiceRuntimeProvided(customService)) {
         final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
 
+        LOGGER.debug("Registering runtime service '{}' for {}...", serviceName, artifactType.name());
         registerBeanDefinition(serviceName, beanDefinition);
       }
     }

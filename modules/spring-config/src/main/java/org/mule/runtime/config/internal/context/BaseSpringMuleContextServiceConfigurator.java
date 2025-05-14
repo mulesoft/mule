@@ -49,6 +49,8 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -66,6 +68,8 @@ import jakarta.inject.Inject;
  * @since 4.5
  */
 public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringMuleContextServiceConfigurator.class);
 
   // This is needed just for some unit test scenarios
   // TODO MULE-20028 remove this
@@ -176,6 +180,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
           || isServiceRuntimeProvided(customService)) {
         final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService, serviceName);
 
+        LOGGER.debug("Registering runtime service '{}' for {}...", serviceName, artifactType.name());
         registerBeanDefinition(serviceName, beanDefinition);
       }
     }
