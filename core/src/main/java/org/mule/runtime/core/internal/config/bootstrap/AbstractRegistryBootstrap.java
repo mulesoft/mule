@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
+import static org.mule.runtime.api.artifact.ArtifactType.APP;
+import static org.mule.runtime.api.artifact.ArtifactType.DOMAIN;
+import static org.mule.runtime.api.artifact.ArtifactType.POLICY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -17,10 +17,10 @@ import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
 
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
@@ -199,7 +199,7 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
   private static ArtifactType fromString(String artifactTypeAsString) {
     for (ArtifactType artifactType : ArtifactType.values()) {
-      if (artifactType.getAsString().equals(artifactTypeAsString)) {
+      if (artifactType.getArtifactTypeAsString().equals(artifactTypeAsString)) {
         return artifactType;
       }
     }

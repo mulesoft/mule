@@ -61,7 +61,7 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws RegistrationException, InitialisationException {
-    registry = new SimpleRegistry(muleContextMock, new MuleLifecycleInterceptor());
+    registry = new SimpleRegistry(muleContextMock, new MuleLifecycleInterceptor(), muleContextMock.getConfiguration());
     final var txFactoryLocator = new TransactionFactoryLocator();
     registry.inject(txFactoryLocator);
     registry.registerObject("txFactory", txFactoryLocator);

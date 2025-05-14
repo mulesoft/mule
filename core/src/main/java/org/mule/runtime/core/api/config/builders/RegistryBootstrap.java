@@ -90,7 +90,7 @@ public interface RegistryBootstrap extends Initialisable {
    * 
    * @deprecated Use {@link #defaultRegistryBoostrap(ArtifactType, BootstrapServiceDiscoverer, Registrer)} instead.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true, since = "4.8")
   static RegistryBootstrap defaultRegistryBoostrap(org.mule.runtime.core.api.config.bootstrap.ArtifactType supportedArtifactType,
                                                    MuleContext muleContext) {
     return defaultRegistryBoostrap(ArtifactType.valueOf(supportedArtifactType.name()),
@@ -106,8 +106,28 @@ public interface RegistryBootstrap extends Initialisable {
    * @param registrer             adds an object to the registry, with any applicable rules (i.e.: service overrides)
    * @return a {@link RegistryBootstrap} instance
    * @since 4.8
+   * 
+   * @deprecated Use
+   *             {@link #defaultRegistryBoostrap(org.mule.runtime.api.artifact.ArtifactType, BootstrapServiceDiscoverer, Registrer)}
+   *             instead.
    */
+  @Deprecated(forRemoval = true, since = "4.10")
   static RegistryBootstrap defaultRegistryBoostrap(ArtifactType supportedArtifactType,
+                                                   BootstrapServiceDiscoverer bootstrapServiceDiscoverer,
+                                                   Registrer registrer) {
+    return new SimpleRegistryBootstrap(supportedArtifactType.getArtifactType(), bootstrapServiceDiscoverer, registrer);
+  }
+
+  /**
+   * Returns a default instance for the given parameters
+   *
+   * @param supportedArtifactType the type of artifact being configured
+   * @param muleContext           the configured {@link MuleContext}
+   * @param registrer             adds an object to the registry, with any applicable rules (i.e.: service overrides)
+   * @return a {@link RegistryBootstrap} instance
+   * @since 4.10
+   */
+  static RegistryBootstrap defaultRegistryBoostrap(org.mule.runtime.api.artifact.ArtifactType supportedArtifactType,
                                                    BootstrapServiceDiscoverer bootstrapServiceDiscoverer,
                                                    Registrer registrer) {
     return new SimpleRegistryBootstrap(supportedArtifactType, bootstrapServiceDiscoverer, registrer);

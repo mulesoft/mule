@@ -19,7 +19,6 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorF
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository.getExtensionModelLoaderManager;
-import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.CONTAINER_CLASS_LOADER;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.MODULE_REPOSITORY;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
@@ -37,6 +36,7 @@ import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
@@ -255,7 +255,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                         Consumer<ClassLoader> actionOnMuleArtifactDeployment)
       throws RegistrationException {
     // Creates a registry to be used as an injector.
-    super(null);
+    super(null, null);
 
     // A "container level" notification server is created and registered in order to be injectable
     serverNotificationManager = ServerNotificationManager
@@ -286,7 +286,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     domainManager = new DefaultDomainManager();
     this.domainClassLoaderFactory =
-        trackDeployableArtifactClassLoaderFactory(domainClassLoaderFactory(name -> getAppDataFolder(name)));
+        trackDeployableArtifactClassLoaderFactory(domainClassLoaderFactory(MuleFoldersUtil::getAppDataFolder));
 
     final AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> artifactPluginDescriptorFactory =
         artifactDescriptorFactoryProvider()
@@ -306,7 +306,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
         new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,
                                                          new DefaultArtifactClassLoaderResolver(containerClassLoader,
                                                                                                 moduleRepository,
-                                                                                                new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name))));
+                                                                                                new DefaultNativeLibraryFinderFactory(MuleFoldersUtil::getAppDataFolder)));
 
     pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactClassLoaderResolver);
     applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
@@ -500,7 +500,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   }
 
   private SchedulerService getSchedulerService() {
-    return (SchedulerService) serviceManager.getServices().stream().filter(s -> s instanceof SchedulerService).findFirst().get();
+    return (SchedulerService) serviceManager.getServices().stream().filter(SchedulerService.class::isInstance).findFirst().get();
   }
 
 }
