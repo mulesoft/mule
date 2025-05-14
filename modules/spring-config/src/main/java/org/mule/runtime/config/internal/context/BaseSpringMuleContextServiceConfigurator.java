@@ -8,6 +8,7 @@ package org.mule.runtime.config.internal.context;
 
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ALERTING_SUPPORT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_ENCODING;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
@@ -15,13 +16,17 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 
 import static java.lang.Boolean.getBoolean;
+import static java.util.Map.entry;
+import static java.util.Map.ofEntries;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -39,11 +44,13 @@ import org.mule.runtime.config.internal.lazy.LazyDataWeaveExtendedExpressionLang
 import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.internal.alert.DefaultAlertingSupport;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
+import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
@@ -77,6 +84,11 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   public static final String DISABLE_TRANSFORMERS_SUPPORT =
       BaseSpringMuleContextServiceConfigurator.class.getName() + ".disableTransformersSupport";
 
+  // Do not use static field. BeanDefinitions are reused and produce weird behaviour
+  private final Map<String, BeanDefinition> baseContextServices =
+      ofEntries(entry(OBJECT_TIME_SUPPLIER, getBeanDefinition(LocalTimeSupplier.class)),
+                entry(OBJECT_ALERTING_SUPPORT, getBeanDefinition(DefaultAlertingSupport.class)));
+
   private final MuleContext muleContext;
   private final ArtifactType artifactType;
   private final ConfigurationProperties configurationProperties;
@@ -105,9 +117,10 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
 
-    if (!artifactType.equals(ArtifactType.DOMAIN)) {
+    if (!artifactType.equals(DOMAIN)) {
       loadServiceConfigurators();
     }
+    registerContextServices(baseContextServices, artifactType.equals(DOMAIN));
 
     // Instances of the repository and locator need to be injected into another objects before actually determining the possible
     // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual

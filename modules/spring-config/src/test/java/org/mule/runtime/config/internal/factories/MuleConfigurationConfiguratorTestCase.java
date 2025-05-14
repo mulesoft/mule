@@ -21,7 +21,6 @@ import static org.hamcrest.core.Is.is;
 
 import static org.junit.Assert.assertThrows;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -49,8 +48,6 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
     final var muleContext = mock(MuleContext.class);
     when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
     muleConfigurationConfigurator.setMuleContext(muleContext);
-
-    muleConfigurationConfigurator.setRegistry(mock(Registry.class));
   }
 
   @Test

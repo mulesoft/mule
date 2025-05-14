@@ -6,10 +6,13 @@
  */
 package org.mule.tck.util;
 
+import static java.time.Instant.ofEpochMilli;
+
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.time.TimeSupplier;
 
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,6 +49,11 @@ public class TestTimeSupplier implements TimeSupplier {
   @Override
   public synchronized long getAsLong() {
     return timeInMillis;
+  }
+
+  @Override
+  public Instant getAsInstant() {
+    return ofEpochMilli(timeInMillis);
   }
 
   /**

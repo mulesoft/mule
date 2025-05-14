@@ -8,6 +8,13 @@ package org.mule.runtime.config.internal.context;
 
 import static org.mule.runtime.api.config.custom.ServiceConfigurator.lookupServiceConfigurators;
 import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXCEPTION_LOCATION_PROVIDER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import static java.lang.reflect.Proxy.getInvocationHandler;
@@ -24,7 +31,9 @@ import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 
 import java.lang.reflect.InvocationHandler;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -37,6 +46,14 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 abstract class AbstractSpringMuleContextServiceConfigurator {
 
+  private static final Set<String> NO_DOMAIN_SERVICES = Set.of(OBJECT_SECURITY_MANAGER,
+                                                               OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER,
+                                                               OBJECT_MULE_STREAM_CLOSER_SERVICE,
+                                                               OBJECT_PROCESSING_TIME_WATCHER,
+                                                               OBJECT_POLICY_MANAGER,
+                                                               OBJECT_EXCEPTION_LOCATION_PROVIDER,
+                                                               OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER);
+
   private final InternalCustomizationService customizationService;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
   private final Registry serviceLocator;
@@ -47,6 +64,12 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     this.customizationService = customizationService;
     this.beanDefinitionRegistry = beanDefinitionRegistry;
     this.serviceLocator = serviceLocator;
+  }
+
+  protected void registerContextServices(Map<String, BeanDefinition> contextServices, boolean domainArtifact) {
+    contextServices.entrySet().stream()
+        .filter(service -> !(domainArtifact && NO_DOMAIN_SERVICES.contains(service.getKey())))
+        .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
   }
 
   protected static BeanDefinition getBeanDefinition(Class<?> beanType) {
