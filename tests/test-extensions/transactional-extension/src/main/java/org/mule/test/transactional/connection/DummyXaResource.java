@@ -6,15 +6,19 @@
  */
 package org.mule.test.transactional.connection;
 
+import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
 import org.mule.runtime.core.api.util.queue.Queue;
 import org.mule.runtime.core.api.util.queue.QueueSession;
-import org.mule.runtime.core.api.transaction.xa.ResourceManagerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DummyXaResource implements XAResource, QueueSession {
 
@@ -122,5 +126,85 @@ public class DummyXaResource implements XAResource, QueueSession {
 
   public boolean isTxStarted() {
     return isTxStarted;
+  }
+
+  public static Matcher<DummyXaResource> commitStarted(boolean isCommitStarted) {
+    return new TypeSafeMatcher<DummyXaResource>() {
+
+      @Override
+      protected boolean matchesSafely(DummyXaResource item) {
+        return item.isCommitStarted() == isCommitStarted;
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("isCommitStarted == " + isCommitStarted);
+      }
+    };
+
+  }
+
+  public static Matcher<DummyXaResource> prepared(boolean isPrepared) {
+    return new TypeSafeMatcher<DummyXaResource>() {
+
+      @Override
+      protected boolean matchesSafely(DummyXaResource item) {
+        return item.isPrepared() == isPrepared;
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("isPrepared == " + isPrepared);
+      }
+    };
+
+  }
+
+  public static Matcher<DummyXaResource> txEnded() {
+    return new TypeSafeMatcher<DummyXaResource>() {
+
+      @Override
+      protected boolean matchesSafely(DummyXaResource item) {
+        return item.isTxEnded();
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("isTxEnded");
+      }
+    };
+
+  }
+
+  public static Matcher<DummyXaResource> rollbackExecuted(boolean isRollback) {
+    return new TypeSafeMatcher<DummyXaResource>() {
+
+      @Override
+      protected boolean matchesSafely(DummyXaResource item) {
+        return item.isRollbackExecuted() == isRollback;
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("isRollbackExecuted == " + isRollback);
+      }
+    };
+
+  }
+
+  public static Matcher<DummyXaResource> txStarted() {
+    return new TypeSafeMatcher<DummyXaResource>() {
+
+      @Override
+      protected boolean matchesSafely(DummyXaResource item) {
+        return item.isTxStarted();
+      }
+
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("isTxStarted");
+      }
+    };
+
   }
 }
