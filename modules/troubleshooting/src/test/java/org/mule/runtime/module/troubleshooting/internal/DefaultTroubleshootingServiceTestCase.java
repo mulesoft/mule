@@ -20,6 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.mule.runtime.module.troubleshooting.internal.operations.ThreadDumpOperation.THREAD_DUMP_OPERATION_NAME;
 
 import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -59,10 +60,11 @@ public class DefaultTroubleshootingServiceTestCase {
     List<TroubleshootingOperationDefinition> availableOperations = troubleshootingService.getAvailableOperations();
 
     assertThat(availableOperations.stream().map(TroubleshootingOperationDefinition::getName).toList().toString(),
-               availableOperations, iterableWithSize(3));
+               availableOperations, iterableWithSize(4));
 
     List<String> operationNames = availableOperations.stream().map(TroubleshootingOperationDefinition::getName).toList();
-    assertThat(operationNames, containsInAnyOrder(BASIC_INFO_OPERATION_NAME, EVENT_DUMP_OPERATION_NAME, TEST_OPERATION_NAME));
+    assertThat(operationNames, containsInAnyOrder(BASIC_INFO_OPERATION_NAME, EVENT_DUMP_OPERATION_NAME,
+                                                  THREAD_DUMP_OPERATION_NAME, TEST_OPERATION_NAME));
   }
 
   @Test
@@ -74,6 +76,9 @@ public class DefaultTroubleshootingServiceTestCase {
         =========="""));
     assertThat(result, containsString("""
         Events
+        ======"""));
+    assertThat(result, containsString("""
+        Thread Dump
         ======"""));
     assertThat(result, containsString("""
         Test

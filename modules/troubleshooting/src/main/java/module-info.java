@@ -24,6 +24,7 @@ module org.mule.runtime.troubleshooting {
   requires org.mule.runtime.deployment.model.impl;
   requires org.mule.runtime.launcher;
   requires org.mule.runtime.manifest;
+  requires java.management;
 
   requires org.apache.commons.lang3;
   requires org.json;
