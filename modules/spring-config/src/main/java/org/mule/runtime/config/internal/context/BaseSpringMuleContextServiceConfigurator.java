@@ -118,8 +118,8 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
     if (!artifactType.equals(ArtifactType.DOMAIN)) {
       loadServiceConfigurators();
-      registerContextServices(baseContextServices);
     }
+    registerContextServices(baseContextServices, artifactType.getArtifactType());
 
     // Instances of the repository and locator need to be injected into another objects before actually determining the possible
     // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.context;
 
+import static org.mule.runtime.api.artifact.ArtifactType.APP;
+import static org.mule.runtime.api.artifact.ArtifactType.POLICY;
 import static org.mule.runtime.api.config.custom.ServiceConfigurator.lookupServiceConfigurators;
 import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
@@ -22,6 +24,7 @@ import static java.lang.reflect.Proxy.isProxyClass;
 
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
+import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker;
@@ -66,9 +69,10 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     this.serviceLocator = serviceLocator;
   }
 
-  protected void registerContextServices(Map<String, BeanDefinition> contextServices) {
+  protected void registerContextServices(Map<String, BeanDefinition> contextServices, ArtifactType artifactType) {
     contextServices.entrySet().stream()
-        .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()))
+        .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)
+            || artifactType.equals(POLICY))
         .forEach(service -> registerBeanDefinition(service.getKey(), service.getValue()));
   }
 
