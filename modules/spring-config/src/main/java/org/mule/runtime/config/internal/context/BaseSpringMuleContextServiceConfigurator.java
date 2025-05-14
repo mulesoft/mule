@@ -19,6 +19,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_P
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER_RESOLVER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
@@ -116,10 +117,10 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
 
-    if (!artifactType.equals(ArtifactType.DOMAIN)) {
+    if (!artifactType.equals(DOMAIN)) {
       loadServiceConfigurators();
     }
-    registerContextServices(baseContextServices, artifactType.getArtifactType());
+    registerContextServices(baseContextServices, artifactType.equals(DOMAIN));
 
     // Instances of the repository and locator need to be injected into another objects before actually determining the possible
     // values. This contributing layer is needed to ensure the correct functioning of the DI mechanism while allowing actual

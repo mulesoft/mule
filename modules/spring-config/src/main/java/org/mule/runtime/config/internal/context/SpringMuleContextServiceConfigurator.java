@@ -65,6 +65,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.SDK_OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
@@ -295,13 +296,13 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     registerConstantBeanDefinition(OBJECT_RESOURCE_LOCATOR, resourceLocator);
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
     registerBeanDefinition(MULE_ARTIFACT_METER_PROVIDER_KEY, resolveArtifactIdMeterProvider());
-    if (!artifactType.equals(ArtifactType.DOMAIN)) {
+    if (!artifactType.equals(DOMAIN)) {
       loadServiceConfigurators();
     }
 
-    registerContextServices(defaultContextServices, artifactType.getArtifactType());
+    registerContextServices(defaultContextServices, artifactType.equals(DOMAIN));
     if (isAddToolingObjectsToRegistry()) {
-      registerContextServices(toolingContextServices, artifactType.getArtifactType());
+      registerContextServices(toolingContextServices, artifactType.equals(DOMAIN));
     }
 
     createBootstrapBeanDefinitions();
