@@ -108,6 +108,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 
 import java.io.BufferedReader;
@@ -133,6 +134,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -176,6 +178,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
       .definedBy("shared-a-app-config.xml").dependingOn(sharedDomainFileBuilder);
   private final ApplicationFileBuilder sharedBAppFileBuilder = new ApplicationFileBuilder("shared-app-b")
       .definedBy("shared-b-app-config.xml").dependingOn(sharedDomainFileBuilder);
+
+  @Rule
+  public SystemProperty disableByteBuddy = new SystemProperty("mule.enable.byteBuddy.objectCreation", "false");
 
   public DomainDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
@@ -1890,6 +1895,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Test
   public void synchronizesDomainUndeployFromClient() throws Exception {
+    System.out.println("[DEBUG] mule.enable.byteBuddy.objectCreation = " + System.getProperty("mule.enable.byteBuddy.objectCreation"));
+
     final Action action = () -> deploymentService.undeployDomain(emptyDomainFileBuilder.getId());
 
     final Action assertAction =
