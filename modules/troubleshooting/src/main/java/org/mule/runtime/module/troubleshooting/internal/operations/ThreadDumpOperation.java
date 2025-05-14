@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.troubleshooting.internal.operations;
 
-import static java.lang.System.lineSeparator;
 import static java.lang.management.ManagementFactory.getThreadMXBean;
 
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperation;
@@ -14,8 +13,6 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallb
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingOperationDefinition;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 
