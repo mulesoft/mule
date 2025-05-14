@@ -108,6 +108,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 
 import java.io.BufferedReader;
@@ -124,6 +125,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
 
 import jakarta.inject.Inject;
@@ -133,7 +135,9 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -181,6 +185,9 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   public DomainDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
   }
+
+  @Rule
+  public SystemProperty disableByteBuddy = new SystemProperty("mule.enable.byteBuddy.objectCreation", "false");
 
   @After
   public void disposeStaleDomains() {
@@ -413,6 +420,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
     triggerDirectoryWatcher();
+
+    Thread.sleep(500);
 
     try {
       executeApplicationFlow("main");

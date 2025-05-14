@@ -113,6 +113,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.config.api.properties.PropertiesResolverUtils;
@@ -402,7 +403,36 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     services = getServicesFolder();
     services.mkdirs();
+
+    // LOG de diagnóstico antes de copiar servicios
+    System.out
+        .println("[DIAG] setUp() - Thread: " + Thread.currentThread().getName() + " Timestamp: " + System.currentTimeMillis());
+    System.out.println("[DIAG] Directorio de servicios antes de copiar: " + services.getAbsolutePath());
+    for (File f : services.listFiles()) {
+      System.out.println("[DIAG]  - " + f.getName() + " (existe: " + f.exists() + ")");
+    }
+    File elService = new File(services, "expressionLanguageService");
+    System.out.println("[DIAG] ¿Existe expressionLanguageService? " + elService.exists());
+
+    if (elService.exists() && elService.isDirectory()) {
+      for (File f : elService.listFiles()) {
+        System.out.println("[DIAG] expressionLanguageService contiene: " + f.getName());
+        if (f.isDirectory() && f.getName().equals("lib")) {
+          for (File jar : f.listFiles()) {
+            System.out.println("[DIAG]   - lib: " + jar.getName());
+          }
+        }
+      }
+    }
+
     testServicesSetup.copyServicesToFolder(services);
+
+    // LOG de diagnóstico después de copiar servicios
+    System.out.println("[DIAG] Directorio de servicios después de copiar: " + services.getAbsolutePath());
+    for (File f : services.listFiles()) {
+      System.out.println("[DIAG]  - " + f.getName() + " (existe: " + f.exists() + ")");
+    }
+    System.out.println("[DIAG] ¿Existe expressionLanguageService? " + elService.exists());
 
     applicationDeploymentListener = mock(DeploymentListener.class);
     testDeploymentListener = new TestDeploymentListener();
@@ -447,6 +477,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     invocationCount = 0;
     correlationIdCount.clear();
     policyParametrization = "";
+
+    serviceManager.start();
+    System.out.println("[DIAG] Servicios registrados en ServiceManager:");
+    for (Service s : serviceManager.getServices()) {
+        System.out.println("[DIAG]  - " + s.getName() + " (" + s.getClass().getName() + ")");
+    }
   }
 
   @Before
@@ -501,7 +537,20 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       stopIfNeeded(extensionModelLoaderRepository);
     }
 
-    deleteTree(muleHome);
+    // LOG de diagnóstico antes de borrar muleHome
+    System.out
+        .println("[DIAG] tearDown() - Thread: " + Thread.currentThread().getName() + " Timestamp: " + System.currentTimeMillis());
+    System.out.println("[DIAG] muleHome a borrar: " + muleHome.getAbsolutePath());
+    if (muleHome.exists()) {
+      for (File f : muleHome.listFiles()) {
+        System.out.println("[DIAG]  - " + f.getName() + " (existe: " + f.exists() + ")");
+      }
+    }
+
+    //deleteTree(muleHome);
+
+    // LOG de diagnóstico después de borrar muleHome
+    System.out.println("[DIAG] muleHome borrado: " + muleHome.getAbsolutePath() + " (existe: " + muleHome.exists() + ")");
 
     // this is a complex classloader setup and we can't reproduce standalone Mule 100%,
     // so trick the next test method into thinking it's the first run, otherwise
@@ -645,9 +694,55 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     if (startServiceManager) {
       serviceManager.start();
     }
+    waitForExpressionLanguageServiceRegistered();
     startIfNeeded(extensionModelLoaderRepository);
     deploymentService.start(false);
   }
+
+  protected void waitForExpressionLanguageServiceRegistered() {
+    int retries = 50; // 5 segundos
+    Exception last = null;
+    while (retries-- > 0) {
+        try {
+            Object elService = serviceManager.getServices().stream()
+                .filter(service -> service.getClass().getName().contains("ExpressionLanguage"))
+                .findFirst()
+                .orElse(null);
+
+            if (elService != null) {
+                try {
+                    // Verifica que la clase esté cargada
+                    Class<?> clazz = elService.getClass().getClassLoader()
+                        .loadClass("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService");
+
+                    // Intenta invocar un método del servicio para asegurarse que está funcional
+                    // Por ejemplo, getName() o create()
+                    java.lang.reflect.Method getNameMethod = clazz.getMethod("getName");
+                    String name = (String) getNameMethod.invoke(elService);
+                    System.out.println("[DIAG] ExpressionLanguageService.getName() = " + name);
+
+                    // (Opcional) Intenta crear una instancia de ExpressionLanguage
+                    java.lang.reflect.Method createMethod = clazz.getMethod("create");
+                    Object expressionLanguage = createMethod.invoke(elService);
+                    System.out.println("[DIAG] ExpressionLanguage creado: " + expressionLanguage);
+
+                    // Si llegamos hasta aquí, el servicio está funcional
+                    return;
+                } catch (Exception e) {
+                    last = e;
+                }
+            }
+            Thread.sleep(100);
+        } catch (Exception e) {
+            last = e;
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {}
+        }
+    }
+    throw new IllegalStateException("expressionLanguageService no está registrado, su clase no es accesible o no es funcional", last);
+  }
+
 
   protected void startDeployment() throws MuleException {
     startDeployment(true);

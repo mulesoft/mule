@@ -14,8 +14,12 @@ import static org.apache.commons.io.FileUtils.copyDirectory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.function.Function;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
@@ -101,14 +105,18 @@ public class TestServicesSetup extends ExternalResource {
   public void copyServicesToFolder(File servicesFolder) throws IOException {
     initNotOverriddenServices();
 
-    copyDirectory(schedulerService,
-                  new File(servicesFolder, SCHEDULER_SERVICE_NAME));
-    copyDirectory(expressionLanguageService,
-                  new File(servicesFolder, EXPRESSION_LANGUAGE_SERVICE_NAME));
+    atomicallyCopyServiceToFolder(schedulerService, new File(servicesFolder, SCHEDULER_SERVICE_NAME));
+    atomicallyCopyServiceToFolder(expressionLanguageService, new File(servicesFolder, EXPRESSION_LANGUAGE_SERVICE_NAME));
     if (!expressionLanguageMetadataServiceDisabled) {
-      copyDirectory(expressionLanguageMetadataService,
-                    new File(servicesFolder, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+      atomicallyCopyServiceToFolder(expressionLanguageMetadataService,
+                                    new File(servicesFolder, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
     }
+  }
+
+  public void atomicallyCopyServiceToFolder(File service, File dstFolder) throws IOException {
+    Path tmp = Files.createTempDirectory(service.getName());
+    FileUtils.copyDirectory(service, tmp.toFile());
+    Files.move(tmp, dstFolder.toPath(), StandardCopyOption.ATOMIC_MOVE);
   }
 
   private void initNotOverriddenServices() throws IOException {
