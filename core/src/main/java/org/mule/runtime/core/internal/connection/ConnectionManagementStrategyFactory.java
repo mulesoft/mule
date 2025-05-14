@@ -20,6 +20,8 @@ import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
+import org.mule.runtime.core.internal.connection.adapter.XATransactionalConnectionProvider;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 import java.util.Optional;
 
@@ -58,9 +60,59 @@ final class ConnectionManagementStrategyFactory {
   public <C> ConnectionManagementStrategy<C> getStrategy(ConnectionProvider<C> connectionProvider,
                                                          FeatureFlaggingService featureFlaggingService) {
     ConnectionManagementType managementType = getManagementType(connectionProvider);
+
+    ConnectionManagementStrategy<C> managementStrategy = null;
+
     if (managementType == POOLING) {
-      return pooling(connectionProvider, featureFlaggingService);
+      managementStrategy = pooling(connectionProvider, featureFlaggingService);
     }
+
+    if (unwrapProviderWrapper(connectionProvider,
+                              XATransactionalConnectionProvider.class) instanceof XATransactionalConnectionProvider xaTxConnectionProvider) {
+      return handleForXa((ConnectionProvider) connectionProvider,
+                         featureFlaggingService,
+                         managementType,
+                         (ConnectionManagementStrategy) managementStrategy,
+                         xaTxConnectionProvider);
+    }
+
+    if (managementStrategy != null) {
+      return managementStrategy;
+    } else {
+      return getNonPoolingStrategy(connectionProvider, managementType);
+    }
+  }
+
+  private <C extends TransactionalConnection> ConnectionManagementStrategy<C> handleForXa(ConnectionProvider<C> connectionProvider,
+                                                                                          FeatureFlaggingService featureFlaggingService,
+                                                                                          ConnectionManagementType managementType,
+                                                                                          ConnectionManagementStrategy<C> poolingManagementStrategy,
+                                                                                          XATransactionalConnectionProvider<C> xaTXConnProvider) {
+    if (poolingManagementStrategy != null) {
+      // this will even be the case it the connection provider is pooled, but pooling is disabled. In this case there won´t be an
+      // XA pool either, as it was explicitly configured that way.
+      return xaConnectionManagementStrategyFactory
+          .map(f -> f.managePooledForXa(poolingManagementStrategy,
+                                        connectionProvider))
+          .orElse(poolingManagementStrategy);
+    } else {
+      ConnectionManagementStrategy<C> xaPoolingManagementStrategy =
+          new NullConnectionManagementStrategy<C>(connectionProvider);
+
+      return getNonPoolingStrategy(new XaManagementWrappedConnectionProvider<>(connectionProvider,
+                                                                               xaConnectionManagementStrategyFactory
+                                                                                   .map(f -> f
+                                                                                       .manageForXa(xaPoolingManagementStrategy,
+                                                                                                    xaTXConnProvider
+                                                                                                        .getXaPoolingProfile(),
+                                                                                                    connectionProvider))
+                                                                                   .orElse(xaPoolingManagementStrategy)),
+                                   managementType);
+    }
+  }
+
+  private <C> ConnectionManagementStrategy<C> getNonPoolingStrategy(ConnectionProvider<C> connectionProvider,
+                                                                    ConnectionManagementType managementType) {
     if (managementType == CACHED) {
       return cached(connectionProvider);
     } else if (managementType == NONE) {
@@ -80,25 +132,38 @@ final class ConnectionManagementStrategyFactory {
 
   private <C> ConnectionManagementStrategy<C> pooling(ConnectionProvider<C> connectionProvider,
                                                       FeatureFlaggingService featureFlaggingService) {
-    String ownerConfigName = "";
     PoolingProfile poolingProfile = defaultPoolingProfile;
-    if (connectionProvider instanceof ConnectionProviderWrapper) {
-      poolingProfile = ((ConnectionProviderWrapper) connectionProvider).getPoolingProfile().orElse(poolingProfile);
-      ownerConfigName = ((ConnectionProviderWrapper<C>) connectionProvider).getOwnerConfigName().orElse("");
+    if (connectionProvider instanceof ConnectionProviderWrapper<C> cpWrapper) {
+      poolingProfile = cpWrapper.getPoolingProfile().orElse(poolingProfile);
     }
 
-    return poolingProfile.isDisabled() ? withoutManagement(connectionProvider)
+    return pooling(poolingProfile, connectionProvider,
+                   (PoolingListener<C>) unwrapProviderWrapper(connectionProvider,
+                                                              PoolingConnectionProvider.class),
+                   featureFlaggingService);
+  }
+
+  private <C> ConnectionManagementStrategy<C> pooling(PoolingProfile poolingProfile,
+                                                      ConnectionProvider<C> connectionProvider,
+                                                      PoolingListener<C> poolingListener,
+                                                      FeatureFlaggingService featureFlaggingService) {
+    String ownerConfigName = "";
+    if (connectionProvider instanceof ConnectionProviderWrapper<C> cpWrapper) {
+      ownerConfigName = cpWrapper.getOwnerConfigName().orElse("");
+    }
+
+    return poolingProfile.isDisabled()
+        ? withoutManagement(connectionProvider)
         : new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile,
-                                                    (PoolingListener<C>) unwrapProviderWrapper(connectionProvider,
-                                                                                               PoolingConnectionProvider.class),
+                                                    poolingListener,
                                                     ownerConfigName, featureFlaggingService);
   }
 
   private <C> ConnectionManagementType getManagementType(ConnectionProvider<C> connectionProvider) {
     ConnectionManagementType type = NONE;
 
-    if (connectionProvider instanceof ConnectionProviderWrapper) {
-      return ((ConnectionProviderWrapper<C>) connectionProvider).getConnectionManagementType();
+    if (connectionProvider instanceof ConnectionProviderWrapper<C> cpWrapper) {
+      return cpWrapper.getConnectionManagementType();
     }
 
     if (connectionProvider instanceof PoolingConnectionProvider) {
