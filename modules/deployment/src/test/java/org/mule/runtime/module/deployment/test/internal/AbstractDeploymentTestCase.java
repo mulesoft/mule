@@ -501,7 +501,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       stopIfNeeded(extensionModelLoaderRepository);
     }
 
-    deleteTree(muleHome);
+    //deleteTree(muleHome);
 
     // this is a complex classloader setup and we can't reproduce standalone Mule 100%,
     // so trick the next test method into thinking it's the first run, otherwise
@@ -645,9 +645,55 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
     if (startServiceManager) {
       serviceManager.start();
     }
+    waitForExpressionLanguageServiceRegistered();
     startIfNeeded(extensionModelLoaderRepository);
     deploymentService.start(false);
   }
+
+  protected void waitForExpressionLanguageServiceRegistered() {
+    int retries = 50; // 5 segundos
+    Exception last = null;
+    while (retries-- > 0) {
+      try {
+        Object elService = serviceManager.getServices().stream()
+            .filter(service -> service.getClass().getName().contains("ExpressionLanguage"))
+            .findFirst()
+            .orElse(null);
+
+        if (elService != null) {
+          try {
+            // Verifica que la clase esté cargada
+            Class<?> clazz = elService.getClass().getClassLoader()
+                .loadClass("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService");
+
+            // Intenta invocar un método del servicio para asegurarse que está funcional
+            // Por ejemplo, getName() o create()
+            java.lang.reflect.Method getNameMethod = clazz.getMethod("getName");
+            String name = (String) getNameMethod.invoke(elService);
+            System.out.println("[DIAG] ExpressionLanguageService.getName() = " + name);
+
+            // (Opcional) Intenta crear una instancia de ExpressionLanguage
+            java.lang.reflect.Method createMethod = clazz.getMethod("create");
+            Object expressionLanguage = createMethod.invoke(elService);
+            System.out.println("[DIAG] ExpressionLanguage creado: " + expressionLanguage);
+
+            // Si llegamos hasta aquí, el servicio está funcional
+            return;
+          } catch (Exception e) {
+            last = e;
+          }
+        }
+        Thread.sleep(100);
+      } catch (Exception e) {
+        last = e;
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ignored) {}
+      }
+    }
+    throw new IllegalStateException("expressionLanguageService no está registrado, su clase no es accesible o no es funcional", last);
+  }
+
 
   protected void startDeployment() throws MuleException {
     startDeployment(true);
