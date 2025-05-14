@@ -180,7 +180,7 @@ public class MuleConfigurationConfigurator extends AbstractComponentFactory<Mule
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
-  
+
   public void setRegistry(Registry registry) {
     this.registry = registry;
   }
