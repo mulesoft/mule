@@ -22,8 +22,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.D
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedArtifactStatusDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
-import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveArtifactStatusDeploymentProperties;
-import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.barUtils1ClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.barUtils1_0JarFile;
@@ -60,7 +58,6 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOM
 import static java.nio.charset.Charset.defaultCharset;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -108,7 +105,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 
 import java.io.BufferedReader;
@@ -125,7 +121,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
 
 import jakarta.inject.Inject;
@@ -135,9 +130,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
 import org.junit.After;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -185,9 +178,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   public DomainDeploymentTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
   }
-
-  @Rule
-  public SystemProperty disableByteBuddy = new SystemProperty("mule.enable.byteBuddy.objectCreation", "false");
 
   @After
   public void disposeStaleDomains() {
@@ -420,8 +410,6 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     addPackedAppFromBuilder(applicationFileBuilder);
     startDeployment();
     triggerDirectoryWatcher();
-
-    Thread.sleep(500);
 
     try {
       executeApplicationFlow("main");
