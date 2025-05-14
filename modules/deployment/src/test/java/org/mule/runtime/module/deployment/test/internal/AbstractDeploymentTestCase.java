@@ -651,45 +651,71 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void waitForExpressionLanguageServiceRegistered() {
-    int retries = 50; // 5 segundos
+    int retries = 5; // 5 segundos
     Exception last = null;
     while (retries-- > 0) {
-      try {
-        Object elService = serviceManager.getServices().stream()
-            .filter(service -> service.getClass().getName().contains("ExpressionLanguage"))
-            .findFirst()
-            .orElse(null);
-
-        if (elService != null) {
-          try {
-            // Verifica que la clase esté cargada
-            Class<?> clazz = elService.getClass().getClassLoader()
-                .loadClass("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService");
-
-            // Intenta invocar un método del servicio para asegurarse que está funcional
-            // Por ejemplo, getName() o create()
-            java.lang.reflect.Method getNameMethod = clazz.getMethod("getName");
-            String name = (String) getNameMethod.invoke(elService);
-            System.out.println("[DIAG] ExpressionLanguageService.getName() = " + name);
-
-            // (Opcional) Intenta crear una instancia de ExpressionLanguage
-            java.lang.reflect.Method createMethod = clazz.getMethod("create");
-            Object expressionLanguage = createMethod.invoke(elService);
-            System.out.println("[DIAG] ExpressionLanguage creado: " + expressionLanguage);
-
-            // Si llegamos hasta aquí, el servicio está funcional
-            return;
-          } catch (Exception e) {
-            last = e;
-          }
-        }
-        Thread.sleep(100);
-      } catch (Exception e) {
-        last = e;
         try {
-          Thread.sleep(100);
-        } catch (InterruptedException ignored) {}
-      }
+            serviceManager.getServices().forEach(service -> {
+                System.out.println("[DIAG] Servicio: " + service.getClass().getName());
+                for (Class<?> iface : service.getClass().getInterfaces()) {
+                    System.out.println("    [DIAG] Implementa: " + iface.getName());
+                }
+            });
+
+            Object elService = serviceManager.getServices().stream()
+                .filter(service -> {
+                    for (Class<?> iface : service.getClass().getInterfaces()) {
+                        if (iface.getName().equals("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService")) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .findFirst()
+                .orElse(null);
+
+            if (elService != null) {
+                // Verifica que implemente la interfaz esperada
+                boolean implementsInterface = false;
+                for (Class<?> iface : elService.getClass().getInterfaces()) {
+                    if (iface.getName().equals("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService")) {
+                        implementsInterface = true;
+                        break;
+                    }
+                }
+                if (!implementsInterface) {
+                    System.out.println("[DIAG] El servicio encontrado no implementa la interfaz esperada.");
+                    last = new IllegalStateException("El servicio no implementa la interfaz esperada");
+                    Thread.sleep(1000);
+                    continue;
+                }
+
+                // Intenta invocar getName() y create()
+                try {
+                    java.lang.reflect.Method getNameMethod = elService.getClass().getMethod("getName");
+                    String name = (String) getNameMethod.invoke(elService);
+                    System.out.println("[DIAG] ExpressionLanguageService.getName() = " + name);
+
+                    java.lang.reflect.Method createMethod = elService.getClass().getMethod("create");
+                    Object expressionLanguage = createMethod.invoke(elService);
+                    System.out.println("[DIAG] ExpressionLanguage creado: " + expressionLanguage);
+
+                    // Si llegamos hasta aquí, el servicio está funcional
+                    return;
+                } catch (Exception e) {
+                    System.out.println("[DIAG] Error al invocar métodos del servicio: " + e.getMessage());
+                    last = e;
+                }
+            } else {
+                System.out.println("[DIAG] No se encontró el servicio ExpressionLanguage. Reintentando...");
+            }
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            last = e;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {}
+        }
     }
     throw new IllegalStateException("expressionLanguageService no está registrado, su clase no es accesible o no es funcional", last);
   }
