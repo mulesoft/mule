@@ -8,6 +8,7 @@ package org.mule.functional.junit4;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.test.allure.AllureConstants.DomainSupport.DOMAIN_SUPPORT;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
@@ -36,13 +37,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.inject.Inject;
-import jakarta.transaction.TransactionManager;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 
+import io.qameta.allure.Feature;
+import jakarta.inject.Inject;
+import jakarta.transaction.TransactionManager;
+
+@Feature(DOMAIN_SUPPORT)
 public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
   /**
