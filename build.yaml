@@ -1,5 +1,5 @@
 upstreamProjects:
-  Mule-runtime/metadata-model-api/1.9.4,
+  Mule-runtime/metadata-model-api/1.9.5,
   Mule-runtime/mule-profiling-api/1.5.4,
   Mule-runtime/mule-api/1.9.5,
   Mule-runtime/mule-extensions-api/1.9.5,
