@@ -9,6 +9,7 @@ package org.mule.runtime.http.api.sse.client;
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.http.api.client.HttpRequestOptions;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.util.function.Consumer;
 
@@ -27,18 +28,24 @@ public class SseSourceConfig {
   private final Consumer<HttpRequestBuilder> requestCustomizer;
   private final HttpRequestOptions requestOptions;
   private final boolean preserveHeaderCase;
+  private final HttpResponse response;
 
-  public static SseSourceConfigBuilder builder(String url) {
+  public static SseSourceConfigBuilder fromUrl(String url) {
     return new SseSourceConfigBuilder(url);
   }
 
+  public static SseSourceConfigBuilderFromResponse fromResponse(HttpResponse response) {
+    return new SseSourceConfigBuilderFromResponse(response);
+  }
+
   SseSourceConfig(String url, SseRetryConfig retryConfig, Consumer<HttpRequestBuilder> requestCustomizer,
-                  HttpRequestOptions requestOptions, boolean preserveHeaderCase) {
+                  HttpRequestOptions requestOptions, boolean preserveHeaderCase, HttpResponse response) {
     this.url = url;
     this.retryConfig = retryConfig;
     this.requestCustomizer = requestCustomizer;
     this.requestOptions = requestOptions;
     this.preserveHeaderCase = preserveHeaderCase;
+    this.response = response;
   }
 
   /**
@@ -75,5 +82,9 @@ public class SseSourceConfig {
    */
   public boolean isPreserveHeaderCase() {
     return preserveHeaderCase;
+  }
+
+  public HttpResponse getResponse() {
+    return response;
   }
 }

@@ -8,7 +8,6 @@ package org.mule.runtime.http.api.sse.client;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.util.function.Consumer;
 
@@ -28,19 +27,11 @@ public interface SseSource extends AutoCloseable {
   int READY_STATUS_CLOSED = 2;
 
   /**
-   * Sends the initiator request
+   * Opens the source. It will send the initiator request or just start parsing the response's payload depending on the configured
+   * {@link SseSourceConfig}.
    */
   void open();
 
-  /**
-   * Opens the source with a given response. It does not send the initiator request but assumes that it was already sent, and
-   * expects that the response has status {@code 200} and Content Type {@code text/event-stream}.
-   * 
-   * @param response the SSE initiator response.
-   * @throws IllegalStateException if the response is not a successful SSE initiator response.
-   * @since 4.9.6, 4.10.0
-   */
-  void open(HttpResponse response);
 
   /**
    * @return the readyState.
