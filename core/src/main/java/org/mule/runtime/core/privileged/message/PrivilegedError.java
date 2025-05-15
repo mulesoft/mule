@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Extends the {@link Error} interface, adding privileged methods.
- * 
+ *
  * @since 4.4
  */
 @NoImplement

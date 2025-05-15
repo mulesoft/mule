@@ -233,7 +233,7 @@ public class IOUtils {
   /**
    * This method wraps {@link org.apache.commons.io.IOUtils}' <code>toByteArray(InputStream)</code> method but catches any
    * {@link IOException} and wraps it into a {@link RuntimeException}.
-   * 
+   *
    * @deprecated Use {@link org.mule.runtime.api.util.IOUtils}
    */
   public static byte[] toByteArray(CursorStreamProvider cursorStreamProvider) {

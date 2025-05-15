@@ -20,7 +20,7 @@ import java.util.Optional;
  * <p>
  * This validation doesn't do the actual resource resolution, but instead generates the failed validation for any errors that
  * happened during the resolution of the imports during the artifact parsing.
- * 
+ *
  * @since 4.8
  */
 public class ImportTargetElement extends AbstractImportValidation {

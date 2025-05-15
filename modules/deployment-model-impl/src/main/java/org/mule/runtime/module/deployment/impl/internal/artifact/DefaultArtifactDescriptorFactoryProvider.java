@@ -26,7 +26,7 @@ import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDes
 
 /**
  * Implementation of {@link ArtifactDescriptorFactoryProvider} discoverable through SPI.
- * 
+ *
  * @since 4.5
  */
 public class DefaultArtifactDescriptorFactoryProvider implements ArtifactDescriptorFactoryProvider {

@@ -872,7 +872,7 @@ public class FileUtils {
    * @param suffix the file's suffix
    * @return a {@link File}
    * @throws RuntimeException
-   * 
+   *
    * @deprecated Use {@link Files#createTempFile(String, String, java.nio.file.attribute.FileAttribute...)} instead.
    */
   @Deprecated

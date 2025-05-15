@@ -51,7 +51,7 @@ public class ArtifactPluginDescriptorFactory
 
   /**
    * Creates a custom factory
-   * 
+   *
    * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
    *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be

@@ -20,13 +20,13 @@ import java.util.Optional;
 public interface MetadataResolutionTypeInformation {
 
   /**
-   * 
+   *
    * @return whether the type is dynamic or not
    */
   boolean isDynamicType();
 
   /**
-   * 
+   *
    * @return an {@link Optional} with the {@link String} name associated to the resolution of the type if it is dynamic. or
    *         {@link Optional#empty()} if the resolution of the type is static.
    */

@@ -523,7 +523,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
    * <p>
    * It let's implementations to add artifact specific URLs by letting them override
    * {@link #addArtifactSpecificClassloaderConfiguration(ArtifactClassLoaderConfigurationBuilder)}
-   * 
+   *
    * @param artifactFile                    the artifact file for which the {@link ClassLoaderConfiguration} is being generated.
    * @param classLoaderConfigurationBuilder the builder of the {@link ClassLoaderConfiguration}.
    * @param dependencies                    the dependencies resolved for this artifact.

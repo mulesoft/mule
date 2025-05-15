@@ -19,7 +19,7 @@ import java.util.Optional;
  * Standalone server instance utility methods.
  * <p>
  * This utility methods are not meant to be used in container mode.
- * 
+ *
  * @since 4.0
  */
 public class StandaloneServerUtils {

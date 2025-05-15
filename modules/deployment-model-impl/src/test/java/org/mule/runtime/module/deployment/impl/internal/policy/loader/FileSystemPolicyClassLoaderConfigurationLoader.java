@@ -41,7 +41,7 @@ public class FileSystemPolicyClassLoaderConfigurationLoader implements ClassLoad
    * @param artifactFolder {@link File} where the current plugin to work with.
    * @param attributes     collection of attributes describing the loader. Non null.
    * @param artifactType   artifactType the type of the artifact of the descriptor to be loaded.
-   * 
+   *
    * @return a {@link ClassLoaderConfiguration} loaded with all its dependencies and URLs
    */
   @Override

@@ -43,7 +43,7 @@ public interface DeployableArtifactClassLoaderFactory<T extends ArtifactDescript
    * @param descriptor                 descriptor of the artifact owner of the created classloader
    * @param artifactPluginClassLoaders {@link List} with the artifact plugin class loaders
    * @return a new classLoader for described artifact
-   * 
+   *
    * @deprecated use {@link #create(String, ArtifactClassLoader, ArtifactDescriptor)} instead.
    */
   @Deprecated

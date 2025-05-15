@@ -35,7 +35,7 @@ public interface ContainerDependantArtifactClassLoaderFactory<T extends Artifact
    * the {@link ModuleLayer} from where the target {@link ClassLoader} will be obtained from.
    * <p>
    * If the Java version being used does not support JPMS, this does nothing.
-   * 
+   *
    * @param clazz the class to get the module layer from.
    */
   void setParentLayerFrom(Class clazz);

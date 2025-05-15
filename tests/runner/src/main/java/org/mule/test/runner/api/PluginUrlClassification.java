@@ -42,7 +42,7 @@ public class PluginUrlClassification {
 
   /**
    * Creates an instance of the classification.
-   * 
+   *
    * @param name                        a {@link String} representing the name of the plugin
    * @param urls                        list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
    * @param exportClasses               list of {@link Class}es that would be used for exporting as extra classes to the plugin.

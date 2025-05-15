@@ -41,7 +41,7 @@ public interface ConfigurationPropertiesResolverProvider extends ConfigurationPr
    * it for its use.
    *
    * @param configurationPropertiesResolver the resolver to use for getting the value of the property.
-   * 
+   *
    * @since 4.8
    */
   public static ConfigurationPropertiesResolverProvider fromResolver(ConfigurationPropertiesResolver configurationPropertiesResolver) {

@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 /**
  * {@link SplittingStrategy} implementation that splits based on an expression.
- * 
+ *
  * @since 4.0
  */
 public class ExpressionSplittingStrategy implements SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> {
@@ -27,7 +27,7 @@ public class ExpressionSplittingStrategy implements SplittingStrategy<CoreEvent,
 
   /**
    * Creates a new {@link ExpressionSplittingStrategy}
-   * 
+   *
    * @param expressionManager expression manager to use to evaluate the expression
    * @param expression        the expression to use to split and get a collection of items
    */

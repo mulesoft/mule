@@ -41,7 +41,7 @@ public class DefaultAlertingSupport implements AlertingSupport {
    * Counts each alert for the times it happened in the last 1, 5 and 15 minutes.
    * <p>
    * The time intervals are the same as reported by *nix load average, so that data can be correlated.
-   * 
+   *
    * @return the count aggregation for each alert.
    */
   public Map<String, TimedDataAggregation<Integer>> alertsCountAggregation() {

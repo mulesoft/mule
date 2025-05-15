@@ -11,7 +11,7 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfigurati
 
 /**
  * Allows to check if a {@link ArtifactConfigurationProcessor} can be used for a given artifact.
- * 
+ *
  * @since 4.5
  */
 interface FallbackAllowedArtifactConfigurationProcessor extends ArtifactConfigurationProcessor {

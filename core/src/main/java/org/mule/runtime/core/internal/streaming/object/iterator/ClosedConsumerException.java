@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.streaming.object.iterator;
 
 /**
  * Exception to signal that a consumer you're trying to access is already closed
- * 
+ *
  * @since 3.5.0
  */
 public class ClosedConsumerException extends RuntimeException {

@@ -48,7 +48,7 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
    * @param wrappedStream the stream to buffer from
    * @param config        the config of the generated buffer
    * @param bufferManager the {@link ByteBufferManager} that will be used to allocate all buffers
-   * 
+   *
    * @deprecated On 4.3.0, please use
    *             {@link #InMemoryCursorStreamProvider(InputStream, InMemoryCursorStreamConfig, ByteBufferManager, ComponentLocation, boolean)}
    *             instead.

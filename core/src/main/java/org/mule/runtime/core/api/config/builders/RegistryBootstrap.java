@@ -87,7 +87,7 @@ public interface RegistryBootstrap extends Initialisable {
    * @param supportedArtifactType the type of artifact being configured
    * @param muleContext           the configured {@link MuleContext}
    * @return a {@link RegistryBootstrap} instance
-   * 
+   *
    * @deprecated Use {@link #defaultRegistryBoostrap(ArtifactType, BootstrapServiceDiscoverer, Registrer)} instead.
    */
   @Deprecated
@@ -135,7 +135,7 @@ public interface RegistryBootstrap extends Initialisable {
 
     /**
      * Registers an object in the registry with a key.
-     * 
+     *
      * @param key   the key to store the value against. This is a non-null value
      * @param value the object to store in the registry. This is a non-null value
      * @throws RegistrationException if an object with the same key already exists

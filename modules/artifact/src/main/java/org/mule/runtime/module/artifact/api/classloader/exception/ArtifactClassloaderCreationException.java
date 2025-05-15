@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.api.classloader.exception;
 /**
  * Exception used to wrap the cause of a classloader creation error, with a message indicating for which artifact the error
  * occurred.
- * 
+ *
  * @since 4.9
  */
 public final class ArtifactClassloaderCreationException extends Exception {

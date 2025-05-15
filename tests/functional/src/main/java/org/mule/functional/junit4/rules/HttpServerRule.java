@@ -20,7 +20,7 @@ import org.junit.rules.ExternalResource;
  * JUnit rule to create an HTTP server
  *
  * @since 4.0
- * 
+ *
  * @deprecated since 4.10 use WireMock instead
  */
 @Deprecated

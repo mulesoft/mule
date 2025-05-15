@@ -35,7 +35,7 @@ public interface EventContextService {
 
   /**
    * The state of the event context.
-   * 
+   *
    * @since 4.10
    */
   public enum EventContextState {

@@ -6,7 +6,7 @@
  */
 /**
  * Mule Log4j Configurator Module.
- * 
+ *
  * @moduleGraph
  * @since 4.5
  */

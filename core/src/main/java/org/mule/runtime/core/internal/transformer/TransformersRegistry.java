@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Provides capabilities for obtaining the appropriate transformers given the from/to {@link DataType}s.
- * 
+ *
  * @since 4.5
  */
 public interface TransformersRegistry {
@@ -47,7 +47,7 @@ public interface TransformersRegistry {
 
   /**
    * Allows to register transformers AFTER this registry has been initialized.
-   * 
+   *
    * @param transformer the transformer to register
    * @throws MuleException if there was a problem registering the transformer.
    */

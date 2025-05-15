@@ -13,7 +13,7 @@ import java.util.Collection;
 
 /**
  * Represents the basic structure of a Mule project in the filesystem.
- * 
+ *
  * @since 4.8
  */
 @NoImplement

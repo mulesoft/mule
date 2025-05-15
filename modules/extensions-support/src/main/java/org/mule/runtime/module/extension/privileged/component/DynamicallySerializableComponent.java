@@ -24,7 +24,7 @@ public interface DynamicallySerializableComponent extends DynamicallyComponent, 
    * Changes the object to actually be serialized when this is serialized.
    * <p>
    * This method is declared so that the Dynamic Class Builder (ByteBuddy) can intercept it.
-   * 
+   *
    * @see Serializable
    * @see <a href=
    *      "https://github.com/cglib/cglib/wiki/How-To#cglib-and-java-serialization">https://github.com/cglib/cglib/wiki/How-To#cglib-and-java-serialization<a>

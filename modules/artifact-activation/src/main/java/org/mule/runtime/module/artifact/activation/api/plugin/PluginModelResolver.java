@@ -53,7 +53,7 @@ public interface PluginModelResolver {
 
   /**
    * @param bundleDependency the bundle dependency of the plugin to get the artifact descriptor for.
-   * 
+   *
    * @throws ArtifactDescriptorCreateException if the serialized descriptor could not be read.
    */
   MulePluginModel resolve(BundleDependency bundleDependency) throws ArtifactDescriptorCreateException;

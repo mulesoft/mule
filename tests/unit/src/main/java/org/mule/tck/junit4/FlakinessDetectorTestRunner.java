@@ -23,13 +23,13 @@ import org.junit.runners.model.InitializationError;
  * valid when a flaky test fails on the continuous integration server but not locally.
  * <p>
  * To use this tool annotate the test class with
- * 
+ *
  * <pre>
  *         &#64;RunWith(FlakinessDetectorTestRunner.class)
  * </pre>
  *
  * And then annotate the flaky test class or flaky test method with
- * 
+ *
  * <pre>
  *         &#64;FlakyTest(times= n) // where n is the number of times you want the test executed
  * </pre>

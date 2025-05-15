@@ -17,7 +17,7 @@ import org.eclipse.aether.artifact.Artifact;
  * classifier attribute.
  * <p/>
  * Format for exclusions is:
- * 
+ *
  * <pre>
  * [groupId]:[artifactId]:[extension]:[classifier]:[version]
  * </pre>

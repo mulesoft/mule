@@ -71,7 +71,7 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Shut
 
   /**
    * Creates a new instance and sets it as the factory of the {@link org.apache.logging.log4j.LogManager}.
-   * 
+   *
    * @return the created {@link MuleLog4jContextFactory}.
    */
   public static MuleLog4jContextFactory createAndInstall() {

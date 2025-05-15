@@ -35,7 +35,7 @@ public class ArtifactPluginDescriptorLoader {
    * Load a {@code ArtifactPluginDescriptor} from a file with the resource of an artifact plugin.
    *
    * @param plugin the artifact plugin file
-   * 
+   *
    * @return the plugin {@code ArtifactPluginDescriptor}
    * @throws IOException if there was a problem trying to read the artifact plugin zip file or using the {@code unpackDestination}
    *                     location

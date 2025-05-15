@@ -14,7 +14,7 @@ import java.util.OptionalInt;
 
 /**
  * Immutable container for correlation properties relative to a {@link Message}.
- * 
+ *
  * @since 4.0
  * @deprecated use {@link ItemSequenceInfo} instead
  */

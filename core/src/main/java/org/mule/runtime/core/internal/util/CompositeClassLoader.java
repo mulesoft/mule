@@ -33,7 +33,7 @@ import com.github.benmanes.caffeine.cache.Cache;
  * For {@link #getResources(String)}, all the classloaders will be queried to get the union of all found resources.
  *
  * @since 1.0
- * 
+ *
  * @deprecated Use {@link MultiParentClassLoaderUtils} instead.
  */
 @Deprecated

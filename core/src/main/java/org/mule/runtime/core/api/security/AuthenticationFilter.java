@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
  * <code>AuthenticationFilter</code> is a base filter for authenticating messages.
- * 
+ *
  * @deprecated Mule Runtime no longer provides implementations for this.
  */
 @Deprecated

@@ -10,7 +10,7 @@ import org.mule.runtime.module.boot.internal.MuleContainerWrapperProvider;
 
 /**
  * Manages the lifecycle of the {@link MuleContainer}.
- * 
+ *
  * @since 4.6
  */
 public interface MuleContainerLifecycleWrapper {

@@ -81,7 +81,7 @@ public class CustomService<T> {
   /**
    * @return {@code true} if this service has to bee present in the base Context, {@code false} if it may depend on artifact
    *         specific objects.
-   * 
+   *
    * @since 4.10
    */
   public boolean isBaseContext() {

@@ -36,7 +36,7 @@ public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param initialPhase               the phase to track for execution failures.
    * @param finalPhase                 the phase to prevent if the {@code trackingPhase} finished with errors.
    * @param initialPhaseLifecycleClass the {@code trackingPhase} interface.

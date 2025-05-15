@@ -24,7 +24,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  * ByteBuddy aspect implementation that stores Spring {@link org.springframework.util.ConcurrentReferenceHashMap} caches, offering
  * a cleanup method. The use the cleanup feature, this aspect must be instrumented through
  * {@link ByteBuddySpringCacheInstrumentator#instrumentForCleanup(ClassLoader)} call.
- * 
+ *
  * @see ByteBuddySpringCacheInstrumentator#instrumentForCleanup(ClassLoader)
  */
 public class ByteBuddySpringCachesManager {
@@ -34,7 +34,7 @@ public class ByteBuddySpringCachesManager {
 
   /**
    * Clears all the registered Spring {@link org.springframework.util.ConcurrentReferenceHashMap} caches.
-   * 
+   *
    * @throws Exception When the cleanup could not be performed.
    */
   public static void clearCaches()
@@ -56,7 +56,7 @@ public class ByteBuddySpringCachesManager {
   /**
    * ByteBuddy aspect that will intercept a {@link org.springframework.util.ConcurrentReferenceHashMap} while it's being
    * constructed and register it at this {@link ByteBuddySpringCachesManager}
-   * 
+   *
    * @param springCache The intercepted {@link org.springframework.util.ConcurrentReferenceHashMap}
    */
   @Advice.OnMethodExit(inline = false)

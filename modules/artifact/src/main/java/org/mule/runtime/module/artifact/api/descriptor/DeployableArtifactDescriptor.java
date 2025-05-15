@@ -22,7 +22,7 @@ import java.util.Set;
 
 /**
  * Describes an artifact that is deployable on the container
- * 
+ *
  * @since 4.5
  */
 public class DeployableArtifactDescriptor extends ArtifactDescriptor {

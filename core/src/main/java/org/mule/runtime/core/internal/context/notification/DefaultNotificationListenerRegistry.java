@@ -21,7 +21,7 @@ import jakarta.inject.Inject;
 
 /**
  * Implementation of {@link NotificationListenerRegistry} registers listeners using a ServerNotificationHandler implementation.
- * 
+ *
  * @since 4.0
  */
 public class DefaultNotificationListenerRegistry implements NotificationListenerRegistry {

@@ -12,7 +12,7 @@ import org.mule.runtime.api.ioc.ObjectProviderConfiguration;
 
 /**
  * Immutable implementation of {@link ObjectProviderConfiguration}
- * 
+ *
  * @since 4.0
  */
 public class ImmutableObjectProviderConfiguration implements ObjectProviderConfiguration {

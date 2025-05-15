@@ -39,7 +39,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * Implementation of {@link ClassLoaderResourceNotFoundExceptionFactory} that will provide details information of the classloading
  * context and possible configuration errors that may lead to the resource or class not being found.
- * 
+ *
  * @since 4.2
  */
 public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoaderResourceNotFoundExceptionFactory {

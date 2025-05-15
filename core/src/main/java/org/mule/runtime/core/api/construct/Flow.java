@@ -64,7 +64,7 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
   /**
    * Decorates the common flow {@link ReactiveProcessor} application by avoiding the emission of an error downstream in the
    * {@link Flux}. Normally used when invoking this {@link Flow} from a {@link Flux} chain, as in the {@code flow-ref} case.
-   * 
+   *
    * @return the decorated {@link ReactiveProcessor}
    */
   ReactiveProcessor referenced();

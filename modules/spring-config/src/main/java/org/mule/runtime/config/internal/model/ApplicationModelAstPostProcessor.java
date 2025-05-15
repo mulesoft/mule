@@ -21,7 +21,7 @@ import java.util.Set;
 
 /**
  * Allows internal Runtime components to customize the {@link ArtifactAst AST} of the artifact being deployed.
- * 
+ *
  * @since 4.5
  */
 public interface ApplicationModelAstPostProcessor {
@@ -36,7 +36,7 @@ public interface ApplicationModelAstPostProcessor {
 
   /**
    * Create a new {@link ArtifactAst} based on the provided one, with any required changes applied.
-   * 
+   *
    * @param ast             the original AST to apply changes on.
    * @param extensionModels the extensions that are registered for this AST's artifact.
    * @return a newly created AST
@@ -46,7 +46,7 @@ public interface ApplicationModelAstPostProcessor {
 
   /**
    * Create a new set of root components to create Spring bean definitions for.
-   * 
+   *
    * @param rootComponents  the root components of an AST.
    * @param extensionModels the extensions that are registered for this AST's artifact.
    * @return a new set of root components to use instead of the ones passed as parameter.

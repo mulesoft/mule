@@ -33,7 +33,7 @@ public class ByteBuddySpringCachesManager {
 
   /**
    * Clears all the registered Spring {@link org.springframework.util.ConcurrentReferenceHashMap} caches.
-   * 
+   *
    * @throws Exception When the cleanup could not be performed.
    */
   public static void clearCaches()
@@ -55,7 +55,7 @@ public class ByteBuddySpringCachesManager {
   /**
    * ByteBuddy aspect that will intercept a {@link org.springframework.util.ConcurrentReferenceHashMap} while it's being
    * constructed and register it at this {@link ByteBuddySpringCachesManager}
-   * 
+   *
    * @param springCache The intercepted {@link org.springframework.util.ConcurrentReferenceHashMap}
    */
   @Advice.OnMethodExit(inline = false)

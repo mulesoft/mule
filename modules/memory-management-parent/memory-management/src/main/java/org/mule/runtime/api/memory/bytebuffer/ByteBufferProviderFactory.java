@@ -14,7 +14,7 @@ import org.mule.runtime.api.profiling.ProfilingService;
 
 /**
  * Provides a factory method for creating basic {@link ByteBufferProvider} instaces.
- * 
+ *
  * @since 4.8
  */
 public interface ByteBufferProviderFactory {

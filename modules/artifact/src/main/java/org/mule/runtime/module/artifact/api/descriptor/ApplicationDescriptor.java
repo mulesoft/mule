@@ -20,7 +20,7 @@ import java.util.Set;
 
 /**
  * Describes a Mule Application artifact.
- * 
+ *
  * @since 4.5
  */
 @NoExtend

@@ -103,7 +103,7 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase {
 
   /**
    * Creates an instance of {@link File} with the path specified in the parameter {@code resource}.
-   * 
+   *
    * @param resource the path to the file.
    * @return a {@link File} representing the resource.
    * @throws URISyntaxException if an error occurred while trying to convert the URI.

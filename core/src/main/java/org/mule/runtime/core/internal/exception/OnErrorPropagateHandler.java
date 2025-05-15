@@ -116,7 +116,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @param buildFor
    */
   @Override

@@ -22,7 +22,7 @@ import org.eclipse.aether.graph.DependencyNode;
  * Base class for pattern filters.
  * <p/>
  * The artifact pattern syntax is of the form:
- * 
+ *
  * <pre>
  * [groupId]:[artifactId]:[extension]:[classifier]:[version]
  * </pre>

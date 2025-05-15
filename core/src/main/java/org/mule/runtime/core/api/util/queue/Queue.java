@@ -30,7 +30,7 @@ public interface Queue extends NamedObject {
 
   /**
    * Blocks and retrieves an object from this queue.
-   * 
+   *
    * @return an object.
    */
   Serializable take() throws InterruptedException;
@@ -45,7 +45,7 @@ public interface Queue extends NamedObject {
 
   /**
    * Discards all the elements in the queue
-   * 
+   *
    * @throws InterruptedException
    */
   void clear() throws InterruptedException;
@@ -53,7 +53,7 @@ public interface Queue extends NamedObject {
   /**
    * Disposes this queue by releasing it's storage and associated memory and storage. If after disposing the queue you try go get
    * it back, you'll get a fresh new one which maintains none of the original one's data
-   * 
+   *
    * @throws MuleException
    * @throws InterruptedException
    */

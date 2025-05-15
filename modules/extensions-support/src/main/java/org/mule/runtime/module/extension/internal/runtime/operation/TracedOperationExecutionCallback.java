@@ -14,7 +14,7 @@ import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 /**
  * A composable {@link ExecutorCallback} that allows to close the operation execution {@link Span} after the operation execution.
- * 
+ *
  * @since 4.5
  */
 public class TracedOperationExecutionCallback implements ExecutorCallback {

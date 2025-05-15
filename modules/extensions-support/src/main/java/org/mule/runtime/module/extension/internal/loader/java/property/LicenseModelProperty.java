@@ -13,7 +13,7 @@ import java.util.Optional;
 
 /**
  * {@link ModelProperty} that contains the information about the license requirements for the extensions.
- * 
+ *
  * @since 4.0
  */
 public class LicenseModelProperty implements ModelProperty {

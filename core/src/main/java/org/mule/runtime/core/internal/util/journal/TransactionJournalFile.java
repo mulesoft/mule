@@ -79,7 +79,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
 
   /**
    * Adds a journal entry for an operation done over a transactional resource
-   * 
+   *
    * @param journalEntry operation details
    */
   public synchronized void logOperation(K journalEntry) {
@@ -193,7 +193,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
 
   /**
    * This will NOT load transactions that are already complete, according to the given {@code transactionCompletePredicate}.
-   * 
+   *
    * @param transactionCompletePredicate a callback to determine if a transaction is complete.
    */
   private void loadAllEntries(TransactionCompletePredicate<T> transactionCompletePredicate) {

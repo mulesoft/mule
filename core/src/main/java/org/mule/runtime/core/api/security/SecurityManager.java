@@ -36,7 +36,7 @@ public interface SecurityManager extends Initialisable {
 
   /**
    * Adds a {@link SecurityProvider} to the set of available providers for authentication.
-   * 
+   *
    * @param provider the new {@link SecurityProvider}
    */
   void addProvider(SecurityProvider provider);
@@ -51,7 +51,7 @@ public interface SecurityManager extends Initialisable {
 
   /**
    * Removes the {@link SecurityProvider} with the given name from the pool of managed {@link SecurityProvider}s
-   * 
+   *
    * @param name the {@link SecurityProvider#getName} to remove
    * @return the {@link SecurityProvider} with the given {@code name}, or {@code null} if none was found
    */
@@ -89,14 +89,14 @@ public interface SecurityManager extends Initialisable {
 
   /**
    * Adds the {@link EncryptionStrategy} to the ones available from this {@link SecurityManager}
-   * 
+   *
    * @param strategy the {@link EncryptionStrategy} to be added
    */
   void addEncryptionStrategy(EncryptionStrategy strategy);
 
   /**
    * Removes the {@link EncryptionStrategy} with the given {@code name} from the set of managed {@link EncryptionStrategy}s
-   * 
+   *
    * @param name the {@link EncryptionStrategy#getName} to remove
    * @return the {@link EncryptionStrategy} with the given {@code name}, or {@code null} if none was found
    */

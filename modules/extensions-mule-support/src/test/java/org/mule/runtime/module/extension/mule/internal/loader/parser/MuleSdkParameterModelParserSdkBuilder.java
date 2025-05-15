@@ -96,7 +96,7 @@ class MuleSdkParameterModelParserSdkBuilder {
 
   /**
    * Adds a deprecation model to the {@link ComponentAst} to be used when creating the parameter parser.
-   * 
+   *
    * @param since      String to return as the "since" parameter of the mock construct.
    * @param message    String to return as the "message" parameter of the mock construct.
    * @param toRemoveIn String to return as the "toRemoveIn" parameter of the mock construct.

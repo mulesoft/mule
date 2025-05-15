@@ -85,7 +85,7 @@ public abstract class AbstractMuleSdkExtensionModelLoadingMediator implements Mu
 
   /**
    * Allows for adding custom parameters to the loading request before the actual loading.
-   * 
+   *
    * @param loadingRequestBuilder The loading request builder to add parameters to.
    */
   protected void addCustomLoadingRequestParameters(ExtensionModelLoadingRequest.Builder loadingRequestBuilder) {

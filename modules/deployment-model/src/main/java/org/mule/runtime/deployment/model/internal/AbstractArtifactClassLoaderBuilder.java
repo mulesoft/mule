@@ -134,7 +134,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
   /**
    * Template method to build different implementations of a {@link RegionClassLoader}
-   * 
+   *
    * @return a new {@link RegionClassLoader}
    */
   protected RegionClassLoader createRegionClassLoader(String artifactId,

@@ -18,9 +18,9 @@ import jakarta.transaction.TransactionManager;
  * Allows for {@link XATransactionalConnection#getXAResource() XA resources} to be managed with a {@link TransactionManager}.
  *
  * @see XATransactionalConnectionProvider
- * 
+ *
  * @see XAResource
- * 
+ *
  * @since 4.10
  */
 public interface XAConnectionManagementStrategyFactory {
@@ -28,7 +28,7 @@ public interface XAConnectionManagementStrategyFactory {
   /**
    * Wraps the given {@code poolingStrategy} with XA capabilities, by registering the pooled connections into a
    * {@link TransactionManager}.
-   * 
+   *
    * @param <C>                the actual type of the connection that supports XA transactions.
    * @param poolingStrategy    the pooling that manages the connections to be used by the {@link TransactionManager}.
    * @param connectionProvider the actual provider for connections to be managed by the {@link TransactionManager}.
