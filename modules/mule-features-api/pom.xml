@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.mule.runtime</groupId>
+    <artifactId>mule-modules</artifactId>
+    <version>4.10.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>mule-features-api</artifactId>
+
+  <!-- The reason this artifact exists is to avoid having an API being changed every time we add features or properties, which is
+  very common even across patch versions -->
+  <name>Mule Runtime Features and System Properties API</name>
+  <description>Centralizes the declarations of all Feature Flags and System Properties to be used by implementation modules</description>
+
+  <properties>
+    <javaModuleName>org.mule.runtime.features.api</javaModuleName>
+    <generatorSources>org/mule/runtime/features/internal/generator</generatorSources>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile-generator</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>${generatorSources}/*.java</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>default-compile</id>
+            <configuration>
+              <excludes>
+                <exclude>${generatorSources}/*.java</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-api</artifactId>
+            <version>${muleApiVersion}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>generate-codes</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <classpathScope>compile</classpathScope>
+              <includePluginDependencies>true</includePluginDependencies>
+              <mainClass>org.mule.runtime.features.internal.generator.FeaturesGenerator</mainClass>
+              <commandlineArgs>${project.build.directory}/generated-sources</commandlineArgs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>code-generator</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
