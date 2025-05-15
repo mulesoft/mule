@@ -99,6 +99,10 @@ public class SseSourceConfig {
     return preserveHeaderCase;
   }
 
+  /**
+   * @return a response whose content is a stream of events ({@code text/event-stream}).
+   * @since 4.10.0, 4.9.5
+   */
   public HttpResponse getResponse() {
     return response;
   }
