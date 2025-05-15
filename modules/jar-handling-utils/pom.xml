@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.16</version>
+        <version>4.6.17</version>
     </parent>
 
     <artifactId>mule-jar-handling-utils</artifactId>
