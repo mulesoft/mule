@@ -11,7 +11,7 @@ import java.util.Properties;
 
 /**
  * Represents the description of a domain.
- * 
+ *
  * @deprecated since 4.5. use org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor instead.
  */
 @Deprecated

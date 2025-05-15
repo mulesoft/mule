@@ -22,7 +22,7 @@ public class Position implements Comparable<Position> {
 
   /**
    * Create a new instance
-   * 
+   *
    * @param bucketIndex the index of the bucket which contains the item
    * @param itemIndex   the item index between its bucket
    */

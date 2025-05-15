@@ -26,7 +26,7 @@ import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepositor
 
 /**
  * Provides concrete implementations of {@link PluginDependenciesResolver} and {@link AbstractArtifactDescriptorFactory}.
- * 
+ *
  * @since 4.5
  */
 @NoImplement
@@ -51,7 +51,7 @@ public interface ArtifactDescriptorFactoryProvider {
 
   /**
    * Creates a factory of descriptors for describing mule applications.
-   * 
+   *
    * @param artifactPluginDescriptorFactory    {@link ArtifactDescriptorFactory} to create the descriptor for plugins.
    * @param descriptorLoaderRepository         {@link DescriptorLoaderRepository} to get the descriptor loader implementation.
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} to create the
@@ -65,7 +65,7 @@ public interface ArtifactDescriptorFactoryProvider {
 
   /**
    * Creates a factory of descriptors for describing mule artifact plugins.
-   * 
+   *
    * @param descriptorLoaderRepository         contains all the {@link ClassLoaderConfigurationLoader} registered on the
    *                                           container. Non null
    * @param artifactDescriptorValidatorBuilder {@link ArtifactDescriptorValidatorBuilder} builder to define the validator to be
@@ -77,9 +77,9 @@ public interface ArtifactDescriptorFactoryProvider {
 
   /**
    * Creates a factory of descriptors for describing mule policy templates.
-   * 
+   *
    * @return a factory to create {@link PolicyTemplateDescriptor}s.
-   * 
+   *
    * @since 4.6
    */
   AbstractArtifactDescriptorFactory<MulePolicyModel, PolicyTemplateDescriptor> createPolicyTemplateDescriptorFactory();

@@ -26,7 +26,7 @@ public final class MuleContainerUtils {
 
   /**
    * Whether Mule is running embedded or standalone.
-   * 
+   *
    * @return true if running standalone
    */
   public static boolean isStandalone() {
@@ -45,7 +45,7 @@ public final class MuleContainerUtils {
   /**
    * The mule runtime base folder is a directory similar to the mule runtime installation one but with only the specific
    * configuration parts of the mule runtime installation such as the apps folder, the domain folder, the conf folder.
-   * 
+   *
    * @return the MULE_BASE directory of this instance. Returns the
    *         {@link org.mule.runtime.core.api.config.MuleProperties#MULE_HOME_DIRECTORY_PROPERTY} property value if
    *         {@link org.mule.runtime.core.api.config.MuleProperties#MULE_BASE_DIRECTORY_PROPERTY} is not set which may be null.

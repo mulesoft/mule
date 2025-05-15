@@ -91,7 +91,7 @@ public interface FlowConstructStatistics extends Statistics {
 
   /**
    * @return the number of messages dispatched from a source of a flow at a given time
-   * 
+   *
    * @since 4.5
    */
   long getTotalDispatchedMessages();
@@ -121,9 +121,9 @@ public interface FlowConstructStatistics extends Statistics {
    * <p>
    * If this is called concurrently with {@link #incExecutionError()}, there is chance of a race condition occurring where an
    * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
-   * 
+   *
    * @return a counter for {@link #getExecutionErrors()}.
-   * 
+   *
    * @since 4.5
    */
   ResetOnQueryCounter getExecutionErrorsCounter();
@@ -136,9 +136,9 @@ public interface FlowConstructStatistics extends Statistics {
    * <p>
    * If this is called concurrently with {@link #incFatalError()}, there is chance of a race condition occurring where an event
    * may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
-   * 
+   *
    * @return a counter for {@link #getFatalErrors()}.
-   * 
+   *
    * @since 4.5
    */
   ResetOnQueryCounter getFatalErrorsCounter();
@@ -151,9 +151,9 @@ public interface FlowConstructStatistics extends Statistics {
    * <p>
    * If this is called concurrently with {@link #incConnectionErrors()}, there is chance of a race condition occurring where an
    * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
-   * 
+   *
    * @return a counter for {@link #getConnectionErrors()}.
-   * 
+   *
    * @since 4.5
    */
   ResetOnQueryCounter getConnectionErrorsCounter();
@@ -166,9 +166,9 @@ public interface FlowConstructStatistics extends Statistics {
    * <p>
    * If this is called concurrently with {@link #incReceivedEvents()}, there is chance of a race condition occurring where an
    * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
-   * 
+   *
    * @return a counter for {@link #getTotalEventsReceived()}.
-   * 
+   *
    * @since 4.5
    */
   ResetOnQueryCounter getEventsReceivedCounter();
@@ -181,9 +181,9 @@ public interface FlowConstructStatistics extends Statistics {
    * <p>
    * If this is called concurrently with {@link #incReceivedEvents()}, there is chance of a race condition occurring where an
    * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
-   * 
+   *
    * @return a counter for {@link #getTotalDispatchedMessages()}.
-   * 
+   *
    * @since 4.5
    */
   ResetOnQueryCounter getDispatchedMessagesCounter();

@@ -79,28 +79,28 @@ public class ExtensionProperties {
   /**
    * The name to be used in a property of a {@link ValueResolvingContext} to store the {@link ConfigurationModel} being used in
    * that context.
-   * 
+   *
    * @since 4.3.0
    */
   public static final String CONFIGURATION_MODEL_PROPERTY_NAME = "Configuration model";
 
   /**
    * The key of an execution context variable indicating that RETRY should not be attempted
-   * 
+   *
    * @since 4.1.6 - 4.2.1 - 4.3.0
    */
   public static final String DO_NOT_RETRY = PROPERTY_PREFIX + "DO_NOT_RETRY";
 
   /**
    * The key of a property or variable indicating that a component was executed while participating in a transaction
-   * 
+   *
    * @since 4.2.3 - 4.3.0
    */
   public static final String IS_TRANSACTIONAL = PROPERTY_PREFIX + "IS_TRANSACTIONAL";
 
   /**
    * The key of a property or variable holding the name of a component's config object
-   * 
+   *
    * @since 4.2.3 - 4.3.0
    */
   public static final String COMPONENT_CONFIG_NAME = PROPERTY_PREFIX + "COMPONENT_CONFIG_NAME";

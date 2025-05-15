@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 /**
  * Allows to obtain {@link MavenClient} instances and configure how those are created.
- * 
+ *
  * @since 4.5
  */
 public class MavenClientFactory {
@@ -30,7 +30,7 @@ public class MavenClientFactory {
    * {@link #setMavenClientProvider(Supplier)}.
    * <p>
    * By default, the {@link MavenClientProvider} is discovered through SPI.
-   * 
+   *
    * @param mavenConfiguration
    * @return a new {@link MavenClient} for the provided {@code mavenConfiguration}.
    */
@@ -40,7 +40,7 @@ public class MavenClientFactory {
 
   /**
    * Registers the {@link MavenClientProvider} to use for obtaining a {@link MavenClient}.
-   * 
+   *
    * @param mavenClientProvider
    */
   public static void setMavenClientProvider(Supplier<MavenClientProvider> mavenClientProvider) {

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * <p>
  * Example: how to define a dependency no DummyCoreExtension extension
  * </p>
- * 
+ *
  * <pre>
  *    <code>{@literal @}MuleCoreExtensionDependency
  *     public void setCoreExtension(DummyCoreExtension extension)

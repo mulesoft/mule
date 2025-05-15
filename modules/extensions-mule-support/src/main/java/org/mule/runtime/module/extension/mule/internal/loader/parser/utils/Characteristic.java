@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 
 /**
  * Utilitarian class to generalize parsing and calculation of different features of Mule Operations.
- * 
+ *
  * @since 4.5
  */
 public class Characteristic<T> {

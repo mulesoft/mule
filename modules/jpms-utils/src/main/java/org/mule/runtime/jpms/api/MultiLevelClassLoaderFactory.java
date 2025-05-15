@@ -11,7 +11,7 @@ import java.net.URLClassLoader;
 
 /**
  * Defines a way for creating a multi-level {@link ClassLoader}.
- * 
+ *
  * @since 4.6
  */
 public interface MultiLevelClassLoaderFactory {

@@ -30,7 +30,7 @@ public class ProvidedObjectStoreWrapper<T extends Serializable> extends Template
 
   /**
    * Wraps the {@code providedObjectStore} if given, or uses the {@code objectStoreSupplier} to create one.
-   * 
+   *
    * @param providedObjectStore the objectStroe provided through config to use. May be null.
    * @param objectStoreSupplier provides the object store to use if {@code providedObjectStore} is null.
    */

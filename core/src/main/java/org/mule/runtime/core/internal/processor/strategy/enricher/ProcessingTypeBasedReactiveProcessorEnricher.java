@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * A {@link ReactiveProcessorEnricher} that enriches a {@link ReactiveProcessor} with some logic based on its
  * {@link ProcessingType}.
- * 
+ *
  * @since 4.4.0
  */
 public class ProcessingTypeBasedReactiveProcessorEnricher implements ReactiveProcessorEnricher {

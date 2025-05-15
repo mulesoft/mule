@@ -6,7 +6,7 @@
  */
 /**
  * Definitions for Mule Metrics.
- * 
+ *
  * @moduleGraph
  * @since 4.5
  */

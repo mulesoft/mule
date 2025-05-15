@@ -155,7 +155,7 @@ public class ExtensionConnectionSupplier {
 
   /**
    * A wrapper around a lazy {@link ConnectionHandler} that generates tracing spans when the connection is actually established.
-   * 
+   *
    * @param <T> The generic type of the connection being handled.
    */
   private static class TracedLazyConnection<T> implements ConnectionHandler<T> {

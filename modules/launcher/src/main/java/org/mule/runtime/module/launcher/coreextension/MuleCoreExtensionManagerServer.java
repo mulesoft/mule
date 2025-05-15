@@ -39,7 +39,7 @@ public interface MuleCoreExtensionManagerServer
 
   /**
    * Allows {@link ServerLockFactory} injection.
-   * 
+   *
    * @param serverLockFactory the container level {@link ServerLockFactory}.
    * @since 4.6.0
    */
@@ -47,7 +47,7 @@ public interface MuleCoreExtensionManagerServer
 
   /**
    * Allows injection of arbitrary objects.
-   * 
+   *
    * @param containerServices the actual implementation of the ContainerServices to use for injection, with the implemented
    *                          interface as key.
    * @since 4.10

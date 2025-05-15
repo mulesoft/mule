@@ -22,7 +22,7 @@ public interface ParameterValueResolver {
 
   /**
    * Creates a resolver for the provided {@code parameters}.
-   * 
+   *
    * @param parameters the parameters to create a resolver for.
    * @return a new resolver
    */

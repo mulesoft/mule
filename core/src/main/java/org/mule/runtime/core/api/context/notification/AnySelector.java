@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 
 /**
  * Notification listener selector that matches any notification
- * 
+ *
  * @since 4.5
  */
 public final class AnySelector implements Predicate<Notification> {

@@ -11,7 +11,7 @@ import org.mule.runtime.module.boot.api.MuleContainerProvider;
 
 /**
  * Default imolementation to create the MuleConteiner.
- * 
+ *
  * @since 4.6
  */
 public class LauncherMuleContainerProvider implements MuleContainerProvider {

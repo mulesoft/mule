@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Features meant to be used in {@link Feature} flag related tests.
- * 
+ *
  * @see FeatureFlaggingUtils
  * @see org.mule.runtime.api.config.FeatureFlaggingService
  * @since 4.4.0

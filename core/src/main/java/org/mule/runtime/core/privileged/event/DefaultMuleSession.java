@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * @deprecated This is here just for backwards compatibility of preexisting serialized objects.
- * 
+ *
  */
 @Deprecated
 public final class DefaultMuleSession implements MuleSession {

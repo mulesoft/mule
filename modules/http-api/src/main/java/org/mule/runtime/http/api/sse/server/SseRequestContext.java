@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  * by a request. This context can be used to reject an SSE connection before starting to send the event stream.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
- * 
+ *
  * @since 4.9.3, 4.10.0
  */
 @Experimental
@@ -34,7 +34,7 @@ public interface SseRequestContext {
   /**
    * By default, a {@link SseClient} will be created with a UUID as identifier. This method allows overriding that client id.
    * Avoid collisions is a responsibility of the method caller.
-   * 
+   *
    * @param overrideId the new id to be used instead of the UUID.
    */
   void setClientId(String overrideId);
@@ -42,7 +42,7 @@ public interface SseRequestContext {
   /**
    * This method can be used to reject an SSE connection when a certain condition is not satisfied by the request. Once you called
    * this method, the event stream will not be sent.
-   * 
+   *
    * @param statusCode   the status code of the response.
    * @param reasonPhrase the reason phrase to add in the response.
    * @return a future that will be completed when the response was successfully sent. It can also be completed exceptionally if

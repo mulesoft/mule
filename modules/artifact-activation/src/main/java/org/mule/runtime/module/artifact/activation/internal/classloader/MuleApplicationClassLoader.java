@@ -98,7 +98,7 @@ public class MuleApplicationClassLoader extends NativeLibraryLoaderMuleDeployabl
    * Resolves the plugin classloader of the thread context classloader artifact.
    * <p>
    * If that classloader doesn't contain plugins, the current context classloader is returned.
-   * 
+   *
    * @return the plugin classloader of the current thread context artifact.
    */
   private static List<ClassLoader> resolveContextArtifactPluginClassLoadersForCurrentClassLoader() {

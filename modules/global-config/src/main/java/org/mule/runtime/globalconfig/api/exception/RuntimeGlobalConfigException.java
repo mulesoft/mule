@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  * Exception thrown when there's a problem in the global runtime configuration.
- * 
+ *
  * @since 4.0
  */
 public final class RuntimeGlobalConfigException extends MuleRuntimeException {

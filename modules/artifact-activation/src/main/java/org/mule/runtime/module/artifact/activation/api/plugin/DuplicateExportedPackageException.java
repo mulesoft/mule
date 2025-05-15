@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * Thrown to indicate that more than one artifact is exporting a given package.
- * 
+ *
  * @since 4.5
  */
 public class DuplicateExportedPackageException extends PluginResolutionError {

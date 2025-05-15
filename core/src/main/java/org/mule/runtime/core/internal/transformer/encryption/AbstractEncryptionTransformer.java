@@ -77,7 +77,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer 
 
   /**
    * Template method were deriving classes can do any initialisation after the properties have been set on this transformer
-   * 
+   *
    * @throws InitialisationException
    */
   @Override

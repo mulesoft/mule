@@ -379,7 +379,7 @@ public class ClassUtils {
 
   /**
    * Gets the field with the given fieldName of the TargetClass making it accessible.
-   * 
+   *
    * @param targetClass class to get the field from.
    * @param fieldName   the name of the field.
    * @param recursive   flag to lookup in subclasses or not
@@ -411,7 +411,7 @@ public class ClassUtils {
 
   /**
    * Gets a field value of a given object
-   * 
+   *
    * @param target    object to get the field value from
    * @param fieldName then name of the field
    * @param recursive flag to lookup in subclasses
@@ -439,7 +439,7 @@ public class ClassUtils {
 
   /**
    * Gets a static field value of a given class
-   * 
+   *
    * @param targetClass the class that holds the requested static field.
    * @param fieldName   the name of the field
    * @param recursive   flag to lookup for the field in subclasses or not
@@ -489,7 +489,7 @@ public class ClassUtils {
    * <p>
    * Notice: If the field is final and it was initialized using a constant, the value change may not be reflected in due compiler
    * optimizations. http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.5.3
-   * 
+   *
    * @param target    the object that holds the target field
    * @param fieldName the name of the field
    * @param value     the value to set
@@ -1127,7 +1127,7 @@ public class ClassUtils {
    * context classloader from the {@code thread}.
    * <p>
    * This is how a typical use should look like:
-   * 
+   *
    * <pre>
    * Thread thread = Thread.currentThread();
    * ClassLoader currentClassLoader = thread.getContextClassLoader();

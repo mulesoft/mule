@@ -73,7 +73,7 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
 
   /**
    * The ID which represents {@code this} loader that will be used to execute the lookup when reading the descriptor file.
-   * 
+   *
    * @see MulePluginModel#getExtensionModelLoaderDescriptor()
    */
   public static final String DESCRIBER_ID = XML_SDK_LOADER_ID;

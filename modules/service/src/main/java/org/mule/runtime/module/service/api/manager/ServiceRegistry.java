@@ -15,7 +15,7 @@ import java.util.Optional;
 
 /**
  * Allows to configure the services that a given Runtime will manage.
- * 
+ *
  * @since 4.5
  */
 public interface ServiceRegistry {
@@ -38,7 +38,7 @@ public interface ServiceRegistry {
 
   /**
    * Un-tracks the given {@code service}.
-   * 
+   *
    * @param <S>              the specific service interface
    * @param serviceInterface the interface of the service to unregister, as declared in
    *                         {@link ServiceAssembly#getServiceContract()} on {@link #register(Service, ServiceAssembly)}.
@@ -47,7 +47,7 @@ public interface ServiceRegistry {
 
   /**
    * Gets the service implementation for the provided interface.
-   * 
+   *
    * @param <S>             the specific service interface
    * @param serviceContract the interface of the service to get, as declared in {@link ServiceAssembly#getServiceContract()} on
    *                        {@link #register(Service, ServiceAssembly)}.

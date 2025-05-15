@@ -74,7 +74,7 @@ public class ObjectBuilderValueResolver<T> extends AbstractComponent
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @since 4.1.1
    */
   @Override

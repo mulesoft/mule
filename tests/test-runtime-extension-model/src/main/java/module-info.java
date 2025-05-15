@@ -18,7 +18,7 @@ module org.mule.test.runtime.extension.model {
   requires org.mule.runtime.extension.model;
 
   requires org.mockito;
-  
+
   provides RuntimeExtensionModelProvider with
       org.mule.runtime.module.artifact.activation.internal.extension.discovery.test.TestRuntimeExtensionModelProvider;
 }

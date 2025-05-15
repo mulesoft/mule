@@ -19,23 +19,23 @@ import java.util.function.Predicate;
 
 /**
  * Service used to register feature flags which will be evaluated at deployment time. For example:
- * 
+ *
  * <code>
  *     // register a feature always "on"
  *     FeatureFlaggingRegistry.getInstance().registerFeature("some feature", c -> true);
  * </code>
- * 
+ *
  * <code>
  *    &#64;Inject
  *    &#64;Named(FEATURE_FLAGGING_SERVICE_KEY)
  *    private FeatureFlaggingService featureFlaggingService;
  *    // ....
- *    
+ *
  *    if (featureFlaggingService.isEnabled("some feature")) {
  *        // ...
  *    }
  * </code>
- * 
+ *
  * @see FeatureFlaggingRegistry
  * @since 4.4.0, 4.3.0, 4.2.3
  */
@@ -52,7 +52,7 @@ public class FeatureFlaggingRegistry {
 
   /**
    * Returns a single instance of this service.
-   * 
+   *
    * @return A unique instance of the service
    */
   public static FeatureFlaggingRegistry getInstance() {
@@ -66,7 +66,7 @@ public class FeatureFlaggingRegistry {
    * evaluated during deploy and exposed through a per-artifact {@link FeatureFlaggingService}.
    *
    * @see FeatureFlaggingService
-   * 
+   *
    * @param feature   {@link Feature} whose feature flag will be registered.
    * @param condition {@link Predicate} That will be evaluated at deployment time. The {@link MuleContext} corresponds to the
    *                  context that is being created for the artifact that is being deployed.

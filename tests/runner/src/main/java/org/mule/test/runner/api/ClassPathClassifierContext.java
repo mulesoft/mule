@@ -164,9 +164,9 @@ public class ClassPathClassifierContext {
   /**
    * Artifacts to be excluded from being added to application {@link ClassLoader} due to they are going to be in container
    * {@link ClassLoader}.
-   * 
+   *
    * @return {@link Set} of Maven coordinates in the format:
-   * 
+   *
    *         <pre>
    *         {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
    *         </pre>

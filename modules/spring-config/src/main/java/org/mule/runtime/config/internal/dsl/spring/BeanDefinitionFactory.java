@@ -634,7 +634,7 @@ public class BeanDefinitionFactory {
    *
    * @param metadata the metadata of the component to get the source location from
    * @return a string representation of the source location of the component located in {@code processorPath}.
-   * 
+   *
    * @since 4.10
    */
   public static String resolveProcessorSourceLocation(ComponentMetadataAst metadata) {

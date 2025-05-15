@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Helper class for the {@link MethodArgumentResolverDelegate} that has the logic of the relation between the mule-extensions-api
  * and the mule-sdk-api.
- * 
+ *
  * @since 4.5
  */
 public class MethodArgumentResolverUtils {

@@ -29,7 +29,7 @@ import java.util.TimeZone;
 
 /**
  * Exposes information about both the physical server and Java Runtime Environment (JRE) that Mule is running on:
- * 
+ *
  * <li><b>env</b> <i>Map of Operating System environment variables </i>
  * <li><b>fileSeparator</b> <i>Character that separates components of a file path. This is "/" on UNIX and "\" on Windows.</i>
  * <li><b>host</b> <i>Fully qualified domain name for the server</i>

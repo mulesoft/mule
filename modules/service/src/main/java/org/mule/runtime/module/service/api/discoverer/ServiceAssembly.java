@@ -24,7 +24,7 @@ public interface ServiceAssembly {
 
   /**
    * @return a new {@link ServiceAssemblyBuilder} for a lazily assembled service.
-   * 
+   *
    * @since 4.6
    */
   public static ServiceAssemblyBuilder lazyBuilder() {

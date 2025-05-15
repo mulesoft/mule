@@ -59,7 +59,7 @@ public class FeatureFlaggingUtils {
 
   /**
    * Constructs a {@link FeatureFlaggingService} instance containing all the registered {@link Feature} flags.
-   * 
+   *
    * @param artifactDescriptor The {@link ArtifactDescriptor} whose metadata will be used to create the {@link FeatureContext}.
    * @return A {@link FeatureFlaggingService}.
    * @see FeatureFlaggingRegistry
@@ -75,7 +75,7 @@ public class FeatureFlaggingUtils {
 
   /**
    * Determines a {@link Feature} flag value.
-   * 
+   *
    * @param feature        The {@link Feature} to evaluate.
    * @param featureContext Relevant {@link FeatureContext}.
    * @return True if the {@link Feature} is enabled.

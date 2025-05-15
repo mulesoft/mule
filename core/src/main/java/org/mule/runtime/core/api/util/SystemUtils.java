@@ -233,7 +233,7 @@ public class SystemUtils {
    *         <li>The value of the system property 'mule.encoding'</li>
    *         <li>{@code Charset.defaultCharset()}</li>
    *         </ul>
-   * 
+   *
    * @deprecated since 4.10, {@link Inject @Inject} an {@link ArtifactEncoding} and call
    *             {@link ArtifactEncoding#getDefaultEncoding()} instead.
    */

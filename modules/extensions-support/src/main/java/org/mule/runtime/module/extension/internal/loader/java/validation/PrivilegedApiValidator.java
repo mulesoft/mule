@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.loader.ProblemsReporter;
 
 /**
  * Validates that the privileged API is properly defined.
- * 
+ *
  * @since 1.0
  */
 public class PrivilegedApiValidator implements ExtensionModelValidator {

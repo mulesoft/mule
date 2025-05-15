@@ -77,7 +77,7 @@ public class ComponentStatistics implements Statistics {
    * <p/>
    * This value does not affect statistics tabulation directly - it is up to the component to enable/disable collection based on
    * the value of this method.
-   * 
+   *
    * @return {@code true} if stats collection is enabled, otherwise false.
    */
   @Override
@@ -89,7 +89,7 @@ public class ComponentStatistics implements Statistics {
    * Tags this stats collector as enabled or disabled.
    * <p/>
    * Does not affect stats calculation - it is up to the caller to check this flag.
-   * 
+   *
    * @param enabled {@code true} if stats should be enabled, otherwise false.
    */
   public void setEnabled(boolean enabled) {
@@ -98,7 +98,7 @@ public class ComponentStatistics implements Statistics {
 
   /**
    * The maximum total event execution time seen since last cleared.
-   * 
+   *
    * @return The maximum time, or zero if no events have been started.
    */
   public long getMaxExecutionTime() {
@@ -107,7 +107,7 @@ public class ComponentStatistics implements Statistics {
 
   /**
    * The minimum total event execution time seen since last cleared.
-   * 
+   *
    * @return The maximum time, or zero if no events have been completed.
    */
   public long getMinExecutionTime() {
@@ -117,7 +117,7 @@ public class ComponentStatistics implements Statistics {
   /**
    * The total cumulative execution time since statistics were last cleared. Includes the sum of all branch times plus any
    * directly recorded execution times.
-   * 
+   *
    * @return The total cumulative execution time, in milliseconds.
    */
   public long getTotalExecutionTime() {
@@ -129,7 +129,7 @@ public class ComponentStatistics implements Statistics {
    * <p/>
    * NOTE: When branch times are recorded, an event will typically be recorded as 'executed' on the first branch event. See
    * {@link #addExecutionBranchTime(boolean, long, long)}.
-   * 
+   *
    * @return The number of events executed since last cleared.
    */
   public long getExecutedEvents() {
@@ -138,7 +138,7 @@ public class ComponentStatistics implements Statistics {
 
   /**
    * Add a new execution-time measurement for one branch of processing an event.
-   * 
+   *
    * @param first  true if this is the first branch for this event
    * @param branch the time to execute this branch
    * @param total  the total time (so far) for processing this event
@@ -178,7 +178,7 @@ public class ComponentStatistics implements Statistics {
    * Add the complete execution time for a flow that also reports branch execution times.
    * <p/>
    * Use in conjunction with {@link #addExecutionBranchTime(boolean, long, long)}.
-   * 
+   *
    * @param time the total time required to process this event
    */
   public synchronized void addCompleteExecutionTime(long time) {
@@ -226,7 +226,7 @@ public class ComponentStatistics implements Statistics {
 
   /**
    * Returns the average execution time, rounded downwards.
-   * 
+   *
    * @return the total event time accumulated to this point, divided by the total number of events recorded.
    */
   public long getAverageExecutionTime() {

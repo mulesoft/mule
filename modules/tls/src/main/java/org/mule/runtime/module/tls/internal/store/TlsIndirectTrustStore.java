@@ -14,7 +14,7 @@ import java.io.IOException;
  * Configure indirect trust stores. TLS/SSL connections are made to trusted systems - the public certificates of trusted systems
  * are store in a keystore (called a trust store) and used to verify that the connection made to a remote system "really is" the
  * expected identity.
- * 
+ *
  * <p>
  * The information specified in this interface may be used to configure a trust store directly, as part of
  * {@link TlsDirectKeyStore}, or it may be stored as property values and used later, or both. It may therefore be specific to a

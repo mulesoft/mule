@@ -25,21 +25,21 @@ public interface Transaction {
 
   /**
    * Begin the transaction.
-   * 
+   *
    * @throws TransactionException
    */
   void begin() throws TransactionException;
 
   /**
    * Commit the transaction
-   * 
+   *
    * @throws TransactionException
    */
   void commit() throws TransactionException;
 
   /**
    * Rollback the transaction
-   * 
+   *
    * @throws TransactionException
    */
   void rollback() throws TransactionException;

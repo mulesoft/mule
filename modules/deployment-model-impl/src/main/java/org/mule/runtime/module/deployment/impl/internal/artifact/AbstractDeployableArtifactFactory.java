@@ -28,7 +28,7 @@ import java.util.Properties;
  * Abstract class for {@link DeployableArtifact} factories.
  * <p/>
  * Handles license validation for the artifact plugins.
- * 
+ *
  * @param <D> the type of the {@link DeployableArtifactDescriptor}
  * @param <T> the type of the {@link DeployableArtifact}
  * @since 4.z
@@ -43,7 +43,7 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
 
   /**
    * Creates a new {@link AbstractDeployableArtifactFactory}
-   * 
+   *
    * @param licenseValidator               the license validator to use for plugins.
    * @param runtimeLockFactory             {@link LockFactory} for Runtime, a unique and shared lock factory to be used between
    *                                       different artifacts.
@@ -69,7 +69,7 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
 
   /**
    * Creates an instance of {@link DeployableArtifact}
-   * 
+   *
    * @param artifactDir the artifact deployment directory.
    * @param properties  deployment properties
    * @return the created artifact.

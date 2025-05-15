@@ -31,7 +31,7 @@ public interface DescriptorLoader<T> {
    * @param artifactFile {@link File} with the content of the artifact to work with. Non null
    * @param attributes   collection of attributes describing the loader. Non null.
    * @param artifactType the type of the artifact of the descriptor to be loaded.
-   * 
+   *
    * @return a {@link T} loaded with the given attributes from the artifact folder.
    * @throws InvalidDescriptorLoaderException when is not possible to load the object with the provided configuration.
    */
@@ -39,7 +39,7 @@ public interface DescriptorLoader<T> {
 
   /**
    * @param artifactType the type of the artifact of the descriptor to be loaded.
-   * 
+   *
    * @return true if the loader supports the artifact type, false otherwise.
    */
   boolean supportsArtifactType(ArtifactType artifactType);

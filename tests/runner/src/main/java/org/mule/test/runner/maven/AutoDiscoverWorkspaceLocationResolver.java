@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * If Maven surefire plugin is used to run test in Maven and the plugin has been configured with {@code forkMode=always} the
  * following Maven system property has to be propagated on surefire configuration:
- * 
+ *
  * <pre>
  *  <systemPropertyVariables>
  *    <maven.multiModuleProjectDirectory>${maven.multiModuleProjectDirectory}</maven.multiModuleProjectDirectory>
@@ -137,13 +137,13 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
    * Discovers Maven projects by searching in class path provided by IDE or Maven (surefire Maven plugin) by looking at those
    * {@link URL}s that have a {@value #POM_XML_FILE} in its {@code url.toFile.getParent.getParent}, because reference between
    * modules in IDE should be like the following:
-   * 
+   *
    * <pre>
    *    /Users/jdoe/Development/mule/extensions/file/target/test-classes
    *    /Users/jdoe/Development/mule/extensions/file/target/classes
    *    /Users/jdoe/Development/mule/core/target/classes
    * </pre>
-   * 
+   *
    * @param classPath
    */
   private void discoverMavenProjectsFromClassPath(List<URL> classPath) {

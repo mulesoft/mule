@@ -84,7 +84,7 @@ public interface MuleContextBuilder {
 
   /**
    * Sets the {@link FeatureFlaggingService} to use instead of the default one.
-   * 
+   *
    * @param featureFlaggingService
    * @since 4.9, 4.8.2
    */

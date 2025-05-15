@@ -16,7 +16,7 @@ import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingSe
 
 /**
  * Registers a {@link TroubleshootingService} as a container service.
- * 
+ *
  * @since 4.10
  */
 public class TroubleshootingContainerServiceProvider implements ContainerServiceProvider<TroubleshootingService> {

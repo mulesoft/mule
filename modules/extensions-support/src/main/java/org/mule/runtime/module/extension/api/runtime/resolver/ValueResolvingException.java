@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.api.runtime.resolver;
 
 /**
  * Generic exception for when the resolution of a value fails
- * 
+ *
  * @since 4.0
  */
 public class ValueResolvingException extends Exception {

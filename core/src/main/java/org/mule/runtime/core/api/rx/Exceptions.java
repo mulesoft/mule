@@ -174,7 +174,7 @@ public class Exceptions {
 
   /**
    * Unwrap a particular {@code Throwable}.
-   * 
+   *
    * @param throwable the exception to wrap
    * @return the unwrapped exception
    */

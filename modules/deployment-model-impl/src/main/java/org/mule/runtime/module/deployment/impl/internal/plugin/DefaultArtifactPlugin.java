@@ -27,7 +27,7 @@ public class DefaultArtifactPlugin implements ArtifactPlugin {
 
   /**
    * Creates a new plugin
-   * 
+   *
    * @param artifactId
    * @param descriptor  describes the plugin to create. Non null.
    * @param classLoader classloader to use on this plugin. Non null.

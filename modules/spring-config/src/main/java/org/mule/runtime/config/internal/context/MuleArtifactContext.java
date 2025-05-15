@@ -469,7 +469,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * interface. The classloader used to load such dynamic classes is being hold by a cache in Spring, and that cache can be
    * cleared by calling {@link CachedIntrospectionResults#clearClassLoader}. Notice that this method can be called with the
    * classloader of the class itself, or any of the parents in its hierarchy.
-   * 
+   *
    * @see AnnotatedObjectInvocationHandler#addAnnotationsToClass
    * @see CachedIntrospectionResults#clearClassLoader
    */

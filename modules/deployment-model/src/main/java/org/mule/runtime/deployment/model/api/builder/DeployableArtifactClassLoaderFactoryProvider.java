@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 /**
  * Provides concrete implementations of {@link DeployableArtifactClassLoaderFactory}.
- * 
+ *
  * @since 4.5
  */
 public class DeployableArtifactClassLoaderFactoryProvider {

@@ -28,7 +28,7 @@ import org.springframework.beans.factory.FactoryBean;
 
 /**
  * Generates an immutable {@link Flow} with the provided config.
- * 
+ *
  * @since 4.0
  */
 public class DefaultFlowFactoryBean extends AbstractComponent implements FactoryBean<Flow> {

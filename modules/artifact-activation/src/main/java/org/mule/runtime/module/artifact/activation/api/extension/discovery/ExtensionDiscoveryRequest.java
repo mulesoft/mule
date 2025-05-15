@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * Container of the parameters that can be given to
  * {@link ExtensionModelDiscoverer#discoverPluginsExtensionModels(ExtensionDiscoveryRequest)}.
- * 
+ *
  * @since 4.5
  */
 @NoImplement
@@ -72,7 +72,7 @@ public interface ExtensionDiscoveryRequest {
    * extensions.
    * <p>
    * Parallelism is achieved using the {@code fork-join} pool.
-   * 
+   *
    * @return {@code true} if the extension model discovery process will attempt to discover an extension model from the
    *         classloaders in parallel instead of sequentially.
    */

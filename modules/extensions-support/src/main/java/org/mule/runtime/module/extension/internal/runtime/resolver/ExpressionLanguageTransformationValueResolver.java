@@ -22,7 +22,7 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingCont
 
 /**
  * Value resolver that relies on a expression language transformation to convert the delegate resolver into the expected type.
- * 
+ *
  * @since 4.5
  */
 public class ExpressionLanguageTransformationValueResolver implements ValueResolver {

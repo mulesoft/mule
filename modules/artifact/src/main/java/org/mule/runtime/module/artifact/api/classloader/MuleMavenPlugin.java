@@ -14,7 +14,7 @@ import org.mule.api.annotation.NoImplement;
  * During deployment with maven packaged artifacts, the mule maven plugin coordinates are used to locate the plugin configuration
  * within the artifact pom to search for the declared shared libraries that will be exported to other plugins within the
  * application.
- * 
+ *
  * @since 4.0
  */
 @NoImplement

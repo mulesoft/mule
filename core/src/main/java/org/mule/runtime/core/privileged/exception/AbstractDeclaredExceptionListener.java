@@ -22,7 +22,7 @@ import jakarta.inject.Inject;
 
 /**
  * This is the base class for error handlers that are declared in an artifact.
- * 
+ *
  * @since 4.5
  */
 @NoExtend

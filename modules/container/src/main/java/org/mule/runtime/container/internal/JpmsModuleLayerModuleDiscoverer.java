@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 /**
  * Discovers {@link MuleContainerModule} from java module descriptors.
- * 
+ *
  * @since 4.6
  */
 public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {

@@ -81,7 +81,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 /**
  * <code>SpringXmlConfigurationBuilder</code> enables Mule to be configured from a Spring XML Configuration file used with Mule
  * name-spaces. Multiple configuration files can be loaded from this builder (specified as a comma-separated list).
- * 
+ *
  * @deprecated Use {@link ArtifactAstConfigurationBuilder} instead.
  */
 @Deprecated

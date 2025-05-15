@@ -16,7 +16,7 @@ import static java.util.Optional.of;
 
 /**
  * Decorates an existing {@link Result} with a {@link MediaType}
- * 
+ *
  * @since 4.2
  */
 public class MediaTypeDecoratedResult extends Result {
@@ -26,7 +26,7 @@ public class MediaTypeDecoratedResult extends Result {
 
   /**
    * Creates a new instance
-   * 
+   *
    * @param delegate  a {@link Result} whose {@link MediaType} will be decorated
    * @param mediaType {@link MediaType} to be used in the {@link Result}
    */

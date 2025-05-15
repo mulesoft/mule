@@ -41,7 +41,7 @@ public class SseSourceConfigBuilder {
 
   /**
    * Configures the {@link SseRetryConfig}.
-   * 
+   *
    * @param retryConfig the retry config.
    * @return this same builder.
    */
@@ -52,7 +52,7 @@ public class SseSourceConfigBuilder {
 
   /**
    * Configures a callback to customize the initiator request builder.
-   * 
+   *
    * @param requestCustomizer the callback.
    * @return this same builder.
    */
@@ -63,7 +63,7 @@ public class SseSourceConfigBuilder {
 
   /**
    * Configures the {@link HttpRequestOptions} of the initiator request.
-   * 
+   *
    * @param requestOptions the request options.
    * @return this same builder.
    */
@@ -74,7 +74,7 @@ public class SseSourceConfigBuilder {
 
   /**
    * Configures the SSE initiator request to preserve the header case. Defaults to the value of {@link PRESERVE_HEADER_CASE}.
-   * 
+   *
    * @param preserveHeadersCase whether the initiator request should preserve headers' case or not.
    * @return this same builder.
    */
@@ -85,7 +85,7 @@ public class SseSourceConfigBuilder {
 
   /**
    * Builds an instance of {@link SseSourceConfig} with the specified parameters. This method is intended to be called only once.
-   * 
+   *
    * @return the new instance of {@link SseSourceConfig}.
    * @since 4.10.0, 4.9.4
    */

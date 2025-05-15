@@ -19,7 +19,7 @@ import java.util.ServiceLoader.Provider;
  * Allows Mule modules to contribute services to the container.
  * <p>
  * A service in this context is an object that provides functionality to the runtime and its core extensions.
- * 
+ *
  * @since 4.10
  */
 public interface ContainerServiceProvider<S> {
@@ -45,7 +45,7 @@ public interface ContainerServiceProvider<S> {
 
   /**
    * Injects the required dependencies into {@code forInject}.
-   * 
+   *
    * @param extension
    * @param forInject
    */

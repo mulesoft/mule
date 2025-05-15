@@ -219,7 +219,7 @@ public final class DeployableProjectModel {
 
   /**
    * This contains the GAV of the modeled project.
-   * 
+   *
    * @return the descriptor of the artifact for this project.
    */
   public BundleDescriptor getDescriptor() {
@@ -229,7 +229,7 @@ public final class DeployableProjectModel {
   /**
    * Mule projects contain additional model information within the project itself (i.e.: mule-artifact.json file). Calling this
    * getter will trigger the loading of that additional data from within the project.
-   * 
+   *
    * @return the additional model information from this project.
    */
   public MuleDeployableModel getDeployableModel() {
@@ -240,9 +240,9 @@ public final class DeployableProjectModel {
    * This structure will be used to obtain the sources/resources and create the classloader for the deployable project.
    * <p>
    * Temporary files related to this project will also be created within the {@link MuleProjectStructure#getProjectFolder()}.
-   * 
+   *
    * @return the folder structure for this deployable project.
-   * 
+   *
    * @since 4.8
    */
   public Optional<MuleProjectStructure> getProjectStructure() {
@@ -253,7 +253,7 @@ public final class DeployableProjectModel {
    * This folder will be used to create the classloader for the deployable project.
    * <p>
    * Temporary files related to this project will also be created within this directory.
-   * 
+   *
    * @return the folder where this deployable project is located.
    */
   public File getProjectFolder() {
@@ -264,7 +264,7 @@ public final class DeployableProjectModel {
 
   /**
    * These are the dependencies of the modeled project, regardless of the classifier.
-   * 
+   *
    * @return the dependencies of the artifact for this project
    */
   public List<BundleDependency> getDependencies() {
@@ -276,7 +276,7 @@ public final class DeployableProjectModel {
    * <p>
    * Elements contained in this set must exist in the {@link BundleDependency#getDescriptor()} of the {@link #getDependencies()
    * dependencies}.
-   * 
+   *
    * @return the shared libraries of the artifact for this project.
    */
   public Set<BundleDescriptor> getSharedLibraries() {
@@ -289,7 +289,7 @@ public final class DeployableProjectModel {
    * In each entry of this map, the dependencies in the value will be added to the plugin represented by the key.
    * <p>
    * Keys of this map must exist in the {@link BundleDependency#getDescriptor()} of the {@link #getDependencies() dependencies}.
-   * 
+   *
    * @return the additional dependencies for the plugins of this project.
    */
   public Map<BundleDescriptor, List<BundleDependency>> getAdditionalPluginDependencies() {

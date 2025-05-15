@@ -15,7 +15,7 @@ import java.lang.annotation.Retention;
  * models it does).
  * <p>
  * A simple JUnit rule cannot be used for this because JUnit applies the rules AFTER the test runner has been configured.
- * 
+ *
  * @since 4.5
  */
 @Retention(RUNTIME)
