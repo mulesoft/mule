@@ -49,7 +49,7 @@ public interface HttpResponseReadyCallback {
 
   /**
    * Starts a response with an SSE stream and returns a {@link SseClient} to send the corresponding events.
-   * 
+   *
    * @return the {@link SseClient} to send the events.
    * @since 4.9.6, 4.10.0
    */

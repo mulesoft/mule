@@ -30,10 +30,25 @@ public class SseSourceConfig {
   private final boolean preserveHeaderCase;
   private final HttpResponse response;
 
+  /**
+   * Creates a builder that allows you to configure certain parameters of the request and the retry mechanism. Use this method if
+   * you want the source to connect to a server with a certain URL and send the request to establish the SSE communication with
+   * auto-retry.
+   *
+   * @param url the server URL.
+   * @return a builder to configure the source parameters.
+   */
   public static SseSourceConfigBuilder fromUrl(String url) {
     return new SseSourceConfigBuilder(url);
   }
 
+  /**
+   * Creates a builder useful when you already have an {@link HttpResponse} with an SSE stream. The resulting SSE Source won't do
+   * automatic retries.
+   *
+   * @param response a response that has a {@code text/event-stream} as payload.
+   * @return a builder to create the {@link SseSourceConfig}.
+   */
   public static SseSourceConfigBuilderFromResponse fromResponse(HttpResponse response) {
     return new SseSourceConfigBuilderFromResponse(response);
   }
