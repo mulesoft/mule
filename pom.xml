@@ -184,7 +184,7 @@
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
-        <oldMuleArtifactVersion>4.9.3-rc1</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.9.4-rc1</oldMuleArtifactVersion>
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
