@@ -236,7 +236,7 @@
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.6.15-rc1</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.6.16-rc1</oldMuleArtifactVersion>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         
         <surefire.args.base>
