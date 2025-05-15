@@ -32,7 +32,6 @@ public interface SseSource extends AutoCloseable {
    */
   void open();
 
-
   /**
    * @return the readyState.
    */
