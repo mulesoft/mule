@@ -18,11 +18,11 @@ import static java.util.Optional.of;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.annotation.metadata.OutputResolver;
 import org.mule.sdk.api.annotation.param.Connection;
 import org.mule.sdk.api.annotation.param.Content;
 import org.mule.sdk.api.exception.ModuleException;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.test.transactionalxa.connection.TestTransactionalConnection;
 
