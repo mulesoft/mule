@@ -48,6 +48,8 @@
         <try transactionalAction="ALWAYS_BEGIN">
             <tx:get-connection transactionalAction="NOT_SUPPORTED" config-ref="localTx1"/>
         </try>
+
+        <set-payload value="#[%dw 2.0 output application/java --- {'transactionBegun': payload.transactionBegun, 'transactionCommited': payload.transactionCommited, 'transactionRolledback': payload.transactionRolledback}]"/>
     </flow>
 
     <flow name="localTxDoesntSupportMultipleResources">
