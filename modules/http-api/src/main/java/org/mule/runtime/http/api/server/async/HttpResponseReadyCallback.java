@@ -53,7 +53,7 @@ public interface HttpResponseReadyCallback {
    *
    * @param config the config for the resulting {@link SseClient}.
    * @return the {@link SseClient} to send the events.
-   * @since 4.9.5, 4.10.0
+   * @since 4.10.0, 4.9.6
    */
   @Experimental
   SseClient startSseResponse(SseClientConfig config);

@@ -13,7 +13,7 @@ import java.net.InetSocketAddress;
 /**
  * Builder for instances of {@link SseClientConfig}.
  *
- * @since 4.10.0, 4.9.5
+ * @since 4.10.0, 4.9.6
  */
 @Experimental
 public class SseClientConfigBuilder {

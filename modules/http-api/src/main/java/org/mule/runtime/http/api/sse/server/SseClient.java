@@ -88,6 +88,7 @@ public interface SseClient extends AutoCloseable {
 
   /**
    * @return the address of the remote client.
+   * @since 4.10.0, 4.9.6
    */
   InetSocketAddress getRemoteAddress();
 

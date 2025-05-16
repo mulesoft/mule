@@ -18,7 +18,7 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
  *
- * @since 4.9.5, 4.10.0
+ * @since 4.10.0, 4.9.6
  */
 @Experimental
 public class SseSourceConfigBuilderFromResponse {

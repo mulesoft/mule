@@ -101,7 +101,7 @@ public class SseSourceConfig {
 
   /**
    * @return a response whose content is a stream of events ({@code text/event-stream}).
-   * @since 4.10.0, 4.9.5
+   * @since 4.10.0, 4.9.6
    */
   public HttpResponse getResponse() {
     return response;

@@ -14,7 +14,7 @@ import java.net.InetSocketAddress;
 /**
  * Configuration for the creation of the {@link SseClient}.
  *
- * @since 4.10.0, 4.9.5
+ * @since 4.10.0, 4.9.6
  */
 @Experimental
 public class SseClientConfig {
