@@ -6,8 +6,16 @@
  */
 package org.mule.runtime.http.api.sse.server;
 
+import org.mule.api.annotation.Experimental;
+
 import java.net.InetSocketAddress;
 
+/**
+ * Builder for instances of {@link SseClientConfig}.
+ *
+ * @since 4.10.0, 4.9.5
+ */
+@Experimental
 public class SseClientConfigBuilder {
 
   private String clientId;

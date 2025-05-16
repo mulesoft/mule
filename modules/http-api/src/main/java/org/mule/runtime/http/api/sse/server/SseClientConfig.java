@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.http.api.sse.server;
 
+import org.mule.api.annotation.Experimental;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
 import java.net.InetSocketAddress;
@@ -15,6 +16,7 @@ import java.net.InetSocketAddress;
  *
  * @since 4.10.0, 4.9.5
  */
+@Experimental
 public class SseClientConfig {
 
   public static SseClientConfigBuilder builderFrom(HttpRequestContext requestContext) {
