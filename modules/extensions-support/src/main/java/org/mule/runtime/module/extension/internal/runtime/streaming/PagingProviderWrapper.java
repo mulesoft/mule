@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
 import java.util.List;
 import java.util.Optional;
