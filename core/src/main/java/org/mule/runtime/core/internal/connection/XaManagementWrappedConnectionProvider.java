@@ -16,20 +16,20 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-final class XaManagementWrappedConnectionProvider<TxC> implements ConnectionProvider<TxC> {
+final class XaManagementWrappedConnectionProvider<C> implements ConnectionProvider<C> {
 
-  private final ConnectionProvider<TxC> baseConnectionProvider;
-  private final ConnectionManagementStrategy<TxC> xaMgmtStrategy;
-  private final Map<TxC, ConnectionHandler<TxC>> handlers = new ConcurrentHashMap<>();
+  private final ConnectionProvider<C> baseConnectionProvider;
+  private final ConnectionManagementStrategy<C> xaMgmtStrategy;
+  private final Map<C, ConnectionHandler<C>> handlers = new ConcurrentHashMap<>();
 
-  XaManagementWrappedConnectionProvider(ConnectionProvider<TxC> baseConnectionProvider,
-                                        ConnectionManagementStrategy<TxC> xaMgmtStrategy) {
+  XaManagementWrappedConnectionProvider(ConnectionProvider<C> baseConnectionProvider,
+                                        ConnectionManagementStrategy<C> xaMgmtStrategy) {
     this.baseConnectionProvider = requireNonNull(baseConnectionProvider);
     this.xaMgmtStrategy = requireNonNull(xaMgmtStrategy);
   }
 
   @Override
-  public TxC connect() throws ConnectionException {
+  public C connect() throws ConnectionException {
     final var connectionHandler = xaMgmtStrategy.getConnectionHandler();
     final var connection = connectionHandler.getConnection();
     handlers.put(connection, connectionHandler);
@@ -37,12 +37,12 @@ final class XaManagementWrappedConnectionProvider<TxC> implements ConnectionProv
   }
 
   @Override
-  public void disconnect(TxC connection) {
+  public void disconnect(C connection) {
     handlers.remove(connection).release();
   }
 
   @Override
-  public ConnectionValidationResult validate(TxC connection) {
+  public ConnectionValidationResult validate(C connection) {
     return baseConnectionProvider.validate(connection);
   }
 }

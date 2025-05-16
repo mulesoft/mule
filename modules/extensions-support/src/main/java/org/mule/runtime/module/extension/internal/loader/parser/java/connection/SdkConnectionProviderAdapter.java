@@ -69,29 +69,41 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     if (connectionProvider != null) {
       if (connectionProvider instanceof ConnectionProvider) {
         return (ConnectionProvider<C>) connectionProvider;
-      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.CachedConnectionProvider) {
-        if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
-          return new SdkCachedXATransactionalConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.CachedConnectionProvider) connectionProvider);
-        } else {
-          return new SdkCachedConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.CachedConnectionProvider<C>) connectionProvider);
-        }
-      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.PoolingConnectionProvider) {
-        if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
-          return new SdkPoolingXATransactionalConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.PoolingConnectionProvider) connectionProvider);
-        } else {
-          return new SdkPoolingConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.PoolingConnectionProvider<C>) connectionProvider);
-        }
-      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.ConnectionProvider) {
-        if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
-          return new SdkXATransactionalConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.ConnectionProvider) connectionProvider);
-        } else {
-          return new SdkConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.ConnectionProvider<C>) connectionProvider);
-        }
+      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.CachedConnectionProvider cachedConnectionProvider) {
+        return fromCachedManagement(cachedConnectionProvider);
+      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.PoolingConnectionProvider poolingConnectionProvider) {
+        return fromPooledManagement(poolingConnectionProvider);
+      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.ConnectionProvider nullMgmtConnectionProvider) {
+        return fromNullManagement(nullMgmtConnectionProvider);
       } else {
         throw new IllegalArgumentException("Unsupported ConnectionProvider type " + connectionProvider.getClass().getName());
       }
     } else {
       throw new IllegalArgumentException("connectionProvider cannot be null");
+    }
+  }
+
+  private static <C> ConnectionProvider<C> fromCachedManagement(org.mule.sdk.api.connectivity.CachedConnectionProvider connectionProvider) {
+    if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
+      return new SdkCachedXATransactionalConnectionProviderAdapter<>(connectionProvider);
+    } else {
+      return new SdkCachedConnectionProviderAdapter<>(connectionProvider);
+    }
+  }
+
+  private static <C> ConnectionProvider<C> fromPooledManagement(org.mule.sdk.api.connectivity.PoolingConnectionProvider connectionProvider) {
+    if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
+      return new SdkPoolingXATransactionalConnectionProviderAdapter<>(connectionProvider);
+    } else {
+      return new SdkPoolingConnectionProviderAdapter<>(connectionProvider);
+    }
+  }
+
+  private static <C> ConnectionProvider<C> fromNullManagement(org.mule.sdk.api.connectivity.ConnectionProvider connectionProvider) {
+    if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
+      return new SdkXATransactionalConnectionProviderAdapter<>(connectionProvider);
+    } else {
+      return new SdkConnectionProviderAdapter<>(connectionProvider);
     }
   }
 

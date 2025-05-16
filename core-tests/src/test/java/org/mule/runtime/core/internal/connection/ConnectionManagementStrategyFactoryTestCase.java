@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -72,8 +73,9 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
     final var connectionProvider = mock(ConnectionProviderWrapper.class);
     when(connectionProvider.getConnectionManagementType()).thenReturn(null);
 
+    final FeatureFlaggingService featureFlaggingService = getFeatureFlaggingService();
     assertThrows(IllegalArgumentException.class,
-                 () -> connMgmtStrategyFactory.getStrategy(connectionProvider, getFeatureFlaggingService()));
+                 () -> connMgmtStrategyFactory.getStrategy(connectionProvider, featureFlaggingService));
   }
 
   @Test
