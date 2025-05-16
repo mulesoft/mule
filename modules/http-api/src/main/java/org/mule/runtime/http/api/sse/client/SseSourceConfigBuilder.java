@@ -14,12 +14,15 @@ import static java.util.Objects.requireNonNull;
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.http.api.client.HttpRequestOptions;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.util.function.Consumer;
 
 /**
- * Builder for instances of {@link SseSourceConfig}. The url is required, so you have to specify it in the constructor of the
- * builder, and the rest of the parameters have their own with* method.
+ * Builder for instances of {@link SseSourceConfig} if it's going to send the initiator request. In this case, the url is
+ * required, so you have to specify it in the constructor of the builder. The rest of the parameters have their own with* method.
+ * If you already sent the request manually, and you want to configure a {@link SseSource} with a give {@link HttpResponse}, use
+ * {@link SseSourceConfig#fromResponse(HttpResponse)} instead.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
  *
@@ -90,6 +93,6 @@ public class SseSourceConfigBuilder {
    * @since 4.10.0, 4.9.4
    */
   public SseSourceConfig build() {
-    return new SseSourceConfig(url, retryConfig, requestCustomizer, requestOptions, preserveHeaderCase);
+    return new SseSourceConfig(url, retryConfig, requestCustomizer, requestOptions, preserveHeaderCase, null);
   }
 }

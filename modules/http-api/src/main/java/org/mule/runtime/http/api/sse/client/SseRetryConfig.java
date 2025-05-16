@@ -33,4 +33,8 @@ public record SseRetryConfig(boolean allowRetryDelayOverride, long initialRetryD
   public static SseRetryConfig defaultConfig() {
     return new SseRetryConfig(true, DEFAULT_RETRY_DELAY_MILLIS, true);
   }
+
+  public static SseRetryConfig noRetry() {
+    return new SseRetryConfig(false, -1, false);
+  }
 }

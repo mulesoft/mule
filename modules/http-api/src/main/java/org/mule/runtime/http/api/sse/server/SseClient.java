@@ -10,6 +10,7 @@ import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 
 /**
@@ -84,6 +85,12 @@ public interface SseClient extends AutoCloseable {
    * @return unique identifier of this client.
    */
   String getClientId();
+
+  /**
+   * @return the address of the remote client.
+   * @since 4.10.0, 4.9.6
+   */
+  InetSocketAddress getRemoteAddress();
 
   /**
    * Closes the connection.
