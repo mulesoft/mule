@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.transactional;
+package org.mule.test.transactionalxa;
 
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
@@ -13,26 +13,26 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
-import org.mule.runtime.extension.api.annotation.execution.OnError;
-import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
-import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
-import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.extension.api.runtime.source.Source;
-import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
-import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
-import org.mule.runtime.extension.api.tx.TransactionHandle;
-import org.mule.test.transactional.connection.DummyXaResource;
-import org.mule.test.transactional.connection.SdkTestTransactionalConnection;
-import org.mule.test.transactional.connection.TestXaTransactionalConnection;
+import org.mule.sdk.api.annotation.execution.OnError;
+import org.mule.sdk.api.annotation.execution.OnSuccess;
+import org.mule.sdk.api.annotation.execution.OnTerminate;
+import org.mule.sdk.api.annotation.metadata.MetadataScope;
+import org.mule.sdk.api.annotation.param.Connection;
+import org.mule.sdk.api.connectivity.XATransactionalConnection;
+import org.mule.sdk.api.runtime.operation.Result;
+import org.mule.sdk.api.runtime.source.Source;
+import org.mule.sdk.api.runtime.source.SourceCallback;
+import org.mule.sdk.api.runtime.source.SourceCallbackContext;
+import org.mule.sdk.api.tx.SourceTransactionalAction;
+import org.mule.sdk.api.tx.TransactionHandle;
+import org.mule.test.transactionalxa.connection.DummyXaResource;
+import org.mule.test.transactionalxa.connection.TestTransactionalConnection;
+import org.mule.test.transactionalxa.connection.TestXaTransactionalConnection;
 
 import java.util.concurrent.ExecutorService;
 
 @MetadataScope(outputResolver = TransactionalMetadataResolver.class)
-public class SdkTransactionalSource extends Source<SdkTestTransactionalConnection, Object> {
+public class TransactionalSource extends Source<TestTransactionalConnection, Object> {
 
   private static final String IS_XA = "isXa";
 
@@ -41,26 +41,26 @@ public class SdkTransactionalSource extends Source<SdkTestTransactionalConnectio
 
   TransactionType txType;
 
-  SourceTransactionalAction transactionalAction;
+  SourceTransactionalAction txAction;
 
   @Connection
-  private ConnectionProvider<SdkTestTransactionalConnection> connectionProvider;
+  private ConnectionProvider<TestTransactionalConnection> connectionProvider;
 
   private ExecutorService connectExecutor;
 
-  public SdkTransactionalSource() {
+  public TransactionalSource() {
     isSuccess = null;
     xaResource = null;
   }
 
   @Override
-  public void onStart(SourceCallback<SdkTestTransactionalConnection, Object> sourceCallback) {
-    connectExecutor = newFixedThreadPool(1, new NamedThreadFactory(SdkTransactionalSource.class.getName()));
+  public void onStart(SourceCallback<TestTransactionalConnection, Object> sourceCallback) {
+    connectExecutor = newFixedThreadPool(1, new NamedThreadFactory(TransactionalSource.class.getName()));
     connectExecutor.execute(() -> {
       SourceCallbackContext ctx = sourceCallback.createContext();
       TransactionHandle txHandle = null;
       try {
-        SdkTestTransactionalConnection connection = connectionProvider.connect();
+        TestTransactionalConnection connection = connectionProvider.connect();
 
         boolean isXa = false;
         if (connection instanceof XATransactionalConnection) {
@@ -70,7 +70,7 @@ public class SdkTransactionalSource extends Source<SdkTestTransactionalConnectio
 
         ctx.addVariable(IS_XA, isXa);
         txHandle = ctx.bindConnection(connection);
-        sourceCallback.handle(Result.<SdkTestTransactionalConnection, Object>builder().output(connection).build(), ctx);
+        sourceCallback.handle(Result.<TestTransactionalConnection, Object>builder().output(connection).build(), ctx);
       } catch (ConnectionException e) {
         sourceCallback.onConnectionException(e);
       } catch (Exception e) {
@@ -101,7 +101,7 @@ public class SdkTransactionalSource extends Source<SdkTestTransactionalConnectio
   }
 
   @OnSuccess
-  public void onSuccess(org.mule.sdk.api.runtime.source.SourceCallbackContext ctx)
+  public void onSuccess(SourceCallbackContext ctx)
       throws TransactionException {
     ctx.getTransactionHandle().commit();
     isSuccess = true;
@@ -115,7 +115,7 @@ public class SdkTransactionalSource extends Source<SdkTestTransactionalConnectio
   }
 
   @OnTerminate
-  public void onTerminate(org.mule.sdk.api.runtime.source.SourceCallbackContext ctx) {
+  public void onTerminate(SourceCallbackContext ctx) {
     Boolean isXa = (Boolean) ctx.getVariable(IS_XA).get();
     if (isXa) {
       TestXaTransactionalConnection connection = ctx.getConnection();
