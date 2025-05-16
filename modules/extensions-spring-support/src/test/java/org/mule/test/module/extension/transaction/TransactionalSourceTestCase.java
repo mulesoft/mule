@@ -6,15 +6,16 @@
  */
 package org.mule.test.module.extension.transaction;
 
+import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import static java.lang.Thread.sleep;
-
+import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -26,34 +27,48 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 import org.mule.test.transactional.SdkTransactionalSource;
 import org.mule.test.transactional.TransactionalSource;
-import org.mule.test.transactional.connection.MessageStorage;
 import org.mule.test.transactional.connection.SdkTestTransactionalConnection;
 import org.mule.test.transactional.connection.TestTransactionalConnection;
 
 import java.util.Collection;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Supplier;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private final boolean isSdkApi;
+  private final Supplier<Boolean> successSource;
   private final String configFile;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return asList(new Object[][] {
-        {"Using Extensions API", false, "source-transaction-config.xml"},
-        {"Using SDK API", true, "sdk-source-transaction-config.xml"}
+        {
+            "Using Extensions API",
+            (Supplier<Boolean>) () -> TransactionalSource.isSuccess,
+            "tx/source-transaction-config.xml"
+        },
+        {
+            "Using SDK API, legacy XA",
+            (Supplier<Boolean>) () -> SdkTransactionalSource.isSuccess,
+            "tx/sdk-source-transaction-config.xml"
+        },
+        {
+            "Using SDK API",
+            (Supplier<Boolean>) () -> org.mule.test.transactionalxa.TransactionalSource.isSuccess,
+            "tx/source-transaction-xa-config.xml"
+        }
     });
   }
 
-  public TransactionalSourceTestCase(String parametrizationName, boolean isSdkApi, String configFile) {
-    this.isSdkApi = isSdkApi;
+  public TransactionalSourceTestCase(String parametrizationName, Supplier<Boolean> successSource, String configFile) {
+    this.successSource = successSource;
     this.configFile = configFile;
   }
 
@@ -67,6 +82,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     MessageStorage.clean();
     TransactionalSource.isSuccess = null;
     SdkTransactionalSource.isSuccess = null;
+    org.mule.test.transactionalxa.TransactionalSource.isSuccess = null;
   }
 
   @After
@@ -74,6 +90,7 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     MessageStorage.clean();
     TransactionalSource.isSuccess = null;
     SdkTransactionalSource.isSuccess = null;
+    org.mule.test.transactionalxa.TransactionalSource.isSuccess = null;
   }
 
   @Test
@@ -169,24 +186,23 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
   }
 
   private void validateFlow(boolean succeeded) {
-    if (isSdkApi) {
-      validate(() -> SdkTransactionalSource.isSuccess != null);
-      assertThat(SdkTransactionalSource.isSuccess, is(succeeded));
-    } else {
-      validate(() -> TransactionalSource.isSuccess != null);
-      assertThat(TransactionalSource.isSuccess, is(succeeded));
-    }
+    validate(() -> successSource.get() != null);
+    assertThat(successSource.get(), is(succeeded));
   }
 
   private void assertTransactionConnectionState(Object connection, boolean begun, boolean committed, boolean rolledBack) {
-    if (connection instanceof TestTransactionalConnection) {
-      assertThat(((TestTransactionalConnection) connection).isTransactionBegun(), is(begun));
-      assertThat(((TestTransactionalConnection) connection).isTransactionCommited(), is(committed));
-      assertThat(((TestTransactionalConnection) connection).isTransactionRolledback(), is(rolledBack));
-    } else if (connection instanceof SdkTestTransactionalConnection) {
-      assertThat(((SdkTestTransactionalConnection) connection).isTransactionBegun(), is(begun));
-      assertThat(((SdkTestTransactionalConnection) connection).isTransactionCommited(), is(committed));
-      assertThat(((SdkTestTransactionalConnection) connection).isTransactionRolledback(), is(rolledBack));
+    if (connection instanceof TestTransactionalConnection conn) {
+      assertThat(conn.isTransactionBegun(), is(begun));
+      assertThat(conn.isTransactionCommited(), is(committed));
+      assertThat(conn.isTransactionRolledback(), is(rolledBack));
+    } else if (connection instanceof SdkTestTransactionalConnection conn) {
+      assertThat(conn.isTransactionBegun(), is(begun));
+      assertThat(conn.isTransactionCommited(), is(committed));
+      assertThat(conn.isTransactionRolledback(), is(rolledBack));
+    } else if (connection instanceof org.mule.test.transactionalxa.connection.TestTransactionalConnection conn) {
+      assertThat(conn.isTransactionBegun(), is(begun));
+      assertThat(conn.isTransactionCommited(), is(committed));
+      assertThat(conn.isTransactionRolledback(), is(rolledBack));
     } else {
       throw new RuntimeException("Stored object is not a valid type of connection");
     }
@@ -203,6 +219,28 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
         throw new RuntimeException(e);
       }
       return event;
+    }
+  }
+
+  public static class MessageStorage extends AbstractComponent implements Processor {
+
+    public static Queue<Object> messages = new ConcurrentLinkedQueue<>();
+
+    public static Throwable exception;
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      event.getError().ifPresent(theError -> exception = theError.getCause());
+      TypedValue<Object> payload = event.getMessage().getPayload();
+      if (payload.getValue() != null) {
+        messages.add(payload.getValue());
+      }
+      return event;
+    }
+
+    public static void clean() {
+      exception = null;
+      messages = new ConcurrentLinkedQueue<>();
     }
   }
 }

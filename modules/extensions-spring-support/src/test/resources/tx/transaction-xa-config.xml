@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tx-xa="http://www.mulesoft.org/schema/mule/tx-xa"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/tx-xa http://www.mulesoft.org/schema/mule/tx-xa/current/mule-tx-xa.xsd">
+
+
+    <tx-xa:config name="localTx1">
+        <tx-xa:connection>
+            <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
+        </tx-xa:connection>
+    </tx-xa:config>
+
+    <tx-xa:config name="localTx2">
+        <tx-xa:connection>
+            <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
+        </tx-xa:connection>
+    </tx-xa:config>
+
+    <tx-xa:config name="nonPoolingTx">
+        <tx-xa:non-pooling-connection />
+    </tx-xa:config>
+
+    <flow name="commitLocalTx">
+        <tx-xa:verify-no-transaction config-ref="localTx1"/>
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+        </try>
+        <tx-xa:verify-transaction-commited config-ref="localTx1"/>
+    </flow>
+
+    <flow name="rollbackLocalTx">
+        <tx-xa:verify-no-transaction config-ref="localTx1"/>
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+            <tx-xa:fail/>
+        </try>
+        <error-handler>
+            <on-error-continue>
+                <tx-xa:verify-transaction-rolledback config-ref="localTx1"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="executeTransactionless">
+        <tx-xa:verify-no-transaction config-ref="localTx1"/>
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:get-connection transactionalAction="NOT_SUPPORTED" config-ref="localTx1"/>
+        </try>
+
+        <set-payload value="#[%dw 2.0 output application/java --- {'transactionBegun': payload.transactionBegun, 'transactionCommited': payload.transactionCommited, 'transactionRolledback': payload.transactionRolledback}]"/>
+    </flow>
+
+    <flow name="localTxDoesntSupportMultipleResources">
+        <try transactionalAction="ALWAYS_BEGIN" >
+            <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+            <tx-xa:verify-transaction-begun config-ref="localTx2"/>
+        </try>
+    </flow>
+
+    <flow name="localTxSupportsMultipleOperationsFromSameResource">
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+            <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+        </try>
+        <tx-xa:verify-transaction-commited config-ref="localTx1"/>
+    </flow>
+
+    <flow name="pagedOperationWithoutTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <tx-xa:paged-transactional-operation config-ref="nonPoolingTx"/>
+        <flow-ref name="accumulatePages" />
+    </flow>
+
+    <flow name="failingPagedOperationWithoutTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <tx-xa:failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+            <reconnect count="5" frequency="10" />
+        </tx-xa:failing-paged-transactional-operation>
+        <flow-ref name="accumulatePages" />
+    </flow>
+
+    <flow name="stickyFailingPagedOperationWithoutTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <tx-xa:sticky-failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+            <reconnect count="5" frequency="10" />
+        </tx-xa:sticky-failing-paged-transactional-operation>
+        <flow-ref name="accumulatePages" />
+    </flow>
+
+    <flow name="pagedOperationInTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:paged-transactional-operation config-ref="nonPoolingTx"/>
+            <flow-ref name="accumulatePages" />
+        </try>
+    </flow>
+
+    <flow name="pagedOperationInTxAlwaysUsesSameConnection">
+        <set-variable variableName="connections" value="#[[]]" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:paged-transactional-operation config-ref="nonPoolingTx"/>
+            <foreach>
+                <tx-xa:get-connection target="connection" config-ref="nonPoolingTx"/>
+                <set-variable variableName="connections" value="#[vars.connections + vars.connection]" />
+            </foreach>
+        </try>
+    </flow>
+
+
+    <flow name="failingPagedOperationInTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+                <reconnect count="5" frequency="10" />
+            </tx-xa:failing-paged-transactional-operation>
+            <flow-ref name="accumulatePages" />
+        </try>
+    </flow>
+
+    <flow name="stickyFailingPagedOperationInTx">
+        <set-variable variableName="accumulator" value="#[[]]" />
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:sticky-failing-paged-transactional-operation failOn="#[vars.failOn]" config-ref="nonPoolingTx">
+                <reconnect count="5" frequency="10" />
+            </tx-xa:sticky-failing-paged-transactional-operation>
+            <flow-ref name="accumulatePages" />
+        </try>
+    </flow>
+
+    <sub-flow name="accumulatePages">
+        <foreach>
+            <set-variable variableName="accumulator" value="#[vars.accumulator + payload]" />
+        </foreach>
+    </sub-flow>
+
+    <flow name="cantNestTransactions">
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+            <try transactionalAction="ALWAYS_BEGIN">
+                <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+            </try>
+        </try>
+    </flow>
+
+    <flow name="operationJoinsAlreadyCreatedTx">
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+            <tx-xa:get-connection config-ref="localTx1"/>
+            <try transactionalAction="BEGIN_OR_JOIN">
+                <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+                <tx-xa:verify-same-connection config-ref="localTx1"/>
+            </try>
+        </try>
+    </flow>
+
+    <flow name="doNotRetryOnTxReconnection">
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx-xa:verify-transaction-begun config-ref="localTx1"/>
+            <tx-xa:connection-exception config-ref="localTx1">
+                <reconnect count="5" frequency="10" />
+            </tx-xa:connection-exception>
+        </try>
+    </flow>
+</mule>

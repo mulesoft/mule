@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tx-xa="http://www.mulesoft.org/schema/mule/tx-xa"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+                          http://www.mulesoft.org/schema/mule/tx-xa http://www.mulesoft.org/schema/mule/tx-xa/current/mule-tx-xa.xsd">
+
+
+    <tx-xa:config name="localTx1">
+        <tx-xa:connection>
+            <reconnection failsDeployment="true"/>
+            <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
+        </tx-xa:connection>
+    </tx-xa:config>
+
+    <flow name="alwaysBeginTxAction" initialState="stopped">
+        <tx-xa:transactional-source-with-tx-parameters config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
+        <logger />
+    </flow>
+
+    <flow name="defaultTxAction" initialState="stopped">
+        <tx-xa:transactional-source-with-tx-parameters config-ref="localTx1"/>
+        <logger />
+    </flow>
+
+    <flow name="injectInOperationJoinNotSupported">
+        <tx-xa:inject-transactional-action config-ref="localTx1" transactionalAction="NOT_SUPPORTED"/>
+    </flow>
+
+    <flow name="injectInOperationDefaultValue">
+        <tx-xa:inject-transactional-action config-ref="localTx1"/>
+    </flow>
+
+</mule>
