@@ -27,7 +27,8 @@ public interface SseSource extends AutoCloseable {
   int READY_STATUS_CLOSED = 2;
 
   /**
-   * Sends the initiator request
+   * Opens the source. It will send the initiator request or just start parsing the response's payload depending on the configured
+   * {@link SseSourceConfig}.
    */
   void open();
 
