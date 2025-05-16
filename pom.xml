@@ -13,7 +13,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.9.5-SNAPSHOT</version>
+    <version>4.9.6-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
