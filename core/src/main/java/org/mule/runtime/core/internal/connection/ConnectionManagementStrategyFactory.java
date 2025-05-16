@@ -68,9 +68,8 @@ final class ConnectionManagementStrategyFactory {
     }
 
     if (unwrapProviderWrapper(connectionProvider,
-                              XATransactionalConnectionProvider.class) instanceof XATransactionalConnectionProvider xaTxConnectionProvider) {
+                              XATransactionalConnectionProvider.class) instanceof XATransactionalConnectionProvider<?> xaTxConnectionProvider) {
       return handleForXa((ConnectionProvider) connectionProvider,
-                         featureFlaggingService,
                          managementType,
                          (ConnectionManagementStrategy) managementStrategy,
                          xaTxConnectionProvider);
@@ -84,7 +83,6 @@ final class ConnectionManagementStrategyFactory {
   }
 
   private <C extends TransactionalConnection> ConnectionManagementStrategy<C> handleForXa(ConnectionProvider<C> connectionProvider,
-                                                                                          FeatureFlaggingService featureFlaggingService,
                                                                                           ConnectionManagementType managementType,
                                                                                           ConnectionManagementStrategy<C> poolingManagementStrategy,
                                                                                           XATransactionalConnectionProvider<C> xaTXConnProvider) {
@@ -97,7 +95,7 @@ final class ConnectionManagementStrategyFactory {
           .orElse(poolingManagementStrategy);
     } else {
       ConnectionManagementStrategy<C> xaPoolingManagementStrategy =
-          new NullConnectionManagementStrategy<C>(connectionProvider);
+          new NullConnectionManagementStrategy<>(connectionProvider);
 
       return getNonPoolingStrategy(new XaManagementWrappedConnectionProvider<>(connectionProvider,
                                                                                xaConnectionManagementStrategyFactory
