@@ -7,6 +7,7 @@
 package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.artifact.api.classloader.LoggerClassRegistry.getLoggerClassRegistry;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
@@ -15,7 +16,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -47,7 +46,6 @@ import org.apache.logging.log4j.message.MessageFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -111,90 +109,14 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void parallelizationWhenGettingLoggerForSameClassAndDifferentCtxClassLoader() throws InterruptedException {
-    Logger originalLogger = getLogger("org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader");
-    Logger regionClassLoaderLogger = getRegionClassLoader();
-
-    DispatchingLogger logger =
-        spy(new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), containerLoggerContext,
-                                  artifactAwareContextSelector,
-                                  messageFactory) {
-
-          @Override
-          public String getName() {
-            return LOGGER_NAME;
-          }
-        });
-
-    final Latch latch = new Latch();
-    final AtomicInteger timesCalled = new AtomicInteger(0);
-
-    doAnswer(invocation -> {
-      if (timesCalled.compareAndSet(0, 1)) {
-        // Make the first call wait here so the second one doesn't get into this method due to the lock
-        assertThat(latch.await(1000, MILLISECONDS), is(true));
-      }
-
-      return invocation.callRealMethod();
-    }).when(logger).getLogger(any(ClassLoader.class), any(Reference.class));
-
-    String log1 = "Log 1";
-    String log2 = "Log 2";
-
-    Thread firstLogThread = new Thread(() -> logger.info(log1));
-    Thread secondLogThread = new Thread(() -> logger.info(log2));
-
-    firstLogThread.setContextClassLoader(regionClassLoader);
-
-    firstLogThread.start();
-
-    // Check the `getLogger` method has been called for the first thread
-    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(timesCalled.get(), is(1));
-      return true;
-    }));
-
-    // Start the second thread and verify it logs
-    secondLogThread.start();
-
-    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      verify(originalLogger, times(1)).info(log2);
-      return true;
-    }));
-
-    verify(regionClassLoaderLogger, times(0)).info(log1);
-
-    // Let the first log continue
-    latch.countDown();
-
-    // Check the first message is logged
-    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      verify(regionClassLoaderLogger, times(1)).info(log1);
-      return true;
-    }));
-
-    firstLogThread.join();
-    secondLogThread.join();
-  }
-
-  @Test
   public void noParallelizationWhenGettingLoggerForSameClassAndSameCtxClassLoader() throws InterruptedException {
-    Logger originalLogger = getLogger("org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader");
     Logger regionClassLoaderLogger = getRegionClassLoader();
-
-    DispatchingLogger logger =
-        spy(new DispatchingLogger(originalLogger, currentClassLoader.hashCode(), containerLoggerContext,
-                                  artifactAwareContextSelector,
-                                  messageFactory) {
-
-          @Override
-          public String getName() {
-            return LOGGER_NAME;
-          }
-        });
 
     final Latch latch = new Latch();
     final AtomicInteger timesCalled = new AtomicInteger(0);
+
+    TestClassOwningLogger loggerOwner = new TestClassOwningLogger();
+    DispatchingLogger logger = loggerOwner.getDispatchingLogger();
 
     doAnswer(invocation -> {
       if (timesCalled.compareAndSet(0, 1)) {
@@ -256,11 +178,97 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
     secondLogThread.join();
   }
 
-  private Logger getLogger(String loggerClassName) {
-    Logger logger = mock(Logger.class, RETURNS_DEEP_STUBS);
-    when(logger.getName()).thenReturn(loggerClassName);
+  @Test
+  public void parallelizationWhenGettingLoggerForSameClassAndDifferentCtxClassLoader() throws InterruptedException {
+    Logger regionClassLoaderLogger = getRegionClassLoader();
 
-    return logger;
+    final Latch latch = new Latch();
+    final AtomicInteger timesCalled = new AtomicInteger(0);
+
+    TestClassOwningLogger loggerOwner = new TestClassOwningLogger();
+    DispatchingLogger logger = loggerOwner.getDispatchingLogger();
+    Logger originalLogger = loggerOwner.getOriginalLogger();
+
+    doAnswer(invocation -> {
+      if (timesCalled.compareAndSet(0, 1)) {
+        // Make the first call wait here so the second one doesn't get into this method due to the lock
+        assertThat(latch.await(1000, MILLISECONDS), is(true));
+      }
+
+      return invocation.callRealMethod();
+    }).when(logger).getLogger(any(ClassLoader.class), any(Reference.class));
+
+    String log1 = "Log 1";
+    String log2 = "Log 2";
+
+    Thread firstLogThread = new Thread(() -> logger.info(log1));
+    Thread secondLogThread = new Thread(() -> logger.info(log2));
+
+    firstLogThread.setContextClassLoader(regionClassLoader);
+
+    firstLogThread.start();
+
+    // Check the `getLogger` method has been called for the first thread
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      assertThat(timesCalled.get(), is(1));
+      return true;
+    }));
+
+    // Start the second thread and verify it logs
+    secondLogThread.start();
+
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      verify(originalLogger, times(1)).info(log2);
+      return true;
+    }));
+
+    verify(regionClassLoaderLogger, times(0)).info(log1);
+
+    // Let the first log continue
+    latch.countDown();
+
+    // Check the first message is logged
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      verify(regionClassLoaderLogger, times(1)).info(log1);
+      return true;
+    }));
+
+    firstLogThread.join();
+    secondLogThread.join();
+  }
+
+  private class TestClassOwningLogger {
+
+    static {
+      getLoggerClassRegistry().register(TestClassOwningLogger.class);
+    }
+
+    private final Logger logger = getLogger();
+
+    private Logger getLogger() {
+      Logger logger = mock(Logger.class, RETURNS_DEEP_STUBS);
+      when(logger.getName()).thenReturn(this.getClass().getName());
+
+      return logger;
+    }
+
+    public DispatchingLogger getDispatchingLogger() {
+
+      return spy(new DispatchingLogger(logger, currentClassLoader.hashCode(), containerLoggerContext,
+                                       artifactAwareContextSelector,
+                                       messageFactory) {
+
+        @Override
+        public String getName() {
+          return LOGGER_NAME;
+        }
+      });
+    }
+
+    public Logger getOriginalLogger() {
+      return logger;
+    }
+
   }
 
   private Logger getRegionClassLoader() {
