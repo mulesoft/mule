@@ -10,6 +10,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPORT_NATIVE_LIBR
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.MuleVersion.v4_6_0;
 
+import static org.mule.runtime.module.artifact.api.classloader.LoggerClassRegistry.getLoggerClassRegistry;
 import static org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils.isFeatureEnabled;
 
 import static net.bytebuddy.description.modifier.Visibility.PUBLIC;
@@ -44,6 +45,7 @@ public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader exten
 
   static {
     registerAsParallelCapable();
+    getLoggerClassRegistry().register(NativeLibraryLoaderMuleDeployableArtifactClassLoader.class);
   }
 
   private final Logger logger = LoggerFactory.getLogger(NativeLibraryLoaderMuleDeployableArtifactClassLoader.class);

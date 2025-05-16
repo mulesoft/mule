@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 /**
  * Mule Log4j Configurator Module.
  *
@@ -33,5 +34,8 @@ module org.mule.runtime.log4j {
 
   exports org.mule.runtime.module.log4j.internal to
       org.mule.runtime.launcher, org.mule.test.infrastructure;
+
+  provides org.mule.runtime.module.artifact.api.classloader.LoggerClassRegistry with
+      org.mule.runtime.module.log4j.internal.Log4jLoggerClassRegistry;
 
 }

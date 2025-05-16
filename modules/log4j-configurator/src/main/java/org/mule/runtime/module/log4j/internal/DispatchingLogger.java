@@ -8,6 +8,7 @@ package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.log4j.internal.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
+import static org.mule.runtime.module.log4j.internal.Log4jLoggerClassRegistry.getLoggerClassesNames;
 
 import static java.lang.Thread.currentThread;
 
@@ -15,11 +16,8 @@ import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 
 import org.mule.runtime.api.util.Reference;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -65,32 +63,13 @@ abstract class DispatchingLogger extends Logger {
 
   private final Map<Integer, Object> loggerClassesLocks = new ConcurrentHashMap<>();
 
-  private static final Set<String> loggerClasses;
-
-  static {
-    loggerClasses = new HashSet<>();
-    // TODO - replace this with a registration mechanism
-    loggerClasses.add("org.mule.runtime.module.artifact.api.classloader.FineGrainedControlClassLoader");
-    loggerClasses.add("org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader");
-    loggerClasses.add("org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader");
-    loggerClasses
-        .add("org.mule.runtime.module.artifact.activation.internal.classloader.NativeLibraryLoaderMuleDeployableArtifactClassLoader");
-    loggerClasses.add("org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader");
-    loggerClasses.add("org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader");
-    loggerClasses.add("org.mule.runtime.container.internal.IsolatedPolicyClassLoader");
-    loggerClasses.add("org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader");
-    loggerClasses.add("org.mule.runtime.module.artifact.api.classloader.RegionClassLoader");
-    loggerClasses.add("org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader");
-    loggerClasses.add("org.mule.runtime.deployment.model.internal.tooling.ToolingRegionClassLoader");
-  }
-
   DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector,
                     MessageFactory messageFactory) {
     super(loggerContext, originalLogger.getName(), messageFactory);
     this.originalLogger = originalLogger;
     this.contextSelector = contextSelector;
     this.ownerClassLoaderHash = ownerClassLoaderHash;
-    shouldBlock = loggerClasses.contains(originalLogger.getName());
+    shouldBlock = getLoggerClassesNames().contains(originalLogger.getName());
   }
 
   private Logger getLogger() {
