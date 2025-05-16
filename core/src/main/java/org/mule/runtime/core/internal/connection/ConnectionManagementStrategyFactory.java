@@ -147,7 +147,7 @@ final class ConnectionManagementStrategyFactory {
                                                       FeatureFlaggingService featureFlaggingService) {
     String ownerConfigName = "";
     if (connectionProvider instanceof ConnectionProviderWrapper<C> cpWrapper) {
-      ownerConfigName = cpWrapper.getOwnerConfigName().orElse("");
+      ownerConfigName = cpWrapper.getOwnerConfigName().orElse(ownerConfigName);
     }
 
     return poolingProfile.isDisabled()
