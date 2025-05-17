@@ -8,6 +8,7 @@ package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.log4j.internal.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
+import static org.mule.runtime.module.log4j.internal.Log4jLoggerClassRegistry.getLoggerClassesNames;
 
 import static java.lang.Thread.currentThread;
 
@@ -17,6 +18,7 @@ import org.mule.runtime.api.util.Reference;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
@@ -53,10 +55,13 @@ abstract class DispatchingLogger extends Logger {
   private final Logger originalLogger;
   private final ContextSelector contextSelector;
   private final int ownerClassLoaderHash;
+  private final boolean shouldBlock;
   private final LoadingCache<ClassLoader, Reference<Logger>> loggerCache = newBuilder()
       .weakKeys()
       .weakValues()
       .build(key -> new Reference<>());
+
+  private final Map<Integer, Object> loggerClassesLocks = new ConcurrentHashMap<>();
 
   DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector,
                     MessageFactory messageFactory) {
@@ -64,6 +69,7 @@ abstract class DispatchingLogger extends Logger {
     this.originalLogger = originalLogger;
     this.contextSelector = contextSelector;
     this.ownerClassLoaderHash = ownerClassLoaderHash;
+    shouldBlock = getLoggerClassesNames().contains(originalLogger.getName());
   }
 
   private Logger getLogger() {
@@ -89,6 +95,16 @@ abstract class DispatchingLogger extends Logger {
       setContextClassLoader(thread, getClass().getClassLoader(), currentClassLoader);
     }
 
+    if (shouldBlock) {
+      synchronized (loggerClassesLocks.computeIfAbsent(resolvedCtxClassLoader.hashCode(), k -> new Object())) {
+        return getLogger(resolvedCtxClassLoader, loggerReference);
+      }
+    } else {
+      return getLogger(resolvedCtxClassLoader, loggerReference);
+    }
+  }
+
+  protected Logger getLogger(ClassLoader resolvedCtxClassLoader, Reference<Logger> loggerReference) {
     Logger logger = loggerReference.get();
     if (logger == null) {
       synchronized (loggerReference) {
