@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -25,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * @param <C> the generic type of the connection being wrapped
  * @since 4.0
  */
-final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
+public final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CachedConnectionHandler.class);
 
@@ -53,7 +56,13 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
    */
   @Override
   public void release() {
-    // no-op
+    if (connection instanceof XATransactionalConnection xaTxConnection) {
+      // Legacy XA support: maintain compatibility with current (1.x) versions of JMS module
+      // (this is the only occurrence of XA using cached connections).
+      // This will not close the connection: it will close the BTM wrapped connection that will return it to the pool.
+      xaTxConnection.close();
+    }
+    // else the cached connection is kept as is so it can continue to be used
   }
 
   /**
@@ -71,7 +80,7 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
       connectionProvider.disconnect(connection);
     } catch (Exception e) {
       if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn(String.format("Error disconnecting cached connection %s. %s", connection, e.getMessage()), e);
+        LOGGER.warn(format("Error disconnecting cached connection %s. %s", connection, e.getMessage()), e);
       }
     } finally {
       connection = null;
@@ -85,7 +94,7 @@ final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
         close();
       } catch (Exception e) {
         if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn(String.format("Error invalidating cached connection %s. %s", connection, e.getMessage()), e);
+          LOGGER.warn(format("Error invalidating cached connection %s. %s", connection, e.getMessage()), e);
         }
       } finally {
         releaser.accept(this);

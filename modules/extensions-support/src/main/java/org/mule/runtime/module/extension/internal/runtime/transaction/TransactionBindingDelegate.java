@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -24,6 +26,7 @@ import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.sdk.api.connectivity.TransactionalConnection;
 import org.mule.sdk.api.connectivity.XATransactionalConnection;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -108,7 +111,12 @@ public class TransactionBindingDelegate {
       throws ConnectionException, TransactionException {
     ConnectionHandler<T> connectionHandler = connectionHandlerSupplier.get();
 
-    T connection = connectionHandler.getConnection();
+    T connection = requireNonNull(connectionHandler
+        .getConnection(), () -> format("connection from '%s' (%s '%s' of extension '%s') is null",
+                                       connectionHandler,
+                                       getComponentModelTypeName(componentModel),
+                                       componentModel.getName(),
+                                       extensionModel.getName()));
     ExtensionTransactionalResource<T> txResource = createTransactionalResource(currentTx, connectionHandler, connection);
     boolean bound = false;
     try {

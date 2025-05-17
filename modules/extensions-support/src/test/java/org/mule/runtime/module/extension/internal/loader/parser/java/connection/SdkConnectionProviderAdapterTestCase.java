@@ -26,10 +26,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.jupiter.api.Test;
 
-public class SdkConnectionProviderAdapterTestCase extends AbstractMuleTestCase {
+class SdkConnectionProviderAdapterTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void cached() {
+  void cached() {
     final var adapter = from(mock(CachedConnectionProvider.class));
 
     assertThat(adapter,
@@ -39,7 +39,7 @@ public class SdkConnectionProviderAdapterTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void cachedXa() {
+  void cachedXa() {
     final var adapted = mock(CachedConnectionProvider.class,
                              withSettings().extraInterfaces(XATransactionalConnectionProvider.class));
     final var xaPoolingProfile = new PoolingProfile();
@@ -57,7 +57,7 @@ public class SdkConnectionProviderAdapterTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void pooled() {
+  void pooled() {
     final var adapter = from(mock(PoolingConnectionProvider.class));
 
     assertThat(adapter,
@@ -67,7 +67,7 @@ public class SdkConnectionProviderAdapterTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void pooledXa() {
+  void pooledXa() {
     final var adapted = mock(PoolingConnectionProvider.class,
                              withSettings().extraInterfaces(XATransactionalConnectionProvider.class));
     final var xaPoolingProfile = new PoolingProfile();
@@ -85,7 +85,7 @@ public class SdkConnectionProviderAdapterTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void nullMaangement() {
+  void nullManagement() {
     final var adapter = from(mock(ConnectionProvider.class));
 
     assertThat(adapter,
@@ -95,7 +95,7 @@ public class SdkConnectionProviderAdapterTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void nullMaangementXa() {
+  void nullManagementXa() {
     final var adapted = mock(ConnectionProvider.class,
                              withSettings().extraInterfaces(XATransactionalConnectionProvider.class));
     final var xaPoolingProfile = new PoolingProfile();

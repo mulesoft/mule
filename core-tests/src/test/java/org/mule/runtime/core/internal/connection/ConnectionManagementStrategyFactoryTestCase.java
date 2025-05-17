@@ -26,6 +26,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -35,17 +36,16 @@ import org.mule.sdk.api.connectivity.XATransactionalConnection;
 import org.mule.sdk.api.connectivity.XATransactionalConnectionProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
-public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
+class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTestCase {
 
   private ConnectionManagementStrategyFactory connMgmtStrategyFactory;
   private ConnectionManagementStrategyFactory noXaSupportConnMgmtStrategyFactory;
@@ -54,12 +54,21 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
 
   @Mock
   private XAConnectionManagementStrategyFactory xaConnectionManagementStrategyFactory;
+  @Mock
+  private ConnectionManagementStrategy managePooledForXa;
+  @Mock
+  private ConnectionManagementStrategy manageForXa;
 
   @Mock
   private LifecycleState deploymentLifecycleState;
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() throws ConnectionException {
+    when(xaConnectionManagementStrategyFactory.managePooledForXa(any(), any()))
+        .thenReturn(managePooledForXa);
+    when(xaConnectionManagementStrategyFactory.manageForXa(any(), any(), any()))
+        .thenReturn(manageForXa);
+
     connMgmtStrategyFactory = new ConnectionManagementStrategyFactory(null, deploymentLifecycleState,
                                                                       of(xaConnectionManagementStrategyFactory));
     noXaSupportConnMgmtStrategyFactory = new ConnectionManagementStrategyFactory(null, deploymentLifecycleState,
@@ -69,7 +78,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void noManagement() {
+  void noManagement() {
     final var connectionProvider = mock(ConnectionProviderWrapper.class);
     when(connectionProvider.getConnectionManagementType()).thenReturn(null);
 
@@ -79,7 +88,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void pooling() throws ConnectionException {
+  void pooling() throws ConnectionException {
     final var poolingConnectionProvider = mock(ConnectionProviderWrapper.class);
     configureAsPooling(poolingConnectionProvider);
 
@@ -93,7 +102,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void poolingDisabled() throws ConnectionException {
+  void poolingDisabled() throws ConnectionException {
     poolingProfile.setDisabled(true);
 
     final var poolingConnectionProvider = mock(ConnectionProviderWrapper.class);
@@ -108,7 +117,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void cached() throws ConnectionException {
+  void cached() throws ConnectionException {
     final var cachedConnectionProvider = mock(ConnectionProviderWrapper.class);
     when(cachedConnectionProvider.getConnectionManagementType()).thenReturn(CACHED);
 
@@ -124,7 +133,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void basic() throws ConnectionException {
+  void basic() throws ConnectionException {
     final var connectionProvider = mock(ConnectionProviderWrapper.class);
     when(connectionProvider.getConnectionManagementType()).thenReturn(NONE);
 
@@ -137,7 +146,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void poolingTx() throws ConnectionException {
+  void poolingTx() throws ConnectionException {
     final var poolingConnectionProvider = mock(ConnectionProviderWrapper.class);
     configureAsPooling(poolingConnectionProvider);
 
@@ -151,7 +160,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void cachedTx() throws ConnectionException {
+  void cachedTx() throws ConnectionException {
     final var cachedConnectionProvider = mock(ConnectionProviderWrapper.class);
     when(cachedConnectionProvider.getConnectionManagementType()).thenReturn(CACHED);
 
@@ -167,7 +176,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void basicTx() throws ConnectionException {
+  void basicTx() throws ConnectionException {
     final var connectionProvider = mock(ConnectionProviderWrapper.class);
     when(connectionProvider.getConnectionManagementType()).thenReturn(NONE);
 
@@ -180,20 +189,19 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void poolingXaTx() throws ConnectionException {
+  void poolingXaTx() throws ConnectionException {
     final var poolingConnectionProvider = createXaConnectionProvider();
     configureAsPooling(poolingConnectionProvider);
 
     final var strategy = connMgmtStrategyFactory.getStrategy(poolingConnectionProvider, getFeatureFlaggingService());
-    assertThat(strategy, instanceOf(PoolingConnectionManagementStrategy.class));
+    assertThat(strategy, sameInstance(managePooledForXa));
 
     verify(((XATransactionalConnectionProvider) poolingConnectionProvider), never()).getXaPoolingProfile();
     assertPooledXaManaged(xaConnectionManagementStrategyFactory, poolingProfile);
-    assertConnectionProvided(poolingConnectionProvider, strategy);
   }
 
   @Test
-  public void cachedXaTx() throws ConnectionException {
+  void cachedXaTx() throws ConnectionException {
     final var cachedConnectionProvider = createXaConnectionProvider();
     when(cachedConnectionProvider.getConnectionManagementType()).thenReturn(CACHED);
 
@@ -201,24 +209,22 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
     when(deploymentLifecycleState.isStopping()).thenReturn(false);
 
     final var strategy = connMgmtStrategyFactory.getStrategy(cachedConnectionProvider, getFeatureFlaggingService());
-    assertThat(strategy, instanceOf(CachedConnectionManagementStrategy.class));
+    assertThat(strategy, sameInstance(manageForXa));
 
     verify(((XATransactionalConnectionProvider) cachedConnectionProvider)).getXaPoolingProfile();
     assertXaManaged(xaConnectionManagementStrategyFactory, poolingProfile);
-    assertConnectionProvided(cachedConnectionProvider, strategy);
   }
 
   @Test
-  public void basicXaTx() throws ConnectionException {
+  void basicXaTx() throws ConnectionException {
     final var connectionProvider = createXaConnectionProvider();
     when(connectionProvider.getConnectionManagementType()).thenReturn(NONE);
 
     final var strategy = connMgmtStrategyFactory.getStrategy(connectionProvider, getFeatureFlaggingService());
-    assertThat(strategy, instanceOf(NullConnectionManagementStrategy.class));
+    assertThat(strategy, sameInstance(manageForXa));
 
     verify(((XATransactionalConnectionProvider) connectionProvider)).getXaPoolingProfile();
     assertXaManaged(xaConnectionManagementStrategyFactory, poolingProfile);
-    assertConnectionProvided(connectionProvider, strategy);
   }
 
   private static void assertPooledXaManaged(XAConnectionManagementStrategyFactory xaConnectionManagementStrategyFactory,
@@ -240,7 +246,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void poolingXaTxNoXaSupport() throws ConnectionException {
+  void poolingXaTxNoXaSupport() throws ConnectionException {
     final var poolingConnectionProvider = createXaConnectionProvider();
     configureAsPooling(poolingConnectionProvider);
 
@@ -252,7 +258,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void cachedXaTxNoXaSupport() throws ConnectionException {
+  void cachedXaTxNoXaSupport() throws ConnectionException {
     final var cachedConnectionProvider = createXaConnectionProvider();
     when(cachedConnectionProvider.getConnectionManagementType()).thenReturn(CACHED);
 
@@ -267,7 +273,7 @@ public class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTes
   }
 
   @Test
-  public void basicXaTxNoXaSupport() throws ConnectionException {
+  void basicXaTxNoXaSupport() throws ConnectionException {
     final var connectionProvider = createXaConnectionProvider();
     when(connectionProvider.getConnectionManagementType()).thenReturn(NONE);
 

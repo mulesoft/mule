@@ -73,12 +73,14 @@ final class ConnectionManagementStrategyFactory {
                          managementType,
                          (ConnectionManagementStrategy) managementStrategy,
                          xaTxConnectionProvider);
-    }
-
-    if (managementStrategy != null) {
+    } else if (managementStrategy != null) {
       return managementStrategy;
+    } else if (managementType == CACHED) {
+      return cached(connectionProvider);
+    } else if (managementType == NONE) {
+      return withoutManagement(connectionProvider);
     } else {
-      return getNonPoolingStrategy(connectionProvider, managementType);
+      throw new IllegalArgumentException("Unknown management type: " + managementType);
     }
   }
 
@@ -94,18 +96,11 @@ final class ConnectionManagementStrategyFactory {
                                         connectionProvider))
           .orElse(poolingManagementStrategy);
     } else {
-      ConnectionManagementStrategy<C> xaPoolingManagementStrategy =
-          new NullConnectionManagementStrategy<>(connectionProvider);
-
-      return getNonPoolingStrategy(new XaManagementWrappedConnectionProvider<>(connectionProvider,
-                                                                               xaConnectionManagementStrategyFactory
-                                                                                   .map(f -> f
-                                                                                       .manageForXa(xaPoolingManagementStrategy,
-                                                                                                    xaTXConnProvider
-                                                                                                        .getXaPoolingProfile(),
-                                                                                                    connectionProvider))
-                                                                                   .orElse(xaPoolingManagementStrategy)),
-                                   managementType);
+      return xaConnectionManagementStrategyFactory
+          .map(f -> f.manageForXa(withoutManagement(connectionProvider),
+                                  xaTXConnProvider.getXaPoolingProfile(),
+                                  connectionProvider))
+          .orElseGet(() -> getNonPoolingStrategy(connectionProvider, managementType));
     }
   }
 

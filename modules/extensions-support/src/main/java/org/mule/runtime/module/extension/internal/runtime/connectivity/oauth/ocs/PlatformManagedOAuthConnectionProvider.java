@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -27,6 +26,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -49,7 +49,6 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.Once;
@@ -79,9 +78,9 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * An {@link OAuthConnectionProviderWrapper} for OAuth connections managed on the Anypoint Platform
@@ -106,9 +105,6 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
   @Inject
   private ExpressionManager expressionManager;
-
-  @Inject
-  private ExtensionManager extensionManager;
 
   @Inject
   private ArtifactEncoding artifactEncoding;
@@ -374,8 +370,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
   @Override
   public ConnectionProvider<C> getDelegate() {
-    checkState(delegate != null, "ConnectionProvider has not been started yet");
-    return delegate;
+    return requireNonNull(delegate, "ConnectionProvider has not been started yet");
   }
 
   @Override
