@@ -62,8 +62,9 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
   private final LifecycleState deploymentLifecycleState;
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final PoolingProfile defaultPoolingProfile;
-  private final ConnectionManagementStrategyFactory managementStrategyFactory;
   private final ReconnectionConfig defaultReconnectionConfig = defaultReconnectionConfig();
+
+  private ConnectionManagementStrategyFactory managementStrategyFactory;
 
   @Inject
   private Optional<XAConnectionManagementStrategyFactory> xaConnectionManagementStrategyFactory;
@@ -82,8 +83,6 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
     this.injector = muleContext.getInjector();
     this.defaultPoolingProfile = new PoolingProfile();
     this.retryPolicyTemplate = new NoRetryPolicyTemplate();
-    managementStrategyFactory = new ConnectionManagementStrategyFactory(defaultPoolingProfile, deploymentLifecycleState,
-                                                                        xaConnectionManagementStrategyFactory);
   }
 
   /**
@@ -303,6 +302,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(retryPolicyTemplate, injector);
+    managementStrategyFactory = new ConnectionManagementStrategyFactory(defaultPoolingProfile, deploymentLifecycleState,
+                                                                        xaConnectionManagementStrategyFactory);
   }
 
   @Override

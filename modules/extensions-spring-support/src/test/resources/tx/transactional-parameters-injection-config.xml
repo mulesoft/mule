@@ -32,12 +32,4 @@
         <tx:inject-transactional-action config-ref="localTx1"/>
     </flow>
 
-    <flow name="sdkInjectInOperationJoinNotSupported">
-        <tx:sdk-inject-transactional-action config-ref="localTx1" transactionalAction="NOT_SUPPORTED"/>
-    </flow>
-
-    <flow name="sdkInjectInOperationDefaultValue">
-        <tx:sdk-inject-transactional-action config-ref="localTx1"/>
-    </flow>
-
 </mule>

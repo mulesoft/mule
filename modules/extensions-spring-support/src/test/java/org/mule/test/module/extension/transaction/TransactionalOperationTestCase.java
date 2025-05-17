@@ -9,6 +9,8 @@ package org.mule.test.module.extension.transaction;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.test.transactional.TransactionalOperations.getPageCalls;
 
+import static java.util.Arrays.asList;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -18,33 +20,43 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.rules.ExpectedException.none;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
-import org.mule.test.transactional.connection.TestLocalTransactionalConnection;
-import org.mule.test.transactional.connection.TestTransactionalConnection;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.runners.Parameterized;
 
+@RunnerDelegateTo(Parameterized.class)
 public class TransactionalOperationTestCase extends AbstractExtensionFunctionalTestCase {
 
-  @Rule
-  public ExpectedException expectedException = none();
+  private final String configFile;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<String> configs() {
+    return asList("tx/transaction-config.xml",
+                  "tx/transaction-xa-config.xml");
+  }
+
+  public TransactionalOperationTestCase(String configFile) {
+    this.configFile = configFile;
+  }
 
   @Override
   protected String getConfigFile() {
-    return "transaction-config.xml";
+    return configFile;
   }
 
   @Test
@@ -59,18 +71,19 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void executeTransactionless() throws Exception {
-    TestLocalTransactionalConnection connection =
-        (TestLocalTransactionalConnection) flowRunner("executeTransactionless").withPayload("")
-            .run().getMessage().getPayload().getValue();
-    assertThat(connection.isTransactionBegun(), is(false));
-    assertThat(connection.isTransactionCommited(), is(false));
-    assertThat(connection.isTransactionRolledback(), is(false));
+    final Map<String, Boolean> result = (Map<String, Boolean>) flowRunner("executeTransactionless").withPayload("")
+        .run().getMessage().getPayload().getValue();
+
+    assertThat(result.get("transactionBegun"), is(false));
+    assertThat(result.get("transactionCommited"), is(false));
+    assertThat(result.get("transactionRolledback"), is(false));
   }
 
   @Test
   public void localTxDoesntSupportMultipleResources() throws Exception {
-    flowRunner("localTxDoesntSupportMultipleResources").runExpectingException(allOf(instanceOf(TransactionException.class),
-                                                                                    hasMessage(containsString("the current transaction doesn't support it and could not be bound"))));
+    flowRunner("localTxDoesntSupportMultipleResources")
+        .runExpectingException(allOf(instanceOf(TransactionException.class),
+                                     hasMessage(containsString("the current transaction doesn't support it and could not be bound"))));
   }
 
   @Test
@@ -95,12 +108,11 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   @Test
   public void pagedOperationInTxAlwaysUsesSameConnection() throws Exception {
     CoreEvent event = flowRunner("pagedOperationInTxAlwaysUsesSameConnection").run();
-    List<TestTransactionalConnection> connections =
-        (List<TestTransactionalConnection>) event.getVariables().get("connections").getValue();
+    List<?> connections = (List) event.getVariables().get("connections").getValue();
     assertThat(connections, is(notNullValue()));
     assertThat(connections, hasSize(2));
 
-    TestTransactionalConnection connection = connections.get(0);
+    Object connection = connections.get(0);
     assertThat(connections.stream().allMatch(c -> c == connection), is(true));
   }
 
@@ -121,35 +133,43 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   @Test
   public void doNotReconnectPagedOperationInTx() throws Exception {
     resetCounters();
-    expectedException.expectCause(instanceOf(ConnectionException.class));
-    expectedException.expectMessage("Failed to retrieve Page");
-    flowRunner("failingPagedOperationInTx").withVariable("failOn", 1).run();
+    final var failingPagedOperationInTx = flowRunner("failingPagedOperationInTx")
+        .withVariable("failOn", 1);
+    var thrown = assertThrows(Exception.class, () -> failingPagedOperationInTx.run());
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), containsString("Failed to retrieve Page"));
   }
 
   @Test
   public void doNotReconnectStickyPagedOperationInTx() throws Exception {
     resetCounters();
-    expectedException.expectCause(instanceOf(ConnectionException.class));
-    expectedException.expectMessage("Failed to retrieve Page");
-    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 1).run();
+    final var stickyFailingPagedOperationInTx = flowRunner("stickyFailingPagedOperationInTx")
+        .withVariable("failOn", 1);
+    var thrown = assertThrows(Exception.class, () -> stickyFailingPagedOperationInTx.run());
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), containsString("Failed to retrieve Page"));
   }
 
   @Test
   @Ignore("MULE-19198")
   public void doNotReconnectPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
-    expectedException.expectCause(instanceOf(ConnectionException.class));
-    expectedException.expectMessage("Failed to retrieve Page");
-    flowRunner("failingPagedOperationInTx").withVariable("failOn", 2).run();
+    final var failingPagedOperationInTx = flowRunner("failingPagedOperationInTx")
+        .withVariable("failOn", 2);
+    var thrown = assertThrows(Exception.class, () -> failingPagedOperationInTx.run());
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), containsString("Failed to retrieve Page"));
   }
 
   @Test
   @Ignore("MULE-19198")
   public void doNotReconnectStickyPagedOperationInTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
-    expectedException.expectCause(instanceOf(ConnectionException.class));
-    expectedException.expectMessage("Failed to retrieve Page");
-    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 2).run();
+    final var stickyFailingPagedOperationInTx = flowRunner("stickyFailingPagedOperationInTx")
+        .withVariable("failOn", 2);
+    var thrown = assertThrows(Exception.class, () -> stickyFailingPagedOperationInTx.run());
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), containsString("Failed to retrieve Page"));
   }
 
   @Test
@@ -183,16 +203,19 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
   @Ignore("MULE-19198")
   public void doNotReconnectStickyPagedOperationWithoutTxWhenConnectionExceptionOnSecondPage() throws Exception {
     resetCounters();
-    expectedException.expectCause(instanceOf(ConnectionException.class));
-    expectedException.expectMessage("Failed to retrieve Page");
-    flowRunner("stickyFailingPagedOperationInTx").withVariable("failOn", 2).run();
+    final var stickyFailingPagedOperationInTx = flowRunner("stickyFailingPagedOperationInTx")
+        .withVariable("failOn", 2);
+    var thrown = assertThrows(Exception.class, () -> stickyFailingPagedOperationInTx.run());
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), containsString("Failed to retrieve Page"));
   }
 
   @Test
   public void cantNestTransactions() throws Exception {
-    expectedException.expectMessage("Non-XA transactions can't be nested.");
-    expectedException.expectCause(is(instanceOf(TransactionStatusException.class)));
-    flowRunner("cantNestTransactions").run();
+    final var cantNestTransactions = flowRunner("cantNestTransactions");
+    var thrown = assertThrows(Exception.class, () -> cantNestTransactions.run());
+    assertThat(thrown.getCause(), instanceOf(TransactionStatusException.class));
+    assertThat(thrown.getMessage(), containsString("Non-XA transactions can't be nested."));
   }
 
   @Test
@@ -202,12 +225,14 @@ public class TransactionalOperationTestCase extends AbstractExtensionFunctionalT
 
   @Test
   public void doNotRetryOnTxReconnection() throws Exception {
-    expectedException.expectCause(instanceOf(ConnectionException.class));
-    expectedException.expectMessage("1");
-    flowRunner("doNotRetryOnTxReconnection").run();
+    final var doNotRetryOnTxReconnection = flowRunner("doNotRetryOnTxReconnection");
+    var thrown = assertThrows(Exception.class, () -> doNotRetryOnTxReconnection.run());
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), is("1"));
   }
 
   private void resetCounters() {
     getPageCalls = 0;
+    org.mule.test.transactionalxa.TransactionalOperations.getPageCalls = 0;
   }
 }

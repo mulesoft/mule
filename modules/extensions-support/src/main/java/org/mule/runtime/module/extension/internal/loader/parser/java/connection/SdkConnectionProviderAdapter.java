@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -23,11 +24,13 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.internal.connection.adapter.XATransactionalConnectionProvider;
 import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
-
-import jakarta.inject.Inject;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Adapts a sdk-api {@link org.mule.sdk.api.connectivity.ConnectionProvider} into a mule-api {@link ConnectionProvider}.
@@ -66,17 +69,41 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     if (connectionProvider != null) {
       if (connectionProvider instanceof ConnectionProvider) {
         return (ConnectionProvider<C>) connectionProvider;
-      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.CachedConnectionProvider) {
-        return new SdkCachedConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.CachedConnectionProvider<C>) connectionProvider);
-      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.PoolingConnectionProvider) {
-        return new SdkPoolingConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.PoolingConnectionProvider<C>) connectionProvider);
-      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.ConnectionProvider) {
-        return new SdkConnectionProviderAdapter<>((org.mule.sdk.api.connectivity.ConnectionProvider<C>) connectionProvider);
+      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.CachedConnectionProvider cachedConnectionProvider) {
+        return fromCachedManagement(cachedConnectionProvider);
+      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.PoolingConnectionProvider poolingConnectionProvider) {
+        return fromPooledManagement(poolingConnectionProvider);
+      } else if (connectionProvider instanceof org.mule.sdk.api.connectivity.ConnectionProvider nullMgmtConnectionProvider) {
+        return fromNullManagement(nullMgmtConnectionProvider);
       } else {
         throw new IllegalArgumentException("Unsupported ConnectionProvider type " + connectionProvider.getClass().getName());
       }
     } else {
       throw new IllegalArgumentException("connectionProvider cannot be null");
+    }
+  }
+
+  private static <C> ConnectionProvider<C> fromCachedManagement(org.mule.sdk.api.connectivity.CachedConnectionProvider connectionProvider) {
+    if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
+      return new SdkCachedXATransactionalConnectionProviderAdapter<>(connectionProvider);
+    } else {
+      return new SdkCachedConnectionProviderAdapter<>(connectionProvider);
+    }
+  }
+
+  private static <C> ConnectionProvider<C> fromPooledManagement(org.mule.sdk.api.connectivity.PoolingConnectionProvider connectionProvider) {
+    if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
+      return new SdkPoolingXATransactionalConnectionProviderAdapter<>(connectionProvider);
+    } else {
+      return new SdkPoolingConnectionProviderAdapter<>(connectionProvider);
+    }
+  }
+
+  private static <C> ConnectionProvider<C> fromNullManagement(org.mule.sdk.api.connectivity.ConnectionProvider connectionProvider) {
+    if (connectionProvider instanceof org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) {
+      return new SdkXATransactionalConnectionProviderAdapter<>(connectionProvider);
+    } else {
+      return new SdkConnectionProviderAdapter<>(connectionProvider);
     }
   }
 
@@ -136,6 +163,20 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     }
   }
 
+  private static class SdkXATransactionalConnectionProviderAdapter<C extends TransactionalConnection>
+      extends SdkConnectionProviderAdapter<C>
+      implements XATransactionalConnectionProvider<C> {
+
+    private SdkXATransactionalConnectionProviderAdapter(org.mule.sdk.api.connectivity.ConnectionProvider<C> delegate) {
+      super(delegate);
+    }
+
+    @Override
+    public PoolingProfile getXaPoolingProfile() {
+      return ((org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) getDelegate()).getXaPoolingProfile();
+    }
+  }
+
   private static class SdkPoolingConnectionProviderAdapter<C> extends SdkConnectionProviderAdapter<C>
       implements PoolingConnectionProvider<C> {
 
@@ -157,11 +198,39 @@ public class SdkConnectionProviderAdapter<C> implements ConnectionProvider<C>, L
     }
   }
 
+  private static class SdkPoolingXATransactionalConnectionProviderAdapter<C extends TransactionalConnection>
+      extends SdkPoolingConnectionProviderAdapter<C>
+      implements XATransactionalConnectionProvider<C> {
+
+    private SdkPoolingXATransactionalConnectionProviderAdapter(org.mule.sdk.api.connectivity.PoolingConnectionProvider<C> delegate) {
+      super(delegate);
+    }
+
+    @Override
+    public PoolingProfile getXaPoolingProfile() {
+      return ((org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) getDelegate()).getXaPoolingProfile();
+    }
+  }
+
   private static class SdkCachedConnectionProviderAdapter<C> extends SdkConnectionProviderAdapter<C>
       implements CachedConnectionProvider<C> {
 
     private SdkCachedConnectionProviderAdapter(org.mule.sdk.api.connectivity.CachedConnectionProvider<C> delegate) {
       super(delegate);
+    }
+  }
+
+  private static class SdkCachedXATransactionalConnectionProviderAdapter<C extends TransactionalConnection>
+      extends SdkCachedConnectionProviderAdapter<C>
+      implements XATransactionalConnectionProvider<C> {
+
+    private SdkCachedXATransactionalConnectionProviderAdapter(org.mule.sdk.api.connectivity.CachedConnectionProvider<C> delegate) {
+      super(delegate);
+    }
+
+    @Override
+    public PoolingProfile getXaPoolingProfile() {
+      return ((org.mule.sdk.api.connectivity.XATransactionalConnectionProvider) getDelegate()).getXaPoolingProfile();
     }
   }
 }

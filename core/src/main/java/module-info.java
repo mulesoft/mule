@@ -234,6 +234,8 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.connection.adapter to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.connectivity to
       org.mule.runtime.spring.config,
       spring.beans;
