@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.function.Function.identity;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
@@ -19,6 +17,10 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.isPartOfActiveTransaction;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.function.Function.identity;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -32,11 +34,11 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
-import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.sdk.api.runtime.streaming.PagingProvider;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -86,7 +88,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
                                 ExtensionConnectionSupplier extensionConnectionSupplier,
                                 boolean supportsOAuth,
                                 ComponentTracer<CoreEvent> operationConnectionTracer) {
-    this.delegate = new PagingProviderWrapper(delegate, executionContext.getExtensionModel());
+    this.delegate = new PagingProviderWrapper<>(delegate, executionContext.getExtensionModel());
     this.config = config;
     this.executionContext = executionContext;
     this.extensionConnectionSupplier = extensionConnectionSupplier;
