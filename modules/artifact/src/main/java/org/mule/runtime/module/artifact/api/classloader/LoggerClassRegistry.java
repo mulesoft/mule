@@ -8,7 +8,8 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static java.util.ServiceLoader.load;
 
-import java.util.Collection;
+import org.mule.runtime.module.artifact.internal.classloader.NoOpLoggerClassRegistry;
+
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -27,9 +28,9 @@ public interface LoggerClassRegistry {
     ServiceLoader<LoggerClassRegistry> factories = load(LoggerClassRegistry.class, LoggerClassRegistry.class.getClassLoader());
     Iterator<LoggerClassRegistry> iterator = factories.iterator();
     if (!iterator.hasNext()) {
-      throw new IllegalStateException(String.format("Could not find %s service implementation through SPI",
-                                                    LoggerClassRegistry.class.getName()));
+      return new NoOpLoggerClassRegistry();
     }
+
     return iterator.next();
   }
 
