@@ -42,6 +42,10 @@ import net.bytebuddy.ByteBuddy;
 
 public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader extends MuleDeployableArtifactClassLoader {
 
+  static {
+    registerAsParallelCapable();
+  }
+
   private final Logger logger = LoggerFactory.getLogger(NativeLibraryLoaderMuleDeployableArtifactClassLoader.class);
 
   public static final String METHOD_NAME = "loadLibrary";
