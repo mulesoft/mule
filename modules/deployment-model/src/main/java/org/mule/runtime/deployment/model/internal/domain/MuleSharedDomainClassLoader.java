@@ -8,6 +8,7 @@ package org.mule.runtime.deployment.model.internal.domain;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory.getDomainId;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
 import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -33,6 +34,7 @@ public class MuleSharedDomainClassLoader extends NativeLibraryLoaderMuleDeployab
 
   static {
     registerAsParallelCapable();
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(MuleSharedDomainClassLoader.class);
   }
 
   private static final Logger LOGGER = getLogger(MuleSharedDomainClassLoader.class);

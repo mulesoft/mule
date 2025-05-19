@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
+
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
@@ -64,8 +66,10 @@ import org.slf4j.Logger;
 public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   protected static final String REGION_OWNER_CANNOT_BE_REMOVED_ERROR = "Region owner cannot be removed";
+
   static {
     registerAsParallelCapable();
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(RegionClassLoader.class);
   }
 
   private static final String CLASS_EXTENSION = ".class";

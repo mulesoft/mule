@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
@@ -45,6 +47,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
   static {
     registerAsParallelCapable();
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(FilteringArtifactClassLoader.class);
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);

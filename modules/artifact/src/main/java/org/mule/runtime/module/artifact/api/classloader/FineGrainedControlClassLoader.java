@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -45,6 +47,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
   static {
     registerAsParallelCapable();
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(FineGrainedControlClassLoader.class);
   }
 
   private static final Logger LOGGER = getLogger(FineGrainedControlClassLoader.class);
