@@ -47,6 +47,7 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -97,8 +98,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private Logger logger;
 
-  private LoggerContextCache loggerContextCache =
-      spy(new LoggerContextCache(artifactAwareContextSelector, mock(ClassLoader.class, RETURNS_DEEP_STUBS)));
+  private LoggerContextCache loggerContextCache;
 
   @Before
   public void before() {
@@ -113,6 +113,12 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
             return LOGGER_NAME;
           }
         };
+    loggerContextCache = spy(new LoggerContextCache(artifactAwareContextSelector, mock(ClassLoader.class, RETURNS_DEEP_STUBS)));
+  }
+
+  @After
+  public void after() {
+    loggerContextCache.dispose();
   }
 
   @Test
