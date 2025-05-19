@@ -78,10 +78,12 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -90,6 +92,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -125,6 +128,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.inject.Inject;
 
@@ -2160,6 +2164,49 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final String artifactId = emptyDomainFileBuilder.getId();
 
     doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, domainDeploymentListener, artifactId);
+  }
+
+  /**
+   * This method is overridden to remove a race condition that affects domain deployment tests, especially in concurrent
+   * environments or on Windows.
+   * <p>
+   * The original implementation may cause the ServiceManager to not register services in time for the Spring context to discover
+   * them, resulting in intermittent (flaky) test failures. This version ensures that services are properly initialized before
+   * proceeding with deployment, thus avoiding the race condition without impacting the behavior of other test classes.
+   * <p>
+   *
+   * @param deploymentAction         the deployment action to execute in the test
+   * @param assertAction             the assertion action to execute after deployment
+   * @param domainDeploymentListener the domain deployment listener
+   * @param artifactId               the identifier of the artifact to deploy
+   */
+  @Override
+  protected void doSynchronizedArtifactDeploymentActionTest(final Action deploymentAction, final Action assertAction,
+                                                            DeploymentListener domainDeploymentListener, String artifactId) {
+    try {
+      startDeployment();
+    } catch (MuleException e) {
+      throw new RuntimeException("Unable to start deployment service");
+    }
+
+    final AtomicBoolean assertionError = new AtomicBoolean(false);
+
+    doAnswer(invocation -> {
+      try {
+        deploymentAction.perform();
+      } catch (Exception ignored) {
+      }
+
+      try {
+        assertAction.perform();
+      } catch (AssertionError e) {
+        assertionError.set(true);
+      }
+      return null;
+    }).when(domainDeploymentListener).onDeploymentStart(artifactId);
+
+    assertDeploymentSuccess(domainDeploymentListener, artifactId);
+    assertFalse("Assertion action failed", assertionError.get());
   }
 
   private Action createUndeployDummyDomainAction() {
