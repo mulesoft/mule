@@ -8,7 +8,7 @@ package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.log4j.internal.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
-import static org.mule.runtime.module.log4j.internal.Log4JBlockingLoggerResolutionClassRegistry.getClassesNamesNeedingBlockingLoggerResolution;
+import static org.mule.runtime.module.log4j.internal.Log4JBlockingLoggerResolutionClassRegistry.getClassNamesNeedingBlockingLoggerResolution;
 
 import static java.lang.Thread.currentThread;
 
@@ -66,7 +66,7 @@ abstract class DispatchingLogger extends Logger {
     this.originalLogger = originalLogger;
     this.contextSelector = contextSelector;
     this.ownerClassLoaderHash = ownerClassLoaderHash;
-    requiresBlockingLoggerResolution = getClassesNamesNeedingBlockingLoggerResolution().contains(originalLogger.getName());
+    requiresBlockingLoggerResolution = getClassNamesNeedingBlockingLoggerResolution().contains(originalLogger.getName());
   }
 
   private Logger getLogger() {
