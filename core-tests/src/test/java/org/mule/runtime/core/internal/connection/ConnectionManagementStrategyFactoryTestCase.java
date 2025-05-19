@@ -288,6 +288,7 @@ class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTestCase {
     final var connectionProvider = mock(ConnectionProviderWrapper.class,
                                         withSettings().extraInterfaces(XATransactionalConnectionProvider.class,
                                                                        org.mule.runtime.core.internal.connection.adapter.XATransactionalConnectionProvider.class));
+    when(connectionProvider.supportsXa()).thenReturn(true);
     when(((XATransactionalConnectionProvider) connectionProvider).getXaPoolingProfile()).thenReturn(poolingProfile);
 
     return connectionProvider;

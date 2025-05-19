@@ -289,7 +289,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
       }
     });
 
-    return (FieldSetter<Object, Object>) setter.get();
+    return setter.get();
   }
 
   private IllegalConnectionProviderModelDefinitionException illegalDelegateException() {
@@ -376,6 +376,11 @@ public class PlatformManagedOAuthConnectionProvider<C>
   @Override
   public ConnectionManagementType getConnectionManagementType() {
     return oauthConfig.getDelegateConnectionProviderModel().getConnectionManagementType();
+  }
+
+  public boolean supportsXa() {
+    // TODO W-18557890 get this from the connection provider model
+    return false;
   }
 
   @Override

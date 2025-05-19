@@ -34,6 +34,12 @@ public interface ConnectionProviderWrapper<C>
   ConnectionManagementType getConnectionManagementType();
 
   /**
+   * @return {@code true} if the delegate {@link ConnectionProvider} may be used in an XA transaction.
+   * @since 4.10
+   */
+  boolean supportsXa();
+
+  /**
    * @return The name of the config that owns this {@link ConnectionProvider}.
    *
    * @since 4.5

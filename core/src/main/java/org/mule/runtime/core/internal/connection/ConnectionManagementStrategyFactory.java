@@ -67,8 +67,10 @@ final class ConnectionManagementStrategyFactory {
       managementStrategy = pooling(connectionProvider, featureFlaggingService);
     }
 
-    if (unwrapProviderWrapper(connectionProvider,
-                              XATransactionalConnectionProvider.class) instanceof XATransactionalConnectionProvider<?> xaTxConnectionProvider) {
+    if (supportsXa(connectionProvider)) {
+      XATransactionalConnectionProvider<?> xaTxConnectionProvider =
+          (XATransactionalConnectionProvider<?>) unwrapProviderWrapper(connectionProvider,
+                                                                       XATransactionalConnectionProvider.class);
       return handleForXa((ConnectionProvider) connectionProvider,
                          managementType,
                          (ConnectionManagementStrategy) managementStrategy,
@@ -166,5 +168,13 @@ final class ConnectionManagementStrategyFactory {
     }
 
     return type;
+  }
+
+  private <C> boolean supportsXa(ConnectionProvider<C> connectionProvider) {
+    if (connectionProvider instanceof ConnectionProviderWrapper<C> cpWrapper) {
+      return cpWrapper.supportsXa();
+    }
+
+    return connectionProvider instanceof XATransactionalConnectionProvider;
   }
 }
