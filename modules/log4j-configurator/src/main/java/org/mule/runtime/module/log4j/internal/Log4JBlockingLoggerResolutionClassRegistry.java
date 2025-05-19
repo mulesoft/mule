@@ -6,22 +6,20 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
-import static java.util.stream.Collectors.toList;
-
-import org.mule.runtime.module.artifact.api.classloader.LoggerClassRegistry;
+import org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Implementation of {@link LoggerClassRegistry} for classes owning a Log4j logger.
+ * Implementation of {@link BlockingLoggerResolutionClassRegistry} for classes owning a Log4j logger.
  */
-public class Log4jLoggerClassRegistry implements LoggerClassRegistry {
+public class Log4JBlockingLoggerResolutionClassRegistry implements BlockingLoggerResolutionClassRegistry {
 
   private static final Collection<Class<?>> loggerClasses = new ArrayList<>();
 
   @Override
-  public void register(Class<?> loggerClass) {
+  public void registerClassNeedingBlockingLoggerResolution(Class<?> loggerClass) {
     loggerClasses.add(loggerClass);
   }
 

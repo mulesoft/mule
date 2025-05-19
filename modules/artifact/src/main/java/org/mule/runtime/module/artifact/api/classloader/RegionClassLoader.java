@@ -7,7 +7,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.artifact.api.classloader.LoggerClassRegistry.getLoggerClassRegistry;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getLoggerClassRegistry;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 
 import static java.lang.Integer.toHexString;
@@ -69,7 +69,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
-    getLoggerClassRegistry().register(RegionClassLoader.class);
+    getLoggerClassRegistry().registerClassNeedingBlockingLoggerResolution(RegionClassLoader.class);
   }
 
   private static final String CLASS_EXTENSION = ".class";

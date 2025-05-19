@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.module.artifact.internal.classloader;
 
-import org.mule.runtime.module.artifact.api.classloader.LoggerClassRegistry;
+import org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry;
 
 /**
- * A no-op {@link LoggerClassRegistry}.
+ * A no-op {@link BlockingLoggerResolutionClassRegistry}.
  */
-public class NoOpLoggerClassRegistry implements LoggerClassRegistry {
+public class NoOpBlockingLoggerResolutionClassRegistry implements BlockingLoggerResolutionClassRegistry {
 
   @Override
-  public void register(Class<?> loggerClass) {
+  public void registerClassNeedingBlockingLoggerResolution(Class<?> loggerClass) {
     // Nothing to do
   }
 

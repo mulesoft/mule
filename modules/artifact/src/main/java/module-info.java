@@ -4,6 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+import org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry;
+
 /**
  * Mule Artifact Module.
  *
@@ -54,7 +57,7 @@ module org.mule.runtime.artifact {
       org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
 
-  uses org.mule.runtime.module.artifact.api.classloader.LoggerClassRegistry;
+  uses BlockingLoggerResolutionClassRegistry;
   uses org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
   uses org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 

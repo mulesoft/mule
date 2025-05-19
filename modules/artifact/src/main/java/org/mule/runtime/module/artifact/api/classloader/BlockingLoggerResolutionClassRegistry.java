@@ -8,7 +8,7 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static java.util.ServiceLoader.load;
 
-import org.mule.runtime.module.artifact.internal.classloader.NoOpLoggerClassRegistry;
+import org.mule.runtime.module.artifact.internal.classloader.NoOpBlockingLoggerResolutionClassRegistry;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -19,16 +19,17 @@ import java.util.ServiceLoader;
  *
  * @since 4.10, 4.9.7, 4.6.18
  */
-public interface LoggerClassRegistry {
+public interface BlockingLoggerResolutionClassRegistry {
 
   /**
-   * Discovers an implementation of {@link LoggerClassRegistry} through {@code SPI}.
+   * Discovers an implementation of {@link BlockingLoggerResolutionClassRegistry} through {@code SPI}.
    */
-  static LoggerClassRegistry getLoggerClassRegistry() {
-    ServiceLoader<LoggerClassRegistry> factories = load(LoggerClassRegistry.class, LoggerClassRegistry.class.getClassLoader());
-    Iterator<LoggerClassRegistry> iterator = factories.iterator();
+  static BlockingLoggerResolutionClassRegistry getLoggerClassRegistry() {
+    ServiceLoader<BlockingLoggerResolutionClassRegistry> factories =
+        load(BlockingLoggerResolutionClassRegistry.class, BlockingLoggerResolutionClassRegistry.class.getClassLoader());
+    Iterator<BlockingLoggerResolutionClassRegistry> iterator = factories.iterator();
     if (!iterator.hasNext()) {
-      return new NoOpLoggerClassRegistry();
+      return new NoOpBlockingLoggerResolutionClassRegistry();
     }
 
     return iterator.next();
@@ -39,6 +40,6 @@ public interface LoggerClassRegistry {
    *
    * @param loggerClass the class owning a {@link org.slf4j.Logger}.
    */
-  void register(Class<?> loggerClass);
+  void registerClassNeedingBlockingLoggerResolution(Class<?> loggerClass);
 
 }

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.module.artifact.api.classloader.LoggerClassRegistry.getLoggerClassRegistry;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getLoggerClassRegistry;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
@@ -51,7 +51,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     // un-deployment of applications or extensions.
     setDefaultUseCaches("jar", false);
 
-    getLoggerClassRegistry().register(FineGrainedControlClassLoader.class);
+    getLoggerClassRegistry().registerClassNeedingBlockingLoggerResolution(FineGrainedControlClassLoader.class);
   }
 
   private static final Logger LOGGER = getLogger(FineGrainedControlClassLoader.class);
