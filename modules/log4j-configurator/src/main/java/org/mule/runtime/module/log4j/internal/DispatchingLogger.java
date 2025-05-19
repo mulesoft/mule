@@ -18,7 +18,6 @@ import org.mule.runtime.api.util.Reference;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
@@ -61,8 +60,6 @@ abstract class DispatchingLogger extends Logger {
       .weakValues()
       .build(key -> new Reference<>());
 
-  private final Map<Integer, Object> loggerClassesLocks = new ConcurrentHashMap<>();
-
   DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector,
                     MessageFactory messageFactory) {
     super(loggerContext, originalLogger.getName(), messageFactory);
@@ -95,8 +92,8 @@ abstract class DispatchingLogger extends Logger {
       setContextClassLoader(thread, getClass().getClassLoader(), currentClassLoader);
     }
 
-    if (shouldBlock) {
-      synchronized (loggerClassesLocks.computeIfAbsent(resolvedCtxClassLoader.hashCode(), k -> new Object())) {
+    if (shouldBlock && contextSelector instanceof ArtifactAwareContextSelector artifactAwareContextSelector) {
+      synchronized (artifactAwareContextSelector.getLoggerContextCache()) {
         return getLogger(resolvedCtxClassLoader, loggerReference);
       }
     } else {
@@ -135,8 +132,8 @@ abstract class DispatchingLogger extends Logger {
     // trick - this is probably a logger declared in a static field
     // the classloader used to create it and the TCCL can be different
     // ask contextSelector for the correct context
-    if (contextSelector instanceof ArtifactAwareContextSelector) {
-      logger = ((ArtifactAwareContextSelector) contextSelector).getContextWithResolvedContextClassLoader(resolvedCtxClassLoader)
+    if (contextSelector instanceof ArtifactAwareContextSelector artifactAwareContextSelector) {
+      logger = artifactAwareContextSelector.getContextWithResolvedContextClassLoader(resolvedCtxClassLoader)
           .getLogger(getName(), getMessageFactory());
     } else {
       logger = contextSelector.getContext(getName(), resolvedCtxClassLoader, true).getLogger(getName(), getMessageFactory());

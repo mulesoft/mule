@@ -19,6 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -34,9 +35,12 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
@@ -93,6 +97,11 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private Logger logger;
 
+  // @Mock(answer = RETURNS_DEEP_STUBS)
+  // LoggerContextCache loggerContextCache;
+  private LoggerContextCache loggerContextCache =
+      spy(new LoggerContextCache(artifactAwareContextSelector, mock(ClassLoader.class, RETURNS_DEEP_STUBS)));
+
   @Before
   public void before() {
     currentClassLoader = Thread.currentThread().getContextClassLoader();
@@ -109,51 +118,74 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void noParallelizationWhenGettingLoggerForSameClassAndSameCtxClassLoader() throws InterruptedException {
+  @Issue("W-18388443")
+  public void noParallelizationWhenGettingLoggerFirstForClassNeedingBlockingAndThenForRegularClass() throws Exception {
     Logger regionClassLoaderLogger = getRegionClassLoader();
 
     final Latch latch = new Latch();
-    final AtomicInteger timesCalled = new AtomicInteger(0);
+    final AtomicInteger getLoggerContextTimesCalled = new AtomicInteger(0);
+    final AtomicBoolean getLoggerBlockingCalled = new AtomicBoolean(false);
+    final AtomicBoolean getLoggerNonBlockingCalled = new AtomicBoolean(false);
 
-    TestClassOwningLogger loggerOwner = new TestClassOwningLogger();
-    DispatchingLogger logger = loggerOwner.getDispatchingLogger();
+    ClassOwningLoggerNeedingBlocking blockingLoggerOwner = new ClassOwningLoggerNeedingBlocking();
+    ClassOwningLogger nonBlockingLoggerOwner = new ClassOwningLogger();
+    DispatchingLogger blockingLogger = blockingLoggerOwner.getDispatchingLogger();
+    DispatchingLogger nonBlockingLogger = nonBlockingLoggerOwner.getDispatchingLogger();
 
     doAnswer(invocation -> {
-      if (timesCalled.compareAndSet(0, 1)) {
-        // Make the first call wait here so the second one doesn't get into this method due to the lock
-        assertThat(latch.await(1000, MILLISECONDS), is(true));
-      } else {
-        timesCalled.compareAndSet(1, 2);
-      }
+      assertThat(getLoggerBlockingCalled.compareAndSet(false, true), is(true));
+      // Make the call wait here so the call for the non-blocking logger owner class isn't made because of the lock of the
+      // `LoggerContextCache` instance being taken in `DispatchingLogger#getLogger(ClassLoader, Reference)`
+      assertThat(latch.await(1000, MILLISECONDS), is(true));
 
       return invocation.callRealMethod();
-    }).when(logger).getLogger(any(ClassLoader.class), any(Reference.class));
+    }).when(blockingLogger).getLogger(any(ClassLoader.class), any(Reference.class));
+
+    doAnswer(invocation -> {
+      assertThat(getLoggerNonBlockingCalled.compareAndSet(false, true), is(true));
+
+      return invocation.callRealMethod();
+    }).when(nonBlockingLogger).getLogger(any(ClassLoader.class), any(Reference.class));
+
+    doAnswer(invocation -> {
+      getLoggerContextTimesCalled.incrementAndGet();
+
+      return regionClassLoaderLoggerContext;
+    }).when(loggerContextCache).doGetLoggerContext(eq(regionClassLoader), any());
 
     String log1 = "Log 1";
     String log2 = "Log 2";
 
-    Thread firstLogThread = new Thread(() -> logger.info(log1));
-    Thread secondLogThread = new Thread(() -> logger.info(log2));
+    Thread blockingLogThread = new Thread(() -> blockingLogger.info(log1));
+    Thread nonBlockingLogThread = new Thread(() -> nonBlockingLogger.info(log2));
 
-    firstLogThread.setContextClassLoader(regionClassLoader);
-    secondLogThread.setContextClassLoader(regionClassLoader);
+    blockingLogThread.setContextClassLoader(regionClassLoader);
+    nonBlockingLogThread.setContextClassLoader(regionClassLoader);
 
-    firstLogThread.start();
-    secondLogThread.start();
+    blockingLogThread.start();
 
     new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(timesCalled.get(), is(1));
+      assertThat(getLoggerBlockingCalled.get(), is(true));
       return true;
     }));
 
     verify(regionClassLoaderLogger, times(0)).info(log1);
     verify(regionClassLoaderLogger, times(0)).info(log2);
 
-    // Give some time to check second invocation didn't get into `getLogger` method due to the lock
-    sleep(200);
-    assertThat(timesCalled.get(), is(1));
+    nonBlockingLogThread.start();
 
-    // Let the first log continue
+    // The second (non-blocking) logger will be allowed to get into the `getLogger` method, but won't be able to take the
+    // synchronize over the `LoggerContextCache` instance and thus get into the `getLoggerContext` method of the latter
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      assertThat(getLoggerNonBlockingCalled.get(), is(true));
+      return true;
+    }));
+
+    // Give some time to check second logger didn't get into `getLogger` method due to the lock
+    sleep(200);
+    assertThat(getLoggerContextTimesCalled.get(), is(0));
+
+    // Let the first logger continue
     latch.countDown();
 
     // Check the first message is logged
@@ -164,7 +196,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
     // Now the second message should be logged
     new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(timesCalled.get(), is(2));
+      assertThat(getLoggerContextTimesCalled.get(), is(2));
       return true;
     }));
 
@@ -174,57 +206,67 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
       return true;
     }));
 
-    firstLogThread.join();
-    secondLogThread.join();
+    blockingLogThread.join();
+    nonBlockingLogThread.join();
   }
 
   @Test
-  public void parallelizationWhenGettingLoggerForSameClassAndDifferentCtxClassLoader() throws InterruptedException {
+  @Issue("W-18388443")
+  public void noParallelizationWhenGettingLoggerFirstForRegularClassAndThenForClassNeedingBlocking() throws Exception {
     Logger regionClassLoaderLogger = getRegionClassLoader();
 
     final Latch latch = new Latch();
-    final AtomicInteger timesCalled = new AtomicInteger(0);
+    final AtomicInteger getLoggerContextTimesCalled = new AtomicInteger(0);
+    final AtomicBoolean getLoggerBlockingCalled = new AtomicBoolean(false);
 
-    TestClassOwningLogger loggerOwner = new TestClassOwningLogger();
-    DispatchingLogger logger = loggerOwner.getDispatchingLogger();
-    Logger originalLogger = loggerOwner.getOriginalLogger();
+    ClassOwningLogger nonBlockingLoggerOwner = new ClassOwningLogger();
+    ClassOwningLoggerNeedingBlocking blockingLoggerOwner = new ClassOwningLoggerNeedingBlocking();
+    DispatchingLogger nonBlockingLogger = nonBlockingLoggerOwner.getDispatchingLogger();
+    DispatchingLogger blockingLogger = blockingLoggerOwner.getDispatchingLogger();
 
     doAnswer(invocation -> {
-      if (timesCalled.compareAndSet(0, 1)) {
-        // Make the first call wait here so the second one doesn't get into this method due to the lock
+      if (getLoggerContextTimesCalled.incrementAndGet() == 1) {
+        // Make the first call wait here so the second logger doesn't get to `DispatchingLogger#getLogger(ClassLoader, Reference)`
+        // because of the lock of the `LoggerContextCache` instance being taken in
+        // `LoggerContextCache#getLoggerContext(ClassLoader)`
         assertThat(latch.await(1000, MILLISECONDS), is(true));
       }
 
+      return regionClassLoaderLoggerContext;
+    }).when(loggerContextCache).doGetLoggerContext(eq(regionClassLoader), any());
+
+    doAnswer(invocation -> {
+      assertThat(getLoggerBlockingCalled.compareAndSet(false, true), is(true));
+
       return invocation.callRealMethod();
-    }).when(logger).getLogger(any(ClassLoader.class), any(Reference.class));
+    }).when(blockingLogger).getLogger(any(ClassLoader.class), any(Reference.class));
 
     String log1 = "Log 1";
     String log2 = "Log 2";
 
-    Thread firstLogThread = new Thread(() -> logger.info(log1));
-    Thread secondLogThread = new Thread(() -> logger.info(log2));
+    Thread nonBlockingLogThread = new Thread(() -> nonBlockingLogger.info(log1));
+    Thread blockingLogThread = new Thread(() -> blockingLogger.info(log2));
 
-    firstLogThread.setContextClassLoader(regionClassLoader);
+    nonBlockingLogThread.setContextClassLoader(regionClassLoader);
+    blockingLogThread.setContextClassLoader(regionClassLoader);
 
-    firstLogThread.start();
-
-    // Check the `getLogger` method has been called for the first thread
-    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      assertThat(timesCalled.get(), is(1));
-      return true;
-    }));
-
-    // Start the second thread and verify it logs
-    secondLogThread.start();
+    nonBlockingLogThread.start();
 
     new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      verify(originalLogger, times(1)).info(log2);
+      assertThat(getLoggerContextTimesCalled.get(), is(1));
       return true;
     }));
 
     verify(regionClassLoaderLogger, times(0)).info(log1);
+    verify(regionClassLoaderLogger, times(0)).info(log2);
 
-    // Let the first log continue
+    blockingLogThread.start();
+
+    // Give some time to check second invocation didn't get into `getLogger` method due to the lock
+    sleep(200);
+    assertThat(getLoggerBlockingCalled.get(), is(false));
+
+    // Let the first logger continue
     latch.countDown();
 
     // Check the first message is logged
@@ -233,15 +275,28 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
       return true;
     }));
 
-    firstLogThread.join();
-    secondLogThread.join();
+    // Now the second message should be logged
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      assertThat(getLoggerBlockingCalled.get(), is(true));
+      return true;
+    }));
+
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      assertThat(getLoggerContextTimesCalled.get(), is(2));
+      return true;
+    }));
+
+    // Check the second message is logged
+    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
+      verify(regionClassLoaderLogger, times(1)).info(log2);
+      return true;
+    }));
+
+    nonBlockingLogThread.join();
+    blockingLogThread.join();
   }
 
-  private class TestClassOwningLogger {
-
-    static {
-      getLoggerClassRegistry().register(TestClassOwningLogger.class);
-    }
+  private class ClassOwningLogger {
 
     private final Logger logger = getLogger();
 
@@ -271,17 +326,32 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   }
 
-  private Logger getRegionClassLoader() {
+  private class ClassOwningLoggerNeedingBlocking extends ClassOwningLogger {
+
+    static {
+      getLoggerClassRegistry().register(ClassOwningLoggerNeedingBlocking.class);
+    }
+
+  }
+
+  private Logger getRegionClassLoader() throws ExecutionException {
     Logger containerLogger = mock(Logger.class);
     Logger regionClassLoaderLogger = mock(Logger.class);
     when(containerLoggerContext.getLogger(anyString(), any(MessageFactory.class))).thenReturn(containerLogger);
     when(regionClassLoaderLoggerContext.getLogger(anyString(), any(MessageFactory.class)))
         .thenReturn(regionClassLoaderLogger);
     // Triggers of the expected Loggers
-    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(regionClassLoader))
-        .thenAnswer(invocation -> regionClassLoaderLoggerContext);
-    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(currentClassLoader))
-        .thenAnswer(invocation -> containerLoggerContext);
+    // when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(regionClassLoader))
+    // .thenReturn(loggerContextCache.getLoggerContext(regionClassLoader));
+    // when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(currentClassLoader))
+    // .thenReturn(loggerContextCache.getLoggerContext(currentClassLoader));
+    when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(any()))
+        .thenAnswer(invocation -> loggerContextCache.getLoggerContext(invocation.getArgument(0)));
+    when(artifactAwareContextSelector.getLoggerContextCache()).thenReturn(loggerContextCache);
+    doAnswer(invocationOnMock -> {
+      return containerLoggerContext;
+    }).when(loggerContextCache).doGetLoggerContext(eq(currentClassLoader), any());
+
 
     return regionClassLoaderLogger;
   }
