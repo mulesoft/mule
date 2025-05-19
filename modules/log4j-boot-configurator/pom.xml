@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.9.6-SNAPSHOT</version>
+        <version>4.9.6-rc1</version>
     </parent>
     <groupId>org.mule.runtime.boot</groupId>
     <artifactId>mule-module-log4j-boot-configurator</artifactId>
