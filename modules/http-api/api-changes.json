@@ -10,12 +10,6 @@
         },
         {
           "ignore": true,
-          "code": "java.method.removed",
-          "old": "method org.mule.runtime.http.api.sse.client.SseSourceConfigBuilder org.mule.runtime.http.api.sse.client.SseSourceConfig::builder(java.lang.String)",
-          "justification": "W-18238331: Utility methods to implement Streamable HTTP"
-        },
-        {
-          "ignore": true,
           "code": "java.method.added",
           "new": "method org.mule.runtime.http.api.sse.client.SseSourceConfigBuilderFromResponse org.mule.runtime.http.api.sse.client.SseSourceConfig::fromResponse(org.mule.runtime.http.api.domain.message.response.HttpResponse)",
           "justification": "W-18238331: Utility methods to implement Streamable HTTP"

@@ -38,7 +38,7 @@ public class SseSourceConfig {
    * @param url the server URL.
    * @return a builder to configure the source parameters.
    */
-  public static SseSourceConfigBuilder fromUrl(String url) {
+  public static SseSourceConfigBuilder builder(String url) {
     return new SseSourceConfigBuilder(url);
   }
 
