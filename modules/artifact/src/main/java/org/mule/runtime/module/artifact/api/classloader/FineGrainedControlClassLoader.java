@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
@@ -49,6 +50,8 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     // locking issues, especially on Windows platforms, preventing the deletion or modification of JAR files during the
     // un-deployment of applications or extensions.
     setDefaultUseCaches("jar", false);
+
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(FineGrainedControlClassLoader.class);
   }
 
   private static final Logger LOGGER = getLogger(FineGrainedControlClassLoader.class);

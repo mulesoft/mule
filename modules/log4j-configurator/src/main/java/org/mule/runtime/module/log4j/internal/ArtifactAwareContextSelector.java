@@ -159,4 +159,9 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
   LoggerContext buildContext(final ClassLoader classLoader) {
     return loggerContextFactory.build(classLoader, this, true);
   }
+
+  LoggerContextCache getLoggerContextCache() {
+    return cache;
+  }
+
 }
