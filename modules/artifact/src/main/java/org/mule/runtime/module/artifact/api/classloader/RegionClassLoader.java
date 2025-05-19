@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.classloader.jar.CachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
@@ -66,8 +67,10 @@ import org.slf4j.Logger;
 public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   protected static final String REGION_OWNER_CANNOT_BE_REMOVED_ERROR = "Region owner cannot be removed";
+
   static {
     registerAsParallelCapable();
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(RegionClassLoader.class);
   }
 
   private static final String CLASS_EXTENSION = ".class";
