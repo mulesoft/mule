@@ -1,4 +1,52 @@
 {
+  "4.9.6": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.sse.client.SseRetryConfig org.mule.runtime.http.api.sse.client.SseRetryConfig::noRetry()",
+          "justification": "W-18238331: Utility methods to implement Streamable HTTP"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.sse.client.SseSourceConfigBuilderFromResponse org.mule.runtime.http.api.sse.client.SseSourceConfig::fromResponse(org.mule.runtime.http.api.domain.message.response.HttpResponse)",
+          "justification": "W-18238331: Utility methods to implement Streamable HTTP"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.sse.client.SseSourceConfigBuilder org.mule.runtime.http.api.sse.client.SseSourceConfig::fromUrl(java.lang.String)",
+          "justification": "W-18238331: Utility methods to implement Streamable HTTP"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.domain.message.response.HttpResponse org.mule.runtime.http.api.sse.client.SseSourceConfig::getResponse()",
+          "justification": "W-18238331: Utility methods to implement Streamable HTTP"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.sse.client.SseSourceConfigBuilderFromResponse",
+          "justification": "W-18238331: Utility methods to implement Streamable HTTP"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.sse.server.SseClientConfig",
+          "justification": "W-18238331: Utility methods to implement Streamable HTTP"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "class org.mule.runtime.http.api.sse.server.SseClientConfigBuilder",
+          "justification": "W-18238331: Utility methods to implement Streamable HTTP"
+        }
+      ]
+    }
+  },
   "4.9.4": {
     "revapi": {
       "ignore": [

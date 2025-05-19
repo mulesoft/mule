@@ -9,6 +9,7 @@ package org.mule.runtime.http.api.sse.client;
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.http.api.client.HttpRequestOptions;
 import org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 import java.util.function.Consumer;
 
@@ -27,18 +28,39 @@ public class SseSourceConfig {
   private final Consumer<HttpRequestBuilder> requestCustomizer;
   private final HttpRequestOptions requestOptions;
   private final boolean preserveHeaderCase;
+  private final HttpResponse response;
 
+  /**
+   * Creates a builder that allows you to configure certain parameters of the request and the retry mechanism. Use this method if
+   * you want the source to connect to a server with a certain URL and send the request to establish the SSE communication with
+   * auto-retry.
+   *
+   * @param url the server URL.
+   * @return a builder to configure the source parameters.
+   */
   public static SseSourceConfigBuilder builder(String url) {
     return new SseSourceConfigBuilder(url);
   }
 
+  /**
+   * Creates a builder useful when you already have an {@link HttpResponse} with an SSE stream. The resulting SSE Source won't do
+   * automatic retries.
+   *
+   * @param response a response that has a {@code text/event-stream} as payload.
+   * @return a builder to create the {@link SseSourceConfig}.
+   */
+  public static SseSourceConfigBuilderFromResponse fromResponse(HttpResponse response) {
+    return new SseSourceConfigBuilderFromResponse(response);
+  }
+
   SseSourceConfig(String url, SseRetryConfig retryConfig, Consumer<HttpRequestBuilder> requestCustomizer,
-                  HttpRequestOptions requestOptions, boolean preserveHeaderCase) {
+                  HttpRequestOptions requestOptions, boolean preserveHeaderCase, HttpResponse response) {
     this.url = url;
     this.retryConfig = retryConfig;
     this.requestCustomizer = requestCustomizer;
     this.requestOptions = requestOptions;
     this.preserveHeaderCase = preserveHeaderCase;
+    this.response = response;
   }
 
   /**
@@ -75,5 +97,13 @@ public class SseSourceConfig {
    */
   public boolean isPreserveHeaderCase() {
     return preserveHeaderCase;
+  }
+
+  /**
+   * @return a response whose content is a stream of events ({@code text/event-stream}).
+   * @since 4.10.0, 4.9.6
+   */
+  public HttpResponse getResponse() {
+    return response;
   }
 }
