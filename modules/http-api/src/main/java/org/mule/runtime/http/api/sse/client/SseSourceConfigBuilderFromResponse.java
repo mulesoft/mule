@@ -14,7 +14,7 @@ import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 
 /**
  * Builder for instances of {@link SseSourceConfig} to be used when you already have an SSE response. If you want to configure a
- * {@link SseSource} to send the initiator request and do retries, use {@link SseSourceConfig#fromUrl(String)} instead.
+ * {@link SseSource} to send the initiator request and do retries, use {@link SseSourceConfig#builder(String)} instead.
  * <p>
  * This API is EXPERIMENTAL. Do not use it until it is stable.
  *
