@@ -97,8 +97,6 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private Logger logger;
 
-  // @Mock(answer = RETURNS_DEEP_STUBS)
-  // LoggerContextCache loggerContextCache;
   private LoggerContextCache loggerContextCache =
       spy(new LoggerContextCache(artifactAwareContextSelector, mock(ClassLoader.class, RETURNS_DEEP_STUBS)));
 
@@ -341,17 +339,11 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
     when(regionClassLoaderLoggerContext.getLogger(anyString(), any(MessageFactory.class)))
         .thenReturn(regionClassLoaderLogger);
     // Triggers of the expected Loggers
-    // when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(regionClassLoader))
-    // .thenReturn(loggerContextCache.getLoggerContext(regionClassLoader));
-    // when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(currentClassLoader))
-    // .thenReturn(loggerContextCache.getLoggerContext(currentClassLoader));
     when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(any()))
         .thenAnswer(invocation -> loggerContextCache.getLoggerContext(invocation.getArgument(0)));
     when(artifactAwareContextSelector.getLoggerContextCache()).thenReturn(loggerContextCache);
-    doAnswer(invocationOnMock -> {
-      return containerLoggerContext;
-    }).when(loggerContextCache).doGetLoggerContext(eq(currentClassLoader), any());
-
+    doAnswer(invocationOnMock -> containerLoggerContext)
+        .when(loggerContextCache).doGetLoggerContext(eq(currentClassLoader), any());
 
     return regionClassLoaderLogger;
   }
