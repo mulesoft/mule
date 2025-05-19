@@ -24,7 +24,7 @@ public interface BlockingLoggerResolutionClassRegistry {
   /**
    * Discovers an implementation of {@link BlockingLoggerResolutionClassRegistry} through {@code SPI}.
    */
-  static BlockingLoggerResolutionClassRegistry getLoggerClassRegistry() {
+  static BlockingLoggerResolutionClassRegistry getBlockingLoggerResolutionClassRegistry() {
     ServiceLoader<BlockingLoggerResolutionClassRegistry> factories =
         load(BlockingLoggerResolutionClassRegistry.class, BlockingLoggerResolutionClassRegistry.class.getClassLoader());
     Iterator<BlockingLoggerResolutionClassRegistry> iterator = factories.iterator();

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getLoggerClassRegistry;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
@@ -323,7 +323,8 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   private class ClassOwningLoggerNeedingBlocking extends ClassOwningLogger {
 
     static {
-      getLoggerClassRegistry().registerClassNeedingBlockingLoggerResolution(ClassOwningLoggerNeedingBlocking.class);
+      getBlockingLoggerResolutionClassRegistry()
+          .registerClassNeedingBlockingLoggerResolution(ClassOwningLoggerNeedingBlocking.class);
     }
 
   }

@@ -8,7 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
-import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getLoggerClassRegistry;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
 
 import static java.io.File.separator;
 
@@ -34,7 +34,7 @@ public class MuleSharedDomainClassLoader extends NativeLibraryLoaderMuleDeployab
 
   static {
     registerAsParallelCapable();
-    getLoggerClassRegistry().registerClassNeedingBlockingLoggerResolution(MuleSharedDomainClassLoader.class);
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(MuleSharedDomainClassLoader.class);
   }
 
   private static final Logger LOGGER = getLogger(MuleSharedDomainClassLoader.class);
