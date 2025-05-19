@@ -3,6 +3,11 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry",
+          "justification": "W-18388443: fix deadlock in logger obtention"
+        },
+        {
           "code": "java.method.added",
           "new": "method org.mule.runtime.module.artifact.api.classloader.RegionClassLoader org.mule.runtime.module.artifact.api.classloader.RegionClassLoader::getNearestRegion(java.lang.ClassLoader)",
           "package": "org.mule.runtime.module.artifact.api.classloader",
