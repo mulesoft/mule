@@ -1,4 +1,18 @@
 {
+  "4.9.6": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.added",
+            "new": "interface org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry",
+            "justification": "W-18388443: fix deadlock in logger obtention"
+          }
+        ]
+      }
+    }
+  },
   "4.9.0": {
     "revapi": {
       "differences": {
