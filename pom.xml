@@ -165,7 +165,7 @@
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
         <muleBomVersion>4.8.6-SNAPSHOT</muleBomVersion>
-        <muleMavenClientBomVersion>2.3.6-SNAPSHOT</muleMavenClientBomVersion>
+        <muleMavenClientBomVersion>2.3.6-rc1</muleMavenClientBomVersion>
 
         <weaveVersion>2.8.3-rc1</weaveVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
