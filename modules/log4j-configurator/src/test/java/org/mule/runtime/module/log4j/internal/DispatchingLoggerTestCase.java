@@ -318,10 +318,6 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
       });
     }
 
-    public Logger getOriginalLogger() {
-      return logger;
-    }
-
   }
 
   private class ClassOwningLoggerNeedingBlocking extends ClassOwningLogger {
