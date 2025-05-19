@@ -23,7 +23,7 @@ public class Log4JBlockingLoggerResolutionClassRegistry implements BlockingLogge
     loggerClasses.add(loggerClass);
   }
 
-  public static Collection<String> getLoggerClassesNames() {
+  public static Collection<String> getClassesNamesNeedingBlockingLoggerResolution() {
     return loggerClasses.stream().map(Class::getName).toList();
   }
 
