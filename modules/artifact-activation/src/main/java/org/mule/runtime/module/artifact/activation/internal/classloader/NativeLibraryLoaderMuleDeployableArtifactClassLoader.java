@@ -41,7 +41,6 @@ public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader exten
 
   static {
     registerAsParallelCapable();
-    getLoggerClassRegistry().register(NativeLibraryLoaderMuleDeployableArtifactClassLoader.class);
   }
 
   public static final String METHOD_NAME = "loadLibrary";
