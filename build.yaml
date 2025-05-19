@@ -1,6 +1,6 @@
 upstreamProjects:
   Mule-runtime/metadata-model-api/1.4.0-JUNE-2025,
-  Mule-runtime/mule-profiling-api/support/1.0.x,
+  Mule-runtime/mule-profiling-api/1.0.0-JUNE-2025,
   Mule-runtime/mule-api/1.4.0-JUNE-2025,
   Mule-runtime/mule-extensions-api/1.4.0-JUNE-2025,
   Mule-runtime/mule-artifact-ast/1.0.0-JUNE-2025,
