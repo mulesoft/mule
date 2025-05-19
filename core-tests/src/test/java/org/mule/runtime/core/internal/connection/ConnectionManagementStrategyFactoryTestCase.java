@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.connection;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.test.allure.AllureConstants.ConnectionManagementFeature.CONNECTION_MANAGEMENT;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -43,6 +44,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 
+import io.qameta.allure.Feature;
+
+@Feature(CONNECTION_MANAGEMENT)
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = LENIENT)
 class ConnectionManagementStrategyFactoryTestCase extends AbstractMuleTestCase {

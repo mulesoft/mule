@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.connection;
 
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
+import static org.mule.test.allure.AllureConstants.ConnectionManagementFeature.CONNECTION_MANAGEMENT;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
@@ -26,6 +27,9 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.jupiter.api.Test;
 
+import io.qameta.allure.Feature;
+
+@Feature(CONNECTION_MANAGEMENT)
 class SdkConnectionProviderAdapterTestCase extends AbstractMuleTestCase {
 
   @Test

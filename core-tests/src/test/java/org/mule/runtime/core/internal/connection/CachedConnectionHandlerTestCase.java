@@ -75,21 +75,21 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getConnection() throws Exception {
+  void getConnection() throws Exception {
     Banana connection = managedConnection.getConnection();
     verify(connectionProvider, never()).connect();
     assertThat(connection, is(sameInstance(this.connection)));
   }
 
   @Test
-  public void getLegacyXaConnection() throws Exception {
+  void getLegacyXaConnection() throws Exception {
     Banana connection = managedLegacyXaConnection.getConnection();
     verify(legacyXaConnectionProvider, never()).connect();
     assertThat(connection, is(sameInstance(this.legacyXaConnection)));
   }
 
   @Test
-  public void returnsAlwaysSameConnectionAndConnectOnlyOnce() throws Exception {
+  void returnsAlwaysSameConnectionAndConnectOnlyOnce() throws Exception {
     Banana connection1 = managedConnection.getConnection();
     Banana connection2 = managedConnection.getConnection();
 
@@ -98,14 +98,14 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void release() throws Exception {
+  void release() throws Exception {
     getConnection();
     managedConnection.release();
     verify(connectionProvider, never()).disconnect(connection);
   }
 
   @Test
-  public void releaseLegacyXa() throws Exception {
+  void releaseLegacyXa() throws Exception {
     getLegacyXaConnection();
     managedLegacyXaConnection.release();
     verify(legacyXaConnectionProvider, never()).disconnect(connection);
@@ -113,14 +113,14 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void close() throws Exception {
+  void close() throws Exception {
     getConnection();
     managedConnection.close();
     verify(connectionProvider).disconnect(connection);
   }
 
   @Test
-  public void closeIsIdempotent() throws Exception {
+  void closeIsIdempotent() throws Exception {
     getConnection();
     managedConnection.close();
     verify(connectionProvider).disconnect(connection);
@@ -132,7 +132,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void invalidate() throws Exception {
+  void invalidate() throws Exception {
     getConnection();
     managedConnection.invalidate();
     verify(connectionProvider).disconnect(connection);
@@ -143,7 +143,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void invalidateIsIdempotent() throws Exception {
+  void invalidateIsIdempotent() throws Exception {
     getConnection();
     managedConnection.invalidate();
     verify(connectionProvider).disconnect(connection);
@@ -157,7 +157,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void concurrentInvalidate() throws Exception {
+  void concurrentInvalidate() throws Exception {
     for (int i = 0; i < 50; i++) {
       before();
       getConnection();
@@ -190,7 +190,7 @@ public class CachedConnectionHandlerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getConnectionProvider() {
+  void getConnectionProvider() {
     assertThat(managedConnection.getConnectionProvider(), is(sameInstance(connectionProvider)));
   }
 

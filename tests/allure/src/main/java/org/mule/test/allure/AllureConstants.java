@@ -813,6 +813,12 @@ public interface AllureConstants {
     }
   }
 
+  interface ConnectionManagementFeature {
+
+    String CONNECTION_MANAGEMENT = "Connection managment";
+
+  }
+
   interface TransactionFeature {
 
     String TRANSACTION = "Transaction";

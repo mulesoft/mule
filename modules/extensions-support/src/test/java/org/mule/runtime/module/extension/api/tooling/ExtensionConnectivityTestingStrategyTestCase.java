@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.module.extension.api.tooling;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -27,18 +31,16 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionPro
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.MuleContextUtils;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
 
   private ExtensionConnectivityTestingStrategy connectivityTestingStrategy;
 
@@ -56,27 +58,28 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
 
   private ConnectionManager connectionManager;
 
-  @Before
+  @BeforeEach
   public void createTestingInstance() throws MuleException {
     connectionManager = new DefaultConnectionManager(muleContext);
+    initialiseIfNeeded(connectionManager);
     connectivityTestingStrategy = new ExtensionConnectivityTestingStrategy(connectionManager, muleContext);
     MuleContextUtils.mockContextWithServices().getInjector().inject(connectivityTestingStrategy);
   }
 
   @Test
-  public void connectionProviderInConfigWithInvalidConnection() throws MuleException {
+  void connectionProviderInConfigWithInvalidConnection() throws MuleException {
     ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(false);
     assertThat(connectionResult.isValid(), is(false));
   }
 
   @Test
-  public void connectionProviderInConfigWithValidConnection() throws MuleException {
+  void connectionProviderInConfigWithValidConnection() throws MuleException {
     ConnectionValidationResult connectionResult = testConnectivityWithConnectionProvider(true);
     assertThat(connectionResult.isValid(), is(true));
   }
 
   @Test
-  public void connectionProviderThrowsException() throws MuleException {
+  void connectionProviderThrowsException() throws MuleException {
     final Exception e = new RuntimeException();
     when(connectionProviderResolver.resolve(any())).thenThrow(e);
     ConnectionValidationResult connectionResult = connectivityTestingStrategy.testConnectivity(connectionProviderResolver);

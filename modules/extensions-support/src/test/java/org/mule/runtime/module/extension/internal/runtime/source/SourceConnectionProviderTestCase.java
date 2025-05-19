@@ -6,13 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
@@ -21,14 +25,17 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class SourceConnectionProviderTestCase extends AbstractMuleTestCase {
 
   @Mock
@@ -49,10 +56,11 @@ public class SourceConnectionProviderTestCase extends AbstractMuleTestCase {
   private SourceConnectionProvider sourceConnectionProvider;
   private ConnectionManager connectionManager;
 
-  @Before
-  public void before() throws Exception {
+  @BeforeEach
+  void before() throws Exception {
     when(configurationInstance.getValue()).thenReturn(configurationObject);
     connectionManager = new DefaultConnectionManager(muleContext);
+    initialiseIfNeeded(connectionManager);
     connectionManager.bind(configurationObject, connectionProvider);
 
     sourceConnectionProvider =
@@ -61,7 +69,7 @@ public class SourceConnectionProviderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testConnection() throws Exception {
+  void testConnection() throws Exception {
     Object testeableConnection = sourceConnectionProvider.connect();
     assertThat(testeableConnection, is(sameInstance(testeableConnection)));
 

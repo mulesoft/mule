@@ -9,6 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.oc
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -18,6 +21,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -33,17 +37,23 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.oauth.api.PlatformManagedConnectionDescriptor;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
-public class PlatformManagedOAuthConnectionProviderTestCase {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
+public class PlatformManagedOAuthConnectionProviderTestCase extends AbstractMuleTestCase {
 
   @Mock
   private PlatformManagedOAuthConfig mockOAuthConfig;
@@ -65,7 +75,7 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
 
   private PlatformManagedOAuthConnectionProvider<Object> provider;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     ConnectionProviderModel mockProviderModel = mock(ConnectionProviderModel.class);
@@ -76,38 +86,38 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
   }
 
   @Test
-  public void testGetGrantType() {
+  void testGetGrantType() {
     PlatformManagedOAuthGrantType mockGrantType = mock(PlatformManagedOAuthGrantType.class);
     when(mockOAuthConfig.getGrantType()).thenReturn(mockGrantType);
     assertThat(provider.getGrantType(), is(mockGrantType));
   }
 
   @Test
-  public void testInvalidateCallsHandler() {
+  void testInvalidateCallsHandler() {
     provider.invalidate("testResourceOwner");
     verify(mockOAuthHandler).invalidate(mockOAuthConfig);
   }
 
   @Test
-  public void testRefreshTokenCallsHandler() {
+  void testRefreshTokenCallsHandler() {
     provider.refreshToken("testResourceOwner");
     verify(mockOAuthHandler).refreshToken(mockOAuthConfig);
   }
 
   @Test
-  public void testGetPoolingProfile() {
+  void testGetPoolingProfile() {
     assertThat(provider.getPoolingProfile().isPresent(), is(true));
     assertThat(provider.getPoolingProfile().get(), is(mockPoolingProfile));
   }
 
   @Test
-  public void testGetReconnectionConfig() {
+  void testGetReconnectionConfig() {
     assertThat(provider.getReconnectionConfig().isPresent(), is(true));
     assertThat(provider.getReconnectionConfig().get(), is(mockReconnectionConfig));
   }
 
   @Test
-  public void testConnect() throws ConnectionException {
+  void testConnect() throws ConnectionException {
     ConnectionProvider<Object> mockDelegate = mock(ConnectionProvider.class);
     when(mockDelegate.connect()).thenReturn(mockConnection);
     when(mockOAuthConfig.getDelegateGrantType()).thenReturn(mock(OAuthGrantType.class));
@@ -123,7 +133,7 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
   }
 
   @Test
-  public void testValidate() {
+  void testValidate() {
     ConnectionProvider<Object> mockDelegate = mock(ConnectionProvider.class);
     ResourceOwnerOAuthContext mockContext = mock(ResourceOwnerOAuthContext.class);
     when(mockContext.getAccessToken()).thenReturn("accessToken");
@@ -140,7 +150,7 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
   }
 
   @Test
-  public void testGetOwnerConfigName() {
+  void testGetOwnerConfigName() {
     String ownerConfigName = "testOwnerConfig";
     when(mockOAuthConfig.getOwnerConfigName()).thenReturn(ownerConfigName);
 
@@ -151,7 +161,7 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
   }
 
   @Test
-  public void testGetResourceOwnerId() {
+  void testGetResourceOwnerId() {
     ResourceOwnerOAuthContext mockContext = mock(ResourceOwnerOAuthContext.class);
     String resourceOwnerId = "testResourceOwnerId";
     when(mockContext.getResourceOwnerId()).thenReturn(resourceOwnerId);
@@ -164,17 +174,17 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
   }
 
   @Test
-  public void testGetRetryPolicyTemplate() {
+  void testGetRetryPolicyTemplate() {
     assertThat(provider.getRetryPolicyTemplate(), is(notNullValue()));
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void testGetDelegate() {
-    provider.getDelegate();
+  @Test
+  void testGetDelegate() {
+    assertThrows(NullPointerException.class, () -> provider.getDelegate());
   }
 
   @Test
-  public void testOnBorrow() throws MuleException {
+  void testOnBorrow() throws MuleException {
     PlatformManagedOAuthConnectionProvider<Object> spyProvider = spy(provider);
     ConnectionProvider<Object> mockConnectionProvider = mock(ConnectionProvider.class);
     PoolingListener<Object> listener = mock(PoolingListener.class);
@@ -198,7 +208,7 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
   }
 
   @Test
-  public void testOnReturn() throws MuleException {
+  void testOnReturn() throws MuleException {
     PlatformManagedOAuthConnectionProvider<Object> spyProvider = spy(provider);
     ConnectionProvider<Object> mockConnectionProvider = mock(ConnectionProvider.class);
     PoolingListener<Object> listener = mock(PoolingListener.class);
@@ -221,8 +231,8 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
     verify(listener, times(1)).onReturn(mockConnection);
   }
 
-  @Test(expected = MuleException.class)
-  public void testStartFailure() throws MuleException, ExecutionException, InterruptedException {
+  @Test
+  void testStartFailure() throws MuleException, ExecutionException, InterruptedException {
     PlatformManagedOAuthConnectionProvider<Object> spyProvider = spy(provider);
     ConnectionProvider<Object> mockConnectionProvider = mock(ConnectionProvider.class);
     PoolingListener<Object> listener = mock(PoolingListener.class);
@@ -238,23 +248,23 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
     doThrow(new ExecutionException("Token refresh failed", new Throwable()))
         .when(future).get();
 
-    spyProvider.start();
+    assertThrows(MuleException.class, () -> spyProvider.start());
   }
 
   @Test
-  public void testStop() throws MuleException {
+  void testStop() throws MuleException {
     PlatformManagedOAuthConnectionProvider<Object> spyProvider = spy(provider);
     spyProvider.stop();
   }
 
   @Test
-  public void testDispose() throws MuleException {
+  void testDispose() throws MuleException {
     PlatformManagedOAuthConnectionProvider<Object> spyProvider = spy(provider);
     spyProvider.dispose();
   }
 
   @Test
-  public void testDisconnect() {
+  void testDisconnect() {
     PlatformManagedOAuthConnectionProvider<Object> spyProvider = spy(provider);
     ConnectionProvider<Object> mockDelegate = mock(ConnectionProvider.class);
     doNothing().when(mockDelegate).disconnect(mockConnection);
@@ -265,7 +275,7 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
   }
 
   @Test
-  public void testGetConnectionManagementType() {
+  void testGetConnectionManagementType() {
     ConnectionProviderModel mockModel = mock(ConnectionProviderModel.class);
     ConnectionManagementType mockType = mock(ConnectionManagementType.class);
     when(mockOAuthConfig.getDelegateConnectionProviderModel()).thenReturn(mockModel);
@@ -273,5 +283,13 @@ public class PlatformManagedOAuthConnectionProviderTestCase {
     ConnectionManagementType managementType = provider.getConnectionManagementType();
 
     assertThat(managementType, is(mockType));
+  }
+
+  @Test
+  void supportsXa() {
+    // TODO W-18557890 update this with the mock extModel
+    boolean supportsXa = provider.supportsXa();
+
+    assertThat(supportsXa, is(false));
   }
 }
