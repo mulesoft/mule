@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
 import static org.mule.runtime.module.artifact.api.classloader.jar.CachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
 import static java.lang.Integer.toHexString;
@@ -59,6 +60,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   static {
     registerAsParallelCapable();
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(MuleArtifactClassLoader.class);
   }
 
   private static final Logger LOGGER = getLogger(MuleArtifactClassLoader.class);

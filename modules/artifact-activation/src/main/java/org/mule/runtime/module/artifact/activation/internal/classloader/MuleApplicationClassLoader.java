@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader;
 
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -32,6 +34,7 @@ public class MuleApplicationClassLoader extends NativeLibraryLoaderMuleDeployabl
 
   static {
     registerAsParallelCapable();
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(MuleApplicationClassLoader.class);
   }
 
   private final NativeLibraryFinder nativeLibraryFinder;

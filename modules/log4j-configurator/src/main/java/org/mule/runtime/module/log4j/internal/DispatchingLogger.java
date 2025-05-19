@@ -8,6 +8,7 @@ package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.log4j.internal.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
+import static org.mule.runtime.module.log4j.internal.Log4JBlockingLoggerResolutionClassRegistry.getClassNamesNeedingBlockingLoggerResolution;
 
 import static java.lang.Thread.currentThread;
 
@@ -58,6 +59,7 @@ abstract class DispatchingLogger extends Logger {
   private final Logger originalLogger;
   private final ContextSelector contextSelector;
   private final int ownerClassLoaderHash;
+  private final boolean requiresBlockingLoggerResolution;
   private final LoadingCache<ClassLoader, Reference<Logger>> loggerCache = newBuilder()
       .weakKeys()
       .weakValues()
@@ -71,6 +73,7 @@ abstract class DispatchingLogger extends Logger {
     this.originalLogger = originalLogger;
     this.contextSelector = contextSelector;
     this.ownerClassLoaderHash = ownerClassLoaderHash;
+    requiresBlockingLoggerResolution = getClassNamesNeedingBlockingLoggerResolution().contains(originalLogger.getName());
   }
 
   private Logger getLogger() {
@@ -96,6 +99,17 @@ abstract class DispatchingLogger extends Logger {
       setContextClassLoader(thread, getClass().getClassLoader(), currentClassLoader);
     }
 
+    if (requiresBlockingLoggerResolution
+        && contextSelector instanceof ArtifactAwareContextSelector) {
+      synchronized (((ArtifactAwareContextSelector) contextSelector).getLoggerContextCache()) {
+        return getLogger(resolvedCtxClassLoader, loggerReference);
+      }
+    } else {
+      return getLogger(resolvedCtxClassLoader, loggerReference);
+    }
+  }
+
+  protected Logger getLogger(ClassLoader resolvedCtxClassLoader, Reference<Logger> loggerReference) {
     Logger logger = loggerReference.get();
     if (logger == null) {
       synchronized (loggerReference) {

@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.classloader.BlockingLoggerResolutionClassRegistry.getBlockingLoggerResolutionClassRegistry;
 import static org.mule.runtime.module.artifact.api.classloader.jar.CachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
 import static java.lang.Boolean.valueOf;
@@ -43,6 +44,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
   static {
     registerAsParallelCapable();
+    getBlockingLoggerResolutionClassRegistry().registerClassNeedingBlockingLoggerResolution(FineGrainedControlClassLoader.class);
   }
 
   private static final Logger LOGGER = getLogger(FineGrainedControlClassLoader.class);
