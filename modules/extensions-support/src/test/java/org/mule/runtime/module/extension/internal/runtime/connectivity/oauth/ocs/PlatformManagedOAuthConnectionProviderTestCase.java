@@ -53,7 +53,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = LENIENT)
-public class PlatformManagedOAuthConnectionProviderTestCase extends AbstractMuleTestCase {
+class PlatformManagedOAuthConnectionProviderTestCase extends AbstractMuleTestCase {
 
   @Mock
   private PlatformManagedOAuthConfig mockOAuthConfig;
