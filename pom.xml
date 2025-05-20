@@ -177,7 +177,7 @@
         <muleHttpPolicyApiVersion>1.8.6-SNAPSHOT</muleHttpPolicyApiVersion>
         <mulePolicyApiVersion>1.8.6-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.8.7-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.8.6-SNAPSHOT</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.8.7-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
