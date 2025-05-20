@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 
-import static java.util.stream.Collectors.toUnmodifiableSet;
+import static com.google.common.collect.ImmutableSet.copyOf;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -53,11 +53,12 @@ public abstract class FileGenerationParameterizedExtensionModelTestCase extends 
     // TODO MULE-11797: as this utils is consumed from
     // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
     // this util should get dropped once the ticket gets implemented.
-    dslResolvingContext = DslResolvingContext.getDefault(dependencies
+    dslResolvingContext = DslResolvingContext.getDefault(copyOf(dependencies
         .stream()
         // loads dependencies as well
         .map(extModelDepClass -> loadExtension(extModelDepClass, loader, null, nullDslResolvingContext()))
-        .collect(toUnmodifiableSet()));
+        // schema generation may change based on the order of the dependencies in this object.
+        .toList()));
   }
 
   @Test
