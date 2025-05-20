@@ -6,9 +6,8 @@
  */
 package org.mule.test.nonimplicit.config.extension.extension.api;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -29,7 +28,7 @@ import org.mule.test.nonimplicit.config.extension.extension.internal.NonImplicit
 import org.mule.test.nonimplicit.config.extension.extension.internal.NonImplicitOperations;
 
 @Extension(name = "Non Implicit")
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Operations({NonImplicitOperations.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/implicit", prefix = "non-implicit")
 @ConnectionProviders(NonImplicitConnectionProvider.class)

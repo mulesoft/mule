@@ -6,9 +6,8 @@
  */
 package org.mule.test.function.extension;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.extension.api.annotation.ExpressionFunctions;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -22,7 +21,7 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 
 @Extension(name = "Test Functions")
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @ExpressionFunctions(GlobalWeaveFunction.class)
 @Operations(WeaveTestUtilsOperations.class)
 @Xml(prefix = "fn")

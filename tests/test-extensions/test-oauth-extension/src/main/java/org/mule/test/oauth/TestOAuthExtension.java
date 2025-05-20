@@ -6,9 +6,8 @@
  */
 package org.mule.test.oauth;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -18,7 +17,7 @@ import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.test.values.extension.MyPojo;
 
 @Extension(name = TestOAuthExtension.TEST_OAUTH_EXTENSION_NAME)
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Configurations({AuthCodeConfig.class, ClientCredentialsConfig.class, MixedConfig.class, WithPooledProviderConfig.class,
     WithValidationThatNeedsRefreshConfig.class})
 @Xml(prefix = "test-oauth")
