@@ -171,7 +171,7 @@
         <aspectjVersion>1.9.2</aspectjVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.4.6-SNAPSHOT</mulePropertiesApiVersion>
+        <mulePropertiesApiVersion>1.4.7-SNAPSHOT</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.8.6-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.8.6-SNAPSHOT</muleHttpPolicyApiVersion>
