@@ -2164,13 +2164,17 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   /**
-   * This method is overridden to remove a race condition that affects domain deployment tests, especially in concurrent
-   * environments or on Windows.
+   * Overrides the default deployment synchronization logic to remove a race condition
+   * that affects domain deployment tests, especially in concurrent environments or on Windows.
    * <p>
-   * The original implementation may cause the ServiceManager to not register services in time for the Spring context to discover
-   * them, resulting in intermittent (flaky) test failures. This version ensures that services are properly initialized before
-   * proceeding with deployment, thus avoiding the race condition without impacting the behavior of other test classes.
+   * In this method, {@code startDeployment(startServiceManager=true)} is called in a concurrent thread,
+   * while {@code assertDeploymentSuccess(domainDeploymentListener, artifactId)} is executed in parallel.
+   * The latter method calls {@code triggerDirectoryWatcher()}, which requires the {@code ServiceManager}
+   * to be properly initialized. If the {@code ServiceManager} is not started in time, the test becomes flaky
+   * due to this race condition.
    * <p>
+   * By explicitly starting the {@code ServiceManager} before delegating to the superclass implementation,
+   * this override ensures that all services are initialized before the Spring context is created.
    *
    * @param deploymentAction         the deployment action to execute in the test
    * @param assertAction             the assertion action to execute after deployment
