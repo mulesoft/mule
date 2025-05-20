@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
@@ -15,6 +14,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
+
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -28,12 +30,13 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.connection.ConnectionManagementType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.connection.adapter.XATransactionalConnectionProvider;
 
 import java.util.Optional;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Base class for implementations of {@link ConnectionProviderWrapper}
@@ -119,6 +122,15 @@ public abstract class AbstractConnectionProviderWrapper<C> implements Connection
     }
 
     return type;
+  }
+
+  @Override
+  public boolean supportsXa() {
+    if (delegate instanceof ConnectionProviderWrapper) {
+      return ((ConnectionProviderWrapper<C>) delegate).supportsXa();
+    }
+
+    return delegate instanceof XATransactionalConnectionProvider;
   }
 
   @Override

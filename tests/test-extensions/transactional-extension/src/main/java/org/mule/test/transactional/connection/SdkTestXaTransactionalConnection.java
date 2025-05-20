@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 public class SdkTestXaTransactionalConnection implements SdkTestTransactionalConnection, XATransactionalConnection {
 
-  private static final Logger logger = LoggerFactory.getLogger(TestXaTransactionalConnection.class);
+  private static final Logger logger = LoggerFactory.getLogger(SdkTestXaTransactionalConnection.class);
   private DummyXaResource xaResource;
   private double connectionId;
 

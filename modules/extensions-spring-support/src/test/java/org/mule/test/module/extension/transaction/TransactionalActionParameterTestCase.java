@@ -6,64 +6,85 @@
  */
 package org.mule.test.module.extension.transaction;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.mule.runtime.extension.api.tx.OperationTransactionalAction.JOIN_IF_POSSIBLE;
 import static org.mule.runtime.extension.api.tx.OperationTransactionalAction.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.tx.SourceTransactionalAction.ALWAYS_BEGIN;
+
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.construct.Flow;
-import org.mule.runtime.extension.api.tx.OperationTransactionalAction;
 import org.mule.runtime.extension.api.tx.SourceTransactionalAction;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
 import org.mule.test.transactional.TransactionalSourceWithTXParameters;
 
-import org.junit.Test;
+import java.util.Collection;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized;
+
+@RunnerDelegateTo(Parameterized.class)
 public class TransactionalActionParameterTestCase extends AbstractExtensionFunctionalTestCase {
+
+  private boolean isSdkApi;
+  private final String configFile;
+
+  @Parameterized.Parameters(name = "{0}")
+  public static Collection<Object[]> configs() {
+    return asList(new Object[][] {
+        {"tx/transactional-parameters-injection-config.xml", false},
+        {"tx/transactional-xa-parameters-injection-config.xml", true}
+    });
+  }
+
+  public TransactionalActionParameterTestCase(String configFile, boolean isSdkApi) {
+    this.isSdkApi = isSdkApi;
+    this.configFile = configFile;
+  }
 
   @Override
   protected String getConfigFile() {
-    return "transactional-parameters-injection-config.xml";
+    return configFile;
   }
 
   @Test
   public void injectAlwaysBeginSourceTransactionalAction() throws Exception {
+    Reference<org.mule.sdk.api.tx.SourceTransactionalAction> sdkSourceTransactionalAction = new Reference<>();
     Reference<SourceTransactionalAction> sourceTransactionalAction = new Reference<>();
-    TransactionalSourceWithTXParameters.responseCallback = tx -> sourceTransactionalAction.set((SourceTransactionalAction) tx);
+
+    if (isSdkApi) {
+      org.mule.test.transactionalxa.TransactionalSourceWithTXParameters.responseCallback =
+          tx -> sdkSourceTransactionalAction.set((org.mule.sdk.api.tx.SourceTransactionalAction) tx);
+    } else {
+      TransactionalSourceWithTXParameters.responseCallback =
+          tx -> sourceTransactionalAction.set((SourceTransactionalAction) tx);
+    }
+
     startFlow("alwaysBeginTxAction");
 
-    assertThat(sourceTransactionalAction.get(), is(ALWAYS_BEGIN));
+    if (isSdkApi) {
+      assertThat(sdkSourceTransactionalAction.get(), is(org.mule.sdk.api.tx.SourceTransactionalAction.ALWAYS_BEGIN));
+    } else {
+      assertThat(sourceTransactionalAction.get(), is(ALWAYS_BEGIN));
+    }
   }
 
   @Test
   public void injectDefaultOperationTransactionalAction() throws Exception {
-    OperationTransactionalAction value =
-        (OperationTransactionalAction) flowRunner("injectInOperationDefaultValue").run().getMessage().getPayload().getValue();
-    assertThat(value, is(JOIN_IF_POSSIBLE));
+    Enum value = (Enum) flowRunner("injectInOperationDefaultValue").run()
+        .getMessage().getPayload().getValue();
+    assertThat(value.name(), is(JOIN_IF_POSSIBLE.name()));
   }
 
   @Test
   public void injectInOperationJoinNotSupported() throws Exception {
-    OperationTransactionalAction value =
-        (OperationTransactionalAction) flowRunner("injectInOperationJoinNotSupported").run().getMessage().getPayload().getValue();
-    assertThat(value, is(NOT_SUPPORTED));
-  }
-
-  @Test
-  public void sdkInjectDefaultOperationTransactionalAction() throws Exception {
-    org.mule.sdk.api.tx.OperationTransactionalAction value =
-        (org.mule.sdk.api.tx.OperationTransactionalAction) flowRunner("sdkInjectInOperationDefaultValue").run().getMessage()
-            .getPayload().getValue();
-    assertThat(value, is(org.mule.sdk.api.tx.OperationTransactionalAction.JOIN_IF_POSSIBLE));
-  }
-
-  @Test
-  public void sdkInjectInOperationJoinNotSupported() throws Exception {
-    org.mule.sdk.api.tx.OperationTransactionalAction value =
-        (org.mule.sdk.api.tx.OperationTransactionalAction) flowRunner("sdkInjectInOperationJoinNotSupported").run().getMessage()
-            .getPayload().getValue();
-    assertThat(value, is(org.mule.sdk.api.tx.OperationTransactionalAction.NOT_SUPPORTED));
+    Enum value = (Enum) flowRunner("injectInOperationJoinNotSupported").run()
+        .getMessage().getPayload().getValue();
+    assertThat(value.name(), is(NOT_SUPPORTED.name()));
   }
 
   private void startFlow(String flowName) throws Exception {

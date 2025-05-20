@@ -18,7 +18,6 @@ import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
 import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -56,7 +55,7 @@ public class SdkTransactionalSource extends Source<SdkTestTransactionalConnectio
 
   @Override
   public void onStart(SourceCallback<SdkTestTransactionalConnection, Object> sourceCallback) {
-    connectExecutor = newFixedThreadPool(1, new NamedThreadFactory(TransactionalSource.class.getName()));
+    connectExecutor = newFixedThreadPool(1, new NamedThreadFactory(SdkTransactionalSource.class.getName()));
     connectExecutor.execute(() -> {
       SourceCallbackContext ctx = sourceCallback.createContext();
       TransactionHandle txHandle = null;

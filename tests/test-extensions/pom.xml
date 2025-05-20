@@ -19,6 +19,7 @@
         <module>marvel-extension</module>
         <module>metadata-extension</module>
         <module>transactional-extension</module>
+        <module>transactional-xa-extension</module>
         <module>vegan-extension</module>
         <module>subtypes-extension</module>
         <module>some-extension</module>

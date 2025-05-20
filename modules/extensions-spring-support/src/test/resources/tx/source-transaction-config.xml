@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:tx="http://www.mulesoft.org/schema/mule/tx"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/tx http://www.mulesoft.org/schema/mule/tx/current/mule-tx.xsd">
+
+    <object name="storeMessage" class="org.mule.test.module.extension.transaction.TransactionalSourceTestCase.MessageStorage"/>
+    <object name="sleep" class="org.mule.test.module.extension.transaction.TransactionalSourceTestCase$SleepProcessor"/>
+    <configuration defaultTransactionTimeout="1000"/>
+
+    <tx:config name="localTx1">
+        <tx:connection>
+            <pooling-profile maxActive="1" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
+        </tx:connection>
+    </tx:config>
+
+    <tx:config name="localTx2">
+        <tx:connection>
+            <pooling-profile maxActive="2" exhaustedAction="WHEN_EXHAUSTED_WAIT"/>
+        </tx:connection>
+    </tx:config>
+
+    <flow name="sourceStartsALocalTxAndGetsCommitted" initialState="stopped">
+        <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
+        <flow-ref name="storeMessage"/>
+    </flow>
+
+    <flow name="sourceStartsALocalTxAndGetsRollBacked" initialState="stopped">
+        <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
+        <flow-ref name="storeMessage"/>
+        <tx:fail/>
+    </flow>
+
+    <flow name="sourceStartsALocalTxAndOperationsCanJointIt" initialState="stopped">
+        <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
+        <flow-ref name="storeMessage"/>
+
+        <tx:verify-same-connection config-ref="localTx1"/>
+        <flow-ref name="storeMessage"/>
+    </flow>
+
+    <flow name="sourceStartsALocalTxAndOperationsWithDifferentConnectionCanTJoinIt" initialState="stopped">
+        <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
+        <flow-ref name="storeMessage"/>
+        <try>
+            <tx:verify-same-connection config-ref="localTx2"/>
+        </try>
+        <error-handler>
+            <on-error-propagate>
+                <flow-ref name="storeMessage"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+
+    <flow name="nonTxSourceDoesntBeginTx" initialState="stopped">
+        <tx:transactional-source config-ref="localTx1"/>
+        <flow-ref name="storeMessage"/>
+    </flow>
+
+    <flow name="nonTxSourceWithNonTxOperation" initialState="stopped">
+        <tx:transactional-source config-ref="localTx2"/>
+        <flow-ref name="storeMessage"/>
+        <tx:verify-no-transaction config-ref="localTx2"/>
+    </flow>
+
+    <flow name="nonTxSourceWithTxInside" initialState="stopped">
+        <tx:transactional-source config-ref="localTx2"/>
+        <flow-ref name="storeMessage"/>
+
+        <try transactionalAction="ALWAYS_BEGIN">
+            <tx:verify-transaction-begun config-ref="localTx2"/>
+        </try>
+    </flow>
+
+    <flow name="sourceWithTimeout" initialState="stopped">
+        <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
+        <flow-ref name="storeMessage"/>
+        <flow-ref name="sleep"/>
+    </flow>
+
+</mule>

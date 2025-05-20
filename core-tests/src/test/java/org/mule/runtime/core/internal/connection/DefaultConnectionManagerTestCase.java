@@ -23,6 +23,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
@@ -30,6 +33,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -47,13 +51,12 @@ import org.mule.tck.testmodels.fruit.Banana;
 
 import java.util.Properties;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -61,6 +64,8 @@ import io.qameta.allure.Story;
 
 @Feature(JAVA_SDK)
 @Story(CONNECTIVITY_TEST)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String CONNECTION_CREATION_FAILURE_MESSAGE = "Invalid credentials! Connection failed to create";
@@ -73,9 +78,6 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   private ConnectionProvider<Banana> testeableConnectionProvider;
 
-  @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
-
   @Mock
   public ConfigurationInstance configurationInstance;
 
@@ -86,7 +88,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   private DefaultConnectionManager connectionManager;
 
-  @Before
+  @BeforeEach
   public void before() throws Exception {
     connectionProvider = mockConnectionProvider(CachedConnectionProvider.class);
     testeableConnectionProvider = mockConnectionProvider(ConnectionProvider.class);
@@ -95,6 +97,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
     muleContextLifecycleState = muleContext.getLifecycleManager().getState();
 
     connectionManager = new DefaultConnectionManager(muleContext);
+    connectionManager.initialise();
   }
 
   private <T extends ConnectionProvider<Banana>> T mockConnectionProvider(Class<T> type) throws Exception {
@@ -106,19 +109,19 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getConnection() throws Exception {
+  void getConnection() throws Exception {
     connectionManager.bind(config, connectionProvider);
     final ConnectionHandler<Banana> connectionHandler = connectionManager.getConnection(config);
     assertThat(connectionHandler.getConnection(), is(sameInstance(connection)));
   }
 
-  @Test(expected = ConnectionException.class)
-  public void assertUnboundedConnection() throws Exception {
-    connectionManager.getConnection(config);
+  @Test
+  void assertUnboundedConnection() throws Exception {
+    assertThrows(ConnectionException.class, () -> connectionManager.getConnection(config));
   }
 
   @Test
-  public void hasBinding() throws Exception {
+  void hasBinding() throws Exception {
     assertBound(false);
     connectionManager.bind(config, connectionProvider);
     assertBound(true);
@@ -131,38 +134,38 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void stop() throws Exception {
+  void stop() throws Exception {
     getConnection();
     connectionManager.stop();
     verifyDisconnect();
   }
 
-  @Test(expected = ConnectionException.class)
-  public void unbind() throws Exception {
+  @Test
+  void unbind() throws Exception {
     getConnection();
     connectionManager.unbind(config);
     verifyDisconnect();
     assertUnboundedConnection();
   }
 
-  private void verifyDisconnect() {
+  void verifyDisconnect() {
     verify(connectionProvider).disconnect(connection);
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void bindWithStoppingMuleContext() throws Exception {
+  @Test
+  void bindWithStoppingMuleContext() throws Exception {
     when(muleContextLifecycleState.isStopping()).thenReturn(true);
-    connectionManager.bind(config, connectionProvider);
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void bindWithStoppedMuleContext() throws Exception {
-    when(muleContextLifecycleState.isStopped()).thenReturn(true);
-    connectionManager.bind(config, connectionProvider);
+    assertThrows(IllegalStateException.class, () -> connectionManager.bind(config, connectionProvider));
   }
 
   @Test
-  public void bindWithStartingMuleContext() throws Exception {
+  void bindWithStoppedMuleContext() throws Exception {
+    when(muleContextLifecycleState.isStopped()).thenReturn(true);
+    assertThrows(IllegalStateException.class, () -> connectionManager.bind(config, connectionProvider));
+  }
+
+  @Test
+  void bindWithStartingMuleContext() throws Exception {
     when(muleContextLifecycleState.isStopped()).thenReturn(true);
     when(muleContextLifecycleState.isStarting()).thenReturn(true);
     connectionManager.bind(config, connectionProvider);
@@ -171,7 +174,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void successfulConnectionProviderConnectivity() throws Exception {
+  void successfulConnectionProviderConnectivity() throws Exception {
     final ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
 
     assertThat(result, isSuccess());
@@ -181,7 +184,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void failingConnectionProviderConnectivity() throws Exception {
+  void failingConnectionProviderConnectivity() throws Exception {
     final ConnectionValidationResult validationResult = failure("oops", new Exception());
     when(testeableConnectionProvider.validate(connection)).thenReturn(validationResult);
     final ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
@@ -193,7 +196,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void poolingConnectionProviderConnectivity() throws Exception {
+  void poolingConnectionProviderConnectivity() throws Exception {
     testeableConnectionProvider = mockConnectionProvider(PoolingConnectionProvider.class);
 
     final ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
@@ -204,7 +207,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void cachedConnectionProviderConnectivity() throws Exception {
+  void cachedConnectionProviderConnectivity() throws Exception {
     final ConnectionValidationResult result = connectionManager.testConnectivity(connectionProvider);
     assertThat(result, isSuccess());
     verify(connectionProvider).connect();
@@ -213,7 +216,7 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void connectionProviderFailsToCreateConnectionOnConnectivityTest() throws Exception {
+  void connectionProviderFailsToCreateConnectionOnConnectivityTest() throws Exception {
     when(testeableConnectionProvider.connect())
         .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
     final ConnectionValidationResult result = connectionManager.testConnectivity(testeableConnectionProvider);
@@ -229,12 +232,13 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("W-14379073")
   @Story(LAZY_CONNECTIONS)
-  public void forceConnectivityTestOnLazyConnections() throws Exception {
+  void forceConnectivityTestOnLazyConnections() throws Exception {
     final Properties deploymentProperties = new Properties();
     deploymentProperties.put(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "true");
     when(muleContext.getDeploymentProperties()).thenReturn(deploymentProperties);
 
     final DelegateConnectionManagerAdapter lazyConnectionManagerAdapter = new DelegateConnectionManagerAdapter(muleContext);
+    lazyConnectionManagerAdapter.initialise();
 
     when(testeableConnectionProvider.connect())
         .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
@@ -248,8 +252,9 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("W-14379073")
   @Story(LAZY_CONNECTIONS)
-  public void forceConnectivityTestOnEagerConnections() throws Exception {
+  void forceConnectivityTestOnEagerConnections() throws Exception {
     final DelegateConnectionManagerAdapter lazyConnectionManagerAdapter = new DelegateConnectionManagerAdapter(muleContext);
+    lazyConnectionManagerAdapter.initialise();
 
     when(testeableConnectionProvider.connect())
         .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));

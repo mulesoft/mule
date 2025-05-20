@@ -16,6 +16,8 @@ import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolS
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.min;
+import static java.time.Duration.ofMillis;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -65,7 +67,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
                                       FeatureFlaggingService featureFlaggingService) {
     super(connectionProvider);
     this.poolingProfile = poolingProfile;
-    this.poolingListener = poolingListener;
+    this.poolingListener = requireNonNull(poolingListener);
     this.poolId = ownerConfigName.concat("-").concat(generateId());
     this.pool = createPool(ownerConfigName, featureFlaggingService);
   }
@@ -144,9 +146,10 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
         break;
     }
 
-    config.setMaxWaitMillis(poolingProfile.getMaxWait());
-    config.setMinEvictableIdleTimeMillis(poolingProfile.getMinEvictionMillis());
-    config.setTimeBetweenEvictionRunsMillis(poolingProfile.getEvictionCheckIntervalMillis());
+
+    config.setMaxWait(ofMillis(poolingProfile.getMaxWait()));
+    config.setMinEvictableIdleDuration(ofMillis(poolingProfile.getMinEvictionMillis()));
+    config.setTimeBetweenEvictionRuns(ofMillis(poolingProfile.getEvictionCheckIntervalMillis()));
     GenericObjectPool<C> genericPool = new GenericObjectPool<>(new ObjectFactoryAdapter(), config);
     LOGGER.debug("Creating pool with ID {} for config {}", poolId, ownerConfigName);
 
@@ -156,7 +159,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     return genericPool;
   }
 
-  protected void applyInitialisationPolicy(GenericObjectPool pool) {
+  protected void applyInitialisationPolicy(GenericObjectPool<C> pool) {
     int initialConnections;
     switch (poolingProfile.getInitialisationPolicy()) {
       case INITIALISE_NONE:

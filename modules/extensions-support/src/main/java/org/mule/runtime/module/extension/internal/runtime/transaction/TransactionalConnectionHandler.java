@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
@@ -40,11 +40,8 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
    * @param resource a {@link ExtensionTransactionalResource} which wraps the connection
    */
   public TransactionalConnectionHandler(ExtensionTransactionalResource<T> resource) {
-    checkArgument(resource != null, "resource cannot be null");
-    this.resource = resource;
-    ConnectionHandler<T> connectionHandler = resource.getConnectionHandler();
-    checkArgument(connectionHandler instanceof ConnectionHandlerAdapter, "connectionHandlerAdapter was expected");
-    this.connectionHandler = (ConnectionHandlerAdapter<T>) connectionHandler;
+    this.resource = requireNonNull(resource, "resource cannot be null");
+    this.connectionHandler = requireNonNull((ConnectionHandlerAdapter<T>) resource.getConnectionHandler());
   }
 
   /**
@@ -58,7 +55,6 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
   /**
    * Does nothing since the connection shouldn't be released until the transaction is resolved
    */
-
   @Override
   public void release() {}
 
