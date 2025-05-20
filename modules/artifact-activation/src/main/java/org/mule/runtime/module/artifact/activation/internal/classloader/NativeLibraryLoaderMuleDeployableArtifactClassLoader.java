@@ -35,14 +35,13 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.bytebuddy.ByteBuddy;
 
 public abstract class NativeLibraryLoaderMuleDeployableArtifactClassLoader extends MuleDeployableArtifactClassLoader {
 
-  private final Logger logger = LoggerFactory.getLogger(NativeLibraryLoaderMuleDeployableArtifactClassLoader.class);
+  static {
+    registerAsParallelCapable();
+  }
 
   public static final String METHOD_NAME = "loadLibrary";
   private final NativeLibraryFinder nativeLibraryFinder;

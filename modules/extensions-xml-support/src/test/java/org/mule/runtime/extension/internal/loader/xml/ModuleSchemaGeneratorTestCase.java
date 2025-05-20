@@ -15,8 +15,8 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.c
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
@@ -24,10 +24,10 @@ import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -53,32 +53,48 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
 
   @Parameterized.Parameters(name = "{index}: Validating xsd for {1}")
   public static Collection<Object[]> data() {
-    final List<String> extensions = asList(
-                                           "module-namespace-custom",
-                                           "module-param-default-types",
-                                           "module-param-custom-types",
-                                           "module-param-role",
-                                           "module-param-types",
-                                           "module-properties-default-types",
-                                           "module-properties-types",
-                                           "module-single-op-with-property",
-                                           "module-single-operation",
-                                           "module-single-operation-camelized",
-                                           "module-tls-config");
+    return asList(
+                  new Object[] {new XmlExtensionModelLoader(), "module-namespace-custom",
+                      "module-namespace-custom.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-param-default-types",
+                      "module-param-default-types.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-param-custom-types",
+                      "module-param-custom-types.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-param-role",
+                      "module-param-role.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-param-types",
+                      "module-param-types.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-properties-default-types",
+                      "module-properties-default-types.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-properties-types",
+                      "module-properties-types.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-single-op-with-property",
+                      "module-single-op-with-property.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-single-operation",
+                      "module-single-operation.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-single-operation-camelized",
+                      "module-single-operation-camelized.xsd",
+                      null, emptyList()},
+                  new Object[] {new XmlExtensionModelLoader(), "module-tls-config",
+                      "module-tls-config.xsd",
+                      null, emptyList()});
+  }
 
-    return extensions.stream().map(moduleName -> {
-      String modulePath = EXPECTED_FILES_DIR + moduleName + ".xml";
+  @Parameterized.Parameter(1)
+  public String extensionModulePath;
 
-      ClassLoader contextClassLoader = currentThread().getContextClassLoader();
-      Map<String, Object> parameters = new HashMap<>();
-      parameters.put(RESOURCE_XML, modulePath);
-      // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
-      parameters.put("COMPILATION_MODE", true);
-      ExtensionModel extensionModel =
-          new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, getDefault(getDependencies()), parameters);
-
-      return new Object[] {extensionModel, moduleName + ".xsd"};
-    }).collect(toList());
+  @Override
+  public void createDslResolvingContext() throws IOException {
+    dslResolvingContext = getDefault(getDependencies());
   }
 
   private static Set<ExtensionModel> getDependencies() {
@@ -107,4 +123,17 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
   protected void assertEquals(String expectedContent, String actualContent) throws Exception {
     compareXML(expectedContent, actualContent);
   }
+
+  @Override
+  protected ExtensionModel doLoadExtension() {
+    ClassLoader contextClassLoader = currentThread().getContextClassLoader();
+
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put(RESOURCE_XML, EXPECTED_FILES_DIR + extensionModulePath + ".xml");
+    // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
+    parameters.put("COMPILATION_MODE", true);
+
+    return new XmlExtensionModelLoader().loadExtensionModel(contextClassLoader, getDefault(getDependencies()), parameters);
+  }
+
 }

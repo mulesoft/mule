@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mockito.junit.MockitoJUnit.rule;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -20,17 +23,16 @@ import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class SourceConnectionManagerTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public MockitoRule rule = rule();
 
   @Mock
   private ConnectionProvider connectionProvider;
@@ -48,12 +50,13 @@ public class SourceConnectionManagerTestCase extends AbstractMuleTestCase {
   private SourceConnectionManager sourceConnectionManager;
   private Object connectionA;
 
-  @Before
-  public void before() throws ConnectionException {
+  @BeforeEach
+  public void before() throws Exception {
     when(connectionProvider.connect()).thenReturn(new Object());
 
     when(configurationInstance.getValue()).thenReturn(configurationObject);
     connectionManager = new DefaultConnectionManager(muleContext);
+    initialiseIfNeeded(connectionManager);
     connectionManager.bind(configurationObject, connectionProvider);
     sourceConnectionManager = new SourceConnectionManager(connectionManager);
 
@@ -62,7 +65,7 @@ public class SourceConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void reusedConnectionOnReleaseNotDeletedUntilAllReferencesLost() throws ConnectionException {
+  void reusedConnectionOnReleaseNotDeletedUntilAllReferencesLost() throws ConnectionException {
     sourceConnectionManager.release(connectionA);
 
     assertThat(sourceConnectionManager.getConnectionHandler(connectionA).isPresent(), is(true));
@@ -76,7 +79,7 @@ public class SourceConnectionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void reusedConnectionOnInvalidateNotDeletedUntilAllReferencesLost() throws ConnectionException {
+  void reusedConnectionOnInvalidateNotDeletedUntilAllReferencesLost() throws ConnectionException {
     sourceConnectionManager.invalidate(connectionA);
 
     assertThat(sourceConnectionManager.getConnectionHandler(connectionA).isPresent(), is(true));

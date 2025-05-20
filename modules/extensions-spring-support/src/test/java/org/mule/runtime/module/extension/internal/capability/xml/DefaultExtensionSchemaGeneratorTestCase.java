@@ -7,19 +7,15 @@
 package org.mule.runtime.module.extension.internal.capability.xml;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
-import static java.util.Optional.ofNullable;
-
-import static com.google.common.collect.ImmutableSet.copyOf;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 import org.mule.extension.test.extension.reconnection.ReconnectionExtension;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
 import org.mule.tck.size.SmallTest;
@@ -47,9 +43,6 @@ import org.mule.test.values.extension.ValuesExtension;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -63,36 +56,57 @@ public class DefaultExtensionSchemaGeneratorTestCase extends FileGenerationParam
 
   private final ExtensionSchemaGenerator generator = new DefaultExtensionSchemaGenerator();
 
-
-  @Parameterized.Parameters(name = "{1}")
+  @Parameterized.Parameters(name = "{2}")
   public static Collection<Object[]> data() {
-
-    final List<ResourceExtensionUnitTest> extensions;
-    extensions = asList(newUnitTest(JAVA_LOADER, MapConnector.class, "map.xsd"),
-                        newUnitTest(JAVA_LOADER, ListConnector.class, "list.xsd"),
-                        newUnitTest(JAVA_LOADER, TestConnector.class, "basic.xsd"),
-                        newUnitTest(JAVA_LOADER, StringListConnector.class, "string-list.xsd"),
-                        newUnitTest(JAVA_LOADER, GlobalPojoConnector.class, "global-pojo.xsd"),
-                        newUnitTest(JAVA_LOADER, GlobalInnerPojoConnector.class, "global-inner-pojo.xsd"),
-                        newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan.xsd"),
-                        newUnitTest(JAVA_LOADER, PetStoreConnector.class, "petstore.xsd"),
-                        newUnitTest(JAVA_LOADER, MetadataExtension.class, "metadata.xsd"),
-                        newUnitTest(JAVA_LOADER, HeisenbergExtension.class, "heisenberg.xsd"),
-                        newUnitTest(JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.xsd"),
-                        newUnitTest(JAVA_LOADER, TransactionalExtension.class, "tx-ext.xsd"),
-                        newUnitTest(JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.xsd"),
-                        newUnitTest(JAVA_LOADER, MarvelExtension.class, "marvel.xsd"),
-                        newUnitTest(JAVA_LOADER, TypedValueExtension.class, "typed-value.xsd"),
-                        newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth.xsd"),
-                        newUnitTest(JAVA_LOADER, WeaveFunctionExtension.class, "test-fn.xsd"),
-                        newUnitTest(JAVA_LOADER, ValuesExtension.class, "values.xsd"),
-                        newUnitTest(JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.xsd"),
-                        newUnitTest(JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.xsd"),
-                        newUnitTest(JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.xsd"),
-                        newUnitTest(JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.xsd"));
-
-    return createExtensionModels(extensions);
+    return asList(
+                  new Object[] {JAVA_LOADER, MapConnector.class, "map.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, ListConnector.class, "list.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, TestConnector.class, "basic.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, StringListConnector.class, "string-list.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, GlobalPojoConnector.class, "global-pojo.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, GlobalInnerPojoConnector.class, "global-inner-pojo.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, VeganExtension.class, "vegan.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, PetStoreConnector.class, "petstore.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, MetadataExtension.class, "metadata.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, HeisenbergExtension.class, "heisenberg.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, SubstitutionGroupExtension.class, "substitutiongroup.xsd",
+                      null, singletonList(HeisenbergExtension.class)},
+                  new Object[] {JAVA_LOADER, TransactionalExtension.class, "tx-ext.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, SubTypesMappingConnector.class, "subtypes.xsd",
+                      null, asList(HeisenbergExtension.class, MetadataExtension.class, VeganExtension.class)},
+                  new Object[] {JAVA_LOADER, MarvelExtension.class, "marvel.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, TypedValueExtension.class, "typed-value.xsd",
+                      null, singletonList(HeisenbergExtension.class)},
+                  new Object[] {JAVA_LOADER, TestOAuthExtension.class, "test-oauth.xsd",
+                      null, singletonList(ValuesExtension.class)},
+                  new Object[] {JAVA_LOADER, WeaveFunctionExtension.class, "test-fn.xsd",
+                      null, singletonList(HeisenbergExtension.class)},
+                  new Object[] {JAVA_LOADER, ValuesExtension.class, "values.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, ImplicitConfigExtension.class, "implicit-config.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, NonImplicitConfigExtension.class, "non-implicit-config.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, SemanticTermsExtension.class, "semantic-terms-extension.xsd",
+                      null, emptyList()},
+                  new Object[] {JAVA_LOADER, ReconnectionExtension.class, "reconnection-extension.xsd",
+                      null, emptyList()});
   }
+
+  @Parameterized.Parameter(1)
+  public Class extensionClass;
 
   @Override
   protected boolean shouldUpdateExpectedFilesOnError() {
@@ -106,7 +120,7 @@ public class DefaultExtensionSchemaGeneratorTestCase extends FileGenerationParam
 
   @Override
   protected String doGenerate(ExtensionModel extensionUnderTest) throws Exception {
-    return generator.generate(extensionUnderTest, new SchemaTestDslContext());
+    return generator.generate(extensionUnderTest, dslResolvingContext);
   }
 
   @Override
@@ -114,27 +128,8 @@ public class DefaultExtensionSchemaGeneratorTestCase extends FileGenerationParam
     compareXML(expectedContent, actualContent);
   }
 
-  private static class SchemaTestDslContext implements DslResolvingContext {
-
-    @Override
-    public Optional<ExtensionModel> getExtension(String name) {
-      return ofNullable(EXTENSION_MODELS.get(name));
-    }
-
-    @Override
-    public Optional<ExtensionModel> getExtensionForType(String typeId) {
-      return getTypeCatalog().getDeclaringExtension(typeId).flatMap(this::getExtension);
-    }
-
-    @Override
-    public Set<ExtensionModel> getExtensions() {
-      return copyOf(EXTENSION_MODELS.values());
-    }
-
-    @Override
-    public TypeCatalog getTypeCatalog() {
-      return TypeCatalog.getDefault(copyOf(EXTENSION_MODELS.values()));
-    }
+  @Override
+  protected ExtensionModel doLoadExtension() {
+    return loadExtension(extensionClass, loader, artifactCoordinates, dslResolvingContext);
   }
-
 }

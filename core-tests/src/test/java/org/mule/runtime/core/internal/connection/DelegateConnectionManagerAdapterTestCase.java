@@ -7,32 +7,41 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.test.allure.AllureConstants.ConnectionManagementFeature.CONNECTION_MANAGEMENT;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.LazyConnectionsStory.LAZY_CONNECTIONS;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import static org.junit.Assert.assertThrows;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @SmallTest
+@Feature(CONNECTION_MANAGEMENT)
+@Story(LAZY_CONNECTIONS)
 public class DelegateConnectionManagerAdapterTestCase extends AbstractMuleContextTestCase {
 
   private DelegateConnectionManagerAdapter managerAdapter;
 
   @Before
-  public void setUp() {
+  public void setUp() throws InitialisationException {
     muleContext.getDeploymentProperties().setProperty(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "true");
     managerAdapter = new DelegateConnectionManagerAdapter(muleContext);
+    managerAdapter.initialise();
   }
 
   @Test

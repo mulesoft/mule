@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.sdk.api.connectivity.TransactionalConnection;
 import org.mule.sdk.api.connectivity.XATransactionalConnection;
 import org.mule.sdk.api.connectivity.XATransactionalConnectionProvider;
 
@@ -26,15 +28,33 @@ import jakarta.transaction.TransactionManager;
 public interface XAConnectionManagementStrategyFactory {
 
   /**
-   * Wraps the given {@code poolingStrategy} with XA capabilities, by registering the pooled connections into a
+   * Wraps the given {@code poolingStrategy} with XA capabilities, by registering the pooled XA connections into a
    * {@link TransactionManager}.
+   * <p>
+   * Non-XA transactions will not have this special handling and will be immediately returned.
    *
-   * @param <C>                the actual type of the connection that supports XA transactions.
+   * @param <C>                the actual type of the connection that may support XA transactions.
    * @param poolingStrategy    the pooling that manages the connections to be used by the {@link TransactionManager}.
    * @param connectionProvider the actual provider for connections to be managed by the {@link TransactionManager}.
    * @return a new strategy that handles XA transactions for the provided connection provider.
    */
-  <C extends XATransactionalConnection> ConnectionManagementStrategy<C> manageForXa(ConnectionManagementStrategy<C> poolingStrategy,
-                                                                                    ConnectionProvider<C> connectionProvider);
+  <C extends TransactionalConnection> ConnectionManagementStrategy<C> managePooledForXa(ConnectionManagementStrategy<C> poolingStrategy,
+                                                                                        ConnectionProvider<C> connectionProvider);
+
+  /**
+   * Wraps the given {@code mgmtStrategy} with XA capabilities, by registering obtained XA connections into a
+   * {@link TransactionManager} and pooling them.
+   * <p>
+   * Non-XA transactions will not have this special handling and will be immediately returned.
+   *
+   * @param <C>                the actual type of the connection that may support XA transactions.
+   * @param mgmtStrategy       the management strategy for connections to be used by the {@link TransactionManager}.
+   * @param xaPoolingProfile   the configuration of the pool for {@link XATransactionalConnection}s.
+   * @param connectionProvider the actual provider for connections to be managed by the {@link TransactionManager}.
+   * @return a new strategy that handles XA transactions for the provided connection provider.
+   */
+  <C extends TransactionalConnection> ConnectionManagementStrategy<C> manageForXa(ConnectionManagementStrategy<C> mgmtStrategy,
+                                                                                  PoolingProfile xaPoolingProfile,
+                                                                                  ConnectionProvider<C> connectionProvider);
 
 }

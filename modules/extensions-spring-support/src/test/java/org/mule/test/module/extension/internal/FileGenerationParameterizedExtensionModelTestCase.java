@@ -6,16 +6,21 @@
  */
 package org.mule.test.module.extension.internal;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 
+import static com.google.common.collect.ImmutableSet.copyOf;
+
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,55 +28,51 @@ import org.junit.runners.Parameterized;
 
 public abstract class FileGenerationParameterizedExtensionModelTestCase extends ParameterizedExtensionModelTestCase {
 
-  public static class ResourceExtensionUnitTest extends ExtensionUnitTest {
+  @Parameterized.Parameter(0)
+  public ExtensionModelLoader loader;
 
-    public static ResourceExtensionUnitTest newUnitTest(ExtensionModelLoader loader, Class<?> extensionClass, String filename) {
-      return newUnitTest(loader, extensionClass, filename, null);
-    }
-
-    public static ResourceExtensionUnitTest newUnitTest(ExtensionModelLoader loader, Class<?> extensionClass, String filename,
-                                                        ArtifactCoordinates artifactCoordinates) {
-      return new ResourceExtensionUnitTest(loader, extensionClass, filename, artifactCoordinates);
-    }
-
-    private final String filename;
-
-    protected ResourceExtensionUnitTest(ExtensionModelLoader loader, Class<?> extensionClass, String filename,
-                                        ArtifactCoordinates artifactCoordinates) {
-      super(loader, extensionClass, artifactCoordinates);
-      this.filename = filename;
-    }
-
-    public String getFilename() {
-      return filename;
-    }
-
-    @Override
-    protected Object[] buildTestParams(ExtensionModel extensionModel) {
-      return new Object[] {extensionModel, filename};
-    }
-  }
-
-  @Parameterized.Parameter(1)
+  @Parameterized.Parameter(2)
   public String expectedFilePath;
 
+  @Parameterized.Parameter(3)
+  public ArtifactCoordinates artifactCoordinates;
+
+  @Parameterized.Parameter(4)
+  public List<Class<? extends ExtensionModel>> dependencies;
+
   protected String expectedContent;
+  protected DslResolvingContext dslResolvingContext;
 
   @Before
   public void setup() throws IOException {
     expectedContent = getResourceAsString(getExpectedFilesDir() + expectedFilePath, getClass());
   }
 
+  @Before
+  public void createDslResolvingContext() throws IOException {
+    // TODO MULE-11797: as this utils is consumed from
+    // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
+    // this util should get dropped once the ticket gets implemented.
+    dslResolvingContext = DslResolvingContext.getDefault(copyOf(dependencies
+        .stream()
+        // loads dependencies as well
+        .map(extModelDepClass -> loadExtension(extModelDepClass, loader, null, nullDslResolvingContext()))
+        // schema generation may change based on the order of the dependencies in this object.
+        .toList()));
+  }
+
   @Test
   public final void generate() throws Exception {
-    String actual = doGenerate(extensionUnderTest);
+    String actual = doGenerate(doLoadExtension());
     try {
       assertEquals(expectedContent, actual);
     } catch (Throwable t) {
       if (shouldUpdateExpectedFilesOnError()) {
         File root = new File(getResourceAsUrl(getExpectedFilesDir() + expectedFilePath, getClass()).toURI());
 
-        for (root = root.getParentFile(); !root.getName().equals("target"); root = root.getParentFile());
+        for (root = root.getParentFile(); !root.getName().equals("target"); root = root.getParentFile()) {
+          ;
+        }
         root = root.getParentFile();
 
         File testDir = new File(root, "src/test/resources/" + getExpectedFilesDir());
@@ -83,6 +84,8 @@ public abstract class FileGenerationParameterizedExtensionModelTestCase extends 
       throw t;
     }
   }
+
+  protected abstract ExtensionModel doLoadExtension();
 
   protected abstract String doGenerate(ExtensionModel extensionUnderTest) throws Exception;
 

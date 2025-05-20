@@ -7,9 +7,9 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 
 import static java.lang.Boolean.getBoolean;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -22,7 +22,6 @@ import org.mule.test.module.extension.internal.FileGenerationParameterizedExtens
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,13 +36,14 @@ public class ExtensionModelJsonGeneratorWithNullArtifactCoordinateTestCase
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
-  @Parameterized.Parameters(name = "{1}")
+  @Parameterized.Parameters(name = "{2}")
   public static Collection<Object[]> data() {
-    List<ResourceExtensionUnitTest> extensions;
-    extensions = singletonList(newUnitTest(JAVA_LOADER, VeganExtension.class, "vegan-without-artifact-coordinates.json"));
-
-    return createExtensionModels(extensions);
+    return singletonList(new Object[] {JAVA_LOADER, VeganExtension.class, "vegan-without-artifact-coordinates.json",
+        null, emptyList()});
   }
+
+  @Parameterized.Parameter(1)
+  public Class extensionClass;
 
   private final ExtensionModelJsonSerializer generator = new ExtensionModelJsonSerializer(true);
 
@@ -70,6 +70,11 @@ public class ExtensionModelJsonGeneratorWithNullArtifactCoordinateTestCase
   @Test
   public void load() {
     ExtensionModel result = generator.deserialize(expectedContent);
-    assertThat(result, is(extensionUnderTest));
+    assertThat(result, is(doLoadExtension()));
+  }
+
+  @Override
+  protected ExtensionModel doLoadExtension() {
+    return loadExtension(extensionClass, loader, artifactCoordinates, dslResolvingContext);
   }
 }

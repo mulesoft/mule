@@ -6,7 +6,6 @@
  */
 package org.mule.test.module.extension.internal;
 
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -15,8 +14,8 @@ import static org.mule.runtime.module.extension.api.resources.BaseExtensionResou
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -27,14 +26,11 @@ import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensi
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.function.TriFunction;
-
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -47,43 +43,18 @@ public abstract class ParameterizedExtensionModelTestCase extends AbstractMuleTe
 
   protected static final ExtensionModelLoader JAVA_LOADER = new DefaultJavaExtensionModelLoader();
 
-  @Parameterized.Parameter
-  public ExtensionModel extensionUnderTest;
-
   @AfterClass
   public static void cleanUp() {
     EXTENSION_MODELS = new HashMap<>();
   }
 
-  protected static Collection<Object[]> createExtensionModels(List<? extends ExtensionUnitTest> extensions) {
-    TriFunction<Class<?>, ExtensionModelLoader, ArtifactCoordinates, ExtensionModel> createExtensionModel =
-        (extension, loader, artifactCoordinates) -> {
-          ExtensionModel model = loadExtension(extension, loader, artifactCoordinates);
-
-          if (EXTENSION_MODELS.put(model.getName(), model) != null) {
-            throw new IllegalArgumentException(format("Extension names must be unique. Name [%s] for extension [%s] was already used",
-                                                      model.getName(), extension.getName()));
-          }
-
-          return model;
-        };
-
-    return extensions.stream()
-        .map(e -> e.toTestParams(createExtensionModel))
-        .collect(toList());
-  }
-
-  protected static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader, ArtifactCoordinates coordinates) {
+  protected static ExtensionModel loadExtension(Class<?> clazz, ExtensionModelLoader loader, ArtifactCoordinates coordinates,
+                                                DslResolvingContext dslResolvingContext) {
     Map<String, Object> params = of(TYPE_PROPERTY_NAME, clazz.getName(),
                                     VERSION, getMuleManifest().getProductVersion(),
                                     // TODO MULE-14517: This workaround should be replaced for a better and more complete
                                     // mechanism
                                     COMPILATION_MODE, true);
-
-    // TODO MULE-11797: as this utils is consumed from
-    // org.mule.runtime.module.extension.internal.capability.xml.schema.AbstractXmlResourceFactory.generateResource(org.mule.runtime.api.meta.model.ExtensionModel),
-    // this util should get dropped once the ticket gets implemented.
-    final DslResolvingContext dslResolvingContext = getDefault(new LinkedHashSet<>(EXTENSION_MODELS.values()));
 
     final String basePackage = clazz.getPackage().toString();
     final ClassLoader pluginClassLoader = new ClassLoader(clazz.getClassLoader()) {

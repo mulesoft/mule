@@ -25,12 +25,14 @@ import static java.util.Collections.singletonMap;
 import static java.util.Collections.sort;
 import static java.util.Optional.empty;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import static org.junit.Assume.assumeThat;
 import static org.junit.rules.Timeout.millis;
+
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.component.Component;
@@ -47,25 +49,26 @@ import org.mule.tck.junit4.rule.LogCleanup;
 import org.mule.tck.junit4.rule.WarningTimeout;
 import org.mule.tck.report.ThreadDumpOnTimeOut;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
-import org.slf4j.Logger;
-
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.rules.DisableOnDebug;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import org.slf4j.Logger;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This implementation provides services to test code for
@@ -207,7 +210,7 @@ public abstract class AbstractMuleTestCase {
 
   @Before
   public final void initializeMuleTest() {
-    skipTestWhenDisabledInCurrentEnvironment();
+    skipTestWhenDisabledInCurrentEnvironment(name.getMethodName());
     printTestHeader();
   }
 
@@ -221,17 +224,33 @@ public abstract class AbstractMuleTestCase {
     return "Testing: " + name.getMethodName();
   }
 
-  private void skipTestWhenDisabledInCurrentEnvironment() {
+  @BeforeEach
+  public final void initializeMuleTest(TestInfo testInfo) {
+    skipTestWhenDisabledInCurrentEnvironment(testInfo.getTestMethod().map(Method::getName).orElse(""));
+    printTestHeader(testInfo);
+  }
+
+  private void printTestHeader(TestInfo testInfo) {
+    if (verbose) {
+      System.out.println(" => " + getTestHeader(testInfo));
+    }
+  }
+
+  protected String getTestHeader(TestInfo testInfo) {
+    return "Testing: " + testInfo.getDisplayName();
+  }
+
+  private void skipTestWhenDisabledInCurrentEnvironment(String testMethodName) {
     assumeThat(this, new BaseMatcher<AbstractMuleTestCase>() {
 
       @Override
       public boolean matches(Object o) {
-        return !(isDisabledInThisEnvironment() || isDisabledInThisEnvironment(name.getMethodName()));
+        return !(isDisabledInThisEnvironment() || isDisabledInThisEnvironment(testMethodName));
       }
 
       @Override
       public void describeTo(Description description) {
-        description.appendText("Test " + name.getMethodName() + " disabled in this environment");
+        description.appendText("Test " + testMethodName + " disabled in this environment");
       }
     });
   }

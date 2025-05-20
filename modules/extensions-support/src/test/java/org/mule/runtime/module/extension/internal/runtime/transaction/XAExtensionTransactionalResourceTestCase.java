@@ -7,15 +7,19 @@
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
 import static javax.transaction.xa.XAResource.TMSUCCESS;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
+
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
@@ -26,15 +30,17 @@ import org.mule.tck.size.SmallTest;
 
 import javax.transaction.xa.XAResource;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class XAExtensionTransactionalResourceTestCase extends AbstractMuleTestCase {
 
   @Mock
@@ -51,7 +57,7 @@ public class XAExtensionTransactionalResourceTestCase extends AbstractMuleTestCa
 
   private XAExtensionTransactionalResource resource;
 
-  @Before
+  @BeforeEach
   public void before() throws Exception {
     resource = new XAExtensionTransactionalResource(connection, connectionHandler, transaction);
     when(connection.getXAResource()).thenReturn(xaResource);
@@ -60,7 +66,7 @@ public class XAExtensionTransactionalResourceTestCase extends AbstractMuleTestCa
     TransactionCoordination.getInstance().bindTransaction(transaction);
   }
 
-  @After
+  @AfterEach
   public void cleanUp() throws Exception {
     Transaction transaction = TransactionCoordination.getInstance().getTransaction();
     if (transaction != null) {
@@ -69,38 +75,39 @@ public class XAExtensionTransactionalResourceTestCase extends AbstractMuleTestCa
   }
 
   @Test
-  public void enlist() throws Exception {
+  void enlist() throws Exception {
     assertThat(resource.enlist(), is(true));
     verify(transaction).enlistResource(xaResource);
   }
 
   @Test
-  public void idempotentEnlist() throws Exception {
+  void idempotentEnlist() throws Exception {
     enlist();
     verify(transaction, times(1)).enlistResource(xaResource);
   }
 
   @Test
-  public void delist() throws Exception {
+  void delist() throws Exception {
     enlist();
     assertThat(resource.delist(), is(true));
     verify(transaction).delistResource(xaResource, TMSUCCESS);
   }
 
   @Test
-  public void delistWithoutEnlist() throws Exception {
+  void delistWithoutEnlist() throws Exception {
     assertThat(resource.delist(), is(false));
     verify(transaction, never()).delistResource(same(xaResource), anyInt());
   }
 
   @Test
-  public void close() throws Exception {
+  void close() throws Exception {
     resource.close();
-    verify(connection).close();
+    verify(connection, never()).close();
+    verify(connectionHandler).release();
   }
 
   @Test
-  public void getTargetObject() {
+  void getTargetObject() {
     assertThat(resource.getTargetObject(), is(sameInstance(connection)));
   }
 }
