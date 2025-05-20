@@ -6,33 +6,37 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static org.mule.tck.junit4.rule.SystemProperty.callWithProperty;
-import static org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
-
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.oauth.TestOAuthExtension;
 
 import java.util.Collection;
-import java.util.List;
 
+import org.junit.Rule;
+import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class OCSExtensionModelJsonGeneratorTestCase extends ExtensionModelJsonGeneratorTestCase {
+
+  protected static final ExtensionModelLoader JAVA_LOADER = new DefaultJavaExtensionModelLoader();
 
   /**
    * Property that if set signals that OCS is supported.
    */
   public static final String OCS_ENABLED = "ocs.enabled";
 
-  @Parameterized.Parameters(name = "{1}")
+  @Rule
+  public SystemProperty ocsEnabled = new SystemProperty(OCS_ENABLED, "true");
+
+  @Parameterized.Parameters(name = "{2}")
   public static Collection<Object[]> data() {
-    List<ResourceExtensionUnitTest> extensions =
-        singletonList(newUnitTest(JAVA_LOADER, TestOAuthExtension.class, "test-oauth-ocs.json"));
-    try {
-      return callWithProperty(OCS_ENABLED, "true", () -> createExtensionModels(extensions));
-    } catch (Throwable t) {
-      throw new RuntimeException("Failed to create the extension models for the test.", t);
-    }
+    return singletonList(new Object[] {JAVA_LOADER, TestOAuthExtension.class, "test-oauth-ocs.json",
+        null, emptyList()});
   }
+
 }
