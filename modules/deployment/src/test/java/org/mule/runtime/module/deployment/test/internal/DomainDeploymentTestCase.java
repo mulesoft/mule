@@ -2182,31 +2182,14 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
    */
   @Override
   protected void doSynchronizedArtifactDeploymentActionTest(final Action deploymentAction, final Action assertAction,
-                                                            DeploymentListener domainDeploymentListener, String artifactId) {
+                                                            DeploymentListener domainDeploymentListener, String artifactId)
+      throws InterruptedException {
     try {
-      startDeployment();
+      serviceManager.start();
     } catch (MuleException e) {
-      throw new RuntimeException("Unable to start deployment service");
+      throw new RuntimeException(e);
     }
-
-    final AtomicBoolean assertionError = new AtomicBoolean(false);
-
-    doAnswer(invocation -> {
-      try {
-        deploymentAction.perform();
-      } catch (Exception ignored) {
-      }
-
-      try {
-        assertAction.perform();
-      } catch (AssertionError e) {
-        assertionError.set(true);
-      }
-      return null;
-    }).when(domainDeploymentListener).onDeploymentStart(artifactId);
-
-    assertDeploymentSuccess(domainDeploymentListener, artifactId);
-    assertFalse("Assertion action failed", assertionError.get());
+    super.doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, domainDeploymentListener, artifactId);
   }
 
   private Action createUndeployDummyDomainAction() {
