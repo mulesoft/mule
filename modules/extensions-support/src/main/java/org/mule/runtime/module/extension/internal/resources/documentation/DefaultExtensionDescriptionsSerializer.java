@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
+import static org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createDefault;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_DESCRIPTIONS_FILE_NAME_MASK;
 
 import static java.lang.String.format;
@@ -16,6 +17,7 @@ import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static javax.xml.transform.OutputKeys.CDATA_SECTION_ELEMENTS;
 import static javax.xml.transform.OutputKeys.INDENT;
 
+import org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException;
 import org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer;
 import org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation;
 
@@ -24,14 +26,11 @@ import java.io.InputStream;
 import java.io.StringWriter;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
@@ -49,19 +48,18 @@ public class DefaultExtensionDescriptionsSerializer implements ExtensionDescript
       marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(JAXB_FORMATTED_OUTPUT, true);
       unmarshaller = jaxbContext.createUnmarshaller();
-    } catch (JAXBException e) {
+    } catch (Exception e) {
       throw new RuntimeException("Failed to initialize XML serialization components", e);
     } finally {
       currentThread().setContextClassLoader(tccl);
     }
 
     try {
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      transformer = transformerFactory.newTransformer();
+      transformer = createDefault().getTransformerFactory().newTransformer();
       transformer.setOutputProperty(INDENT, "yes");
       transformer.setOutputProperty(CDATA_SECTION_ELEMENTS, "description");
-    } catch (TransformerConfigurationException e) {
-      throw new RuntimeException("Failed to initialize XML serialization components", e);
+    } catch (Exception e) {
+      throw new ExtensionDescriptionSerializerException("Failed to initialize XML serialization components", e);
     }
   }
 
@@ -77,25 +75,21 @@ public class DefaultExtensionDescriptionsSerializer implements ExtensionDescript
       transformer.transform(new DOMSource(domResult.getNode()), new StreamResult(writer));
       return writer.toString();
     } catch (Exception e) {
-      throw new RuntimeException("Failed to serialize XML documentation", e);
+      throw new ExtensionDescriptionSerializerException("Failed to serialize XML documentation", e);
     }
   }
 
   @Override
   public synchronized XmlExtensionDocumentation deserialize(String xml) {
-    try {
-      return (DefaultXmlExtensionDocumentation) unmarshaller.unmarshal(new ByteArrayInputStream(xml.getBytes(UTF_8)));
-    } catch (JAXBException e) {
-      throw new RuntimeException("Failed to deserialize XML documentation from string", e);
-    }
+    return deserialize(new ByteArrayInputStream(xml.getBytes(UTF_8)));
   }
 
   @Override
   public synchronized XmlExtensionDocumentation deserialize(InputStream xml) {
     try {
       return (DefaultXmlExtensionDocumentation) unmarshaller.unmarshal(xml);
-    } catch (JAXBException e) {
-      throw new RuntimeException("Failed to deserialize XML documentation from stream", e);
+    } catch (Exception e) {
+      throw new ExtensionDescriptionSerializerException("Failed to deserialize XML documentation from stream", e);
     }
   }
 
