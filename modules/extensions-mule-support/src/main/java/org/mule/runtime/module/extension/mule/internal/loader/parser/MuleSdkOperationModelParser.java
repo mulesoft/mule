@@ -23,7 +23,6 @@ import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -32,6 +31,7 @@ import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.meta.version.MuleMinorVersion;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -306,7 +306,7 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(new ResolvedMinMuleVersion(name, new MuleVersion(MIN_MULE_VERSION),
+    return of(new ResolvedMinMuleVersion(name, new MuleMinorVersion(MIN_MULE_VERSION),
                                          format("Operation %s has min mule version %s because the Mule Sdk was introduced in that version.",
                                                 name, MIN_MULE_VERSION)));
   }

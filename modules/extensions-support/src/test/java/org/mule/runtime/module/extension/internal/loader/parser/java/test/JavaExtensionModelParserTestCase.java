@@ -49,17 +49,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 
 public class JavaExtensionModelParserTestCase {
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   @Issue("W-12622240")
@@ -126,15 +121,15 @@ public class JavaExtensionModelParserTestCase {
     JavaExtensionModelParser parser = getParser(ExtensionUsingLegacyApi.class);
     assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion(), is(FIRST_MULE_VERSION));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Extension SimpleExtension has min mule version 4.1.1 because it is the default value."));
+               is("Extension SimpleExtension has min mule version 4.1 because it is the default value."));
   }
 
   @Test
   public void getMMVForSdkExtension() {
     JavaExtensionModelParser parser = getParser(ExtensionUsingSdkApi.class);
-    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5"));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Extension SimpleExtension has min mule version 4.5.0 because it if annotated with the new sdk api @Extension."));
+               is("Extension SimpleExtension has min mule version 4.5 because it if annotated with the new sdk api @Extension."));
   }
 
   @Test
@@ -158,7 +153,7 @@ public class JavaExtensionModelParserTestCase {
     JavaExtensionModelParser parser = getParser(ExtensionWithConfiguration.class);
     assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion(), is(FIRST_MULE_VERSION));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Extension MixedConfigurationsAnnotationExtension has min mule version 4.1.1 because it is the default value."));
+               is("Extension MixedConfigurationsAnnotationExtension has min mule version 4.1 because it is the default value."));
   }
 
   @Test
@@ -295,10 +290,12 @@ public class JavaExtensionModelParserTestCase {
 
     @Override
     public boolean equals(Object o) {
-      if (this == o)
+      if (this == o) {
         return true;
-      if (o == null || getClass() != o.getClass())
+      }
+      if (o == null || getClass() != o.getClass()) {
         return false;
+      }
       SimplePojoWithTime that = (SimplePojoWithTime) o;
       return Objects.equals(name, that.name) &&
           Objects.equals(age, that.age) &&

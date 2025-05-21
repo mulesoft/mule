@@ -13,10 +13,10 @@ import static org.mule.tests.chains.api.config.TestProcessorChainsNamespaceInfoP
 import static java.lang.String.format;
 
 import org.mule.metadata.api.ClassTypeLoader;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
+import org.mule.runtime.api.meta.version.MuleMinorVersion;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
@@ -27,7 +27,7 @@ public class TestProcessorChainsExtensionLoadingDelegate implements ExtensionLoa
   public static final String EXTENSION_DESCRIPTION = "Spring Module Plugin";
   public static final String VENDOR = "Mulesoft";
   public static final String VERSION = "1.4.0-SNAPSHOT";
-  public static final MuleVersion MIN_MULE_VERSION = new MuleVersion("4.4");
+  public static final MuleMinorVersion MIN_MULE_VERSION = new MuleMinorVersion("4.4");
   public static final String XSD_FILE_NAME = "mule-test-processor-chains.xsd";
   private static final String UNESCAPED_LOCATION_PREFIX = "http://";
   private static final String SCHEMA_LOCATION = "www.mulesoft.org/schema/mule/test-processor-chains";

@@ -18,7 +18,7 @@ import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.Category;
-import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.version.MuleMinorVersion;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
@@ -80,7 +80,7 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(new ResolvedMinMuleVersion(extensionName, new MuleVersion(MIN_MULE_VERSION),
+    return of(new ResolvedMinMuleVersion(extensionName, new MuleMinorVersion(MIN_MULE_VERSION),
                                          format("Application %s has min mule version %s because the Mule Sdk was introduced in that version.",
                                                 extensionName, MIN_MULE_VERSION)));
   }

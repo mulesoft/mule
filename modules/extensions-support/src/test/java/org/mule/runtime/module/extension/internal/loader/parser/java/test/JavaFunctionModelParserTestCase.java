@@ -38,23 +38,23 @@ public class JavaFunctionModelParserTestCase {
     setParser(Functions.class.getMethod("function"), ConfigurationFunctions.class);
     assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion(), is(FIRST_MULE_VERSION));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Function function has min mule version 4.1.1 because it is the default value."));
+               is("Function function has min mule version 4.1 because it is the default value."));
   }
 
   @Test
   public void getMMVForSdkAnnotatedFunction() throws NoSuchMethodException {
     setParser(SdkFunctions.class.getMethod("sdkFunction"), ConfigurationFunctions.class);
-    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5"));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Method sdkFunction has min mule version 4.5.0 because it is annotated with Alias. Alias was introduced in Mule 4.5.0."));
+               is("Method sdkFunction has min mule version 4.5 because it is annotated with Alias. Alias was introduced in Mule 4.5."));
   }
 
   @Test
   public void getMMVForFunctionFromConfigurationWithSdkFunctionsAnnotation() throws NoSuchMethodException {
     setParser(Functions.class.getMethod("function"), ConfigurationWithSdkFunctionsAnnotation.class);
-    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5"));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Function function has min mule version 4.5.0 because it was propagated from the @Functions annotation at the extension class used to add the function."));
+               is("Function function has min mule version 4.5 because it was propagated from the @Functions annotation at the extension class used to add the function."));
   }
 
   protected void setParser(Method method, Class<?> extensionClass) {

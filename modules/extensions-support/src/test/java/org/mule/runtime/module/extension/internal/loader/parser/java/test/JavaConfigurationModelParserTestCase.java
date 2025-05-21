@@ -10,10 +10,11 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.test
 
 import static java.lang.String.format;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.rules.ExpectedException.none;
+import static org.hamcrest.Matchers.containsString;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -38,14 +39,9 @@ import org.mule.sdk.api.connectivity.ConnectionValidationResult;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class JavaConfigurationModelParserTestCase {
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   @Test
   public void getConfigurationNameFromConfigurationUsingSdkApi() {
@@ -62,13 +58,11 @@ public class JavaConfigurationModelParserTestCase {
 
   @Test
   public void getConfigurationNameFromConfigurationUsingSdkAndLegacyApi() {
-    expectedException.expect(instanceOf(IllegalModelDefinitionException.class));
-    expectedException.expectMessage("Annotations org.mule.runtime.extension.api.annotation.Configuration and " +
-        "org.mule.sdk.api.annotation.Configuration are both present at the same time on Configuration SimpleWronglyAnnotatedConfiguration");
-
     JavaConfigurationModelParser javaConfigurationModelParser =
         getParser(SimpleSdkExtensionWithWronglyAnnotatedConfiguration.class, SimpleWronglyAnnotatedConfiguration.class);
-    javaConfigurationModelParser.getName();
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> javaConfigurationModelParser.getName());
+    assertThat(thrown.getMessage(), containsString("Annotations org.mule.runtime.extension.api.annotation.Configuration and " +
+        "org.mule.sdk.api.annotation.Configuration are both present at the same time on Configuration SimpleWronglyAnnotatedConfiguration"));
   }
 
   @Test
@@ -99,27 +93,27 @@ public class JavaConfigurationModelParserTestCase {
   public void getMMVForSdkImplicitConfiguration() {
     JavaConfigurationModelParser javaConfigurationModelParser =
         getParser(LegacyAnnotationsExtension.class, NoImplicitSdkConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5"));
     assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration NoImplicitSdkConfiguration has min mule version 4.5.0 because it is annotated with NoImplicit. NoImplicit was introduced in Mule 4.5.0."));
+               is("Configuration NoImplicitSdkConfiguration has min mule version 4.5 because it is annotated with NoImplicit. NoImplicit was introduced in Mule 4.5."));
   }
 
   @Test
   public void getMMVForLegacyAnnotationConfiguration() {
     JavaConfigurationModelParser javaConfigurationModelParser =
         getParser(LegacyAnnotationsExtension.class, LegacyAnnotationConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.1.1"));
+    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.1"));
     assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration LegacyAnnotationConfiguration has min mule version 4.1.1 because it is the default value."));
+               is("Configuration LegacyAnnotationConfiguration has min mule version 4.1 because it is the default value."));
   }
 
   @Test
   public void getMMVForSdkAnnotationConfiguration() {
     JavaConfigurationModelParser javaConfigurationModelParser =
         getParser(LegacyAnnotationsExtension.class, SdkAnnotationConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5"));
     assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration SdkAnnotationConfiguration has min mule version 4.5.0 because it is annotated with Configuration. Configuration was introduced in Mule 4.5.0."));
+               is("Configuration SdkAnnotationConfiguration has min mule version 4.5 because it is annotated with Configuration. Configuration was introduced in Mule 4.5."));
   }
 
   @Test
@@ -144,18 +138,18 @@ public class JavaConfigurationModelParserTestCase {
   public void getMMVForAnnotatedConfiguration() {
     JavaConfigurationModelParser javaConfigurationModelParser =
         getParser(LegacyAnnotationsExtension.class, AnnotatedConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.1.1"));
+    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.1"));
     assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration AnnotatedConfiguration has min mule version 4.1.1 because it is the default value."));
+               is("Configuration AnnotatedConfiguration has min mule version 4.1 because it is the default value."));
   }
 
   @Test
   public void getMMVForConfigurationFromExtensionWithSdkConfigurationsAnnotation() {
     JavaConfigurationModelParser javaConfigurationModelParser =
         getParser(SimpleLegacyExtension.class, SimpleLegacyConfiguration.class);
-    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
+    assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5"));
     assertThat(javaConfigurationModelParser.getResolvedMinMuleVersion().get().getReason(),
-               is("Configuration SimpleLegacyConfiguration has min mule version 4.5.0 because it was propagated from the annotation (either @Configurations or @Config) used to reference this configuration."));
+               is("Configuration SimpleLegacyConfiguration has min mule version 4.5 because it was propagated from the annotation (either @Configurations or @Config) used to reference this configuration."));
   }
 
   protected JavaConfigurationModelParser getParser(Class<?> extension, Class<?> configuration) {
