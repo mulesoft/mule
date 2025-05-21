@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.utils;
 
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.version.MuleMinorVersion;
 
 /**
  * Holds information about the minimum {@link MuleVersion} that a component can run on and the reason for that value.
@@ -15,19 +16,19 @@ import org.mule.runtime.api.meta.MuleVersion;
  */
 public class ResolvedMinMuleVersion {
 
-  public static final MuleVersion FIRST_MULE_VERSION = new MuleVersion("4.1.1");
+  public static final MuleMinorVersion FIRST_MULE_VERSION = new MuleMinorVersion("4.1");
   private String componentName;
-  private MuleVersion minMuleVersion;
+  private MuleMinorVersion minMuleVersion;
   private String reason;
   private ResolvedMinMuleVersion innerComponent = null;
 
-  public ResolvedMinMuleVersion(String componentName, MuleVersion minMuleVersion, String reason) {
+  public ResolvedMinMuleVersion(String componentName, MuleMinorVersion minMuleVersion, String reason) {
     this.componentName = componentName;
     this.minMuleVersion = minMuleVersion;
     this.reason = reason;
   }
 
-  public MuleVersion getMinMuleVersion() {
+  public MuleMinorVersion getMinMuleVersion() {
     return minMuleVersion;
   }
 
