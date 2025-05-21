@@ -5,6 +5,30 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.exception.runtimeAdded",
+            "old": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.io.InputStream)",
+            "new": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.io.InputStream) throws org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
+            "exception": "org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
+            "justification": "W-18586735: ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.exception.runtimeAdded",
+            "old": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.lang.String)",
+            "new": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.lang.String) throws org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
+            "exception": "org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
+            "justification": "W-18586735: ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.exception.runtimeAdded",
+            "old": "method java.lang.String org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::serialize(org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation)",
+            "new": "method java.lang.String org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::serialize(org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation) throws org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
+            "exception": "org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
+            "justification": "W-18586735: Use standard Java xml apis instead of xerces for extension doc generation"
+          },
+          {
+            "ignore": true,
             "code": "java.method.returnTypeTypeParametersChanged",
             "old": "method org.mule.runtime.core.api.streaming.CursorProviderFactory org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getCursorProviderFactory()",
             "new": "method <T> org.mule.runtime.core.api.streaming.CursorProviderFactory<T> org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getCursorProviderFactory()",
