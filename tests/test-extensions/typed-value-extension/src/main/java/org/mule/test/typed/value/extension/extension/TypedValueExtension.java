@@ -6,9 +6,8 @@
  */
 package org.mule.test.typed.value.extension.extension;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -22,7 +21,7 @@ import org.mule.test.heisenberg.extension.model.DifferedKnockableDoor;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 @Operations(TypedValueParameterOperations.class)
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Extension(name = "TypedValue")
 @Sources(TypedValueSource.class)
 @Import(type = KnockeableDoor.class)

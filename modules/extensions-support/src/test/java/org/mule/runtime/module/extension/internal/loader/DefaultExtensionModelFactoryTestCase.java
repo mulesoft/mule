@@ -13,7 +13,6 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
-import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
@@ -23,6 +22,7 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAI
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
@@ -53,6 +53,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
+
 import static org.junit.Assert.assertThrows;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -117,10 +118,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-
-import org.junit.Test;
+import java.util.Set;
 
 import org.hamcrest.Matcher;
+import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -352,7 +353,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   @Test
   @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
   public void defaultJavaVersionSupport() {
-    assertThat(heisenbergExtension.getSupportedJavaVersions(), equalTo(ALL_SUPPORTED_JAVA_VERSIONS));
+    assertThat(heisenbergExtension.getSupportedJavaVersions(), equalTo(Set.of(JAVA_21.version(), JAVA_17.version())));
   }
 
   @Test

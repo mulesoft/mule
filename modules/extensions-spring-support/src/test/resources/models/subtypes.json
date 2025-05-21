@@ -5,8 +5,7 @@
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
-    "1.8",
-    "11",
+    "21",
     "17"
   ],
   "category": "COMMUNITY",

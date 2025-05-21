@@ -3,12 +3,11 @@
   "description": "",
   "version": "4.0.0",
   "vendor": "MuleSoft",
-  "category": "COMMUNITY",
   "supportedJavaVersions": [
-    "1.8",
-    "11",
-    "17"
+    "17",
+    "21"
   ],
+  "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "capitalizedwithspacesinthename",
     "namespace": "http://www.mulesoft.org/schema/mule/capitalized",
@@ -293,13 +292,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "_UNDERSCORE-SET-PAYLOAD-WITH-PARAMETER",
             "namespace": "CAPITALIZEDWITHSPACESINTHENAME",
@@ -655,13 +654,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-HARDCODED-VALUE",
             "namespace": "CAPITALIZEDWITHSPACESINTHENAME",
@@ -986,13 +985,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-WITH-NAME-PARAMETER",
             "namespace": "CAPITALIZEDWITHSPACESINTHENAME",

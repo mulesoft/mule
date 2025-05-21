@@ -6,10 +6,8 @@
  */
 package org.mule.test.javaxinject;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 
 import org.mule.runtime.api.config.ArtifactEncoding;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -23,8 +21,7 @@ import javax.inject.Inject;
 @Extension(name = JavaxInjectCompatibilityTestExtension.JAVAX_INJECT_COMPATIBILITY_TEST_EXTENSION)
 @Xml(prefix = "javax-inject",
     namespace = "http://www.mulesoft.org/schema/mule/javax-inject")
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17, JAVA_21})
-
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Configurations(JavaxInjectCompatibilityTestConfiguration.class)
 @ExpressionFunctions(JavaxInjectCompatibilityTestFunction.class)
 public class JavaxInjectCompatibilityTestExtension {

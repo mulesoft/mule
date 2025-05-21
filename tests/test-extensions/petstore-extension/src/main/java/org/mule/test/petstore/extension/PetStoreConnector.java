@@ -6,9 +6,8 @@
  */
 package org.mule.test.petstore.extension;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -29,7 +28,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Extension(name = "petstore")
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Operations({PetStoreOperations.class, PetStoreOperationsWithFailures.class, PetStoreFailingOperations.class})
 @ConnectionProviders({SimplePetStoreConnectionProvider.class, PooledPetStoreConnectionProvider.class,
     TransactionalPetStoreConnectionProvider.class, PooledPetStoreConnectionProviderWithFailureInvalidConnection.class,

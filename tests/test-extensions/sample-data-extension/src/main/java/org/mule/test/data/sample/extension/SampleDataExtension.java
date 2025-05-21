@@ -6,9 +6,8 @@
  */
 package org.mule.test.data.sample.extension;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -30,10 +29,8 @@ import org.mule.test.data.sample.extension.source.ShowInDslParameterGroupListene
 import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListener;
 import org.mule.test.data.sample.extension.source.SimpleTestSampleDataListenerWithTwoBoundActingParameters;
 
-import org.checkerframework.checker.units.qual.A;
-
 @Extension(name = SampleDataExtension.EXTENSION_NAME)
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/sample-data", prefix = "sample-data")
 @ConnectionProviders(SampleDataConnectionProvider.class)
 @Operations(SampleDataOperations.class)

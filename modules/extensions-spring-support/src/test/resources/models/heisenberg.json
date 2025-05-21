@@ -5,10 +5,8 @@
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
-    "1.8",
-    "11",
-    "17",
-    "21"
+    "21",
+    "17"
   ],
   "category": "SELECT",
   "xmlDsl": {

@@ -6,9 +6,8 @@
  */
 package org.mule.test.parameter.resolver.extension.extension;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -19,7 +18,7 @@ import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 
 @Configurations({ParameterResolverConfig.class, NestedWrapperTypesConfig.class})
 @Extension(name = "ParameterResolver")
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Import(type = KnockeableDoor.class)
 @Import(type = DifferedKnockableDoor.class)
 public class ParameterResolverExtension {

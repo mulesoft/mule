@@ -3,12 +3,11 @@
   "description": "Documentation for the connector",
   "version": "4.0.0",
   "vendor": "MuleSoft",
-  "category": "COMMUNITY",
   "supportedJavaVersions": [
-    "1.8",
-    "11",
-    "17"
+    "17",
+    "21"
   ],
+  "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "module-documentation",
     "namespace": "http://www.mulesoft.org/schema/mule/module-documentation",
@@ -359,7 +358,6 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
@@ -369,6 +367,7 @@
             "MODULE-DOCUMENTATION:ANOTHER_CUSTOM_ERROR_HERE"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "ANOTHER_OPERATION_WITH_DOC",
             "namespace": "MODULE-DOCUMENTATION",
@@ -825,7 +824,6 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
@@ -835,6 +833,7 @@
             "MODULE-DOCUMENTATION:ANOTHER_CUSTOM_ERROR_HERE"
           ],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "OPERATION-WITH-DOC",
             "namespace": "MODULE-DOCUMENTATION",

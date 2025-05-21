@@ -6,9 +6,8 @@
  */
 package org.mule.test.marvel;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -23,7 +22,7 @@ import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.xmen.XMen;
 
 @Extension(name = MARVEL_EXTENSION)
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Configurations({IronMan.class, DrStrange.class, XMen.class})
 @ErrorTypes(DrStrangeErrorTypeDefinition.class)
 @Export(classes = {IronMan.class, DrStrangeTypeWithCustomStereotype.class})

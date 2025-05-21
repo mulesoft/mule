@@ -6,9 +6,8 @@
  */
 package org.mule.test.values.extension;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
@@ -29,7 +28,7 @@ import org.mule.test.values.extension.source.SimpleSource;
 import org.mule.test.values.extension.source.SourceWithTwoBoundActingParameters;
 
 @Extension(name = "Values")
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Configurations({SimpleConfig.class, ConfigWithValueParameter.class,
     ConfigWithValueAndRequiredParam.class, ConfigWithValuesWithRequiredParamsFromParamGroup.class,
     ConfigWithValuesWithRequiredParamsFromShowInDslGroup.class, ConfigWithFailureErrorProvider.class,

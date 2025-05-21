@@ -6,9 +6,8 @@
  */
 package org.mule.test.complex.config.properties.deprecated.extension;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
@@ -17,7 +16,7 @@ import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.sdk.api.annotation.dsl.xml.Xml;
 
 @Extension(name = "Config Properties Deprecated")
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Xml(prefix = ConfigPropertiesExtensionDeprecated.NAMESPACE_PREFIX)
 @Configurations(ConfigPropertiesExtensionDeprecatedConfig.class)
 @Export(

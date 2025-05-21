@@ -6,9 +6,8 @@
  */
 package org.mule.test.multi.implicit.config.extension.extension;
 
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
-import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
@@ -21,7 +20,7 @@ import org.mule.test.implicit.exclusive.config.extension.extension.NonImplicitCo
 import org.mule.test.implicit.exclusive.config.extension.extension.NullSafeInterface;
 
 @Extension(name = "multiImplicitConfig")
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
+@JavaVersionSupport({JAVA_21, JAVA_17})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/multiimplicitconfig", prefix = "multiimplicitconfig")
 @Configurations(value = {BlaConfig.class, BleConfig.class, NonImplicitConfig.class, AnotherConfigThatCanBeUsedImplicitly.class})
 @Import(type = NullSafeInterface.class)
