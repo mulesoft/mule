@@ -47,6 +47,11 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
     this.bufferManager = bufferManager;
   }
 
+  @Override
+  public int available() throws IOException {
+    return stream.available();
+  }
+
   /**
    * Consumes the stream in order to obtain data that has not been read yet.
    *
