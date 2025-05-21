@@ -3,12 +3,11 @@
   "description": "",
   "version": "4.0.0",
   "vendor": "MuleSoft",
-  "category": "COMMUNITY",
   "supportedJavaVersions": [
-    "1.8",
-    "11",
-    "17"
+    "17",
+    "21"
   ],
+  "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "module-properties",
     "namespace": "http://www.mulesoft.org/schema/mule/module-properties",
@@ -357,13 +356,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CALL-PRIVATE-NESTED-OPERATIONS",
             "namespace": "MODULE-PROPERTIES",
@@ -719,13 +718,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-ADD-PARAM-AND-PROPERTY-VALUES",
             "namespace": "MODULE-PROPERTIES",
@@ -1081,13 +1080,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-ADD-PARAM-AND-PROPERTY-VALUES-THRU-INTERNAL-OPERATION",
             "namespace": "MODULE-PROPERTIES",
@@ -1443,13 +1442,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-CONFIG-DEFAULT-PARAM-VALUE",
             "namespace": "MODULE-PROPERTIES",
@@ -1774,13 +1773,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-CONFIG-DEFAULT-PROPERTY-USE-OPTIONAL",
             "namespace": "MODULE-PROPERTIES",
@@ -2105,13 +2104,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-CONFIG-OPTIONAL-PROPERTY",
             "namespace": "MODULE-PROPERTIES",
@@ -2436,13 +2435,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-CONFIG-PARAM-VALUE",
             "namespace": "MODULE-PROPERTIES",
@@ -2767,13 +2766,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-HARDCODED-FILE-PROPERTY",
             "namespace": "MODULE-PROPERTIES",
@@ -3098,13 +3097,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-HARDCODED-GLOBAL-PROPERTY",
             "namespace": "MODULE-PROPERTIES",
@@ -3429,13 +3428,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-HARDCODED-SYSTEM-PROPERTY",
             "namespace": "MODULE-PROPERTIES",
@@ -3760,13 +3759,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-HARDCODED-VALUE",
             "namespace": "MODULE-PROPERTIES",
@@ -4091,13 +4090,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "SET-PAYLOAD-PARAM-VALUE",
             "namespace": "MODULE-PROPERTIES",

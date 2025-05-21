@@ -3,12 +3,11 @@
   "description": "",
   "version": "4.0.0",
   "vendor": "MuleSoft",
-  "category": "COMMUNITY",
   "supportedJavaVersions": [
-    "1.8",
-    "11",
-    "17"
+    "17",
+    "21"
   ],
+  "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "module-xsd-custom-types",
     "namespace": "http://www.mulesoft.org/schema/mule/module-xsd-custom-types",
@@ -46,13 +45,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "COPY-XSDTYPE1",
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
@@ -354,13 +353,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET-HARDCODED-XSDTYPE1",
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
@@ -616,13 +615,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "IS-XSDTYPE1",
         "namespace": "MODULE-XSD-CUSTOM-TYPES",
@@ -924,13 +923,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "OPERATION-WITH-CUSTOM-TYPES",
         "namespace": "MODULE-XSD-CUSTOM-TYPES",

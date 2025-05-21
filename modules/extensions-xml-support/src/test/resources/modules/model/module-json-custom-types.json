@@ -3,12 +3,11 @@
   "description": "",
   "version": "4.0.0",
   "vendor": "MuleSoft",
-  "category": "COMMUNITY",
   "supportedJavaVersions": [
-    "1.8",
-    "11",
-    "17"
+    "17",
+    "21"
   ],
+  "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "module-json-custom-types",
     "namespace": "http://www.mulesoft.org/schema/mule/module-json-custom-types",
@@ -46,13 +45,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "CHECK-STREET-IS-AVENUE",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -382,13 +381,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "COPY-JSONTYPE1",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -746,13 +745,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET-HARDCODED-TYPE1",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -1036,13 +1035,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "GET-HARDCODED-TYPE1-AS-JSON",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -1298,13 +1297,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "IS-JSONTYPE1",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -1634,13 +1633,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "IS-JSONTYPE1-CONTENT",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -1971,13 +1970,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "IS-JSONTYPE2",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -2324,13 +2323,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JOIN-ARRAYS",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -2670,13 +2669,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "JOIN-STRING-ARRAY",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -3061,13 +3060,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "OPERATION-WITH-CUSTOM-TYPES",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
@@ -3397,13 +3396,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "OPERATION-WITH-INPUT-DATA",
         "namespace": "MODULE-JSON-CUSTOM-TYPES",
