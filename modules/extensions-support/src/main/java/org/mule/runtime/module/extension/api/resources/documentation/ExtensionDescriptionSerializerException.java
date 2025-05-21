@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.api.resources.documentation;
 
+/**
+ * Indicates a problem during serialization or deserialization when using the {@link ExtensionDescriptionsSerializer}.
+ * 
+ * @since 4.10
+ */
 public class ExtensionDescriptionSerializerException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
@@ -13,6 +18,5 @@ public class ExtensionDescriptionSerializerException extends RuntimeException {
   public ExtensionDescriptionSerializerException(String message, Exception cause) {
     super(message, cause);
   }
-
 
 }

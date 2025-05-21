@@ -9,7 +9,7 @@
             "old": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.io.InputStream)",
             "new": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.io.InputStream) throws org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
             "exception": "org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
-            "justification": "W-18586735: ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+            "justification": "W-18586735: Use standard Java xml apis instead of xerces for extension doc generation"
           },
           {
             "ignore": true,
@@ -17,7 +17,7 @@
             "old": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.lang.String)",
             "new": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.lang.String) throws org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
             "exception": "org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
-            "justification": "W-18586735: ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+            "justification": "W-18586735: Use standard Java xml apis instead of xerces for extension doc generation"
           },
           {
             "ignore": true,
