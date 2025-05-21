@@ -49,7 +49,7 @@ public class DefaultExtensionDescriptionsSerializer implements ExtensionDescript
       marshaller.setProperty(JAXB_FORMATTED_OUTPUT, true);
       unmarshaller = jaxbContext.createUnmarshaller();
     } catch (Exception e) {
-      throw new RuntimeException("Failed to initialize XML serialization components", e);
+      throw new ExtensionDescriptionSerializerException("Failed to initialize XML serialization components", e);
     } finally {
       currentThread().setContextClassLoader(tccl);
     }

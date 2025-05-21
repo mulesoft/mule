@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.api.resources.documentation;
 
 /**
  * Indicates a problem during serialization or deserialization when using the {@link ExtensionDescriptionsSerializer}.
- * 
+ *
  * @since 4.10
  */
 public class ExtensionDescriptionSerializerException extends RuntimeException {
