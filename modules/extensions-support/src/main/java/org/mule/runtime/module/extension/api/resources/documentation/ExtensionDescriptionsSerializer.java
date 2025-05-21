@@ -19,11 +19,11 @@ public interface ExtensionDescriptionsSerializer {
 
   ExtensionDescriptionsSerializer SERIALIZER = new DefaultExtensionDescriptionsSerializer();
 
-  String serialize(XmlExtensionDocumentation dto);
+  String serialize(XmlExtensionDocumentation dto) throws ExtensionDescriptionSerializerException;
 
-  XmlExtensionDocumentation deserialize(String xml);
+  XmlExtensionDocumentation deserialize(String xml) throws ExtensionDescriptionSerializerException;
 
-  XmlExtensionDocumentation deserialize(InputStream xml);
+  XmlExtensionDocumentation deserialize(InputStream xml) throws ExtensionDescriptionSerializerException;
 
   String getFileName(String extensionName);
 

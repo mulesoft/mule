@@ -59,7 +59,6 @@ module org.mule.runtime.extensions.support {
   requires java.compiler;
   // XML documentation classes
   requires jakarta.xml.bind;
-  requires org.mule.apache.xerces;
 
   requires com.github.benmanes.caffeine;
   requires com.google.common;
