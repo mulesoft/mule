@@ -15,6 +15,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.alert.AlertingSupport;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,9 +32,9 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Tracks instances of {@link ManagedCursorProvider} through the {@link #track(ManagedCursorProvider, Runnable)} method. This
@@ -52,6 +53,12 @@ import org.slf4j.Logger;
  */
 public class StreamingGhostBuster implements Lifecycle {
 
+  /*
+   * A stream that is GCd when it hasn't been completely consumed may provoke leaks on certain conditions (the most common one is
+   * connections from a db connection pool that remain taken until the data is fully read).
+   */
+  public static final String ALERT_NOT_CONSUMED_STREAM_BUSTED = "NOT_CONSUMED_STREAM_BUSTED";
+
   private static final long POLL_INTERVAL = SECONDS.toMillis(5);
   private static final Logger LOGGER = getLogger(StreamingGhostBuster.class);
 
@@ -61,6 +68,9 @@ public class StreamingGhostBuster implements Lifecycle {
 
   @Inject
   private SchedulerService schedulerService;
+
+  @Inject
+  private AlertingSupport alertingSupport;
 
   private Scheduler scheduler;
 
@@ -177,6 +187,8 @@ public class StreamingGhostBuster implements Lifecycle {
     public void dispose() {
       if (!clear) {
         clear = true;
+        alertingSupport.triggerAlert(ALERT_NOT_CONSUMED_STREAM_BUSTED,
+                                     janitor.provider.getOriginatingLocation().map(ComponentLocation::getLocation).orElse(null));
         janitor.releaseResources();
         if (callOnDispose != null) {
           callOnDispose.run();
