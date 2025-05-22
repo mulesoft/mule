@@ -90,6 +90,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -2160,6 +2161,35 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     final String artifactId = emptyDomainFileBuilder.getId();
 
     doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, domainDeploymentListener, artifactId);
+  }
+
+  /**
+   * Overrides the default deployment synchronization logic to remove a race condition that affects domain deployment tests,
+   * especially in concurrent environments or on Windows.
+   * <p>
+   * In this method, {@code startDeployment(startServiceManager=true)} is called in a concurrent thread, while
+   * {@code assertDeploymentSuccess(domainDeploymentListener, artifactId)} is executed in parallel. The latter method calls
+   * {@code triggerDirectoryWatcher()}, which requires the {@code ServiceManager} to be properly initialized. If the
+   * {@code ServiceManager} is not started in time, the test becomes flaky due to this race condition.
+   * <p>
+   * By explicitly starting the {@code ServiceManager} before delegating to the superclass implementation, this override ensures
+   * that all services are initialized before the Spring context is created.
+   *
+   * @param deploymentAction         the deployment action to execute in the test
+   * @param assertAction             the assertion action to execute after deployment
+   * @param domainDeploymentListener the domain deployment listener
+   * @param artifactId               the identifier of the artifact to deploy
+   */
+  @Override
+  protected void doSynchronizedArtifactDeploymentActionTest(final Action deploymentAction, final Action assertAction,
+                                                            DeploymentListener domainDeploymentListener, String artifactId)
+      throws InterruptedException {
+    try {
+      serviceManager.start();
+    } catch (MuleException e) {
+      throw new RuntimeException(e);
+    }
+    super.doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, domainDeploymentListener, artifactId);
   }
 
   private Action createUndeployDummyDomainAction() {
