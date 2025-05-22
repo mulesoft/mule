@@ -17,6 +17,8 @@ import org.mule.runtime.api.time.TimeSupplier;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import jakarta.inject.Inject;
 
@@ -46,11 +48,19 @@ public class DefaultAlertingSupport implements AlertingSupport {
    *
    * @return the count aggregation for each alert.
    */
+  @Override
   public Map<String, TimedDataAggregation<Integer>> alertsCountAggregation() {
+    return alertsAggregation(() -> 0, (a, t) -> a + 1);
+  }
+
+  /**
+   */
+  @Override
+  public <A> Map<String, TimedDataAggregation<A>> alertsAggregation(Supplier<A> aaa, BiFunction<A, Object, A> accumulator) {
     return timedBuffersPerAlert.entrySet()
         .stream()
         .collect(toMap(Entry::getKey,
-                       e -> e.getValue().<Integer>aggregate(0, (a, t) -> ((Integer) a) + 1)));
+                       e -> e.getValue().aggregate(aaa.get(), accumulator)));
   }
 
   @Inject
