@@ -27,7 +27,7 @@ public class CursorProviderJanitor {
 
   private static final Logger LOGGER = getLogger(CursorProviderJanitor.class);
 
-  CursorProvider provider;
+  CursorProvider<? extends Cursor> provider;
   private final AtomicInteger openCursorsCount;
   private final MutableStreamingStatistics statistics;
   private final AtomicBoolean closed = new AtomicBoolean(false);
@@ -40,7 +40,8 @@ public class CursorProviderJanitor {
    * @param openCursorsCount an {@link AtomicInteger} to decrement each time a cursor is released
    * @param statistics       a {@link MutableStreamingStatistics}
    */
-  public CursorProviderJanitor(CursorProvider provider, AtomicInteger openCursorsCount, MutableStreamingStatistics statistics) {
+  public CursorProviderJanitor(CursorProvider<? extends Cursor> provider, AtomicInteger openCursorsCount,
+                               MutableStreamingStatistics statistics) {
     this.provider = provider;
     this.openCursorsCount = openCursorsCount;
     this.statistics = statistics;
