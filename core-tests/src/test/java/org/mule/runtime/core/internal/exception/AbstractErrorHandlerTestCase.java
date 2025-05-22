@@ -15,9 +15,11 @@ import static java.util.Collections.singletonList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.alert.AlertingSupport;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -26,6 +28,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder;
+import org.mule.runtime.ast.privileged.error.DefaultErrorType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -53,6 +56,8 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
 
   @Rule
   public VerboseExceptions verbose;
+
+  protected AlertingSupport alertingSupport;
 
   public AbstractErrorHandlerTestCase(VerboseExceptions verbose) {
     this.verbose = verbose;
@@ -82,6 +87,8 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
     muleEvent = CoreEvent.builder(context).message(of("")).build();
 
     when(mockException.getExceptionInfo()).thenReturn(new MuleExceptionInfo());
+
+    alertingSupport = mock(AlertingSupport.class);
   }
 
   @Test
@@ -134,4 +141,12 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
 
     return event;
   }
+
+  protected void addErrorType(ComponentIdentifier errorTypeIdentifier) {
+    final MuleExceptionInfo exceptionInfo = mock(MuleExceptionInfo.class);
+    when(exceptionInfo.getErrorType())
+        .thenReturn(new DefaultErrorType(errorTypeIdentifier.getName(), errorTypeIdentifier.getNamespace(), null));
+    when(mockException.getExceptionInfo()).thenReturn(exceptionInfo);
+  }
+
 }

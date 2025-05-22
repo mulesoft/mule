@@ -8,6 +8,9 @@ package org.mule.runtime.core.internal.exception;
 
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_MULE_UNKNOWN_ERROR_RAISED;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -16,18 +19,25 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_PROPAGATE;
+import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SUPPORTABILITY;
+import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SupportabilityStory.ALERTS;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Mono.just;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -35,12 +45,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
@@ -63,18 +72,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -85,9 +91,6 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
   protected MuleContext muleContext = mockContextWithServices();
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
   private static final Logger LOGGER = getLogger(OnErrorPropagateHandlerTestCase.class);
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   private final NotificationDispatcher notificationDispatcher = getNotificationDispatcher(muleContext);
   private final TestTransaction mockTransaction =
@@ -124,49 +127,49 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   @Test
   public void testHandleExceptionWithNoConfig() throws Exception {
-    configureXaTransactionAndSingleResourceTransaction();
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
     when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(onErrorPropagateHandler.getLocation()));
+    addErrorType(CONNECTIVITY);
+
+    configureXaTransactionAndSingleResourceTransaction();
+
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
     startIfNeeded(onErrorPropagateHandler);
 
-    expectedException.expectCause(sameInstance(mockException));
+    var thrown = assertThrows(Exception.class, () -> onErrorPropagateHandler.handleException(mockException, muleEvent));
+    assertThat(thrown.getCause(), sameInstance(mockException));
 
-    try {
-      onErrorPropagateHandler.handleException(mockException, muleEvent);
-    } finally {
-      verify(mockException, never()).setHandled(anyBoolean());
-      verify(mockTransaction, times(1)).setRollbackOnly();
-      verify(mockTransaction, times(0)).commit();
-      verify(mockTransaction, times(1)).rollback();
-    }
+    verify(mockException, never()).setHandled(anyBoolean());
+    verify(mockTransaction, times(1)).setRollbackOnly();
+    verify(mockTransaction, times(0)).commit();
+    verify(mockTransaction, times(1)).rollback();
   }
 
   @Test
   public void testHandleExceptionWithoutRollback() throws Exception {
-    configureXaTransactionAndSingleResourceTransaction();
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
+
+    configureXaTransactionAndSingleResourceTransaction();
     ComponentLocation location = mock(ComponentLocation.class);
     when(location.getRootContainerName()).thenReturn("");
     when(location.getLocation()).thenReturn("");
     when(mockTransaction.getComponentLocation()).thenReturn(ofNullable(location));
+
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
     startIfNeeded(onErrorPropagateHandler);
 
-    expectedException.expectCause(sameInstance(mockException));
+    var thrown = assertThrows(Exception.class, () -> onErrorPropagateHandler.handleException(mockException, muleEvent));
+    assertThat(thrown.getCause(), sameInstance(mockException));
 
-    try {
-      onErrorPropagateHandler.handleException(mockException, muleEvent);
-    } finally {
-      verify(mockException, never()).setHandled(anyBoolean());
-      verify(mockTransaction, times(0)).setRollbackOnly();
-      verify(mockTransaction, times(0)).commit();
-      verify(mockTransaction, times(0)).rollback();
-    }
+    verify(mockException, never()).setHandled(anyBoolean());
+    verify(mockTransaction, times(0)).setRollbackOnly();
+    verify(mockTransaction, times(0)).commit();
+    verify(mockTransaction, times(0)).rollback();
   }
 
   @Test
@@ -178,15 +181,12 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
 
-    expectedException.expectCause(sameInstance(mockException));
+    var thrown = assertThrows(Exception.class, () -> onErrorPropagateHandler.handleException(mockException, muleEvent));
+    assertThat(thrown.getCause(), sameInstance(mockException));
 
-    try {
-      onErrorPropagateHandler.handleException(mockException, muleEvent);
-    } finally {
-      verify(mockException, never()).setHandled(anyBoolean());
-    }
-
+    verify(mockException, never()).setHandled(anyBoolean());
   }
 
   @Test
@@ -202,15 +202,12 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
 
-    expectedException.expectCause(sameInstance(mockException));
+    var thrown = assertThrows(Exception.class, () -> onErrorPropagateHandler.handleException(mockException, muleEvent));
+    assertThat(thrown.getCause(), sameInstance(mockException));
 
-    try {
-      onErrorPropagateHandler.handleException(mockException, muleEvent);
-    } finally {
-      verify(mockException, never()).setHandled(anyBoolean());
-    }
-
+    verify(mockException, never()).setHandled(anyBoolean());
   }
 
   @Test
@@ -223,15 +220,12 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
 
-    expectedException.expect(hasRootCause(sameInstance(innerException)));
+    var thrown = assertThrows(Exception.class, () -> onErrorPropagateHandler.handleException(mockException, muleEvent));
+    assertThat(thrown, hasRootCause(sameInstance(innerException)));
 
-    try {
-      onErrorPropagateHandler.handleException(mockException, muleEvent);
-    } finally {
-      verify(mockException, never()).setHandled(anyBoolean());
-    }
-
+    verify(mockException, never()).setHandled(anyBoolean());
   }
 
   /**
@@ -240,19 +234,20 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
    */
   @Test
   public void testMessageToStringNotCalledOnFailure() throws Exception {
-    muleEvent = CoreEvent.builder(muleEvent).message(spy(of(""))).build();
-    muleEvent = spy(muleEvent);
+    var message = spy(of(""));
+    when(message.toString()).thenThrow(new RuntimeException("Message.toString() should not be called"));
+    muleEvent = CoreEvent.builder(muleEvent).message(message).build();
+
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
 
     onErrorPropagateHandler
-        .setMessageProcessors(asList(createFailingEventMessageProcessor(mockException),
-                                     createFailingEventMessageProcessor(mockException)));
+        .setMessageProcessors(asList(createFailingEventMessageProcessor(new RuntimeException(mockException)),
+                                     createFailingEventMessageProcessor(new RuntimeException(mockException))));
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
-    when(muleEvent.getMessage().toString()).thenThrow(new RuntimeException("Message.toString() should not be called"));
 
-    expectedException.expect(Exception.class);
-    onErrorPropagateHandler.handleException(mockException, muleEvent);
+    assertThrows(Exception.class, () -> onErrorPropagateHandler.handleException(mockException, muleEvent));
   }
 
   @Test
@@ -273,6 +268,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
                 thownRef::set);
 
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
     router.accept(mockException);
 
     assertThat(thownRef.get().getCause(), not(instanceOf(AssertionError.class)));
@@ -281,6 +277,8 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   @Test
   public void exceptionRoutersAreDisposedWhenNoErrorInMono() throws MuleException {
+    addErrorType(CONNECTIVITY);
+
     initialiseIfNeeded(onErrorPropagateHandler, muleContext);
     startIfNeeded(onErrorPropagateHandler);
     MessageProcessorChain chain =
@@ -298,19 +296,63 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     when(mockException.handled()).thenReturn(false);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
 
     MessageProcessorChain chain =
         buildNewChainWithListOfProcessors(empty(), singletonList(createFailingEventMessageProcessor(mockException)),
                                           onErrorPropagateHandler);
     initialiseIfNeeded(chain, muleContext);
-    expectedException.expect(hasRootCause(sameInstance(mockException)));
-    try {
-      just(testEvent()).transform(chain).block();
-      fail("Expected exception");
-    } finally {
-      onErrorPropagateHandler.assertAllRoutersWereDisposed();
-      disposeIfNeeded(chain, getLogger(getClass()));
-    }
+
+    final org.mule.runtime.api.message.Error error = mock(org.mule.runtime.api.message.Error.class);
+    when(error.getCause()).thenReturn(mockException);
+    final ErrorType errorType = mockException.getExceptionInfo().getErrorType();
+    when(error.getErrorType()).thenReturn(errorType);
+    final CoreEvent event = CoreEvent.builder(testEvent())
+        .error(error)
+        .build();
+
+    final Mono<CoreEvent> mono = just(event).transform(chain);
+    var thrown = assertThrows(Exception.class, () -> mono.block());
+    assertThat(thrown, hasRootCause(sameInstance(mockException)));
+
+    onErrorPropagateHandler.assertAllRoutersWereDisposed();
+    disposeIfNeeded(chain, getLogger(getClass()));
+  }
+
+  @Test
+  @Feature(SUPPORTABILITY)
+  @Story(ALERTS)
+  public void unknownErrorAlertTriggered() throws Exception {
+    addErrorType(UNKNOWN);
+    when(mockException.handled()).thenReturn(false);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
+    when(mockException.getEvent()).thenReturn(muleEvent);
+    initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    onErrorPropagateHandler.setAlertingSupport(alertingSupport);
+    startIfNeeded(onErrorPropagateHandler);
+
+    assertThrows(Exception.class, () -> onErrorPropagateHandler.handleException(mockException, muleEvent));
+
+    verify(alertingSupport).triggerAlert(ALERT_MULE_UNKNOWN_ERROR_RAISED,
+                                         mockException.toString());
+  }
+
+  @Test
+  @Feature(SUPPORTABILITY)
+  @Story(ALERTS)
+  public void knownErrorAlertNotTriggered() throws Exception {
+    addErrorType(CONNECTIVITY);
+    when(mockException.handled()).thenReturn(false);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
+    when(mockException.getEvent()).thenReturn(muleEvent);
+    initialiseIfNeeded(onErrorPropagateHandler, muleContext);
+    onErrorPropagateHandler.setAlertingSupport(alertingSupport);
+    startIfNeeded(onErrorPropagateHandler);
+
+    assertThrows(Exception.class, () -> onErrorPropagateHandler.handleException(mockException, muleEvent));
+
+    verify(alertingSupport, never()).triggerAlert(any());
+    verify(alertingSupport, never()).triggerAlert(any(), any());
   }
 
   private Processor createChangingEventMessageProcessor(final CoreEvent lastEventCreated) {
@@ -322,7 +364,11 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   private Processor createFailingEventMessageProcessor(Exception toThrow) {
     return event -> {
-      throw new DefaultMuleException(toThrow);
+      if (toThrow instanceof MuleException muleExceptionToThrow) {
+        throw muleExceptionToThrow;
+      } else {
+        throw new DefaultMuleException(toThrow);
+      }
     };
   }
 

@@ -64,10 +64,12 @@ public class CursorProviderJanitor {
 
   /**
    * Releases the resources of the underlying {@link CursorProvider}, including its {@link Cursor cursors}
+   *
+   * @return {@code false} if the resources had been released previously.
    */
-  public final void releaseResources() {
+  public final boolean releaseResources() {
     if (!released.compareAndSet(false, true)) {
-      return;
+      return false;
     }
 
     try {
@@ -84,6 +86,7 @@ public class CursorProviderJanitor {
       }
       provider = null;
     }
+    return true;
   }
 
   /**

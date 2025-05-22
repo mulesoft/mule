@@ -9,10 +9,10 @@ package org.mule.runtime.core.internal.alert;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 
-import org.mule.runtime.api.alert.AlertingSupport;
 import org.mule.runtime.api.alert.TimedDataAggregation;
 import org.mule.runtime.api.alert.TimedDataBuffer;
 import org.mule.runtime.api.time.TimeSupplier;
+import org.mule.runtime.core.api.alert.MuleAlertingSupport;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 
 import jakarta.inject.Inject;
 
-public class DefaultAlertingSupport implements AlertingSupport {
+public class DefaultAlertingSupport implements MuleAlertingSupport {
 
   private TimeSupplier timeSupplier;
 
@@ -41,26 +41,19 @@ public class DefaultAlertingSupport implements AlertingSupport {
     buffer.put(alertData);
   }
 
-  /**
-   * Counts each alert for the times it happened in the last 1, 5 and 15 minutes.
-   * <p>
-   * The time intervals are the same as reported by *nix load average, so that data can be correlated.
-   *
-   * @return the count aggregation for each alert.
-   */
   @Override
   public Map<String, TimedDataAggregation<Integer>> alertsCountAggregation() {
     return alertsAggregation(() -> 0, (a, t) -> a + 1);
   }
 
-  /**
-   */
   @Override
-  public <A> Map<String, TimedDataAggregation<A>> alertsAggregation(Supplier<A> aaa, BiFunction<A, Object, A> accumulator) {
+  public <A> Map<String, TimedDataAggregation<A>> alertsAggregation(Supplier<A> baseIntervalAggregationSupplier,
+                                                                    BiFunction<A, Object, A> accumulator) {
+    final A baseIntevalAggregation = baseIntervalAggregationSupplier.get();
     return timedBuffersPerAlert.entrySet()
         .stream()
         .collect(toMap(Entry::getKey,
-                       e -> e.getValue().aggregate(aaa.get(), accumulator)));
+                       e -> e.getValue().aggregate(baseIntevalAggregation, accumulator)));
   }
 
   @Inject

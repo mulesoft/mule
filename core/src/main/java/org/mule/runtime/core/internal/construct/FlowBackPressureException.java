@@ -23,13 +23,6 @@ public abstract class FlowBackPressureException extends MuleException {
 
   private static final long serialVersionUID = -4973370165925845336L;
 
-  /*
-   * Backpressure is the mechanism by which incoming events in excess of current capacity are rejected. This could happen because
-   * of a spike of incoming events or a longer than usual processing time of the flows. A common smell in this case is when
-   * backpressure is triggered for systems that have capacity cpu and memory wise.
-   */
-  public static final String ALERT_BACKPRESSURE_TRIGGERED = "BACKPRESSURE_TRIGGERED";
-
   private final Component flow;
 
   /**

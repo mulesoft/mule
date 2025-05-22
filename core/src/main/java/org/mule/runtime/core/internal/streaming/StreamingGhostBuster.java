@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming;
 
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_NOT_CONSUMED_STREAM_BUSTED;
 import static org.mule.runtime.core.internal.streaming.CursorManager.STREAMING_VERBOSE;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
 
@@ -53,12 +54,6 @@ import jakarta.inject.Inject;
  */
 public class StreamingGhostBuster implements Lifecycle {
 
-  /*
-   * A stream that is GCd when it hasn't been completely consumed may provoke leaks on certain conditions (the most common one is
-   * connections from a db connection pool that remain taken until the data is fully read).
-   */
-  public static final String ALERT_NOT_CONSUMED_STREAM_BUSTED = "NOT_CONSUMED_STREAM_BUSTED";
-
   private static final long POLL_INTERVAL = SECONDS.toMillis(5);
   private static final Logger LOGGER = getLogger(StreamingGhostBuster.class);
 
@@ -66,10 +61,8 @@ public class StreamingGhostBuster implements Lifecycle {
   private volatile boolean stopped = false;
   private Future taskHandle;
 
-  @Inject
   private SchedulerService schedulerService;
 
-  @Inject
   private AlertingSupport alertingSupport;
 
   private Scheduler scheduler;
@@ -169,7 +162,7 @@ public class StreamingGhostBuster implements Lifecycle {
    * cleanup the resources without actually depending on the ManagedCursorProvider instance. That is when the
    * CursorProviderJanitor comes very handy.
    */
-  private class StreamingWeakReference extends WeakReference<ManagedCursorProvider> {
+  class StreamingWeakReference extends WeakReference<ManagedCursorProvider> {
 
     private final int id;
     private final CursorProviderJanitor janitor;
@@ -187,9 +180,15 @@ public class StreamingGhostBuster implements Lifecycle {
     public void dispose() {
       if (!clear) {
         clear = true;
-        alertingSupport.triggerAlert(ALERT_NOT_CONSUMED_STREAM_BUSTED,
-                                     janitor.provider.getOriginatingLocation().map(ComponentLocation::getLocation).orElse(null));
-        janitor.releaseResources();
+        var originatingLocation = janitor.provider != null
+            ? janitor.provider.getOriginatingLocation()
+                .map(ComponentLocation::getLocation)
+                .orElse(null)
+            : null;
+        if (janitor.releaseResources()) {
+          alertingSupport.triggerAlert(ALERT_NOT_CONSUMED_STREAM_BUSTED,
+                                       originatingLocation);
+        }
         if (callOnDispose != null) {
           callOnDispose.run();
         }
@@ -206,5 +205,15 @@ public class StreamingGhostBuster implements Lifecycle {
       super.clear();
       clear = true;
     }
+  }
+
+  @Inject
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
+  }
+
+  @Inject
+  public void setAlertingSupport(AlertingSupport alertingSupport) {
+    this.alertingSupport = alertingSupport;
   }
 }

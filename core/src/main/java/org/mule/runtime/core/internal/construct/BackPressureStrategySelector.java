@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_BACKPRESSURE_TRIGGERED;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
-import static org.mule.runtime.core.internal.construct.FlowBackPressureException.ALERT_BACKPRESSURE_TRIGGERED;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createAndThrowIfNeeded;
 
 import static java.lang.Thread.currentThread;
