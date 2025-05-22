@@ -7,11 +7,11 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-test-extensions-parent</artifactId>
-        <version>4.4.0-20250519</version>
+        <version>4.4.0-20250522</version>
     </parent>
 
     <artifactId>mule-some-extension</artifactId>
-    <version>4.4.0-20250519</version>
+    <version>4.4.0-20250522</version>
     <packaging>jar</packaging>
 
     <name>Mule Some Test Extension</name>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.4.0-20250519</version>
+        <version>4.4.0-20250522</version>
     </parent>
     <artifactId>mule-module-extensions-spring-support</artifactId>
     <name>Mule Extensions Spring Support</name>

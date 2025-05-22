@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.4.0-20250519</version>
+        <version>4.4.0-20250522</version>
     </parent>
     <groupId>org.mule.tests.plugin</groupId>
     <artifactId>mule-tests-component-plugin</artifactId>
