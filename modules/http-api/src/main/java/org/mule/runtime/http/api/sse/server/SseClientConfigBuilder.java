@@ -9,6 +9,7 @@ package org.mule.runtime.http.api.sse.server;
 import org.mule.api.annotation.Experimental;
 
 import java.net.InetSocketAddress;
+import java.util.function.Consumer;
 
 /**
  * Builder for instances of {@link SseClientConfig}.
@@ -20,9 +21,10 @@ public class SseClientConfigBuilder {
 
   private String clientId;
   private InetSocketAddress remoteAddress;
+  private Consumer<SseResponseCustomizer> customizer;
 
   public SseClientConfig build() {
-    return new SseClientConfig(clientId, remoteAddress);
+    return new SseClientConfig(clientId, remoteAddress, customizer);
   }
 
   public SseClientConfigBuilder withClientId(String clientId) {
@@ -32,6 +34,11 @@ public class SseClientConfigBuilder {
 
   public SseClientConfigBuilder withRemoteAddress(InetSocketAddress remoteAddress) {
     this.remoteAddress = remoteAddress;
+    return this;
+  }
+
+  public SseClientConfigBuilder customizeResponse(Consumer<SseResponseCustomizer> consumer) {
+    this.customizer = consumer;
     return this;
   }
 }

@@ -49,4 +49,6 @@ public interface SseRequestContext {
    *         the response failed to be sent.
    */
   CompletableFuture<Void> reject(int statusCode, String reasonPhrase);
+
+  void customizeResponse(Consumer<SseResponseCustomizer> responseCustomizer);
 }
