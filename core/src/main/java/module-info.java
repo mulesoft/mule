@@ -100,6 +100,7 @@ module org.mule.runtime.core {
   requires jakarta.transaction;
 
   exports org.mule.runtime.core.api;
+  exports org.mule.runtime.core.api.alert;
   exports org.mule.runtime.core.api.artifact;
   exports org.mule.runtime.core.api.component;
   exports org.mule.runtime.core.api.connection.util;

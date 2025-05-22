@@ -9,14 +9,15 @@ package org.mule.runtime.core.internal.util.queue;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.CORE_ERROR_TYPE_REPO;
+import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ALERTING_SUPPORT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.processor.rector.profiling.ProfilingTestUtils.mockProcessingStrategyProfilingChainWithoutTriggeringEvent;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
@@ -26,6 +27,7 @@ import static java.util.Optional.empty;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.component.Component;
@@ -36,6 +38,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.alert.MuleAlertingSupport;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -64,7 +67,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.NotImplementedException;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -107,6 +109,10 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestC
 
   @Test
   public void testStartupOrder() throws Exception {
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_ALERTING_SUPPORT,
+                                                                         mock(MuleAlertingSupport.class));
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_NOTIFICATION_DISPATCHER,
+                                                                         mock(NotificationDispatcher.class));
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_NOTIFICATION_DISPATCHER,
                                                                          mock(NotificationDispatcher.class));
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(ErrorTypeRepository.class.getName(),

@@ -6,9 +6,12 @@
  */
 package org.mule.test.module.extension.source;
 
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_BACKPRESSURE_TRIGGERED;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
+import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SUPPORTABILITY;
+import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SupportabilityStory.ALERTS;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -16,10 +19,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
 
+import org.mule.runtime.api.alert.AlertingSupport;
+import org.mule.runtime.api.alert.TimedDataAggregation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.alert.MuleAlertingSupport;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
@@ -28,14 +36,21 @@ import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
+import jakarta.inject.Inject;
 
-@Feature(SOURCES)
-@Story(BACKPRESSURE)
+@Features({@Feature(SOURCES), @Feature(SUPPORTABILITY)})
+@Stories({@Story(BACKPRESSURE), @Story(ALERTS)})
 public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static List<CoreEvent> EVENTS;
@@ -50,6 +65,9 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
       }
     }
   }
+
+  @Inject
+  private AlertingSupport alertingSupport;
 
   private HeisenbergExtension heisenberg;
   private List<BackPressureContext> backPressureContexts;
@@ -92,6 +110,11 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
     } finally {
       stopFlow("defaultToFail");
     }
+
+    var alertsAggregation = aggregateAlerts();
+    assertThat(alertsAggregation, hasKey(ALERT_BACKPRESSURE_TRIGGERED));
+    assertThat(alertsAggregation.get(ALERT_BACKPRESSURE_TRIGGERED).forLast15MinsInterval(),
+               hasItem("MAX_CONCURRENCY_EXCEEDED - defaultToFail"));
   }
 
   @Test
@@ -110,6 +133,11 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
     } finally {
       stopFlow("configuredToDrop");
     }
+
+    var alertsAggregation = aggregateAlerts();
+    assertThat(alertsAggregation, hasKey(ALERT_BACKPRESSURE_TRIGGERED));
+    assertThat(alertsAggregation.get(ALERT_BACKPRESSURE_TRIGGERED).forLast15MinsInterval(),
+               hasItem("MAX_CONCURRENCY_EXCEEDED - configuredToDrop"));
   }
 
   @Test
@@ -122,6 +150,18 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
     } finally {
       stopFlow("defaultCase");
     }
+
+    var alertsAggregation = aggregateAlerts();
+    assertThat(alertsAggregation, hasKey(ALERT_BACKPRESSURE_TRIGGERED));
+    assertThat(alertsAggregation.get(ALERT_BACKPRESSURE_TRIGGERED).forLast15MinsInterval(),
+               hasItem("MAX_CONCURRENCY_EXCEEDED - defaultCase"));
+  }
+
+  private Map<String, TimedDataAggregation<Set<String>>> aggregateAlerts() {
+    return ((MuleAlertingSupport) alertingSupport).alertsAggregation(() -> new TreeSet<>(), (a, t) -> {
+      a.add(Objects.toString(t, "(null)"));
+      return a;
+    });
   }
 
   private void startFlow(String flowName) throws Exception {

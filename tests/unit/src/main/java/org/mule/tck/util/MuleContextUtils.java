@@ -15,7 +15,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
 import static java.lang.String.format;
@@ -25,8 +24,14 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
+import static org.reflections.ReflectionUtils.Fields;
+import static org.reflections.ReflectionUtils.Methods;
+import static org.reflections.ReflectionUtils.get;
+import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,10 +45,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.reflections.ReflectionUtils.Fields;
-import static org.reflections.ReflectionUtils.Methods;
-import static org.reflections.ReflectionUtils.get;
-import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -67,7 +68,6 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -189,6 +189,7 @@ public class MuleContextUtils {
           Object toInject = resolveObjectToInject(dependencyType);
 
           try {
+            method.setAccessible(true);
             method.invoke(object, nullToOptional ? of(toInject) : toInject);
           } catch (Exception e) {
             throw new RuntimeException(format("Could not inject dependency on method %s of type %s", method.getName(),
@@ -437,9 +438,8 @@ public class MuleContextUtils {
    * Creates a basic event builder with its context built from the provided {@code muleContext}.
    */
   public static <B extends CoreEvent.Builder> B eventBuilder(MuleContext muleContext) throws MuleException {
-    FlowConstruct flowConstruct = getTestFlow(muleContext);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(flowConstruct);
-    return (B) CoreEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
+    return (B) CoreEvent
+        .builder(create(muleContext.getUniqueIdString(), muleContext.getId(), TEST_CONNECTOR_LOCATION, null, empty()));
   }
 
   public static void verifyRegistration(MuleContext muleContext, String registryKey, ArgumentCaptor captor) {
