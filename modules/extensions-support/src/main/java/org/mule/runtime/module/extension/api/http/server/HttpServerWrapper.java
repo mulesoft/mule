@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.api.http;
+package org.mule.runtime.module.extension.api.http.server;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.sdk.api.http.HttpConstants;
