@@ -11,6 +11,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.runtime.http.api.server.ServerCreationException;
+import org.mule.runtime.module.extension.api.http.server.HttpServerWrapper;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfigurationBuilder;
 import org.mule.sdk.api.http.client.HttpRequestOptions;

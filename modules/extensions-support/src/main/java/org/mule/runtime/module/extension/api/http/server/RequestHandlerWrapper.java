@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.api.http;
+package org.mule.runtime.module.extension.api.http.server;
 
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 import org.mule.runtime.http.api.server.RequestHandler;
@@ -21,7 +21,7 @@ public class RequestHandlerWrapper implements RequestHandler {
   @Override
   public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
     // TODO: Null?
-    delegate.handleRequest(null, null);
+    delegate.handleRequest(new HttpRequestContextWrapper(requestContext), new HttpResponseReadyCallbackWrapper(responseCallback));
   }
 
   @Override
