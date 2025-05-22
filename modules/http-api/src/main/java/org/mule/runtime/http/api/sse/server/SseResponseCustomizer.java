@@ -6,11 +6,16 @@
  */
 package org.mule.runtime.http.api.sse.server;
 
+import org.mule.api.annotation.Experimental;
+
 /**
  * Interface intended to customize the SSE initiator response header, allowing to configure only certain parameters.
+ * <p>
+ * This API is EXPERIMENTAL. Do not use it until it is stable.
  *
  * @since 4.10.0, 4.9.6
  */
+@Experimental
 public interface SseResponseCustomizer {
 
   /**

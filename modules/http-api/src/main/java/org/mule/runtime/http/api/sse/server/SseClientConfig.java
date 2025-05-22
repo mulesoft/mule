@@ -35,7 +35,8 @@ public class SseClientConfig {
   SseClientConfig(String clientId, InetSocketAddress remoteHostAddress, Consumer<SseResponseCustomizer> customizerConsumer) {
     this.clientId = clientId;
     this.remoteAddress = remoteHostAddress;
-    this.responseCustomizerConsumer = customizerConsumer != null ? customizerConsumer : ignored -> {};
+    this.responseCustomizerConsumer = customizerConsumer != null ? customizerConsumer : ignored -> {
+    };
   }
 
   /**
@@ -54,7 +55,7 @@ public class SseClientConfig {
   }
 
   /**
-   * @return the configured consumer of {@link SseResponseCustomizer} to 
+   * @return the configured consumer of {@link SseResponseCustomizer} to configure the initiator response.
    */
   public Consumer<SseResponseCustomizer> getResponseCustomizerConsumer() {
     return responseCustomizerConsumer;
