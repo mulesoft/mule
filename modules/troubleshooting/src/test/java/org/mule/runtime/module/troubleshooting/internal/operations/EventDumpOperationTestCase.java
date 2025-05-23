@@ -19,12 +19,16 @@ import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
 import static java.time.ZoneId.of;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -41,9 +45,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 public class EventDumpOperationTestCase {
@@ -51,7 +54,7 @@ public class EventDumpOperationTestCase {
   private DeploymentService deploymentService;
   private EventDumpOperation eventDumpOperation;
 
-  @Before
+  @BeforeEach
   public void setup() {
     FlowStackEntry flowStackEntry = mockFlowStackEntry();
     Application app1 = mockApplication("app1", flowStackEntry);
@@ -97,10 +100,8 @@ public class EventDumpOperationTestCase {
 
   @Test
   public void whenApplicationIsPassedItReturnsOnlyThePassedOne() throws IOException {
-    Map<String, String> argumentsWithApplication = new HashMap<>();
-    argumentsWithApplication.put(APPLICATION_ARGUMENT_NAME, "app1");
     final var writer = new StringWriter();
-    executeEventDump(argumentsWithApplication, writer);
+    executeEventDump(singletonMap(APPLICATION_ARGUMENT_NAME, "app1"), writer);
     String result = writer.toString();
 
     var expected = """
@@ -120,7 +121,7 @@ public class EventDumpOperationTestCase {
     }
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void whenTheEventContextServiceIsNotPresentItRaisesAnException() throws IOException {
     for (Application application : deploymentService.getApplications()) {
       Registry registry = application.getArtifactContext().getRegistry();
@@ -130,6 +131,6 @@ public class EventDumpOperationTestCase {
     Map<String, String> arguments = new HashMap<>();
     arguments.put(APPLICATION_ARGUMENT_NAME, "app1");
     final var writer = new StringWriter();
-    executeEventDump(arguments, writer);
+    assertThrows(IllegalArgumentException.class, () -> executeEventDump(arguments, writer));
   }
 }

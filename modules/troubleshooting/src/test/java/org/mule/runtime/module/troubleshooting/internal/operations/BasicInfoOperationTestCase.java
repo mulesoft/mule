@@ -15,20 +15,21 @@ import static org.hamcrest.core.StringContains.containsString;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 public class BasicInfoOperationTestCase {
 
   private BasicInfoOperation basicInfoOperation;
 
-  @Before
+  @BeforeEach
   public void setup() {
     basicInfoOperation = new BasicInfoOperation();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     System.clearProperty("mule.sysprop");
     System.clearProperty("nonmule.sysprop");

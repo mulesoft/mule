@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.alert.MuleAlertingSupport;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -53,7 +54,9 @@ public class DefaultAlertingSupport implements MuleAlertingSupport {
     return timedBuffersPerAlert.entrySet()
         .stream()
         .collect(toMap(Entry::getKey,
-                       e -> e.getValue().aggregate(baseIntevalAggregation, accumulator)));
+                       e -> e.getValue().aggregate(baseIntevalAggregation, accumulator),
+                       (x, y) -> x,
+                       TreeMap::new));
   }
 
   @Inject
