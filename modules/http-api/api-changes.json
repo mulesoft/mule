@@ -5,6 +5,24 @@
         {
           "ignore": true,
           "code": "java.method.added",
+          "new": "method java.util.function.Consumer<org.mule.runtime.http.api.sse.server.SseResponseCustomizer> org.mule.runtime.http.api.sse.server.SseClientConfig::getResponseCustomizerConsumer()",
+          "justification": "W-18599423: Allow to customize the SSE initiator response"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.sse.server.SseClientConfigBuilder org.mule.runtime.http.api.sse.server.SseClientConfigBuilder::customizeResponse(java.util.function.Consumer<org.mule.runtime.http.api.sse.server.SseResponseCustomizer>)",
+          "justification": "W-18599423: Allow to customize the SSE initiator response"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.added",
+          "new": "interface org.mule.runtime.http.api.sse.server.SseResponseCustomizer",
+          "justification": "W-18599423: Allow to customize the SSE initiator response"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
           "new": "method org.mule.runtime.http.api.sse.client.SseRetryConfig org.mule.runtime.http.api.sse.client.SseRetryConfig::noRetry()",
           "justification": "W-18238331: Utility methods to implement Streamable HTTP"
         },

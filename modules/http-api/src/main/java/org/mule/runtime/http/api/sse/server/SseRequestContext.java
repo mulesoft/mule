@@ -49,4 +49,12 @@ public interface SseRequestContext {
    *         the response failed to be sent.
    */
   CompletableFuture<Void> reject(int statusCode, String reasonPhrase);
+
+  /**
+   * Allows configuring certain parameters of the SSE initiator response.
+   * 
+   * @param responseCustomizer a callback that receives the {@link SseResponseCustomizer}.
+   * @since 4.10.0, 4.9.6
+   */
+  void customizeResponse(Consumer<SseResponseCustomizer> responseCustomizer);
 }
