@@ -9,6 +9,7 @@ package org.mule.runtime.http.api.sse.server;
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 import org.mule.runtime.http.api.server.HttpServer;
 
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +29,9 @@ public interface SseRequestContext {
 
   /**
    * @return the received request that matched an SSE endpoint.
+   * @deprecated Use {{@link #getRequestContext()}} instead.
    */
+  @Deprecated(forRemoval = true)
   HttpRequest getRequest();
 
   /**
@@ -57,4 +60,10 @@ public interface SseRequestContext {
    * @since 4.10.0, 4.9.6
    */
   void customizeResponse(Consumer<SseResponseCustomizer> responseCustomizer);
+
+  /**
+   * @return the context of the received request that matched an SSE endpoint.
+   * @since 4.10.0, 4.9.6
+   */
+  HttpRequestContext getRequestContext();
 }
