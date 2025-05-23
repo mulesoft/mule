@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
@@ -122,6 +123,78 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
       @Override
       public String describeFailure() {
         return "flow event never set by the source flow";
+      }
+    });
+  }
+
+  @Test
+  public void testStartWhenStopping() throws Exception {
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
+    SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
+    schedulerMessageSource.setListener(flow);
+    schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+
+    DefaultMuleContext spyMuleContext = spy((DefaultMuleContext) muleContext);
+    doReturn(true).when(spyMuleContext).isStopping();
+
+    schedulerMessageSource.setMuleContext(spyMuleContext);
+    schedulerMessageSource.start();
+
+    assertThat("Scheduler should not be started when MuleContext is stopping",
+               schedulerMessageSource.isStarted(), is(false));
+  }
+
+  @Test
+  public void testRunWhenStopping() throws Exception {
+
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
+    SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
+    schedulerMessageSource.setListener(flow);
+    schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+
+    DefaultMuleContext spyMuleContext = spy((DefaultMuleContext) muleContext);
+    doReturn(true).when(spyMuleContext).isStopping();
+    // Ensure polling would occur if not stopping
+    doReturn(true).when(spyMuleContext).isPrimaryPollingInstance();
+
+    schedulerMessageSource.setMuleContext(spyMuleContext);
+    schedulerMessageSource.trigger();
+    new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return flow.event == null;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "flow event was processed when MuleContext was in stopping state";
+      }
+    });
+  }
+
+  @Test
+  public void testPollWhenStopping() throws Exception {
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
+    SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
+    schedulerMessageSource.setListener(flow);
+    schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+
+    DefaultMuleContext spyMuleContext = spy((DefaultMuleContext) muleContext);
+    doReturn(true).when(spyMuleContext).isStopping();
+
+    schedulerMessageSource.setMuleContext(spyMuleContext);
+    schedulerMessageSource.trigger();
+    new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
+
+      @Override
+      public boolean isSatisfied() {
+        return flow.event == null;
+      }
+
+      @Override
+      public String describeFailure() {
+        return "fPoll operation executed when MuleContext was in stopping state";
       }
     });
   }
