@@ -10,6 +10,7 @@ import org.mule.api.annotation.Experimental;
 import org.mule.runtime.http.api.domain.request.HttpRequestContext;
 
 import java.net.InetSocketAddress;
+import java.util.function.Consumer;
 
 /**
  * Configuration for the creation of the {@link SseClient}.
@@ -29,10 +30,13 @@ public class SseClientConfig {
 
   private final String clientId;
   private final InetSocketAddress remoteAddress;
+  private final Consumer<SseResponseCustomizer> responseCustomizerConsumer;
 
-  SseClientConfig(String clientId, InetSocketAddress remoteHostAddress) {
+  SseClientConfig(String clientId, InetSocketAddress remoteHostAddress, Consumer<SseResponseCustomizer> customizerConsumer) {
     this.clientId = clientId;
     this.remoteAddress = remoteHostAddress;
+    this.responseCustomizerConsumer = customizerConsumer != null ? customizerConsumer : ignored -> {
+    };
   }
 
   /**
@@ -48,6 +52,13 @@ public class SseClientConfig {
    */
   public InetSocketAddress getRemoteHostAddress() {
     return remoteAddress;
+  }
+
+  /**
+   * @return the configured consumer of {@link SseResponseCustomizer} to configure the initiator response.
+   */
+  public Consumer<SseResponseCustomizer> getResponseCustomizerConsumer() {
+    return responseCustomizerConsumer;
   }
 
   private static InetSocketAddress nullSafeGetAddress(HttpRequestContext requestContext) {
