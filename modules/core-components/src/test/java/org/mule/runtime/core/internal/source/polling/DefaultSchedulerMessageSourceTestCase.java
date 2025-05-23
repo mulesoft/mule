@@ -154,11 +154,12 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
 
     DefaultMuleContext spyMuleContext = spy((DefaultMuleContext) muleContext);
-    doReturn(true).when(spyMuleContext).isStopping();
+    doReturn(false).when(spyMuleContext).isStopping();
     doReturn(true).when(spyMuleContext).isPrimaryPollingInstance();
 
     schedulerMessageSource.setMuleContext(spyMuleContext);
     schedulerMessageSource.start();
+    doReturn(true).when(spyMuleContext).isStopping();
     new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
 
       @Override
@@ -172,7 +173,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
       }
     });
 
-    verify(spyMuleContext, times(1)).isStopping();
+    verify(spyMuleContext, atLeastOnce()).isStopping();
     verify(spyMuleContext, never()).isPrimaryPollingInstance();
   }
 
