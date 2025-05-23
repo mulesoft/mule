@@ -1,5 +1,5 @@
 {
-  "4.9.7": {
+  "4.9.6": {
     "revapi": {
       "ignore": [
         {
@@ -19,13 +19,7 @@
           "code": "java.class.added",
           "new": "interface org.mule.runtime.http.api.sse.server.SseResponseCustomizer",
           "justification": "W-18599423: Allow to customize the SSE initiator response"
-        }
-      ]
-    }
-  },
-  "4.9.6": {
-    "revapi": {
-      "ignore": [
+        },
         {
           "ignore": true,
           "code": "java.method.added",
