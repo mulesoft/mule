@@ -20,7 +20,7 @@ public interface SseResponseCustomizer {
 
   /**
    * Adds a header to the SSE response. Having two headers with the same name is allowed.
-   * 
+   *
    * @param name  header name.
    * @param value header value.
    */

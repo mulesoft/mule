@@ -52,7 +52,7 @@ public interface SseRequestContext {
 
   /**
    * Allows configuring certain parameters of the SSE initiator response.
-   * 
+   *
    * @param responseCustomizer a callback that receives the {@link SseResponseCustomizer}.
    * @since 4.10.0, 4.9.6
    */
