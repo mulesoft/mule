@@ -29,8 +29,10 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -146,7 +148,6 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
   @Test
   public void testRunWhenStopping() throws Exception {
-
     DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
     schedulerMessageSource.setListener(flow);
@@ -154,11 +155,10 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
     DefaultMuleContext spyMuleContext = spy((DefaultMuleContext) muleContext);
     doReturn(true).when(spyMuleContext).isStopping();
-    // Ensure polling would occur if not stopping
     doReturn(true).when(spyMuleContext).isPrimaryPollingInstance();
 
     schedulerMessageSource.setMuleContext(spyMuleContext);
-    schedulerMessageSource.trigger();
+    schedulerMessageSource.start();
     new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
 
       @Override
@@ -171,6 +171,9 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
         return "flow event was processed when MuleContext was in stopping state";
       }
     });
+
+    verify(spyMuleContext, times(1)).isStopping();
+    verify(spyMuleContext, never()).isPrimaryPollingInstance();
   }
 
   @Test
@@ -194,7 +197,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
       @Override
       public String describeFailure() {
-        return "fPoll operation executed when MuleContext was in stopping state";
+        return "flow event was processed when MuleContext was in stopping state";
       }
     });
   }
