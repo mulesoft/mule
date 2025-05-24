@@ -58,6 +58,7 @@ import org.mule.tck.probe.Probe;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.Issue;
 import org.slf4j.Logger;
 
 import org.junit.After;
@@ -130,6 +131,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   }
 
   @Test
+  @Issue("W-17981248")
   public void testStartWhenStopping() throws Exception {
     DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
@@ -147,6 +149,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   }
 
   @Test
+  @Issue("W-17981248")
   public void testRunWhenStopping() throws Exception {
     DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
@@ -160,24 +163,14 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     schedulerMessageSource.setMuleContext(spyMuleContext);
     schedulerMessageSource.start();
     doReturn(true).when(spyMuleContext).isStopping();
-    new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
-
-      @Override
-      public boolean isSatisfied() {
-        return flow.event == null;
-      }
-
-      @Override
-      public String describeFailure() {
-        return "flow event was processed when MuleContext was in stopping state";
-      }
-    });
 
     verify(spyMuleContext, atLeastOnce()).isStopping();
+    // isPrimaryPollingInstance() was never called if isStopping() returns true
     verify(spyMuleContext, never()).isPrimaryPollingInstance();
   }
 
   @Test
+  @Issue("W-17981248")
   public void testPollWhenStopping() throws Exception {
     DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
@@ -189,18 +182,8 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
     schedulerMessageSource.setMuleContext(spyMuleContext);
     schedulerMessageSource.trigger();
-    new PollingProber(RECEIVE_TIMEOUT, 100).check(new Probe() {
 
-      @Override
-      public boolean isSatisfied() {
-        return flow.event == null;
-      }
-
-      @Override
-      public String describeFailure() {
-        return "flow event was processed when MuleContext was in stopping state";
-      }
-    });
+    verify(spyMuleContext, times(1)).isStopping();
   }
 
   @Test
