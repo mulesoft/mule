@@ -182,6 +182,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
     schedulerMessageSource.setMuleContext(spyMuleContext);
     schedulerMessageSource.trigger();
+    Thread.sleep(100);
 
     verify(spyMuleContext, times(1)).isStopping();
   }
