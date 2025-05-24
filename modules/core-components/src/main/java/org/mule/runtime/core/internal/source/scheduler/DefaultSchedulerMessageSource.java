@@ -113,6 +113,11 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
       return;
     }
     try {
+      // Check if context is stopping before scheduling new task
+      if (muleContext.isStopping()) {
+        LOGGER.info("Not starting scheduler as MuleContext is stopping");
+        return;
+      }
       // The initialization phase if handled by the scheduler
       schedulingJob =
           withContextClassLoader(muleContext.getExecutionClassLoader(), () -> scheduler.schedule(pollingExecutor, () -> run()));
@@ -158,6 +163,12 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
     // Make sure we start with a clean state.
     setCurrentEvent(null);
 
+    // Check if context is stopping before executing
+    if (muleContext.isStopping()) {
+      LOGGER.info("Skipping scheduler execution as MuleContext is stopping");
+      return;
+    }
+
     if (muleContext.isPrimaryPollingInstance()) {
       poll();
     }
@@ -167,6 +178,12 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
    * Triggers the forced execution of the polling message processor ignoring the configured scheduler.
    */
   private void poll() {
+    // Check if context is stopping before polling
+    if (muleContext.isStopping()) {
+      LOGGER.info("Skipping poll as MuleContext is stopping");
+      return;
+    }
+
     boolean execute = false;
     synchronized (this) {
       if (disallowConcurrentExecution && executing) {
