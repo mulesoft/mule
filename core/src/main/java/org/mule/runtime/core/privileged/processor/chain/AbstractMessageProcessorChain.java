@@ -238,6 +238,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private boolean chainSpanCreated = false;
   private static final Component UNKNOWN_COMPONENT = getUnnamedComponent();
 
+  @Inject
   private AlertingSupport alertingSupport;
   @Inject
   private MeterProvider meterProvider;
@@ -873,7 +874,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     this.chainComponentTracer = chainComponentTracer;
   }
 
-  @Inject
   public void setAlertingSupport(AlertingSupport alertingSupport) {
     this.alertingSupport = alertingSupport;
   }

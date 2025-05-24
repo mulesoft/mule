@@ -431,7 +431,6 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
                                                    () -> ((ParameterizedType) (method.getGenericParameterTypes()[0]))
                                                        .getActualTypeArguments()[0]);
 
-        method.setAccessible(true);
         if (dependency != null) {
           method.invoke(object, dependency);
         }
