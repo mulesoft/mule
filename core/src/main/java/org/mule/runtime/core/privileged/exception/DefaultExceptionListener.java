@@ -16,8 +16,6 @@ import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_I
 
 import static java.text.MessageFormat.format;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
-
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -34,7 +32,8 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
-import org.mule.runtime.core.privileged.exception.MessagingException;
+
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,7 +151,7 @@ public final class DefaultExceptionListener implements Initialisable {
       statistics.incFatalError();
     }
 
-    String logUniqueId = defaultString(event.getCorrelationId(), NOT_SET);
+    String logUniqueId = Objects.toString(event.getCorrelationId(), NOT_SET);
 
     String printableLogMessage =
         format("Message identification summary here: id={0}, correlation={1}", logUniqueId, event.getGroupCorrelation());

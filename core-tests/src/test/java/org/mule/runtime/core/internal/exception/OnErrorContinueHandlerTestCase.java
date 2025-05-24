@@ -7,6 +7,9 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_MULE_UNKNOWN_ERROR_RAISED;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -15,6 +18,8 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ON_ERROR_CONTINUE;
+import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SUPPORTABILITY;
+import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SupportabilityStory.ALERTS;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -24,7 +29,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.rules.ExpectedException.none;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,13 +59,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-
 import reactor.core.publisher.Flux;
 
 @Feature(ERROR_HANDLING)
@@ -65,9 +71,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   protected MuleContext muleContext = mockContextWithServices();
   private static final String DEFAULT_LOG_MESSAGE = "LOG";
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   private TestTransaction mockTransaction;
   private TestTransaction mockXaTransaction;
@@ -107,10 +110,13 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   @Test
   public void handleExceptionWithNoConfig() throws Exception {
-    configureXaTransactionAndSingleResourceTransaction();
     when(mockException.handled()).thenReturn(true);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
+
+    configureXaTransactionAndSingleResourceTransaction();
+
     initialiseIfNeeded(onErrorContinueHandler, muleContext);
     startIfNeeded(onErrorContinueHandler);
 
@@ -129,9 +135,12 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
     initialiseIfNeeded(onErrorContinueHandler, muleContext);
     startIfNeeded(onErrorContinueHandler);
+
     when(mockException.handled()).thenReturn(true);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
+
     final CoreEvent result = onErrorContinueHandler.handleException(mockException, muleEvent);
 
     verify(mockException).setHandled(true);
@@ -149,9 +158,12 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
     initialiseIfNeeded(onErrorContinueHandler, muleContext);
     startIfNeeded(onErrorContinueHandler);
+
     when(mockException.handled()).thenReturn(true);
     when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
+
     CoreEvent exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
 
     verify(mockException).setHandled(true);
@@ -166,16 +178,17 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
   public void messageToStringNotCalledOnFailure() throws Exception {
     muleEvent = builder(muleEvent).message(spy(of(""))).build();
     muleEvent = spy(muleEvent);
+
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
     when(mockException.getEvent()).thenReturn(muleEvent);
+    addErrorType(CONNECTIVITY);
 
     onErrorContinueHandler.setMessageProcessors(asList(createFailingEventMessageProcessor(),
                                                        createFailingEventMessageProcessor()));
     initialiseIfNeeded(onErrorContinueHandler, muleContext);
     when(muleEvent.getMessage().toString()).thenThrow(new RuntimeException("Message.toString() should not be called"));
 
-    expectedException.expect(Exception.class);
-    onErrorContinueHandler.handleException(mockException, muleEvent);
+    assertThrows(Exception.class, () -> onErrorContinueHandler.handleException(mockException, muleEvent));
   }
 
   @Test
@@ -198,9 +211,46 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
     when(mockException.getEvent()).thenReturn(muleEvent);
     when(mockException.handled()).thenReturn(true);
+    addErrorType(CONNECTIVITY);
     router.accept(mockException);
 
     assertThat(resultRef.get(), not(nullValue()));
+  }
+
+  @Test
+  @Feature(SUPPORTABILITY)
+  @Story(ALERTS)
+  public void unknownErrorAlertTriggered() throws Exception {
+    addErrorType(UNKNOWN);
+    when(mockException.handled()).thenReturn(false);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
+    when(mockException.getEvent()).thenReturn(muleEvent);
+    initialiseIfNeeded(onErrorContinueHandler, muleContext);
+    onErrorContinueHandler.setAlertingSupport(alertingSupport);
+    startIfNeeded(onErrorContinueHandler);
+
+    onErrorContinueHandler.handleException(mockException, muleEvent);
+
+    verify(alertingSupport).triggerAlert(ALERT_MULE_UNKNOWN_ERROR_RAISED,
+                                         mockException.toString());
+  }
+
+  @Test
+  @Feature(SUPPORTABILITY)
+  @Story(ALERTS)
+  public void knownErrorAlertNotTriggered() throws Exception {
+    addErrorType(CONNECTIVITY);
+    when(mockException.handled()).thenReturn(false);
+    when(mockException.getDetailedMessage()).thenReturn(DEFAULT_LOG_MESSAGE);
+    when(mockException.getEvent()).thenReturn(muleEvent);
+    initialiseIfNeeded(onErrorContinueHandler, muleContext);
+    onErrorContinueHandler.setAlertingSupport(alertingSupport);
+    startIfNeeded(onErrorContinueHandler);
+
+    onErrorContinueHandler.handleException(mockException, muleEvent);
+
+    verify(alertingSupport, never()).triggerAlert(any());
+    verify(alertingSupport, never()).triggerAlert(any(), any());
   }
 
   private Processor createChagingEventMessageProcessor(final CoreEvent lastEventCreated) {
