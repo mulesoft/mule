@@ -109,9 +109,9 @@ public class ReactorChainsAlertsTestCase extends AbstractReactiveProcessorTestCa
     probe(() -> {
       verify(alertingSupport).triggerAlert(eq(ALERT_REACTOR_DISCARDED_EVENT), any());
 
-      verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DROPPED_EVENT));
+      verify(alertingSupport, never()).triggerAlert(ALERT_REACTOR_DROPPED_EVENT);
       verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DROPPED_EVENT), any());
-      verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DROPPED_ERROR));
+      verify(alertingSupport, never()).triggerAlert(ALERT_REACTOR_DROPPED_ERROR);
       verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DROPPED_ERROR), any());
 
       return true;
@@ -141,9 +141,9 @@ public class ReactorChainsAlertsTestCase extends AbstractReactiveProcessorTestCa
     probe(() -> {
       verify(alertingSupport).triggerAlert(eq(ALERT_REACTOR_DROPPED_EVENT), any());
 
-      verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DISCARDED_EVENT));
+      verify(alertingSupport, never()).triggerAlert(ALERT_REACTOR_DISCARDED_EVENT);
       verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DISCARDED_EVENT), any());
-      verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DROPPED_ERROR));
+      verify(alertingSupport, never()).triggerAlert(ALERT_REACTOR_DROPPED_ERROR);
       verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DROPPED_ERROR), any());
 
       return true;
@@ -173,9 +173,9 @@ public class ReactorChainsAlertsTestCase extends AbstractReactiveProcessorTestCa
     probe(() -> {
       verify(alertingSupport).triggerAlert(eq(ALERT_REACTOR_DROPPED_ERROR), any());
 
-      verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DISCARDED_EVENT));
+      verify(alertingSupport, never()).triggerAlert(ALERT_REACTOR_DISCARDED_EVENT);
       verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DISCARDED_EVENT), any());
-      verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DROPPED_EVENT));
+      verify(alertingSupport, never()).triggerAlert(ALERT_REACTOR_DROPPED_EVENT);
       verify(alertingSupport, never()).triggerAlert(eq(ALERT_REACTOR_DROPPED_EVENT), any());
 
       return true;

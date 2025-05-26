@@ -159,7 +159,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       context -> context.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY)
           .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
 
-  private static Map<ClassLoader, AlertingSupport> ALERTS_PER_DEPLOYMENT = new WeakHashMap<ClassLoader, AlertingSupport>();
+  private static final Map<ClassLoader, AlertingSupport> ALERTS_PER_DEPLOYMENT = new WeakHashMap<>();
 
   static {
     try {
@@ -534,9 +534,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             // #1 Set back previous TCCL.
             .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_CONSUMER)))
         .doOnDiscard(CoreEvent.class,
-                     event -> {
-                       alertingSupport.triggerAlert(ALERT_REACTOR_DISCARDED_EVENT, event.getCorrelationId());
-                     })
+                     event -> alertingSupport.triggerAlert(ALERT_REACTOR_DISCARDED_EVENT, event.getCorrelationId()))
         .doOnNext(event -> afterProcessorInSameThread(event, (Processor) processor)));
 
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
@@ -853,10 +851,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Override
   public void dispose() {
-    synchronized (ALERTS_PER_DEPLOYMENT) {
-      final ClassLoader tccl = currentThread().getContextClassLoader();
-      ALERTS_PER_DEPLOYMENT.remove(resolveRegionContextClassLoader(tccl).orElse(tccl));
-    }
+    // ALERTS_PER_DEPLOYMENT will be cleared by the weakReference
 
     disposeIfNeeded(getMessageProcessorsForLifecycle(), LOGGER);
 

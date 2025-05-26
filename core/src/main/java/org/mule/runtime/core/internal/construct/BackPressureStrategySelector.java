@@ -53,10 +53,10 @@ class BackPressureStrategySelector {
         abstractPipeline.getProcessingStrategy().checkBackpressureAccepting(event);
         accepted = true;
       } catch (FromFlowRejectedExecutionException ree) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("waitStrategy - " + ree.getClass().getName() + " @ "
-              + event.getContext().getOriginatingLocation().getRootContainerName() + ": " + ree.getReason());
-        }
+        LOGGER.debug("waitStrategy - {} @ {}: {}",
+                     ree.getClass().getName(),
+                     event.getContext().getOriginatingLocation().getRootContainerName(),
+                     ree.getReason());
 
         // TODO MULE-16106 Add a callback for WAIT back pressure applied on the source
         try {
@@ -81,10 +81,9 @@ class BackPressureStrategySelector {
       throws FlowBackPressureException {
     final BackPressureReason reason = abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event);
     if (reason != null) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER
-            .debug("failDropStrategy - @ " + event.getContext().getOriginatingLocation().getRootContainerName() + ": " + reason);
-      }
+      LOGGER.debug("failDropStrategy - @ {}: {}",
+                   event.getContext().getOriginatingLocation().getRootContainerName(),
+                   reason);
 
       abstractPipeline.getAlertingSupport().triggerAlert(ALERT_BACKPRESSURE_TRIGGERED,
                                                          reason.name() + " - " + abstractPipeline.getName());

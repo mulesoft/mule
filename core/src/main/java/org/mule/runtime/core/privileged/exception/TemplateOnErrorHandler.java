@@ -505,9 +505,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     return event -> {
       MessagingException exception = (MessagingException) getException(event);
 
-      final var errorType = exception.getExceptionInfo().getErrorType();
-      if (errorType.getNamespace().equals(UNKNOWN.getNamespace())
-          && errorType.getIdentifier().equals(UNKNOWN.getName())) {
+      final var raisedErrorType = exception.getExceptionInfo().getErrorType();
+      if (raisedErrorType.getNamespace().equals(UNKNOWN.getNamespace())
+          && raisedErrorType.getIdentifier().equals(UNKNOWN.getName())) {
         alertingSupport.triggerAlert(ALERT_MULE_UNKNOWN_ERROR_RAISED,
                                      exception.getCause() != null ? exception.getCause().toString() : exception.toString());
       }

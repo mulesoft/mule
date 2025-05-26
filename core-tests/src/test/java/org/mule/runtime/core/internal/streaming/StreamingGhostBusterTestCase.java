@@ -77,7 +77,7 @@ public class StreamingGhostBusterTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-18573")
-  public void releaseResourcesWhenReferenceIsCollected() {
+  void releaseResourcesWhenReferenceIsCollected() {
     MutableStreamingStatistics statistics = mock(MutableStreamingStatistics.class);
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     ManagedCursorStreamProvider managedCursorProvider = new ManagedCursorStreamProvider(of(provider), statistics);
@@ -98,7 +98,7 @@ public class StreamingGhostBusterTestCase extends AbstractMuleTestCase {
   @Test
   @Feature(SUPPORTABILITY)
   @Story(ALERTS)
-  public void collectedReferenceNotClosedTriggersAlert() {
+  void collectedReferenceNotClosedTriggersAlert() {
     MutableStreamingStatistics statistics = mock(MutableStreamingStatistics.class);
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     when(provider.getOriginatingLocation()).thenReturn(Optional.of(from("streamGenerator")));
@@ -120,7 +120,7 @@ public class StreamingGhostBusterTestCase extends AbstractMuleTestCase {
   @Test
   @Feature(SUPPORTABILITY)
   @Story(ALERTS)
-  public void collectedReferencePreviouslyClosedNotTriggersAlert() {
+  void collectedReferencePreviouslyClosedNotTriggersAlert() {
     MutableStreamingStatistics statistics = mock(MutableStreamingStatistics.class);
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
     when(provider.getOriginatingLocation()).thenReturn(Optional.of(from("streamGenerator")));
