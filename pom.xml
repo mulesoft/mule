@@ -12,7 +12,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.8.6-rc1</version>
+    <version>4.8.6-rc2</version>
 
     <!-- Organization -->
     <organization>
