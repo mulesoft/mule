@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.ast.privileged.error.DefaultErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 
 /**
@@ -77,7 +80,9 @@ public class EventProcessingException extends MuleException {
   }
 
   private void storeErrorTypeInfo(CoreEvent event) {
-    event.getError().ifPresent(e -> getExceptionInfo().setErrorType(e.getErrorType()));
+    getExceptionInfo().setErrorType(event.getError()
+        .map(err -> err.getErrorType())
+        .orElseGet(() -> new DefaultErrorType(UNKNOWN.getName(), UNKNOWN.getNamespace(), null)));
   }
 
   private void storeSuppressedCausesInfo(Throwable cause) {

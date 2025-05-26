@@ -861,6 +861,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
+  static void clearAlertsPerDeploymentMap() {
+    ALERTS_PER_DEPLOYMENT.clear();
+  }
+
   FlowExceptionHandler getMessagingExceptionHandler() {
     return messagingExceptionHandler;
   }

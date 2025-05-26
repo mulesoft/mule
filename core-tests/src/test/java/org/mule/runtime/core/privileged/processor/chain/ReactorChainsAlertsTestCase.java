@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChain.clearAlertsPerDeploymentMap;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SUPPORTABILITY;
 import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SupportabilityStory.ALERTS;
@@ -68,6 +69,7 @@ public class ReactorChainsAlertsTestCase extends AbstractReactiveProcessorTestCa
 
   @Before
   public void before() throws MuleException {
+    clearAlertsPerDeploymentMap();
     event = testEvent();
     alertingSupport = mock(AlertingSupport.class);
 
@@ -84,6 +86,7 @@ public class ReactorChainsAlertsTestCase extends AbstractReactiveProcessorTestCa
     }
 
     asyncExecutor.shutdownNow();
+    clearAlertsPerDeploymentMap();
   }
 
   @Test

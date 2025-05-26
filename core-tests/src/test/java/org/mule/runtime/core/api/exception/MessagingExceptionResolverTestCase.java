@@ -11,7 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_NAME;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
+import static org.mule.runtime.privileged.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
 import static java.util.Collections.emptyList;
@@ -20,6 +20,7 @@ import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -256,7 +257,8 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private void assertExceptionErrorType(MessagingException me, ErrorType expected) {
     Optional<Error> error = me.getEvent().getError();
     assertThat("No error found, expecting error with error type [" + expected + "]", error.isPresent(), is(true));
-    assertThat(error.get().getErrorType(), is(expected));
+    assertThat(error.get().getErrorType().getNamespace(), is(expected.getNamespace()));
+    assertThat(error.get().getErrorType().getIdentifier(), is(expected.getIdentifier()));
   }
 
   private MessagingException newMessagingException(Throwable e, CoreEvent event, Component processor) {
