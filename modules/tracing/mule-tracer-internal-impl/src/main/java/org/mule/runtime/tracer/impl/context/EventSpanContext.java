@@ -50,9 +50,11 @@ public class EventSpanContext implements SpanContext {
 
   @Override
   public void endSpan(Assertion assertion) {
-    assertion.assertOnSpan(currentSpan);
-    currentSpan.end();
-    currentSpan = resolveParentAsInternalSpan();
+    if (currentSpan != null) {
+      assertion.assertOnSpan(currentSpan);
+      currentSpan.end();
+      currentSpan = resolveParentAsInternalSpan();
+    }
   }
 
   @Override
