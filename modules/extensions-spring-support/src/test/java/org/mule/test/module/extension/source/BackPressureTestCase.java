@@ -44,13 +44,13 @@ import java.util.TreeSet;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
-import io.qameta.allure.Features;
-import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
 import jakarta.inject.Inject;
 
-@Features({@Feature(SOURCES), @Feature(SUPPORTABILITY)})
-@Stories({@Story(BACKPRESSURE), @Story(ALERTS)})
+@Feature(SOURCES)
+@Feature(SUPPORTABILITY)
+@Story(BACKPRESSURE)
+@Story(ALERTS)
 public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
 
   private static List<CoreEvent> EVENTS;
