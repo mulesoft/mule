@@ -88,6 +88,14 @@ public interface MuleAlertingSupport extends AlertingSupport {
      */
     public static final String ALERT_REACTOR_DROPPED_ERROR = "REACTOR_DROPPED_ERROR";
 
+    /**
+     * Additional data in alerts:
+     * <ul>
+     * <li>Unique name (includes the config name) of the connection for which recovery failed.</li>
+     * </ul>
+     */
+    public static final String ALERT_XA_RECOVERY_START_ERROR = "XA_RECOVERY_START_ERROR";
+
     private AlertNames() {
       // Nothing to do
     }
