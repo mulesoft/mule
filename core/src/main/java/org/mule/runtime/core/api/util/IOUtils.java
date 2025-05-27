@@ -26,8 +26,6 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import org.slf4j.Logger;
 
@@ -136,7 +134,7 @@ public class IOUtils {
     // Try to load the resource from the classpath.
     if (url == null) {
       try {
-        url = (URL) AccessController.doPrivileged((PrivilegedAction) () -> ClassUtils.getResource(resourceName, callingClass));
+        url = ClassUtils.getResource(resourceName, callingClass);
         if (url == null) {
           logger.debug("Unable to load resource " + resourceName + " from the classpath");
         }
