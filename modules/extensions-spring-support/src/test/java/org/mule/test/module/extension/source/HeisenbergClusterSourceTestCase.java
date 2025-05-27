@@ -6,12 +6,15 @@
  */
 package org.mule.test.module.extension.source;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.test.allure.AllureConstants.ClusteringFeature.CLUSTERING;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
+
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.api.cluster.ClusterService;
 import org.mule.runtime.core.api.MuleContext;
@@ -19,17 +22,31 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 
+@RunnerDelegateTo(Parameterized.class)
 @Features({@Feature(CLUSTERING), @Feature(SOURCES)})
 public class HeisenbergClusterSourceTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Parameters(name = "primaryPollingInstance: {0}")
+  public static Collection<Boolean> params() {
+    return asList(false, true);
+  }
+
+  @Parameter(0)
+  public boolean primaryPollingInstance;
 
   private Flow flow;
 
@@ -60,7 +77,7 @@ public class HeisenbergClusterSourceTestCase extends AbstractExtensionFunctional
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
         muleContext.getCustomizationService().overrideDefaultServiceImpl(OBJECT_CLUSTER_SERVICE,
-                                                                         new TestClusterService());
+                                                                         new TestClusterService(primaryPollingInstance));
       }
     });
   }
@@ -68,13 +85,21 @@ public class HeisenbergClusterSourceTestCase extends AbstractExtensionFunctional
   @Test
   public void primaryNodeOnlyDefaultToTrue() throws Exception {
     startFlow("source-default");
-    assertThat(sourceTimesStarted, is(0));
+    if (primaryPollingInstance) {
+      assertThat(sourceTimesStarted, is(1));
+    } else {
+      assertThat(sourceTimesStarted, is(0));
+    }
   }
 
   @Test
   public void primaryNodeOnlySetToTrue() throws Exception {
     startFlow("source-true");
-    assertThat(sourceTimesStarted, is(0));
+    if (primaryPollingInstance) {
+      assertThat(sourceTimesStarted, is(1));
+    } else {
+      assertThat(sourceTimesStarted, is(0));
+    }
   }
 
   @Test
@@ -90,9 +115,15 @@ public class HeisenbergClusterSourceTestCase extends AbstractExtensionFunctional
 
   private static class TestClusterService implements ClusterService {
 
+    private final boolean primaryPollingInstance;
+
+    public TestClusterService(boolean primaryPollingInstance) {
+      this.primaryPollingInstance = primaryPollingInstance;
+    }
+
     @Override
     public boolean isPrimaryPollingInstance() {
-      return false;
+      return primaryPollingInstance;
     }
 
   }
