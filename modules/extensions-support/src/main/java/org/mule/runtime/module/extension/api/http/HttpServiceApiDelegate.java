@@ -9,13 +9,15 @@ package org.mule.runtime.module.extension.api.http;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.runtime.http.api.server.ServerCreationException;
+import org.mule.runtime.http.api.tcp.TcpClientSocketProperties;
+import org.mule.runtime.http.api.tcp.TcpClientSocketPropertiesBuilder;
+import org.mule.runtime.module.extension.api.http.client.HttpClientWrapper;
 import org.mule.runtime.module.extension.api.http.server.HttpServerWrapper;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.HttpClientConfigurationBuilder;
-import org.mule.sdk.api.http.client.HttpRequestOptions;
-import org.mule.sdk.api.http.client.HttpRequestOptionsBuilder;
+import org.mule.sdk.api.http.client.HttpClientConfigurer;
 import org.mule.sdk.api.http.client.auth.HttpAuthenticationBuilder;
 import org.mule.sdk.api.http.client.proxy.NtlmProxyConfigBuilder;
 import org.mule.sdk.api.http.client.proxy.ProxyConfig;
@@ -28,7 +30,7 @@ import org.mule.sdk.api.http.server.HttpServerConfigurer;
 import org.mule.sdk.api.http.server.PathAndMethodRequestMatcherBuilder;
 import org.mule.sdk.api.http.server.RequestHandler;
 import org.mule.sdk.api.http.server.RequestMatcher;
-import org.mule.sdk.api.http.tcp.TcpSocketPropertiesBuilder;
+import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
 import org.mule.sdk.api.http.utils.RequestMatcherRegistryBuilder;
 
 import java.util.function.Consumer;
@@ -42,8 +44,16 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   private HttpService httpService;
 
   @Override
-  public HttpClient client(Consumer<HttpClientConfigurationBuilder> configBuilder) {
-    return null;
+  public HttpClient client(Consumer<HttpClientConfigurer> configBuilder) {
+    var builder = new HttpClientConfiguration.Builder();
+    var configurer = new HttpClientConfigurerToBuilder(builder);
+    configBuilder.accept(configurer);
+    HttpClientConfiguration configuration = builder.build();
+    try {
+      return new HttpClientWrapper(httpService.getClientFactory().create(configuration));
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   @Override
@@ -76,27 +86,12 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   }
 
   @Override
-  public TcpSocketPropertiesBuilder tcpSocketPropertiesBuilder() {
-    return null;
-  }
-
-  @Override
   public HttpResponseBuilder responseBuilder(HttpResponse original) {
     return null;
   }
 
   @Override
   public HttpRequestBuilder requestBuilder() {
-    return null;
-  }
-
-  @Override
-  public HttpRequestOptionsBuilder requestOptionsBuilder() {
-    return null;
-  }
-
-  @Override
-  public HttpRequestOptionsBuilder requestOptionsBuilder(HttpRequestOptions original) {
     return null;
   }
 
@@ -177,6 +172,119 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
     @Override
     public HttpServerConfigurer setReadTimeout(long readTimeout) {
       builder.setReadTimeout(readTimeout);
+      return this;
+    }
+  }
+
+
+  private record HttpClientConfigurerToBuilder(HttpClientConfiguration.Builder builder) implements HttpClientConfigurer {
+
+    @Override
+    public HttpClientConfigurer setTlsContextFactory(TlsContextFactory tlsContextFactory) {
+      builder.setTlsContextFactory(tlsContextFactory);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer setProxyConfig(ProxyConfig proxyConfig) {
+      // builder.setProxyConfig(proxyConfig);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer setMaxConnections(int maxConnections) {
+      builder.setMaxConnections(maxConnections);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer setUsePersistentConnections(boolean usePersistentConnections) {
+      builder.setUsePersistentConnections(usePersistentConnections);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer setConnectionIdleTimeout(int connectionIdleTimeout) {
+      builder.setConnectionIdleTimeout(connectionIdleTimeout);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer setStreaming(boolean streaming) {
+      builder.setStreaming(streaming);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer setResponseBufferSize(int responseBufferSize) {
+      builder.setResponseBufferSize(responseBufferSize);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer setName(String name) {
+      builder.setName(name);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer setDecompress(Boolean decompress) {
+      builder.setDecompress(decompress);
+      return this;
+    }
+
+    @Override
+    public HttpClientConfigurer configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configurerConsumer) {
+      var propsBuilder = TcpClientSocketProperties.builder();
+      var configurer = new TcpSocketPropertiesConfigurerToBuilder(propsBuilder);
+      configurerConsumer.accept(configurer);
+      builder.setClientSocketProperties(propsBuilder.build());
+      return this;
+    }
+  }
+
+  private record TcpSocketPropertiesConfigurerToBuilder(TcpClientSocketPropertiesBuilder builder)
+      implements TcpSocketPropertiesConfigurer {
+
+    @Override
+    public TcpSocketPropertiesConfigurer sendBufferSize(Integer sendBufferSize) {
+      builder.sendBufferSize(sendBufferSize);
+      return this;
+    }
+
+    @Override
+    public TcpSocketPropertiesConfigurer receiveBufferSize(Integer receiveBufferSize) {
+      builder.receiveBufferSize(receiveBufferSize);
+      return this;
+    }
+
+    @Override
+    public TcpSocketPropertiesConfigurer clientTimeout(Integer clientTimeout) {
+      builder.clientTimeout(clientTimeout);
+      return this;
+    }
+
+    @Override
+    public TcpSocketPropertiesConfigurer sendTcpNoDelay(Boolean sendTcpNoDelay) {
+      builder.sendTcpNoDelay(sendTcpNoDelay);
+      return this;
+    }
+
+    @Override
+    public TcpSocketPropertiesConfigurer linger(Integer linger) {
+      builder.linger(linger);
+      return this;
+    }
+
+    @Override
+    public TcpSocketPropertiesConfigurer keepAlive(Boolean keepAlive) {
+      builder.keepAlive(keepAlive);
+      return this;
+    }
+
+    @Override
+    public TcpSocketPropertiesConfigurer connectionTimeout(Integer connectionTimeout) {
+      builder.connectionTimeout(connectionTimeout);
       return this;
     }
   }
