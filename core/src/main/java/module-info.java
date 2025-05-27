@@ -127,6 +127,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.object;
   exports org.mule.runtime.core.api.policy;
   exports org.mule.runtime.core.api.processor;
+  // Apart from Mule Runtime, this is used in integration tests and MUnit
   exports org.mule.runtime.core.api.processor.strategy;
   exports org.mule.runtime.core.api.registry;
   exports org.mule.runtime.core.api.retry;

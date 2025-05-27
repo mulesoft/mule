@@ -11,6 +11,7 @@ import static org.mule.test.allure.AllureConstants.SerializationFeature.SERIALIZ
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.sameInstance;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +20,7 @@ import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -29,7 +30,7 @@ import io.qameta.allure.Story;
 public class ObjectSerializerDelegateTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void delegatesProperly() {
+  void delegatesProperly() {
     final var objectSerializer = mock(ObjectSerializer.class);
     final var internalProtocol = mock(SerializationProtocol.class);
     when(objectSerializer.getInternalProtocol()).thenReturn(internalProtocol);
