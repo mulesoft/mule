@@ -51,7 +51,7 @@ import io.qameta.allure.Story;
 
 @Feature(STREAMING)
 @Story(STREAM_MANAGEMENT)
-public class StreamingGhostBusterTestCase extends AbstractMuleTestCase {
+class StreamingGhostBusterTestCase extends AbstractMuleTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
 

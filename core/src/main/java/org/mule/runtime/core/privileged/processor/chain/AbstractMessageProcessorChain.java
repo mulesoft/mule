@@ -169,6 +169,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       LOGGER.debug("ApplicationClassLoader interface not available in current context", e);
     }
 
+    configureReactorHooks();
+  }
+
+  public static void configureReactorHooks() {
     // Log dropped events/errors
     // Use a different logger for keeping compatibility with currently available tools and documentation
     Hooks.onErrorDropped(error -> {

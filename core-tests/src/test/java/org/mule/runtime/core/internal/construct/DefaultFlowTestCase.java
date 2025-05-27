@@ -6,20 +6,35 @@
  */
 package org.mule.runtime.core.internal.construct;
 
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
+import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
+import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
+import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
+
+import static reactor.core.publisher.Mono.just;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -32,15 +47,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
-import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
-import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
-import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
@@ -53,6 +59,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.construct.Flow.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
@@ -78,9 +85,7 @@ import java.util.function.BiFunction;
 
 import org.junit.After;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -100,9 +105,6 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
   private DefaultFlowBuilder.DefaultFlow stoppedFlow;
   private SensingNullMessageProcessor sensingMessageProcessor;
   private final BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction;
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   public DefaultFlowTestCase(String strategyName, BiFunction<Processor, CoreEvent, CoreEvent> triggerFunction) {
     this.triggerFunction = triggerFunction;
@@ -267,12 +269,10 @@ public class DefaultFlowTestCase extends AbstractFlowConstructTestCase {
 
   @Test
   public void illegalCustomMaxConcurrency() {
-    expectedException.expect(IllegalArgumentException.class);
-    Flow.builder(FLOW_NAME, muleContext)
+    final Builder flowBuilder = Flow.builder(FLOW_NAME, muleContext)
         .source(directInboundMessageSource)
-        .processors(getSensingNullMessageProcessor())
-        .maxConcurrency(0)
-        .build();
+        .processors(getSensingNullMessageProcessor());
+    assertThrows(IllegalArgumentException.class, () -> flowBuilder.maxConcurrency(0));
   }
 
   @Test

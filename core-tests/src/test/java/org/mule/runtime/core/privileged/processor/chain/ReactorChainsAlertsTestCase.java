@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChain.clearAlertsPerDeploymentMap;
+import static org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChain.configureReactorHooks;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SUPPORTABILITY;
 import static org.mule.test.allure.AllureConstants.SupportabilityFeature.SupportabilityStory.ALERTS;
@@ -42,12 +43,14 @@ import java.util.concurrent.ExecutorService;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import reactor.core.publisher.Hooks;
 
 @Feature(SUPPORTABILITY)
 @Story(ALERTS)
@@ -67,9 +70,17 @@ public class ReactorChainsAlertsTestCase extends AbstractReactiveProcessorTestCa
     super(mode);
   }
 
+  // Test that use StepsVerifier destroy the hooks, so we ensure they are in place for this test.
+  @BeforeClass
+  public static void resetReactorHooks() {
+    Hooks.resetOnErrorDropped();
+    Hooks.resetOnNextDropped();
+    configureReactorHooks();
+    clearAlertsPerDeploymentMap();
+  }
+
   @Before
   public void before() throws MuleException {
-    clearAlertsPerDeploymentMap();
     event = testEvent();
     alertingSupport = mock(AlertingSupport.class);
 
