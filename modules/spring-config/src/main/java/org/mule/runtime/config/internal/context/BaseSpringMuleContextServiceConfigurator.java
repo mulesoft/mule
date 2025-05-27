@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_EN
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_POOLS_CONFIG;
@@ -36,6 +37,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
+import org.mule.runtime.config.internal.bean.MuleConfigurationDelegate;
 import org.mule.runtime.config.internal.bean.DefaultObjectSerializerDelegate;
 import org.mule.runtime.config.internal.el.DataWeaveExtendedExpressionLanguageAdaptorFactoryBean;
 import org.mule.runtime.config.internal.el.DefaultExpressionManagerFactoryBean;
@@ -149,6 +151,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
 
     registerConstantBeanDefinition(OBJECT_REGISTRY, getServiceLocator());
     registerBeanDefinition(DEFAULT_OBJECT_SERIALIZER_NAME, getBeanDefinition(DefaultObjectSerializerDelegate.class));
+    registerBeanDefinition(OBJECT_MULE_CONFIGURATION, getBeanDefinition(MuleConfigurationDelegate.class));
 
     createRuntimeServices();
     createBootstrapBeanDefinitions();

@@ -6,6 +6,14 @@
           {
             "ignore": true,
             "code": "java.annotation.added",
+            "old": "class org.mule.runtime.core.api.context.notification.MuleContextNotification",
+            "new": "class org.mule.runtime.core.api.context.notification.MuleContextNotification",
+            "annotation": "@org.mule.api.annotation.NoInstantiate",
+            "justification": "W-18627046: Make MuleConfiguration accessible in base spring context - API thinning"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
             "old": "class org.mule.runtime.core.api.context.notification.FlowStackElement",
             "new": "class org.mule.runtime.core.api.context.notification.FlowStackElement",
             "annotation": "@org.mule.api.annotation.NoExtend",

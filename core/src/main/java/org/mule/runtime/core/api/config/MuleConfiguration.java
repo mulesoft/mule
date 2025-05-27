@@ -34,6 +34,11 @@ public interface MuleConfiguration {
 
   boolean isClientMode();
 
+  /**
+   * @return
+   * @deprecated use {@link org.mule.runtime.api.config.ArtifactEncoding} instead.
+   */
+  @Deprecated
   String getDefaultEncoding();
 
   String getId();
