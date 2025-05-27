@@ -22,6 +22,7 @@ import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -167,6 +168,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     verify(spyMuleContext, atLeastOnce()).isStopping();
     // isPrimaryPollingInstance() was never called if isStopping() returns true
     verify(spyMuleContext, never()).isPrimaryPollingInstance();
+    assertThat("Flow should not be executed when MuleContext is stopping", flow.event, is(nullValue()));
   }
 
   @Test
@@ -185,6 +187,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     Thread.sleep(100);
 
     verify(spyMuleContext, times(1)).isStopping();
+    assertThat("Flow should not be executed when MuleContext is stopping", flow.event, is(nullValue()));
   }
 
   @Test
