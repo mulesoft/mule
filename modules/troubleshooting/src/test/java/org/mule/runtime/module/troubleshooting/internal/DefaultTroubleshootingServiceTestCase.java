@@ -13,6 +13,7 @@ import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTe
 import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTestUtils.mockFlowStackEntry;
 import static org.mule.runtime.module.troubleshooting.internal.operations.BasicInfoOperation.BASIC_INFO_OPERATION_NAME;
 import static org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation.EVENT_DUMP_OPERATION_NAME;
+import static org.mule.runtime.module.troubleshooting.internal.operations.ThreadDumpOperation.THREAD_DUMP_OPERATION_NAME;
 
 import static java.util.Collections.emptyMap;
 
@@ -20,7 +21,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mule.runtime.module.troubleshooting.internal.operations.ThreadDumpOperation.THREAD_DUMP_OPERATION_NAME;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -32,15 +34,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultTroubleshootingServiceTestCase {
 
   private DefaultTroubleshootingService troubleshootingService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     FlowStackEntry flowStackEntry = mockFlowStackEntry();
     Application app1 = mockApplication("app1", flowStackEntry);
@@ -50,7 +52,7 @@ public class DefaultTroubleshootingServiceTestCase {
     troubleshootingService.registerOperation(new TestTroubleshootingOperation());
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     troubleshootingService.unregisterOperation(TEST_OPERATION_NAME);
   }
@@ -85,22 +87,25 @@ public class DefaultTroubleshootingServiceTestCase {
         ===="""));
   }
 
-  @Test(expected = TroubleshootingOperationException.class)
+  @Test
   public void tryToExecuteAnUnableOperationThrowsException() throws TroubleshootingOperationException {
-    troubleshootingService.executeOperation("notExistingOperation", emptyMap());
+    assertThrows(TroubleshootingOperationException.class,
+                 () -> troubleshootingService.executeOperation("notExistingOperation", emptyMap()));
   }
 
-  @Test(expected = TroubleshootingOperationException.class)
+  @Test
   public void missingRequiredParameter() throws TroubleshootingOperationException {
-    troubleshootingService.executeOperation(TEST_OPERATION_NAME, emptyMap());
+    assertThrows(TroubleshootingOperationException.class,
+                 () -> troubleshootingService.executeOperation(TEST_OPERATION_NAME, emptyMap()));
   }
 
-  @Test(expected = TroubleshootingOperationException.class)
+  @Test
   public void unexpectedParameter() throws TroubleshootingOperationException {
     Map<String, String> unexpectedParameter = new HashMap<>();
     unexpectedParameter.put(REQUIRED_ARGUMENT_NAME, "some value");
     unexpectedParameter.put("unexpected", "other value");
-    troubleshootingService.executeOperation(TEST_OPERATION_NAME, unexpectedParameter);
+    assertThrows(TroubleshootingOperationException.class,
+                 () -> troubleshootingService.executeOperation(TEST_OPERATION_NAME, unexpectedParameter));
   }
 
   @Test
