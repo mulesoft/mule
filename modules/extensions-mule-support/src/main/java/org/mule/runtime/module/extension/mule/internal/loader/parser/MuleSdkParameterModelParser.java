@@ -27,7 +27,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
@@ -36,6 +35,7 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
+import org.mule.runtime.api.meta.version.MuleMinorVersion;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
@@ -262,7 +262,7 @@ public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser
 
   @Override
   public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(new ResolvedMinMuleVersion(name, new MuleVersion(MIN_MULE_VERSION),
+    return of(new ResolvedMinMuleVersion(name, new MuleMinorVersion(MIN_MULE_VERSION),
                                          format("Parameter %s has min mule version %s because the Mule Sdk was introduced in that version.",
                                                 name, MIN_MULE_VERSION)));
   }

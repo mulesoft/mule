@@ -29,7 +29,7 @@ import org.mule.test.provided.dependency.ProvidedDependencyExtension;
 
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -49,7 +49,7 @@ public class ExtensionWithProvidedDependencyTestCase {
 
     assertThat(extension.getName(), is(ProvidedDependencyExtension.NAME));
     assertThat(extension.getMinMuleVersion().isPresent(), is(true));
-    assertThat(extension.getMinMuleVersion().get().toString(), is("4.1.1"));
+    assertThat(extension.getMinMuleVersion().get().toString(), is("4.1.0"));
 
     assertThat(extension.getConfigurationModel("config").isPresent(), is(true));
     ConfigurationModel configurationModel = extension.getConfigurationModel("config").get();
@@ -58,7 +58,7 @@ public class ExtensionWithProvidedDependencyTestCase {
         configurationModel.getOperationModel("dummyOperation")
             .orElseThrow(() -> new RuntimeException("'dummyOperation' not found"));
     assertThat(operationModel.getMinMuleVersion().isPresent(), is(true));
-    assertThat(operationModel.getMinMuleVersion().get().toString(), is("4.1.1"));
+    assertThat(operationModel.getMinMuleVersion().get().toString(), is("4.1.0"));
   }
 
   public static ExtensionModel loadExtension(Class<?> clazz, Map<String, Object> params) {
