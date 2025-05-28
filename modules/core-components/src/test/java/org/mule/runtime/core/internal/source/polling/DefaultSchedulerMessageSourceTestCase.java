@@ -22,14 +22,18 @@ import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -55,6 +59,7 @@ import org.mule.tck.probe.Probe;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.qameta.allure.Issue;
 import org.slf4j.Logger;
 
 import org.junit.After;
@@ -124,6 +129,65 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
         return "flow event never set by the source flow";
       }
     });
+  }
+
+  @Test
+  @Issue("W-17981248")
+  public void testStartWhenStopping() throws Exception {
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
+    SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
+    schedulerMessageSource.setListener(flow);
+    schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+
+    DefaultMuleContext spyMuleContext = spy((DefaultMuleContext) muleContext);
+    doReturn(true).when(spyMuleContext).isStopping();
+
+    schedulerMessageSource.setMuleContext(spyMuleContext);
+    schedulerMessageSource.start();
+
+    assertThat("Scheduler should not be started when MuleContext is stopping",
+               schedulerMessageSource.isStarted(), is(false));
+  }
+
+  @Test
+  @Issue("W-17981248")
+  public void testRunWhenStopping() throws Exception {
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
+    SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
+    schedulerMessageSource.setListener(flow);
+    schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+
+    DefaultMuleContext spyMuleContext = spy((DefaultMuleContext) muleContext);
+    doReturn(false).when(spyMuleContext).isStopping();
+    doReturn(true).when(spyMuleContext).isPrimaryPollingInstance();
+
+    schedulerMessageSource.setMuleContext(spyMuleContext);
+    schedulerMessageSource.start();
+    doReturn(true).when(spyMuleContext).isStopping();
+
+    verify(spyMuleContext, atLeastOnce()).isStopping();
+    // isPrimaryPollingInstance() was never called if isStopping() returns true
+    verify(spyMuleContext, never()).isPrimaryPollingInstance();
+    assertThat("Flow should not be executed when MuleContext is stopping", flow.event, is(nullValue()));
+  }
+
+  @Test
+  @Issue("W-17981248")
+  public void testPollWhenStopping() throws Exception {
+    DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
+    SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
+    schedulerMessageSource.setListener(flow);
+    schedulerMessageSource.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
+
+    DefaultMuleContext spyMuleContext = spy((DefaultMuleContext) muleContext);
+    doReturn(true).when(spyMuleContext).isStopping();
+
+    schedulerMessageSource.setMuleContext(spyMuleContext);
+    schedulerMessageSource.trigger();
+    Thread.sleep(100);
+
+    verify(spyMuleContext, times(1)).isStopping();
+    assertThat("Flow should not be executed when MuleContext is stopping", flow.event, is(nullValue()));
   }
 
   @Test
