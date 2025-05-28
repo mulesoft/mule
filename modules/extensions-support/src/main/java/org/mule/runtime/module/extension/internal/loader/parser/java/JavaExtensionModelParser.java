@@ -34,7 +34,7 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-import static net.bytebuddy.jar.asm.Opcodes.ASM9;
+import static net.bytebuddy.jar.asm.Opcodes.ASM5;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -82,7 +82,6 @@ import org.mule.sdk.api.annotation.OnArtifactLifecycle;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 import org.mule.sdk.api.meta.JavaVersion;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -168,33 +167,30 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
       return javaVersionSupport.value();
     } catch (EnumConstantNotPresentException e) {
       // An enum value not present in the Mule container version of `JavaVersion` is in use, we need to introspect the annotation
-    }
+      try {
+        Class<?> annotatedClass = extensionElement.getDeclaringClass().get();
 
-    try {
-      Class<?> annotatedClass = extensionElement
-          .getDeclaringClass()
-          .orElseThrow(() -> new RuntimeException(format("Expected extension element '%s' to have a declaring class",
-                                                         extensionElement)));
-      ClassReader reader = new ClassReader(currentThread().getContextClassLoader()
-          .getResourceAsStream(annotatedClass.getName().replace(".", "/") + ".class"));
+        ClassReader reader = new ClassReader(currentThread().getContextClassLoader()
+            .getResourceAsStream(annotatedClass.getName().replace(".", "/") + ".class"));
 
-      List<JavaVersion> javaVersions = new ArrayList<>();
-      reader.accept(new ClassVisitor(ASM9) {
+        List<JavaVersion> javaVersions = new ArrayList<>();
+        reader.accept(new ClassVisitor(ASM5) {
 
-        @Override
-        public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-          if (descriptor.endsWith(JavaVersionSupport.class.getSimpleName() + ";")) {
-            return new AnnotationVisitor(ASM9) {
+          @Override
+          public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+            return new AnnotationVisitor(ASM5) {
 
               @Override
               public AnnotationVisitor visitArray(String name) {
-                return new AnnotationVisitor(ASM9) {
+                return new AnnotationVisitor(ASM5) {
 
                   @Override
                   public void visitEnum(String name, String desc, String value) {
                     try {
-                      javaVersions.add(valueOf(value));
-                    } catch (Exception e) {
+                      if (descriptor.endsWith(JavaVersionSupport.class.getSimpleName() + ";")) {
+                        javaVersions.add(valueOf(value));
+                      }
+                    } catch (IllegalArgumentException e) {
                       LOGGER.debug("Found unknown value '{}' in JavaVersionSupport annotation", value, e);
                     }
                   }
@@ -202,14 +198,13 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
               }
             };
           }
+        }, 0);
 
-          return super.visitAnnotation(descriptor, visible);
-        }
-      }, 0);
-
-      return javaVersions.toArray(new JavaVersion[javaVersions.size()]);
-    } catch (Exception e) {
-      throw new RuntimeException("Unexpected error while parsing JavaVersionSupport values", e);
+        return javaVersions.toArray(new JavaVersion[javaVersions.size()]);
+      } catch (Exception e2) {
+        e.addSuppressed(e2);
+        throw e;
+      }
     }
   }
 
