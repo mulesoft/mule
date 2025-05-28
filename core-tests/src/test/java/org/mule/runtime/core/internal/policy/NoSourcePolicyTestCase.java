@@ -9,15 +9,18 @@ package org.mule.runtime.core.internal.policy;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils.block;
 
+import static java.util.Optional.empty;
+
+import static reactor.core.publisher.Mono.error;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -62,6 +65,7 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
 
     when(initialEvent.getVariables()).thenReturn(new CaseInsensitiveHashMap<>());
     when(initialEvent.getSourcePolicyContext()).thenReturn((EventInternalContext) sourcePolicyContext);
+    when(initialEvent.getError()).thenReturn(empty());
   }
 
   @Test

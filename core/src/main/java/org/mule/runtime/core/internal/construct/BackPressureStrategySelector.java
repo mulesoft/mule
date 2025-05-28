@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.construct;
 
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.sleep;
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_BACKPRESSURE_TRIGGERED;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createAndThrowIfNeeded;
+
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.sleep;
 
 import org.mule.runtime.core.api.construct.BackPressureReason;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -51,16 +53,18 @@ class BackPressureStrategySelector {
         abstractPipeline.getProcessingStrategy().checkBackpressureAccepting(event);
         accepted = true;
       } catch (FromFlowRejectedExecutionException ree) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("waitStrategy - " + ree.getClass().getName() + " @ "
-              + event.getContext().getOriginatingLocation().getRootContainerName() + ": " + ree.getReason());
-        }
+        LOGGER.debug("waitStrategy - {} @ {}: {}",
+                     ree.getClass().getName(),
+                     event.getContext().getOriginatingLocation().getRootContainerName(),
+                     ree.getReason());
 
         // TODO MULE-16106 Add a callback for WAIT back pressure applied on the source
         try {
           sleep(EVENT_LOOP_SCHEDULER_BUSY_RETRY_INTERVAL_MS);
         } catch (InterruptedException e) {
           currentThread().interrupt();
+          abstractPipeline.getAlertingSupport().triggerAlert(ALERT_BACKPRESSURE_TRIGGERED,
+                                                             ree.getReason().name() + " - " + abstractPipeline.getName());
           createAndThrowIfNeeded(abstractPipeline, ree.getReason(), ree);
         }
       }
@@ -77,11 +81,12 @@ class BackPressureStrategySelector {
       throws FlowBackPressureException {
     final BackPressureReason reason = abstractPipeline.getProcessingStrategy().checkBackpressureEmitting(event);
     if (reason != null) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER
-            .debug("failDropStrategy - @ " + event.getContext().getOriginatingLocation().getRootContainerName() + ": " + reason);
-      }
+      LOGGER.debug("failDropStrategy - @ {}: {}",
+                   event.getContext().getOriginatingLocation().getRootContainerName(),
+                   reason);
 
+      abstractPipeline.getAlertingSupport().triggerAlert(ALERT_BACKPRESSURE_TRIGGERED,
+                                                         reason.name() + " - " + abstractPipeline.getName());
       throw abstractPipeline.getBackPressureExceptions().get(reason);
     }
   }

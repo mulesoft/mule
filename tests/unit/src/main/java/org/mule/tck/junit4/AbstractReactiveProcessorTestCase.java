@@ -9,6 +9,7 @@ package org.mule.tck.junit4;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
+import static org.mule.tck.SimpleUnitTestSupportSchedulerService.UNIT_TEST_THREAD_GROUP;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
 
@@ -29,15 +30,18 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.privileged.exception.MessagingException;
+import org.mule.tck.SimpleUnitTestSupportScheduler;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
 import java.util.Collection;
 import java.util.Map;
-
-import org.reactivestreams.Publisher;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.reactivestreams.Publisher;
 
 import reactor.core.publisher.Mono;
 
@@ -77,7 +81,12 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    scheduler = muleContext.getSchedulerService().cpuIntensiveScheduler();
+    scheduler = new SimpleUnitTestSupportScheduler(8,
+                                                   new NamedThreadFactory(SimpleUnitTestSupportScheduler.class.getSimpleName(),
+                                                                          SimpleUnitTestSupportSchedulerService.class
+                                                                              .getClassLoader(),
+                                                                          UNIT_TEST_THREAD_GROUP),
+                                                   new AbortPolicy());
   }
 
   @Override

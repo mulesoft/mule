@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.privileged.exception;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_END;
 import static org.mule.runtime.api.notification.ErrorHandlerNotification.PROCESS_START;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_ROLLBACK;
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_MULE_UNKNOWN_ERROR_RAISED;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -38,6 +41,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.alert.AlertingSupport;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -106,6 +110,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
   public static final String MULE_RUNTIME_ERROR_METRICS = "Mule runtime error metrics";
+
   private ComponentTracer<CoreEvent> componentTracer;
 
   private boolean fromGlobalErrorHandler = false;
@@ -115,9 +120,6 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Inject
   private ErrorTypeRepository errorTypeRepository;
-
-  @Inject
-  private ConfigurationProperties configurationProperties;
 
   @Inject
   private InternalProfilingService profilingService;
@@ -146,10 +148,12 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private final CopyOnWriteArrayList<String> suppressedErrorTypeMatches = new CopyOnWriteArrayList<>();
 
   @Inject
-  MeterProvider meterProvider;
+  private MeterProvider meterProvider;
   @Inject
-  ErrorMetricsFactory errorMetricsFactory;
+  private ErrorMetricsFactory errorMetricsFactory;
   private ErrorMetrics errorMetrics;
+
+  private AlertingSupport alertingSupport;
 
   public void addGlobalErrorHandlerComponentReference(ComponentLocation location) {
     componentsReferencingGlobalErrorHandler.add(location.getLocation());
@@ -230,6 +234,10 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public synchronized void initialise() throws InitialisationException {
+    if (alertingSupport == null) {
+      throw new InitialisationException(createStaticMessage("'alertingSupport' cannot be null"), this);
+    }
+
     componentTracer = componentTracerFactory.fromComponent(TemplateOnErrorHandler.this);
     errorMetrics = errorMetricsFactory.create(meterProvider.getMeterBuilder(MULE_RUNTIME_ERROR_METRICS).build());
     this.rollbackProducer = profilingService.getProfilingDataProducer(TX_ROLLBACK);
@@ -253,8 +261,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       // All calling methods will end up transforming any error class other than MessagingException into that one.
       public void accept(Exception error) {
         // Measure only when enter the error handling scope and not when bubbling inside it.
-        if (!ErrorHandlerContextManager.isHandling((MessagingException) error))
+        if (!ErrorHandlerContextManager.isHandling((MessagingException) error)) {
           measure((MessagingException) error);
+        }
         fluxSink.next(addContext(TemplateOnErrorHandler.this, (MessagingException) error, continueCallback, propagateCallback));
       }
     };
@@ -388,7 +397,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
     fluxFactory = new OnErrorHandlerFluxObjectFactory(processingStrategy);
 
-    errorTypeMatcher = createErrorType(errorTypeRepository, errorType, configurationProperties);
+    errorTypeMatcher = createErrorTypeMatcher(errorTypeRepository, errorType);
     if (!inDefaultErrorHandler()) {
       errorHandlerLocation = getLocation().getLocation();
       isLocalErrorHandlerLocation = ERROR_HANDLER_LOCATION_PATTERN.matcher(errorHandlerLocation).find();
@@ -495,6 +504,15 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   protected Function<CoreEvent, CoreEvent> beforeRouting() {
     return event -> {
       MessagingException exception = (MessagingException) getException(event);
+
+      final var raisedErrorType = exception.getExceptionInfo().getErrorType();
+      // TODO W-18626930 remove this null check
+      if (raisedErrorType != null
+          && raisedErrorType.getNamespace().equals(UNKNOWN.getNamespace())
+          && raisedErrorType.getIdentifier().equals(UNKNOWN.getName())) {
+        alertingSupport.triggerAlert(ALERT_MULE_UNKNOWN_ERROR_RAISED,
+                                     exception.getCause() != null ? exception.getCause().toString() : exception.toString());
+      }
 
       getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
 
@@ -763,6 +781,11 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   public void setFromGlobalErrorHandler(boolean fromGlobalErrorHandler) {
     this.fromGlobalErrorHandler = fromGlobalErrorHandler;
+  }
+
+  @Inject
+  public void setAlertingSupport(AlertingSupport alertingSupport) {
+    this.alertingSupport = alertingSupport;
   }
 
 }

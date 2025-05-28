@@ -14,6 +14,8 @@ import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
 
+import static java.util.Collections.singletonMap;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
@@ -31,7 +33,6 @@ import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -62,7 +63,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
     // Identifier for cases where this class is directly instantiated by the runtime core in order to implement default error
     // handling.
-    setAnnotations(Collections.singletonMap(ANNOTATION_NAME, buildFromStringRepresentation(COMPONENT_IDENTIFIER)));
+    setAnnotations(singletonMap(ANNOTATION_NAME, buildFromStringRepresentation(COMPONENT_IDENTIFIER)));
 
     redeliveryExhaustedMatcher = createErrorTypeMatcher(redeliveryExhaustedErrorType);
   }

@@ -13,6 +13,9 @@ import static org.mule.runtime.api.notification.MessageProcessorNotification.MES
 import static org.mule.runtime.api.notification.MessageProcessorNotification.createFrom;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_REACTOR_DISCARDED_EVENT;
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_REACTOR_DROPPED_ERROR;
+import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALERT_REACTOR_DROPPED_EVENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.isStopped;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -42,6 +45,8 @@ import static org.mule.runtime.core.privileged.processor.chain.UnnamedComponent.
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -51,9 +56,11 @@ import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Operators.lift;
 
+import org.mule.runtime.api.alert.AlertingSupport;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -105,6 +112,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -112,13 +120,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import jakarta.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
+import jakarta.inject.Inject;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Hooks;
@@ -152,18 +159,38 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       context -> context.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY)
           .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
 
-  static {
-    // Log dropped events/errors
-    // Use a different logger for keeping compatibility with currently available tools and documentation
-    Hooks.onErrorDropped(error -> MULE_CTX_LOGGER.debug("ERROR DROPPED", error));
-    Hooks.onNextDropped(event -> MULE_CTX_LOGGER.debug("EVENT DROPPED {}", event));
+  private static final Map<ClassLoader, AlertingSupport> ALERTS_PER_DEPLOYMENT = new WeakHashMap<>();
 
+  static {
     try {
       appClClass = (Class<ClassLoader>) AbstractMessageProcessorChain.class.getClassLoader()
           .loadClass("org.mule.runtime.deployment.model.api.application.ApplicationClassLoader");
     } catch (ClassNotFoundException e) {
       LOGGER.debug("ApplicationClassLoader interface not available in current context", e);
     }
+
+    configureReactorHooks();
+  }
+
+  public static void configureReactorHooks() {
+    // Log dropped events/errors
+    // Use a different logger for keeping compatibility with currently available tools and documentation
+    Hooks.onErrorDropped(error -> {
+      MULE_CTX_LOGGER.debug("ERROR DROPPED", error);
+      LOGGER.warn("ERROR DROPPED", error);
+
+      final ClassLoader tccl = currentThread().getContextClassLoader();
+      ALERTS_PER_DEPLOYMENT.get(resolveRegionContextClassLoader(tccl).orElse(tccl))
+          .triggerAlert(ALERT_REACTOR_DROPPED_ERROR, error.toString());
+    });
+    Hooks.onNextDropped(event -> {
+      MULE_CTX_LOGGER.debug("EVENT DROPPED {}", event);
+      LOGGER.warn("EVENT DROPPED {}", event);
+
+      final ClassLoader tccl = currentThread().getContextClassLoader();
+      ALERTS_PER_DEPLOYMENT.get(resolveRegionContextClassLoader(tccl).orElse(tccl))
+          .triggerAlert(ALERT_REACTOR_DROPPED_EVENT, event instanceof Event e ? e.getCorrelationId() : event.toString());
+    });
   }
 
   private final String name;
@@ -216,9 +243,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private static final Component UNKNOWN_COMPONENT = getUnnamedComponent();
 
   @Inject
-  MeterProvider meterProvider;
+  private AlertingSupport alertingSupport;
   @Inject
-  ErrorMetricsFactory errorMetricsFactory;
+  private MeterProvider meterProvider;
+  @Inject
+  private ErrorMetricsFactory errorMetricsFactory;
   private ErrorMetrics errorMetrics;
 
   AbstractMessageProcessorChain(String name,
@@ -402,17 +431,23 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     stream = stream.contextWrite(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
-      if (tccl == null || tccl.getParent() == null
-          || appClClass == null || !appClClass.isAssignableFrom(tccl.getClass())) {
-        return ctx;
-      } else {
-        return ctx
-            .put(TCCL_ORIGINAL_REACTOR_CTX_KEY, tccl)
-            .put(TCCL_REACTOR_CTX_KEY, tccl.getParent());
-      }
+      return resolveRegionContextClassLoader(tccl)
+          .map(regionCl -> ctx
+              .put(TCCL_ORIGINAL_REACTOR_CTX_KEY, tccl)
+              .put(TCCL_REACTOR_CTX_KEY, regionCl))
+          .orElse(ctx);
     });
 
     return stream;
+  }
+
+  private static Optional<ClassLoader> resolveRegionContextClassLoader(ClassLoader tccl) {
+    if (tccl != null && tccl.getParent() != null
+        && appClClass != null && appClClass.isAssignableFrom(tccl.getClass())) {
+      return of(tccl.getParent());
+    } else {
+      return empty();
+    }
   }
 
   /*
@@ -502,6 +537,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
             .andThen(next)
             // #1 Set back previous TCCL.
             .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_CONSUMER)))
+        .doOnDiscard(CoreEvent.class,
+                     event -> alertingSupport.triggerAlert(ALERT_REACTOR_DISCARDED_EVENT, event.getCorrelationId()))
         .doOnNext(event -> afterProcessorInSameThread(event, (Processor) processor)));
 
     // Apply processing strategy. This is done here to ensure notifications and interceptors do not execute on async processor
@@ -780,6 +817,11 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
 
     errorMetrics = errorMetricsFactory.create(meterProvider.getMeterBuilder(MULE_RUNTIME_ERROR_METRICS).build());
+
+    synchronized (ALERTS_PER_DEPLOYMENT) {
+      final ClassLoader tccl = currentThread().getContextClassLoader();
+      ALERTS_PER_DEPLOYMENT.putIfAbsent(resolveRegionContextClassLoader(tccl).orElse(tccl), alertingSupport);
+    }
   }
 
   @Override
@@ -813,12 +855,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   @Override
   public void dispose() {
+    // ALERTS_PER_DEPLOYMENT will be cleared by the weakReference
+
     disposeIfNeeded(getMessageProcessorsForLifecycle(), LOGGER);
 
     if (switchOnErrorScheduler != null) {
       switchOnErrorScheduler.stop();
       switchOnErrorScheduler = null;
     }
+  }
+
+  static void clearAlertsPerDeploymentMap() {
+    ALERTS_PER_DEPLOYMENT.clear();
   }
 
   FlowExceptionHandler getMessagingExceptionHandler() {
@@ -828,4 +876,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   public void setComponentTracer(ComponentTracer<CoreEvent> chainComponentTracer) {
     this.chainComponentTracer = chainComponentTracer;
   }
+
+  public void setAlertingSupport(AlertingSupport alertingSupport) {
+    this.alertingSupport = alertingSupport;
+  }
+
 }
