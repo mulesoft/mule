@@ -44,7 +44,7 @@ import io.qameta.allure.Story;
 
 @Feature(SUPPORTABILITY)
 @Story(ALERTS)
-public class AlertFuseboardOperationTestCase {
+class AlertFuseboardOperationTestCase {
 
   private DeploymentService deploymentService;
   private AlertFuseboardOperation alertFuseboardOperation;
@@ -68,7 +68,7 @@ public class AlertFuseboardOperationTestCase {
   }
 
   @Test
-  public void whenNoApplicationIsPassedItReturnsAllApplications() throws IOException {
+  void whenNoApplicationIsPassedItReturnsAllApplications() throws IOException {
     final var writer = new StringWriter();
     alertFuseboardOperation.getCallback().execute(emptyMap(), writer);
     Object result = writer.toString();
@@ -89,7 +89,7 @@ public class AlertFuseboardOperationTestCase {
   }
 
   @Test
-  public void whenApplicationIsPassedItReturnsOnlyThePassedOne() throws IOException {
+  void whenApplicationIsPassedItReturnsOnlyThePassedOne() throws IOException {
     final var writer = new StringWriter();
     alertFuseboardOperation.getCallback().execute(singletonMap(APPLICATION_ARGUMENT_NAME, "app1"), writer);
     String result = writer.toString();
@@ -102,8 +102,8 @@ public class AlertFuseboardOperationTestCase {
     assertThat(result, is(equalTo(expected)));
   }
 
-  public static Application mockApplication(String appName,
-                                            Map<String, TimedDataAggregation<Integer>> alertsCountAggregation) {
+  private static Application mockApplication(String appName,
+                                             Map<String, TimedDataAggregation<Integer>> alertsCountAggregation) {
     Application mockApp = mock(Application.class);
     when(mockApp.getArtifactName()).thenReturn(appName);
 
