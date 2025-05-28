@@ -27,7 +27,6 @@ import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import static org.mule.runtime.api.notification.PolicyNotification.BEFORE_NEXT;
@@ -39,20 +38,19 @@ import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistr
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.application.MuleApplicationPolicyProvider.IS_POLICY_REORDER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedDeploymentProperties;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.getPersistedFlowDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
+import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.START_ARTIFACT_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.byeXmlExtensionPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.exceptionThrowingPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
-import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.httpPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.moduleUsingByeXmlExtensionPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.policyConfigurationExtensionJarFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.policyDependencyInjectionExtensionJarFile;
@@ -66,29 +64,6 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POL
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.ApplicationConfiguration.APPLICATION_CONFIGURATION;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-
-import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.startsWith;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.fail;
-import static org.junit.rules.ExpectedException.none;
-import static org.slf4j.event.Level.DEBUG;
-import static org.slf4j.event.Level.INFO;
-
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -100,23 +75,17 @@ import org.mule.runtime.api.notification.PolicyNotification;
 import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityException;
-import org.mule.runtime.container.internal.IsolatedPolicyClassLoader;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.security.AbstractSecurityProvider;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.module.extension.internal.policy.NoOpPolicyManager;
@@ -136,12 +105,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import com.github.valfirst.slf4jtest.LoggingEvent;
-import com.github.valfirst.slf4jtest.TestLogger;
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -183,20 +146,16 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Rule
   public SystemProperty enablePolicyIsolationSystemProperty;
 
-  @Rule
-  public SystemProperty separateCLforPolicyIsolationSystemProperty;
-
   private final boolean shareErrorTypeRepository;
 
-  @Parameterized.Parameters(
-      name = "Parallel: {0} -  Share ErrorType repo {1} - Enable policy isolation {2} - Separate ClassLoader for policy isolation {3}")
+  @Parameterized.Parameters(name = "Parallel: {0} - Share ErrorType repo: {1} - Enable policy isolation {2}")
   public static List<Object[]> parameters() {
     // Only run without parallel deployment since this configuration does not affect policy deployment at all
     return asList(
-                  new Object[] {false, false, false, true},
-                  new Object[] {false, false, true, true},
-                  new Object[] {false, true, true, true},
-                  new Object[] {false, true, false, true});
+                  new Object[] {false, false, false},
+                  new Object[] {false, false, true},
+                  new Object[] {false, true, true},
+                  new Object[] {false, true, false});
   }
 
   // Policy artifact file builders
@@ -224,8 +183,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
-  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation,
-                                             boolean separateCLforPolicyIsolation) {
+  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation) {
     super(parallelDeployment);
     this.shareErrorTypeRepository = shareErrorType;
     this.shareErrorTypeRepoSystemProperty =
@@ -233,9 +191,6 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     this.enablePolicyIsolationSystemProperty =
         new SystemProperty((ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
                            Boolean.toString(enablePolicyIsolation));
-    this.separateCLforPolicyIsolationSystemProperty =
-        new SystemProperty((SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
-                           Boolean.toString(separateCLforPolicyIsolation));
   }
 
   @BeforeClass
@@ -1053,88 +1008,6 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(2));
-  }
-
-  @Test
-  @Feature(POLICY_DEPLOYMENT)
-  @Issue("W-17340911")
-  public void appliesPolicyAndVerifiesClassLoaderIsolation() throws Exception {
-    // domain with HTTP plugin
-    DomainFileBuilder domainFileBuilder =
-        new DomainFileBuilder("domain").definedBy("empty-domain-config.xml");
-    domainFileBuilder.dependingOn(httpPlugin);
-
-    // policy with HTTP plugin
-    PolicyFileBuilder policyFileBuilder =
-        new PolicyFileBuilder(FOO_POLICY_NAME).describedBy(new MulePolicyModel.MulePolicyModelBuilder()
-            .setMinMuleVersion(MIN_MULE_VERSION)
-            .setName(FOO_POLICY_NAME)
-            .setRequiredProduct(MULE)
-            .withBundleDescriptorLoader(
-                                        createBundleDescriptorLoader(FOO_POLICY_NAME,
-                                                                     MULE_POLICY_CLASSIFIER,
-                                                                     PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-            .withClassLoaderModelDescriptorLoader(
-                                                  new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
-            .build());
-
-
-    policyFileBuilder.dependingOn(httpPlugin);
-    policyManager.registerPolicyTemplate(policyFileBuilder.getArtifactFile());
-
-    addPackedDomainFromBuilder(domainFileBuilder);
-
-    // deploy app that depends on the domain
-    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
-                                                                                           helloExtensionV1Plugin)
-                                                                                               .dependingOn(domainFileBuilder);
-    addPackedAppFromBuilder(applicationFileBuilder);
-
-    startDeployment();
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
-
-    // apply policy to the application
-    policyManager.addPolicy(applicationFileBuilder.getId(), policyFileBuilder.getArtifactId(),
-                            new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1,
-                                                      singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
-
-    RegionClassLoader appRegionClassLoader = findApp(applicationFileBuilder.getId(), 1).getRegionClassLoader();
-    MuleDeployableArtifactClassLoader policyArtifactClassLoader = null;
-    for (ArtifactClassLoader artifactLoader : appRegionClassLoader.getArtifactPluginClassLoaders()) {
-      if (artifactLoader.getArtifactDescriptor() != null &&
-          FOO_POLICY_NAME.equals(artifactLoader.getArtifactDescriptor().getName())) {
-        policyArtifactClassLoader = (MuleDeployableArtifactClassLoader) artifactLoader;
-      }
-    }
-
-    if (isClassLoaderHierarchyValid(policyArtifactClassLoader)) {
-      ClassLoader policyClassLoader = policyArtifactClassLoader.getParent();
-      ClassLoader newRegionClassLoader = policyClassLoader.getParent();
-
-      if (isPolicyIsolationFullyEnabled(enablePolicyIsolationSystemProperty, separateCLforPolicyIsolationSystemProperty)) {
-        assertThat(newRegionClassLoader instanceof IsolatedPolicyClassLoader, is(true));
-        assertThat(((IsolatedPolicyClassLoader) newRegionClassLoader).getClassLoaderLookupPolicy()
-            .getPackageLookupStrategy("org.mule.extension.http.api"), is(CHILD_FIRST));
-      } else {
-        assertThat(newRegionClassLoader instanceof RegionClassLoader, is(true));
-        assertThat(((RegionClassLoader) newRegionClassLoader).getClassLoaderLookupPolicy()
-            .getPackageLookupStrategy("org.mule.extension.http.api"), is(PARENT_FIRST));
-      }
-    }
-
-    executeApplicationFlow("main");
-    assertThat(invocationCount, equalTo(1));
-  }
-
-  private boolean isClassLoaderHierarchyValid(ClassLoader classLoader) {
-    return classLoader != null && classLoader.getParent() != null && classLoader.getParent().getParent() != null;
-  }
-
-  private boolean isPolicyIsolationFullyEnabled(SystemProperty enablePolicyIsolationSystemProperty,
-                                                SystemProperty separateCLforPolicyIsolationSystemProperty) {
-    return enablePolicyIsolationSystemProperty.getValue().equals("true")
-        && separateCLforPolicyIsolationSystemProperty.getValue().equals("true");
   }
 
   private void doApplicationPolicyExecutionTest(PolicyPointcut pointcut, int expectedPolicyInvocations,
