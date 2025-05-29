@@ -12,12 +12,12 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-module-tracing-parent</artifactId>
-        <version>4.6.18-rc1</version>
+        <version>4.6.18-rc2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mule-tracer-exporter-configuration-api</artifactId>
-    <version>4.6.18-rc1</version>
+    <version>4.6.18-rc2</version>
     <name>Mule Tracer Internal Exporter Configuration Api</name>
     <description>Api for the internal tracer exporter configuration</description>
 
