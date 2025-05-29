@@ -8,13 +8,13 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
@@ -26,10 +26,11 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.junit.MockitoJUnit.rule;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -47,16 +48,18 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import io.qameta.allure.Issue;
 
 @SmallTest
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
 
   private static final String TEST_EXTENSION_NAME = "Test Extension";
@@ -81,23 +84,20 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
           .withParent(MULE_CONNECTIVITY_ERROR)
           .build();
 
-  @Rule
-  public MockitoRule rule = rule().silent();
-
-  @Mock(lenient = true)
+  @Mock
   private ExtensionModel extensionModel;
 
-  @Mock(lenient = true)
+  @Mock
   private OperationModel operationWithError;
 
-  @Mock(lenient = true)
+  @Mock
   private OperationModel operationWithoutErrors;
 
   private final MuleContext muleContext = mockContextWithServices();
   private ErrorTypeRepository typeRepository;
   private ErrorTypeLocator typeLocator;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     XmlDslModel.XmlDslModelBuilder builder = XmlDslModel.builder();
     builder.setPrefix(EXTENSION_PREFIX);
@@ -133,7 +133,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void lookupErrorsForOperation() {
+  void lookupErrorsForOperation() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationWithError, operationWithoutErrors));
 
     doTest();
@@ -141,7 +141,7 @@ public class ExtensionErrorsRegistrantTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("MULE-19293")
-  public void lookupErrorsForOperationFromConfig() {
+  void lookupErrorsForOperationFromConfig() {
     final ConfigurationModel configModel = mock(ConfigurationModel.class);
     when(configModel.getOperationModels()).thenReturn(asList(operationWithError, operationWithoutErrors));
     when(extensionModel.getConfigurationModels()).thenReturn(singletonList(configModel));

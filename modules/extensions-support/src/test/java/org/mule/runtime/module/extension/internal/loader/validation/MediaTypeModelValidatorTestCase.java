@@ -6,17 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
+
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.junit.rules.ExpectedException.none;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -45,55 +52,51 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
-
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public ExpectedException expectedException = none();
 
   private static final String EMPTY = "";
 
   private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModel extensionModel;
 
-  @Mock(lenient = true)
+  @Mock
   private OperationModel operationModel;
 
-  @Mock(lenient = true)
+  @Mock
   private SourceModel sourceModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ExtensionTypeDescriptorModelProperty descriptorModelProperty;
 
-  @Mock(lenient = true)
+  @Mock
   private ExtensionOperationDescriptorModelProperty operationDescriptorModelProperty;
 
-  @Mock(lenient = true)
+  @Mock
   private OutputModel sourceOutputModel;
 
-  @Mock(lenient = true)
+  @Mock
   private OutputModel operationOutputModel;
 
-  @Mock(lenient = true)
+  @Mock
   private MetadataType operationOutputType;
 
-  @Mock(lenient = true)
+  @Mock
   private MetadataType sourceOutputType;
 
   private MediaTypeModelValidator validator = new MediaTypeModelValidator();
 
-  @Before
+  @BeforeEach
   public void before() throws Exception {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
@@ -146,96 +149,92 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void mediaTypeAnnotationMissingOnSourceWithStringOutput() throws Exception {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage("'source' has a String type output but doesn't specify a default mime type.");
+  void mediaTypeAnnotationMissingOnSourceWithStringOutput() throws Exception {
     mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
     when(sourceOutputModel.getType()).thenReturn(toMetadataType(String.class));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(), containsString("'source' has a String type output but doesn't specify a default mime type."));
   }
 
   @Test
-  public void mediaTypeAnnotationMissingOnSourceWithStreamOutput() throws Exception {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage("Source 'source' has a InputStream type output but doesn't specify a default mime type.");
+  void mediaTypeAnnotationMissingOnSourceWithStreamOutput() throws Exception {
     mockExtensionTypeDescriptorModelProperty(TestStreamSource.class);
     when(sourceOutputModel.getType()).thenReturn(toMetadataType(InputStream.class));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Source 'source' has a InputStream type output but doesn't specify a default mime type."));
   }
 
   @Test
-  public void mediaTypeAnnotationMissingOnOperationWithStringOutput() throws Exception {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage("Operation 'operation' has a String type output but doesn't specify a default mime type.");
+  void mediaTypeAnnotationMissingOnOperationWithStringOutput() throws Exception {
     mockExtensionOperationDescriptorModelProperty("returnsString");
     when(operationOutputModel.getType()).thenReturn(toMetadataType(String.class));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Operation 'operation' has a String type output but doesn't specify a default mime type."));
   }
 
   @Test
-  public void mediaTypeAnnotationMissingOnOperationWithStreamOutput() throws Exception {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException
-        .expectMessage("Operation 'operation' has a InputStream type output but doesn't specify a default mime type.");
+  void mediaTypeAnnotationMissingOnOperationWithStreamOutput() throws Exception {
     mockExtensionOperationDescriptorModelProperty("returnsStream");
     when(operationOutputModel.getType()).thenReturn(toMetadataType(InputStream.class));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Operation 'operation' has a InputStream type output but doesn't specify a default mime type."));
   }
 
   @Test
-  public void mediaTypeAnnotationAndStaticResolverOnOperation() throws Exception {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException
-        .expectMessage("Operation 'operation' is declaring both a custom output Type using a Static MetadataResolver, and a custom media type through the @MediaType annotation.");
+  void mediaTypeAnnotationAndStaticResolverOnOperation() throws Exception {
     mockExtensionOperationDescriptorModelProperty("returnsString");
     mockMediaTypeAnnotation(operationModel, "*/*", true);
     when(operationOutputModel.getType()).thenReturn(operationOutputType);
     when(operationOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(of(new CustomDefinedStaticTypeAnnotation()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Operation 'operation' is declaring both a custom output Type using a Static MetadataResolver, and a custom media type through the @MediaType annotation."));
   }
 
   @Test
-  public void mediaTypeAnnotationAndStaticResolverOnSource() throws Exception {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException
-        .expectMessage("Source 'source' is declaring both a custom output Type using a Static MetadataResolver, and a custom media type through the @MediaType annotation.");
+  void mediaTypeAnnotationAndStaticResolverOnSource() throws Exception {
     mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
     mockMediaTypeAnnotation(sourceModel, "*/*", true);
     when(sourceOutputModel.getType()).thenReturn(sourceOutputType);
     when(sourceOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(of(new CustomDefinedStaticTypeAnnotation()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Source 'source' is declaring both a custom output Type using a Static MetadataResolver, and a custom media type through the @MediaType annotation."));
   }
 
   @Test
-  public void mediaTypeAnnotationValueMissingOnOperation() throws Exception {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage("Operation 'operation' has a String type output but doesn't specify a default mime type.");
+  void mediaTypeAnnotationValueMissingOnOperation() throws Exception {
     mockExtensionOperationDescriptorModelProperty("returnsString");
     mockMediaTypeAnnotation(operationModel, EMPTY, false);
     when(operationOutputModel.getType()).thenReturn(operationOutputType);
     when(operationOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(empty());
     when(operationOutputType.getMetadataFormat()).thenReturn(new MetadataFormat("java", "java", "application/java"));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Operation 'operation' has a String type output but doesn't specify a default mime type."));
   }
 
   @Test
-  public void mediaTypeAnnotationValueMissingOnSource() throws Exception {
-    expectedException.expect(IllegalModelDefinitionException.class);
-    expectedException.expectMessage("Source 'source' has a String type output but doesn't specify a default mime type.");
+  void mediaTypeAnnotationValueMissingOnSource() throws Exception {
     mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
     mockMediaTypeAnnotation(sourceModel, EMPTY, false);
     when(sourceOutputModel.getType()).thenReturn(sourceOutputType);
     when(sourceOutputType.getAnnotation(CustomDefinedStaticTypeAnnotation.class))
         .thenReturn(empty());
     when(sourceOutputType.getMetadataFormat()).thenReturn(new MetadataFormat("java", "java", "application/java"));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Source 'source' has a String type output but doesn't specify a default mime type."));
   }
 
   @Test
-  public void mediaTypeAnnotationWithDefaultValueAndStaticResolverOnOperation() throws Exception {
+  void mediaTypeAnnotationWithDefaultValueAndStaticResolverOnOperation() throws Exception {
     mockExtensionOperationDescriptorModelProperty("returnsString");
     mockMediaTypeAnnotation(operationModel, EMPTY, false);
     mockMediaTypeAnnotation(sourceModel, "*/*", false);
@@ -247,7 +246,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void mediaTypeAnnotationWithDefaultValueAndStaticResolverOnSource() throws Exception {
+  void mediaTypeAnnotationWithDefaultValueAndStaticResolverOnSource() throws Exception {
     mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
     mockMediaTypeAnnotation(sourceModel, EMPTY, false);
     mockMediaTypeAnnotation(operationModel, "*/*", false);
@@ -259,7 +258,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void mediaTypeAnnotationAndStaticResolverOnOperationInRuntime() throws Exception {
+  void mediaTypeAnnotationAndStaticResolverOnOperationInRuntime() throws Exception {
     setCompileTime(false);
     mockExtensionOperationDescriptorModelProperty("returnsString");
     mockMediaTypeAnnotation(operationModel, "*/*", false);
@@ -270,7 +269,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void mediaTypeAnnotationAndStaticResolverOnSourceInRuntime() throws Exception {
+  void mediaTypeAnnotationAndStaticResolverOnSourceInRuntime() throws Exception {
     setCompileTime(false);
     mockExtensionTypeDescriptorModelProperty(TestStringSource.class);
     mockMediaTypeAnnotation(sourceModel, "*/*", false);
@@ -281,7 +280,7 @@ public class MediaTypeModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceAndOperationReturnsAnObject() throws Exception {
+  void sourceAndOperationReturnsAnObject() throws Exception {
     mockMediaTypeAnnotation(operationModel, "*/*", false);
     mockMediaTypeAnnotation(sourceModel, "*/*", false);
     validate(extensionModel, validator);

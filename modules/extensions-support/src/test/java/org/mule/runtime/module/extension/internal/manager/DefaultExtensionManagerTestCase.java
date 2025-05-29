@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -31,6 +30,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSupportedJavaVersions;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.stubRegistryKeys;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
 
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
@@ -45,13 +45,17 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.junit.Assert.fail;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.junit.MockitoJUnit.rule;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -95,22 +99,21 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @SmallTest
 @Feature(SDK)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public MockitoRule rule = rule();
 
   private static final String MULESOFT = "MuleSoft";
   private static final String OTHER_VENDOR = "OtherVendor";
@@ -125,13 +128,13 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private static final String EXTENSION1_VERSION = "3.6.0";
   private static final String EXTENSION2_VERSION = "3.6.0";
 
-  @Mock(lenient = true)
+  @Mock
   private ExtensionModel extensionModel1;
 
-  @Mock(lenient = true)
+  @Mock
   private ExtensionModel extensionModel2;
 
-  @Mock(lenient = true)
+  @Mock
   private ExtensionModel extensionModel3WithRepeatedName;
 
   private MuleContext muleContext;
@@ -145,32 +148,32 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
   private ConnectionManagerAdapter connectionManagerAdapter;
 
-  @Mock(lenient = true)
+  @Mock
   private OperationModel extension1OperationModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ExecutionContextAdapter extension1OperationContext;
 
-  @Mock(lenient = true)
+  @Mock
   private ConfigurationProvider extension1ConfigurationProvider;
 
-  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private final ConfigurationInstance extension1ConfigurationInstance = mock(ConfigurationInstance.class);
 
-  @Mock(lenient = true)
+  @Mock
   private CompletableComponentExecutorFactory executorFactory;
 
-  @Mock(lenient = true)
+  @Mock
   private CompletableComponentExecutor executor;
 
-  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private CoreEvent event;
 
   private ClassLoader classLoader;
 
   private final Object configInstance = new Object();
 
-  @Before
+  @BeforeEach
   public void before() throws MuleException {
     muleContext = mockContextWithServices();
     when(muleContext.getArtifactType()).thenReturn(APP);
@@ -252,24 +255,24 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getExtensions() {
+  void getExtensions() {
     testEquals(asList(extensionModel1, extensionModel2), extensionsManager.getExtensions());
   }
 
   @Test
-  public void getExtensionsByName() {
+  void getExtensionsByName() {
     Optional<ExtensionModel> extension = extensionsManager.getExtension(EXTENSION1_NAME);
     assertThat(extension.isPresent(), is(true));
     assertThat(extension.get(), is(sameInstance(extensionModel1)));
   }
 
   @Test
-  public void contextClassLoaderKept() {
+  void contextClassLoaderKept() {
     assertThat(classLoader, sameInstance(Thread.currentThread().getContextClassLoader()));
   }
 
   @Test
-  public void contextClassLoaderKeptAfterException() {
+  void contextClassLoaderKeptAfterException() {
     ExtensionModel extensionModel = mock(ExtensionModel.class);
     when(extensionModel.getName()).thenThrow(new RuntimeException());
     try {
@@ -281,7 +284,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getConfigurationByName() throws Exception {
+  void getConfigurationByName() throws Exception {
     registerConfigurationProvider();
 
     ConfigurationInstance configurationInstance =
@@ -290,7 +293,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getConfigurationThroughImplicitConfiguration() throws Exception {
+  void getConfigurationThroughImplicitConfiguration() throws Exception {
     registerIntoMockContext(muleContext, getImplicitConfigurationProviderName(extensionModel1,
                                                                               extension1ConfigurationModel,
                                                                               muleContext.getArtifactType(), muleContext.getId(),
@@ -310,7 +313,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getOperationExecutorThroughImplicitConfigurationConcurrently() throws Exception {
+  void getOperationExecutorThroughImplicitConfigurationConcurrently() throws Exception {
     final int threadCount = 2;
     final CountDownLatch joinerLatch = new CountDownLatch(threadCount);
 
@@ -339,15 +342,16 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
     assertThat(configurationInstance.get().getValue(), is(sameInstance(configInstance)));
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void getOperationExecutorWithNotImplicitConfig() {
+  @Test
+  void getOperationExecutorWithNotImplicitConfig() {
     makeExtension1ConfigurationNotImplicit();
 
-    extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event);
+    assertThrows(IllegalStateException.class,
+                 () -> extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event));
   }
 
   @Test
-  public void registerTwoExtensionsWithTheSameNameButDifferentVendor() {
+  void registerTwoExtensionsWithTheSameNameButDifferentVendor() {
     registerExtensions(extensionModel2, extensionModel3WithRepeatedName);
     List<ExtensionModel> extensionModels = new ArrayList<>(extensionsManager.getExtensions());
     List<String> extensionNameList =
@@ -361,14 +365,14 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void ignoresRegisteringAlreadyRegisteredExtensions() {
+  void ignoresRegisteringAlreadyRegisteredExtensions() {
     final int registeredExtensionsCount = extensionsManager.getExtensions().size();
     registerExtensions(extensionModel1, extensionModel1, extensionModel1);
     assertThat(extensionsManager.getExtensions(), hasSize(registeredExtensionsCount));
   }
 
   @Test
-  public void enumTransformer() throws Exception {
+  void enumTransformer() throws Exception {
     DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
     initialiseIfNeeded(extensionsManager, true, muleContext);
 
@@ -385,7 +389,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void enumCollectionTransformer() throws Exception {
+  void enumCollectionTransformer() throws Exception {
     DefaultExtensionManager extensionsManager = new DefaultExtensionManager();
     initialiseIfNeeded(extensionsManager, true, muleContext);
 
@@ -401,7 +405,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Test
   @Story(ENFORCE_EXTENSION_JAVA_VERSION)
-  public void resolveJdkValidator() {
+  void resolveJdkValidator() {
     DefaultExtensionManager extensionManager = (DefaultExtensionManager) extensionsManager;
 
     // assert default value

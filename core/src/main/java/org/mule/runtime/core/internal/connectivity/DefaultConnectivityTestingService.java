@@ -33,7 +33,7 @@ import jakarta.inject.Inject;
 /**
  * Default implementation of {@link ConnectivityTestingService}.
  * <p>
- * It searchs for the {@link ConnectivityTestingStrategy} instances registered in mule to find the possible strategies to do
+ * It searches for the {@link ConnectivityTestingStrategy} instances registered in mule to find the possible strategies to do
  * connection testing over mule component instances
  *
  * @since 4.0

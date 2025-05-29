@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -15,11 +15,14 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeAnnotation;
@@ -59,14 +62,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class JavaValueProviderModelValidatorTestCase {
 
   private final JavaTypeLoader loader = new JavaTypeLoader(this.getClass().getClassLoader());
@@ -83,34 +88,34 @@ public class JavaValueProviderModelValidatorTestCase {
 
   private ProblemsReporter problemsReporter;
 
-  @Mock(lenient = true)
+  @Mock
   ExtensionModel extensionModel;
 
-  @Mock(lenient = true)
+  @Mock
   OperationModel operationModel;
 
-  @Mock(lenient = true)
+  @Mock
   ParameterModel operationParameter;
 
-  @Mock(lenient = true)
+  @Mock
   ParameterModel anotherOperationParameter;
 
-  @Mock(lenient = true)
+  @Mock
   ParameterModel configrationParameter;
 
-  @Mock(lenient = true)
+  @Mock
   ConfigurationModel configurationModel;
 
-  @Mock(lenient = true)
+  @Mock
   ParameterGroupModel parameterGroupModel;
 
-  @Mock(lenient = true)
+  @Mock
   ParameterGroupModel configurationParameterGroupModel;
 
   private ValueProviderFactoryModelPropertyBuilder operationParameterBuilder;
   private ValueProviderFactoryModelPropertyBuilder configrationParameterBuilder;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     valueProviderModelValidator = new JavaValueProviderModelValidator();
     problemsReporter = new ProblemsReporter(extensionModel);
@@ -138,7 +143,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void valueProviderShouldBeInstantiable() {
+  void valueProviderShouldBeInstantiable() {
     ValueProviderFactoryModelPropertyBuilder builder =
         ValueProviderFactoryModelProperty.builder(NonInstantiableProvider.class);
     mockParameter(operationParameter, builder, "anotherId");
@@ -148,7 +153,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterShouldExist() {
+  void parameterShouldExist() {
     operationParameterBuilder.withInjectableParameter("someParam", STRING_TYPE, true);
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
@@ -158,7 +163,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterShouldBeOfSametype() {
+  void parameterShouldBeOfSametype() {
     operationParameterBuilder.withInjectableParameter("someName", NUMBER_TYPE, true);
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
@@ -168,7 +173,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void injectConnectionInConnectionLessComponent() throws NoSuchFieldException {
+  void injectConnectionInConnectionLessComponent() throws NoSuchFieldException {
     operationParameterBuilder.withConnection(SomeValueProvider.class.getDeclaredField("connection"));
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
@@ -178,7 +183,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void configurationBasedValueProviderDoesntSupportConnectionInjection() throws NoSuchFieldException {
+  void configurationBasedValueProviderDoesntSupportConnectionInjection() throws NoSuchFieldException {
     configrationParameterBuilder.withConnection(SomeValueProvider.class.getDeclaredField("connection"));
     mockParameter(configrationParameter, configrationParameterBuilder);
     when(configurationModel.getModelProperty(ValueProviderFactoryModelProperty.class))
@@ -189,7 +194,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void configurationBasedValueProviderDoesntSupportConfigurationInjection() throws NoSuchFieldException {
+  void configurationBasedValueProviderDoesntSupportConfigurationInjection() throws NoSuchFieldException {
     configrationParameterBuilder.withConfig(SomeValueProvider.class.getDeclaredField("connection"));
     mockParameter(configrationParameter, configrationParameterBuilder);
     when(configurationModel.getModelProperty(ValueProviderFactoryModelProperty.class))
@@ -200,7 +205,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterWithValueProviderShouldBeOfStringType() {
+  void parameterWithValueProviderShouldBeOfStringType() {
     when(operationParameter.getType()).thenReturn(NUMBER_TYPE);
 
     validate();
@@ -208,7 +213,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterWithValueProviderHasRepeatedIdInCompileTime() {
+  void parameterWithValueProviderHasRepeatedIdInCompileTime() {
     ValueProviderFactoryModelPropertyBuilder builder =
         ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
     mockParameter(operationParameter, builder);
@@ -218,7 +223,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterExists() {
+  void boundParameterExists() {
     operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName");
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
@@ -228,7 +233,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterShouldExist() {
+  void boundParameterShouldExist() {
     operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName");
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
@@ -238,7 +243,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterFromExtractionExpressionExists() {
+  void boundParameterFromExtractionExpressionExists() {
     operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName.someTag.@attribute");
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
@@ -248,7 +253,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterFromExtractionExpressionShouldExist() {
+  void boundParameterFromExtractionExpressionShouldExist() {
     operationParameterBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName.nested.fields");
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(operationParameterBuilder.build()));
@@ -258,7 +263,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterWithValueProviderHasDifferentIdInCompileTime() {
+  void parameterWithValueProviderHasDifferentIdInCompileTime() {
     ValueProviderFactoryModelPropertyBuilder builder =
         ValueProviderFactoryModelProperty.builder(SomeOtherValueProvider.class);
     mockParameter(operationParameter, builder, "anotherId");
@@ -268,7 +273,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterShouldNotBeAnnotatedWithBothOfValuesAndFieldValues() {
+  void parameterShouldNotBeAnnotatedWithBothOfValuesAndFieldValues() {
     ValueProviderFactoryModelPropertyBuilder builder =
         ValueProviderFactoryModelProperty.builder(SomeValueProvider.class);
     mockParameter(operationParameter, builder);
@@ -288,7 +293,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterWithFieldValueProviderDoNotHaveToBeStringType() {
+  void parameterWithFieldValueProviderDoNotHaveToBeStringType() {
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class)).thenReturn(empty());
 
     ValueProviderFactoryModelPropertyBuilder valueProviderFactoryModelPropertyBuilder =
@@ -303,7 +308,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void modelTypeMatchesValueProviderTypeForStringParameter() {
+  void modelTypeMatchesValueProviderTypeForStringParameter() {
     mockAnotherParameter(anotherOperationParameter, STRING_TYPE_WITH_ANNOTATIONS);
     operationParameterBuilder.withInjectableParameter("anotherParameter", OBJECT_TYPE, true);
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
@@ -313,7 +318,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void modelTypeMatchesValueProviderTypeForNumberParameter() {
+  void modelTypeMatchesValueProviderTypeForNumberParameter() {
     mockAnotherParameter(anotherOperationParameter, NUMBER_TYPE_WITH_ANNOTATIONS);
     operationParameterBuilder.withInjectableParameter("anotherParameter", OBJECT_TYPE, true);
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
@@ -323,7 +328,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void modelTypeMatchesValueProviderTypeForObjectParameter() {
+  void modelTypeMatchesValueProviderTypeForObjectParameter() {
     mockAnotherParameter(anotherOperationParameter, OBJECT_TYPE_WITH_ANNOTATIONS);
     operationParameterBuilder.withInjectableParameter("anotherParameter", OBJECT_TYPE, true);
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
@@ -333,7 +338,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void modelTypeMatchesValueProviderTypeForArrayParameter() {
+  void modelTypeMatchesValueProviderTypeForArrayParameter() {
     mockAnotherParameter(anotherOperationParameter, ARRAY_TYPE_WITH_ANNOTATIONS);
     operationParameterBuilder.withInjectableParameter("anotherParameter", OBJECT_TYPE, true);
     when(operationParameter.getModelProperty(ValueProviderFactoryModelProperty.class))
@@ -343,7 +348,7 @@ public class JavaValueProviderModelValidatorTestCase {
   }
 
   @Test
-  public void modelTypeContainsTwoParametersWithTheSameName() {
+  void modelTypeContainsTwoParametersWithTheSameName() {
     ParameterModel clashingParameterMock = mock(ParameterModel.class);
 
     mockParameter(clashingParameterMock, operationParameterBuilder, "anotherValueProviderId", "anotherParameter", OBJECT_TYPE);

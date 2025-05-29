@@ -21,14 +21,17 @@ import static java.util.Optional.of;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -44,21 +47,28 @@ import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.meta.model.construct.ConstructModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
+import org.mule.runtime.api.meta.model.nested.NestedChainModel;
+import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
+import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -101,9 +111,7 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.XMLUnit;
-
 import org.hamcrest.Matcher;
-
 import org.mockito.Mockito;
 
 public final class ExtensionsTestUtils {
@@ -383,7 +391,7 @@ public final class ExtensionsTestUtils {
   public static CursorStreamProviderFactory getDefaultCursorStreamProviderFactory() {
     return new InMemoryCursorStreamProviderFactory(new SimpleByteBufferManager(),
                                                    InMemoryCursorStreamConfig.getDefault(),
-                                                   mock(StreamingManager.class, Mockito.RETURNS_DEEP_STUBS));
+                                                   mock(StreamingManager.class, RETURNS_DEEP_STUBS));
   }
 
   public static void assertType(MetadataType metadataType, Class<?> expectedRawType,
@@ -406,4 +414,32 @@ public final class ExtensionsTestUtils {
         .orElse(null);
   }
 
+  /**
+   * Makes the {@link ComponentModel#accept(ComponentModelVisitor)} method work on the given {@code components} mocks
+   *
+   * @param components an array of mock {@link ComponentModel components}
+   */
+  public static void visitableMock(ComponentModel... components) {
+    for (ComponentModel component : components) {
+      lenient().doAnswer(invocation -> {
+        ComponentModelVisitor visitor = (ComponentModelVisitor) invocation.getArguments()[0];
+        if (component instanceof ConstructModel) {
+          visitor.visit((ConstructModel) component);
+        } else if (component instanceof OperationModel) {
+          visitor.visit((OperationModel) component);
+        } else if (component instanceof SourceModel) {
+          visitor.visit((SourceModel) component);
+        } else if (component instanceof NestedComponentModel) {
+          visitor.visit((NestedComponentModel) component);
+        } else if (component instanceof NestedChainModel) {
+          visitor.visit((NestedChainModel) component);
+        } else if (component instanceof NestedRouteModel) {
+          visitor.visit((NestedRouteModel) component);
+        } else {
+          throw new IllegalArgumentException("Unsupported visitable mock of class " + component.getClass().getName());
+        }
+        return null;
+      }).when(component).accept(Mockito.any(ComponentModelVisitor.class));
+    }
+  }
 }

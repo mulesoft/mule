@@ -6,6 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
+import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -13,23 +26,19 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
-import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mockito.quality.Strictness.LENIENT;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
@@ -63,26 +72,23 @@ import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   private static final String FUNCTION_NAME = "function";
   private static final String CONSTRUCT_NAME = "construct";
@@ -105,25 +111,25 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private static final String REPEATED_NAME = "repeatedName";
   private static final String UNIQUE_PARAM_NAME = "uniqueParam";
 
-  @Mock(lenient = true)
+  @Mock
   private ExtensionModel extensionModel;
 
-  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private ConfigurationModel configurationModel;
 
-  @Mock(lenient = true)
+  @Mock
   private OperationModel operationModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ConnectionProviderModel connectionProviderModel;
 
-  @Mock(lenient = true)
+  @Mock
   private SourceModel sourceModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ConstructModel constructModel;
 
-  @Mock(lenient = true)
+  @Mock
   private FunctionModel functionModel;
 
   private XmlDslModel xmlDslModel = new XmlDslModel();
@@ -156,7 +162,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   private NameClashModelValidator validator = new NameClashModelValidator();
 
-  @Before
+  @BeforeEach
   public void before() {
     when(extensionModel.getName()).thenReturn("extensionName");
     when(extensionModel.getConfigurationModels()).thenReturn(singletonList(configurationModel));
@@ -230,58 +236,54 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   public void operationClashingWithConfig() {
     String clashingName = OPERATION_NAME + CONFIG_SUFFIX;
     when(operationModel.getName()).thenReturn(clashingName);
-    exception.expect(IllegalModelDefinitionException.class);
     when(configurationModel.getName()).thenReturn(clashingName);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void configParameterWithRepeatedName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(TOP_LEVEL_OPERATION_PARAM_NAME, Banana.class);
     mockParameters(configurationModel, simpleConfigParam, topLevelConfigParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void configNameClashesWithOperationParameterType() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, TopLevelConfig.class);
     when(configurationModel.getName()).thenReturn(TopLevelConfig.class.getName());
     mockParameters(operationModel, topLevelConfigParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void connectionProviderTopLevelParameterCrashesWithOperationName() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("contains 2 components 'operation' which it's transformed DSL name is 'operation'.");
     ParameterModel offending = getParameter(OPERATION_NAME, TopLevelTest.class);
     mockParameters(connectionProviderModel, simpleConnectionProviderParam, topLevelConnectionProviderParam, offending);
-    validate();
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate());
+    assertThat(thrown.getMessage(),
+               containsString("contains 2 components 'operation' which it's transformed DSL name is 'operation'."));
   }
 
   @Test
   public void connectionProviderNameClashesWithOperationParameterName() {
     String clashingName = SIMPLE_PARAM_NAME + CONNECTION_PROVIDER_SUFFIX;
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage(format(
-                                   "Extension '%s' has a connection provider named '%s' and an operation named operation with an argument type named equally.",
-                                   extensionModel.getName(), hyphenize(clashingName)));
     ParameterModel offending = getParameter(clashingName, ChildTest.class);
     when(connectionProviderModel.getName()).thenReturn(clashingName);
     when(operationModel.getAllParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
-    validate();
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate());
+    assertThat(thrown.getMessage(),
+               containsString(format(
+                                     "Extension '%s' has a connection provider named '%s' and an operation named operation with an argument type named equally.",
+                                     extensionModel.getName(), hyphenize(clashingName))));
   }
 
   @Test
   public void connectionProviderNameClashesWithOperationParameterType() {
-    exception.expect(IllegalModelDefinitionException.class);
     String clashingName = SIMPLE_PARAM_NAME + CONNECTION_PROVIDER_SUFFIX;
     when(connectionProviderModel.getName()).thenReturn(clashingName);
     ParameterModel offending = getParameter(clashingName, TopLevelTest.class);
     when(operationModel.getAllParameterModels()).thenReturn(asList(topLevelOperationParam, offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -294,68 +296,60 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void configTopLevelParameterCrashesWithConfigName() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(configurationModel.getName()).thenReturn(CONFIG_NAME);
     ParameterModel offending = getParameter(CONFIG_NAME, TopLevelTest.class);
     mockParameters(configurationModel, simpleConfigParam, topLevelConfigParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void connectionProviderTopLevelParameterCrashesWithConfigName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(CONFIG_NAME, TopLevelTest.class);
     mockParameters(connectionProviderModel, simpleConnectionProviderParam, topLevelConnectionProviderParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void operationTopLevelParameterCrashesWithOperationName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(OPERATION_NAME, TopLevelTest.class);
     when(operationModel.getAllParameterModels()).thenReturn(asList(simpleOperationParam, topLevelOperationParam, offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void connectionProviderTopLevelParameterCrashesWithName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(CONNECTION_PROVIDER_NAME, TopLevelTest.class);
     mockParameters(connectionProviderModel, simpleConnectionProviderParam, topLevelConnectionProviderParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void configWithRepeatedParameterName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     mockParameters(configurationModel, simpleConfigParam, topLevelConfigParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void operationWithRepeatedParameterName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     mockParameters(operationModel, simpleConfigParam, topLevelConfigParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void operationNameClashesWithParameterTypeName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(TOP_LEVEL_SINGULAR_PARAM_NAME, TopLevelTest.class);
     when(operationModel.getName()).thenReturn(TopLevelTest.class.getSimpleName());
     mockParameters(operationModel, topLevelOperationParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void connectionProviderWithRepeatedParameterName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     mockParameters(connectionProviderModel, simpleConfigParam, topLevelConfigParam, offending);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -369,17 +363,15 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sourceWithRepeatedParameterNameWithinCallback() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     SourceCallbackModel sourceCallbackModel = mock(SourceCallbackModel.class);
     mockParameters(sourceCallbackModel, simpleConnectionProviderParam, offending);
     when(sourceModel.getErrorCallback()).thenReturn(of(sourceCallbackModel));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void sourceWithRepeatedParameterNameAmongCallbackAndSource() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     SourceCallbackModel sourceCallbackModel = mock(SourceCallbackModel.class);
     mockParameters(sourceCallbackModel, simpleConfigParam);
@@ -392,7 +384,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
                                                        of(sourceCallbackModel), empty(), empty(), false, false, false,
                                                        null, SOURCE, emptySet(), PUBLIC, emptySet(), emptySet(), null);
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -407,21 +399,19 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void mapSingularizeClashOnOperation() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(operationModel.getName()).thenReturn(CHILD_SINGULAR_PARAM_NAME);
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestMap);
     when(operationModel.getAllParameterModels()).thenReturn(asList(offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void mapSingularizeClashOnConnectionProvider() {
-    exception.expect(IllegalModelDefinitionException.class);
     String clashingName = CHILD_PLURAL_PARAM_NAME + CONNECTION_PROVIDER_SUFFIX;
     when(connectionProviderModel.getName()).thenReturn(clashingName);
     ParameterModel offending = getParameter(clashingName, childTestMap);
     when(operationModel.getAllParameterModels()).thenReturn(asList(offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -434,11 +424,10 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void mapSingularizeClashOnTopLevelParameterDifferentType() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestMap);
     ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
     when(operationModel.getAllParameterModels()).thenReturn(asList(singular, offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -451,21 +440,19 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void listSingularizeClashOnOperation() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(operationModel.getName()).thenReturn(CHILD_SINGULAR_PARAM_NAME);
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
     when(operationModel.getAllParameterModels()).thenReturn(asList(offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void listSingularizeClashOnConnectionProvider() {
     String clashingName = CHILD_PLURAL_PARAM_NAME + CONNECTION_PROVIDER_SUFFIX;
-    exception.expect(IllegalModelDefinitionException.class);
     when(connectionProviderModel.getName()).thenReturn(clashingName);
     ParameterModel offending = getParameter(clashingName, childTestList);
     when(operationModel.getAllParameterModels()).thenReturn(asList(offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -478,11 +465,10 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void listSingularizeClashOnTopLevelParameterDifferentType() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
     ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
     when(operationModel.getAllParameterModels()).thenReturn(asList(singular, offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -504,12 +490,11 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void topLevelParameterClashOnSubtypeWithDifferentType() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(TOP_LEVEL_SINGULAR_PARAM_NAME, TopLevelTest.class);
     mockParameters(operationModel, offending);
     when(extensionModel.getSubTypes()).thenReturn(ImmutableSet
         .of(new SubTypesModel(toMetadataType(ChildTest.class), ImmutableSet.of(toMetadataType(TopLevelSubtype.class)))));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -524,8 +509,6 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void differentNamesClashWhenHyphenized() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("contains 2 components 'config-name");
     ConfigurationModel configuration = mock(ConfigurationModel.class);
     mockModelProperties(configuration);
     when(configuration.getName()).thenReturn("config-name");
@@ -534,36 +517,35 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(configuration.getOperationModels()).thenReturn(ImmutableList.of());
     when(configuration.getConnectionProviders()).thenReturn(ImmutableList.of());
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel, configuration));
-    validate();
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate());
+    assertThat(thrown.getMessage(),
+               containsString("contains 2 components 'config-name"));
   }
 
   @Test
   public void contentParametersWithSameNameAndDifferentType() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Object.class);
     when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
     ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
     when(secondParam.getRole()).thenReturn(CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
     when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void contentParametersWithSameNameAndTypeButDifferentRole() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
     when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
     ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, TopLevelTest.class);
     when(secondParam.getRole()).thenReturn(BEHAVIOUR);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
     when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void contentParameterClashWithAttributeParameterWithinSameGroup() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterGroupModel group = mock(ParameterGroupModel.class);
     ParameterModel contentParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Object.class);
     when(contentParam.getRole()).thenReturn(PRIMARY_CONTENT);
@@ -581,13 +563,13 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     when(anotherGroup.getParameterModels()).thenReturn(asList(notContentParam));
 
     when(operationModel.getParameterGroupModels()).thenReturn(asList(group, anotherGroup));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
+  @Test
   public void invalidModelDueToRepeatedParameterWithGroupThatDoesntShowInDsl() {
     mockParameterGroups(operationModel, false);
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -598,38 +580,33 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void repeatedContentParameterNameAndConfiguration() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(configurationModel.getName()).thenReturn(REPEATED_NAME);
     ParameterModel param = getParameter(REPEATED_NAME + CONFIG_SUFFIX, ChildObjectTest.class);
     when(param.getRole()).thenReturn(PRIMARY_CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(param));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void repeatedContentParameterNameAndOperation() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(operationModel.getName()).thenReturn(REPEATED_NAME);
     ParameterModel param = getParameter(REPEATED_NAME, ChildObjectTest.class);
     when(param.getRole()).thenReturn(PRIMARY_CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(param));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void repeatedContentParameterNameAndSource() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(sourceModel.getName()).thenReturn(REPEATED_NAME);
     ParameterModel param = getParameter(REPEATED_NAME, ChildObjectTest.class);
     when(param.getRole()).thenReturn(PRIMARY_CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(param));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void repeatedContentParameterNameAndChildElementSupport() {
-    exception.expect(IllegalModelDefinitionException.class);
-
     OperationModel anotherOperationModel = mock(OperationModel.class);
 
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
@@ -645,12 +622,11 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     mockParameterGroup(operationModel, asList(param));
     mockParameterGroup(anotherOperationModel, asList(anotherParam));
 
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void repeatedChildElementSupportNameAndChildElementSupportDifferentType() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel firstParam = getParameter(UNIQUE_PARAM_NAME + "1", ChildElementTest.class);
     ParameterModel secondParam = getParameter(UNIQUE_PARAM_NAME + "2", ChildElementTestClone.class);
     when(firstParam.getRole()).thenReturn(BEHAVIOUR);
@@ -659,7 +635,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     mockParameterGroup(operationModel, asList(firstParam, secondParam));
 
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -697,7 +673,6 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void repeatedChildElementSupportNameAndChildElementSupportDifferenctTypeDifferentOperation() {
-    exception.expect(IllegalModelDefinitionException.class);
     OperationModel anotherOperationModel = mock(OperationModel.class);
 
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
@@ -713,12 +688,11 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     mockParameterGroup(operationModel, asList(param));
     mockParameterGroup(anotherOperationModel, asList(anotherParam));
 
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void repeatedChildElementSupportAndOperation() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(operationModel.getName()).thenReturn(REPEATED_NAME);
     when(operationModel.getAllParameterModels()).thenReturn(emptyList());
     ParameterModel param = getParameter(UNIQUE_PARAM_NAME, ChildElementTest.class);
@@ -727,12 +701,11 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     mockParameterGroup(constructModel, asList(param));
 
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void repeatedChildElementSupportNameAndSource() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(sourceModel.getName()).thenReturn(REPEATED_NAME);
 
     ParameterModel param = getParameter(UNIQUE_PARAM_NAME, ChildElementTest.class);
@@ -741,25 +714,23 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
     mockParameterGroup(operationModel, asList(param));
 
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void listSingularizeClashOnConstruct() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(constructModel.getName()).thenReturn(CHILD_SINGULAR_PARAM_NAME);
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
     when(constructModel.getAllParameterModels()).thenReturn(asList(offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void mapSingularizeClashOnConstruct() {
-    exception.expect(IllegalModelDefinitionException.class);
     when(constructModel.getName()).thenReturn(CHILD_SINGULAR_PARAM_NAME);
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestMap);
     when(constructModel.getAllParameterModels()).thenReturn(asList(offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -772,21 +743,19 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void listSingularizeClashOnTopLevelParameterDifferentTypeOnConstruct() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel offending = getParameter(CHILD_PLURAL_PARAM_NAME, childTestList);
     ParameterModel singular = getParameter(CHILD_SINGULAR_PARAM_NAME, ChildObjectTest.class);
     when(constructModel.getAllParameterModels()).thenReturn(asList(singular, offending));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void repeatedFunctionNames() {
-    exception.expect(IllegalModelDefinitionException.class);
     FunctionModel anotherFunctionModel = mock(FunctionModel.class);
     when(anotherFunctionModel.getName()).thenReturn(FUNCTION_NAME);
     when(anotherFunctionModel.getAllParameterModels()).thenReturn(emptyList());
     when(extensionModel.getFunctionModels()).thenReturn(asList(functionModel, anotherFunctionModel));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -806,49 +775,44 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void operationNameClashesWithAnotherOperationName() {
-    exception.expect(IllegalModelDefinitionException.class);
     OperationModel anotherOperationModel = mock(OperationModel.class);
     when(anotherOperationModel.getName()).thenReturn(OPERATION_NAME);
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel, anotherOperationModel));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void configurationNameClashesWithAnotherConfigurationName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ConfigurationModel anotherConfigurationModel = mock(ConfigurationModel.class);
     when(anotherConfigurationModel.getName()).thenReturn(CONFIG_NAME);
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel, anotherConfigurationModel));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void sourceNameClashesWithSourceName() {
-    exception.expect(IllegalModelDefinitionException.class);
     SourceModel anotherSourceModel = mock(SourceModel.class);
     when(anotherSourceModel.getName()).thenReturn(SOURCE_NAME);
     when(anotherSourceModel.getErrorCallback()).thenReturn(empty());
     when(anotherSourceModel.getSuccessCallback()).thenReturn(empty());
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel, anotherSourceModel));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void constructNameClashesWithAnotherConstructName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ConstructModel anotherConstructModel = mock(ConstructModel.class);
     when(anotherConstructModel.getName()).thenReturn(CONSTRUCT_NAME);
     when(extensionModel.getConstructModels()).thenReturn(asList(constructModel, anotherConstructModel));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void connectionProviderNameClashesWithAnotherConnectionProviderName() {
-    exception.expect(IllegalModelDefinitionException.class);
     ConnectionProviderModel anotherConnectionProviderModel = mock(ConnectionProviderModel.class);
     when(anotherConnectionProviderModel.getName()).thenReturn(CONNECTION_PROVIDER_NAME);
     when(extensionModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel, anotherConnectionProviderModel));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
@@ -879,26 +843,24 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void contentParametersWithSameNameAndAreNotAssignable() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
     when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
     ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, AnotherPojo.class);
     when(secondParam.getRole()).thenReturn(CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
     when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test
   public void contentParametersWithSameNameAreAssignableButDifferentTypeId() {
-    exception.expect(IllegalModelDefinitionException.class);
     ParameterModel firstParam = getParameter(CHILD_SINGULAR_PARAM_NAME, Pojo.class);
     when(firstParam.getRole()).thenReturn(PRIMARY_CONTENT);
     ParameterModel secondParam = getParameter(CHILD_SINGULAR_PARAM_NAME, ChildPojo.class);
     when(secondParam.getRole()).thenReturn(CONTENT);
     when(operationModel.getAllParameterModels()).thenReturn(asList(firstParam));
     when(sourceModel.getAllParameterModels()).thenReturn(asList(secondParam));
-    validate();
+    assertThrows(IllegalModelDefinitionException.class, () -> validate());
   }
 
   @Test

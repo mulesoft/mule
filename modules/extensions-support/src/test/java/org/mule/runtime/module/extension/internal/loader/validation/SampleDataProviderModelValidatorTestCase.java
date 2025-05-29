@@ -6,25 +6,29 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
+import static org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty.builder;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
+
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
-import static org.mule.runtime.core.api.util.ClassUtils.getMethod;
-import static org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty.builder;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -64,15 +68,17 @@ import java.util.Map;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.hamcrest.Matcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class SampleDataProviderModelValidatorTestCase {
 
   private static Result<String, String> OUTPUT_RESULT;
@@ -84,32 +90,32 @@ public class SampleDataProviderModelValidatorTestCase {
   private JavaSampleDataModelValidator validator;
   private ProblemsReporter problemsReporter;
 
-  @Mock(lenient = true)
+  @Mock
   private ExtensionModel extensionModel;
 
-  @Mock(lenient = true, answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private OperationModel operationModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ParameterModel parameterModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ConfigurationModel configurationModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ParameterGroupModel parameterGroupModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ParameterGroupModel configurationParameterGroupModel;
 
-  @Mock(lenient = true, answer = RETURNS_DEEP_STUBS)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private SourceModel sourceModel;
 
   private SampleDataProviderFactoryModelPropertyBuilder providerBuilder;
 
   private ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  @Before
+  @BeforeEach
   public void setUp() {
     OUTPUT_RESULT = mock(Result.class);
     validator = new JavaSampleDataModelValidator();
@@ -159,13 +165,13 @@ public class SampleDataProviderModelValidatorTestCase {
     mockComponent(sourceModel, builder(ConnectedSampleDataProvider.class), ConfigAwareSampleDataProvider.class.getSimpleName());
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     OUTPUT_RESULT = null;
   }
 
   @Test
-  public void providerShouldBeInstantiable() {
+  void providerShouldBeInstantiable() {
     SampleDataProviderFactoryModelPropertyBuilder builder = builder(NonInstantiableProvider.class);
     mockComponent(operationModel, builder, "anotherId");
 
@@ -174,7 +180,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterShouldExist() {
+  void parameterShouldExist() {
     providerBuilder.withInjectableParameter("someParam", STRING_TYPE, true);
     when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
         .thenReturn(of(providerBuilder.build()));
@@ -186,7 +192,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void parameterShouldBeOfSameType() {
+  void parameterShouldBeOfSameType() {
     providerBuilder.withInjectableParameter("someName", NUMBER_TYPE, true);
     mockOperationProvider();
 
@@ -195,7 +201,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void injectConnectionInConnectionLessComponent() {
+  void injectConnectionInConnectionLessComponent() {
     providerBuilder.withConnection(getField(ConnectedSampleDataProvider.class, "connection", reflectionCache).get());
     when(operationModel.requiresConnection()).thenReturn(false);
     mockOperationProvider();
@@ -205,7 +211,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void injectConfigInConfigLessComponent() {
+  void injectConfigInConfigLessComponent() {
     providerBuilder.withConfig(getField(ConfigAwareSampleDataProvider.class, "config", reflectionCache).get());
     mockOperationProvider();
 
@@ -214,7 +220,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void injectConfigInConfigAwareComponent() {
+  void injectConfigInConfigAwareComponent() {
     providerBuilder.withConfig(getField(ConfigAwareSampleDataProvider.class, "config", reflectionCache).get());
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getOperationModels()).thenReturn(emptyList());
@@ -224,7 +230,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void duplicateProviderId() {
+  void duplicateProviderId() {
     mockOperationProvider();
     String id = ConnectedSampleDataProvider.class.getSimpleName();
     mockComponent(sourceModel, builder(ConfigAwareSampleDataProvider.class), id);
@@ -235,7 +241,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void legalComponent() {
+  void legalComponent() {
     mockOperationProvider();
     mockSourceProvider();
 
@@ -244,35 +250,35 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void operationWithWrongPayloadTypeSampleDataProvider() {
+  void operationWithWrongPayloadTypeSampleDataProvider() {
     assertWrongGenerics(operationModel,
                         MapSampleDataProvider.class,
                         "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] is used at component 'superOperation' which outputs a Result<java.lang.String, java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String, java.lang.String>, java.lang.String>'");
   }
 
   @Test
-  public void operationWithWrongAttributesTypeSampleDataProvider() {
+  void operationWithWrongAttributesTypeSampleDataProvider() {
     assertWrongGenerics(operationModel,
                         MapAttributesSampleDataProvider.class,
                         "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] is used at component 'superOperation' which outputs a Result<java.lang.String, java.lang.String>, but the provider generic signature is '<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>'");
   }
 
   @Test
-  public void sourceWithWrongPayloadTypeSampleDataProvider() {
+  void sourceWithWrongPayloadTypeSampleDataProvider() {
     assertWrongGenerics(sourceModel,
                         MapSampleDataProvider.class,
                         "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapSampleDataProvider] is used at component 'listener' which outputs a Result<java.lang.String, java.lang.String>, but the provider generic signature is '<java.util.Map<java.lang.String, java.lang.String>, java.lang.String>'");
   }
 
   @Test
-  public void sourceWithWrongAttributesTypeSampleDataProvider() {
+  void sourceWithWrongAttributesTypeSampleDataProvider() {
     assertWrongGenerics(sourceModel,
                         MapAttributesSampleDataProvider.class,
                         "SampleDataProvider [org.mule.runtime.module.extension.internal.loader.validation.SampleDataProviderModelValidatorTestCase$MapAttributesSampleDataProvider] is used at component 'listener' which outputs a Result<java.lang.String, java.lang.String>, but the provider generic signature is '<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>'");
   }
 
   @Test
-  public void operationWithBoxedVoidAttributes() {
+  void operationWithBoxedVoidAttributes() {
     mockComponent(operationModel, builder(VoidAttributesSampleDataProvider.class),
                   VoidAttributesSampleDataProvider.class.getSimpleName());
 
@@ -283,7 +289,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void operationWithNativeVoidAttributes() {
+  void operationWithNativeVoidAttributes() {
     mockComponent(operationModel, builder(VoidAttributesSampleDataProvider.class),
                   VoidAttributesSampleDataProvider.class.getSimpleName());
 
@@ -294,7 +300,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void operationWithBoxedVoidReturnType() {
+  void operationWithBoxedVoidReturnType() {
     mockComponent(operationModel, builder(VoidReturnTypeSampleDataProvider.class),
                   VoidAttributesSampleDataProvider.class.getSimpleName());
 
@@ -303,7 +309,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void pagingOperationWithInputStreamPayload() {
+  void pagingOperationWithInputStreamPayload() {
     Method method = getPagedOperationMethod();
     mockInputStreamPaging(method);
 
@@ -315,7 +321,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void pagingOperationWithSampleProviderWhichDoesNotReturnCollection() {
+  void pagingOperationWithSampleProviderWhichDoesNotReturnCollection() {
     Method method = getPagedOperationMethod();
     mockInputStreamPaging(method);
 
@@ -326,7 +332,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void pagingOperationWithSampleProviderWhichReturnsCollectionOfWrongType() {
+  void pagingOperationWithSampleProviderWhichReturnsCollectionOfWrongType() {
     Method method = getPagedOperationMethod();
     mockInputStreamPaging(method);
     mockComponent(operationModel, builder(PagedStringSampleDataProvider.class),
@@ -337,7 +343,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void pagingOperationWithUnboundedSampleProvider() {
+  void pagingOperationWithUnboundedSampleProvider() {
     Method method = getPagedOperationMethod();
     mockInputStreamPaging(method);
 
@@ -349,7 +355,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void pagingOperationWithSampleProviderWhichReturnsAttributesOfWrongType() {
+  void pagingOperationWithSampleProviderWhichReturnsAttributesOfWrongType() {
     Method method = getPagedOperationMethod();
     mockInputStreamPaging(method);
 
@@ -361,7 +367,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void operationSamePayloadTypeUsingGenericsSampleDataProvider() {
+  void operationSamePayloadTypeUsingGenericsSampleDataProvider() {
     mockComponent(operationModel, builder(SampleDataProviderWithGenerics.class),
                   SampleDataProviderWithGenerics.class.getSimpleName());
     ParameterizedType outputType = TypeUtils.parameterize(Map.class, String.class, Object.class);
@@ -373,7 +379,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void operationSamePayloadTypeUsingNestedGenericsSampleDataProvider() {
+  void operationSamePayloadTypeUsingNestedGenericsSampleDataProvider() {
     mockComponent(operationModel, builder(SampleDataProviderWithNestedGenerics.class),
                   SampleDataProviderWithNestedGenerics.class.getSimpleName());
     ParameterizedType listType = TypeUtils.parameterize(List.class, String.class);
@@ -386,7 +392,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void operationSamePayloadTypeUsingWrongGenericsSampleDataProvider() {
+  void operationSamePayloadTypeUsingWrongGenericsSampleDataProvider() {
     mockComponent(operationModel, builder(SampleDataProviderWithGenerics.class),
                   SampleDataProviderWithGenerics.class.getSimpleName());
     ParameterizedType outputType = TypeUtils.parameterize(Map.class, Integer.class, Object.class);
@@ -398,7 +404,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void operationSamePayloadTypeUsingWrongNestedGenericsSampleDataProvider() {
+  void operationSamePayloadTypeUsingWrongNestedGenericsSampleDataProvider() {
     mockComponent(operationModel, builder(SampleDataProviderWithNestedGenerics.class),
                   SampleDataProviderWithNestedGenerics.class.getSimpleName());
     ParameterizedType listType = TypeUtils.parameterize(List.class, Object.class);
@@ -411,7 +417,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterExists() {
+  void boundParameterExists() {
     providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName");
     when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
         .thenReturn(of(providerBuilder.build()));
@@ -423,7 +429,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterShouldExist() {
+  void boundParameterShouldExist() {
     providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName");
     when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
         .thenReturn(of(providerBuilder.build()));
@@ -435,7 +441,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterFromExtractionExpressionExists() {
+  void boundParameterFromExtractionExpressionExists() {
     providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "someName.someTag.@attribute");
     when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
         .thenReturn(of(providerBuilder.build()));
@@ -447,7 +453,7 @@ public class SampleDataProviderModelValidatorTestCase {
   }
 
   @Test
-  public void boundParameterFromExtractionExpressionShouldExist() {
+  void boundParameterFromExtractionExpressionShouldExist() {
     providerBuilder.withInjectableParameter("actingParameter", STRING_TYPE, true, "anotherName.nested.fields");
     when(operationModel.getModelProperty(SampleDataProviderFactoryModelProperty.class))
         .thenReturn(of(providerBuilder.build()));
@@ -687,4 +693,5 @@ public class SampleDataProviderModelValidatorTestCase {
       return null;
     }
   }
+
 }
