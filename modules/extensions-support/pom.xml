@@ -170,13 +170,6 @@
         </dependency>
 
         <!--Test Dependencies-->
-<!--        <dependency>-->
-<!--            <groupId>org.mule.runtime</groupId>-->
-<!--            <artifactId>mule-api</artifactId>-->
-<!--            <version>${muleApiVersion}</version>-->
-<!--            <type>test-jar</type>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-tests</artifactId>
