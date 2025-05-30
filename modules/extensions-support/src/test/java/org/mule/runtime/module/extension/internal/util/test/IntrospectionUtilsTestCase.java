@@ -135,7 +135,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   // This test cannot be migrated to JUnit 5 until https://github.com/google/compile-testing/pull/155
   @ClassRule
-  public CompilationRule compilationRule = new CompilationRule();
+  public static CompilationRule compilationRule = new CompilationRule();
 
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
