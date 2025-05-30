@@ -15,6 +15,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.metadata.message.api.MessageMetadataType;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -37,7 +38,10 @@ import org.mule.runtime.config.internal.context.lazy.LazyComponentInitializerAda
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
+
+import jakarta.inject.Inject;
 
 /**
  * {@link MetadataService} implementation that initialises the required components before doing test connectivity.
@@ -49,14 +53,17 @@ import java.util.function.Supplier;
  */
 public class LazyMetadataService implements MetadataService, Initialisable {
 
-  private final LazyComponentInitializerAdapter lazyMuleArtifactContext;
-  private final Supplier<MetadataService> metadataServiceSupplier;
+  private final Function<Registry, MetadataService> metadataServiceSupplier;
+
+  @Inject
+  private LazyComponentInitializerAdapter lazyMuleArtifactContext;
+
+  @Inject
+  private Registry registry;
 
   private MetadataService metadataService;
 
-  public LazyMetadataService(LazyComponentInitializerAdapter lazyMuleArtifactContext,
-                             Supplier<MetadataService> metadataServiceSupplier) {
-    this.lazyMuleArtifactContext = lazyMuleArtifactContext;
+  public LazyMetadataService(Function<Registry, MetadataService> metadataServiceSupplier) {
     this.metadataServiceSupplier = metadataServiceSupplier;
   }
 
@@ -205,6 +212,6 @@ public class LazyMetadataService implements MetadataService, Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
-    this.metadataService = metadataServiceSupplier.get();
+    this.metadataService = metadataServiceSupplier.apply(registry);
   }
 }

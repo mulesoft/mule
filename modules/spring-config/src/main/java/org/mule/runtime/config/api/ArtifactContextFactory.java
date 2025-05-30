@@ -46,6 +46,7 @@ public interface ArtifactContextFactory extends ConfigurationBuilder {
    *
    * @since 4.7
    */
+  @Deprecated(since = "4.10", forRemoval = true)
   public static ArtifactContextFactory createArtifactContextFactory(ArtifactAst artifactAst,
                                                                     Map<String, String> artifactProperties,
                                                                     ArtifactType artifactType,
@@ -54,12 +55,31 @@ public interface ArtifactContextFactory extends ConfigurationBuilder {
                                                                     List<ServiceConfigurator> serviceConfigurators,
                                                                     Optional<ArtifactContext> parentArtifactContext)
       throws ConfigurationException {
+    return createArtifactContextFactory(artifactAst,
+                                        artifactProperties,
+                                        artifactType,
+                                        enableLazyInit,
+                                        serviceConfigurators,
+                                        parentArtifactContext);
+  }
+
+  /**
+   * Creates a new {@link ArtifactContextFactory} based on the given ArtifactctAst and its creation parameters.
+   *
+   * @since 4.10
+   */
+  public static ArtifactContextFactory createArtifactContextFactory(ArtifactAst artifactAst,
+                                                                    Map<String, String> artifactProperties,
+                                                                    ArtifactType artifactType,
+                                                                    boolean enableLazyInit,
+                                                                    List<ServiceConfigurator> serviceConfigurators,
+                                                                    Optional<ArtifactContext> parentArtifactContext)
+      throws ConfigurationException {
     ArtifactAstConfigurationBuilder configurationBuilder =
         new ArtifactAstConfigurationBuilder(artifactAst,
                                             artifactProperties,
                                             artifactType,
                                             enableLazyInit,
-                                            addToolingObjectsToRegistry,
                                             createComponentBuildingDefinitionRegistry(artifactAst));
 
     parentArtifactContext

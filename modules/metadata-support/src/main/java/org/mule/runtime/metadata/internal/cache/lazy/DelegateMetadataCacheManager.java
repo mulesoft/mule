@@ -6,25 +6,32 @@
  */
 package org.mule.runtime.metadata.internal.cache.lazy;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
+
+import jakarta.inject.Inject;
 
 public class DelegateMetadataCacheManager implements MetadataCacheManager, Initialisable {
 
-  private final Supplier<MetadataCacheManager> metadataCacheManagerSupplier;
+  private final Function<Registry, MetadataCacheManager> metadataCacheManagerSupplier;
+
+  @Inject
+  private Registry registry;
+
   private MetadataCacheManager metadataCacheManagerDelegate;
 
-  public DelegateMetadataCacheManager(Supplier<MetadataCacheManager> metadataCacheManagerSupplier) {
+  public DelegateMetadataCacheManager(Function<Registry, MetadataCacheManager> metadataCacheManagerSupplier) {
     this.metadataCacheManagerSupplier = metadataCacheManagerSupplier;
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    this.metadataCacheManagerDelegate = metadataCacheManagerSupplier.get();
+    this.metadataCacheManagerDelegate = metadataCacheManagerSupplier.apply(registry);
   }
 
   @Override

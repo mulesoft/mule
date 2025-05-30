@@ -488,7 +488,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
         new MuleArtifactContext(mockMuleContext, emptyArtifact(), empty(),
                                 new BaseConfigurationComponentLocator(),
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                emptyMap(), false, APP,
+                                emptyMap(), APP,
                                 new ComponentBuildingDefinitionRegistry(),
                                 mock(MemoryManagementService.class),
                                 mock(FeatureFlaggingService.class),

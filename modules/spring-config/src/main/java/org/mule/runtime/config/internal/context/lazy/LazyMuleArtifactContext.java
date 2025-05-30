@@ -29,7 +29,6 @@ import static java.lang.ThreadLocal.withInitial;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
-import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
@@ -37,7 +36,6 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -151,7 +149,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  ContributedErrorTypeRepository errorTypeRepository,
                                  ContributedErrorTypeLocator errorTypeLocator,
                                  Map<String, String> artifactProperties,
-                                 boolean addToolingObjectsToRegistry,
                                  ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
                                  LockFactory runtimeLockFactory,
@@ -162,7 +159,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       throws BeansException {
     super(muleContext, artifactAst, parentConfigurationProperties,
           baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
-          artifactProperties, addToolingObjectsToRegistry,
+          artifactProperties,
           artifactType, componentBuildingDefinitionRegistry, memoryManagementService,
           featureFlaggingService, expressionLanguageMetadataService);
 
@@ -190,7 +187,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
     return new LazySpringMuleContextServiceConfigurator(this,
                                                         artifactProperties,
-                                                        isAddToolingObjectsToRegistry(),
                                                         runtimeLockFactory,
                                                         getMuleContext(),
                                                         getCoreFunctionsProvider(),

@@ -8,6 +8,9 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.APP_NAME_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.DOMAIN_HOME_DIRECTORY_PROPERTY;
@@ -425,6 +428,11 @@ public class ArtifactContextBuilder {
     for (Map.Entry<Object, Object> entry : deploymentProperties.entrySet()) {
       mergedProperties.put(entry.getKey().toString(), entry.getValue().toString());
     }
+
+    mergedProperties.put(MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY, "" + addToolingObjectsToRegistry);
+    mergedProperties.put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "" + enableLazyInit);
+    mergedProperties.put(MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY,
+                         "" + !disableXmlValidations);
 
     return mergedProperties;
   }

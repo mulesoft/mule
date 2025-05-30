@@ -240,6 +240,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.connectivity to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       spring.beans;
   exports org.mule.runtime.core.internal.connector to
       com.mulesoft.mule.runtime.cluster;
@@ -418,6 +419,7 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.store to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
@@ -540,6 +542,7 @@ module org.mule.runtime.core {
       com.mulesoft.anypoint.gw.core;
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       spring.beans;
   exports org.mule.runtime.core.internal.value.cache to
       org.mule.runtime.metadata.support,
