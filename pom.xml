@@ -180,7 +180,7 @@
         <muleAnnotationsApiVersion>1.8.6</muleAnnotationsApiVersion>
         <mule.module.maven.plugin.version>1.9.6</mule.module.maven.plugin.version>
         <mule.extensions.maven.plugin.version>1.9.6-rc4</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.9.6-rc4</mule.app.plugins.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.9.6</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
