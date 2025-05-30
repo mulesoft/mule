@@ -21,7 +21,7 @@ public class SdkApiForwardCompatibilityTestCase extends AbstractExtensionFunctio
 
   @Override
   protected String getConfigFile() {
-    return "sdk/sdk-api-classloading-mule-config-flow.xml";
+    return "sdk/sdk-api-forward-compatibility-mule-config-flow.xml";
   }
 
   @Test
