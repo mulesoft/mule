@@ -260,6 +260,8 @@ public class MuleContextUtils {
       throw new RuntimeException(e);
     }
 
+    when(muleContext.getExecutionClassLoader()).thenReturn(MuleContextUtils.class.getClassLoader());
+
     return muleContext;
   }
 

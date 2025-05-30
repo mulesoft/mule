@@ -6,19 +6,25 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+
+import static org.springframework.core.ResolvableType.forType;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
-import static org.springframework.core.ResolvableType.forType;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.message.Message;
@@ -43,14 +49,17 @@ import java.util.List;
 import java.util.Optional;
 
 import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
@@ -65,7 +74,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   private OperationReturnTypeModelValidator validator = new OperationReturnTypeModelValidator();
   private ClassTypeLoader typeLoader = new DefaultExtensionsTypeLoaderFactory().createTypeLoader();
 
-  @Before
+  @BeforeEach
   public void before() {
     ExtensionOperationDescriptorModelProperty modelProperty = new ExtensionOperationDescriptorModelProperty(operationElement);
 
@@ -79,43 +88,43 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   }
 
   @Test
-  public void valid() {
+  void valid() {
     validate(extensionModel, validator);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void resultWithoutGenerics() {
-    when(operationElement.getReturnType()).thenReturn(new TypeWrapper(forType(new TypeToken<Result>() {}.getType()), typeLoader));
     validate(extensionModel, validator);
   }
 
   @Test
-  public void resultWithGenerics() {
+  void resultWithoutGenerics() {
+    when(operationElement.getReturnType()).thenReturn(new TypeWrapper(forType(new TypeToken<Result>() {}.getType()), typeLoader));
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+  }
+
+  @Test
+  void resultWithGenerics() {
     when(operationElement.getReturnType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<Result<?, ?>>() {}.getType()), typeLoader));
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void resultListWithoutGenerics() {
+  @Test
+  void resultListWithoutGenerics() {
     when(operationElement.getReturnType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<List<Result>>() {}.getType()), typeLoader));
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void completionCallbackWithoutGenerics() {
+  @Test
+  void completionCallbackWithoutGenerics() {
     when(operationElement.getReturnType()).thenReturn(new TypeWrapper(forType(new TypeToken<Void>() {}.getType()), typeLoader));
     ExtensionParameter completionCallbackParam = mock(ExtensionParameter.class);
     when(completionCallbackParam.getType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<CompletionCallback>() {}.getType()), typeLoader));
     when(operationElement.getParameters()).thenReturn(singletonList(completionCallbackParam));
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
   @Test
-  public void completionCallbackWithInvalidGenerics() {
+  void completionCallbackWithInvalidGenerics() {
     when(operationElement.getReturnType()).thenReturn(new TypeWrapper(forType(new TypeToken<Void>() {}.getType()), typeLoader));
     ExtensionParameter completionCallbackParam = mock(ExtensionParameter.class);
     when(completionCallbackParam.getType())
@@ -126,7 +135,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   }
 
   @Test
-  public void resultWithInvalidGenerics() {
+  void resultWithInvalidGenerics() {
     when(operationElement.getReturnType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<Result<Void, String>>() {}.getType()), typeLoader));
     ProblemsReporter problemsReporter = validate(extensionModel, validator);
@@ -134,25 +143,25 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   }
 
   @Test
-  public void resultCollectionWithInvalidGenerics() {
+  void resultCollectionWithInvalidGenerics() {
     when(operationElement.getReturnType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<List<Result<Void, String>>>() {}.getType()), typeLoader));
     ProblemsReporter problemsReporter = validate(extensionModel, validator);
     assertThat(problemsReporter.getWarnings(), hasSize(1));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void muleEventReturnType() {
+  @Test
+  void muleEventReturnType() {
     when(operationElement.getReturnType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<CoreEvent>() {}.getType()), typeLoader));
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void muleMessageReturnType() {
+  @Test
+  void muleMessageReturnType() {
     when(operationElement.getReturnType())
         .thenReturn(new TypeWrapper(forType(new TypeToken<Message>() {}.getType()), typeLoader));
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
 }

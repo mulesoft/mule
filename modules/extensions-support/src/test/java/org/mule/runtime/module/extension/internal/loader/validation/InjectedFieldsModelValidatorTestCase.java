@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-import static java.util.Arrays.asList;
-import static java.util.Optional.of;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
-
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
@@ -21,6 +13,18 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
+
+import static java.util.Arrays.asList;
+import static java.util.Optional.of;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -45,20 +49,22 @@ import org.mule.sdk.api.annotation.param.RuntimeVersion;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
 
-  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModel extensionModel;
 
-  @Mock(lenient = true)
+  @Mock
   private OperationModel operationModel;
 
   @Mock
@@ -75,7 +81,7 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
 
   private InjectedFieldsModelValidator validator = new InjectedFieldsModelValidator();
 
-  @Before
+  @BeforeEach
   public void before() {
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
     when(extensionModel.getName()).thenReturn("dummyExtension");
@@ -87,38 +93,38 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void singleEncodingOperationArgument() {
+  void singleEncodingOperationArgument() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     withMethod(operationModel, "singleEncoding");
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void encodingOperationArgumentWrongType() {
+  @Test
+  void encodingOperationArgumentWrongType() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     withMethod(operationModel, "encodingWrongType");
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedEncodingOperationArgument() {
+  @Test
+  void repeatedEncodingOperationArgument() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     withMethod(operationModel, "repeatedEncoding");
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedEncodingOperationArgumentObjectFields() {
+  @Test
+  void repeatedEncodingOperationArgumentObjectFields() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     withMethod(operationModel, "argumentWithRepeatedEncodingFields");
     ParameterModel parameterModel = mock(ParameterModel.class, withSettings().lenient());
     when(parameterModel.getType()).thenReturn(toMetadataType(RepeatedEncoding.class));
     mockParameters(operationModel, parameterModel);
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedEncodingPojoField() {
+  @Test
+  void repeatedEncodingPojoField() {
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     when(sourceModel.getSuccessCallback()).thenReturn(java.util.Optional.empty());
     when(sourceModel.getErrorCallback()).thenReturn(java.util.Optional.empty());
@@ -127,29 +133,29 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     mockParameters(sourceModel, parameterModel);
 
     mockImplementingType(sourceModel, SourceRepeatedEncoding.class);
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedEncodingSourceField() {
+  @Test
+  void repeatedEncodingSourceField() {
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     when(sourceModel.getSuccessCallback()).thenReturn(java.util.Optional.empty());
     when(sourceModel.getErrorCallback()).thenReturn(java.util.Optional.empty());
 
     mockImplementingType(sourceModel, SourceRepeatedEncoding.class);
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedEncodingConfigField() {
-    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
-    mockImplementingType(configurationModel, ConfigRepeatedEncoding.class);
-
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
   @Test
-  public void legacyApiConfigRef() {
+  void repeatedEncodingConfigField() {
+    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
+    mockImplementingType(configurationModel, ConfigRepeatedEncoding.class);
+
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+  }
+
+  @Test
+  void legacyApiConfigRef() {
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     mockImplementingType(configurationModel, ConfigLegacyApiRefName.class);
 
@@ -157,31 +163,31 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sdkApiConfigRef() {
+  void sdkApiConfigRef() {
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     mockImplementingType(configurationModel, ConfigSdkApiRefName.class);
 
     validate(extensionModel, validator);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedRefNameConfigField() {
+  @Test
+  void repeatedRefNameConfigField() {
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     mockImplementingType(configurationModel, ConfigRepeatedRefName.class);
 
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void encodingConfigFieldWrongType() {
+  @Test
+  void encodingConfigFieldWrongType() {
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     mockImplementingType(configurationModel, ConfigEncodingWrongType.class);
 
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedRuntimeVersionPojoField() {
+  @Test
+  void repeatedRuntimeVersionPojoField() {
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     when(sourceModel.getSuccessCallback()).thenReturn(java.util.Optional.empty());
     when(sourceModel.getErrorCallback()).thenReturn(java.util.Optional.empty());
@@ -190,33 +196,33 @@ public class InjectedFieldsModelValidatorTestCase extends AbstractMuleTestCase {
     mockParameters(sourceModel, parameterModel);
 
     mockImplementingType(sourceModel, SourceRepeatedEncoding.class);
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedRuntimeVersionConfigField() {
+  @Test
+  void repeatedRuntimeVersionConfigField() {
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     mockImplementingType(configurationModel, RepeatedRuntimeVersion.class);
 
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void repeatedRuntimeVersionSourceField() {
+  @Test
+  void repeatedRuntimeVersionSourceField() {
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
     when(sourceModel.getSuccessCallback()).thenReturn(java.util.Optional.empty());
     when(sourceModel.getErrorCallback()).thenReturn(java.util.Optional.empty());
 
     mockImplementingType(sourceModel, SourceRepeatedRuntimeVersion.class);
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void runtimeVersionConfigFieldWrongType() {
+  @Test
+  void runtimeVersionConfigFieldWrongType() {
     when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
     mockImplementingType(configurationModel, ConfigRuntimeVersionWrongType.class);
 
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
 

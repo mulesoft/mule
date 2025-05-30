@@ -6,20 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.resources.manifest;
 
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getApiMethods;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -47,13 +50,16 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.reflect.TypeToken;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class ExportedPackagesCollectorTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -70,7 +76,7 @@ public class ExportedPackagesCollectorTestCase extends AbstractMuleTestCase {
 
   private ExportedPackagesCollector collector;
 
-  @Before
+  @BeforeEach
   public void setup() {
     ClassLoaderModelProperty classLoaderModelProperty = new ClassLoaderModelProperty(getClass().getClassLoader());
     when(extensionModel.getModelProperty(ClassLoaderModelProperty.class)).thenReturn(of(classLoaderModelProperty));
@@ -99,7 +105,7 @@ public class ExportedPackagesCollectorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void collect() {
+  void collect() {
     Set<String> exportedPackages = collector.getExportedPackages();
     assertThat(exportedPackages, hasSize(6));
     assertThat(exportedPackages,
@@ -107,7 +113,7 @@ public class ExportedPackagesCollectorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void collectFromModelProperty() {
+  void collectFromModelProperty() {
     when(extensionModel.getModelProperty(ExportedClassNamesModelProperty.class))
         .thenReturn(of(new ExportedClassNamesModelProperty(singleton(FruitConsistency.class.getName()))));
 
