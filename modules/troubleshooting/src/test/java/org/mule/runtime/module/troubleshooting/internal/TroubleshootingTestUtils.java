@@ -28,6 +28,7 @@ import static org.mockito.Mockito.withSettings;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.core.api.alert.MuleAlertingSupport;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.EventContextService;
@@ -62,6 +63,7 @@ public final class TroubleshootingTestUtils {
 
     Registry registry = mock(Registry.class);
     when(registry.lookupByName(EventContextService.REGISTRY_KEY)).thenReturn(of(eventContextService));
+    when(registry.lookupByType(MuleAlertingSupport.class)).thenReturn(of(mock(MuleAlertingSupport.class)));
 
     ArtifactContext artifactContext = mock(ArtifactContext.class);
     when(artifactContext.getRegistry()).thenReturn(registry);
