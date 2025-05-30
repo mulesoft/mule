@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension.source;
+package org.mule.test.module.extension.metadata;
 
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
@@ -23,17 +23,15 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import org.junit.Test;
-
 import org.hamcrest.Matcher;
+import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @Features({@Feature(SOURCES), @Feature(SDK_TOOLING_SUPPORT)})
 @Stories({@Story(POLLING), @Story(METADATA_SERVICE)})
@@ -60,7 +58,7 @@ public class LazyPollingSourceTestCase extends AbstractExtensionFunctionalTestCa
 
   @Override
   protected String getConfigFile() {
-    return "source/polling-source-config-without-scheduling-strategy.xml";
+    return "metadata/polling-source-config-without-scheduling-strategy.xml";
   }
 
   @Test

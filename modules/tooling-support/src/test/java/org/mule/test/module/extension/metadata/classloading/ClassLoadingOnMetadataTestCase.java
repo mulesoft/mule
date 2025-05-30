@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension.classloading;
+package org.mule.test.module.extension.metadata.classloading;
 
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.tck.util.TestConnectivityUtils.disableAutomaticTestConnectivity;
