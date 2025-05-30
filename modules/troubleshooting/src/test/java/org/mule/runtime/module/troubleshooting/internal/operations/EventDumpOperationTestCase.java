@@ -56,8 +56,14 @@ public class EventDumpOperationTestCase {
 
   @BeforeEach
   public void setup() {
-    FlowStackEntry flowStackEntry = mockFlowStackEntry();
-    Application app1 = mockApplication("app1", flowStackEntry);
+    FlowStackEntry flowStackEntry = mockFlowStackEntry("001");
+    Application app1 = mockApplication("app1",
+                                       // shufled to ensure sorting
+                                       mockFlowStackEntry("001_z", flowStackEntry),
+                                       // an envent context withput hierarchy
+                                       mockFlowStackEntry("abc"),
+                                       mockFlowStackEntry("001_1", flowStackEntry),
+                                       flowStackEntry);
     Application app2 = mockApplication("app2");
     deploymentService = mockDeploymentService(app1, app2);
     eventDumpOperation = new EventDumpOperation(deploymentService);
@@ -88,11 +94,28 @@ public class EventDumpOperationTestCase {
         Active Events for application 'app1'
         ------------------------------------
 
-        "EventId", running for: 00:00.000, state: EXECUTING
+        Total Event Contexts:      4
+        Total Root Contexts:       2
+
+        "001" hierarchy
+
+            "001_1", running for: 00:00.000, state: EXECUTING
+                at ns:component@MockLocation(null) 66 ms
+
+            "001_z", running for: 00:00.000, state: EXECUTING
+                at ns:component@MockLocation(null) 66 ms
+
+        "001", running for: 00:00.000, state: EXECUTING
+            at ns:component@MockLocation(null) 66 ms
+
+        "abc", running for: 00:00.000, state: EXECUTING
             at ns:component@MockLocation(null) 66 ms
 
         Active Events for application 'app2'
         ------------------------------------
+
+        Total Event Contexts:      0
+        Total Root Contexts:       0
 
         """;
     assertThat(result, is(equalTo(expected)));
@@ -105,7 +128,21 @@ public class EventDumpOperationTestCase {
     String result = writer.toString();
 
     var expected = """
-        "EventId", running for: 00:00.000, state: EXECUTING
+        Total Event Contexts:      4
+        Total Root Contexts:       2
+
+        "001" hierarchy
+
+            "001_1", running for: 00:00.000, state: EXECUTING
+                at ns:component@MockLocation(null) 66 ms
+
+            "001_z", running for: 00:00.000, state: EXECUTING
+                at ns:component@MockLocation(null) 66 ms
+
+        "001", running for: 00:00.000, state: EXECUTING
+            at ns:component@MockLocation(null) 66 ms
+
+        "abc", running for: 00:00.000, state: EXECUTING
             at ns:component@MockLocation(null) 66 ms
 
         """;

@@ -69,6 +69,11 @@ public interface EventContextService {
     String getServerId();
 
     /**
+     * @return the id of the parent event the {@link FlowCallStack} belongs to. {@code null} if this is the root context.
+     */
+    String getParentEventId();
+
+    /**
      * @return the id of the event the {@link FlowCallStack} belongs to.
      */
     String getEventId();
