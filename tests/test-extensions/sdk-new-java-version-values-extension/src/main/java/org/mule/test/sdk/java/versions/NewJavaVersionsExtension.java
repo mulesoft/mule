@@ -11,13 +11,11 @@ import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_1000;
 
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.sdk.api.annotation.JavaVersionSupport;
 
 @Extension(name = "New Java versions")
 @JavaVersionSupport({JAVA_17, JAVA_21, JAVA_1000})
 @Xml(prefix = "new-java-versions")
-@Operations(NewJavaVersionsTestOperations.class)
 public class NewJavaVersionsExtension {
 }
