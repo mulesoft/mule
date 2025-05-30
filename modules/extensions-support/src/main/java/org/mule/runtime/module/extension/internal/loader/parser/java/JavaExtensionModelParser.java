@@ -174,15 +174,16 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
             .getResourceAsStream(annotatedClass.getName().replace(".", "/") + ".class"));
 
         List<JavaVersion> javaVersions = new ArrayList<>();
-        reader.accept(new ClassVisitor(ASM5) {
+        int asmVersion = ASM5;
+        reader.accept(new ClassVisitor(asmVersion) {
 
           @Override
           public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
-            return new AnnotationVisitor(ASM5) {
+            return new AnnotationVisitor(asmVersion) {
 
               @Override
               public AnnotationVisitor visitArray(String name) {
-                return new AnnotationVisitor(ASM5) {
+                return new AnnotationVisitor(asmVersion) {
 
                   @Override
                   public void visitEnum(String name, String desc, String value) {
