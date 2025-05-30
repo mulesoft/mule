@@ -6,19 +6,6 @@
  */
 package org.mule.test.module.extension;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.hamcrest.collection.IsMapContaining.hasKey;
-import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
@@ -34,6 +21,23 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.MELEE_WEAPON;
+
+import static java.lang.String.format;
+
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -85,12 +89,12 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   private static final String VICTIM = "Skyler";
   private static final String EMPTY_STRING = "";
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
-
   @Override
   protected String[] getConfigFiles() {
-    return new String[] {"heisenberg-operation-config.xml", "vegan-config.xml", "static-metadata-execution.xml"};
+    return new String[] {
+        "operations/heisenberg-operation-config.xml",
+        "operations/vegan-config.xml",
+        "operations/static-metadata-execution.xml"};
   }
 
   @Override
@@ -270,8 +274,8 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
   @Test
   public void operationWithRequiredParameterButNullReturningExpression() throws Exception {
     // This cannot be validated at the AST because the exception results of a provided expression evaluating to null
-    expectedException.expect(hasRootCause(instanceOf(IllegalArgumentException.class)));
-    runFlow("knockWithNullDoor");
+    var thrown = assertThrows(Exception.class, () -> runFlow("knockWithNullDoor"));
+    assertThat(thrown, hasRootCause(instanceOf(IllegalArgumentException.class)));
   }
 
   @Test
@@ -314,17 +318,15 @@ public class OperationExecutionTestCase extends AbstractExtensionFunctionalTestC
 
   @Test
   public void extensionWithExceptionEnricher() throws Throwable {
-    expectedException.expect(ConnectionException.class);
-    expectedException.expectMessage(is(ENRICHED_MESSAGE + CALL_GUS_MESSAGE));
-    runFlowAndThrowCause("callGus");
+    var thrown = assertThrows(ConnectionException.class, () -> runFlowAndThrowCause("callGus"));
+    assertThat(thrown.getMessage(), is(ENRICHED_MESSAGE + CALL_GUS_MESSAGE));
   }
 
   @Test
   public void operationWithExceptionEnricher() throws Throwable {
-    expectedException.expect(HeisenbergException.class);
-    expectedException.expectCause(is(instanceOf(HealthException.class)));
-    expectedException.expectMessage(containsString(CURE_CANCER_MESSAGE));
-    runFlowAndThrowCause("cureCancer");
+    var thrown = assertThrows(HeisenbergException.class, () -> runFlowAndThrowCause("cureCancer"));
+    assertThat(thrown.getCause(), is(instanceOf(HealthException.class)));
+    assertThat(thrown.getMessage(), containsString(CURE_CANCER_MESSAGE));
   }
 
   private void runFlowAndThrowCause(String callGus) throws Throwable {

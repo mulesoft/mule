@@ -17,6 +17,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,7 +25,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
-import static org.junit.rules.ExpectedException.none;
+
+import static org.junit.Assert.assertThrows;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
@@ -50,22 +52,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jakarta.inject.Inject;
-
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
+import jakarta.inject.Inject;
 
 @Feature(EXTENSIONS_CLIENT)
 public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigTestCase {
-
-  @Rule
-  public ExpectedException exception = none();
 
   protected static final String HEISENBERG_EXT_NAME = HEISENBERG;
   protected static final String HEISENBERG_CONFIG = "heisenberg";
@@ -93,7 +89,9 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
 
   @Override
   protected String[] getConfigFiles() {
-    return new String[] {"vegan-config.xml", "heisenberg-config.xml"};
+    return new String[] {
+        "operations/vegan-config.xml",
+        "operations/heisenberg-config.xml"};
   }
 
   protected abstract <T, A> Result<T, A> doExecute(String extension, String operation, Optional<String> configName,
@@ -237,43 +235,40 @@ public abstract class ExtensionsClientTestCase extends AbstractHeisenbergConfigT
   @Test
   @Description("Executes an operation that fails using the client and checks the threw exception")
   public void executeFailureOperation() throws Throwable {
-    exception.expect(MuleException.class);
-    exception.expectCause(instanceOf(ConnectionException.class));
-    exception.expectMessage("You are not allowed to speak with gus.");
-    doExecute(HEISENBERG_EXT_NAME, "callGusFring", HEISENBERG_CONFIG, emptyMap());
+    var thrown =
+        assertThrows(MuleException.class, () -> doExecute(HEISENBERG_EXT_NAME, "callGusFring", HEISENBERG_CONFIG, emptyMap()));
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), containsString("You are not allowed to speak with gus."));
   }
 
   @Test
   @Description("Executes an operation that fails using the client and checks the threw exception")
   public void executeFailureNonBlockingOperation() throws Throwable {
-    exception.expect(MuleException.class);
-    exception.expectCause(instanceOf(ConnectionException.class));
-    exception.expectMessage("You are not allowed to speak with gus.");
-    doExecute(HEISENBERG_EXT_NAME, "callGusFringNonBlocking", HEISENBERG_CONFIG, emptyMap());
+    var thrown = assertThrows(MuleException.class,
+                              () -> doExecute(HEISENBERG_EXT_NAME, "callGusFringNonBlocking", HEISENBERG_CONFIG, emptyMap()));
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), containsString("You are not allowed to speak with gus."));
   }
 
   @Test
   @Description("Tries to execute an operation from an extension that does not exist")
   public void nonExistentExtension() throws Throwable {
-    exception.expect(MuleRuntimeException.class);
-    exception.expectMessage("No Extension [no-exist] Found");
-    doExecute("no-exist", "operation", "config", emptyMap());
+    var thrown = assertThrows(MuleRuntimeException.class, () -> doExecute("no-exist", "operation", "config", emptyMap()));
+    assertThat(thrown.getMessage(), containsString("No Extension [no-exist] Found"));
   }
 
   @Test
   @Description("Tries to execute an operation that does not exist")
   public void nonExistentOperation() throws Throwable {
-    exception.expect(MuleRuntimeException.class);
-    exception.expectMessage("No Operation [operationDontExist] Found");
-    doExecute(VEGAN, "operationDontExist", "config", emptyMap());
+    var thrown = assertThrows(MuleRuntimeException.class, () -> doExecute(VEGAN, "operationDontExist", "config", emptyMap()));
+    assertThat(thrown.getMessage(), containsString("No Operation [operationDontExist] Found"));
   }
 
   @Test
   @Description("Tries to execute an operation with a configuration that does not exist")
   public void nonExistentConfiguration() throws Throwable {
-    exception.expect(MuleRuntimeException.class);
-    exception.expectMessage("No configuration [configDontExist] found");
-    doExecute(VEGAN, "applyPolicy", "configDontExist", emptyMap());
+    var thrown = assertThrows(MuleRuntimeException.class, () -> doExecute(VEGAN, "applyPolicy", "configDontExist", emptyMap()));
+    assertThat(thrown.getMessage(), containsString("No configuration [configDontExist] found"));
   }
 
   @Test

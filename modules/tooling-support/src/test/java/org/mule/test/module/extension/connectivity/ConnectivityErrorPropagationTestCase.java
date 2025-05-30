@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension;
+package org.mule.test.module.extension.connectivity;
 
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
@@ -20,21 +20,21 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.sdk.api.exception.ModuleException;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.util.TestConnectivityUtils;
+import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.some.extension.CustomConnectionException;
 
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.hamcrest.Matcher;
 
 public class ConnectivityErrorPropagationTestCase extends AbstractExtensionFunctionalTestCase {
 
   private TestConnectivityUtils utils;
 
   @Rule
-  public SystemProperty rule = TestConnectivityUtils.disableAutomaticTestConnectivity();
+  public SystemProperty rule = disableAutomaticTestConnectivity();
 
   @Before
   public void setUp() {
@@ -48,7 +48,7 @@ public class ConnectivityErrorPropagationTestCase extends AbstractExtensionFunct
 
   @Override
   protected String getConfigFile() {
-    return "connectivity-error-propagation-config.xml";
+    return "connectivity/connectivity-error-propagation-config.xml";
   }
 
   @Override

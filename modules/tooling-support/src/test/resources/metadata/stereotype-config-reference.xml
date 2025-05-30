@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
+
+
+    <marvel:dr-strange-config name="drStrange" ironManConfig="ironCat">
+        <marvel:missile-connection>
+            <reconnection failsDeployment="true"/>
+        </marvel:missile-connection>
+    </marvel:dr-strange-config>
+
+    <marvel:iron-man-config name="ironCat"/>
+
+    <flow name="matchingOperationFlow" initialState="stopped">
+        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain"
+                             nextOperationReference="theNextOperation"
+                             listenerId="matchingOperationFlow"/>
+        <marvel:with-flow-reference flowRef="referencedFlow" name="theNextOperation"/>
+    </flow>
+
+
+    <flow name="referencedFlow">
+        <marvel:with-flow-reference flowRef="referencedFlow" name="otherOperation"/>
+    </flow>
+
+
+    <flow name="operationMismatch" initialState="stopped">
+        <marvel:bytes-caster config-ref="drStrange" castFrequencyInMillis="5000" spell="dormammu i've come to bargain"
+                             nextOperationReference="theNextOperation"
+                             listenerId="operationMismatch"/>
+        <marvel:with-flow-reference flowRef="referencedFlow" name="otherOperation"/>
+    </flow>
+
+
+    <flow name="nonReferencedFlow">
+        <marvel:with-flow-reference flowRef="differentFlow" name="otherOperation"/>
+    </flow>
+
+
+</mule>

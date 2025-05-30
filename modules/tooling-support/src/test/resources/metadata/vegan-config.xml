@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vegan="http://www.mulesoft.org/schema/mule/vegan"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/vegan http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd">
+
+
+    <vegan:apple-config name="apple">
+        <vegan:cook-book>
+            <vegan:vegan-cook-book/>
+        </vegan:cook-book>
+    </vegan:apple-config>
+    <vegan:banana-config name="banana"/>
+    <vegan:kiwi-config name="kiwi"/>
+    <vegan:peach-config name="peach">
+        <vegan:connection/>
+    </vegan:peach-config>
+
+    <flow name="appleOk">
+        <vegan:eat-apple config-ref="apple"/>
+    </flow>
+
+    <flow name="bananaOk">
+        <vegan:eat-banana config-ref="banana"/>
+    </flow>
+
+    <flow name="kiwiOk">
+        <vegan:eat-kiwi config-ref="kiwi"/>
+    </flow>
+
+    <flow name="peachOk">
+        <vegan:harvest-peaches config-ref="peach"/>
+        <logger/>
+    </flow>
+
+    <flow name="appleSourceOk">
+        <vegan:harvest-apples config-ref="apple"/>
+        <logger/>
+    </flow>
+
+    <flow name="eatComplexListOfMaps">
+        <vegan:try-to-eat-this-list-of-maps>
+            <vegan:foods>
+                #[payload]
+            </vegan:foods>
+        </vegan:try-to-eat-this-list-of-maps>
+    </flow>
+
+</mule>

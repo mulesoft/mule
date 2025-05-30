@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.extension.config;
+package org.mule.test.module.extension.metadata.config;
 
 import static org.mule.runtime.api.component.location.Location.builder;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
@@ -20,14 +20,13 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @RunnerDelegateTo(Parameterized.class)
 @Feature(SDK_TOOLING_SUPPORT)
@@ -44,8 +43,8 @@ public class StereotypedConfigReferenceTestCase extends AbstractExtensionFunctio
   @Parameterized.Parameters(name = "{0}")
   public static String[] params() {
     return new String[] {
-        "stereotype-config-reference.xml",
-        "stereotype-config-reference-inverse.xml"
+        "metadata/stereotype-config-reference.xml",
+        "metadata/stereotype-config-reference-inverse.xml"
     };
   }
 

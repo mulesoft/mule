@@ -17,7 +17,7 @@ public class SourceWithoutConnectedOperationTestCase extends AbstractExtensionFu
 
   @Override
   protected String getConfigFile() {
-    return "vegan-config.xml";
+    return "operations/vegan-config.xml";
   }
 
   @Override

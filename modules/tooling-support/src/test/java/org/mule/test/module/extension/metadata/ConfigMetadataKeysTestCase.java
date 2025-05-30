@@ -24,12 +24,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.inject.Inject;
-
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import jakarta.inject.Inject;
 
 @Feature(SDK_TOOLING_SUPPORT)
 @Story(METADATA_SERVICE)
@@ -40,7 +39,7 @@ public class ConfigMetadataKeysTestCase extends AbstractExtensionFunctionalTestC
 
   @Override
   protected String getConfigFile() {
-    return "vegan-config.xml";
+    return "metadata/vegan-config.xml";
   }
 
   @Override

@@ -14,6 +14,7 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -37,13 +38,11 @@ import org.mule.test.module.extension.AbstractHeisenbergConfigTestCase;
 
 import java.util.List;
 
-import jakarta.inject.Inject;
-
 import org.junit.Test;
-
 import org.mockito.ArgumentCaptor;
 
 import io.qameta.allure.Feature;
+import jakarta.inject.Inject;
 
 @Feature(EXTENSIONS_CLIENT)
 public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeisenbergConfigTestCase {
@@ -60,7 +59,7 @@ public class ExtensionClientStreamingConfigurationTestCase extends AbstractHeise
 
   @Override
   protected String[] getConfigFiles() {
-    return new String[] {"heisenberg-config.xml"};
+    return new String[] {"operations/heisenberg-config.xml"};
   }
 
   @Override
