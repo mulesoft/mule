@@ -23,6 +23,7 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallb
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationException;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
+import org.mule.runtime.module.troubleshooting.internal.operations.AlertFuseboardOperation;
 import org.mule.runtime.module.troubleshooting.internal.operations.BasicInfoOperation;
 import org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation;
 import org.mule.runtime.module.troubleshooting.internal.operations.ThreadDumpOperation;
@@ -44,6 +45,7 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
   public DefaultTroubleshootingService(DeploymentService deploymentService) {
     registerOperation(new BasicInfoOperation());
     registerOperation(new EventDumpOperation(deploymentService));
+    registerOperation(new AlertFuseboardOperation(deploymentService));
     registerOperation(new ThreadDumpOperation());
   }
 
