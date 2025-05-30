@@ -69,9 +69,9 @@ public final class TroubleshootingTestUtils {
     return mockApp;
   }
 
-  public static FlowStackEntry mockFlowStackEntry() {
+  public static FlowStackEntry mockFlowStackEntry(String eventId) {
     FlowStackEntry mockEntry = mock(FlowStackEntry.class, withSettings().name("<FlowStackEntry>"));
-    when(mockEntry.getEventId()).thenReturn("EventId");
+    when(mockEntry.getEventId()).thenReturn(eventId);
     when(mockEntry.getServerId()).thenReturn("ServerId");
     when(mockEntry.getState()).thenReturn(EXECUTING);
 
@@ -95,5 +95,12 @@ public final class TroubleshootingTestUtils {
       when(mockEntry.getFlowCallStack()).thenReturn(flowCallStack);
       return mockEntry;
     }
+  }
+
+  public static FlowStackEntry mockFlowStackEntry(String eventId, FlowStackEntry parent) {
+    FlowStackEntry mockEntry = mockFlowStackEntry(eventId);
+    final var parentEventId = parent.getEventId();
+    when(mockEntry.getParentEventId()).thenReturn(parentEventId);
+    return mockEntry;
   }
 }

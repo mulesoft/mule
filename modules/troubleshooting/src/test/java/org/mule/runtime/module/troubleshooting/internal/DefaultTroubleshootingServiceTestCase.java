@@ -44,7 +44,7 @@ public class DefaultTroubleshootingServiceTestCase {
 
   @BeforeEach
   public void setUp() {
-    FlowStackEntry flowStackEntry = mockFlowStackEntry();
+    FlowStackEntry flowStackEntry = mockFlowStackEntry("001");
     Application app1 = mockApplication("app1", flowStackEntry);
     Application app2 = mockApplication("app2");
     DeploymentService deploymentService = mockDeploymentService(app1, app2);

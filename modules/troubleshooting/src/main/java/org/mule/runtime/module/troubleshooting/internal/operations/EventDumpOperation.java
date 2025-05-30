@@ -27,6 +27,11 @@ import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingOp
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Operation used to collect an event dump.
@@ -98,15 +103,93 @@ public class EventDumpOperation implements TroubleshootingOperation {
                                                                application.getArtifactName())));
 
     final var currentlyActiveFlowStacks = eventContextService.getCurrentlyActiveFlowStacks();
+    final var roots = hierarchicalEvents(currentlyActiveFlowStacks);
 
-    for (FlowStackEntry fs : currentlyActiveFlowStacks) {
-      writer.write(format("\"%s\", running for: %s, state: %s%n%s",
-                          fs.getEventId(),
-                          formatDuration(fs.getExecutingTime().toMillis(), "mm:ss.SSS"),
-                          fs.getState().name(),
-                          flowCallStackString(fs.getFlowCallStack()).indent(4)));
-      writer.write(lineSeparator());
+    writer.write(format(""
+        + "Total Event Contexts: %6d%n"
+        + "Total Root Contexts:  %6d%n"
+        + "%n",
+                        currentlyActiveFlowStacks.size(),
+                        roots.size()));
+
+    for (NestedEventsNode rootFlowStackNode : roots) {
+      if (rootFlowStackNode.getDirectChidren().isEmpty()) {
+        writer.write(formatFlowStack(rootFlowStackNode.getFlowStack()));
+        writer.write(lineSeparator());
+      } else {
+        writer.write(format("\"%s\" hierarchy%n%n", rootFlowStackNode.getEventId()));
+        writeHierarchy(writer, rootFlowStackNode, 0);
+      }
     }
+  }
+
+  private static Collection<NestedEventsNode> hierarchicalEvents(final List<FlowStackEntry> currentlyActiveFlowStacks) {
+    // use treesets to ensure consistent sorting in the report
+
+    var nodesById = new TreeMap<String, NestedEventsNode>();
+    for (FlowStackEntry fs : currentlyActiveFlowStacks) {
+      final NestedEventsNode node = new NestedEventsNode(fs.getEventId(), fs);
+      nodesById.put(fs.getEventId(), node);
+    }
+
+    var roots = new TreeMap<String, NestedEventsNode>();
+    for (Entry<String, NestedEventsNode> node : nodesById.entrySet()) {
+      final var parentEventId = node.getValue().getFlowStack().getParentEventId();
+      if (parentEventId != null) {
+        nodesById.get(parentEventId).addDirectChild(node.getValue());
+      } else {
+        roots.put(node.getKey(), node.getValue());
+      }
+    }
+    return roots.values();
+  }
+
+  private static void writeHierarchy(Writer writer, NestedEventsNode node, int identIndex) throws IOException {
+    for (NestedEventsNode childNode : node.getDirectChidren()) {
+      writeHierarchy(writer, childNode, identIndex + 4);
+    }
+
+    writer.write(formatFlowStack(node.getFlowStack()).indent(identIndex));
+    writer.write(lineSeparator());
+  }
+
+  private static class NestedEventsNode {
+
+    private final String eventId;
+
+    private final FlowStackEntry flowStack;
+
+    private SortedMap<String, NestedEventsNode> directChildren = new TreeMap<>();
+
+    public NestedEventsNode(String eventId, FlowStackEntry flowStack) {
+      this.eventId = eventId;
+      this.flowStack = flowStack;
+    }
+
+    public String getEventId() {
+      return eventId;
+    }
+
+    public FlowStackEntry getFlowStack() {
+      return flowStack;
+    }
+
+    public void addDirectChild(NestedEventsNode child) {
+      directChildren.put(child.getEventId(), child);
+    }
+
+    public Collection<NestedEventsNode> getDirectChidren() {
+      return directChildren.values();
+    }
+
+  }
+
+  private static String formatFlowStack(FlowStackEntry fs) throws IOException {
+    return format("\"%s\", running for: %s, state: %s%n%s",
+                  fs.getEventId(),
+                  formatDuration(fs.getExecutingTime().toMillis(), "mm:ss.SSS"),
+                  fs.getState().name(),
+                  flowCallStackString(fs.getFlowCallStack()).indent(4));
   }
 
   // put this logic here so the current representation of stacks that is logged is not modified.
