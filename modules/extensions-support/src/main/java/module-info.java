@@ -107,7 +107,8 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.spring.config,
       org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.module.extension.internal.data.sample to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.loader to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.mule.support,

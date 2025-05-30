@@ -23,7 +23,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 
-import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,6 +70,8 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+import org.junit.Before;
+import org.mockito.Mock;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -81,12 +82,6 @@ import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.ResolvableType;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
-import org.mockito.Mock;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Story;
@@ -94,9 +89,6 @@ import io.qameta.allure.Story;
 @Features({@Feature(LAZY_INITIALIZATION), @Feature(CONFIGURATION_COMPONENT_LOCATOR)})
 @Story(COMPONENT_LIFE_CYCLE)
 public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDslModelTestCase {
-
-  @Rule
-  public final ExpectedException expectedException = none();
 
   protected LazyMuleArtifactContext lazyMuleArtifactContext;
 
@@ -204,7 +196,7 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
                                     empty(),
                                     new BaseConfigurationComponentLocator(),
                                     new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                    emptyMap(), false, APP, empty(), lockFactory,
+                                    emptyMap(), APP, empty(), lockFactory,
                                     componentBuildingDefinitionRegistry,
                                     mock(MemoryManagementService.class),
                                     mock(FeatureFlaggingService.class),

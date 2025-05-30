@@ -18,6 +18,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -27,7 +28,7 @@ import org.mule.runtime.config.internal.context.lazy.LazyComponentInitializerAda
 import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -45,17 +46,19 @@ import jakarta.inject.Named;
 public class LazyValueProviderService implements ValueProviderService, Initialisable {
 
   public static final String NON_LAZY_VALUE_PROVIDER_SERVICE = "_muleNonLazyValueProviderService";
-  private final Supplier<ValueProviderService> valueProviderServiceSupplier;
+  private final Function<Registry, ValueProviderService> valueProviderServiceSupplier;
 
-  private final LazyComponentInitializerAdapter lazyComponentInitializer;
+  @Inject
+  private LazyComponentInitializerAdapter lazyComponentInitializer;
 
   @Inject
   @Named(NON_LAZY_VALUE_PROVIDER_SERVICE)
   private ValueProviderService providerService;
 
-  public LazyValueProviderService(LazyComponentInitializerAdapter lazyComponentInitializer,
-                                  Supplier<ValueProviderService> valueProviderServiceSupplier) {
-    this.lazyComponentInitializer = lazyComponentInitializer;
+  @Inject
+  private Registry registry;
+
+  public LazyValueProviderService(Function<Registry, ValueProviderService> valueProviderServiceSupplier) {
     this.valueProviderServiceSupplier = valueProviderServiceSupplier;
   }
 
@@ -103,6 +106,6 @@ public class LazyValueProviderService implements ValueProviderService, Initialis
 
   @Override
   public void initialise() throws InitialisationException {
-    this.providerService = valueProviderServiceSupplier.get();
+    this.providerService = valueProviderServiceSupplier.apply(registry);
   }
 }

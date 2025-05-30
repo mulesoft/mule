@@ -20,7 +20,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import static org.junit.Assert.fail;
+
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -56,11 +58,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
 import org.mockito.ArgumentCaptor;
 
 import io.qameta.allure.Issue;
-
 import jakarta.inject.Inject;
 
 public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCase {
@@ -151,7 +151,7 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
                                                                                 boolean lazyInit)
       throws IOException {
     return withContextClassLoader(new URLClassLoader(new URL[] {basePath.toURI().toURL()}, null),
-                                  () -> new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, lazyInit, false,
+                                  () -> new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, lazyInit,
                                                                             mock(ComponentBuildingDefinitionRegistry.class)));
   }
 

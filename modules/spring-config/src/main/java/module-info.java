@@ -96,6 +96,8 @@ module org.mule.runtime.spring.config {
       org.mule.runtime.deployment.model.impl;
   exports org.mule.runtime.config.internal.bean to
       spring.beans;
+  exports org.mule.runtime.config.internal.bean.lazy to
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.config.internal.context to
       org.mule.runtime.deployment,
       spring.beans;

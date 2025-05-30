@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.metadata.internal.cache.lazy;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -14,20 +15,26 @@ import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.metadata.api.locator.ComponentLocator;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
+
+import jakarta.inject.Inject;
 
 public class DelegateMetadataCacheIdGeneratorFactory implements MetadataCacheIdGeneratorFactory<ComponentAst>, Initialisable {
 
-  private final Supplier<MetadataCacheIdGeneratorFactory<ComponentAst>> metadataCacheIdGeneratorFactorySupplier;
+  private final Function<Registry, MetadataCacheIdGeneratorFactory<ComponentAst>> metadataCacheIdGeneratorFactorySupplier;
+
+  @Inject
+  private Registry registry;
+
   private MetadataCacheIdGeneratorFactory<ComponentAst> metadataCacheIdGeneratorFactoryDelegate;
 
-  public DelegateMetadataCacheIdGeneratorFactory(Supplier<MetadataCacheIdGeneratorFactory<ComponentAst>> metadataCacheIdGeneratorFactorySupplier) {
+  public DelegateMetadataCacheIdGeneratorFactory(Function<Registry, MetadataCacheIdGeneratorFactory<ComponentAst>> metadataCacheIdGeneratorFactorySupplier) {
     this.metadataCacheIdGeneratorFactorySupplier = metadataCacheIdGeneratorFactorySupplier;
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    this.metadataCacheIdGeneratorFactoryDelegate = metadataCacheIdGeneratorFactorySupplier.get();
+    this.metadataCacheIdGeneratorFactoryDelegate = metadataCacheIdGeneratorFactorySupplier.apply(registry);
   }
 
   @Override
