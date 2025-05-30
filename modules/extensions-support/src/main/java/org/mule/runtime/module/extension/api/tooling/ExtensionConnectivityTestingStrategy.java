@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.api.tooling;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 
 import static java.lang.String.format;
 
@@ -20,7 +21,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -64,7 +64,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
   public ConnectionValidationResult testConnectivity(Object connectivityTestingObject) {
     CoreEvent initialiserEvent = null;
     try {
-      initialiserEvent = NullEventFactory.getNullEvent();
+      initialiserEvent = getNullEvent();
       if (connectivityTestingObject instanceof ConnectionProviderResolver) {
         ConnectionProviderResolver<?> resolver = (ConnectionProviderResolver<?>) connectivityTestingObject;
         try (ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent, expressionManager).build()) {

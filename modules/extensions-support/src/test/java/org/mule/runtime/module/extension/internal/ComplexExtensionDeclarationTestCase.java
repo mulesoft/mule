@@ -10,6 +10,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
 import static org.mule.test.module.extension.internal.util.extension.TestHttpConnectorDeclarer.EXTENSION_DESCRIPTION;
 import static org.mule.test.module.extension.internal.util.extension.TestHttpConnectorDeclarer.EXTENSION_NAME;
@@ -46,7 +47,6 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionDeclarationTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.module.extension.internal.util.extension.TestHttpConnectorDeclarer;
@@ -76,7 +76,7 @@ public class ComplexExtensionDeclarationTestCase extends AbstractJavaExtensionDe
       protected void declareExtension(ExtensionLoadingContext context) {
         new TestHttpConnectorDeclarer().declareOn(context.getExtensionDeclarer());
       }
-    }.loadExtensionModel(ExtensionModelLoadingRequest.builder(getClass().getClassLoader(), getDefault(emptySet())).build());
+    }.loadExtensionModel(builder(getClass().getClassLoader(), getDefault(emptySet())).build());
   }
 
   @Test
