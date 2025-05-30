@@ -6,21 +6,24 @@
  */
 package org.mule.runtime.module.launcher.splash;
 
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-import static java.nio.charset.Charset.defaultCharset;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.sort;
-import static java.util.stream.Collectors.toMap;
-import static org.apache.commons.io.IOUtils.lineIterator;
-import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.ARTIFACT_PATCHES_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getArtifactPatchesLibFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
+
+import static java.lang.String.format;
+import static java.lang.System.getProperties;
+import static java.lang.System.getProperty;
+import static java.nio.charset.Charset.defaultCharset;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.sort;
+import static java.util.stream.Collectors.toMap;
+
+import static org.apache.commons.io.IOUtils.lineIterator;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.NetworkUtils;
@@ -147,13 +150,13 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
 
   private void listMuleSystemProperties() {
     Map<String, String> muleProperties = new HashMap<>();
-    System.getProperties().stringPropertyNames().stream().filter(property -> property.startsWith(SYSTEM_PROPERTY_PREFIX))
+    getProperties().stringPropertyNames().stream().filter(property -> property.startsWith(SYSTEM_PROPERTY_PREFIX))
         .forEach(property -> muleProperties.put(property, getProperty(property)));
     listItems(muleProperties, "Mule system properties:");
   }
 
   private void listJavaSystemProperties() {
     listItems(Stream.of("java.vendor", "java.vm.name", "java.home")
-        .collect(toMap(String::toString, propertyName -> getProperty(propertyName))), "JDK properties:");
+        .collect(toMap(String::toString, System::getProperty)), "JDK properties:");
   }
 }

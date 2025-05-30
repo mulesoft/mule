@@ -9,9 +9,11 @@ package org.mule.runtime.module.troubleshooting.internal;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
+
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
@@ -52,13 +54,13 @@ public final class TroubleshootingTestUtils {
   }
 
   public static FlowStackEntry mockFlowStackEntry() {
-    FlowStackEntry mockEntry = mock(FlowStackEntry.class);
+    FlowStackEntry mockEntry = mock(FlowStackEntry.class, withSettings().name("<FlowStackEntry>"));
     when(mockEntry.getEventId()).thenReturn("EventId");
     when(mockEntry.getServerId()).thenReturn("ServerId");
 
     FlowStackElement flowStackElement = new FlowStackElement("MockFlow", "MockLocation");
 
-    FlowCallStack flowCallStack = mock(FlowCallStack.class);
+    FlowCallStack flowCallStack = mock(FlowCallStack.class, withSettings().name("<FlowCallStack>"));
     when(flowCallStack.getElements()).thenReturn(singletonList(flowStackElement));
 
     when(mockEntry.getFlowCallStack()).thenReturn(flowCallStack);

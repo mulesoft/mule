@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.troubleshooting.internal;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperation;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback;
@@ -39,6 +41,6 @@ public class TestTroubleshootingOperation implements TroubleshootingOperation {
 
   @Override
   public TroubleshootingOperationCallback getCallback() {
-    return (args) -> String.format("%s with these arguments: %s", TEST_OPERATION_DESCRIPTION, args);
+    return (args, writer) -> writer.write(format("%s with these arguments: %s", TEST_OPERATION_DESCRIPTION, args));
   }
 }

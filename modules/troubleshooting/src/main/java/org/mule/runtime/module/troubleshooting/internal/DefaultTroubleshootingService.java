@@ -7,6 +7,14 @@
 package org.mule.runtime.module.troubleshooting.internal;
 
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.time.ZonedDateTime.now;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.leftPad;
+import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
@@ -15,19 +23,25 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallb
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationException;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
+import org.mule.runtime.module.troubleshooting.internal.operations.BasicInfoOperation;
 import org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class DefaultTroubleshootingService implements TroubleshootingService {
 
   private final Map<String, TroubleshootingOperationDefinition> definitionsByName = new HashMap<>();
-  private final Map<String, TroubleshootingOperationCallback> callbacksByName = new HashMap<>();
+  private final Map<String, TroubleshootingOperationCallback> callbacksByName = new LinkedHashMap<>();
 
   public DefaultTroubleshootingService(DeploymentService deploymentService) {
+    registerOperation(new BasicInfoOperation());
     registerOperation(new EventDumpOperation(deploymentService));
   }
 
@@ -53,9 +67,48 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
   }
 
   @Override
-  public Object executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException {
-    TroubleshootingOperationCallback callback = getCallback(name, arguments);
-    return callback.execute(arguments);
+  public String executeAllOperations(Map<String, String> arguments) throws TroubleshootingOperationException {
+    final var writer = new StringWriter();
+    writeHeader(writer);
+
+    for (Entry<String, TroubleshootingOperationCallback> callbackEntry : callbacksByName.entrySet()) {
+      doExecuteOperation(callbackEntry.getKey(), arguments, callbackEntry.getValue(), writer);
+    }
+    return writer.toString();
+  }
+
+  @Override
+  public String executeOperation(String name, Map<String, String> arguments) throws TroubleshootingOperationException {
+    final var writer = new StringWriter();
+    writeHeader(writer);
+
+    doExecuteOperation(name, arguments, getCallback(name, arguments), writer);
+    return writer.toString();
+  }
+
+  private void writeHeader(final StringWriter writer) {
+    writer.write("Mule Runtime supportability information" + lineSeparator());
+    writer.write(lineSeparator());
+    writer.write("  Generated at " + now().format(ISO_DATE_TIME) + lineSeparator());
+    writer.write(lineSeparator());
+  }
+
+  private void doExecuteOperation(String name, Map<String, String> arguments, TroubleshootingOperationCallback callback,
+                                  final StringWriter writer)
+      throws TroubleshootingOperationException {
+    final var niceName = capitalize(join(splitByCharacterTypeCamelCase(name), ' '));
+    writer.write(niceName + lineSeparator());
+    writer.write(leftPad("", niceName.length(), "=") + lineSeparator());
+    writer.write(lineSeparator());
+
+    try {
+      callback.execute(arguments, writer);
+    } catch (IOException e) {
+      throw new TroubleshootingOperationException("Exception executing troubleshooting operation '" + name + ":(" + arguments
+          + ")'", e);
+    }
+
+    writer.write(lineSeparator());
   }
 
   private TroubleshootingOperationCallback getCallback(String operationName, Map<String, String> receivedArguments)
