@@ -5,7 +5,7 @@
     <parent>
         <artifactId>mule-modules</artifactId>
         <groupId>org.mule.runtime</groupId>
-        <version>4.6.18-rc2</version>
+        <version>4.6.18</version>
     </parent>
     <artifactId>mule-module-tanuki-boot</artifactId>
     <packaging>jar</packaging>
