@@ -12,16 +12,14 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATIST
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.emptyMap;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoExtend;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
-import org.mule.runtime.core.internal.management.stats.PilotFlowsSummaryStatistics;
+import org.mule.runtime.core.internal.management.stats.FlowsSummaryStatisticsV2;
 import org.mule.runtime.metrics.api.MeterProvider;
 
 import java.util.Collection;
@@ -40,7 +38,7 @@ public class AllStatistics {
   private final ApplicationStatistics appStats;
   private final FlowsSummaryStatistics flowSummaryStatistics;
   // TODO W-18668900: swap and remove once the pilot is concluded
-  private final FlowsSummaryStatistics flowSummaryStatisticsPilot;
+  private final FlowsSummaryStatistics flowSummaryStatisticsV2;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
   private ArtifactMeterProvider meterProvider;
 
@@ -51,7 +49,7 @@ public class AllStatistics {
     clear();
     appStats = new ApplicationStatistics(this);
     flowSummaryStatistics = new DefaultFlowsSummaryStatistics(isStatisticsEnabled);
-    flowSummaryStatisticsPilot = new PilotFlowsSummaryStatistics(isStatisticsEnabled);
+    flowSummaryStatisticsV2 = new FlowsSummaryStatisticsV2(isStatisticsEnabled);
     appStats.setEnabled(isStatisticsEnabled);
     add(appStats);
   }
@@ -137,8 +135,8 @@ public class AllStatistics {
   @Experimental
   @Deprecated
   // TODO W-18668900: swap and remove once the pilot is concluded
-  public FlowsSummaryStatistics getFlowSummaryStatisticsPilot() {
-    return flowSummaryStatisticsPilot;
+  public FlowsSummaryStatistics getFlowSummaryStatisticsV2() {
+    return flowSummaryStatisticsV2;
   }
 
   /**
@@ -174,7 +172,7 @@ public class AllStatistics {
   public void trackUsingMeterProvider(MeterProvider meterProvider, String artifactId) {
     this.meterProvider = new ArtifactMeterProvider(meterProvider, artifactId);
     this.flowSummaryStatistics.trackUsingMeterProvider(this.meterProvider);
-    this.flowSummaryStatisticsPilot.trackUsingMeterProvider(this.meterProvider);
+    this.flowSummaryStatisticsV2.trackUsingMeterProvider(this.meterProvider);
     this.flowConstructStats.values()
         .forEach(flowConstructStatsValue -> flowConstructStatsValue.trackUsingMeterProvider(this.meterProvider));
   }

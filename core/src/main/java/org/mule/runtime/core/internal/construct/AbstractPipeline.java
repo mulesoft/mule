@@ -136,7 +136,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final int maxConcurrency;
   private final DefaultFlowsSummaryStatistics flowsSummaryStatistics;
   // TODO W-18668900: swap and remove once the pilot is concluded
-  private final DefaultFlowsSummaryStatistics flowsSummaryStatisticsPilot;
+  private final DefaultFlowsSummaryStatistics flowsSummaryStatisticsV2;
   private final boolean triggerFlow;
   private final boolean apikitFlow;
   private final FlowType flowType;
@@ -152,8 +152,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           Integer maxConcurrency,
                           DefaultFlowsSummaryStatistics flowsSummaryStatistics,
-                          DefaultFlowsSummaryStatistics flowsSummaryStatisticsPilot, // TODO W-18668900: remove once the pilot is
-                                                                                     // concluded
+                          DefaultFlowsSummaryStatistics flowsSummaryStatisticsV2, // TODO W-18668900: remove once the pilot is
+                          // concluded
                           FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
@@ -177,7 +177,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     this.processors = unmodifiableList(processors);
     this.maxConcurrency = maxConcurrency != null ? maxConcurrency : DEFAULT_MAX_CONCURRENCY;
     this.flowsSummaryStatistics = flowsSummaryStatistics;
-    this.flowsSummaryStatisticsPilot = flowsSummaryStatisticsPilot;
+    this.flowsSummaryStatisticsV2 = flowsSummaryStatisticsV2;
     this.triggerFlow = source != null;
     this.apikitFlow = isApiKitFlow(getName());
     this.flowType = flowClassifier != null ? flowClassifier.getFlowType(getName()) : GENERIC;
@@ -683,11 +683,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     if (triggerFlow) {
-      triggerFlowsUpdater.accept(flowsSummaryStatisticsPilot);
+      triggerFlowsUpdater.accept(flowsSummaryStatisticsV2);
     } else {
       switch (flowType) {
-        case APIKIT, SOAPKIT -> apikitflowsUpdater.accept(flowsSummaryStatisticsPilot);
-        case GENERIC -> privateFlowsUpdater.accept(flowsSummaryStatisticsPilot);
+        case APIKIT, SOAPKIT -> apikitflowsUpdater.accept(flowsSummaryStatisticsV2);
+        case GENERIC -> privateFlowsUpdater.accept(flowsSummaryStatisticsV2);
       }
     }
   }

@@ -10,13 +10,13 @@ package org.mule.runtime.core.internal.management.stats;
  *
  * @since 4.10
  */
-public class PilotFlowsSummaryStatistics extends DefaultFlowsSummaryStatistics {
+public class FlowsSummaryStatisticsV2 extends DefaultFlowsSummaryStatistics {
 
-  public PilotFlowsSummaryStatistics(boolean isStatisticsEnabled) {
+  public FlowsSummaryStatisticsV2(boolean isStatisticsEnabled) {
     super(isStatisticsEnabled);
   }
 
   protected String getMetricSuffix() {
-    return "-pilot";
+    return "-v2";
   }
 }
