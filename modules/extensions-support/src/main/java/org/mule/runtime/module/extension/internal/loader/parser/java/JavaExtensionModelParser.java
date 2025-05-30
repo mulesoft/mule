@@ -168,7 +168,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     } catch (EnumConstantNotPresentException e) {
       // An enum value not present in the Mule container version of `JavaVersion` is in use, we need to introspect the annotation
       try {
-        Class<?> annotatedClass = extensionElement.getDeclaringClass().get();
+        Class<?> annotatedClass = extensionElement.getDeclaringClass().orElseThrow();
 
         ClassReader reader = new ClassReader(currentThread().getContextClassLoader()
             .getResourceAsStream(annotatedClass.getName().replace(".", "/") + ".class"));
