@@ -184,7 +184,7 @@ public class EventDumpOperation implements TroubleshootingOperation {
 
   }
 
-  private static String formatFlowStack(FlowStackEntry fs) throws IOException {
+  private static String formatFlowStack(FlowStackEntry fs) {
     return format("\"%s\", running for: %s, state: %s%n%s",
                   fs.getEventId(),
                   formatDuration(fs.getExecutingTime().toMillis(), "mm:ss.SSS"),
