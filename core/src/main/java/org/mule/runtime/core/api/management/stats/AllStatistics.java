@@ -21,6 +21,7 @@ import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
+import org.mule.runtime.core.internal.management.stats.PilotFlowsSummaryStatistics;
 import org.mule.runtime.metrics.api.MeterProvider;
 
 import java.util.Collection;
@@ -38,6 +39,8 @@ public class AllStatistics {
   private long startTime;
   private final ApplicationStatistics appStats;
   private final FlowsSummaryStatistics flowSummaryStatistics;
+  // TODO W-18668900: swap and remove once the pilot is concluded
+  private final FlowsSummaryStatistics flowSummaryStatisticsPilot;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
   private ArtifactMeterProvider meterProvider;
 
@@ -48,6 +51,7 @@ public class AllStatistics {
     clear();
     appStats = new ApplicationStatistics(this);
     flowSummaryStatistics = new DefaultFlowsSummaryStatistics(isStatisticsEnabled);
+    flowSummaryStatisticsPilot = new PilotFlowsSummaryStatistics(isStatisticsEnabled);
     appStats.setEnabled(isStatisticsEnabled);
     add(appStats);
   }
@@ -124,6 +128,20 @@ public class AllStatistics {
   }
 
   /**
+   * This method will be removed once the pilot is concluded. If the pilot is successful, these statistics will replace the ones
+   * from {@link #getFlowSummaryStatistics()}.
+   *
+   * @return The flow summary statistics such as categorized flow counts.
+   * @deprecated will be removed once the pilot is concluded.
+   */
+  @Experimental
+  @Deprecated
+  // TODO W-18668900: swap and remove once the pilot is concluded
+  public FlowsSummaryStatistics getFlowSummaryStatisticsPilot() {
+    return flowSummaryStatisticsPilot;
+  }
+
+  /**
    * @return whether the payload statistics are enabled
    * @since 4.4, 4.3.1
    * @deprecated since 4.4.1, 4.5.0. Payload statistics are no longer supported and will always return false.
@@ -156,6 +174,7 @@ public class AllStatistics {
   public void trackUsingMeterProvider(MeterProvider meterProvider, String artifactId) {
     this.meterProvider = new ArtifactMeterProvider(meterProvider, artifactId);
     this.flowSummaryStatistics.trackUsingMeterProvider(this.meterProvider);
+    this.flowSummaryStatisticsPilot.trackUsingMeterProvider(this.meterProvider);
     this.flowConstructStats.values()
         .forEach(flowConstructStatsValue -> flowConstructStatsValue.trackUsingMeterProvider(this.meterProvider));
   }
