@@ -551,25 +551,24 @@ class DeclarationBasedElementModelFactory {
     MetadataType valueType = mapType.getOpenRestriction().get();
     Optional<DslElementSyntax> generic = paramDsl.getGeneric(valueType);
 
-    generic
-        .ifPresent(entryDsl -> objectValue.getParameters()
-            .forEach((key, value) -> sarasa(entryDsl, valueType, key, value, isParameterWrappedByContainer, mapConfig, mapElement,
-                                            parentConfig, parentElement)));
+    generic.ifPresent(entryDsl -> objectValue.getParameters()
+        .forEach((key, value) -> addKeyValueEntry(entryDsl, valueType, key, value, isParameterWrappedByContainer, mapConfig,
+                                                  mapElement, parentConfig, parentElement)));
 
     if (isParameterWrappedByContainer) {
       ComponentConfiguration result = mapConfig.build();
       parentConfig.withNestedComponent(result);
       parentElement.containing(mapElement.withConfig(result).build());
     } else if (generic.isEmpty()) {
-      objectValue.getParameters()
-          .forEach((key, value) -> sarasa(paramDsl, valueType, key, value, false, null, null, parentConfig, parentElement));
+      objectValue.getParameters().forEach((key, value) -> addKeyValueEntry(paramDsl, valueType, key, value, false, null, null,
+                                                                           parentConfig, parentElement));
     }
   }
 
-  private void sarasa(DslElementSyntax entryDsl, MetadataType valueType, String key, ParameterValue value,
-                      boolean isParameterWrappedByContainer, ComponentConfiguration.Builder mapConfig,
-                      DslElementModel.Builder mapElement, ComponentConfiguration.Builder parentConfig,
-                      DslElementModel.Builder parentElement) {
+  private void addKeyValueEntry(DslElementSyntax entryDsl, MetadataType valueType, String key, ParameterValue value,
+                                boolean isParameterWrappedByContainer, ComponentConfiguration.Builder mapConfig,
+                                DslElementModel.Builder mapElement, ComponentConfiguration.Builder parentConfig,
+                                DslElementModel.Builder parentElement) {
     ComponentConfiguration.Builder entryConfigBuilder = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(entryDsl));
 
