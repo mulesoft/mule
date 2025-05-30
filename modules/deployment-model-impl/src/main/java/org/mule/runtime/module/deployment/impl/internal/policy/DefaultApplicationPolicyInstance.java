@@ -144,8 +144,7 @@ public class DefaultApplicationPolicyInstance implements ApplicationPolicyInstan
   }
 
   private boolean isPolicyIsolationEnabled(PolicyTemplateDescriptor descriptor) {
-    return isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor) &&
-        isFeatureEnabled(SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION, descriptor);
+    return isFeatureEnabled(ENABLE_POLICY_ISOLATION, descriptor);
   }
 
   /**
