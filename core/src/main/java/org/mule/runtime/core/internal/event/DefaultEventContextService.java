@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.event.EventContextService.EventContextSt
 import static org.mule.runtime.core.api.event.EventContextService.EventContextState.TERMINATED;
 
 import static java.lang.System.lineSeparator;
+import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.concurrent.ConcurrentHashMap.newKeySet;
 
@@ -59,6 +60,7 @@ public class DefaultEventContextService implements EventContextService {
   private static final class DefaultFlowStackEntry implements FlowStackEntry {
 
     private final String serverId;
+    private final String parentEventId;
     private final String eventId;
     private final EventContextState state;
     private final Duration executingTime;
@@ -67,6 +69,7 @@ public class DefaultEventContextService implements EventContextService {
 
     public DefaultFlowStackEntry(BaseEventContext context, Instant now) {
       this.serverId = context.getServerId();
+      this.parentEventId = context.getParentContext().map(BaseEventContext::getId).orElse(null);
       this.eventId = context.getId();
 
       if (context.isTerminated()) {
@@ -79,7 +82,7 @@ public class DefaultEventContextService implements EventContextService {
         state = EXECUTING;
       }
 
-      this.executingTime = Duration.between(context.getStartTime(), now);
+      this.executingTime = between(context.getStartTime(), now);
       this.originatingLocation = context.getOriginatingLocation().getLocation();
       this.flowCallStack = context.getFlowCallStack().clone();
     }
@@ -87,6 +90,11 @@ public class DefaultEventContextService implements EventContextService {
     @Override
     public String getServerId() {
       return serverId;
+    }
+
+    @Override
+    public String getParentEventId() {
+      return parentEventId;
     }
 
     @Override
