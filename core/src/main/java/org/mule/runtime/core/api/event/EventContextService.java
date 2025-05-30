@@ -11,6 +11,7 @@ import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -33,8 +34,33 @@ public interface EventContextService {
   List<FlowStackEntry> getCurrentlyActiveFlowStacks();
 
   /**
+   * The state of the event context.
+   * 
+   * @since 4.10
+   */
+  public enum EventContextState {
+    /**
+     * Event is being executed by the flow or executable component, or finished but the response is still being processed.
+     */
+    EXECUTING,
+    /**
+     * Event execution complete and the response was already handled.
+     */
+    RESPONSE_PROCESSED,
+    /**
+     * Same as {@link #RESPONSE_PROCESSED}, but all of the child events are {@link #RESPONSE_PROCESSED} as well.
+     */
+    COMPLETE,
+    /**
+     * After {@link #COMPLETE}, and all completion callbacks of the context were executed.
+     */
+    TERMINATED
+  }
+
+  /**
    * Contains a {@link FlowCallStack} and context information about its owner.
    */
+  @NoImplement
   public interface FlowStackEntry {
 
     /**
@@ -46,6 +72,16 @@ public interface EventContextService {
      * @return the id of the event the {@link FlowCallStack} belongs to.
      */
     String getEventId();
+
+    /**
+     * @return the state of this entry.
+     */
+    EventContextState getState();
+
+    /**
+     * @return the time that this execution has been executing.
+     */
+    Duration getExecutingTime();
 
     /**
      * @return the {@link FlowCallStack} of a single event.

@@ -33,6 +33,19 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
     implements FlowTraceManager, Initialisable, Disposable {
 
   public static final String FLOW_STACK_INFO_KEY = MuleExceptionInfo.FLOW_STACK_INFO_KEY;
+  // check the api, since this may be deployed on an environment with an older api
+  private static final boolean GET_SOURCE_LOCATION_AVAILABLE;
+
+  static {
+    var getSourceLocationAvailable = true;
+    try {
+      Component.class.getDeclaredMethod("getSourceLocation");
+    } catch (NoSuchMethodException nsme) {
+      getSourceLocationAvailable = false;
+    }
+    GET_SOURCE_LOCATION_AVAILABLE = getSourceLocationAvailable;
+  }
+
 
   private final FlowNotificationTextDebugger pipelineProcessorDebugger;
   private final MessageProcessorTextDebugger messageProcessorTextDebugger;
@@ -40,6 +53,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   private ServerNotificationManager notificationManager;
 
   private volatile boolean listenersAdded = false;
+
 
 
   public MessageProcessingFlowTraceManager() {
@@ -85,7 +99,10 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification) {
     FlowCallStack flowCallStack = ((CoreEvent) notification.getEvent()).getFlowCallStack();
     if (flowCallStack != null) {
-      ((DefaultFlowCallStack) flowCallStack).pushCurrentProcessorPath(notification.getComponent().getRepresentation());
+      final var representation = notification.getComponent().getRepresentation();
+      ((DefaultFlowCallStack) flowCallStack).pushCurrentProcessorPath(representation,
+                                                                      notification.getComponent().getLocation(),
+                                                                      notification.getComponent().getAnnotations());
     }
   }
 

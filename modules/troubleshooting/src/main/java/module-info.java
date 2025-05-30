@@ -17,6 +17,7 @@ module org.mule.runtime.troubleshooting {
   requires org.mule.runtime.deployment;
   requires org.mule.runtime.deployment.model;
 
+  requires org.apache.commons.lang3;
   requires org.json;
   requires com.google.gson;
 

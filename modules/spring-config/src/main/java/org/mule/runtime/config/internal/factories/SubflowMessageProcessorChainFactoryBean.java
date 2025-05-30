@@ -53,6 +53,7 @@ public class SubflowMessageProcessorChainFactoryBean extends AbstractComponentFa
   protected SubflowMessageProcessorChainBuilder getBuilderInstance() {
     SubflowMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder();
     builder.withComponentTracerFactory(componentTracerFactory);
+    builder.setAnnotations(getAnnotations());
     builder.setName(name);
     return builder;
   }

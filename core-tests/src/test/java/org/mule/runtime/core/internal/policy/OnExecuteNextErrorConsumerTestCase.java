@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 
+import static java.util.Collections.emptyMap;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -49,7 +51,7 @@ public class OnExecuteNextErrorConsumerTestCase extends AbstractMuleTestCase {
     flowCallStack = mock(DefaultFlowCallStack.class);
     Function<MessagingException, CoreEvent> prepareEvent = event -> updatedEvent;
 
-    consumer = new OnExecuteNextErrorConsumer(prepareEvent, notificationHelper, location);
+    consumer = new OnExecuteNextErrorConsumer(prepareEvent, notificationHelper, location, emptyMap());
   }
 
   @Test
