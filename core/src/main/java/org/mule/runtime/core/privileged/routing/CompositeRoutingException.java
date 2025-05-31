@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.routing.result;
+package org.mule.runtime.core.privileged.routing;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.message.Message.of;
@@ -22,7 +22,6 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.privileged.processor.Router;
-import org.mule.runtime.core.privileged.routing.RoutingResult;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
