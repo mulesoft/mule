@@ -52,6 +52,7 @@
         <module>semantic-terms-extension</module>
         <module>reusable-app</module>
         <module>provided-dependency</module>
+        <module>sdk-new-java-version-values-extension</module>
     </modules>
 
     <build>
