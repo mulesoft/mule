@@ -67,7 +67,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory {
 
   private final boolean enableLazyInit;
-  private final boolean addToolingObjectsToRegistry;
 
   private final ArtifactAst artifactAst;
   private final Map<String, String> artifactProperties;
@@ -79,7 +78,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
 
   private ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
-                                          ArtifactType artifactType, boolean enableLazyInit, boolean addToolingObjectsToRegistry,
+                                          ArtifactType artifactType, boolean enableLazyInit,
                                           LockFactory runtimeLockFactory, MemoryManagementService memoryManagementService,
                                           ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
       throws ConfigurationException {
@@ -87,17 +86,16 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
     this.enableLazyInit = enableLazyInit;
-    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
   }
 
   public ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
-                                         ArtifactType artifactType, boolean enableLazyInit, boolean addToolingObjectsToRegistry,
+                                         ArtifactType artifactType, boolean enableLazyInit,
                                          ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
       throws ConfigurationException {
-    this(artifactAst, artifactProperties, artifactType, enableLazyInit, addToolingObjectsToRegistry,
+    this(artifactAst, artifactProperties, artifactType, enableLazyInit,
          getRuntimeLockFactory(),
          DefaultMemoryManagementService.getInstance(),
          componentBuildingDefinitionRegistry);
@@ -105,7 +103,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
 
   public ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties)
       throws ConfigurationException {
-    this(artifactAst, artifactProperties, ArtifactType.APP, false, false,
+    this(artifactAst, artifactProperties, ArtifactType.APP, false,
          new DefaultComponentBuildingDefinitionRegistryFactory()
              .create(artifactAst.dependencies(),
                      artifactAst::dependenciesDsl));
@@ -189,7 +187,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                          resolveParentConfigurationProperties(),
                                          baseConfigurationComponentLocator,
                                          errorTypeRepository, errorTypeLocator,
-                                         getArtifactProperties(), addToolingObjectsToRegistry, artifactType,
+                                         getArtifactProperties(), artifactType,
                                          resolveComponentModelInitializer(),
                                          runtimeLockFactory,
                                          componentBuildingDefinitionRegistry,
@@ -201,7 +199,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                         resolveParentConfigurationProperties(),
                                         baseConfigurationComponentLocator,
                                         errorTypeRepository, errorTypeLocator,
-                                        getArtifactProperties(), addToolingObjectsToRegistry, artifactType,
+                                        getArtifactProperties(), artifactType,
                                         componentBuildingDefinitionRegistry,
                                         new ArtifactMemoryManagementService(memoryManagementService),
                                         featureFlaggingService, expressionLanguageMetadataService);

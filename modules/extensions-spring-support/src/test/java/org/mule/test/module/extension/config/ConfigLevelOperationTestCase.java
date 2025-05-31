@@ -6,9 +6,12 @@
  */
 package org.mule.test.module.extension.config;
 
+import static java.util.Arrays.asList;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -16,7 +19,6 @@ import org.mule.tck.testmodels.fruit.Kiwi;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
@@ -28,7 +30,7 @@ public class ConfigLevelOperationTestCase extends AbstractExtensionFunctionalTes
 
   @Parameters
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {{Apple.class}, {Banana.class}, {Kiwi.class}});
+    return asList(new Object[][] {{Apple.class}, {Banana.class}, {Kiwi.class}});
   }
 
   private final Class<? extends Fruit> fruitType;
@@ -39,7 +41,7 @@ public class ConfigLevelOperationTestCase extends AbstractExtensionFunctionalTes
 
   @Override
   protected String getConfigFile() {
-    return "vegan-config.xml";
+    return "operations/vegan-config.xml";
   }
 
   @Test

@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.module.launcher.privileged.ContainerServiceProvider;
+import org.mule.runtime.module.tooling.internal.config.ToolingServicesConfigurator;
 import org.mule.runtime.module.tooling.internal.launcher.ToolingSupportContainerServiceProvider;
 
 /**
@@ -64,5 +65,7 @@ module org.mule.runtime.tooling.support {
       with org.mule.runtime.module.tooling.internal.dsl.model.DefaultDslElementModelFactory;
   provides ContainerServiceProvider
       with ToolingSupportContainerServiceProvider;
+  provides ServiceConfigurator with
+      ToolingServicesConfigurator;
 
 }

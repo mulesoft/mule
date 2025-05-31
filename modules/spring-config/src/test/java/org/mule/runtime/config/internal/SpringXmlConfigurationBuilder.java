@@ -204,7 +204,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                                                         artifactType,
                                                                                         enableLazyInit);
     if (baseMuleArtifactContext instanceof ConfigurableApplicationContext) {
-      ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
+      baseMuleArtifactContext.setParent(parentContext);
     }
     return baseMuleArtifactContext;
   }
@@ -264,7 +264,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         parentConfigurationProperties,
                                                         baseConfigurationComponentLocator,
                                                         errorTypeRepository, errorTypeLocator,
-                                                        getArtifactProperties(), true, artifactType,
+                                                        getArtifactProperties(), artifactType,
                                                         resolveComponentModelInitializer(),
                                                         runtimeLockFactory,
                                                         componentBuildingDefinitionRegistry,
@@ -275,7 +275,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     parentConfigurationProperties,
                                                     baseConfigurationComponentLocator,
                                                     errorTypeRepository, errorTypeLocator,
-                                                    getArtifactProperties(), true, artifactType,
+                                                    getArtifactProperties(), artifactType,
                                                     componentBuildingDefinitionRegistry,
                                                     new ArtifactMemoryManagementService(memoryManagementService),
                                                     featureFlaggingService, expressionLanguageMetadataService);

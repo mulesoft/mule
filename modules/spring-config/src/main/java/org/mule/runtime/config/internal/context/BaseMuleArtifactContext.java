@@ -12,12 +12,13 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.config.privileged.spring.ByteBuddySpringCacheInstrumentator;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
+import org.mule.runtime.config.privileged.spring.ByteBuddySpringCacheInstrumentator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
@@ -66,6 +67,11 @@ public class BaseMuleArtifactContext extends AbstractRefreshableConfigApplicatio
     this.originalRegistry = ((MuleRegistryHelper) (((MuleContextWithRegistry) muleContext).getRegistry())).getDelegate();
     this.serviceDiscoverer = new DefaultRegistry(muleContext);
     this.artifactType = artifactType;
+
+    final InternalCustomizationService customizationService =
+        (InternalCustomizationService) (muleContext.getCustomizationService());
+    customizationService.setArtifactProperties(artifactProperties);
+    customizationService.setArtifactType(artifactType.getArtifactType());
 
     this.configurationProperties = createConfigurationAttributeResolver(parentConfigurationProperties,
                                                                         artifactProperties,

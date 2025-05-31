@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.bean.lazy;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -21,6 +22,7 @@ import org.mule.sdk.api.data.sample.SampleDataException;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import jakarta.inject.Inject;
@@ -38,23 +40,25 @@ import jakarta.inject.Named;
 public class LazySampleDataService implements SampleDataService, Initialisable {
 
   public static final String NON_LAZY_SAMPLE_DATA_SERVICE = "_muleNonLazySampleDataService";
-  private final Supplier<SampleDataService> sampleDataServiceSupplier;
+  private final Function<Registry, SampleDataService> sampleDataServiceSupplier;
 
-  private final LazyComponentInitializerAdapter lazyComponentInitializer;
+  @Inject
+  private Registry registry;
+
+  @Inject
+  private LazyComponentInitializerAdapter lazyComponentInitializer;
 
   @Inject
   @Named(NON_LAZY_SAMPLE_DATA_SERVICE)
   private SampleDataService sampleDataService;
 
-  public LazySampleDataService(LazyComponentInitializerAdapter lazyComponentInitializer,
-                               Supplier<SampleDataService> sampleDataServiceSupplier) {
-    this.lazyComponentInitializer = lazyComponentInitializer;
+  public LazySampleDataService(Function<Registry, SampleDataService> sampleDataServiceSupplier) {
     this.sampleDataServiceSupplier = sampleDataServiceSupplier;
   }
 
   @Override
   public void initialise() throws InitialisationException {
-    this.sampleDataService = sampleDataServiceSupplier.get();
+    this.sampleDataService = sampleDataServiceSupplier.apply(registry);
   }
 
   @Override

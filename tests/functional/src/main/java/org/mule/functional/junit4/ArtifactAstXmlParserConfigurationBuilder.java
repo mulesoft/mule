@@ -10,7 +10,11 @@ import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.ArtifactContextFactory.createArtifactContextFactory;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -27,6 +31,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -66,12 +71,15 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
                                                   boolean addToolingObjectsToRegistry,
                                                   ArtifactDeclaration artifactDeclaration,
                                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
-    this.artifactProperties = artifactProperties;
+    this.artifactProperties = new HashMap<>(artifactProperties);
+    this.artifactProperties.put(MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY, "" + addToolingObjectsToRegistry);
+    this.artifactProperties.put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "" + enableLazyInit);
+
     this.enableLazyInit = enableLazyInit;
     this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
 
     this.cachingAstXmlParser = new LazyValue<>(() -> new CachingAstXmlParser(false, false,
-                                                                             artifactProperties,
+                                                                             unmodifiableMap(this.artifactProperties),
                                                                              artifactType,
                                                                              parentArtifactContext != null
                                                                                  ? parentArtifactContext.getArtifactAst()
@@ -88,12 +96,16 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
                                                   boolean ignoreCaches,
                                                   String[] configResources,
                                                   ExpressionLanguageMetadataService expressionLanguageMetadataService) {
-    this.artifactProperties = artifactProperties;
+    this.artifactProperties = new HashMap<>(artifactProperties);
+    this.artifactProperties.put(MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY, "" + addToolingObjectsToRegistry);
+    this.artifactProperties.put(MULE_LAZY_INIT_DEPLOYMENT_PROPERTY, "" + enableLazyInit);
+    this.artifactProperties.put(MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY, "" + !disableXmlValidations);
+
     this.enableLazyInit = enableLazyInit;
     this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
 
     this.cachingAstXmlParser = new LazyValue<>(() -> new CachingAstXmlParser(disableXmlValidations, ignoreCaches,
-                                                                             artifactProperties,
+                                                                             unmodifiableMap(this.artifactProperties),
                                                                              artifactType,
                                                                              parentArtifactContext != null
                                                                                  ? parentArtifactContext.getArtifactAst()

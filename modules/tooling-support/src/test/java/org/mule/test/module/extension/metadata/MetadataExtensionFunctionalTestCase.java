@@ -31,6 +31,7 @@ import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
@@ -68,14 +69,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import org.junit.Before;
 import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 //TODO MULE-12809: Make MetadataTestCase use LazyMetadataService
 @RunnerDelegateTo(Parameterized.class)
@@ -83,14 +83,16 @@ import io.qameta.allure.Story;
 @Story(METADATA_SERVICE)
 public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentModel> extends AbstractExtensionFunctionalTestCase {
 
-  protected static final String METADATA_TEST = "metadata-tests.xml";
-  protected static final String RUNTIME_METADATA_CONFIG = "metadata-runtime-tests.xml";
+  protected static final String METADATA_TEST = "metadata/metadata-tests.xml";
+  protected static final String RUNTIME_METADATA_CONFIG = "metadata/metadata-runtime-tests.xml";
   protected static final String DSQL_QUERY = "dsql:SELECT id FROM Circle WHERE (diameter < 18)";
 
-  protected static final String METADATA_TEST_STATIC_NO_REF_CONFIGURATION = "metadata-tests-static-no-ref-configuration.xml";
-  protected static final String METADATA_TEST_DYNAMIC_NO_REF_CONFIGURATION = "metadata-tests-dynamic-no-ref-configuration.xml";
+  protected static final String METADATA_TEST_STATIC_NO_REF_CONFIGURATION =
+      "metadata/metadata-tests-static-no-ref-configuration.xml";
+  protected static final String METADATA_TEST_DYNAMIC_NO_REF_CONFIGURATION =
+      "metadata/metadata-tests-dynamic-no-ref-configuration.xml";
   protected static final String METADATA_TEST_DYNAMIC_IMPLICIT_CONFIGURATION =
-      "metadata-tests-dynamic-implicit-configuration.xml";
+      "metadata/metadata-tests-dynamic-implicit-configuration.xml";
 
   protected static final String CONTENT_METADATA_WITH_KEY_ID = "contentMetadataWithKeyId";
   protected static final String OUTPUT_METADATA_WITH_KEY_ID = "outputMetadataWithKeyId";

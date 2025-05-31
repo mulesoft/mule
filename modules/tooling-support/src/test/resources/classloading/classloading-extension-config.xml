@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:classloading="http://www.mulesoft.org/schema/mule/classloading"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/classloading http://www.mulesoft.org/schema/mule/classloading/current/mule-classloading.xsd">
+
+    <classloading:config name="cached">
+        <classloading:cached-connection/>
+    </classloading:config>
+
+    <classloading:config name="pooling">
+        <classloading:pooling-connection/>
+    </classloading:config>
+
+    <classloading:config name="none">
+        <classloading:none-connection/>
+    </classloading:config>
+
+    <flow name="cached-operation">
+        <classloading:some-operation config-ref="cached"/>
+    </flow>
+
+    <flow name="pooling-operation">
+        <classloading:some-operation config-ref="pooling"/>
+    </flow>
+
+    <flow name="none-operation">
+        <classloading:some-operation config-ref="none"/>
+    </flow>
+
+</mule>
