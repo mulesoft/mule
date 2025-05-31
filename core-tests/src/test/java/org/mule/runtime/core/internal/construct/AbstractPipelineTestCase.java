@@ -53,6 +53,7 @@ public class AbstractPipelineTestCase extends AbstractMuleContextTestCase {
                         DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
                         ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
+            new DefaultFlowsSummaryStatistics(true), // TODO W-18668900: remove once the pilot is concluded
             flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);
     }
 
