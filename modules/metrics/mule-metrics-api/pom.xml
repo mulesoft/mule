@@ -12,12 +12,12 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-module-metrics-parent</artifactId>
-        <version>4.6.19-SNAPSHOT</version>
+        <version>4.6.19-rc1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mule-metrics-api</artifactId>
-    <version>4.6.19-SNAPSHOT</version>
+    <version>4.6.19-rc1</version>
     <name>Mule Metrics Api</name>
     <description>Definitions for Mule Metrics</description>
 

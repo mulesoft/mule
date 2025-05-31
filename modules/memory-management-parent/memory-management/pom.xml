@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-module-memory-management-parent</artifactId>
-        <version>4.6.19-SNAPSHOT</version>
+        <version>4.6.19-rc1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-memory-management</artifactId>
-    <version>4.6.19-SNAPSHOT</version>
+    <version>4.6.19-rc1</version>
     <name>Mule Memory Management Module</name>
     <description>This module performs memory management for the runtime</description>
 
