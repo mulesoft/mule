@@ -23,6 +23,7 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAI
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
@@ -109,6 +110,7 @@ import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.marvel.MarvelExtension;
+import org.mule.test.sdk.java.versions.NewJavaVersionsExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
@@ -124,6 +126,7 @@ import org.junit.rules.ExpectedException;
 import org.hamcrest.Matcher;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @SmallTest
@@ -365,6 +368,14 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   public void customJavaVersionSupport() {
     ExtensionModel model = loadExtension(TestJavaSupportExtension.class);
     assertThat(model.getSupportedJavaVersions(), contains(JAVA_8.version(), JAVA_17.version()));
+  }
+
+  @Test
+  @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
+  @Issue("W-18586120")
+  public void customJavaVersionSupportWithJavaVersionMismatch() {
+    ExtensionModel model = loadExtension(NewJavaVersionsExtension.class);
+    assertThat(model.getSupportedJavaVersions(), contains(JAVA_11.version(), JAVA_17.version()));
   }
 
   private void assertStreamingStrategy(ParameterModel streamingParameter) {
