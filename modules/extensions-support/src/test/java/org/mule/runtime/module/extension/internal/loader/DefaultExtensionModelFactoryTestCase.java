@@ -110,6 +110,7 @@ import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.marvel.MarvelExtension;
+import org.mule.test.sdk.java.versions.NewJavaVersionsExtension;
 import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganExtension;
 
@@ -123,6 +124,7 @@ import org.junit.Test;
 import org.hamcrest.Matcher;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @SmallTest
@@ -360,6 +362,14 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   public void customJavaVersionSupport() {
     ExtensionModel model = loadExtension(TestJavaSupportExtension.class);
     assertThat(model.getSupportedJavaVersions(), contains(JAVA_8.version(), JAVA_17.version()));
+  }
+
+  @Test
+  @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
+  @Issue("W-18586120")
+  public void customJavaVersionSupportWithJavaVersionMismatch() {
+    ExtensionModel model = loadExtension(NewJavaVersionsExtension.class);
+    assertThat(model.getSupportedJavaVersions(), contains(JAVA_17.version(), JAVA_21.version()));
   }
 
   private void assertStreamingStrategy(ParameterModel streamingParameter) {
