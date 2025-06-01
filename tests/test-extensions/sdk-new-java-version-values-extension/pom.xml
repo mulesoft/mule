@@ -16,6 +16,7 @@
     <properties>
         <javaModuleName>org.mule.test.extension.sdk.java.versions</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
