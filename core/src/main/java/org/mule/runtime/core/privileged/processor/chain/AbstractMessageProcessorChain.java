@@ -25,6 +25,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.core.internal.artifact.ArtifactClassLoaderFinder.artifactClassLoaderFinder;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
@@ -45,8 +46,6 @@ import static org.mule.runtime.core.privileged.processor.chain.UnnamedComponent.
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -146,8 +145,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
           "This may lead to an event getting stuck, or even a processor may stop responding.";
   public static final String UNKNOWN = "unknown";
 
-  private static Class<ClassLoader> appClClass;
-
   private static final Logger MULE_CTX_LOGGER = getLogger(DefaultMuleContext.class);
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
 
@@ -162,13 +159,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   private static final Map<ClassLoader, AlertingSupport> ALERTS_PER_DEPLOYMENT = new WeakHashMap<>();
 
   static {
-    try {
-      appClClass = (Class<ClassLoader>) AbstractMessageProcessorChain.class.getClassLoader()
-          .loadClass("org.mule.runtime.module.artifact.activation.api.classloader.ApplicationClassLoader");
-    } catch (ClassNotFoundException e) {
-      LOGGER.debug("ApplicationClassLoader interface not available in current context", e);
-    }
-
     configureReactorHooks();
   }
 
@@ -442,12 +432,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
   }
 
   private static Optional<ClassLoader> resolveRegionContextClassLoader(ClassLoader tccl) {
-    if (tccl != null && tccl.getParent() != null
-        && appClClass != null && appClClass.isAssignableFrom(tccl.getClass())) {
-      return of(tccl.getParent());
-    } else {
-      return empty();
-    }
+    return artifactClassLoaderFinder().findRegionContextClassLoader();
   }
 
   /*

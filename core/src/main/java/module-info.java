@@ -5,6 +5,7 @@
  * LICENSE.txt file.
  */
 import org.mule.api.annotation.jpms.PrivilegedApi;
+import org.mule.runtime.core.internal.artifact.ArtifactClassLoaderFinder;
 
 /**
  * Mule server and core classes.
@@ -211,6 +212,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.alert to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.artifact to
+      org.mule.runtime.artifact.activation;
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -633,5 +636,6 @@ module org.mule.runtime.core {
 
   uses org.mule.runtime.core.privileged.transaction.TransactionFactory;
   uses org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
+  uses ArtifactClassLoaderFinder;
 
 }
