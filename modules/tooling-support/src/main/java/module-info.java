@@ -71,6 +71,8 @@ module org.mule.runtime.tooling.support {
       spring.core;
   opens org.mule.runtime.module.tooling.internal.connectivity to
       spring.core;
+  opens org.mule.runtime.module.tooling.internal.metadata.cache.lazy to
+      spring.core;
   opens org.mule.runtime.module.tooling.internal.value to
       spring.core;
 
