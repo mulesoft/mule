@@ -14,6 +14,6 @@ import org.mule.api.annotation.NoImplement;
  * @deprecated no longer used in Mule Runtime
  */
 @NoImplement
-@Deprecated(forRemoval = true)
+@Deprecated(forRemoval = true, since = "4.10")
 public interface ApplicationClassLoader {
 }

@@ -53,7 +53,6 @@ import static org.slf4j.MDC.getCopyOfContextMap;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
-import static reactor.core.publisher.Operators.lift;
 
 import org.mule.runtime.api.alert.AlertingSupport;
 import org.mule.runtime.api.artifact.Registry;
@@ -115,20 +114,16 @@ import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 
 import jakarta.inject.Inject;
-import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Hooks;
-import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
 /**
@@ -137,8 +132,6 @@ import reactor.util.context.ContextView;
  */
 abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent implements MessageProcessorChain {
 
-  private static final String TCCL_REACTOR_CTX_KEY = "mule.context.tccl";
-  private static final String TCCL_ORIGINAL_REACTOR_CTX_KEY = "mule.context.tccl_original";
   private static final String REACTOR_ON_OPERATOR_ERROR_LOCAL = "reactor.onOperatorError.local";
   private static final String UNEXPECTED_ERROR_HANDLER_STATE_MESSAGE =
       "Unexpected state. Error handler should be invoked with either an Event instance or a MessagingException. " +
@@ -147,14 +140,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
   private static final Logger MULE_CTX_LOGGER = getLogger(DefaultMuleContext.class);
   private static final Logger LOGGER = getLogger(AbstractMessageProcessorChain.class);
-
-  private static final Consumer<Context> TCCL_REACTOR_CTX_CONSUMER =
-      context -> context.getOrEmpty(TCCL_REACTOR_CTX_KEY)
-          .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
-
-  private static final Consumer<Context> TCCL_ORIGINAL_REACTOR_CTX_CONSUMER =
-      context -> context.getOrEmpty(TCCL_ORIGINAL_REACTOR_CTX_KEY)
-          .ifPresent(cl -> currentThread().setContextClassLoader((ClassLoader) cl));
 
   private static final Map<ClassLoader, AlertingSupport> ALERTS_PER_DEPLOYMENT = new WeakHashMap<>();
 
@@ -419,15 +404,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     stream = stream.doOnNext(event -> chainComponentTracer
         .endCurrentSpan(event));
 
-    stream = stream.contextWrite(ctx -> {
-      ClassLoader tccl = currentThread().getContextClassLoader();
-      return resolveRegionContextClassLoader(tccl)
-          .map(regionCl -> ctx
-              .put(TCCL_ORIGINAL_REACTOR_CTX_KEY, tccl)
-              .put(TCCL_REACTOR_CTX_KEY, regionCl))
-          .orElse(ctx);
-    });
-
     return stream;
   }
 
@@ -515,13 +491,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
 
     // Set thread context
     interceptors.add((processor, next) -> stream -> from(stream)
-        // #2 Wrap execution, after processing strategy, on processor execution thread.
+        // #1 Wrap execution, after processing strategy, on processor execution thread.
         .doOnNext(event -> beforeProcessorInSameThread(event, (Processor) processor))
-        // #1 Update TCCL with the one from the Region of the processor to execute once in execution thread.
-        .transform(doOnNextOrErrorWithContext(TCCL_REACTOR_CTX_CONSUMER)
-            .andThen(next)
-            // #1 Set back previous TCCL.
-            .andThen(doOnNextOrErrorWithContext(TCCL_ORIGINAL_REACTOR_CTX_CONSUMER)))
+        .transform(next)
         .doOnDiscard(CoreEvent.class,
                      event -> alertingSupport.triggerAlert(ALERT_REACTOR_DISCARDED_EVENT, event.getCorrelationId()))
         .doOnNext(event -> afterProcessorInSameThread(event, (Processor) processor)));
@@ -536,7 +508,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // Apply processor interceptors around processor and other core logic
     interceptors.addAll(additionalInterceptors);
 
-    // #4 Wrap execution, including processing strategy, on flow thread.
+    // #2 Wrap execution, including processing strategy, on flow thread.
     interceptors.add((processor, next) -> {
       String processorPath = getProcessorPath((Processor) processor);
       ComponentTracer<CoreEvent> coreComponentTracer = getComponentTracer(processor, chainComponentTracer);
@@ -665,38 +637,6 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       };
       dmc.addListener(stopListener);
     }
-  }
-
-  private Function<? super Publisher<CoreEvent>, ? extends Publisher<CoreEvent>> doOnNextOrErrorWithContext(Consumer<Context> contextConsumer) {
-    return lift((scannable, subscriber) -> new CoreSubscriber<CoreEvent>() {
-
-      @Override
-      public void onNext(CoreEvent event) {
-        contextConsumer.accept(currentContext());
-        subscriber.onNext(event);
-      }
-
-      @Override
-      public void onError(Throwable throwable) {
-        contextConsumer.accept(currentContext());
-        subscriber.onError(throwable);
-      }
-
-      @Override
-      public void onComplete() {
-        subscriber.onComplete();
-      }
-
-      @Override
-      public Context currentContext() {
-        return subscriber.currentContext();
-      }
-
-      @Override
-      public void onSubscribe(Subscription s) {
-        subscriber.onSubscribe(s);
-      }
-    });
   }
 
   private void preNotification(CoreEvent event, Processor processor) {
