@@ -7,26 +7,26 @@
 package org.mule.runtime.module.troubleshooting.internal.operations;
 
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import static org.apache.commons.lang3.StringUtils.leftPad;
+
 import org.mule.runtime.core.api.event.EventContextService;
 import org.mule.runtime.core.api.event.EventContextService.FlowStackEntry;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperation;
+import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationDefinition;
 import org.mule.runtime.module.troubleshooting.internal.DefaultArgumentDefinition;
 import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingOperationDefinition;
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperation;
-import org.mule.runtime.module.troubleshooting.api.TroubleshootingOperationCallback;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
- * Operation used to collect an event dump in JSON format.
+ * Operation used to collect an event dump.
  * <p>
  * The name of the operation is "events".
  * <p>
@@ -38,7 +38,7 @@ import java.util.List;
 public class EventDumpOperation implements TroubleshootingOperation {
 
   public static final String EVENT_DUMP_OPERATION_NAME = "events";
-  public static final String EVENT_DUMP_OPERATION_DESCRIPTION = "Collects an EventDump in JSON format";
+  public static final String EVENT_DUMP_OPERATION_DESCRIPTION = "Collects an EventDump of currently active events";
 
   public static final String APPLICATION_ARGUMENT_NAME = "application";
   public static final String APPLICATION_ARGUMENT_DESCRIPTION = "Application to collect the event dump from";
@@ -58,30 +58,34 @@ public class EventDumpOperation implements TroubleshootingOperation {
 
   @Override
   public TroubleshootingOperationCallback getCallback() {
-    return arguments -> {
-      JSONObject flowStacks = new JSONObject();
+    return (arguments, writer) -> {
       final String applicationName = arguments.get(APPLICATION_ARGUMENT_NAME);
       if (applicationName == null) {
-        addFlowStacksForAllApplications(flowStacks);
+        writeFlowStacksForAllApplications(writer);
       } else {
         Application application = deploymentService.findApplication(applicationName);
-        addFlowStacksFor(application, flowStacks);
+        writeFlowStackEntries(application, writer);
       }
-      return flowStacks.toString(2);
     };
   }
 
-  private static void addFlowStacksFor(Application application, JSONObject flowStacks) {
-    flowStacks.put(application.getArtifactName(), getFlowStackEntries(application));
+  private static void writeFlowStacksFor(Application application, Writer writer)
+      throws IOException {
+    final var appsTitle = "Active Events for application '" + application.getArtifactName() + "'";
+    writer.write(appsTitle + lineSeparator());
+    writer.write(leftPad("", appsTitle.length(), "-") + lineSeparator());
+    writer.write(lineSeparator());
+
+    writeFlowStackEntries(application, writer);
   }
 
-  private void addFlowStacksForAllApplications(JSONObject flowStacks) {
+  private void writeFlowStacksForAllApplications(Writer writer) throws IOException {
     for (Application application : deploymentService.getApplications()) {
-      addFlowStacksFor(application, flowStacks);
+      writeFlowStacksFor(application, writer);
     }
   }
 
-  private static JSONArray getFlowStackEntries(Application application) {
+  private static void writeFlowStackEntries(Application application, Writer writer) throws IOException {
     EventContextService eventContextService = application
         .getArtifactContext()
         .getRegistry()
@@ -90,31 +94,14 @@ public class EventDumpOperation implements TroubleshootingOperation {
         .orElseThrow(() -> new IllegalArgumentException(format("Could not get EventContextService for application %s.",
                                                                application.getArtifactName())));
 
-    return flowStackEntriesToJSON(eventContextService.getCurrentlyActiveFlowStacks());
-  }
+    final var currentlyActiveFlowStacks = eventContextService.getCurrentlyActiveFlowStacks();
 
-  private static JSONArray flowStackEntriesToJSON(List<FlowStackEntry> flowStackEntries) {
-    JSONArray entriesArrayAsJSON = new JSONArray();
-    for (FlowStackEntry flowStackEntry : flowStackEntries) {
-      entriesArrayAsJSON.put(flowStackEntryToJSON(flowStackEntry));
+    for (FlowStackEntry fs : currentlyActiveFlowStacks) {
+      writer.write(format("\"%s\"%n%s",
+                          fs.getEventId(),
+                          fs.getFlowCallStack().toString().indent(4)));
+      writer.write(lineSeparator());
     }
-    return entriesArrayAsJSON;
-  }
-
-  private static JSONObject flowStackEntryToJSON(FlowStackEntry flowStackEntry) {
-    JSONObject entryAsJSON = new JSONObject();
-    entryAsJSON.put("eventId", flowStackEntry.getEventId());
-    entryAsJSON.put("serverId", flowStackEntry.getServerId());
-    entryAsJSON.put("flowCallStack", flowCallStackToJSON(flowStackEntry.getFlowCallStack()));
-    return entryAsJSON;
-  }
-
-  private static JSONArray flowCallStackToJSON(FlowCallStack flowCallStack) {
-    JSONArray callStackAsJSON = new JSONArray();
-    for (FlowStackElement element : flowCallStack.getElements()) {
-      callStackAsJSON.put(element.toString());
-    }
-    return callStackAsJSON;
   }
 
   private static TroubleshootingOperationDefinition createOperationDefinition() {
