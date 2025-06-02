@@ -9,6 +9,7 @@ package org.mule.runtime.config.internal.context;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.DEPLOYMENT_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.FORWARD_COMPATIBILITY_HELPER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
@@ -202,7 +203,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
       .put(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class))
       .put(OBJECT_CONVERTER_RESOLVER, getBeanDefinition(DynamicDataTypeConversionResolver.class))
-      .put(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class))
+      .put(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class, true))
       .put(OBJECT_LOCK_PROVIDER, getBeanDefinition(SingleServerLockProvider.class))
       .put(OBJECT_PROCESSING_TIME_WATCHER, getBeanDefinition(DefaultProcessingTimeWatcher.class))
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
@@ -288,9 +289,13 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     coreFunctionsProvider.setConfigurationProperties(configurationProperties);
     registerConstantBeanDefinition(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY, coreFunctionsProvider);
 
-    artifactProperties.forEach(this::registerConstantBeanDefinition);
+    getArtifactProperties()
+        .entrySet()
+        .stream()
+        .filter(e -> !e.getKey().startsWith(DEPLOYMENT_PROPERTY_PREFIX))
+        .forEach(e -> registerConstantBeanDefinition(e.getKey(), e.getValue()));
 
-    if (valueOf(artifactProperties.getOrDefault(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY, FALSE.toString()))) {
+    if (valueOf(getArtifactProperties().getOrDefault(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY, FALSE.toString()))) {
       registerConstantBeanDefinition(OBJECT_ARTIFACT_AST, artifactAst);
     }
   }
