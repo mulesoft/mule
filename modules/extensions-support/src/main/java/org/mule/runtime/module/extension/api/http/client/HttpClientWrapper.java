@@ -7,12 +7,15 @@
 package org.mule.runtime.module.extension.api.http.client;
 
 import org.mule.runtime.http.api.client.HttpRequestOptions;
+import org.mule.runtime.http.api.sse.client.SseSourceConfig;
 import org.mule.runtime.module.extension.api.http.message.muletosdk.HttpResponseWrapper;
 import org.mule.runtime.module.extension.api.http.message.sdktomule.HttpRequestWrapper;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpRequestOptionsConfigurer;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
+import org.mule.sdk.api.http.sse.client.SseSource;
+import org.mule.sdk.api.http.sse.client.SseSourceConfigurer;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -42,6 +45,13 @@ public class HttpClientWrapper implements HttpClient {
       }
     });
     return future;
+  }
+
+  @Override
+  public SseSource sseSource(Consumer<SseSourceConfigurer> configConsumer) {
+    SseSourceConfigurerImpl configurer = new SseSourceConfigurerImpl();
+    configConsumer.accept(configurer);
+    return new SseSourceWrapper(delegate.sseSource(configurer.build()));
   }
 
   @Override
