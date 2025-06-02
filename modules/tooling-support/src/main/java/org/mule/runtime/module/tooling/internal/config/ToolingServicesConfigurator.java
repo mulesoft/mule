@@ -41,8 +41,8 @@ import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.metadata.internal.cache.lazy.DelegateMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.metadata.internal.cache.lazy.DelegateMetadataCacheManager;
-import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.tooling.internal.connectivity.DefaultConnectivityTestingService;
+import org.mule.runtime.module.tooling.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.tooling.internal.value.MuleValueProviderService;
 
 

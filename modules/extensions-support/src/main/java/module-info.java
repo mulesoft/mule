@@ -100,15 +100,13 @@ module org.mule.runtime.extensions.support {
 
   exports org.mule.runtime.module.extension.internal to
       org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.tooling.support,
       org.mule.test.runner;
   exports org.mule.runtime.module.extension.internal.config to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.module.extension.internal.data.sample to
-      org.mule.runtime.spring.config,
-      org.mule.runtime.tooling.support;
+      org.mule.runtime.extensions.tooling.support;
   exports org.mule.runtime.module.extension.internal.loader to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.mule.support,
@@ -125,8 +123,6 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.module.extension.internal.loader.java.type.property to
       org.mule.runtime.extensions.spring.support;
-  exports org.mule.runtime.module.extension.internal.metadata to
-      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.loader.parser.java to
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes to
@@ -144,9 +140,6 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.client to
       org.mule.runtime.core;
-  exports org.mule.runtime.module.extension.internal.runtime.config to
-      org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity to
       org.mule.runtime.core,
       org.mule.runtime.extensions.spring.support;
@@ -176,8 +169,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.resolver to
       org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.extensions.xml.support,
-      org.mule.runtime.tooling.support;
+      org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.module.extension.internal.runtime.resolver.resolver to
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.source to
@@ -193,8 +185,6 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.tooling.support,
       org.mule.runtime.spring.config;
-  exports org.mule.runtime.module.extension.internal.value to
-      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.loader.java.enricher to
       org.mule.runtime.extensions.mule.support;
   exports org.mule.runtime.module.extension.internal.loader.java.type.runtime to
@@ -212,8 +202,6 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.loader.parser.metadata to
       org.mule.runtime.extensions.mule.support,
       org.mule.runtime.extensions.spring.support;
-  exports org.mule.runtime.module.extension.internal.metadata.chain to
-      org.mule.runtime.tooling.support;
 
   opens org.mule.runtime.module.extension.internal.resources.documentation to
       jakarta.xml.bind;

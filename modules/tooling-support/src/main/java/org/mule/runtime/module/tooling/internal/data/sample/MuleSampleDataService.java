@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.data.sample;
+package org.mule.runtime.module.tooling.internal.data.sample;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver.staticParametersFrom;
@@ -38,6 +38,7 @@ import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.tooling.sampledata.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
+import org.mule.runtime.module.extension.internal.data.sample.DefaultSampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.data.sample.SampleDataException;
 

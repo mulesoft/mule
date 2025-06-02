@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.data.sample;
+package org.mule.runtime.module.tooling.internal.data.sample;
 
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
