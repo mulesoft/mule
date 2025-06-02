@@ -15,6 +15,7 @@ import static java.io.File.separator;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.module.artifact.activation.api.classloader.DomainClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -30,7 +31,8 @@ import org.slf4j.Logger;
 /**
  * Defines a {@link MuleArtifactClassLoader} for a domain artifact.
  */
-public class MuleSharedDomainClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader {
+public class MuleSharedDomainClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader
+    implements DomainClassLoader {
 
   static {
     registerAsParallelCapable();
