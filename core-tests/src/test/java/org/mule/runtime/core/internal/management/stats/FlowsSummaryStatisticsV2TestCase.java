@@ -8,9 +8,9 @@ package org.mule.runtime.core.internal.management.stats;
 
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
-import static org.mule.runtime.core.api.management.stats.FlowClassifier.FlowType.APIKIT;
-import static org.mule.runtime.core.api.management.stats.FlowClassifier.FlowType.GENERIC;
-import static org.mule.runtime.core.api.management.stats.FlowClassifier.FlowType.SOAPKIT;
+import static org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType.APIKIT;
+import static org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType.GENERIC;
+import static org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType.SOAPKIT;
 import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.FlowSummaryStory.ACTIVE_FLOWS_SUMMARY;
 import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.PRICING_METRICS;
 
@@ -31,7 +31,6 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.management.stats.FlowClassifier;
 import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
@@ -49,7 +48,7 @@ import org.junit.Test;
 @Feature(PRICING_METRICS)
 @Story(ACTIVE_FLOWS_SUMMARY)
 // TODO W-18668900: swap with FlowsSummaryStatisticsTestCase and remove once the pilot is concluded
-public class FlowsSummaryStatisticsPilotTestCase extends AbstractMuleContextTestCase {
+public class FlowsSummaryStatisticsV2TestCase extends AbstractMuleContextTestCase {
 
   @Override
   protected void doSetUp() throws Exception {

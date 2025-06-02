@@ -133,7 +133,6 @@ public class AllStatistics {
    * @deprecated will be removed once the pilot is concluded.
    */
   @Experimental
-  @Deprecated
   // TODO W-18668900: swap and remove once the pilot is concluded
   public FlowsSummaryStatistics getFlowSummaryStatisticsV2() {
     return flowSummaryStatisticsV2;

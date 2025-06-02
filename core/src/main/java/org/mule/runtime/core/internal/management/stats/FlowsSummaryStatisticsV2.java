@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.management.stats;
 
 /**
+ * This variation of {@link DefaultFlowsSummaryStatistics} only applies a different suffix to the metrics when exported. The
+ * difference in the computation of the values lies elsewhere as these classes are mostly just containers.
  *
  * @since 4.10
  */

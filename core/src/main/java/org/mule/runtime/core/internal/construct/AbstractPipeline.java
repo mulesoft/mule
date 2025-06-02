@@ -17,7 +17,7 @@ import static org.mule.runtime.core.api.alert.MuleAlertingSupport.AlertNames.ALE
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.ApiKitStatsUtils.isApiKitFlow;
-import static org.mule.runtime.core.api.management.stats.FlowClassifier.FlowType.GENERIC;
+import static org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType.GENERIC;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
@@ -63,8 +63,8 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.management.stats.FlowClassifier;
-import org.mule.runtime.core.api.management.stats.FlowClassifier.FlowType;
+import org.mule.runtime.core.internal.management.stats.FlowClassifier;
+import org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -152,8 +152,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           Integer maxConcurrency,
                           DefaultFlowsSummaryStatistics flowsSummaryStatistics,
-                          DefaultFlowsSummaryStatistics flowsSummaryStatisticsV2, // TODO W-18668900: remove once the pilot is
-                          // concluded
+                          // TODO W-18668900: remove once the pilot is concluded
+                          DefaultFlowsSummaryStatistics flowsSummaryStatisticsV2,
                           FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);

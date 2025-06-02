@@ -9,9 +9,9 @@ package org.mule.runtime.config.internal.context;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.CONFIG;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.core.api.management.stats.FlowClassifier.FlowType.APIKIT;
-import static org.mule.runtime.core.api.management.stats.FlowClassifier.FlowType.GENERIC;
-import static org.mule.runtime.core.api.management.stats.FlowClassifier.FlowType.SOAPKIT;
+import static org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType.APIKIT;
+import static org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType.GENERIC;
+import static org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType.SOAPKIT;
 
 import static java.util.Collections.singletonList;
 import static java.util.Collections.emptyList;
@@ -28,7 +28,7 @@ import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
-import org.mule.runtime.core.api.management.stats.FlowClassifier;
+import org.mule.runtime.core.internal.management.stats.FlowClassifier;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;

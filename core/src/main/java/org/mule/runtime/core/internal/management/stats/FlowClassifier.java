@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.management.stats;
+package org.mule.runtime.core.internal.management.stats;
 
 import org.mule.api.annotation.NoImplement;
 
