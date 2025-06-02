@@ -56,7 +56,18 @@ module org.mule.runtime.tooling.support {
   exports org.mule.runtime.module.tooling.internal to
       org.mule.runtime.launcher;
 
+  exports org.mule.runtime.module.tooling.internal.config to
+      spring.beans;
+  exports org.mule.runtime.module.tooling.internal.connectivity to
+      spring.beans;
+  exports org.mule.runtime.module.tooling.internal.value to
+      spring.beans;
+
   opens org.mule.runtime.module.tooling.internal.config to
+      spring.core;
+  opens org.mule.runtime.module.tooling.internal.connectivity to
+      spring.core;
+  opens org.mule.runtime.module.tooling.internal.value to
       spring.core;
 
   provides org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer

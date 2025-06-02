@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.connectivity;
+package org.mule.runtime.module.tooling.internal.connectivity;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingStrategy.lookupConnectivityTestingStrategies;
