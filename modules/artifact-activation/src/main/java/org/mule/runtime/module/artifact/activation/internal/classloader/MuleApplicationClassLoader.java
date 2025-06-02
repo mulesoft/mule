@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.toFile;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.module.artifact.activation.api.classloader.ApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -30,7 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MuleApplicationClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader {
+public class MuleApplicationClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader
+    implements ApplicationClassLoader {
 
   static {
     registerAsParallelCapable();
