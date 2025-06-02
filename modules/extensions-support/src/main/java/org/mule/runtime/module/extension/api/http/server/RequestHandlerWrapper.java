@@ -20,7 +20,6 @@ public class RequestHandlerWrapper implements RequestHandler {
 
   @Override
   public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
-    // TODO: Null?
     delegate.handleRequest(new HttpRequestContextWrapper(requestContext), new HttpResponseReadyCallbackWrapper(responseCallback));
   }
 

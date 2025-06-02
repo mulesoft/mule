@@ -23,10 +23,6 @@ import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.sdk.api.http.server.HttpServer;
 import org.mule.sdk.api.http.server.HttpServerConfigurer;
-import org.mule.sdk.api.http.server.PathAndMethodRequestMatcherBuilder;
-import org.mule.sdk.api.http.server.RequestHandler;
-import org.mule.sdk.api.http.server.RequestMatcher;
-import org.mule.sdk.api.http.utils.RequestMatcherRegistryBuilder;
 
 import java.util.function.Consumer;
 
@@ -83,22 +79,5 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   public HttpRequestBuilder requestBuilder(boolean preserveHeaderCase) {
     return new HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message.request.HttpRequest
         .builder(preserveHeaderCase));
-  }
-
-
-
-  @Override
-  public RequestMatcherRegistryBuilder<RequestHandler> requestMatcherRegistryBuilder() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public RequestMatcher acceptAllRequests() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public PathAndMethodRequestMatcherBuilder requestMatcherBuilder() {
-    throw new UnsupportedOperationException();
   }
 }
