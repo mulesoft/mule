@@ -374,7 +374,7 @@ public class FakeMuleServer {
    * Adds a service implementation file to the Mule server.
    *
    * @param service service file to add. Non null.
-   * @throws IOException if the servcie file cannot be accessed
+   * @throws IOException if the service file cannot be accessed
    */
   public void addZippedService(File service) throws IOException {
     String baseName = getName(service.getPath());

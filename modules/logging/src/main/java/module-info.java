@@ -12,6 +12,8 @@
  */
 module org.mule.runtime.logging {
 
+  exports org.mule.runtime.module.log4j.api;
+
   // Allows usage of Unsafe for caffeine, required for DataWeave
   // TODO: remove after TD-0231495 is done
   requires jdk.unsupported;

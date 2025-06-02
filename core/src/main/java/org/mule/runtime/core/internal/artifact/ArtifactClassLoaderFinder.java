@@ -14,7 +14,7 @@ import java.util.ServiceLoader;
 /**
  * Allows to resolve the proper classloader to use on certain use cases, unwinding the classloader hierarchy of the deployable
  * artifacts in the Mule Runtime.
- * 
+ *
  * @since 4.10
  */
 public interface ArtifactClassLoaderFinder {

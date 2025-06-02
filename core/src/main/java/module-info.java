@@ -61,7 +61,10 @@ module org.mule.runtime.core {
   requires org.mule.runtime.profiling.api;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
+  // module from the boot layer, will not be available in tests
+  requires static org.mule.runtime.logging;
   requires org.mule.runtime.manifest;
+
 
   requires org.mule.runtime.metrics.api;
   requires org.mule.runtime.tracer.api;
