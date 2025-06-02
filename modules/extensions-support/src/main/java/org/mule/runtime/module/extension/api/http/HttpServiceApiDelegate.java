@@ -18,10 +18,6 @@ import org.mule.runtime.module.extension.api.http.server.HttpServerConfigurerToB
 import org.mule.runtime.module.extension.api.http.server.HttpServerWrapper;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfigurer;
-import org.mule.sdk.api.http.client.auth.HttpAuthenticationBuilder;
-import org.mule.sdk.api.http.client.proxy.NtlmProxyConfigBuilder;
-import org.mule.sdk.api.http.client.proxy.ProxyConfig;
-import org.mule.sdk.api.http.client.proxy.ProxyConfigBuilder;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
@@ -103,36 +99,6 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
 
   @Override
   public PathAndMethodRequestMatcherBuilder requestMatcherBuilder() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder authBuilder() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder basicAuthBuilder(String username, String password) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder digestAuthBuilder(String username, String password) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public HttpAuthenticationBuilder.HttpNtlmAuthenticationBuilder ntlmAuthBuilder(String username, String password) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ProxyConfigBuilder<ProxyConfig, ?> proxyConfigBuilder() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public NtlmProxyConfigBuilder ntlmProxyConfigBuilder() {
     throw new UnsupportedOperationException();
   }
 }
