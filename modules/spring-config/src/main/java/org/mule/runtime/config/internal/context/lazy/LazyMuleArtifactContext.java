@@ -53,7 +53,6 @@ import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocato
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.SpringMuleContextServiceConfigurator;
-import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
@@ -101,8 +100,6 @@ import org.springframework.lang.Nullable;
  */
 public class LazyMuleArtifactContext extends MuleArtifactContext
     implements LazyComponentInitializerAdapter, ComponentModelInitializer {
-
-  public static final String SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH = "_sharedPartitionatedPersistentObjectStorePath";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
 

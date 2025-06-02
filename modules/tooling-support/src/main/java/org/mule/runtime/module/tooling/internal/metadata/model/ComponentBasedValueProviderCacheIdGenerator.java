@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.api.dsl.model.metadata;
+package org.mule.runtime.module.tooling.internal.metadata.model;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 

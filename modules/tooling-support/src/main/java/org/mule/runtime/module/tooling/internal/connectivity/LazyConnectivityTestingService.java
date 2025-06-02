@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.bean.lazy;
+package org.mule.runtime.module.tooling.internal.connectivity;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 
@@ -19,7 +19,7 @@ import org.mule.runtime.api.exception.ObjectNotFoundException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.config.api.LazyComponentInitializer;
-import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
+import org.mule.runtime.config.internal.context.lazy.NoSuchComponentModelException;
 
 import java.util.List;
 import java.util.function.Function;

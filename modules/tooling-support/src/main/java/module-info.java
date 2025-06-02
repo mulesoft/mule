@@ -62,6 +62,8 @@ module org.mule.runtime.tooling.support {
       spring.beans;
   exports org.mule.runtime.module.tooling.internal.connectivity to
       spring.beans;
+  exports org.mule.runtime.module.tooling.internal.metadata.model to
+      spring.beans;
   exports org.mule.runtime.module.tooling.internal.value to
       spring.beans;
 
@@ -70,6 +72,8 @@ module org.mule.runtime.tooling.support {
   opens org.mule.runtime.module.tooling.internal.config to
       spring.core;
   opens org.mule.runtime.module.tooling.internal.connectivity to
+      spring.core;
+  opens org.mule.runtime.module.tooling.internal.metadata to
       spring.core;
   opens org.mule.runtime.module.tooling.internal.metadata.cache.lazy to
       spring.core;

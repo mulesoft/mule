@@ -30,6 +30,7 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
+
 import static org.junit.Assume.assumeThat;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -60,7 +61,7 @@ public class MetadataNegativeTestCase extends AbstractMetadataOperationTestCase 
   private static final String NO_DYNAMIC_KEY_AVAILABLE = "Component [%s] is not a MetadataKeyProvider";
   private static final String DYNAMIC_CONFIG = "dynamic-config";
   private static final String NO_SUCH_COMPONENT_MODEL_EXCEPTION_CLASS_NAME =
-      "org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException";
+      "org.mule.runtime.config.internal.context.lazy.NoSuchComponentModelException";
   private static final String INVALID_COMPONENT_EXCEPTION_CLASSNAME =
       "org.mule.runtime.metadata.internal.InvalidComponentIdException";
 

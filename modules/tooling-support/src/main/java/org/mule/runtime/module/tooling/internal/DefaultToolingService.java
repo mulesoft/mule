@@ -7,7 +7,7 @@
 package org.mule.runtime.module.tooling.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
+import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY;

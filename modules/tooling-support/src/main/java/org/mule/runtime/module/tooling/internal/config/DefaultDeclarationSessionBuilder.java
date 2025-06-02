@@ -6,26 +6,26 @@
  */
 package org.mule.runtime.module.tooling.internal.config;
 
-import static java.lang.Boolean.valueOf;
-import static java.lang.System.getProperty;
-
-import static org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
+import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_XML_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
+
+import static java.lang.Boolean.valueOf;
+import static java.lang.System.getProperty;
+
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSession;
 import org.mule.runtime.module.tooling.api.artifact.DeclarationSessionBuilder;
 import org.mule.runtime.module.tooling.internal.AbstractArtifactAgnosticServiceBuilder;
 import org.mule.runtime.module.tooling.internal.ApplicationSupplier;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.File;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 public class DefaultDeclarationSessionBuilder
     extends AbstractArtifactAgnosticServiceBuilder<DeclarationSessionBuilder, DeclarationSession>

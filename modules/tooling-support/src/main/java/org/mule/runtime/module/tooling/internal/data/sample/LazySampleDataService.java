@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.bean.lazy;
+package org.mule.runtime.module.tooling.internal.data.sample;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.INVALID_LOCATION;
@@ -15,7 +15,7 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.config.internal.context.lazy.LazyComponentInitializerAdapter;
-import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
+import org.mule.runtime.config.internal.context.lazy.NoSuchComponentModelException;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.sdk.api.data.sample.SampleDataException;

@@ -8,7 +8,9 @@ package org.mule.runtime.config.internal.context.lazy;
 
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
-import static org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
+import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.LAZY_MULE_OBJECT_STORE_MANAGER;
+import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.LAZY_MULE_RUNTIME_LOCK_FACTORY;
+import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
@@ -39,9 +41,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  * @since 4.5
  */
 public class LazySpringMuleContextServiceConfigurator extends SpringMuleContextServiceConfigurator {
-
-  public static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
-  public static final String LAZY_MULE_RUNTIME_LOCK_FACTORY = "_muleLazyRuntimeLockFactory";
 
   private final LazyComponentInitializerAdapter lazyComponentInitializer;
   private final LockFactory runtimeLockFactory;

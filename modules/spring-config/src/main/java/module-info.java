@@ -87,23 +87,18 @@ module org.mule.runtime.spring.config {
 
   // Required to build MUnit chains
   exports org.mule.runtime.config.privileged.dsl.spring;
+  exports org.mule.runtime.config.privileged.spring
+      to spring.core;
 
-  exports org.mule.runtime.config.api.dsl.model.metadata to
-      org.mule.runtime.tooling.support,
-      spring.beans;
   exports org.mule.runtime.config.internal to
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl;
   exports org.mule.runtime.config.internal.bean to
       spring.beans;
-  exports org.mule.runtime.config.internal.bean.lazy to
-      org.mule.runtime.tooling.support;
   exports org.mule.runtime.config.internal.context to
       org.mule.runtime.deployment,
       spring.beans;
   exports org.mule.runtime.config.internal.context.lazy to
-      org.mule.runtime.tooling.support;
-  exports org.mule.runtime.config.internal.dsl to
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.config.internal.dsl.processor to
       org.mule.runtime.core,
@@ -126,8 +121,7 @@ module org.mule.runtime.spring.config {
   exports org.mule.runtime.config.internal.lazy to
       spring.beans;
   exports org.mule.runtime.config.internal.model to
-      org.mule.runtime.extensions.xml.support,
-      org.mule.runtime.tooling.support;
+      org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.config.internal.processor to
       spring.beans;
 
@@ -142,8 +136,6 @@ module org.mule.runtime.spring.config {
   opens org.mule.runtime.config.api.factories.streaming to
       spring.core;
   opens org.mule.runtime.config.internal.bean to
-      spring.core;
-  opens org.mule.runtime.config.internal.bean.lazy to
       spring.core;
   opens org.mule.runtime.config.internal.context.service to
       org.mule.runtime.core;
@@ -160,6 +152,5 @@ module org.mule.runtime.spring.config {
       spring.core;
   opens org.mule.runtime.config.internal.factories.streaming to
       net.bytebuddy;
-  exports org.mule.runtime.config.privileged.spring to spring.core;
 
 }

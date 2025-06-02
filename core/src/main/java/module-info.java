@@ -543,7 +543,8 @@ module org.mule.runtime.core {
       com.mulesoft.anypoint.gw.core;
   exports org.mule.runtime.core.internal.value.cache to
       org.mule.runtime.metadata.support,
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support;
 
   opens org.mule.runtime.core.api to
       spring.core;
