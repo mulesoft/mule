@@ -8,10 +8,11 @@ package org.mule.runtime.module.extension.api.http.client;
 
 import org.mule.runtime.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.sdk.api.http.client.HttpRequestOptionsConfigurer;
-import org.mule.sdk.api.http.client.auth.HttpAuthentication;
-import org.mule.sdk.api.http.client.proxy.ProxyConfig;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfigurer;
+import org.mule.sdk.api.http.client.proxy.ProxyConfigurer;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class HttpRequestOptionsConfigurerToBuilder implements HttpRequestOptionsConfigurer {
 
@@ -34,14 +35,18 @@ public class HttpRequestOptionsConfigurerToBuilder implements HttpRequestOptions
   }
 
   @Override
-  public HttpRequestOptionsConfigurer setAuthentication(HttpAuthentication authentication) {
-    // builder.authentication(authentication);
+  public HttpRequestOptionsConfigurer setAuthentication(Consumer<HttpAuthenticationConfigurer> configurerConsumer) {
+    HttpAuthenticationConfigurerImpl configurer = new HttpAuthenticationConfigurerImpl();
+    configurerConsumer.accept(configurer);
+    builder.authentication(configurer.build());
     return this;
   }
 
   @Override
-  public HttpRequestOptionsConfigurer setProxyConfig(ProxyConfig proxyConfig) {
-    // builder.proxyConfig(proxyConfig);
+  public HttpRequestOptionsConfigurer setProxyConfig(Consumer<ProxyConfigurer> proxyConfig) {
+    ProxyConfigurerImpl configurer = new ProxyConfigurerImpl();
+    proxyConfig.accept(configurer);
+    builder.proxyConfig(configurer.build());
     return this;
   }
 
