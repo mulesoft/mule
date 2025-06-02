@@ -7,13 +7,10 @@
 package org.mule.runtime.module.extension.api.http.client;
 
 import org.mule.runtime.http.api.client.HttpRequestOptions;
-import org.mule.runtime.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.runtime.module.extension.api.http.message.muletosdk.HttpResponseWrapper;
 import org.mule.runtime.module.extension.api.http.message.sdktomule.HttpRequestWrapper;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpRequestOptionsConfigurer;
-import org.mule.sdk.api.http.client.auth.HttpAuthentication;
-import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
@@ -55,39 +52,5 @@ public class HttpClientWrapper implements HttpClient {
   @Override
   public void stop() {
     delegate.stop();
-  }
-
-  private record HttpRequestOptionsConfigurerToBuilder(HttpRequestOptionsBuilder builder)
-      implements HttpRequestOptionsConfigurer {
-
-    @Override
-    public HttpRequestOptionsConfigurer setResponseTimeout(int responseTimeout) {
-      builder.responseTimeout(responseTimeout);
-      return this;
-    }
-
-    @Override
-    public HttpRequestOptionsConfigurer setFollowsRedirect(boolean followsRedirect) {
-      builder.followsRedirect(followsRedirect);
-      return this;
-    }
-
-    @Override
-    public HttpRequestOptionsConfigurer setAuthentication(HttpAuthentication authentication) {
-      // builder.authentication(authentication);
-      return this;
-    }
-
-    @Override
-    public HttpRequestOptionsConfigurer setProxyConfig(ProxyConfig proxyConfig) {
-      // builder.proxyConfig(proxyConfig);
-      return this;
-    }
-
-    @Override
-    public HttpRequestOptionsConfigurer setSendBodyAlways(boolean sendBodyAlways) {
-      builder.sendBodyAlways(sendBodyAlways);
-      return this;
-    }
   }
 }
