@@ -32,6 +32,7 @@ module org.mule.runtime.deployment.model.impl {
   requires org.mule.runtime.policy.api;
   requires org.mule.runtime.profiling.api;
   requires org.mule.runtime.service;
+  requires org.mule.tools.api.classloader;
 
   // For deserialization of patching model:
   requires com.google.common;
@@ -40,7 +41,6 @@ module org.mule.runtime.deployment.model.impl {
   requires org.apache.commons.collections4;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
-  requires mule.classloader.model;
   requires semver4j;
 
   exports org.mule.runtime.module.deployment.impl.internal to
