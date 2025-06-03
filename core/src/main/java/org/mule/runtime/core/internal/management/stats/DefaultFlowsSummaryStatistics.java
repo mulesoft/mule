@@ -192,7 +192,7 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
         .build();
 
     // Register the declared private flows.
-    meter.counterBuilder(DECLARED_PRIVATE_FLOWS_APP_NAME)
+    meter.counterBuilder(DECLARED_PRIVATE_FLOWS_APP_NAME + getMetricSuffix())
         .withValueSupplier(() -> (long) declaredPrivateFlows.get())
         .withConsumerForAddOperation(value -> declaredPrivateFlows.addAndGet(value.intValue()))
         .withSupplierForIncrementAndGetOperation(() -> (long) declaredPrivateFlows.incrementAndGet())
@@ -200,14 +200,14 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
 
 
     // Register the active private flows.
-    meter.counterBuilder(ACTIVE_PRIVATE_FLOWS_APP_NAME)
+    meter.counterBuilder(ACTIVE_PRIVATE_FLOWS_APP_NAME + getMetricSuffix())
         .withValueSupplier(() -> (long) activePrivateFlows.get())
         .withConsumerForAddOperation(value -> activePrivateFlows.addAndGet(value.intValue()))
         .withSupplierForIncrementAndGetOperation(() -> (long) activePrivateFlows.incrementAndGet())
         .withDescription(ACTIVE_PRIVATE_FLOWS_APP_DESCRIPTION).build();
 
     // Register the declared trigger flows.
-    meter.counterBuilder(DECLARED_TRIGGER_FLOWS_APP_NAME)
+    meter.counterBuilder(DECLARED_TRIGGER_FLOWS_APP_NAME + getMetricSuffix())
         .withValueSupplier(() -> (long) declaredTriggerFlows.get())
         .withConsumerForAddOperation(value -> declaredTriggerFlows.addAndGet(value.intValue()))
         .withSupplierForIncrementAndGetOperation(() -> (long) declaredTriggerFlows.incrementAndGet())
@@ -215,21 +215,21 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
 
 
     // Register the active trigger flows.
-    meter.counterBuilder(ACTIVE_TRIGGER_FLOWS_NAME)
+    meter.counterBuilder(ACTIVE_TRIGGER_FLOWS_NAME + getMetricSuffix())
         .withValueSupplier(() -> (long) activeTriggerFlows.get())
         .withConsumerForAddOperation(value -> activeTriggerFlows.addAndGet(value.intValue()))
         .withSupplierForIncrementAndGetOperation(() -> (long) activeTriggerFlows.incrementAndGet())
         .withDescription(ACTIVE_TRIGGER_FLOWS_DESCRIPTION).build();
 
     // Register the declared apikit flows.
-    meter.counterBuilder(DECLARED_APIKIT_FLOWS_APP_NAME)
+    meter.counterBuilder(DECLARED_APIKIT_FLOWS_APP_NAME + getMetricSuffix())
         .withValueSupplier(() -> (long) declaredApikitFlows.get())
         .withConsumerForAddOperation(value -> declaredApikitFlows.addAndGet(value.intValue()))
         .withSupplierForIncrementAndGetOperation(() -> (long) declaredApikitFlows.incrementAndGet())
         .withDescription(DECLARED_APIKIT_FLOWS_APP_DESCRIPTION).build();
 
     // Register the active apikit flows.
-    meter.counterBuilder(ACTIVE_APIKIT_FLOWS_APP_NAME)
+    meter.counterBuilder(ACTIVE_APIKIT_FLOWS_APP_NAME + getMetricSuffix())
         .withValueSupplier(() -> (long) activeApikitFlows.get())
         .withConsumerForAddOperation(value -> activeApikitFlows.addAndGet(value.intValue()))
         .withSupplierForIncrementAndGetOperation(() -> (long) activeApikitFlows.incrementAndGet())
@@ -248,5 +248,10 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
         "\t\tFlows: " + declaredApiKitFlowNames + "\n" +
         "\t}\n" +
         '}';
+  }
+
+  // TODO W-18668900: remove once the pilot is concluded
+  protected String getMetricSuffix() {
+    return "";
   }
 }
