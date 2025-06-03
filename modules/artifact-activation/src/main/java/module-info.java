@@ -4,6 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+import org.mule.runtime.core.internal.artifact.ArtifactClassLoaderFinder;
+import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderFinder;
+
 /**
  * Provides behavior necessary for loading artifacts.
  *
@@ -77,5 +80,8 @@ module org.mule.runtime.artifact.activation {
       org.mule.test.runner;
   exports org.mule.runtime.module.artifact.activation.internal.plugin to
       org.mule.runtime.deployment.model.impl;
+
+  provides ArtifactClassLoaderFinder
+      with DefaultArtifactClassLoaderFinder;
 
 }
