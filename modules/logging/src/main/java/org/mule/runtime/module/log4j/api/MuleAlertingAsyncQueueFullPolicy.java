@@ -16,6 +16,12 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.async.DefaultAsyncQueueFullPolicy;
 import org.apache.logging.log4j.core.async.EventRoute;
 
+/**
+ * Specialization of {@link DefaultAsyncQueueFullPolicy} that calls registered callbacks to trigger alerts to help in
+ * troubleshooting.
+ * 
+ * @since 4.10
+ */
 public class MuleAlertingAsyncQueueFullPolicy extends DefaultAsyncQueueFullPolicy {
 
   // use the classloader as key so entries are GCd on app undeployment
@@ -31,9 +37,10 @@ public class MuleAlertingAsyncQueueFullPolicy extends DefaultAsyncQueueFullPolic
   }
 
   /**
+   * Registers a callback to be called when {@link #getRoute(long, Level)} is called, before delegating to the superinterface.
    *
-   * @param regionClassLoader
-   * @param callback
+   * @param regionClassLoader the region classloader for the artifact that owns the callback the callback
+   * @param callback          the callback to invoke
    */
   public static void register(ClassLoader regionClassLoader, Consumer<ClassLoader> callback) {
     callbacks.put(regionClassLoader, callback);
