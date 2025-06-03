@@ -6,45 +6,44 @@
  */
 package org.mule.runtime.module.extension.api.http.server;
 
-import org.mule.runtime.http.api.sse.server.SseClientConfig;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestContext;
-import org.mule.sdk.api.http.sse.server.SseClientConfigurer;
+import org.mule.sdk.api.http.sse.server.SseClientConfig;
 import org.mule.sdk.api.http.sse.server.SseResponseCustomizer;
 
 import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 
-public class SseClientConfigurerImpl implements SseClientConfigurer {
+public class SseClientConfigImpl implements SseClientConfig {
 
   private String clientId;
   private InetSocketAddress remoteAddress;
   private Consumer<SseResponseCustomizer> responseCustomizer;
 
   @Override
-  public SseClientConfigurer withRequestContext(HttpRequestContext requestContext) {
+  public SseClientConfig withRequestContext(HttpRequestContext requestContext) {
     return withRemoteAddress(nullSafeGetAddress(requestContext));
   }
 
   @Override
-  public SseClientConfigurer withClientId(String clientId) {
+  public SseClientConfig withClientId(String clientId) {
     this.clientId = clientId;
     return this;
   }
 
   @Override
-  public SseClientConfigurer withRemoteAddress(InetSocketAddress remoteAddress) {
+  public SseClientConfig withRemoteAddress(InetSocketAddress remoteAddress) {
     this.remoteAddress = remoteAddress;
     return this;
   }
 
   @Override
-  public SseClientConfigurer customizeResponse(Consumer<SseResponseCustomizer> consumer) {
-    this.responseCustomizer = consumer;
+  public SseClientConfig customizeResponse(Consumer<SseResponseCustomizer> callback) {
+    this.responseCustomizer = callback;
     return this;
   }
 
-  public SseClientConfig build() {
-    return SseClientConfig.builder()
+  public org.mule.runtime.http.api.sse.server.SseClientConfig build() {
+    return org.mule.runtime.http.api.sse.server.SseClientConfig.builder()
         .withClientId(clientId)
         .withRemoteAddress(remoteAddress)
         .customizeResponse(customizer -> responseCustomizer.accept(new SseResponseCustomizerWrapper(customizer)))

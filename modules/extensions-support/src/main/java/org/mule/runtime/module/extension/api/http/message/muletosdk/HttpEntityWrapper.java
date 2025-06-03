@@ -14,7 +14,6 @@ import org.mule.sdk.api.http.domain.entity.multipart.Part;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.OptionalLong;
 
 public class HttpEntityWrapper implements HttpEntity {
@@ -48,11 +47,6 @@ public class HttpEntityWrapper implements HttpEntity {
   @Override
   public Collection<Part> getParts() throws IOException {
     return muleEntity.getParts().stream().map(HttpPartWrapper::new).collect(toUnmodifiableList());
-  }
-
-  @Override
-  public Optional<Long> getLength() {
-    return muleEntity.getLength();
   }
 
   @Override

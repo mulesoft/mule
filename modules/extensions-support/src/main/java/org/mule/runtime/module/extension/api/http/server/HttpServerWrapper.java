@@ -88,7 +88,8 @@ public class HttpServerWrapper implements HttpServer {
 
   @Override
   public SseEndpointManager sse(String ssePath, Consumer<SseRequestContext> onRequest, Consumer<SseClient> onClient) {
-    // TODO: Hi!
-    return null;
+    return new SseEndpointManagerWrapper(delegate.sse(ssePath,
+                                                      ctx -> onRequest.accept(new SseRequestContextWrapper(ctx)),
+                                                      sseClient -> onClient.accept(new SseClientWrapper(sseClient))));
   }
 }

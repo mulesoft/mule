@@ -73,18 +73,18 @@ public class HttpClientConfigToBuilder implements HttpClientConfig {
   }
 
   @Override
-  public HttpClientConfig configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configurerConsumer) {
+  public HttpClientConfig configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configCallback) {
     var propsBuilder = TcpClientSocketProperties.builder();
     var configurer = new TcpSocketPropertiesConfigurerToBuilder(propsBuilder);
-    configurerConsumer.accept(configurer);
+    configCallback.accept(configurer);
     builder.setClientSocketProperties(propsBuilder.build());
     return this;
   }
 
   @Override
-  public HttpClientConfig configProxy(Consumer<ProxyConfig> configurerConsumer) {
+  public HttpClientConfig configProxy(Consumer<ProxyConfig> configCallback) {
     var configurer = new ProxyConfigImpl();
-    configurerConsumer.accept(configurer);
+    configCallback.accept(configurer);
     builder.setProxyConfig(configurer.build());
     return this;
   }

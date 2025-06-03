@@ -15,7 +15,7 @@ import org.mule.runtime.module.extension.api.http.client.HttpClientWrapper;
 import org.mule.runtime.module.extension.api.http.message.HttpEntityFactoryImpl;
 import org.mule.runtime.module.extension.api.http.message.HttpRequestBuilderWrapper;
 import org.mule.runtime.module.extension.api.http.message.HttpResponseBuilderWrapper;
-import org.mule.runtime.module.extension.api.http.server.HttpServerConfigurerToBuilder;
+import org.mule.runtime.module.extension.api.http.server.HttpServerConfigToBuilder;
 import org.mule.runtime.module.extension.api.http.server.HttpServerWrapper;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfig;
@@ -24,7 +24,7 @@ import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.sdk.api.http.server.HttpServer;
-import org.mule.sdk.api.http.server.HttpServerConfigurer;
+import org.mule.sdk.api.http.server.HttpServerConfig;
 
 import java.util.function.Consumer;
 
@@ -38,10 +38,10 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   private final HttpEntityFactory httpEntityFactory = new HttpEntityFactoryImpl();
 
   @Override
-  public HttpClient client(Consumer<HttpClientConfig> configBuilder) {
+  public HttpClient client(Consumer<HttpClientConfig> configCallback) {
     var builder = new HttpClientConfiguration.Builder();
     var configurer = new HttpClientConfigToBuilder(builder);
-    configBuilder.accept(configurer);
+    configCallback.accept(configurer);
     HttpClientConfiguration configuration = builder.build();
     try {
       return new HttpClientWrapper(httpService.getClientFactory().create(configuration));
@@ -51,11 +51,11 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   }
 
   @Override
-  public HttpServer server(Consumer<HttpServerConfigurer> configBuilder)
+  public HttpServer server(Consumer<HttpServerConfig> configCallback)
       throws org.mule.sdk.api.http.server.ServerCreationException {
     var builder = new HttpServerConfiguration.Builder();
-    var configurer = new HttpServerConfigurerToBuilder(builder);
-    configBuilder.accept(configurer);
+    var configurer = new HttpServerConfigToBuilder(builder);
+    configCallback.accept(configurer);
     HttpServerConfiguration configuration = builder.build();
     try {
       return new HttpServerWrapper(httpService.getServerFactory().create(configuration));
