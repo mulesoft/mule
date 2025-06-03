@@ -27,6 +27,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
+import org.mule.runtime.privileged.exception.SuppressedMuleException;
 
 import java.io.ObjectStreamException;
 import java.util.ArrayList;
@@ -127,9 +128,11 @@ public final class ErrorBuilder {
     List<MuleException> suppressedCauses = muleException.getExceptionInfo().getSuppressedCauses();
     if (!suppressedCauses.isEmpty()) {
       List<Error> suppressions = new ArrayList<>(suppressedCauses.size());
-      for (MuleException suppressedException : suppressedCauses) {
-        if (suppressedException instanceof MessagingException) {
-          ((MessagingException) suppressedException).getEvent().getError().ifPresent(error -> {
+      for (MuleException suppressedExceptionInfo : suppressedCauses) {
+        MuleException suppressed =
+            ((SuppressedMuleException.SuppressedMuleExceptionInfo) suppressedExceptionInfo).obtainSuppressedException();
+        if (suppressed instanceof MessagingException) {
+          ((MessagingException) suppressed).getEvent().getError().ifPresent(error -> {
             suppressions.add(error);
             // First suppressed error cause needs to be set in order to maintain backwards compatibility
             // with the exception of the RetryPolicyExhaustedException, because
