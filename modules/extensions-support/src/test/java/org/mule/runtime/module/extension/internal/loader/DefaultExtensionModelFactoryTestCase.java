@@ -23,6 +23,7 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAI
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
