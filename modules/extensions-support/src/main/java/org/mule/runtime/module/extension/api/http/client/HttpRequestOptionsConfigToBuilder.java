@@ -7,51 +7,51 @@
 package org.mule.runtime.module.extension.api.http.client;
 
 import org.mule.runtime.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.sdk.api.http.client.HttpRequestOptionsConfigurer;
-import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfigurer;
-import org.mule.sdk.api.http.client.proxy.ProxyConfigurer;
+import org.mule.sdk.api.http.client.HttpRequestOptionsConfig;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfig;
+import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class HttpRequestOptionsConfigurerToBuilder implements HttpRequestOptionsConfigurer {
+public class HttpRequestOptionsConfigToBuilder implements HttpRequestOptionsConfig {
 
   private final HttpRequestOptionsBuilder builder;
 
-  HttpRequestOptionsConfigurerToBuilder(HttpRequestOptionsBuilder builder) {
+  HttpRequestOptionsConfigToBuilder(HttpRequestOptionsBuilder builder) {
     this.builder = builder;
   }
 
   @Override
-  public HttpRequestOptionsConfigurer setResponseTimeout(int responseTimeout) {
+  public HttpRequestOptionsConfig setResponseTimeout(int responseTimeout) {
     builder.responseTimeout(responseTimeout);
     return this;
   }
 
   @Override
-  public HttpRequestOptionsConfigurer setFollowsRedirect(boolean followsRedirect) {
+  public HttpRequestOptionsConfig setFollowsRedirect(boolean followsRedirect) {
     builder.followsRedirect(followsRedirect);
     return this;
   }
 
   @Override
-  public HttpRequestOptionsConfigurer setAuthentication(Consumer<HttpAuthenticationConfigurer> configurerConsumer) {
+  public HttpRequestOptionsConfig setAuthentication(Consumer<HttpAuthenticationConfig> authConfigCallback) {
     HttpAuthenticationConfigurerImpl configurer = new HttpAuthenticationConfigurerImpl();
-    configurerConsumer.accept(configurer);
+    authConfigCallback.accept(configurer);
     builder.authentication(configurer.build());
     return this;
   }
 
   @Override
-  public HttpRequestOptionsConfigurer setProxyConfig(Consumer<ProxyConfigurer> proxyConfig) {
-    ProxyConfigurerImpl configurer = new ProxyConfigurerImpl();
-    proxyConfig.accept(configurer);
+  public HttpRequestOptionsConfig setProxyConfig(Consumer<ProxyConfig> proxyConfigCallback) {
+    ProxyConfigImpl configurer = new ProxyConfigImpl();
+    proxyConfigCallback.accept(configurer);
     builder.proxyConfig(configurer.build());
     return this;
   }
 
   @Override
-  public HttpRequestOptionsConfigurer setSendBodyAlways(boolean sendBodyAlways) {
+  public HttpRequestOptionsConfig setSendBodyAlways(boolean sendBodyAlways) {
     builder.sendBodyAlways(sendBodyAlways);
     return this;
   }
@@ -66,7 +66,7 @@ public class HttpRequestOptionsConfigurerToBuilder implements HttpRequestOptions
       return true;
     if (obj == null || obj.getClass() != this.getClass())
       return false;
-    var that = (HttpRequestOptionsConfigurerToBuilder) obj;
+    var that = (HttpRequestOptionsConfigToBuilder) obj;
     return Objects.equals(this.builder, that.builder);
   }
 
