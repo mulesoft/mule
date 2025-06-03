@@ -7,29 +7,25 @@
 package org.mule.runtime.module.extension.api.http.client;
 
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
-import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfigurer;
+import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfig;
 
-public class HttpAuthenticationConfigurerImpl implements HttpAuthenticationConfigurer {
+public class HttpAuthenticationConfigurerImpl implements HttpAuthenticationConfig {
 
   private HttpAuthentication result;
 
   @Override
-  public HttpAuthenticationConfigurer basic(String username, String password, boolean preemptive) {
+  public void basic(String username, String password, boolean preemptive) {
     result = HttpAuthentication.basic(username, password).preemptive(preemptive).build();
-    return this;
   }
 
   @Override
-  public HttpAuthenticationConfigurer digest(String username, String password, boolean preemptive) {
+  public void digest(String username, String password, boolean preemptive) {
     result = HttpAuthentication.digest(username, password).preemptive(preemptive).build();
-    return this;
   }
 
   @Override
-  public HttpAuthenticationConfigurer ntlm(String username, String password, boolean preemptive, String domain,
-                                           String workstation) {
+  public void ntlm(String username, String password, boolean preemptive, String domain, String workstation) {
     result = HttpAuthentication.ntlm(username, password).preemptive(preemptive).domain(domain).workstation(workstation).build();
-    return this;
   }
 
   public HttpAuthentication build() {

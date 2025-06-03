@@ -9,72 +9,71 @@ package org.mule.runtime.module.extension.api.http.client;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.tcp.TcpClientSocketProperties;
-import org.mule.sdk.api.http.client.HttpClientConfigurer;
-import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfigurer;
-import org.mule.sdk.api.http.client.proxy.ProxyConfigurer;
+import org.mule.sdk.api.http.client.HttpClientConfig;
+import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class HttpClientConfigurerToBuilder implements HttpClientConfigurer {
+public class HttpClientConfigToBuilder implements HttpClientConfig {
 
   private final HttpClientConfiguration.Builder builder;
 
-  public HttpClientConfigurerToBuilder(HttpClientConfiguration.Builder builder) {
+  public HttpClientConfigToBuilder(HttpClientConfiguration.Builder builder) {
     this.builder = builder;
   }
 
   @Override
-  public HttpClientConfigurer setTlsContextFactory(TlsContextFactory tlsContextFactory) {
+  public HttpClientConfig setTlsContextFactory(TlsContextFactory tlsContextFactory) {
     builder.setTlsContextFactory(tlsContextFactory);
     return this;
   }
 
   @Override
-  public HttpClientConfigurer setMaxConnections(int maxConnections) {
+  public HttpClientConfig setMaxConnections(int maxConnections) {
     builder.setMaxConnections(maxConnections);
     return this;
   }
 
   @Override
-  public HttpClientConfigurer setUsePersistentConnections(boolean usePersistentConnections) {
+  public HttpClientConfig setUsePersistentConnections(boolean usePersistentConnections) {
     builder.setUsePersistentConnections(usePersistentConnections);
     return this;
   }
 
   @Override
-  public HttpClientConfigurer setConnectionIdleTimeout(int connectionIdleTimeout) {
+  public HttpClientConfig setConnectionIdleTimeout(int connectionIdleTimeout) {
     builder.setConnectionIdleTimeout(connectionIdleTimeout);
     return this;
   }
 
   @Override
-  public HttpClientConfigurer setStreaming(boolean streaming) {
+  public HttpClientConfig setStreaming(boolean streaming) {
     builder.setStreaming(streaming);
     return this;
   }
 
   @Override
-  public HttpClientConfigurer setResponseBufferSize(int responseBufferSize) {
+  public HttpClientConfig setResponseBufferSize(int responseBufferSize) {
     builder.setResponseBufferSize(responseBufferSize);
     return this;
   }
 
   @Override
-  public HttpClientConfigurer setName(String name) {
+  public HttpClientConfig setName(String name) {
     builder.setName(name);
     return this;
   }
 
   @Override
-  public HttpClientConfigurer setDecompress(Boolean decompress) {
+  public HttpClientConfig setDecompress(Boolean decompress) {
     builder.setDecompress(decompress);
     return this;
   }
 
   @Override
-  public HttpClientConfigurer configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configurerConsumer) {
+  public HttpClientConfig configClientSocketProperties(Consumer<TcpSocketPropertiesConfigurer> configurerConsumer) {
     var propsBuilder = TcpClientSocketProperties.builder();
     var configurer = new TcpSocketPropertiesConfigurerToBuilder(propsBuilder);
     configurerConsumer.accept(configurer);
@@ -83,8 +82,8 @@ public class HttpClientConfigurerToBuilder implements HttpClientConfigurer {
   }
 
   @Override
-  public HttpClientConfigurer configProxy(Consumer<ProxyConfigurer> configurerConsumer) {
-    var configurer = new ProxyConfigurerImpl();
+  public HttpClientConfig configProxy(Consumer<ProxyConfig> configurerConsumer) {
+    var configurer = new ProxyConfigImpl();
     configurerConsumer.accept(configurer);
     builder.setProxyConfig(configurer.build());
     return this;
@@ -100,7 +99,7 @@ public class HttpClientConfigurerToBuilder implements HttpClientConfigurer {
       return true;
     if (obj == null || obj.getClass() != this.getClass())
       return false;
-    var that = (HttpClientConfigurerToBuilder) obj;
+    var that = (HttpClientConfigToBuilder) obj;
     return Objects.equals(this.builder, that.builder);
   }
 

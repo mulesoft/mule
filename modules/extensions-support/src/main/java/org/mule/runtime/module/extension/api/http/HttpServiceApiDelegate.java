@@ -10,14 +10,16 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.runtime.http.api.server.ServerCreationException;
-import org.mule.runtime.module.extension.api.http.client.HttpClientConfigurerToBuilder;
+import org.mule.runtime.module.extension.api.http.client.HttpClientConfigToBuilder;
 import org.mule.runtime.module.extension.api.http.client.HttpClientWrapper;
+import org.mule.runtime.module.extension.api.http.message.HttpEntityFactoryImpl;
 import org.mule.runtime.module.extension.api.http.message.HttpRequestBuilderWrapper;
 import org.mule.runtime.module.extension.api.http.message.HttpResponseBuilderWrapper;
 import org.mule.runtime.module.extension.api.http.server.HttpServerConfigurerToBuilder;
 import org.mule.runtime.module.extension.api.http.server.HttpServerWrapper;
 import org.mule.sdk.api.http.client.HttpClient;
-import org.mule.sdk.api.http.client.HttpClientConfigurer;
+import org.mule.sdk.api.http.client.HttpClientConfig;
+import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
@@ -33,10 +35,12 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   @Inject
   private HttpService httpService;
 
+  private final HttpEntityFactory httpEntityFactory = new HttpEntityFactoryImpl();
+
   @Override
-  public HttpClient client(Consumer<HttpClientConfigurer> configBuilder) {
+  public HttpClient client(Consumer<HttpClientConfig> configBuilder) {
     var builder = new HttpClientConfiguration.Builder();
-    var configurer = new HttpClientConfigurerToBuilder(builder);
+    var configurer = new HttpClientConfigToBuilder(builder);
     configBuilder.accept(configurer);
     HttpClientConfiguration configuration = builder.build();
     try {
@@ -79,5 +83,10 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   public HttpRequestBuilder requestBuilder(boolean preserveHeaderCase) {
     return new HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message.request.HttpRequest
         .builder(preserveHeaderCase));
+  }
+
+  @Override
+  public HttpEntityFactory entityFactory() {
+    return httpEntityFactory;
   }
 }
