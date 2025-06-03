@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.loader.validation;
 
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockMetadataResolverFactory;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -23,14 +23,15 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
-import static org.apache.commons.lang3.JavaVersion.JAVA_17;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -55,7 +56,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
@@ -77,16 +77,16 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCase {
 
   public static final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -96,9 +96,6 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   private static final Supplier<SimpleOutputResolver> SIMPLE_OUTPUT_RESOLVER =
       ResolverSupplier.of(SimpleOutputResolver.class);
   public static final String PARAMETER_NAME = "parameterName";
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModel extensionModel;
@@ -225,7 +222,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     }
   }
 
-  @Before
+  @BeforeEach
   public void before() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(extensionModel.getSourceModels()).thenReturn(asList(sourceModel));
@@ -264,7 +261,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void valid() {
+  void valid() {
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(MOCK_RESOLVER_SUPPLIER, emptyMap(), MOCK_RESOLVER_SUPPLIER,
                                                                    NullMetadataResolverSupplier.INSTANCE));
@@ -275,10 +272,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void operationWithAttributeResolverButNoAttributes() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("has an AttributesTypeResolver defined but it doesn't declare any attributes");
-
+  void operationWithAttributeResolverButNoAttributes() {
     when(extensionModel.getSourceModels()).thenReturn(emptyList());
     mockMetadataResolverFactory(operationModel,
                                 new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE, emptyMap(),
@@ -289,43 +283,42 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Object.class), false, emptySet()));
     when(operationModel.getOutputAttributes())
         .thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(void.class), false, emptySet()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("has an AttributesTypeResolver defined but it doesn't declare any attributes"));
   }
 
   @Test
-  public void operationReturnsObjectType() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("declares 'class java.lang.Object' as its return type. Components that return a type such");
+  void operationReturnsObjectType() {
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Object.class), false, emptySet()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("declares 'class java.lang.Object' as its return type. Components that return a type such"));
   }
 
   @Test
-  public void operationReturnsVoidType() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception
-        .expectMessage("A Metadata OutputResolver named 'MockResolver' in category 'MockResolver' was defined for the Void Operation 'operation'. "
-            + "Output resolvers cannot be used on Void Operations, since they produce no output.");
-
+  void operationReturnsVoidType() {
     mockMetadataResolverFactory(operationModel,
                                 new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE, emptyMap(),
                                                                    MOCK_RESOLVER_SUPPLIER,
                                                                    NullMetadataResolverSupplier.INSTANCE));
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Void.class), true, emptySet()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("A Metadata OutputResolver named 'MockResolver' in category 'MockResolver' was defined for the Void Operation 'operation'. "
+                   + "Output resolvers cannot be used on Void Operations, since they produce no output."));
   }
 
   @Test
-  public void operationReturnsDictionaryTypeWithObjectTypeValue() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("declares a map of 'class java.lang.Object' as its return type.");
-
+  void operationReturnsDictionaryTypeWithObjectTypeValue() {
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("declares a map of 'class java.lang.Object' as its return type."));
   }
 
   @Test
-  public void operationReturnsDictionaryTypeWithPojoValue() {
+  void operationReturnsDictionaryTypeWithPojoValue() {
     dictionaryType = typeBuilder.objectType()
         .openWith(toMetadataType(Apple.class)).build();
     when(operationModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
@@ -337,24 +330,23 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void sourceReturnsObjectType() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("Components that return a type such as Object or Map (or a collection of any of those)");
+  void sourceReturnsObjectType() {
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Object.class), false, emptySet()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Components that return a type such as Object or Map (or a collection of any of those)"));
   }
 
   @Test
-  public void sourceReturnsDictionaryType() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("Source 'source' declares a map of 'class java.lang.Object' as its return type. "
-        + "Components that return a type such as Object or Map ");
+  void sourceReturnsDictionaryType() {
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Source 'source' declares a map of 'class java.lang.Object' as its return type. "));
   }
 
   @Test
-  public void sourceReturnsPojoType() {
+  void sourceReturnsPojoType() {
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE, emptyMap(),
                                                                    MOCK_RESOLVER_SUPPLIER,
@@ -364,7 +356,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void sourceReturnsObjectTypeWithDefinedOutputResolver() {
+  void sourceReturnsObjectTypeWithDefinedOutputResolver() {
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel(EMPTY, toMetadataType(Object.class), false, emptySet()));
     mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE, emptyMap(),
                                                                                 SIMPLE_OUTPUT_RESOLVER,
@@ -373,7 +365,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void sourceReturnsDictionaryTypeWithDefinedOutputResolver() {
+  void sourceReturnsDictionaryTypeWithDefinedOutputResolver() {
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
     mockMetadataResolverFactory(sourceModel, new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE, emptyMap(),
                                                                                 SIMPLE_OUTPUT_RESOLVER,
@@ -382,26 +374,23 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void sourceReturnsArrayTypeOfObjectWithoutDefinedOutputResolver() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("");
+  void sourceReturnsArrayTypeOfObjectWithoutDefinedOutputResolver() {
     arrayType = typeBuilder.arrayType().of(toMetadataType(Object.class)).build();
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", arrayType, false, emptySet()));
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
   @Test
-  public void sourceReturnsArrayTypeOfDictionaryWithObjectValue() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("declares a collection of ");
-
+  void sourceReturnsArrayTypeOfDictionaryWithObjectValue() {
     arrayType = typeBuilder.arrayType().of(dictionaryType).build();
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", arrayType, false, emptySet()));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("declares a collection of "));
   }
 
   @Test
-  public void metadataResolverWithDifferentCategories() {
+  void metadataResolverWithDifferentCategories() {
     setValidKeyId(EMPTY);
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(ResolverSupplier.of(DifferentCategoryResolver.class),
@@ -409,42 +398,38 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
                                                                    SIMPLE_OUTPUT_RESOLVER,
                                                                    NullMetadataResolverSupplier.INSTANCE));
 
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("specifies metadata resolvers that doesn't belong to the same category");
-
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("specifies metadata resolvers that doesn't belong to the same category"));
   }
 
   @Test
-  public void metadataResolverWithEmptyCategoryName() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("specifies a metadata resolver 'EmptyCategoryName' which has an empty category name");
+  void metadataResolverWithEmptyCategoryName() {
     setValidKeyId(EMPTY);
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(ResolverSupplier.of(EmptyCategoryName.class),
                                                                    emptyMap(),
                                                                    SIMPLE_OUTPUT_RESOLVER,
                                                                    NullMetadataResolverSupplier.INSTANCE));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("specifies a metadata resolver 'EmptyCategoryName' which has an empty category name"));
   }
 
   @Test
-  public void metadataResolverWithEmptyResolverName() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("specifies a metadata resolver 'EmptyResolverName' which has an empty resolver name");
-
+  void metadataResolverWithEmptyResolverName() {
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE,
                                                                    emptyMap(),
                                                                    ResolverSupplier.of(EmptyResolverName.class),
                                                                    NullMetadataResolverSupplier.INSTANCE));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("specifies a metadata resolver 'EmptyResolverName' which has an empty resolver name"));
   }
 
   @Test
-  public void metadataResolverWithRepeatedResolverName() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("Resolver names should be unique for a given category");
+  void metadataResolverWithRepeatedResolverName() {
     Map<String, Supplier<? extends InputTypeResolver>> inputResolvers = new HashMap<>();
     ParameterModel parameterModel = mock(ParameterModel.class);
     when(parameterModel.getName()).thenReturn(PARAMETER_NAME);
@@ -457,23 +442,24 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
                                                                    inputResolvers,
                                                                    SIMPLE_OUTPUT_RESOLVER,
                                                                    NullMetadataResolverSupplier.INSTANCE));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Resolver names should be unique for a given category"));
   }
 
   @Test
-  public void metadataKeyMissingDefaultValues() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("defines '1' MetadataKeyPart with default values, but the type contains '2'");
-
+  void metadataKeyMissingDefaultValues() {
     setInvalidKeyId();
     ParameterModel param1 = getMockKeyPartParam(null, 1);
     ParameterModel param2 = getMockKeyPartParam("SomeValue", 2);
     when(sourceModel.getAllParameterModels()).thenReturn(asList(param1, param2));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("defines '1' MetadataKeyPart with default values, but the type contains '2'"));
   }
 
   @Test
-  public void metadataKeyWithValidDefaultValues() {
+  void metadataKeyWithValidDefaultValues() {
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE, emptyMap(),
                                                                    MOCK_RESOLVER_SUPPLIER,
@@ -487,7 +473,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void metadataKeyWithoutDefaultValues() {
+  void metadataKeyWithoutDefaultValues() {
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE, emptyMap(),
                                                                    MOCK_RESOLVER_SUPPLIER,
@@ -501,18 +487,17 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void metadataKeyIdWithoutTypeResolver() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception
-        .expectMessage("Source 'source' defines a MetadataKeyId parameter but neither an Output nor Type resolver that makes use of it was defined");
+  void metadataKeyIdWithoutTypeResolver() {
     ParameterModel param = getMockKeyPartParam("Value", 1);
     setValidKeyId(param.getName());
     when(sourceModel.getAllParameterModels()).thenReturn(singletonList(param));
-    validate(extensionModel, validator);
+    var thrown = assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+    assertThat(thrown.getMessage(),
+               containsString("Source 'source' defines a MetadataKeyId parameter but neither an Output nor Type resolver that makes use of it was defined"));
   }
 
   @Test
-  public void metadataKeyIdWithoutTypeResolverOnRuntimeShouldNotFail() {
+  void metadataKeyIdWithoutTypeResolverOnRuntimeShouldNotFail() {
     setCompileTime(false);
     ParameterModel param = getMockKeyPartParam("Value", 1);
     setValidKeyId(param.getName());
@@ -521,7 +506,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void noMetadataKey() {
+  void noMetadataKey() {
     ParameterModel param = mock(ParameterModel.class);
     when(sourceModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
     when(sourceModel.getAllParameterModels()).thenReturn(singletonList(param));
@@ -529,7 +514,7 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void stringMetadataKeyWithDefaultValue() {
+  void stringMetadataKeyWithDefaultValue() {
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(NullMetadataResolverSupplier.INSTANCE, emptyMap(),
                                                                    MOCK_RESOLVER_SUPPLIER,

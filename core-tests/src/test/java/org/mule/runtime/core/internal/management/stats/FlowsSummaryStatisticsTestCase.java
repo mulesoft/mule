@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.management.stats;
 
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STOPPED;
-import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.PRICING_METRICS;
 import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.FlowSummaryStory.ACTIVE_FLOWS_SUMMARY;
+import static org.mule.test.allure.AllureConstants.PricingMetricsFeature.PRICING_METRICS;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
@@ -22,26 +22,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.Test;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Test;
 
 /**
  * Note: flow-mappings are not considered
@@ -64,11 +55,8 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
     DefaultFlowsSummaryStatistics flowsSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
     TestPipeline flow = new TestPipeline("", muleContext,
                                          mock(MessageSource.class),
-                                         emptyList(), empty(), empty(),
                                          INITIAL_STATE_STARTED,
-                                         null,
-                                         flowsSummaryStatistics,
-                                         null, null);
+                                         flowsSummaryStatistics);
 
     flow.initialise();
     assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
@@ -88,11 +76,8 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
     DefaultFlowsSummaryStatistics flowsSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
     TestPipeline flow = new TestPipeline("get:\\reservation:api-config", muleContext,
                                          null,
-                                         emptyList(), empty(), empty(),
                                          INITIAL_STATE_STARTED,
-                                         null,
-                                         flowsSummaryStatistics,
-                                         null, null);
+                                         flowsSummaryStatistics);
 
     flow.initialise();
     assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 1, 0, 0, 0, 0);
@@ -112,11 +97,8 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
     DefaultFlowsSummaryStatistics flowsSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
     TestPipeline flow = new TestPipeline("get:\\reservation:api-config", muleContext,
                                          mock(MessageSource.class),
-                                         emptyList(), empty(), empty(),
                                          INITIAL_STATE_STARTED,
-                                         null,
-                                         flowsSummaryStatistics,
-                                         null, null);
+                                         flowsSummaryStatistics);
 
     flow.initialise();
     assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
@@ -136,11 +118,8 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
     DefaultFlowsSummaryStatistics flowsSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
     TestPipeline flow = new TestPipeline("", muleContext,
                                          null,
-                                         emptyList(), empty(), empty(),
                                          INITIAL_STATE_STARTED,
-                                         null,
-                                         flowsSummaryStatistics,
-                                         null, null);
+                                         flowsSummaryStatistics);
 
     flow.initialise();
     assertFlowsSummaryStatistics(flowsSummaryStatistics, 0, 0, 1, 0, 0, 0);
@@ -160,18 +139,12 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
     DefaultFlowsSummaryStatistics flowsSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
     TestPipeline flow1 = new TestPipeline("", muleContext,
                                           mock(MessageSource.class),
-                                          emptyList(), empty(), empty(),
                                           INITIAL_STATE_STARTED,
-                                          null,
-                                          flowsSummaryStatistics,
-                                          null, null);
+                                          flowsSummaryStatistics);
     TestPipeline flow2 = new TestPipeline("", muleContext,
                                           mock(MessageSource.class),
-                                          emptyList(), empty(), empty(),
                                           INITIAL_STATE_STARTED,
-                                          null,
-                                          flowsSummaryStatistics,
-                                          null, null);
+                                          flowsSummaryStatistics);
 
     flow1.initialise();
     flow2.initialise();
@@ -195,11 +168,8 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
     DefaultFlowsSummaryStatistics flowsSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
     TestPipeline flow = new TestPipeline("", muleContext,
                                          mock(MessageSource.class),
-                                         emptyList(), empty(), empty(),
                                          INITIAL_STATE_STARTED,
-                                         null,
-                                         flowsSummaryStatistics,
-                                         null, null);
+                                         flowsSummaryStatistics);
 
     flow.initialise();
     assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
@@ -227,11 +197,8 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
     DefaultFlowsSummaryStatistics flowsSummaryStatistics = new DefaultFlowsSummaryStatistics(true);
     TestPipeline flow = new TestPipeline("", muleContext,
                                          mock(MessageSource.class),
-                                         emptyList(), empty(), empty(),
                                          INITIAL_STATE_STOPPED,
-                                         null,
-                                         flowsSummaryStatistics,
-                                         null, null);
+                                         flowsSummaryStatistics);
 
     flow.initialise();
     assertFlowsSummaryStatistics(flowsSummaryStatistics, 1, 0, 0, 0, 0, 0);
@@ -273,14 +240,10 @@ public class FlowsSummaryStatisticsTestCase extends AbstractMuleContextTestCase 
 
   private static class TestPipeline extends AbstractPipeline {
 
-    public TestPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
-                        Optional<FlowExceptionHandler> exceptionListener,
-                        Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
-                        Integer maxConcurrency,
-                        DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
-                        ComponentInitialStateManager componentInitialStateManager) {
-      super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
-            flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);
+    public TestPipeline(String name, MuleContext muleContext, MessageSource source, String initialState,
+                        DefaultFlowsSummaryStatistics flowsSummaryStatistics) {
+      super(name, muleContext, source, emptyList(), empty(), empty(), initialState, null,
+            flowsSummaryStatistics, new DefaultFlowsSummaryStatistics(true), null, null);
     }
 
     @Override

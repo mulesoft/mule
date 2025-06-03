@@ -6,17 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
@@ -41,37 +46,40 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableSet;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
 
-  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
+  @Mock(answer = RETURNS_DEEP_STUBS)
   private ExtensionModel extensionModel;
 
-  @Mock(lenient = true)
+  @Mock
   private OperationModel operationModel;
 
-  @Mock(lenient = true)
+  @Mock
   private SourceModel sourceModel;
 
-  @Mock(lenient = true)
+  @Mock
   private SourceCallbackModel sourceCallbackModel;
 
-  @Mock(lenient = true)
+  @Mock
   private ParameterModel invalidParameterModel;
 
-  @Mock(lenient = true)
+  @Mock
   private OutputModel outputModel;
 
   private JavaInputParametersTypeModelValidator validator = new JavaInputParametersTypeModelValidator();
 
-  @Before
+  @BeforeEach
   public void before() {
     when(extensionModel.getName()).thenReturn("dummyExtension");
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
@@ -90,18 +98,19 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
     visitableMock(operationModel, sourceModel);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidModelDueToOperationWithArgumentParameterWithoutGetter() {
-    validateOperationParameterOfType(toMetadataType(PojoWithParameterWithoutGetter.class));
+  @Test
+  void invalidModelDueToOperationWithArgumentParameterWithoutGetter() {
+    final MetadataType metadataType = toMetadataType(PojoWithParameterWithoutGetter.class);
+    assertThrows(IllegalModelDefinitionException.class, () -> validateOperationParameterOfType(metadataType));
   }
 
   @Test
-  public void validModelDueToOperationWithArgumentParameterWithGetter() {
+  void validModelDueToOperationWithArgumentParameterWithGetter() {
     validateOperationParameterOfType(toMetadataType(PojoWithParameterWithGetter.class));
   }
 
   @Test
-  public void validateObjectTypeImplementedInMap() {
+  void validateObjectTypeImplementedInMap() {
     ObjectTypeBuilder object = BaseTypeBuilder.create(JAVA).objectType();
     object.id("ObjectAsMap").with(new ClassInformationAnnotation(Map.class));
     object.addField().key("fieldWithGetter").required().value(TYPE_LOADER.load(String.class));
@@ -109,14 +118,16 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
     validateOperationParameterOfType(object.build());
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidModelDueToOperationArgumentWithSubtypeWithoutGetter() {
-    validateOperationParameterOfType(toMetadataType(BaseType.class));
+  @Test
+  void invalidModelDueToOperationArgumentWithSubtypeWithoutGetter() {
+    final MetadataType metadataType = toMetadataType(BaseType.class);
+    assertThrows(IllegalModelDefinitionException.class, () -> validateOperationParameterOfType(metadataType));
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void invalidModelDueToOperationArgumentWithListOfSubtypeWithoutGetter() {
-    validateOperationParameterOfType(TYPE_LOADER.load(new com.google.common.reflect.TypeToken<List<BaseType>>() {}.getType()));
+  @Test
+  void invalidModelDueToOperationArgumentWithListOfSubtypeWithoutGetter() {
+    final MetadataType metadataType = TYPE_LOADER.load(new com.google.common.reflect.TypeToken<List<BaseType>>() {}.getType());
+    assertThrows(IllegalModelDefinitionException.class, () -> validateOperationParameterOfType(metadataType));
   }
 
   private void validateOperationParameterOfType(MetadataType operationParameterType) {
@@ -131,7 +142,7 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void validModelDueSubtypeWithoutGetterNotUsedAsInputParameter() {
+  void validModelDueSubtypeWithoutGetterNotUsedAsInputParameter() {
     SubTypesModel subTypesModel =
         new SubTypesModel(toMetadataType(BaseType.class), ImmutableSet.of(toMetadataType(PojoWithParameterWithoutGetter.class)));
     when(extensionModel.getSubTypes()).thenReturn(ImmutableSet.of(subTypesModel));
@@ -140,7 +151,7 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void operationOutputIsNotValidated() {
+  void operationOutputIsNotValidated() {
     when(operationModel.getAllParameterModels()).thenReturn(emptyList());
     when(operationModel.getOutput()).thenReturn(outputModel);
     when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
@@ -148,7 +159,7 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void sourceOutputIsNotValidated() {
+  void sourceOutputIsNotValidated() {
     when(sourceModel.getAllParameterModels()).thenReturn(emptyList());
     when(sourceModel.getOutput()).thenReturn(outputModel);
     when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
@@ -156,7 +167,7 @@ public class InputParameterTypesValidatorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void operationAttributesAreNotValidated() {
+  void operationAttributesAreNotValidated() {
     when(operationModel.getAllParameterModels()).thenReturn(emptyList());
     when(outputModel.getType()).thenReturn(toMetadataType(PojoWithParameterWithoutGetter.class));
     when(operationModel.getOutput()).thenReturn(outputModel);

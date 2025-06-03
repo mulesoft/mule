@@ -6,14 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-import static java.util.Arrays.asList;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.when;
-
-import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockParameters;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.validate;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.visitableMock;
+
+import static java.util.Arrays.asList;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -25,14 +30,16 @@ import org.mule.runtime.module.extension.internal.loader.java.validation.Operati
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class OperationParametersTypeModelValidatorTestCase extends AbstractMuleTestCase {
 
   public static final String EXTENSION_NAME = "extension";
@@ -48,7 +55,7 @@ public class OperationParametersTypeModelValidatorTestCase extends AbstractMuleT
 
   private ExtensionModelValidator validator = new OperationParametersTypeModelValidator();
 
-  @Before
+  @BeforeEach
   public void before() {
     when(operationModel.getName()).thenReturn(OPERATION_NAME);
     when(parameterModel.getName()).thenReturn("parameterName");
@@ -57,20 +64,20 @@ public class OperationParametersTypeModelValidatorTestCase extends AbstractMuleT
     visitableMock(operationModel);
   }
 
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void eventType() {
+  @Test
+  void eventType() {
     when(parameterModel.getType()).thenReturn(toMetadataType(CoreEvent.class));
-    validate(extensionModel, validator);
-  }
-
-  @Test(expected = IllegalModelDefinitionException.class)
-  public void messageType() {
-    when(parameterModel.getType()).thenReturn(toMetadataType(Message.class));
-    validate(extensionModel, validator);
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
   }
 
   @Test
-  public void validType() {
+  void messageType() {
+    when(parameterModel.getType()).thenReturn(toMetadataType(Message.class));
+    assertThrows(IllegalModelDefinitionException.class, () -> validate(extensionModel, validator));
+  }
+
+  @Test
+  void validType() {
     when(parameterModel.getType()).thenReturn(toMetadataType(Object.class));
     validate(extensionModel, validator);
   }

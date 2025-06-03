@@ -22,6 +22,9 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.d
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 
 import static javax.lang.model.SourceVersion.latestSupported;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -29,11 +32,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assume.assumeThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -108,13 +110,12 @@ import javax.annotation.processing.ProcessingEnvironment;
 
 import com.google.testing.compile.CompilationRule;
 
-import org.springframework.core.ResolvableType;
-
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.springframework.core.ResolvableType;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -132,8 +133,9 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  @Rule
-  public CompilationRule compilationRule = new CompilationRule();
+  // This test cannot be migrated to JUnit 5 until https://github.com/google/compile-testing/pull/155
+  @ClassRule
+  public static CompilationRule compilationRule = new CompilationRule();
 
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
@@ -801,10 +803,12 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
     @Override
     public boolean equals(Object o) {
-      if (this == o)
+      if (this == o) {
         return true;
-      if (o == null || getClass() != o.getClass())
+      }
+      if (o == null || getClass() != o.getClass()) {
         return false;
+      }
       PojoWithEqualsAndHashCode that = (PojoWithEqualsAndHashCode) o;
       return Objects.equals(name, that.name);
     }

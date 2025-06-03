@@ -62,7 +62,7 @@ public class ExtensionConnectivityTestingStrategyTestCase extends AbstractMuleTe
   public void createTestingInstance() throws MuleException {
     connectionManager = new DefaultConnectionManager(muleContext);
     initialiseIfNeeded(connectionManager);
-    connectivityTestingStrategy = new ExtensionConnectivityTestingStrategy(connectionManager, muleContext);
+    connectivityTestingStrategy = new ExtensionConnectivityTestingStrategy(connectionManager);
     MuleContextUtils.mockContextWithServices().getInjector().inject(connectivityTestingStrategy);
   }
 

@@ -22,8 +22,10 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.noti
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveExtensionMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
+import static org.mule.sdk.api.meta.JavaVersion.valueOf;
 
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
@@ -31,6 +33,9 @@ import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+
+import static net.bytebuddy.jar.asm.Opcodes.ASM5;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.Category;
@@ -87,8 +92,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import net.bytebuddy.jar.asm.AnnotationVisitor;
+import net.bytebuddy.jar.asm.ClassReader;
+import net.bytebuddy.jar.asm.ClassVisitor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link ExtensionModelParser} for Java based syntax
@@ -97,7 +104,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JavaExtensionModelParser extends AbstractJavaModelParser implements ExtensionModelParser {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(JavaExtensionModelParser.class);
+  private static final Logger LOGGER = getLogger(JavaExtensionModelParser.class);
 
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
   private List<ErrorModelParser> errorModelParsers;
@@ -147,10 +154,59 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
 
   private Set<String> parseSupportedJavaVersions(ExtensionElement extensionElement) {
     return extensionElement.getValueFromAnnotation(JavaVersionSupport.class)
-        .map(a -> a.getEnumArrayValue(JavaVersionSupport::value).stream()
+        .map(a -> a
+            .getEnumArrayValue(javaVersionSupport -> getJavaVersionSupport(javaVersionSupport, extensionElement))
+            .stream()
             .map(JavaVersion::version)
             .collect(toCollection(() -> (Set<String>) new LinkedHashSet<String>())))
         .orElse(emptySet());
+  }
+
+  private JavaVersion[] getJavaVersionSupport(JavaVersionSupport javaVersionSupport, ExtensionElement extensionElement) {
+    try {
+      return javaVersionSupport.value();
+    } catch (EnumConstantNotPresentException e) {
+      // An enum value not present in the Mule container version of `JavaVersion` is in use, we need to introspect the annotation
+      try {
+        Class<?> annotatedClass = extensionElement.getDeclaringClass().orElseThrow();
+
+        ClassReader reader = new ClassReader(currentThread().getContextClassLoader()
+            .getResourceAsStream(annotatedClass.getName().replace(".", "/") + ".class"));
+
+        List<JavaVersion> javaVersions = new ArrayList<>();
+        int asmVersion = ASM5;
+        reader.accept(new ClassVisitor(asmVersion) {
+
+          @Override
+          public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
+            return new AnnotationVisitor(asmVersion) {
+
+              @Override
+              public AnnotationVisitor visitArray(String name) {
+                return new AnnotationVisitor(asmVersion) {
+
+                  @Override
+                  public void visitEnum(String name, String desc, String value) {
+                    try {
+                      if (descriptor.endsWith(JavaVersionSupport.class.getSimpleName() + ";")) {
+                        javaVersions.add(valueOf(value));
+                      }
+                    } catch (IllegalArgumentException e) {
+                      LOGGER.debug("Found unknown value '{}' in JavaVersionSupport annotation", value, e);
+                    }
+                  }
+                };
+              }
+            };
+          }
+        }, 0);
+
+        return javaVersions.toArray(new JavaVersion[javaVersions.size()]);
+      } catch (Exception e2) {
+        e.addSuppressed(e2);
+        throw e;
+      }
+    }
   }
 
   private void parseSubtypes() {
