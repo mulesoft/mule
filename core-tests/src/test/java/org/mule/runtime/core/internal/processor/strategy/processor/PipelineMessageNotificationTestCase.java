@@ -237,6 +237,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
                         ErrorHandler errorHandler) {
       super(name, muleContext, messageSource, messageProcessors, ofNullable(errorHandler), empty(), INITIAL_STATE_STARTED,
             DEFAULT_MAX_CONCURRENCY,
+            new DefaultFlowsSummaryStatistics(true),
             new DefaultFlowsSummaryStatistics(true), createFlowStatistics(name, muleContext.getStatistics()),
             new ComponentInitialStateManager() {
 
