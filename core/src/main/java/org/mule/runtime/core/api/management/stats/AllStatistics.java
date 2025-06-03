@@ -12,9 +12,11 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATIST
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.emptyMap;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
