@@ -25,6 +25,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_S
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_21;
 import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
 import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.JAVA_VERSIONS_IN_EXTENSION_MODEL;
