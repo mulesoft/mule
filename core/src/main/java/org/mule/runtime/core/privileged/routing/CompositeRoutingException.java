@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @since 3.5.0
  * @see RoutingResult
  */
-public final class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
+public class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
 
   private static final String MESSAGE_TITLE = "Error(s) were found for route(s):";
   private static final String MESSAGE_SUB_TITLE = "Detailed Error(s) for route(s):";
