@@ -41,7 +41,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_R
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXCEPTION_LOCATION_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_FLOW_CLASSIFIER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_IN_MEMORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_PERSISTENT;
@@ -176,6 +175,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  * @since 4.0
  */
 public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
+
+  private static final String OBJECT_FLOW_CLASSIFIER = "_muleFlowClassifier";
 
   private final MuleContextWithRegistry muleContext;
   private final ArtifactType artifactType;

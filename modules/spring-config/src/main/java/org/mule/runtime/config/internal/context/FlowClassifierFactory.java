@@ -14,6 +14,7 @@ import static org.mule.runtime.core.internal.management.stats.FlowClassifier.Flo
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
@@ -69,7 +70,7 @@ public class FlowClassifierFactory {
 
     return concat(artifactAst.topLevelComponentsStream(), topLevelsFromParent)
         .filter(c -> componentIsConfigOf(c, extensionName))
-        .toList();
+        .collect(toList());
   }
 
   private static boolean componentIsConfigOf(ComponentAst componentAst, String extensionName) {
@@ -98,13 +99,13 @@ public class FlowClassifierFactory {
     Set<String> flowMappings = new HashSet<>();
     ComponentParameterAst flowMappingsParameter = apiKitConfig.getParameter(DEFAULT_GROUP_NAME, APIKIT_FLOW_MAPPINGS_PARAM_NAME);
     Object flowMappingsValue = flowMappingsParameter.getValue().getRight();
-    if (flowMappingsValue instanceof Iterable<?> flowMappingsList) {
-      for (Object flowMapping : flowMappingsList) {
-        if (flowMapping instanceof ComponentAst flowMappingComp) {
+    if (flowMappingsValue instanceof Iterable<?>) {
+      for (Object flowMapping : (Iterable<?>) flowMappingsValue) {
+        if (flowMapping instanceof ComponentAst) {
           ComponentParameterAst flowMappingParameter =
-              flowMappingComp.getParameter(APIKIT_FLOW_REF_PARAM_GROUP_NAME, APIKIT_FLOW_REF_PARAM_NAME);
-          if (flowMappingParameter.getValue().getRight() instanceof String stringValue) {
-            flowMappings.add(stringValue);
+              ((ComponentAst) flowMapping).getParameter(APIKIT_FLOW_REF_PARAM_GROUP_NAME, APIKIT_FLOW_REF_PARAM_NAME);
+          if (flowMappingParameter.getValue().getRight() instanceof String) {
+            flowMappings.add((String) flowMappingParameter.getValue().getRight());
           } else {
             LOGGER
                 .error("Component `{}` has a flow-ref that is not a String value, the model `{}` must have changed incompatibly",
@@ -150,7 +151,7 @@ public class FlowClassifierFactory {
       }
 
       Optional<String> candidateKitConfigName = tryExtractConfigNameFromFlowName(flowName);
-      if (candidateKitConfigName.isEmpty()) {
+      if (!candidateKitConfigName.isPresent()) {
         return GENERIC;
       }
 

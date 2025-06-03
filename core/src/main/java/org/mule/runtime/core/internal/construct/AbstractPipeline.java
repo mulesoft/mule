@@ -687,8 +687,13 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       triggerFlowsUpdater.accept(flowsSummaryStatisticsV2);
     } else {
       switch (flowType) {
-        case APIKIT, SOAPKIT -> apikitflowsUpdater.accept(flowsSummaryStatisticsV2);
-        case GENERIC -> privateFlowsUpdater.accept(flowsSummaryStatisticsV2);
+        case APIKIT:
+        case SOAPKIT:
+          apikitflowsUpdater.accept(flowsSummaryStatisticsV2);
+          break;
+        case GENERIC:
+          privateFlowsUpdater.accept(flowsSummaryStatisticsV2);
+          break;
       }
     }
   }
