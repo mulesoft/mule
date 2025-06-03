@@ -151,7 +151,8 @@ public class DefaultPolicyTemplateFactoryTestCase extends AbstractMuleTestCase {
     PolicyTemplateClassLoaderBuilder policyTemplateClassLoaderBuilder = mock(PolicyTemplateClassLoaderBuilder.class);
     when(policyTemplateClassLoaderBuilder.setParentClassLoader(regionClassLoader)).thenReturn(policyTemplateClassLoaderBuilder);
     when(policyTemplateClassLoaderBuilder.setArtifactDescriptor(descriptor)).thenReturn(policyTemplateClassLoaderBuilder);
-    when(policyTemplateClassLoaderBuilder.addArtifactPluginDescriptors(any())).thenReturn(policyTemplateClassLoaderBuilder);
+    when(policyTemplateClassLoaderBuilder.addArtifactPluginDescriptors(any(ArtifactPluginDescriptor[].class)))
+        .thenReturn(policyTemplateClassLoaderBuilder);
     return policyTemplateClassLoaderBuilder;
   }
 
