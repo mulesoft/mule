@@ -63,18 +63,8 @@ public class HttpRequestWrapper implements HttpRequest {
   }
 
   @Override
-  public String getHeaderValueIgnoreCase(String headerName) {
-    return muleRequest.getHeaderValueIgnoreCase(headerName);
-  }
-
-  @Override
   public Collection<String> getHeaderValues(String headerName) {
     return muleRequest.getHeaderValues(headerName);
-  }
-
-  @Override
-  public Collection<String> getHeaderValuesIgnoreCase(String headerName) {
-    return muleRequest.getHeaderValuesIgnoreCase(headerName);
   }
 
   @Override

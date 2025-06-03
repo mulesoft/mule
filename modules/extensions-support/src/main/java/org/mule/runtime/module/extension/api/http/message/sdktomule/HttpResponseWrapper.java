@@ -47,7 +47,7 @@ public class HttpResponseWrapper implements HttpResponse {
 
   @Override
   public String getHeaderValueIgnoreCase(String headerName) {
-    return sdkResponse.getHeaderValueIgnoreCase(headerName);
+    return sdkResponse.getHeaderValue(headerName);
   }
 
   @Override
@@ -57,7 +57,7 @@ public class HttpResponseWrapper implements HttpResponse {
 
   @Override
   public Collection<String> getHeaderValuesIgnoreCase(String headerName) {
-    return sdkResponse.getHeaderValuesIgnoreCase(headerName);
+    return sdkResponse.getHeaderValues(headerName);
   }
 
   @Override

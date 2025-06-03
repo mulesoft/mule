@@ -69,7 +69,7 @@ public class HttpRequestWrapper implements HttpRequest {
 
   @Override
   public String getHeaderValueIgnoreCase(String headerName) {
-    return request.getHeaderValueIgnoreCase(headerName);
+    return request.getHeaderValue(headerName);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class HttpRequestWrapper implements HttpRequest {
 
   @Override
   public Collection<String> getHeaderValuesIgnoreCase(String headerName) {
-    return request.getHeaderValuesIgnoreCase(headerName);
+    return request.getHeaderValues(headerName);
   }
 
   @Override

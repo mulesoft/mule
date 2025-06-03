@@ -9,64 +9,63 @@ package org.mule.runtime.module.extension.api.http.server;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
-import org.mule.runtime.module.extension.api.http.HttpServiceApiDelegate;
-import org.mule.sdk.api.http.server.HttpServerConfigurer;
+import org.mule.sdk.api.http.server.HttpServerConfig;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public final class HttpServerConfigurerToBuilder implements HttpServerConfigurer {
+public final class HttpServerConfigToBuilder implements HttpServerConfig {
 
   private final HttpServerConfiguration.Builder builder;
 
-  public HttpServerConfigurerToBuilder(HttpServerConfiguration.Builder builder) {
+  public HttpServerConfigToBuilder(HttpServerConfiguration.Builder builder) {
     this.builder = builder;
   }
 
   @Override
-  public HttpServerConfigurer setHost(String host) {
+  public HttpServerConfig setHost(String host) {
     builder.setHost(host);
     return this;
   }
 
   @Override
-  public HttpServerConfigurer setPort(int port) {
+  public HttpServerConfig setPort(int port) {
     builder.setPort(port);
     return this;
   }
 
   @Override
-  public HttpServerConfigurer setTlsContextFactory(TlsContextFactory tlsContextFactory) {
+  public HttpServerConfig setTlsContextFactory(TlsContextFactory tlsContextFactory) {
     builder.setTlsContextFactory(tlsContextFactory);
     return this;
   }
 
   @Override
-  public HttpServerConfigurer setUsePersistentConnections(boolean usePersistentConnections) {
+  public HttpServerConfig setUsePersistentConnections(boolean usePersistentConnections) {
     builder.setUsePersistentConnections(usePersistentConnections);
     return this;
   }
 
   @Override
-  public HttpServerConfigurer setConnectionIdleTimeout(int connectionIdleTimeout) {
+  public HttpServerConfig setConnectionIdleTimeout(int connectionIdleTimeout) {
     builder.setConnectionIdleTimeout(connectionIdleTimeout);
     return this;
   }
 
   @Override
-  public HttpServerConfigurer setSchedulerSupplier(Supplier<Scheduler> schedulerSupplier) {
+  public HttpServerConfig setSchedulerSupplier(Supplier<Scheduler> schedulerSupplier) {
     builder.setSchedulerSupplier(schedulerSupplier);
     return this;
   }
 
   @Override
-  public HttpServerConfigurer setName(String name) {
+  public HttpServerConfig setName(String name) {
     builder.setName(name);
     return this;
   }
 
   @Override
-  public HttpServerConfigurer setReadTimeout(long readTimeout) {
+  public HttpServerConfig setReadTimeout(long readTimeout) {
     builder.setReadTimeout(readTimeout);
     return this;
   }
@@ -81,7 +80,7 @@ public final class HttpServerConfigurerToBuilder implements HttpServerConfigurer
       return true;
     if (obj == null || obj.getClass() != this.getClass())
       return false;
-    var that = (HttpServerConfigurerToBuilder) obj;
+    var that = (HttpServerConfigToBuilder) obj;
     return Objects.equals(this.builder, that.builder);
   }
 
