@@ -16,6 +16,8 @@ module org.mule.runtime.boot.log4j {
   // Exported.
   exports org.mule.runtime.module.log4j.boot.api;
 
+  requires org.mule.runtime.logging;
+
   // Third party modules
   requires com.lmax.disruptor;
   requires org.apache.logging.log4j.core;

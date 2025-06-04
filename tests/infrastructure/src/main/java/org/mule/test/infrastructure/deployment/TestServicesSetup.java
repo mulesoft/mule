@@ -107,6 +107,10 @@ public class TestServicesSetup extends ExternalResource {
     return expressionLanguageMetadataService;
   }
 
+  public boolean isExpressionLanguageMetadataServiceDisabled() {
+    return expressionLanguageMetadataServiceDisabled;
+  }
+
   public void initNotOverriddenServices() throws IOException {
     if (schedulerService == null) {
       schedulerService = schedulerServiceJarFile;

@@ -5,6 +5,7 @@
  * LICENSE.txt file.
  */
 import org.mule.api.annotation.jpms.PrivilegedApi;
+import org.mule.runtime.core.internal.artifact.ArtifactClassLoaderFinder;
 
 /**
  * Mule server and core classes.
@@ -60,7 +61,10 @@ module org.mule.runtime.core {
   requires org.mule.runtime.profiling.api;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
+  // module from the boot layer, will not be available in tests
+  requires static org.mule.runtime.logging;
   requires org.mule.runtime.manifest;
+
 
   requires org.mule.runtime.metrics.api;
   requires org.mule.runtime.tracer.api;
@@ -211,6 +215,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.alert to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.artifact to
+      org.mule.runtime.artifact.activation;
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -635,5 +641,6 @@ module org.mule.runtime.core {
 
   uses org.mule.runtime.core.privileged.transaction.TransactionFactory;
   uses org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
+  uses ArtifactClassLoaderFinder;
 
 }
