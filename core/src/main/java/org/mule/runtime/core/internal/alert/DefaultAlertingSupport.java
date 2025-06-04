@@ -14,8 +14,6 @@ import static java.lang.Thread.currentThread;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.alert.AlertingSupport;
 import org.mule.runtime.api.alert.TimedDataAggregation;
 import org.mule.runtime.api.alert.TimedDataBuffer;
@@ -26,20 +24,15 @@ import org.mule.runtime.core.api.alert.MuleAlertingSupport;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import org.slf4j.Logger;
-
 import jakarta.inject.Inject;
 
 public class DefaultAlertingSupport implements MuleAlertingSupport, Initialisable {
-
-  private static final Logger LOGGER = getLogger(DefaultAlertingSupport.class);
 
   private static final Map<ClassLoader, AlertingSupport> ALERTS_PER_DEPLOYMENT = new WeakHashMap<>();
 
@@ -80,10 +73,6 @@ public class DefaultAlertingSupport implements MuleAlertingSupport, Initialisabl
     }
   }
 
-  private static Optional<ClassLoader> resolveRegionContextClassLoader(ClassLoader tccl) {
-    return artifactClassLoaderFinder().findRegionContextClassLoader();
-  }
-
   @Override
   public void triggerAlert(String alertName) {
     triggerAlert(alertName, null);
@@ -117,6 +106,11 @@ public class DefaultAlertingSupport implements MuleAlertingSupport, Initialisabl
   @Inject
   public void setTimeSupplier(TimeSupplier timeSupplier) {
     this.timeSupplier = timeSupplier;
+  }
+
+  // for test cases
+  public static Map<ClassLoader, AlertingSupport> getAlertsPerDeployment() {
+    return ALERTS_PER_DEPLOYMENT;
   }
 
 }
