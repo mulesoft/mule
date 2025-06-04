@@ -19,7 +19,7 @@ import org.apache.logging.log4j.core.async.EventRoute;
 /**
  * Specialization of {@link DefaultAsyncQueueFullPolicy} that calls registered callbacks to trigger alerts to help in
  * troubleshooting.
- * 
+ *
  * @since 4.10
  */
 public class MuleAlertingAsyncQueueFullPolicy extends DefaultAsyncQueueFullPolicy {
