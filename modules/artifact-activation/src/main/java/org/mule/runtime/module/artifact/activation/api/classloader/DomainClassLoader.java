@@ -4,16 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.api.application;
+package org.mule.runtime.module.artifact.activation.api.classloader;
 
 import org.mule.api.annotation.NoImplement;
 
 /**
- * Identifies a classLoader created for a given Mule application
- *
- * @deprecated no longer used in Mule Runtime
+ * Identifies a classLoader created for a given Mule domain
  */
 @NoImplement
-@Deprecated(forRemoval = true)
-public interface ApplicationClassLoader {
+public interface DomainClassLoader {
+
 }

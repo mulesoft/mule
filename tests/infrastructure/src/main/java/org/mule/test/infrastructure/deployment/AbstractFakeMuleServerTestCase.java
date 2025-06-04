@@ -9,6 +9,7 @@ package org.mule.test.infrastructure.deployment;
 import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
 
 import static org.apache.logging.log4j.LogManager.shutdown;
+
 import static org.junit.rules.RuleChain.outerRule;
 
 import org.mule.runtime.config.api.properties.PropertiesResolverUtils;
@@ -85,7 +86,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   }
 
   protected boolean addExpressionLanguageMetadataService() {
-    return true;
+    return !testServicesSetup.isExpressionLanguageMetadataServiceDisabled();
   }
 
   @After

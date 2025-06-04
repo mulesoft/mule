@@ -96,6 +96,16 @@ public interface MuleAlertingSupport extends AlertingSupport {
      */
     public static final String ALERT_XA_RECOVERY_START_ERROR = "XA_RECOVERY_START_ERROR";
 
+    /**
+     * When a log appender writes logs slower than the log entries are being generated, the logger ringbuffer starts to fill up.
+     * When it is full, it will cause threads attempting to log to either wait for space to be available in the ringbuffer or log
+     * synchronously, depending on the configuration. In either case, a thread that may not be supposed to block or wait will do
+     * so, causing performance issues in the Mule Runtime.
+     * <p>
+     * No additional data in alerts.
+     */
+    public static final String ALERT_ASYNC_LOGGER_RINGBUFFER_FULL = "ASYNC_LOOGER_RINGBUFFER_FULL";
+
     private AlertNames() {
       // Nothing to do
     }

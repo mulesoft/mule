@@ -14,6 +14,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.logging.log4j.LogManager.setFactory;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.module.log4j.api.MuleAlertingAsyncQueueFullPolicy;
 import org.mule.runtime.module.log4j.boot.internal.ContextSelectorWrapper;
 
 import java.util.ArrayList;
@@ -81,6 +82,7 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Shut
     getLogger("triggerDefaultFactoryCreation");
     // We need to set this property so log4j uses the same context factory everywhere
     setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
+    setProperty("log4j2.AsyncQueueFullPolicy", MuleAlertingAsyncQueueFullPolicy.class.getName());
     MuleLog4jContextFactory log4jContextFactory = new MuleLog4jContextFactory();
     setFactory(log4jContextFactory);
     return log4jContextFactory;
