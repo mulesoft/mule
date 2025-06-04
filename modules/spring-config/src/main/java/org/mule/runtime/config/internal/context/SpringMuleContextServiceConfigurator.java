@@ -75,7 +75,6 @@ import static org.mule.runtime.feature.api.management.FeatureFlaggingManagementS
 import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
 import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.metrics.exporter.api.MeterExporterProperties.METRIC_EXPORTER_ENABLED_PROPERTY;
-import org.mule.runtime.module.extension.api.http.HttpServiceApiDelegate;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.getBoolean;
@@ -131,6 +130,7 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
+import org.mule.runtime.http.support.api.HttpServiceApiDelegate;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.metrics.api.MeterProvider;
@@ -154,14 +154,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.ImmutableMap;
-
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-
-import jakarta.inject.Inject;
 
 /**
  * This class configured all the services available in a {@code MuleContext}.
