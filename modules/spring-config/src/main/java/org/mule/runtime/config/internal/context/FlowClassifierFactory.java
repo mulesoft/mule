@@ -98,7 +98,7 @@ public class FlowClassifierFactory {
     Set<String> flowMappings = new HashSet<>();
     ComponentParameterAst flowMappingsParameter = apiKitConfig.getParameter(DEFAULT_GROUP_NAME, APIKIT_FLOW_MAPPINGS_PARAM_NAME);
     Object flowMappingsValue = flowMappingsParameter.getValue().getRight();
-    if (flowMappingsValue instanceof Iterable<?> flowMappingsList) {
+    if (flowMappingsValue instanceof Iterable<?>flowMappingsList) {
       for (Object flowMapping : flowMappingsList) {
         if (flowMapping instanceof ComponentAst flowMappingComp) {
           ComponentParameterAst flowMappingParameter =
