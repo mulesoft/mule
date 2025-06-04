@@ -73,7 +73,6 @@ module org.mule.runtime.extensions.support {
   requires java.desktop;
   requires net.bytebuddy;
   requires org.jgrapht.core;
-  requires javax.inject;
 
   exports org.mule.runtime.module.extension.api.manager;
   exports org.mule.runtime.module.extension.api.loader;
@@ -206,10 +205,6 @@ module org.mule.runtime.extensions.support {
 
   opens org.mule.runtime.module.extension.internal.resources.documentation to
       jakarta.xml.bind;
-  exports org.mule.runtime.module.extension.api.http;
-  exports org.mule.runtime.module.extension.api.http.server;
-  exports org.mule.runtime.module.extension.api.http.message.muletosdk;
-  exports org.mule.runtime.module.extension.api.http.message.sdktomule;
 
   provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
       org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy;
