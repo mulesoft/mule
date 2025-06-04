@@ -71,7 +71,6 @@ import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBo
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.feature.api.management.FeatureFlaggingManagementService.PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY;
 import static org.mule.runtime.metrics.exporter.api.MeterExporterProperties.METRIC_EXPORTER_ENABLED_PROPERTY;
-import org.mule.runtime.module.extension.api.http.HttpServiceApiDelegate;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
@@ -123,6 +122,7 @@ import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
+import org.mule.runtime.http.support.api.HttpServiceApiDelegate;
 import org.mule.runtime.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory;
@@ -143,14 +143,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.ImmutableMap;
-
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-
-import jakarta.inject.Inject;
 
 /**
  * This class configured all the services available in a {@code MuleContext}.
