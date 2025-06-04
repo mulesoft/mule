@@ -28,7 +28,7 @@ import org.mule.sdk.api.http.server.HttpServerConfig;
 
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService {
 
