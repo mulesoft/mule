@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * {@link ErrorMessageAwareException} to provide an error message using {@link RoutingResult} that provides access to all route
  * results for use in error handlers.
  *
- * @since 3.5.0
+ * @since 4.6, moved from {@link org.mule.runtime.core.internal.routing.result.CompositeRoutingException}
  * @see RoutingResult
  */
 public class CompositeRoutingException extends MuleException implements ComposedErrorException, ErrorMessageAwareException {
