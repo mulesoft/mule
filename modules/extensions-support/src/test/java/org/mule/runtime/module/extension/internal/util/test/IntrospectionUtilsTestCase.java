@@ -133,7 +133,7 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   @ClassRule
-  public CompilationRule compilationRule = new CompilationRule();
+  public static CompilationRule compilationRule = new CompilationRule();
 
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
