@@ -10,6 +10,7 @@ import org.mule.runtime.core.privileged.routing.RoutingResult;
 
 /**
  * This is kept for backwards compatibility with persistent serialized data.
+ *
  * @since 3.5.0
  */
 public class CompositeRoutingException extends org.mule.runtime.core.privileged.routing.CompositeRoutingException {
