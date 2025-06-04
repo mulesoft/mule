@@ -188,6 +188,7 @@ public class DefaultFlowBuilder implements Builder {
     flow = new DefaultFlow(name, muleContext, source, processors,
                            ofNullable(exceptionListener), ofNullable(processingStrategyFactory), initialState, maxConcurrency,
                            (DefaultFlowsSummaryStatistics) statistics.getFlowSummaryStatistics(),
+                           (DefaultFlowsSummaryStatistics) statistics.getFlowSummaryStatisticsV2(),
                            createFlowStatistics(name, statistics),
                            componentInitialStateManager);
 
@@ -209,10 +210,12 @@ public class DefaultFlowBuilder implements Builder {
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           Integer maxConcurrency,
-                          DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
+                          DefaultFlowsSummaryStatistics flowsSummaryStatistics,
+                          DefaultFlowsSummaryStatistics flowsSummaryStatisticsV2,
+                          FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
       super(name, muleContext, source, processors, exceptionListener, processingStrategyFactory, initialState, maxConcurrency,
-            flowsSummaryStatistics, flowConstructStatistics, componentInitialStateManager);
+            flowsSummaryStatistics, flowsSummaryStatisticsV2, flowConstructStatistics, componentInitialStateManager);
 
       if (this.getExceptionListener() instanceof GlobalErrorHandler) {
         ((GlobalErrorHandler) this.getExceptionListener()).addComponentReference(getName());
