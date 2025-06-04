@@ -15,6 +15,7 @@ import static org.mule.runtime.api.notification.PipelineMessageNotification.PROC
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType.GENERIC;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.internal.construct.FlowBackPressureException.createFlowBackPressureException;
@@ -61,6 +62,8 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
+import org.mule.runtime.core.internal.management.stats.FlowClassifier;
+import org.mule.runtime.core.internal.management.stats.FlowClassifier.FlowType;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -131,8 +134,11 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private Map<BackPressureReason, FlowBackPressureException> backPressureExceptions;
   private final int maxConcurrency;
   private final DefaultFlowsSummaryStatistics flowsSummaryStatistics;
+  // TODO W-18668900: swap and remove once the pilot is concluded
+  private final DefaultFlowsSummaryStatistics flowsSummaryStatisticsV2;
   private final boolean triggerFlow;
   private final boolean apikitFlow;
+  private final FlowType flowType;
   private final ComponentInitialStateManager componentInitialStateManager;
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
@@ -143,15 +149,20 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                           Optional<FlowExceptionHandler> exceptionListener,
                           Optional<ProcessingStrategyFactory> processingStrategyFactory, String initialState,
                           Integer maxConcurrency,
-                          DefaultFlowsSummaryStatistics flowsSummaryStatistics, FlowConstructStatistics flowConstructStatistics,
+                          DefaultFlowsSummaryStatistics flowsSummaryStatistics,
+                          // TODO W-18668900: remove once the pilot is concluded
+                          DefaultFlowsSummaryStatistics flowsSummaryStatisticsV2,
+                          FlowConstructStatistics flowConstructStatistics,
                           ComponentInitialStateManager componentInitialStateManager) {
     super(name, muleContext, exceptionListener, initialState, flowConstructStatistics);
 
+    FlowClassifier flowClassifier;
     try {
       // TODO: verify if the lookup in registry AbstractPipeline can be removed (W-12718088)
       interceptorManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InterceptorManager.class);
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
       componentTracerFactory = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(ComponentTracerFactory.class);
+      flowClassifier = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(FlowClassifier.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
@@ -163,8 +174,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     this.processors = unmodifiableList(processors);
     this.maxConcurrency = maxConcurrency != null ? maxConcurrency : DEFAULT_MAX_CONCURRENCY;
     this.flowsSummaryStatistics = flowsSummaryStatistics;
+    this.flowsSummaryStatisticsV2 = flowsSummaryStatisticsV2;
     this.triggerFlow = source != null;
     this.apikitFlow = isApiKitFlow(getName());
+    this.flowType = flowClassifier != null ? flowClassifier.getFlowType(getName()) : GENERIC;
 
     this.processingStrategyFactory = processingStrategyFactory.orElseGet(() -> defaultProcessingStrategy());
     if (this.processingStrategyFactory instanceof AsyncProcessingStrategyFactory) {
@@ -661,12 +674,27 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private void updateFlowsSummaryStatistics(Consumer<DefaultFlowsSummaryStatistics> triggerFlowsUpdater,
                                             Consumer<DefaultFlowsSummaryStatistics> apikitflowsUpdater,
                                             Consumer<DefaultFlowsSummaryStatistics> privateFlowsUpdater) {
+    // TODO W-18668900: swap and remove once the pilot is concluded
     if (triggerFlow) {
       triggerFlowsUpdater.accept(flowsSummaryStatistics);
     } else if (apikitFlow) {
       apikitflowsUpdater.accept(flowsSummaryStatistics);
     } else {
       privateFlowsUpdater.accept(flowsSummaryStatistics);
+    }
+
+    if (triggerFlow) {
+      triggerFlowsUpdater.accept(flowsSummaryStatisticsV2);
+    } else {
+      switch (flowType) {
+        case APIKIT:
+        case SOAPKIT:
+          apikitflowsUpdater.accept(flowsSummaryStatisticsV2);
+          break;
+        case GENERIC:
+          privateFlowsUpdater.accept(flowsSummaryStatisticsV2);
+          break;
+      }
     }
   }
 

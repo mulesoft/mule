@@ -161,6 +161,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestC
 
     public RecordingFlow(String name, MuleContext muleContext) {
       super(name, muleContext, null, emptyList(), empty(), empty(), INITIAL_STATE_STARTED, DEFAULT_MAX_CONCURRENCY,
+            new DefaultFlowsSummaryStatistics(true),
             new DefaultFlowsSummaryStatistics(true), null,
             new ComponentInitialStateManager() {
 

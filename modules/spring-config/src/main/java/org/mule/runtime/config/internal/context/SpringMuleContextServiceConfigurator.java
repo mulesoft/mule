@@ -176,6 +176,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleContextServiceConfigurator {
 
+  private static final String OBJECT_FLOW_CLASSIFIER = "_muleFlowClassifier";
+
   private final MuleContextWithRegistry muleContext;
   private final ArtifactType artifactType;
   private final ArtifactAst artifactAst;
@@ -311,6 +313,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     // from the base registry
     registerConstantBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
     registerConstantBeanDefinition(OBJECT_NOTIFICATION_HANDLER, muleContext.getNotificationManager());
+    registerConstantBeanDefinition(OBJECT_FLOW_CLASSIFIER, new FlowClassifierFactory(artifactAst).create());
     registerConstantBeanDefinition(OBJECT_STATISTICS, muleContext.getStatistics());
     registerConstantBeanDefinition(OBJECT_RESOURCE_LOCATOR, resourceLocator);
     registerConstantBeanDefinition(MULE_MEMORY_MANAGEMENT_SERVICE, memoryManagementService);
