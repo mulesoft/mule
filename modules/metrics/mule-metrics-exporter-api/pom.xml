@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-module-metrics-parent</artifactId>
-        <version>4.6.18</version>
+        <version>4.6.19</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mule-metrics-exporter-api</artifactId>
-    <version>4.6.18</version>
+    <version>4.6.19</version>
     <name>Mule Metrics Exporter Api</name>
     <description>Definitions for Mule Metrics Exporter Api</description>
     

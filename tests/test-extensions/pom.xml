@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.6.18</version>
+        <version>4.6.19</version>
     </parent>
 
     <artifactId>mule-test-extensions-parent</artifactId>
