@@ -25,6 +25,7 @@ import org.mule.runtime.core.privileged.processor.Router;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -100,8 +101,7 @@ public class CompositeRoutingException extends MuleException implements Composed
     if (muleException != null) {
       builder.append(routeSubtitle).append(muleException.getDetailedMessage());
     } else {
-      builder.append(routeSubtitle)
-          .append("Caught exception in Exception Strategy: " + exception.getMessage());
+      builder.append(routeSubtitle).append("Caught exception in Exception Strategy: ").append(exception.getMessage());
     }
   }
 
@@ -113,7 +113,7 @@ public class CompositeRoutingException extends MuleException implements Composed
       detailedFailures =
           (Map<String, Pair<Error, MuleException>>) getDetailedFailuresMethod.invoke(routingResult);
     } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-      LOGGER.warn("Invalid Invocation, Expected method {} doesn't exist", getDetailedFailuresMethod.getName());
+      LOGGER.warn("Invalid Invocation, Expected method getFailuresWithExceptionInfo doesn't exist");
     }
     return detailedFailures;
   }
@@ -122,7 +122,7 @@ public class CompositeRoutingException extends MuleException implements Composed
     StringBuilder builder = new StringBuilder();
     for (Entry<String, Error> routeResult : routingResult.getFailures().entrySet()) {
       Throwable routeException = routeResult.getValue().getCause();
-      builder.append(lineSeparator() + "\t").append("Route ").append(routeResult.getKey()).append(": ")
+      builder.append(lineSeparator()).append("\t").append("Route ").append(routeResult.getKey()).append(": ")
           .append(routeException.getClass().getName())
           .append(": ").append(routeException.getMessage());
     }
@@ -137,9 +137,9 @@ public class CompositeRoutingException extends MuleException implements Composed
   @Override
   public List<Error> getErrors() {
     if (!routingResult.getFailures().isEmpty()) {
-      return routingResult.getFailures().values().stream().collect(toList());
+      return new ArrayList<>(routingResult.getFailures().values());
     } else {
-      return routingResult.getFailuresWithExceptionInfo().values().stream().map(pair -> pair.getFirst()).collect(toList());
+      return routingResult.getFailuresWithExceptionInfo().values().stream().map(Pair::getFirst).collect(toList());
     }
   }
 
