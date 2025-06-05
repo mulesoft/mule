@@ -13,7 +13,7 @@ import org.mule.runtime.core.privileged.routing.RoutingResult;
  *
  * @since 3.5.0
  */
-public class CompositeRoutingException extends org.mule.runtime.core.privileged.routing.CompositeRoutingException {
+public final class CompositeRoutingException extends org.mule.runtime.core.privileged.routing.CompositeRoutingException {
 
   private static final long serialVersionUID = -4421728527040579605L;
 
