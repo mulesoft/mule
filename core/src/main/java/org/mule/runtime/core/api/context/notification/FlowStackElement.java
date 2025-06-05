@@ -80,7 +80,7 @@ public class FlowStackElement implements Serializable {
 
   /**
    * @return the location of the component on this execution point.
-   * @since 4.10
+   * @since 4.10, 4.9.7
    */
   // is NOT a getter so it is not serialized by DW!
   public ComponentLocation executingLocation() {
@@ -89,7 +89,7 @@ public class FlowStackElement implements Serializable {
 
   /**
    * @return the annotations of the component on this execution point.
-   * @since 4.10
+   * @since 4.10, 4.9.7
    */
   // is NOT a getter so it is not serialized by DW!
   public Map<QName, Object> executingComponentAnnotations() {
@@ -98,7 +98,7 @@ public class FlowStackElement implements Serializable {
 
   /**
    * @return the location within the artifact source for the component on this execution point.
-   * @since 4.10
+   * @since 4.10, 4.9.7
    */
   // is NOT a getter so it is not serialized by DW!
   public String executingComponentSourceLocation() {
