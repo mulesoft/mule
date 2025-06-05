@@ -8,6 +8,7 @@ package org.mule.tck.util;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsEqual.equalTo;
+
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -82,7 +83,7 @@ public class FlowTraceUtils {
 
       @Override
       protected boolean matchesSafely(FlowStackElement flowStackElement) {
-        return executingLocationMatcher.matches(flowStackElement.getExecutingLocation().getLocation());
+        return executingLocationMatcher.matches(flowStackElement.executingLocation().getLocation());
       }
 
       @Override

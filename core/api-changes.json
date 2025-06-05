@@ -32,13 +32,13 @@
 		  {
 		    "ignore": true,
 		    "code": "java.method.added",
-		    "new": "method java.lang.String org.mule.runtime.core.api.context.notification.FlowStackElement::getExecutingComponentSourceLocation()",
+		    "new": "method java.lang.String org.mule.runtime.core.api.context.notification.FlowStackElement::executingComponentSourceLocation()",
 		    "justification": "W-18267133: Improvements for FlowStack"
 		  },
 		  {
 		    "ignore": true,
 		    "code": "java.method.added",
-		    "new": "method org.mule.runtime.api.component.location.ComponentLocation org.mule.runtime.core.api.context.notification.FlowStackElement::getExecutingLocation()",
+		    "new": "method org.mule.runtime.api.component.location.ComponentLocation org.mule.runtime.core.api.context.notification.FlowStackElement::executingLocation()",
 		    "justification": "W-18267133: Improvements for FlowStack"
 		  },
 		  {
