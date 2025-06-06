@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static org.mule.runtime.api.util.Preconditions.checkState;
+
+import static java.lang.Math.min;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.interrupted;
-import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
@@ -104,11 +107,13 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
     while (remaining > 0) {
       try {
-        if (totalRead > 0 && stream.available() < 1) {
+        final var available = stream.available();
+        if (totalRead > 0 && available < 1) {
           break;
         }
 
-        int read = stream.read(dest, offset, remaining);
+        int read = stream.read(dest, offset,
+                               available > 0 ? min(remaining, available) : remaining);
 
         if (read == -1) {
           streamFullyConsumed = true;
@@ -124,15 +129,24 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
         totalRead += read;
         remaining -= read;
         offset += read;
+
+        if (available > 0) {
+          // available informed, honor it
+          if (totalRead > 0) {
+            buffer.position(offset);
+          }
+
+          return totalRead;
+        }
+        // else: no data available or not informed. Fill the buffer, block if necessary.
       } catch (IOException e) {
         if (!interrupted()) {
           throw e;
         }
 
-        currentThread().interrupt();
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn("Thread {} interrupted while reading from stream.", currentThread().getName());
-        }
+        final var thread = currentThread();
+        thread.interrupt();
+        LOGGER.warn("Thread {} interrupted while reading from stream.", thread.getName());
 
         if (totalRead == 0 || closed.get()) {
           streamFullyConsumed = true;
