@@ -65,7 +65,7 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
     try {
       return new HttpServerWrapper(httpService.getServerFactory().create(configuration));
     } catch (ServerCreationException e) {
-      throw new org.mule.sdk.api.http.server.ServerCreationException(e.getMessage());
+      throw new org.mule.sdk.api.http.server.ServerCreationException(e.getMessage(), e);
     }
   }
 
