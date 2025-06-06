@@ -21,6 +21,7 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClientFactory;
 import org.mule.runtime.http.api.server.HttpServerFactory;
 import org.mule.runtime.http.api.server.ServerCreationException;
+import org.mule.sdk.api.http.client.ClientCreationException;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
@@ -54,15 +55,12 @@ class HttpServiceApiDelegateTestCase {
   }
 
   @Test
-  void clientCreation() {
-    // Given
+  void clientCreation() throws ClientCreationException {
     when(httpService.getClientFactory()).thenReturn(httpClientFactory);
     when(httpClientFactory.create(any())).thenReturn(mock(org.mule.runtime.http.api.client.HttpClient.class));
 
-    // When
     HttpClient client = delegate.client(config -> config.setName("test-client"));
 
-    // Then
     assertThat(client, notNullValue());
     verify(httpService).getClientFactory();
     verify(httpClientFactory).create(any());
@@ -70,17 +68,14 @@ class HttpServiceApiDelegateTestCase {
 
   @Test
   void serverCreation() throws Exception {
-    // Given
     when(httpService.getServerFactory()).thenReturn(httpServerFactory);
     when(httpServerFactory.create(any())).thenReturn(mock(org.mule.runtime.http.api.server.HttpServer.class));
 
-    // When
     HttpServer server = delegate.server(config -> {
       config.setName("test-server");
       config.setHost("localhost");
     });
 
-    // Then
     assertThat(server, notNullValue());
     verify(httpService).getServerFactory();
     verify(httpServerFactory).create(any());
@@ -88,11 +83,9 @@ class HttpServiceApiDelegateTestCase {
 
   @Test
   void serverCreationFailure() throws Exception {
-    // Given
     when(httpService.getServerFactory()).thenReturn(httpServerFactory);
     when(httpServerFactory.create(any())).thenThrow(new ServerCreationException("Test error"));
 
-    // When/Then
     var exception = assertThrows(org.mule.sdk.api.http.server.ServerCreationException.class, () -> {
       delegate.server(config -> {
         config.setName("test-server");

@@ -17,6 +17,7 @@ import org.mule.runtime.http.support.internal.message.HttpRequestBuilderWrapper;
 import org.mule.runtime.http.support.internal.message.HttpResponseBuilderWrapper;
 import org.mule.runtime.http.support.internal.server.HttpServerConfigToBuilder;
 import org.mule.runtime.http.support.internal.server.HttpServerWrapper;
+import org.mule.sdk.api.http.client.ClientCreationException;
 import org.mule.sdk.api.http.client.HttpClient;
 import org.mule.sdk.api.http.client.HttpClientConfig;
 import org.mule.sdk.api.http.domain.entity.HttpEntityFactory;
@@ -42,7 +43,7 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   }
 
   @Override
-  public HttpClient client(Consumer<HttpClientConfig> configCallback) {
+  public HttpClient client(Consumer<HttpClientConfig> configCallback) throws ClientCreationException {
     var builder = new HttpClientConfiguration.Builder();
     var configurer = new HttpClientConfigToBuilder(builder);
     configCallback.accept(configurer);
@@ -50,7 +51,7 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
     try {
       return new HttpClientWrapper(httpService.getClientFactory().create(configuration));
     } catch (Exception e) {
-      return null;
+      throw new ClientCreationException("Couldn't create client", e);
     }
   }
 
