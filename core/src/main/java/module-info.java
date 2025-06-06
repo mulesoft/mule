@@ -585,6 +585,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.privileged.processor.simple to
       spring.core;
+  opens org.mule.runtime.core.privileged.routing to
+      kryo.shaded;
 
   opens org.mule.runtime.core.internal.config to
       org.mule.runtime.tooling.support,
