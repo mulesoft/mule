@@ -71,9 +71,8 @@ import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingCon
 import static org.mule.runtime.feature.api.management.FeatureFlaggingManagementService.PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY;
 import static org.mule.runtime.metrics.exporter.api.MeterExporterProperties.METRIC_EXPORTER_ENABLED_PROPERTY;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.getBoolean;
-import static java.lang.Boolean.valueOf;
+import static java.lang.Boolean.parseBoolean;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -295,7 +294,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
         .filter(e -> !e.getKey().startsWith(DEPLOYMENT_PROPERTY_PREFIX))
         .forEach(e -> registerConstantBeanDefinition(e.getKey(), e.getValue()));
 
-    if (valueOf(getArtifactProperties().getOrDefault(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY, FALSE.toString()))) {
+    if (parseBoolean(getArtifactProperties().get(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY))) {
       registerConstantBeanDefinition(OBJECT_ARTIFACT_AST, artifactAst);
     }
   }
