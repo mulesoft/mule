@@ -18,7 +18,6 @@ import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 
 public final class HttpRequestBuilderWrapper implements HttpRequestBuilder {
@@ -143,30 +142,4 @@ public final class HttpRequestBuilderWrapper implements HttpRequestBuilder {
   public HttpRequest build() {
     return new HttpRequestWrapper(builder.build());
   }
-
-  public org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder builder() {
-    return builder;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this)
-      return true;
-    if (obj == null || obj.getClass() != this.getClass())
-      return false;
-    var that = (HttpRequestBuilderWrapper) obj;
-    return Objects.equals(this.builder, that.builder);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(builder);
-  }
-
-  @Override
-  public String toString() {
-    return "HttpRequestBuilderWrapper[" +
-        "builder=" + builder + ']';
-  }
-
 }
