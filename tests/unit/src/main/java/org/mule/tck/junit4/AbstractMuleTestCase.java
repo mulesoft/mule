@@ -64,6 +64,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.Timeout;
 import org.junit.rules.DisableOnDebug;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestName;
@@ -74,6 +75,7 @@ import org.slf4j.Logger;
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This implementation provides services to test code for
  * creating mock and test objects.
  */
+@Timeout(AbstractMuleTestCase.DEFAULT_TEST_TIMEOUT_SECS)
 public abstract class AbstractMuleTestCase {
 
   public static final String TEST_PAYLOAD = "test";
