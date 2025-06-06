@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.support.internal.server;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_FORWARD_COMPATIBILITY;
+
 import static java.net.InetAddress.getByName;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,6 +20,7 @@ import org.mule.runtime.http.api.server.ServerAddress;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +29,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+@Feature(HTTP_FORWARD_COMPATIBILITY)
 @ExtendWith(MockitoExtension.class)
 class ServerAddressWrapperTestCase {
 

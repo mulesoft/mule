@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.support.internal.message;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_FORWARD_COMPATIBILITY;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 
@@ -25,9 +27,11 @@ import org.mule.sdk.api.http.domain.entity.HttpEntity;
 import java.io.IOException;
 import java.net.URI;
 
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@Feature(HTTP_FORWARD_COMPATIBILITY)
 class HttpRequestBuilderWrapperTestCase {
 
   private static final String TEST_URI = "https://example.com";

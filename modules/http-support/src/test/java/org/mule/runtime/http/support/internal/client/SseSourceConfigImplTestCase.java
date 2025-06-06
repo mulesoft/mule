@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.support.internal.client;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_FORWARD_COMPATIBILITY;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -17,9 +19,11 @@ import org.mule.runtime.http.api.sse.client.SseSourceConfig;
 import org.mule.runtime.http.support.internal.message.HttpResponseBuilderWrapper;
 import org.mule.sdk.api.http.domain.message.response.HttpResponse;
 
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@Feature(HTTP_FORWARD_COMPATIBILITY)
 class SseSourceConfigImplTestCase {
 
   private SseSourceConfigImpl configurer;

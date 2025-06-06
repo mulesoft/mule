@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.support.internal.client;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_FORWARD_COMPATIBILITY;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -14,11 +16,13 @@ import org.mule.runtime.http.api.client.HttpRequestOptions;
 import org.mule.runtime.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.runtime.http.api.client.auth.HttpAuthentication;
 
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+@Feature(HTTP_FORWARD_COMPATIBILITY)
 class HttpRequestOptionsConfigToBuilderTestCase {
 
   private HttpRequestOptionsBuilder actualBuilder;
