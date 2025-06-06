@@ -175,7 +175,7 @@ public class PolicyChain extends AbstractComponent
 
   private Consumer<CoreEvent> pushBeforeNextFlowStackElement() {
     return event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-        .push(new FlowStackElement(flowStackEntryName, getIdentifier(), null));
+        .push(new FlowStackElement(flowStackEntryName, getIdentifier(), null, getLocation(), getAnnotations()));
   }
 
   private Consumer<CoreEvent> popFlowFlowStackElement() {

@@ -14,8 +14,11 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.exception.MessagingException;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import javax.xml.namespace.QName;
 
 /**
  * Consumer executed when a chain triggered by a policy's execute-next processor finishes with an error. That chain can be a flow,
@@ -26,13 +29,16 @@ public class OnExecuteNextErrorConsumer implements Consumer<Throwable> {
   private final Function<MessagingException, CoreEvent> prepareEvent;
   private final PolicyNotificationHelper notificationHelper;
   private final ComponentLocation location;
+  private final Map<QName, Object> annotations;
 
   public OnExecuteNextErrorConsumer(Function<MessagingException, CoreEvent> prepareEvent,
                                     PolicyNotificationHelper notificationHelper,
-                                    ComponentLocation location) {
+                                    ComponentLocation location,
+                                    Map<QName, Object> annotations) {
     this.prepareEvent = prepareEvent;
     this.notificationHelper = notificationHelper;
     this.location = location;
+    this.annotations = annotations;
   }
 
   @Override
@@ -50,7 +56,7 @@ public class OnExecuteNextErrorConsumer implements Consumer<Throwable> {
 
   private Consumer<CoreEvent> pushAfterNextFlowStackElement() {
     return event -> ((DefaultFlowCallStack) event.getFlowCallStack())
-        .push(new FlowStackElement(toPolicyLocation(location), null));
+        .push(new FlowStackElement(toPolicyLocation(location), null, location, annotations));
   }
 
   private String toPolicyLocation(ComponentLocation componentLocation) {

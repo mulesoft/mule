@@ -6,40 +6,60 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import static java.lang.System.currentTimeMillis;
+import static org.mule.runtime.api.component.Component.Annotations.SOURCE_LOCATION_ANNOTATION_KEY;
 
+import static java.lang.System.currentTimeMillis;
+import static java.time.Instant.now;
+import static java.util.Objects.requireNonNull;
+
+import org.mule.api.annotation.NoExtend;
+import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 
 import java.io.Serializable;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 /**
  * Keeps context information about the processors that a flow executed.
  *
  * @since 3.8.0
  */
-public final class FlowStackElement implements Serializable {
+@NoInstantiate
+@NoExtend
+public class FlowStackElement implements Serializable {
 
   private static final long serialVersionUID = -2372094725681872367L;
 
   private final String flowName;
   private final String processorPath;
+  private final transient ComponentLocation executingLocation;
+  private final transient Map<QName, Object> executingComponentAnnotations;
   private final long creationTime;
   private final transient ComponentIdentifier chainIdentifier;
 
-  public FlowStackElement(String flowName, String processorPath) {
-    this(flowName, null, processorPath);
+  public FlowStackElement(String flowName, String processorPath, ComponentLocation executingLocation,
+                          Map<QName, Object> executingComponentAnnotations) {
+    this(flowName, null, processorPath, executingLocation, executingComponentAnnotations);
   }
 
-  public FlowStackElement(String flowName, ComponentIdentifier chainIdentifier, String processorPath) {
+  public FlowStackElement(String flowName, ComponentIdentifier chainIdentifier, String processorPath,
+                          ComponentLocation executingLocation, Map<QName, Object> executingComponentAnnotations) {
     this.flowName = flowName;
     this.processorPath = processorPath;
-    this.creationTime = currentTimeMillis();
+    this.executingLocation = requireNonNull(executingLocation);
+    this.executingComponentAnnotations = executingComponentAnnotations;
+    this.creationTime = now().toEpochMilli();
     this.chainIdentifier = chainIdentifier;
   }
 
   /**
    * @return the path of the currently executing processor in the flow represented by this element.
+   * @deprecated Use {@link #getExecutingLocation()} and {@link #getExecutingComponentAnnotations()} instead.
    */
+  @Deprecated
   public String getProcessorPath() {
     return processorPath;
   }
@@ -59,6 +79,35 @@ public final class FlowStackElement implements Serializable {
   }
 
   /**
+   * @return the location of the component on this execution point.
+   * @since 4.10, 4.9.7
+   */
+  // is NOT a getter so it is not serialized by DW!
+  public ComponentLocation executingLocation() {
+    return executingLocation;
+  }
+
+  /**
+   * @return the annotations of the component on this execution point.
+   * @since 4.10, 4.9.7
+   */
+  // is NOT a getter so it is not serialized by DW!
+  public Map<QName, Object> executingComponentAnnotations() {
+    return executingComponentAnnotations;
+  }
+
+  /**
+   * @return the location within the artifact source for the component on this execution point.
+   * @since 4.10, 4.9.7
+   */
+  // is NOT a getter so it is not serialized by DW!
+  public String executingComponentSourceLocation() {
+    return executingComponentAnnotations != null
+        ? (String) executingComponentAnnotations.get(SOURCE_LOCATION_ANNOTATION_KEY)
+        : null;
+  }
+
+  /**
    * @return the time when the flow stack was created.
    */
   public long getCreationTimeLong() {
@@ -69,7 +118,7 @@ public final class FlowStackElement implements Serializable {
    * @return the milliseconds elapsed between its creation and now.
    */
   public long getElapsedTimeLong() {
-    return currentTimeMillis() - creationTime;
+    return now().toEpochMilli() - creationTime;
   }
 
   /**
@@ -103,5 +152,12 @@ public final class FlowStackElement implements Serializable {
 
   public String toStringWithElapsedTime() {
     return toString().concat(" ").concat(Long.toString(getElapsedTimeLong())).concat(" ms");
+  }
+
+  public String toStringEventDumpFormat() {
+    return executingLocation().getComponentIdentifier().getIdentifier().toString().concat("@")
+        .concat(executingLocation().getLocation())
+        .concat("(" + executingComponentSourceLocation() + ")")
+        .concat(" ").concat(Long.toString(getElapsedTimeLong())).concat(" ms");
   }
 }

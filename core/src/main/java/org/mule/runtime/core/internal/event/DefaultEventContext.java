@@ -143,6 +143,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   }
 
   @Override
+  public Instant getStartTime() {
+    return receivedDate;
+  }
+
+  @Override
   public ComponentLocation getOriginatingLocation() {
     return location;
   }
@@ -334,6 +339,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     private final ComponentLocation componentLocation;
     private final String id;
     private final String correlationId;
+    private final Instant startTime = now();
     private transient SpanContext spanContext;
     private final String rootId;
 
@@ -387,6 +393,11 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     @Override
     public Instant getReceivedTime() {
       return parent.getReceivedTime();
+    }
+
+    @Override
+    public Instant getStartTime() {
+      return startTime;
     }
 
     @Override

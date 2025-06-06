@@ -42,6 +42,7 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   private volatile boolean listenersAdded = false;
 
 
+
   public MessageProcessingFlowTraceManager() {
     messageProcessorTextDebugger = new MessageProcessorTextDebugger(this);
     pipelineProcessorDebugger = new FlowNotificationTextDebugger(this);
@@ -85,7 +86,10 @@ public class MessageProcessingFlowTraceManager extends LocationExecutionContextP
   public void onMessageProcessorNotificationPreInvoke(MessageProcessorNotification notification) {
     FlowCallStack flowCallStack = ((CoreEvent) notification.getEvent()).getFlowCallStack();
     if (flowCallStack != null) {
-      ((DefaultFlowCallStack) flowCallStack).pushCurrentProcessorPath(notification.getComponent().getRepresentation());
+      final var representation = notification.getComponent().getRepresentation();
+      ((DefaultFlowCallStack) flowCallStack).pushCurrentProcessorPath(representation,
+                                                                      notification.getComponent().getLocation(),
+                                                                      notification.getComponent().getAnnotations());
     }
   }
 

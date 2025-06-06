@@ -14,6 +14,10 @@ import static org.mule.runtime.module.troubleshooting.internal.operations.EventD
 import static org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation.EVENT_DUMP_OPERATION_DESCRIPTION;
 import static org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation.EVENT_DUMP_OPERATION_NAME;
 
+import static java.time.Clock.fixed;
+import static java.time.Instant.now;
+import static java.time.Instant.ofEpochMilli;
+import static java.time.ZoneId.of;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
@@ -21,6 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -32,11 +37,14 @@ import org.mule.runtime.module.troubleshooting.api.ArgumentDefinition;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import org.mockito.MockedStatic;
 
 public class EventDumpOperationTestCase {
 
@@ -70,15 +78,15 @@ public class EventDumpOperationTestCase {
   @Test
   public void whenNoApplicationIsPassedItReturnsAllApplications() throws IOException {
     final var writer = new StringWriter();
-    eventDumpOperation.getCallback().execute(emptyMap(), writer);
+    executeEventDump(emptyMap(), writer);
     Object result = writer.toString();
 
     var expected = """
         Active Events for application 'app1'
         ------------------------------------
 
-        "EventId"
-            <FlowCallStack>
+        "EventId", running for: 00:00.000, state: EXECUTING
+            at ns:component@MockLocation(null) 66 ms
 
         Active Events for application 'app2'
         ------------------------------------
@@ -92,15 +100,24 @@ public class EventDumpOperationTestCase {
     Map<String, String> argumentsWithApplication = new HashMap<>();
     argumentsWithApplication.put(APPLICATION_ARGUMENT_NAME, "app1");
     final var writer = new StringWriter();
-    eventDumpOperation.getCallback().execute(argumentsWithApplication, writer);
+    executeEventDump(argumentsWithApplication, writer);
     String result = writer.toString();
 
     var expected = """
-        "EventId"
-            <FlowCallStack>
+        "EventId", running for: 00:00.000, state: EXECUTING
+            at ns:component@MockLocation(null) 66 ms
 
         """;
     assertThat(result, is(equalTo(expected)));
+  }
+
+  private void executeEventDump(Map<String, String> args, final StringWriter writer) throws IOException {
+    Instant instant = now(fixed(ofEpochMilli(66), of("UTC")));
+    try (MockedStatic<Instant> mockedStatic = mockStatic(Instant.class)) {
+      mockedStatic.when(Instant::now).thenReturn(instant);
+
+      eventDumpOperation.getCallback().execute(args, writer);
+    }
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -113,6 +130,6 @@ public class EventDumpOperationTestCase {
     Map<String, String> arguments = new HashMap<>();
     arguments.put(APPLICATION_ARGUMENT_NAME, "app1");
     final var writer = new StringWriter();
-    eventDumpOperation.getCallback().execute(arguments, writer);
+    executeEventDump(arguments, writer);
   }
 }

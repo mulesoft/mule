@@ -6,7 +6,10 @@
  */
 package org.mule.tck.core.util.queue;
 
-import static junit.framework.Assert.assertNotSame;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.util.queue.Queue;
@@ -39,8 +42,8 @@ public class QueueTestComponent {
     queue.dispose();
 
     Queue queue2 = mgr.getQueueSession().getQueue(queueName);
-    assertNotSame(queue, queue2);
-    assertEquals(0, queue2.size());
+    assertThat(queue, not(sameInstance(queue2)));
+    assertThat(queue2.size(), is(0));
   }
 
 }

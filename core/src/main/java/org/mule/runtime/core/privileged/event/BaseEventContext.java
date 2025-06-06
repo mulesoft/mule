@@ -115,6 +115,12 @@ public interface BaseEventContext extends EventContext {
   boolean isTerminated();
 
   /**
+   * @return {@code true} if the response of {@code this} context is done.
+   * @since 4.10, 4.9.7
+   */
+  boolean isResponseDone();
+
+  /**
    * Use to determine if the event context is complete. A {@link EventContext} is considered complete once:
    * <ul>
    * <li>A response event/error is available.</li>

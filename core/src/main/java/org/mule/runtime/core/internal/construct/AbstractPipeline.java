@@ -468,7 +468,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
       FlowCallStack flowCallStack = event.getFlowCallStack();
       if (flowCallStack instanceof DefaultFlowCallStack) {
-        ((DefaultFlowCallStack) flowCallStack).push(new FlowStackElement(AbstractPipeline.this.getName(), getIdentifier(), null));
+        ((DefaultFlowCallStack) flowCallStack)
+            .push(new FlowStackElement(AbstractPipeline.this.getName(), getIdentifier(), null, getLocation(), getAnnotations()));
       }
       notificationFirer.dispatch(new PipelineMessageNotification(createInfo(event, null, AbstractPipeline.this),
                                                                  AbstractPipeline.this.getName(), PROCESS_START));
