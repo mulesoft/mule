@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.support.internal.server;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_FORWARD_COMPATIBILITY;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,12 +21,14 @@ import org.mule.sdk.api.http.sse.server.SseClientConfig;
 
 import java.util.function.Consumer;
 
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+@Feature(HTTP_FORWARD_COMPATIBILITY)
 @ExtendWith(MockitoExtension.class)
 class HttpResponseReadyCallbackWrapperTestCase {
 

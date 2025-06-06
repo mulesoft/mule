@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.support.internal.server;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_FORWARD_COMPATIBILITY;
+
 import static java.net.InetSocketAddress.createUnresolved;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,8 +19,10 @@ import org.mule.runtime.http.api.domain.request.ServerConnection;
 
 import java.net.InetSocketAddress;
 
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.Test;
 
+@Feature(HTTP_FORWARD_COMPATIBILITY)
 class ServerConnectionWrapperTestCase {
 
   @Test

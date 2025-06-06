@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.http.support.internal.message;
 
+import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_FORWARD_COMPATIBILITY;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -16,9 +18,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import io.qameta.allure.Feature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@Feature(HTTP_FORWARD_COMPATIBILITY)
 class HttpEntityFactoryImplTestCase {
 
   private HttpEntityFactoryImpl factory;
