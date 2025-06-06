@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 
+import static java.lang.String.format;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -29,6 +30,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -76,18 +78,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-import org.reactivestreams.Publisher;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 import org.mockito.ArgumentCaptor;
+import org.reactivestreams.Publisher;
 
 import io.qameta.allure.Issue;
-
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -426,7 +425,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
         new PhantomReference<>(sourcePolicy, sourcePolicyReferenceQueue);
 
     // An event and a source policy context are created in order to emulate an inflight event.
-    InternalEvent event = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
+    InternalEvent event = mock(InternalEvent.class);
     PolicyPointcutParameters policyPointcutParameters = mock(PolicyPointcutParameters.class);
     SourcePolicyContext sourcePolicyContext = new SourcePolicyContext(policyPointcutParameters);
     when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) sourcePolicyContext);
@@ -564,7 +563,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     new PollingProber(GC_POLLING_TIMEOUT, DEFAULT_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       System.gc();
       return policyManager.getActivePoliciesCount() == policyCount;
-    }));
+    }, () -> format("Expected %d policies, there were %d.", policyCount, policyManager.getActivePoliciesCount())));
   }
 
   @Test

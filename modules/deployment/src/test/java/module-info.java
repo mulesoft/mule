@@ -51,6 +51,7 @@ open module org.mule.runtime.deployment.test {
   requires org.apache.logging.log4j;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
+  requires org.mockito;
   requires org.jetbrains.annotations;
   requires io.qameta.allure.commons;
 
