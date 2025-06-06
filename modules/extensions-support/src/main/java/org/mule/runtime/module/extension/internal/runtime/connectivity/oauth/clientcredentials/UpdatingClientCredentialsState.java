@@ -57,13 +57,15 @@ public class UpdatingClientCredentialsState
   }
 
   private void updateDelegate(ResourceOwnerOAuthContext initialContext) {
-    if (initialContext.getAccessToken() == null) {
+    String accessToken = initialContext.getAccessToken();
+    String expiresIn = initialContext.getExpiresIn();
+    if (accessToken == null) {
       LOGGER
           .warn("Null token was set in the ResourceOwnerOAuthContext. Using previous token, and ensuring this state stays invalidated for next attempt");
       invalidated = true;
       return;
     }
-    delegate = new ImmutableClientCredentialsState(initialContext.getAccessToken(), initialContext.getExpiresIn());
+    delegate = new ImmutableClientCredentialsState(accessToken, expiresIn);
     invalidated = false;
   }
 
