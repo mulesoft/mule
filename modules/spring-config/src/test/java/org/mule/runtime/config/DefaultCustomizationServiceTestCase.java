@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.config;
 
+import static org.mule.runtime.api.artifact.ArtifactType.DOMAIN;
 import static org.mule.test.allure.AllureConstants.CustomizationServiceFeature.CUSTOMIZATION_SERVICE;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -17,8 +20,11 @@ import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.util.HashMap;
+
+import org.junit.jupiter.api.Test;
+
 import io.qameta.allure.Feature;
-import org.junit.Test;
 
 @Feature(CUSTOMIZATION_SERVICE)
 public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
@@ -28,7 +34,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   private DefaultCustomizationService customizationService = new DefaultCustomizationService();
 
   @Test
-  public void overridesDefaultServiceClass() throws Exception {
+  void overridesDefaultServiceClass() throws Exception {
     final Class<String> serviceClass = String.class;
 
     customizationService.overrideDefaultServiceClass(SERVICE_ID, serviceClass);
@@ -38,7 +44,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void overridesDefaultService() throws Exception {
+  void overridesDefaultService() throws Exception {
     final Object service = new Object();
 
     customizationService.overrideDefaultServiceImpl(SERVICE_ID, service);
@@ -48,7 +54,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void registersCustomServiceClass() throws Exception {
+  void registersCustomServiceClass() throws Exception {
     final Class<String> serviceClass = String.class;
 
     customizationService.registerCustomServiceClass(SERVICE_ID, serviceClass);
@@ -60,7 +66,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void registersCustomService() throws Exception {
+  void registersCustomService() throws Exception {
     final Object service = new Object();
 
     customizationService.registerCustomServiceImpl(SERVICE_ID, service);
@@ -72,7 +78,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void interceptsDefaultService() {
+  void interceptsDefaultService() {
     final Object defaultService = new Object();
     final Object service = new Object();
 
@@ -89,7 +95,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void interceptsWithoutDefaultService() {
+  void interceptsWithoutDefaultService() {
     final Object service = new Object();
 
     customizationService.interceptDefaultServiceImpl(SERVICE_ID, serviceInterceptor -> {
@@ -104,13 +110,26 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void skipsDefaultService() {
+  void skipsDefaultService() {
     customizationService.interceptDefaultServiceImpl(SERVICE_ID, ServiceInterceptor::remove);
 
     assertThat(customizationService.getDefaultServices().size(), equalTo(1));
 
     final CustomService customService = customizationService.getOverriddenService(SERVICE_ID).get();
     assertThat(customService.getServiceImpl().isPresent(), is(false));
+  }
+
+  @Test
+  void artifactProperties() {
+    final var artifactProperties = new HashMap<String, String>();
+    artifactProperties.put("key1", "value1");
+    customizationService.setArtifactProperties(artifactProperties);
+    artifactProperties.put("key2", "value2");
+    customizationService.setArtifactType(DOMAIN);
+
+    assertThat(customizationService.getArtifactProperties(), hasKey("key1"));
+    assertThat(customizationService.getArtifactProperties(), not(hasKey("key2")));
+    assertThat(customizationService.getArtifactType(), is(DOMAIN));
   }
 
   private void assertServiceInstance(CustomService customService, Object service) {
