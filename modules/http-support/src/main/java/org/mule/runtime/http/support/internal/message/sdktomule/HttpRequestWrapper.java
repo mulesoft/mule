@@ -24,7 +24,7 @@ public class HttpRequestWrapper implements HttpRequest {
 
   @Override
   public HttpProtocol getProtocol() {
-    return HttpProtocol.valueOf(request.getProtocol().name());
+    return HttpProtocol.valueOf(request.getProtocolVersion().name());
   }
 
   @Override

@@ -26,6 +26,21 @@ public class SseClientWrapper implements SseClient {
   }
 
   @Override
+  public void sendEvent(String name, String data, String id) throws IOException {
+    sseClient.sendEvent(name, data, id);
+  }
+
+  @Override
+  public void sendEvent(String name, String data) throws IOException {
+    sseClient.sendEvent(name, data);
+  }
+
+  @Override
+  public void sendEvent(String data) throws IOException {
+    sseClient.sendEvent(data);
+  }
+
+  @Override
   public void sendComment(String comment) {
     sseClient.sendComment(comment);
   }

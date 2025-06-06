@@ -9,8 +9,6 @@ package org.mule.runtime.http.support.internal.client;
 import org.mule.runtime.http.api.tcp.TcpClientSocketPropertiesBuilder;
 import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
 
-import java.util.Objects;
-
 public class TcpSocketPropertiesConfigurerToBuilder implements TcpSocketPropertiesConfigurer {
 
   private final TcpClientSocketPropertiesBuilder builder;
@@ -59,30 +57,5 @@ public class TcpSocketPropertiesConfigurerToBuilder implements TcpSocketProperti
   public TcpSocketPropertiesConfigurer connectionTimeout(Integer connectionTimeout) {
     builder.connectionTimeout(connectionTimeout);
     return this;
-  }
-
-  public TcpClientSocketPropertiesBuilder builder() {
-    return builder;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this)
-      return true;
-    if (obj == null || obj.getClass() != this.getClass())
-      return false;
-    var that = (TcpSocketPropertiesConfigurerToBuilder) obj;
-    return Objects.equals(this.builder, that.builder);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(builder);
-  }
-
-  @Override
-  public String toString() {
-    return "TcpSocketPropertiesConfigurerToBuilder[" +
-        "builder=" + builder + ']';
   }
 }

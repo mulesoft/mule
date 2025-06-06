@@ -38,7 +38,7 @@ public class ServerAddressWrapper implements org.mule.sdk.api.http.server.Server
     if (serverAddress instanceof ServerAddressWrapper otherWrapper) {
       return delegate.overlaps(otherWrapper.delegate);
     } else {
-      throw new IllegalArgumentException("Comparing pears with apples!");
+      return false;
     }
   }
 }

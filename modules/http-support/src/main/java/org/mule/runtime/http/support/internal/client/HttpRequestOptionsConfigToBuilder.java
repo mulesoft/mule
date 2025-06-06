@@ -11,16 +11,9 @@ import org.mule.sdk.api.http.client.HttpRequestOptionsConfig;
 import org.mule.sdk.api.http.client.auth.HttpAuthenticationConfig;
 import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
-public class HttpRequestOptionsConfigToBuilder implements HttpRequestOptionsConfig {
-
-  private final HttpRequestOptionsBuilder builder;
-
-  HttpRequestOptionsConfigToBuilder(HttpRequestOptionsBuilder builder) {
-    this.builder = builder;
-  }
+public record HttpRequestOptionsConfigToBuilder(HttpRequestOptionsBuilder builder) implements HttpRequestOptionsConfig {
 
   @Override
   public HttpRequestOptionsConfig setResponseTimeout(int responseTimeout) {
@@ -55,30 +48,4 @@ public class HttpRequestOptionsConfigToBuilder implements HttpRequestOptionsConf
     builder.sendBodyAlways(sendBodyAlways);
     return this;
   }
-
-  public HttpRequestOptionsBuilder builder() {
-    return builder;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this)
-      return true;
-    if (obj == null || obj.getClass() != this.getClass())
-      return false;
-    var that = (HttpRequestOptionsConfigToBuilder) obj;
-    return Objects.equals(this.builder, that.builder);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(builder);
-  }
-
-  @Override
-  public String toString() {
-    return "HttpRequestOptionsConfigurerToBuilder[" +
-        "builder=" + builder + ']';
-  }
-
 }

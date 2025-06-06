@@ -13,16 +13,9 @@ import org.mule.sdk.api.http.client.HttpClientConfig;
 import org.mule.sdk.api.http.client.proxy.ProxyConfig;
 import org.mule.sdk.api.http.tcp.TcpSocketPropertiesConfigurer;
 
-import java.util.Objects;
 import java.util.function.Consumer;
 
-public class HttpClientConfigToBuilder implements HttpClientConfig {
-
-  private final HttpClientConfiguration.Builder builder;
-
-  public HttpClientConfigToBuilder(HttpClientConfiguration.Builder builder) {
-    this.builder = builder;
-  }
+public record HttpClientConfigToBuilder(HttpClientConfiguration.Builder builder) implements HttpClientConfig {
 
   @Override
   public HttpClientConfig setTlsContextFactory(TlsContextFactory tlsContextFactory) {
@@ -88,30 +81,4 @@ public class HttpClientConfigToBuilder implements HttpClientConfig {
     builder.setProxyConfig(configurer.build());
     return this;
   }
-
-  public HttpClientConfiguration.Builder builder() {
-    return builder;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this)
-      return true;
-    if (obj == null || obj.getClass() != this.getClass())
-      return false;
-    var that = (HttpClientConfigToBuilder) obj;
-    return Objects.equals(this.builder, that.builder);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(builder);
-  }
-
-  @Override
-  public String toString() {
-    return "HttpClientConfigurerToBuilder[" +
-        "builder=" + builder + ']';
-  }
-
 }
