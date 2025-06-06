@@ -14,6 +14,8 @@ import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import org.mule.runtime.api.artifact.ArtifactType;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +28,9 @@ public class DefaultCustomizationService implements InternalCustomizationService
 
   private final Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
   private final Map<String, CustomService> customServices = new HashMap<>();
+
+  private ArtifactType artifactType;
+  private Map<String, String> artifactProperties = new HashMap<>();
 
   /**
    * {@inheritDoc}
@@ -96,6 +101,26 @@ public class DefaultCustomizationService implements InternalCustomizationService
   @Override
   public Map<String, CustomService> getDefaultServices() {
     return unmodifiableMap(muleContextDefaultServices);
+  }
+
+  @Override
+  public void setArtifactProperties(Map<String, String> artifactProperties) {
+    this.artifactProperties = unmodifiableMap(new HashMap<>(artifactProperties));
+  }
+
+  @Override
+  public Map<String, String> getArtifactProperties() {
+    return artifactProperties;
+  }
+
+  @Override
+  public void setArtifactType(ArtifactType artifactType) {
+    this.artifactType = artifactType;
+  }
+
+  @Override
+  public ArtifactType getArtifactType() {
+    return artifactType;
   }
 
 }

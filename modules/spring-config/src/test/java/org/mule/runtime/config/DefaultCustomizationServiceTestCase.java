@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.config;
 
+import static org.mule.runtime.api.artifact.ArtifactType.DOMAIN;
 import static org.mule.test.allure.AllureConstants.CustomizationServiceFeature.CUSTOMIZATION_SERVICE;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -17,8 +20,11 @@ import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import io.qameta.allure.Feature;
+import java.util.HashMap;
+
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
 
 @Feature(CUSTOMIZATION_SERVICE)
 public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
@@ -111,6 +117,19 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
 
     final CustomService customService = customizationService.getOverriddenService(SERVICE_ID).get();
     assertThat(customService.getServiceImpl().isPresent(), is(false));
+  }
+
+  @Test
+  public void artifactProperties() {
+    final var artifactProperties = new HashMap<String, String>();
+    artifactProperties.put("key1", "value1");
+    customizationService.setArtifactProperties(artifactProperties);
+    artifactProperties.put("key2", "value2");
+    customizationService.setArtifactType(DOMAIN);
+
+    assertThat(customizationService.getArtifactProperties(), hasKey("key1"));
+    assertThat(customizationService.getArtifactProperties(), not(hasKey("key2")));
+    assertThat(customizationService.getArtifactType(), is(DOMAIN));
   }
 
   private void assertServiceInstance(CustomService customService, Object service) {
