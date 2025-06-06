@@ -188,7 +188,13 @@
         <skipRevapiCheck>${skipMuleModuleMojos}</skipRevapiCheck>
         <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
         
-        <surefire.args.base>-XX:+TieredCompilation ${surefire.args.encoding} ${surefire.args.aspectj} ${surefire.args.jacoco}</surefire.args.base>
+        <surefire.args.junit>-Djunit.jupiter.execution.timeout.mode=disabled_on_debug</surefire.args.junit>
+        <surefire.args.base>
+            -XX:+TieredCompilation ${surefire.args.encoding}
+            ${surefire.args.junit}
+            ${surefire.args.aspectj}
+            ${surefire.args.jacoco}
+        </surefire.args.base>
         <surefire.test.unit.open.args.target>org.mule.runtime.jpms.utils</surefire.test.unit.open.args.target>
         <surefire.test.unit.open.args>
             -XX:+IgnoreUnrecognizedVMOptions
