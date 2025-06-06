@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
  *
  * @since 4.0
  */
-public final class RoutingResult {
+public final class RoutingResult implements Serializable {
 
   private final Map<String, Message> successfulRoutesResultMap;
   private final Map<String, Error> failedRoutesErrorMap;
