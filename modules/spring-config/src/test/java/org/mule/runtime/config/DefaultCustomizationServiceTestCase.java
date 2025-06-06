@@ -22,7 +22,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.qameta.allure.Feature;
 
@@ -34,7 +34,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   private DefaultCustomizationService customizationService = new DefaultCustomizationService();
 
   @Test
-  public void overridesDefaultServiceClass() throws Exception {
+  void overridesDefaultServiceClass() throws Exception {
     final Class<String> serviceClass = String.class;
 
     customizationService.overrideDefaultServiceClass(SERVICE_ID, serviceClass);
@@ -44,7 +44,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void overridesDefaultService() throws Exception {
+  void overridesDefaultService() throws Exception {
     final Object service = new Object();
 
     customizationService.overrideDefaultServiceImpl(SERVICE_ID, service);
@@ -54,7 +54,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void registersCustomServiceClass() throws Exception {
+  void registersCustomServiceClass() throws Exception {
     final Class<String> serviceClass = String.class;
 
     customizationService.registerCustomServiceClass(SERVICE_ID, serviceClass);
@@ -66,7 +66,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void registersCustomService() throws Exception {
+  void registersCustomService() throws Exception {
     final Object service = new Object();
 
     customizationService.registerCustomServiceImpl(SERVICE_ID, service);
@@ -78,7 +78,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void interceptsDefaultService() {
+  void interceptsDefaultService() {
     final Object defaultService = new Object();
     final Object service = new Object();
 
@@ -95,7 +95,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void interceptsWithoutDefaultService() {
+  void interceptsWithoutDefaultService() {
     final Object service = new Object();
 
     customizationService.interceptDefaultServiceImpl(SERVICE_ID, serviceInterceptor -> {
@@ -110,7 +110,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void skipsDefaultService() {
+  void skipsDefaultService() {
     customizationService.interceptDefaultServiceImpl(SERVICE_ID, ServiceInterceptor::remove);
 
     assertThat(customizationService.getDefaultServices().size(), equalTo(1));
@@ -120,7 +120,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void artifactProperties() {
+  void artifactProperties() {
     final var artifactProperties = new HashMap<String, String>();
     artifactProperties.put("key1", "value1");
     customizationService.setArtifactProperties(artifactProperties);
