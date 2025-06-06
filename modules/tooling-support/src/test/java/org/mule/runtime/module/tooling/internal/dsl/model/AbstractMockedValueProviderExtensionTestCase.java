@@ -37,14 +37,16 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.IntStream.range;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsNot.not;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.mockito.quality.Strictness.LENIENT;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -104,14 +106,12 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
-import org.slf4j.Logger;
-
 import org.junit.Before;
 import org.junit.Rule;
-
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.slf4j.Logger;
 
 public abstract class AbstractMockedValueProviderExtensionTestCase extends AbstractMuleTestCase {
 
@@ -154,7 +154,7 @@ public abstract class AbstractMockedValueProviderExtensionTestCase extends Abstr
   protected static final String OTHER_OPERATION_LOCATION = MY_FLOW + "/processors/1";
 
   @Rule
-  public MockitoRule mockito = MockitoJUnit.rule();
+  public MockitoRule mockito = MockitoJUnit.rule().strictness(LENIENT);
 
   @Mock(lenient = true)
   protected ExtensionModel mockExtension;

@@ -73,7 +73,15 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
   }
 
   protected static BeanDefinition getBeanDefinition(Class<?> beanType) {
-    return getBeanDefinitionBuilder(beanType).getBeanDefinition();
+    return getBeanDefinition(beanType, false);
+  }
+
+  protected static BeanDefinition getBeanDefinition(Class<?> beanType, boolean primary) {
+    BeanDefinitionBuilder beanDefinitionBuilder = getBeanDefinitionBuilder(beanType);
+    if (primary) {
+      beanDefinitionBuilder.setPrimary(true);
+    }
+    return beanDefinitionBuilder.getBeanDefinition();
   }
 
   protected void registerConstantBeanDefinition(String serviceId, Object impl) {

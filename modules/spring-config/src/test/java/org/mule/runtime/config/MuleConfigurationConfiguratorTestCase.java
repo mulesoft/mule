@@ -333,7 +333,7 @@ public class MuleConfigurationConfiguratorTestCase extends AbstractMuleTestCase 
                                                      configFiles, this, muleContext.getExtensionManager().getExtensions(), false,
                                                      muleContext.getExecutionClassLoader(), muleContext.getConfiguration(), null);
       }
-      new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false, false,
+      new ArtifactAstConfigurationBuilder(artifactAst, emptyMap(), APP, false,
                                           new DefaultComponentBuildingDefinitionRegistryFactory()
                                               .create(artifactAst.dependencies(),
                                                       artifactAst::dependenciesDsl))

@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.module.launcher.privileged.ContainerServiceProvider;
+import org.mule.runtime.module.tooling.internal.config.ToolingServicesConfigurator;
 import org.mule.runtime.module.tooling.internal.launcher.ToolingSupportContainerServiceProvider;
 
 /**
@@ -55,7 +56,28 @@ module org.mule.runtime.tooling.support {
   exports org.mule.runtime.module.tooling.internal to
       org.mule.runtime.launcher;
 
+  exports org.mule.runtime.module.tooling.internal.data.sample to
+      spring.beans;
+  exports org.mule.runtime.module.tooling.internal.config to
+      spring.beans;
+  exports org.mule.runtime.module.tooling.internal.connectivity to
+      spring.beans;
+  exports org.mule.runtime.module.tooling.internal.metadata.model to
+      spring.beans;
+  exports org.mule.runtime.module.tooling.internal.value to
+      spring.beans;
+
+  opens org.mule.runtime.module.tooling.internal.data.sample to
+      spring.core;
   opens org.mule.runtime.module.tooling.internal.config to
+      spring.core;
+  opens org.mule.runtime.module.tooling.internal.connectivity to
+      spring.core;
+  opens org.mule.runtime.module.tooling.internal.metadata to
+      spring.core;
+  opens org.mule.runtime.module.tooling.internal.metadata.cache.lazy to
+      spring.core;
+  opens org.mule.runtime.module.tooling.internal.value to
       spring.core;
 
   provides org.mule.runtime.config.api.dsl.ArtifactDeclarationXmlSerializer
@@ -64,5 +86,7 @@ module org.mule.runtime.tooling.support {
       with org.mule.runtime.module.tooling.internal.dsl.model.DefaultDslElementModelFactory;
   provides ContainerServiceProvider
       with ToolingSupportContainerServiceProvider;
+  provides ServiceConfigurator with
+      ToolingServicesConfigurator;
 
 }
