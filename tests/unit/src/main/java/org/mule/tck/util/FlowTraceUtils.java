@@ -82,7 +82,7 @@ public class FlowTraceUtils {
 
       @Override
       protected boolean matchesSafely(FlowStackElement flowStackElement) {
-        return executingLocationMatcher.matches(flowStackElement.getExecutingLocation().getLocation());
+        return executingLocationMatcher.matches(flowStackElement.executingLocation().getLocation());
       }
 
       @Override

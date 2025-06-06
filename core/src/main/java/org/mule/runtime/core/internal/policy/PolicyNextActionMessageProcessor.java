@@ -162,7 +162,7 @@ public class PolicyNextActionMessageProcessor extends AbstractComponent implemen
         return false;
       }
 
-      return isSubflowWithinASoucePolicy(builderFromStringRepresentation(pair.getSecond().getExecutingLocation().getLocation())
+      return isSubflowWithinASoucePolicy(builderFromStringRepresentation(pair.getSecond().executingLocation().getLocation())
           .build());
     });
   }

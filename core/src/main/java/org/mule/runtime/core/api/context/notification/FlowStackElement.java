@@ -57,7 +57,7 @@ public class FlowStackElement implements Serializable {
 
   /**
    * @return the path of the currently executing processor in the flow represented by this element.
-   * @deprecated Use {@link #getExecutingLocation()} and {@link #getExecutingComponentAnnotations()} instead.
+   * @deprecated Use {@link #executingLocation()} and {@link #getExecutingComponentAnnotations()} instead.
    */
   @Deprecated
   public String getProcessorPath() {
@@ -82,7 +82,8 @@ public class FlowStackElement implements Serializable {
    * @return the location of the component on this execution point.
    * @since 4.10
    */
-  public ComponentLocation getExecutingLocation() {
+  // is NOT a getter so it is not serialized by DW!
+  public ComponentLocation executingLocation() {
     return executingLocation;
   }
 
@@ -99,7 +100,8 @@ public class FlowStackElement implements Serializable {
    * @return the location within the artifact source for the component on this execution point.
    * @since 4.10
    */
-  public String getExecutingComponentSourceLocation() {
+  // is NOT a getter so it is not serialized by DW!
+  public String executingComponentSourceLocation() {
     return executingComponentAnnotations != null
         ? (String) executingComponentAnnotations.get(SOURCE_LOCATION_ANNOTATION_KEY)
         : null;
@@ -153,9 +155,9 @@ public class FlowStackElement implements Serializable {
   }
 
   public String toStringEventDumpFormat() {
-    return getExecutingLocation().getComponentIdentifier().getIdentifier().toString().concat("@")
-        .concat(getExecutingLocation().getLocation())
-        .concat("(" + getExecutingComponentSourceLocation() + ")")
+    return executingLocation().getComponentIdentifier().getIdentifier().toString().concat("@")
+        .concat(executingLocation().getLocation())
+        .concat("(" + executingComponentSourceLocation() + ")")
         .concat(" ").concat(Long.toString(getElapsedTimeLong())).concat(" ms");
   }
 }

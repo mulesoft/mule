@@ -715,7 +715,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   private String getFlowStackElementLocation(FlowStackElement element) {
-    return element.getExecutingLocation().getLocation();
+    return element.executingLocation().getLocation();
   }
 
   /**
