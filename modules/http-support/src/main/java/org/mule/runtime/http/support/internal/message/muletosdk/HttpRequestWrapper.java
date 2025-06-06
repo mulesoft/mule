@@ -7,7 +7,7 @@
 package org.mule.runtime.http.support.internal.message.muletosdk;
 
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.sdk.api.http.domain.HttpProtocol;
+import org.mule.sdk.api.http.domain.HttpProtocolVersion;
 import org.mule.sdk.api.http.domain.entity.HttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 
@@ -23,8 +23,8 @@ public class HttpRequestWrapper implements HttpRequest {
   }
 
   @Override
-  public HttpProtocol getProtocol() {
-    return HttpProtocol.valueOf(muleRequest.getProtocol().name());
+  public HttpProtocolVersion getProtocolVersion() {
+    return HttpProtocolVersion.valueOf(muleRequest.getProtocol().name());
   }
 
   @Override
@@ -55,6 +55,11 @@ public class HttpRequestWrapper implements HttpRequest {
   @Override
   public Collection<String> getHeaderNames() {
     return muleRequest.getHeaderNames();
+  }
+
+  @Override
+  public boolean containsHeader(String headerName) {
+    return muleRequest.containsHeader(headerName);
   }
 
   @Override

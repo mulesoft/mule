@@ -32,10 +32,14 @@ import jakarta.inject.Inject;
 
 public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService {
 
-  @Inject
+  private final HttpEntityFactory httpEntityFactory = new HttpEntityFactoryImpl();
+
   private HttpService httpService;
 
-  private final HttpEntityFactory httpEntityFactory = new HttpEntityFactoryImpl();
+  @Inject
+  public void setHttpService(HttpService httpService) {
+    this.httpService = httpService;
+  }
 
   @Override
   public HttpClient client(Consumer<HttpClientConfig> configCallback) {
@@ -66,7 +70,7 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
 
   @Override
   public HttpResponseBuilder responseBuilder() {
-    return new HttpResponseBuilderWrapper(org.mule.runtime.http.api.domain.message.response.HttpResponse.builder());
+    return new HttpResponseBuilderWrapper();
   }
 
   @Override
@@ -76,13 +80,12 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
 
   @Override
   public HttpRequestBuilder requestBuilder() {
-    return new HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message.request.HttpRequest.builder());
+    return new HttpRequestBuilderWrapper();
   }
 
   @Override
   public HttpRequestBuilder requestBuilder(boolean preserveHeaderCase) {
-    return new HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message.request.HttpRequest
-        .builder(preserveHeaderCase));
+    return new HttpRequestBuilderWrapper(preserveHeaderCase);
   }
 
   @Override

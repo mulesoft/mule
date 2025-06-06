@@ -80,10 +80,18 @@ public class SseSourceConfigImpl implements SseSourceConfig {
   }
 
   public org.mule.runtime.http.api.sse.client.SseSourceConfig build() {
-    if (response == null) {
+    if (response == null && url == null) {
+      throw new IllegalArgumentException("An HTTP Response or an URL must be provided to build an SseSource");
+    }
+
+    if (response != null) {
+      return fromResponse(new HttpResponseWrapper(response)).build();
+    } else {
       var optionsBuilder = HttpRequestOptions.builder();
-      var optionsConfigurer = new HttpRequestOptionsConfigToBuilder(optionsBuilder);
-      requestOptionsConfigConsumer.accept(optionsConfigurer);
+      if (requestOptionsConfigConsumer != null) {
+        var optionsConfigurer = new HttpRequestOptionsConfigToBuilder(optionsBuilder);
+        requestOptionsConfigConsumer.accept(optionsConfigurer);
+      }
 
       return org.mule.runtime.http.api.sse.client.SseSourceConfig
           .builder(url)
@@ -92,8 +100,6 @@ public class SseSourceConfigImpl implements SseSourceConfig {
           .withRequestOptions(optionsBuilder.build())
           .withPreserveHeadersCase(preserveHeadersCase)
           .build();
-    } else {
-      return fromResponse(new HttpResponseWrapper(response)).build();
     }
   }
 }

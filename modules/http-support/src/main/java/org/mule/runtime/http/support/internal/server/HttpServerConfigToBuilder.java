@@ -11,7 +11,6 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.server.HttpServerConfiguration;
 import org.mule.sdk.api.http.server.HttpServerConfig;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public final class HttpServerConfigToBuilder implements HttpServerConfig {
@@ -69,30 +68,4 @@ public final class HttpServerConfigToBuilder implements HttpServerConfig {
     builder.setReadTimeout(readTimeout);
     return this;
   }
-
-  public HttpServerConfiguration.Builder builder() {
-    return builder;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this)
-      return true;
-    if (obj == null || obj.getClass() != this.getClass())
-      return false;
-    var that = (HttpServerConfigToBuilder) obj;
-    return Objects.equals(this.builder, that.builder);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(builder);
-  }
-
-  @Override
-  public String toString() {
-    return "HttpServerConfigurerToBuilder[" +
-        "builder=" + builder + ']';
-  }
-
 }

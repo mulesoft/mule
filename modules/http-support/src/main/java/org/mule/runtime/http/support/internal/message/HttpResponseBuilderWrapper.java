@@ -16,8 +16,13 @@ import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import java.util.Collection;
 import java.util.Optional;
 
-public record HttpResponseBuilderWrapper(org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder builder)
-    implements HttpResponseBuilder {
+public final class HttpResponseBuilderWrapper implements HttpResponseBuilder {
+
+  private final org.mule.runtime.http.api.domain.message.response.HttpResponseBuilder builder;
+
+  public HttpResponseBuilderWrapper() {
+    this.builder = org.mule.runtime.http.api.domain.message.response.HttpResponse.builder();
+  }
 
   @Override
   public HttpResponseBuilder statusCode(Integer statusCode) {

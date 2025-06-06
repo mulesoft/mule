@@ -7,20 +7,35 @@
 package org.mule.runtime.http.support.internal.message;
 
 import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.http.api.domain.HttpProtocol;
 import org.mule.runtime.http.support.internal.message.muletosdk.HttpRequestWrapper;
 import org.mule.runtime.http.support.internal.message.sdktomule.HttpEntityWrapper;
 import org.mule.sdk.api.http.HttpConstants;
-import org.mule.sdk.api.http.domain.HttpProtocol;
+import org.mule.sdk.api.http.domain.HttpProtocolVersion;
 import org.mule.sdk.api.http.domain.entity.HttpEntity;
 import org.mule.sdk.api.http.domain.message.request.HttpRequest;
 import org.mule.sdk.api.http.domain.message.request.HttpRequestBuilder;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 
-public record HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder builder)
-    implements HttpRequestBuilder {
+public final class HttpRequestBuilderWrapper implements HttpRequestBuilder {
+
+  private final org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder builder;
+
+  public HttpRequestBuilderWrapper() {
+    this.builder = org.mule.runtime.http.api.domain.message.request.HttpRequest.builder();
+  }
+
+  public HttpRequestBuilderWrapper(boolean preserveHeaderCase) {
+    this.builder = org.mule.runtime.http.api.domain.message.request.HttpRequest.builder(preserveHeaderCase);
+  }
+
+  public HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder builder) {
+    this.builder = builder;
+  }
 
   @Override
   public HttpRequestBuilder uri(String uri) {
@@ -47,8 +62,8 @@ public record HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message
   }
 
   @Override
-  public HttpRequestBuilder protocol(HttpProtocol protocol) {
-    builder.protocol(org.mule.runtime.http.api.domain.HttpProtocol.valueOf(protocol.name()));
+  public HttpRequestBuilder protocol(HttpProtocolVersion protocol) {
+    builder.protocol(HttpProtocol.valueOf(protocol.name()));
     return this;
   }
 
@@ -128,4 +143,30 @@ public record HttpRequestBuilderWrapper(org.mule.runtime.http.api.domain.message
   public HttpRequest build() {
     return new HttpRequestWrapper(builder.build());
   }
+
+  public org.mule.runtime.http.api.domain.message.request.HttpRequestBuilder builder() {
+    return builder;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this)
+      return true;
+    if (obj == null || obj.getClass() != this.getClass())
+      return false;
+    var that = (HttpRequestBuilderWrapper) obj;
+    return Objects.equals(this.builder, that.builder);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(builder);
+  }
+
+  @Override
+  public String toString() {
+    return "HttpRequestBuilderWrapper[" +
+        "builder=" + builder + ']';
+  }
+
 }
