@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TR
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_SPAN_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_FACTORY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HTTP_SERVICE_API_REGISTRY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_CONFIGURATION_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_FACTORY_KEY;
@@ -130,6 +131,7 @@ import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.core.internal.value.MuleValueProviderService;
+import org.mule.runtime.http.support.api.HttpServiceApiDelegate;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.metrics.api.MeterProvider;
@@ -153,14 +155,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.ImmutableMap;
-
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-
-import jakarta.inject.Inject;
 
 /**
  * This class configured all the services available in a {@code MuleContext}.
@@ -241,6 +241,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY, getBeanDefinition(DefaultInitialSpanInfoProvider.class))
       .put(PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY, getBeanDefinition(DefaultFeatureManagementService.class))
       .put(FORWARD_COMPATIBILITY_HELPER_KEY, getBeanDefinition(DefaultForwardCompatibilityHelper.class))
+      .put(MULE_HTTP_SERVICE_API_REGISTRY_KEY, getBeanDefinition(HttpServiceApiDelegate.class))
       .build();
 
   // Do not use static field. BeanDefinitions are reused and produce weird behaviour

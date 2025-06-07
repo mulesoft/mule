@@ -378,6 +378,7 @@ public interface AllureConstants {
 
     String HTTP_EXTENSION = "HTTP Extension";
     String HTTP_SERVICE = "HTTP Service";
+    String HTTP_FORWARD_COMPATIBILITY = "HTTP Forward Compatibility";
 
     interface HttpStory {
 
