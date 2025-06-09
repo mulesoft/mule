@@ -11,6 +11,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_ST
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_INCREMENT_SIZE;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTE_STREAMING_BUFFER_SIZE;
+
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.util.DataSize;
 
@@ -24,6 +25,7 @@ public final class InMemoryCursorStreamConfig {
   private final DataSize initialBufferSize;
   private final DataSize bufferSizeIncrement;
   private final DataSize maxBufferSize;
+  private final boolean eagerRead;
 
   /**
    * @return A new instance configured with default settings
@@ -34,7 +36,8 @@ public final class InMemoryCursorStreamConfig {
                                           new DataSize(DEFAULT_BYTE_STREAMING_BUFFER_INCREMENT_SIZE,
                                                        DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT),
                                           new DataSize(DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE,
-                                                       DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT));
+                                                       DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT),
+                                          false);
   }
 
   /**
@@ -44,8 +47,10 @@ public final class InMemoryCursorStreamConfig {
    * @param bufferSizeIncrement the size that the buffer should gain each time it is expanded. A value of zero bytes means no
    *                            expansion. Cannot be negative byte size.
    * @param maxBufferSize       the maximum amount of space that the buffer can grow to. Use {@code null} for unbounded buffers
+   * @param eagerRead           if provided cursors read method will return immediately after reading some data
    */
-  public InMemoryCursorStreamConfig(DataSize initialBufferSize, DataSize bufferSizeIncrement, DataSize maxBufferSize) {
+  public InMemoryCursorStreamConfig(DataSize initialBufferSize, DataSize bufferSizeIncrement, DataSize maxBufferSize,
+                                    boolean eagerRead) {
     final int initial = initialBufferSize.toBytes();
     checkArgument(initial > 0, "initialBufferSize must be greater than zero bytes");
     final int increment = bufferSizeIncrement.toBytes();
@@ -62,6 +67,7 @@ public final class InMemoryCursorStreamConfig {
     this.initialBufferSize = initialBufferSize;
     this.bufferSizeIncrement = bufferSizeIncrement;
     this.maxBufferSize = maxBufferSize;
+    this.eagerRead = eagerRead;
   }
 
   public DataSize getInitialBufferSize() {
@@ -74,5 +80,19 @@ public final class InMemoryCursorStreamConfig {
 
   public DataSize getMaxBufferSize() {
     return maxBufferSize;
+  }
+
+  /**
+   * If eager read is {@code true}, {@code read} methods will return immediately after readily available data has been read. As
+   * more data becomes available, subsequent calls to {@code read} will be required to consume that.
+   * <p>
+   * If eager read is {@code false}, {@code read} methods will not return until the intermediate buffer of the cursor is full.
+   *
+   * @return if provided cursors {@code read} methods will return immediately after readily available data has been read.
+   *
+   * @since 4.10
+   */
+  public boolean isEagerRead() {
+    return eagerRead;
   }
 }

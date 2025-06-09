@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Math.toIntExact;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
+
+import static java.lang.Math.toIntExact;
+
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
@@ -29,6 +31,7 @@ public final class BufferedCursorStream extends AbstractCursorStream {
   private static final ByteBuffer NULL_BUFFER = ByteBuffer.allocate(0);
 
   private final InputStreamBuffer streamBuffer;
+  private final boolean eagerRead;
 
   /**
    * Intermediate buffer between this cursor and the {@code traversableBuffer}. This reduces contention on the
@@ -44,9 +47,10 @@ public final class BufferedCursorStream extends AbstractCursorStream {
    * @param streamBuffer the buffer which provides data
    * @param provider     the {@link CursorStreamProvider} for the {@link CursorStream cursors} that will consume this buffer
    */
-  public BufferedCursorStream(InputStreamBuffer streamBuffer, CursorStreamProvider provider) {
+  public BufferedCursorStream(InputStreamBuffer streamBuffer, CursorStreamProvider provider, boolean eagerRead) {
     super(provider);
     this.streamBuffer = streamBuffer;
+    this.eagerRead = eagerRead;
   }
 
   /**
@@ -85,7 +89,7 @@ public final class BufferedCursorStream extends AbstractCursorStream {
       return -1;
     }
 
-    int read = unsigned((int) localBuffer.get());
+    int read = unsigned(localBuffer.get());
     position++;
     return read;
   }
@@ -113,6 +117,9 @@ public final class BufferedCursorStream extends AbstractCursorStream {
         read += remaining;
         off += remaining;
         len -= remaining;
+        if (eagerRead) {
+          return read;
+        }
       }
     }
   }

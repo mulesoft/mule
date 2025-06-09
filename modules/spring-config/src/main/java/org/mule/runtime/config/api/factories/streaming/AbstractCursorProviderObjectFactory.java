@@ -9,6 +9,7 @@ package org.mule.runtime.config.api.factories.streaming;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 
@@ -19,6 +20,9 @@ public abstract class AbstractCursorProviderObjectFactory<T> extends AbstractCom
 
   @Inject
   protected StreamingManager streamingManager;
+
+  @Inject
+  protected FeatureFlaggingService ffService;
 
   @Override
   public T getObject() throws Exception {

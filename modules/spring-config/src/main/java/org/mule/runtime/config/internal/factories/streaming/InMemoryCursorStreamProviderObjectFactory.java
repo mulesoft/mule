@@ -18,21 +18,24 @@ public class InMemoryCursorStreamProviderObjectFactory
   private final int initialBufferSize;
   private final int bufferSizeIncrement;
   private final int maxInMemorySize;
-  private DataUnit dataUnit;
+  private final DataUnit dataUnit;
+  private final boolean eagerInit;
 
   public InMemoryCursorStreamProviderObjectFactory(int initialBufferSize, int bufferSizeIncrement, int maxInMemorySize,
-                                                   DataUnit dataUnit) {
+                                                   DataUnit dataUnit, boolean eagerInit) {
     this.initialBufferSize = initialBufferSize;
     this.bufferSizeIncrement = bufferSizeIncrement;
     this.maxInMemorySize = maxInMemorySize;
     this.dataUnit = dataUnit;
+    this.eagerInit = eagerInit;
   }
 
   @Override
   public CursorStreamProviderFactory doGetObject() throws Exception {
     InMemoryCursorStreamConfig config = new InMemoryCursorStreamConfig(new DataSize(initialBufferSize, dataUnit),
                                                                        new DataSize(bufferSizeIncrement, dataUnit),
-                                                                       new DataSize(maxInMemorySize, dataUnit));
+                                                                       new DataSize(maxInMemorySize, dataUnit),
+                                                                       eagerInit);
 
 
     return streamingManager.forBytes().getInMemoryCursorProviderFactory(config);

@@ -9,9 +9,12 @@ package org.mule.runtime.core.internal.streaming.bytes.test;
 import static java.lang.Math.min;
 import static java.lang.String.format;
 import static java.lang.System.arraycopy;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+
+import static org.apache.commons.lang3.RandomStringUtils.insecure;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -32,7 +35,8 @@ public abstract class AbstractByteStreamingTestCase extends AbstractMuleTestCase
   protected String data;
 
   public AbstractByteStreamingTestCase(int dataSize) {
-    data = randomAlphanumeric(dataSize);
+    final int count = dataSize;
+    data = insecure().nextAlphanumeric(count);
   }
 
   protected String toString(byte[] dest) throws IOException {
