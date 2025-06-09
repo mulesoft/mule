@@ -12,6 +12,7 @@ import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingSto
 import static java.lang.Thread.currentThread;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
@@ -29,13 +30,97 @@ import io.qameta.allure.Story;
 
 @Feature(STREAMING)
 @Story(BYTES_STREAMING)
-public class InputStreamBufferTestCase extends AbstractMuleTestCase {
+class InputStreamBufferTestCase extends AbstractMuleTestCase {
 
   private static final int ACTUAL_STREAM_BUFFER_SIZE = 8;
 
   @Test
+  void streamDataAvailableEventually() {
+    final var is = new InputStream() {
+
+      private boolean firstRead = false;
+
+      @Override
+      public int read() throws IOException {
+        return 0;
+      }
+
+      @Override
+      public int read(byte[] b, int off, int len) throws IOException {
+        if (!firstRead) {
+          firstRead = true;
+          return 0;
+        }
+
+        return super.read(b, off, len);
+      }
+
+      @Override
+      public int available() throws IOException {
+        return 0;
+      }
+    };
+
+    final var streamBuffer = new InMemoryStreamBuffer(is, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
+    final var byteBuffer = streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE);
+
+    assertThat(byteBuffer.limit(), is(ACTUAL_STREAM_BUFFER_SIZE));
+    assertThat(byteBuffer.capacity(), is(ACTUAL_STREAM_BUFFER_SIZE));
+  }
+
+  @Test
+  void streamFinished() {
+    final var is = new InputStream() {
+
+      @Override
+      public int read() throws IOException {
+        return -1;
+      }
+
+      @Override
+      public int available() throws IOException {
+        return 0;
+      }
+    };
+
+    final var streamBuffer = new InMemoryStreamBuffer(is, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
+    final var byteBuffer = streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE);
+
+    assertThat(byteBuffer, nullValue());
+  }
+
+  @Test
+  void streamFinishedAfterSomeData() {
+    final var is = new InputStream() {
+
+      private long bytesRead;
+
+      @Override
+      public int read() throws IOException {
+        if (bytesRead > ACTUAL_STREAM_BUFFER_SIZE) {
+          return -1;
+        }
+
+        bytesRead++;
+        return 0;
+      }
+
+      @Override
+      public int available() throws IOException {
+        return ACTUAL_STREAM_BUFFER_SIZE;
+      }
+    };
+
+    final var streamBuffer = new InMemoryStreamBuffer(is, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
+    final var byteBuffer = streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE);
+
+    assertThat(byteBuffer.limit(), is(ACTUAL_STREAM_BUFFER_SIZE));
+    assertThat(byteBuffer.capacity(), is(ACTUAL_STREAM_BUFFER_SIZE));
+  }
+
+  @Test
   @Issue("W-18716253")
-  public void streamAvailableDataSmallerThanAvaiableBuffer() {
+  void streamAvailableDataSmallerThanAvaiableBuffer() {
     final var latch = new CountDownLatch(1);
 
     final var is = new InputStream() {
@@ -58,16 +143,6 @@ public class InputStreamBufferTestCase extends AbstractMuleTestCase {
       }
 
       @Override
-      public int read(byte[] b) throws IOException {
-        return super.read(b);
-      }
-
-      @Override
-      public int read(byte[] b, int off, int len) throws IOException {
-        return super.read(b, off, len);
-      }
-
-      @Override
       public int available() throws IOException {
         return (int) (ACTUAL_STREAM_BUFFER_SIZE - bytesRead % ACTUAL_STREAM_BUFFER_SIZE);
       }
@@ -78,5 +153,6 @@ public class InputStreamBufferTestCase extends AbstractMuleTestCase {
     final var byteBuffer = streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE + 1);
 
     assertThat(byteBuffer.limit(), is(ACTUAL_STREAM_BUFFER_SIZE));
+    assertThat(byteBuffer.capacity(), is(ACTUAL_STREAM_BUFFER_SIZE));
   }
 }

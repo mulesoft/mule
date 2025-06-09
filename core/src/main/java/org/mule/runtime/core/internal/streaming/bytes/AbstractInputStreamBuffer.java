@@ -112,8 +112,7 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
           break;
         }
 
-        int read = stream.read(dest, offset,
-                               available > 0 ? min(remaining, available) : remaining);
+        int read = stream.read(dest, offset, readLength(remaining, available));
 
         if (read == -1) {
           streamFullyConsumed = true;
@@ -132,36 +131,43 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
         if (available > 0) {
           // available informed, honor it
-          if (totalRead > 0) {
-            buffer.position(offset);
-          }
-
-          return totalRead;
+          return advanceBufferPosition(buffer, totalRead, offset);
         }
         // else: no data available or not informed. Fill the buffer, block if necessary.
       } catch (IOException e) {
-        if (!interrupted()) {
-          throw e;
-        }
-
-        final var thread = currentThread();
-        thread.interrupt();
-        LOGGER.warn("Thread {} interrupted while reading from stream.", thread.getName());
-
-        if (totalRead == 0 || closed.get()) {
-          streamFullyConsumed = true;
-          return -1;
-        }
-
-        throw e;
+        return handleIoException(e, totalRead);
       }
     }
 
+    return advanceBufferPosition(buffer, totalRead, offset);
+  }
+
+  private int readLength(int remaining, final int available) {
+    return available > 0 ? min(remaining, available) : remaining;
+  }
+
+  private int advanceBufferPosition(ByteBuffer buffer, int totalRead, int offset) {
     if (totalRead > 0) {
       buffer.position(offset);
     }
-
     return totalRead;
+  }
+
+  private int handleIoException(IOException ioe, int totalRead) throws IOException {
+    if (!interrupted()) {
+      throw ioe;
+    }
+
+    final var thread = currentThread();
+    thread.interrupt();
+    LOGGER.warn("Thread {} interrupted while reading from stream.", thread.getName());
+
+    if (totalRead == 0 || closed.get()) {
+      streamFullyConsumed = true;
+      return -1;
+    }
+
+    throw ioe;
   }
 
   protected abstract ByteBuffer copy(long position, int length);
