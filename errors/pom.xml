@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.9.6</version>
+        <version>4.9.6-WITH-W-18622349</version>
     </parent>
     <artifactId>mule-runtime-errors</artifactId>
     <packaging>jar</packaging>
