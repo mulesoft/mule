@@ -23,13 +23,6 @@
         </surefire.add.modules>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.value.cache=org.mule.runtime.tooling.support
-            --add-exports=org.mule.runtime.metadata.support/org.mule.runtime.metadata.internal=org.mule.runtime.tooling.support
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
-            --add-opens=org.mule.runtime.tooling.support/org.mule.runtime.module.tooling.internal=ALL-UNNAMED
             ${surefire.module.args}
         </surefire.args>
     </properties>
@@ -43,6 +36,7 @@
                         <id>default-testCompile</id>
                         <configuration>
                             <compilerArgs>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.tooling.support</arg>
                                 <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.value.cache=org.mule.runtime.tooling.support</arg>
                                 <arg>--add-exports=org.mule.runtime.metadata.support/org.mule.runtime.metadata.internal=org.mule.runtime.tooling.support</arg>
                             </compilerArgs>
@@ -178,10 +172,23 @@
             <scope>test</scope>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-vegan-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-values-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-some-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
@@ -195,7 +202,42 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
+            <artifactId>mule-petstore-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-metadata-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-marvel-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
             <artifactId>mule-javax-inject-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-heisenberg-extension</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>classloading-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>

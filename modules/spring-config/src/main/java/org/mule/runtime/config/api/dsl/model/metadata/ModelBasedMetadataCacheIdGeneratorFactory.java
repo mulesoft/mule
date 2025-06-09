@@ -19,6 +19,7 @@ import org.mule.runtime.metadata.internal.cache.ComponentAstBasedMetadataCacheId
  *
  * @since 4.1.4, 4.2.0
  */
+@Deprecated(since = "4.10", forRemoval = true)
 public class ModelBasedMetadataCacheIdGeneratorFactory implements MetadataCacheIdGeneratorFactory<ComponentAst> {
 
   @Override

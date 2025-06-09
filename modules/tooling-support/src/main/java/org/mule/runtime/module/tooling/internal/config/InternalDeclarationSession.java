@@ -36,7 +36,6 @@ import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.app.declaration.api.ParameterizedElementDeclaration;
-import org.mule.runtime.config.api.dsl.model.metadata.DeclarationBasedMetadataCacheIdGenerator;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
@@ -50,6 +49,7 @@ import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataCompon
 import org.mule.runtime.module.tooling.internal.artifact.metadata.MetadataKeysExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.sampledata.SampleDataExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.value.ValueProviderExecutor;
+import org.mule.runtime.module.tooling.internal.metadata.model.DeclarationBasedMetadataCacheIdGenerator;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.Optional;

@@ -8,18 +8,19 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
-import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.ApplicationStatus.APPLICATION_STATUS_STORY;
 import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.LIFECYCLE_AND_DEPENDENCY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LifecycleAndDependencyInjectionFeature.ApplicationStatus.APPLICATION_STATUS_STORY;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.junit.Assert.fail;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -46,11 +47,11 @@ import org.mule.tck.probe.PollingProber;
 import java.io.File;
 import java.net.URL;
 
-import jakarta.inject.Inject;
+import org.junit.Test;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
+import jakarta.inject.Inject;
 
 /**
  * These tests verify that the {@link DefaultMuleApplication} status is set correctly depending on its
@@ -84,7 +85,6 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
                                              appLocation, null, null,
-                                             getRuntimeLockFactory(),
                                              mock(MemoryManagementService.class),
                                              mock(ArtifactConfigurationProcessor.class));
     application.setArtifactContext(mockArtifactContext);

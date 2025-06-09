@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.config.internal.context;
 
-import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
-import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
-import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.DEPLOYMENT_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.FORWARD_COMPATIBILITY_HELPER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
@@ -67,18 +65,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.SDK_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
-import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.runtime.feature.api.management.FeatureFlaggingManagementService.PROFILING_FEATURE_MANAGEMENT_SERVICE_KEY;
-import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
-import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.runtime.metrics.exporter.api.MeterExporterProperties.METRIC_EXPORTER_ENABLED_PROPERTY;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.getBoolean;
-import static java.lang.Boolean.valueOf;
+import static java.lang.Boolean.parseBoolean;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -87,7 +81,6 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.internal.factories.MuleConfigurationConfigurator;
@@ -105,7 +98,6 @@ import org.mule.runtime.core.internal.config.DefaultFeatureManagementService;
 import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.connection.DelegateConnectionManagerAdapter;
-import org.mule.runtime.core.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
@@ -129,9 +121,6 @@ import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
-import org.mule.runtime.core.internal.value.MuleValueProviderService;
-import org.mule.runtime.metadata.internal.MuleMetadataService;
-import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
 import org.mule.runtime.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.error.ErrorMetricsFactory;
 import org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory;
@@ -139,7 +128,6 @@ import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConf
 import org.mule.runtime.metrics.impl.DefaultMeterProvider;
 import org.mule.runtime.metrics.impl.meter.error.DefaultErrorMetricsFactory;
 import org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwardCompatibilityHelper;
-import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.extension.internal.store.SdkObjectStoreManagerAdapter;
 import org.mule.runtime.tracer.customization.impl.provider.DefaultInitialSpanInfoProvider;
 import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
@@ -214,7 +202,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER, getBeanDefinition(MuleMessageProcessingManager.class))
       .put(OBJECT_MULE_STREAM_CLOSER_SERVICE, getBeanDefinition(DefaultStreamCloserService.class))
       .put(OBJECT_CONVERTER_RESOLVER, getBeanDefinition(DynamicDataTypeConversionResolver.class))
-      .put(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class))
+      .put(OBJECT_LOCK_FACTORY, getBeanDefinition(MuleLockFactory.class, true))
       .put(OBJECT_LOCK_PROVIDER, getBeanDefinition(SingleServerLockProvider.class))
       .put(OBJECT_PROCESSING_TIME_WATCHER, getBeanDefinition(DefaultProcessingTimeWatcher.class))
       .put(OBJECT_EXCEPTION_LOCATION_PROVIDER, getBeanDefinition(MessagingExceptionLocationProvider.class))
@@ -243,27 +231,15 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
       .put(FORWARD_COMPATIBILITY_HELPER_KEY, getBeanDefinition(DefaultForwardCompatibilityHelper.class))
       .build();
 
-  // Do not use static field. BeanDefinitions are reused and produce weird behaviour
-  private final ImmutableMap<String, BeanDefinition> toolingContextServices = ImmutableMap.<String, BeanDefinition>builder()
-      .put(METADATA_SERVICE_KEY, getBeanDefinition(MuleMetadataService.class))
-      .put(VALUE_PROVIDER_SERVICE_KEY, getBeanDefinition(MuleValueProviderService.class))
-      .put(SAMPLE_DATA_SERVICE_KEY, getBeanDefinition(MuleSampleDataService.class))
-      .put(CONNECTIVITY_TESTING_SERVICE_KEY, getBeanDefinition(DefaultConnectivityTestingService.class))
-      .put(METADATA_CACHE_MANAGER_KEY, getBeanDefinition(DefaultPersistentMetadataCacheManager.class))
-      .put(METADATA_CACHE_ID_GENERATOR_KEY, getBeanDefinition(ModelBasedMetadataCacheIdGeneratorFactory.class))
-      .build();
-
   private final MuleFunctionsBindingContextProvider coreFunctionsProvider;
   private final ConfigurationProperties configurationProperties;
   private final Map<String, String> artifactProperties;
-  private final boolean addToolingObjectsToRegistry;
   private final MemoryManagementService memoryManagementService;
 
   public SpringMuleContextServiceConfigurator(MuleContextWithRegistry muleContext,
                                               MuleFunctionsBindingContextProvider coreFunctionsProvider,
                                               ConfigurationProperties configurationProperties,
                                               Map<String, String> artifactProperties,
-                                              boolean addToolingObjectsToRegistry,
                                               ArtifactType artifactType,
                                               ArtifactAst artifactAst,
                                               BeanDefinitionRegistry beanDefinitionRegistry,
@@ -276,7 +252,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     this.coreFunctionsProvider = coreFunctionsProvider;
     this.configurationProperties = configurationProperties;
     this.artifactProperties = artifactProperties;
-    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.artifactType = artifactType;
     this.artifactAst = artifactAst;
     this.resourceLocator = resourceLocator;
@@ -303,9 +278,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     }
 
     registerContextServices(defaultContextServices, artifactType.equals(DOMAIN));
-    if (isAddToolingObjectsToRegistry()) {
-      registerContextServices(toolingContextServices, artifactType.equals(DOMAIN));
-    }
 
     createBootstrapBeanDefinitions();
     createLocalObjectStoreBeanDefinitions();
@@ -316,9 +288,13 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
     coreFunctionsProvider.setConfigurationProperties(configurationProperties);
     registerConstantBeanDefinition(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY, coreFunctionsProvider);
 
-    artifactProperties.forEach(this::registerConstantBeanDefinition);
+    getArtifactProperties()
+        .entrySet()
+        .stream()
+        .filter(e -> !e.getKey().startsWith(DEPLOYMENT_PROPERTY_PREFIX))
+        .forEach(e -> registerConstantBeanDefinition(e.getKey(), e.getValue()));
 
-    if (valueOf(artifactProperties.getOrDefault(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY, FALSE.toString()))) {
+    if (parseBoolean(getArtifactProperties().get(MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY))) {
       registerConstantBeanDefinition(OBJECT_ARTIFACT_AST, artifactAst);
     }
   }
@@ -442,10 +418,6 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
 
   protected Map<String, String> getArtifactProperties() {
     return artifactProperties;
-  }
-
-  protected boolean isAddToolingObjectsToRegistry() {
-    return addToolingObjectsToRegistry;
   }
 
   protected MemoryManagementService getMemoryManagementService() {

@@ -15,13 +15,12 @@ import static org.mule.runtime.config.internal.dsl.utils.DslConstants.POOLING_PR
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECTION_CONFIG_PARAMETER_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.SCHEDULING_STRATEGY_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.ApplicationModel.TLS_CONTEXT_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.POOLING_PROFILE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
@@ -40,6 +39,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.app.declaration.api.ParameterValue;
@@ -68,6 +68,13 @@ import org.slf4j.LoggerFactory;
 class InfrastructureElementModelDelegate {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InfrastructureElementModelDelegate.class);
+
+  public static final ComponentIdentifier RECONNECTION_CONFIG_PARAMETER_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(RECONNECTION_CONFIG_PARAMETER_NAME).build();
+  public static final ComponentIdentifier SCHEDULING_STRATEGY_IDENTIFIER =
+      builder().namespace(CORE_PREFIX).name(SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER).build();
+  public static final ComponentIdentifier TLS_CONTEXT_IDENTIFIER =
+      builder().namespace(TLS_PREFIX).name(TLS_CONTEXT_ELEMENT_IDENTIFIER).build();
 
   private final Set<String> eeStreamingStrategies =
       ImmutableSet.of(REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS, REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS);

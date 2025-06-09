@@ -19,12 +19,15 @@ import static org.mule.test.allure.AllureConstants.RegistryFeature.ObjectRegistr
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+
 import static org.junit.Assert.assertThat;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry;
@@ -37,8 +40,6 @@ import org.mule.tck.junit4.MockExtensionManagerConfigurationBuilder;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,6 +48,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
@@ -94,7 +96,7 @@ public class ArtifactAstInRegistryTestCase extends AbstractMuleTestCase {
                                                                                                                        addArtifactAstToRegistry
                                                                                                                            .toString()),
                                                                                                           APP,
-                                                                                                          lazyInit, false,
+                                                                                                          lazyInit,
                                                                                                           mock(ComponentBuildingDefinitionRegistry.class));
 
     muleContext = (MuleContextWithRegistry) new DefaultMuleContextFactory()

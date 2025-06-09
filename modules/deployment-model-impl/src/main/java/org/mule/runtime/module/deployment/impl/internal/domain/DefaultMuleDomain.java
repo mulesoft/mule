@@ -28,7 +28,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -66,7 +65,6 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   private final List<ArtifactPlugin> artifactPlugins;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
   private final ClassLoaderRepository classLoaderRepository;
-  private final LockFactory runtimeLockFactory;
   private final MemoryManagementService memoryManagementService;
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
 
@@ -78,7 +76,6 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
                            ServiceRepository serviceRepository,
                            List<ArtifactPlugin> artifactPlugins,
                            ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                           LockFactory runtimeLockFactory,
                            MemoryManagementService memoryManagementService,
                            ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     super("domain", "domain", deploymentClassLoader);
@@ -87,7 +84,6 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
     this.serviceRepository = serviceRepository;
     this.artifactPlugins = artifactPlugins;
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
-    this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
   }
@@ -202,7 +198,6 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
           .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                 descriptor.getDeploymentProperties())))
           .setServiceRepository(serviceRepository)
-          .setRuntimeLockFactory(runtimeLockFactory)
           .setMemoryManagementService(memoryManagementService)
           .setArtifactCoordinates(descriptor.getBundleDescriptor());
 

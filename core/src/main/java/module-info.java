@@ -233,7 +233,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.config.builders to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
-      org.mule.runtime.tooling.support,
       org.mule.test.unit;
   exports org.mule.runtime.core.internal.connection to
       com.mulesoft.mule.runtime.bti,
@@ -244,9 +243,6 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.connection.adapter to
       org.mule.runtime.extensions.support;
-  exports org.mule.runtime.core.internal.connectivity to
-      org.mule.runtime.spring.config,
-      spring.beans;
   exports org.mule.runtime.core.internal.connector to
       com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.core.internal.construct to
@@ -334,9 +330,10 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.lock to
-      org.mule.runtime.spring.config,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.launcher,
+      org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
@@ -424,6 +421,7 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.store to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
@@ -489,6 +487,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.repository,
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kryo,
@@ -537,6 +536,7 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.util.store to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
@@ -544,12 +544,10 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       com.mulesoft.mule.runtime.license,
       com.mulesoft.anypoint.gw.core;
-  exports org.mule.runtime.core.internal.value to
-      org.mule.runtime.spring.config,
-      spring.beans;
   exports org.mule.runtime.core.internal.value.cache to
       org.mule.runtime.metadata.support,
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support;
 
   opens org.mule.runtime.core.api to
       spring.core;
@@ -589,11 +587,8 @@ module org.mule.runtime.core {
       kryo.shaded;
 
   opens org.mule.runtime.core.internal.config to
-      org.mule.runtime.tooling.support,
       spring.core;
   opens org.mule.runtime.core.internal.connection to
-      spring.core;
-  opens org.mule.runtime.core.internal.connectivity to
       spring.core;
   opens org.mule.runtime.core.internal.construct to
       spring.core;
@@ -635,8 +630,6 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.transaction to
       spring.core;
   opens org.mule.runtime.core.internal.transformer to
-      spring.core;
-  opens org.mule.runtime.core.internal.value to
       spring.core;
 
   uses org.mule.runtime.core.privileged.transaction.TransactionFactory;

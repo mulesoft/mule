@@ -6,17 +6,17 @@
  */
 package org.mule.test.module.extension.config;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.ArrayUtils.toObject;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
+import static java.util.Arrays.asList;
+
+import static org.apache.commons.lang3.ArrayUtils.toObject;
+
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -127,6 +127,6 @@ public abstract class AbstractConfigParserTestCase extends AbstractHeisenbergCon
 
   @Override
   protected String getConfigFile() {
-    return "heisenberg-config.xml";
+    return "operations/heisenberg-config.xml";
   }
 }

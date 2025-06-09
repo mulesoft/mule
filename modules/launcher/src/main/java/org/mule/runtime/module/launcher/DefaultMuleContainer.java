@@ -131,7 +131,7 @@ public class DefaultMuleContainer implements MuleContainer {
         new DefaultMuleCoreExtensionManagerServer(new ClasspathMuleCoreExtensionDiscoverer(artifactResourcesRegistry
             .getContainerClassLoader()),
                                                   new ReflectionMuleCoreExtensionDependencyResolver());
-    this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
+    this.muleLockFactory = new ServerLockFactory();
 
     loadContainerServiceProviders()
         .forEach(containerServiceProvider -> setService(containerServiceProvider.getServiceInterface(),

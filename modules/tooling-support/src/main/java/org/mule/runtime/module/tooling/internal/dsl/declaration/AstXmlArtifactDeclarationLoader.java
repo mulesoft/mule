@@ -19,25 +19,28 @@ import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.NUMBER
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.STRING;
 import static org.mule.runtime.app.declaration.api.fluent.SimpleValueType.TIME;
 import static org.mule.runtime.ast.api.xml.AstXmlParserAttribute.IS_CDATA;
-import static org.mule.runtime.config.internal.dsl.XmlConstants.buildRawParamKeyForDocAttribute;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
-import static org.mule.runtime.extension.api.util.LayoutOrderComparator.OBJECTS_FIELDS_BY_LAYOUT_ORDER;
-import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.KEY_ATTRIBUTE_NAME;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
+import static org.mule.runtime.extension.api.util.LayoutOrderComparator.OBJECTS_FIELDS_BY_LAYOUT_ORDER;
+import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.sort;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Predicates.alwaysTrue;
+import static javax.xml.namespace.QName.valueOf;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
 import org.mule.metadata.api.model.AnyType;
@@ -107,12 +110,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import javax.xml.namespace.QName;
 
 import com.google.common.collect.ImmutableList;
 
@@ -123,6 +129,8 @@ import com.google.common.collect.ImmutableList;
  * @since 4.4
  */
 public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLoader {
+
+  public static final String DOC_NAMESPACE = "doc";
 
   private final DslResolvingContext context;
 
@@ -884,6 +892,18 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
       return NUMBER;
     } else {
       return STRING;
+    }
+  }
+
+  public static Optional<String> buildRawParamKeyForDocAttribute(Entry<String, String> docAttr) {
+    final QName qName = valueOf(docAttr.getKey());
+
+    if (NS_MULE_DOCUMENTATION.equals(qName.getNamespaceURI())) {
+      return of(DOC_NAMESPACE + ":" + qName.getLocalPart());
+    } else if (isEmpty(qName.getNamespaceURI())) {
+      return of(DOC_NAMESPACE + ":" + docAttr.getKey());
+    } else {
+      return empty();
     }
   }
 }

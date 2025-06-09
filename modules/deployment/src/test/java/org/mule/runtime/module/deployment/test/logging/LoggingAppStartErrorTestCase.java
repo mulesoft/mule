@@ -6,11 +6,7 @@
  */
 package org.mule.runtime.module.deployment.test.logging;
 
-import static java.util.Optional.ofNullable;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DEPLOYMENT_FAILED;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.ERROR_REPORTING;
@@ -18,10 +14,17 @@ import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.ERROR_RE
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
+
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.Is.is;
+
+import static org.junit.Assert.assertThrows;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -29,10 +32,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-import com.github.valfirst.slf4jtest.LoggingEvent;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -53,8 +52,8 @@ import org.mule.runtime.module.artifact.activation.internal.classloader.MuleAppl
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
-import org.mule.runtime.module.deployment.test.internal.AbstractApplicationDeploymentTestCase;
 import org.mule.runtime.module.deployment.internal.DefaultArtifactDeployer;
+import org.mule.runtime.module.deployment.test.internal.AbstractApplicationDeploymentTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -64,12 +63,14 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Feature;
@@ -91,9 +92,6 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
 
   private final TestLogger loggerDefaultMuleApplication = getTestLogger(DefaultMuleApplication.class);
   private final TestLogger loggerDefaultArtifactDeployer = getTestLogger(DefaultArtifactDeployer.class);
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
@@ -124,7 +122,6 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
                                              null, mock(ServiceRepository.class),
                                              mock(ExtensionModelLoaderRepository.class),
                                              appLocation, null, null,
-                                             getRuntimeLockFactory(),
                                              mock(MemoryManagementService.class),
                                              mock(ArtifactConfigurationProcessor.class));
 
@@ -142,14 +139,11 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
     MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
     doThrow(new LifecycleException(createStaticMessage(expectedLogMessage), mockMessageSource)).when(mockedMuleContext).start();
 
-    try {
-      expectedException.expect(DeploymentStartException.class);
-      application.start();
-    } finally {
-      assertStatus(DEPLOYMENT_FAILED);
-      assertThat(loggerDefaultMuleApplication.getAllLoggingEvents(),
-                 hasItem(new LoggingEventMatcher(containsString(expectedLogMessage))));
-    }
+    assertThrows(DeploymentStartException.class, () -> application.start());
+
+    assertStatus(DEPLOYMENT_FAILED);
+    assertThat(loggerDefaultMuleApplication.getAllLoggingEvents(),
+               hasItem(new LoggingEventMatcher(containsString(expectedLogMessage))));
   }
 
   private void assertStatus(final ApplicationStatus status) {

@@ -128,7 +128,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private final RegionPluginClassLoadersFactory pluginClassLoadersFactory;
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
-  private final ServerLockFactory runtimeLockFactory;
   private ProfiledMemoryManagementService memoryManagementService = DefaultMemoryManagementService.getInstance();
   private final ProfilingService containerProfilingService;
   private final ServerNotificationManager serverNotificationManager;
@@ -278,8 +277,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, artifactMemoryManagementService);
     registerObject(MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE, getContainerFeatureFlaggingService());
 
-    runtimeLockFactory = new ServerLockFactory();
-
     this.containerClassLoader = containerClassLoader;
     artifactClassLoaderManager = new DefaultClassLoaderManager();
     licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
@@ -332,7 +329,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                              artifactClassLoaderManager, serviceManager,
                                              domainClassLoaderBuilderFactory,
                                              extensionModelLoaderRepository, licenseValidator,
-                                             runtimeLockFactory,
                                              this.memoryManagementService,
                                              artifactConfigurationProcessor);
 
@@ -349,7 +345,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver,
                                                        licenseValidator,
-                                                       runtimeLockFactory,
                                                        this.memoryManagementService,
                                                        artifactConfigurationProcessor,
                                                        actionOnMuleArtifactDeployment);
@@ -468,13 +463,6 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   public ArtifactConfigurationProcessor getArtifactConfigurationProcessor() {
     return artifactConfigurationProcessor;
-  }
-
-  /**
-   * @return a {@link ServerLockFactory} that can be shared between deployable artifacts.
-   */
-  public ServerLockFactory getRuntimeLockFactory() {
-    return runtimeLockFactory;
   }
 
   /**

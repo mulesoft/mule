@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,7 +29,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.mule.maven.pom.parser.api.model.MavenModelBuilder;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -67,7 +67,6 @@ public abstract class AbstractArtifactAgnosticServiceBuilderTestCase extends Abs
                                         mock(ClassLoaderRepository.class), mock(PolicyTemplateClassLoaderBuilderFactory.class),
                                         mock(PluginDependenciesResolver.class),
                                         discoverLicenseValidator(getClass().getClassLoader()),
-                                        mock(LockFactory.class),
                                         mock(MemoryManagementService.class),
                                         mock(ArtifactConfigurationProcessor.class)));
 

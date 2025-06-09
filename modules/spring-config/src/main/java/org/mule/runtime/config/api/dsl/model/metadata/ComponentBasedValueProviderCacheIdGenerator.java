@@ -11,13 +11,14 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
-import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheId;
 import org.mule.runtime.core.internal.value.cache.ValueProviderCacheIdGenerator;
+import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.metadata.internal.cache.DslElementBasedValueProviderCacheIdGenerator;
 
 import java.util.Optional;
 
+@Deprecated(since = "4.10", forRemoval = true)
 public class ComponentBasedValueProviderCacheIdGenerator implements ValueProviderCacheIdGenerator<ComponentAst> {
 
   private final DslElementModelFactory elementModelFactory;

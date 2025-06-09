@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.APP_CREATION;
 
 import static java.util.Optional.empty;
 
 import static org.hamcrest.Matchers.instanceOf;
+
 import static org.junit.Assert.assertThat;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,9 +43,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
-import org.junit.Test;
 
 @Feature(APP_CREATION)
 @Issue("W-11911617")
@@ -63,7 +65,6 @@ public class ApplicationsCreatedWithDeprecatedDescriptorClassTestCase extends Ab
                                     mock(PolicyTemplateClassLoaderBuilderFactory.class),
                                     mock(PluginDependenciesResolver.class),
                                     mock(LicenseValidator.class),
-                                    getRuntimeLockFactory(),
                                     mock(MemoryManagementService.class),
                                     mock(ArtifactConfigurationProcessor.class));
 

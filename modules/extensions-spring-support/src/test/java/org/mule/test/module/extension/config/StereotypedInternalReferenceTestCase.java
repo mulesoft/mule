@@ -6,19 +6,19 @@
  */
 package org.mule.test.module.extension.config;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.junit.Assert.assertThrows;
+
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class StereotypedInternalReferenceTestCase extends AbstractExtensionFunctionalTestCase {
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   @Override
   protected String getConfigFile() {
@@ -38,10 +38,9 @@ public class StereotypedInternalReferenceTestCase extends AbstractExtensionFunct
 
   @Test
   public void softReferencesFailsAtRuntime() throws Exception {
-    expectedException.expectMessage("does not match the expected operation");
-
     Flow flow = (Flow) getFlowConstruct("operationMismatch");
-    flow.start();
+    var thrown = assertThrows(Exception.class, () -> flow.start());
+    assertThat(thrown.getMessage(), containsString("does not match the expected operation"));
   }
 
   @Test

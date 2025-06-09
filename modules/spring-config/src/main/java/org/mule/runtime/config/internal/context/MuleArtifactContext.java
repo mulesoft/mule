@@ -130,6 +130,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+
 import org.slf4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -168,7 +169,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private final ContributedErrorTypeRepository errorTypeRepository;
   private final ContributedErrorTypeLocator errorTypeLocator;
   private final Map<String, String> artifactProperties;
-  private final boolean addToolingObjectsToRegistry;
   protected List<ConfigurableObjectProvider> objectProviders = new ArrayList<>();
   private final ExtensionManager extensionManager;
   // TODO W-10855416: remove this
@@ -198,7 +198,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                              ContributedErrorTypeRepository errorTypeRepository,
                              ContributedErrorTypeLocator errorTypeLocator,
                              Map<String, String> artifactProperties,
-                             boolean addToolingObjectsToRegistry,
                              ArtifactType artifactType,
                              ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
                              MemoryManagementService memoryManagementService,
@@ -215,7 +214,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     this.errorTypeRepository = errorTypeRepository;
     this.errorTypeLocator = errorTypeLocator;
     this.artifactProperties = artifactProperties;
-    this.addToolingObjectsToRegistry = addToolingObjectsToRegistry;
     this.memoryManagementService = memoryManagementService;
 
     extensionManager = muleContext.getExtensionManager();
@@ -663,7 +661,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                                     getCoreFunctionsProvider(),
                                                     getConfigurationProperties(),
                                                     artifactProperties,
-                                                    addToolingObjectsToRegistry,
                                                     getArtifactType(),
                                                     getApplicationModel(),
                                                     beanFactory,
@@ -792,9 +789,5 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected DefaultResourceLocator getResourceLocator() {
     return resourceLocator;
-  }
-
-  public boolean isAddToolingObjectsToRegistry() {
-    return addToolingObjectsToRegistry;
   }
 }

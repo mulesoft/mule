@@ -36,16 +36,13 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -56,9 +53,6 @@ public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private MuleContext mockMuleContext;
   private final ClassLoader executionClassloader = mock(ClassLoader.class);
@@ -103,7 +97,7 @@ public class MuleArtifactContextTestCase extends AbstractMuleTestCase {
         new MuleArtifactContext(mockMuleContext, emptyArtifact(), empty(),
                                 new BaseConfigurationComponentLocator(),
                                 new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                emptyMap(), false, APP,
+                                emptyMap(), APP,
                                 new ComponentBuildingDefinitionRegistry(),
                                 mock(MemoryManagementService.class),
                                 featureFlaggingService, mock(ExpressionLanguageMetadataService.class)) {

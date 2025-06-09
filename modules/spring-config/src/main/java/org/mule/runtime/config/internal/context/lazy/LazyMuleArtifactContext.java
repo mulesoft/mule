@@ -29,7 +29,6 @@ import static java.lang.ThreadLocal.withInitial;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.sort;
-import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.Location;
@@ -37,13 +36,11 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.util.Pair;
@@ -55,7 +52,6 @@ import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocato
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.SpringMuleContextServiceConfigurator;
-import org.mule.runtime.config.internal.dsl.model.NoSuchComponentModelException;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.validation.IgnoreOnLazyInit;
@@ -104,8 +100,6 @@ import org.springframework.lang.Nullable;
 public class LazyMuleArtifactContext extends MuleArtifactContext
     implements LazyComponentInitializerAdapter, ComponentModelInitializer {
 
-  public static final String SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH = "_sharedPartitionatedPersistentObjectStorePath";
-
   private static final Logger LOGGER = LoggerFactory.getLogger(LazyMuleArtifactContext.class);
 
   private final boolean dslDeclarationValidationEnabled;
@@ -122,7 +116,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private final ThreadLocal<Set<String>> beanNamesBeingInitialized = withInitial(HashSet::new);
 
   private final Map<String, String> artifactProperties;
-  private final LockFactory runtimeLockFactory;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -140,7 +133,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
    * @param parentComponentModelInitializer
-   * @param runtimeLockFactory
    * @param componentBuildingDefinitionRegistryFactory
    * @param featureFlaggingService
    * @since 4.0
@@ -151,10 +143,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  ContributedErrorTypeRepository errorTypeRepository,
                                  ContributedErrorTypeLocator errorTypeLocator,
                                  Map<String, String> artifactProperties,
-                                 boolean addToolingObjectsToRegistry,
                                  ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
-                                 LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
                                  MemoryManagementService memoryManagementService,
                                  FeatureFlaggingService featureFlaggingService,
@@ -162,7 +152,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       throws BeansException {
     super(muleContext, artifactAst, parentConfigurationProperties,
           baseConfigurationComponentLocator, errorTypeRepository, errorTypeLocator,
-          artifactProperties, addToolingObjectsToRegistry,
+          artifactProperties,
           artifactType, componentBuildingDefinitionRegistry, memoryManagementService,
           featureFlaggingService, expressionLanguageMetadataService);
 
@@ -176,7 +166,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         .getOrDefault(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY, Boolean.FALSE.toString()));
 
     this.artifactProperties = artifactProperties;
-    this.runtimeLockFactory = runtimeLockFactory;
 
     this.baseGraph = generateFor(getApplicationModel());
 
@@ -190,8 +179,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
     return new LazySpringMuleContextServiceConfigurator(this,
                                                         artifactProperties,
-                                                        isAddToolingObjectsToRegistry(),
-                                                        runtimeLockFactory,
                                                         getMuleContext(),
                                                         getCoreFunctionsProvider(),
                                                         getConfigurationProperties(),

@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain.test;
 
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
-import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.isHeavyPackage;
 
 import static java.util.Optional.empty;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
@@ -75,7 +75,6 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
                                                                               domainClassLoaderBuilderFactory,
                                                                               extensionModelLoaderRepository,
                                                                               licenseValidator,
-                                                                              getRuntimeLockFactory(),
                                                                               mock(MemoryManagementService.class),
                                                                               mock(ArtifactConfigurationProcessor.class));
   private DefaultDomainManager domainManager;

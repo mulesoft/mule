@@ -16,7 +16,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
@@ -30,7 +29,6 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
@@ -97,19 +95,17 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
   private final ArtifactType artifactType;
-  private final LockFactory runtimeLockFactory;
   private final ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
       new DefaultComponentBuildingDefinitionRegistryFactory();
 
   private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                         ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
-                                        LockFactory runtimeLockFactory, MemoryManagementService memoryManagementService)
+                                        MemoryManagementService memoryManagementService)
       throws ConfigurationException {
     super(configResources, artifactProperties);
     this.artifactType = artifactType;
     this.enableLazyInit = enableLazyInit;
     this.disableXmlValidations = disableXmlValidations;
-    this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
   }
 
@@ -117,7 +113,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                        ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations)
       throws ConfigurationException {
     this(configResources, artifactProperties, artifactType, enableLazyInit, disableXmlValidations,
-         getRuntimeLockFactory(), DefaultMemoryManagementService.getInstance());
+         DefaultMemoryManagementService.getInstance());
   }
 
   // TODO: MULE-19422 Remove specific tests usages
@@ -144,29 +140,26 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   @Deprecated
   public SpringXmlConfigurationBuilder(String[] configFiles, boolean enableLazyInit, boolean disableXmlValidations)
       throws ConfigurationException {
-    this(configFiles, emptyMap(), APP, enableLazyInit, disableXmlValidations, getRuntimeLockFactory(),
+    this(configFiles, emptyMap(), APP, enableLazyInit, disableXmlValidations,
          DefaultMemoryManagementService.getInstance());
   }
 
   public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
                                        Map<String, String> artifactProperties, ArtifactType artifactType,
-                                       boolean enableLazyInitialisation, boolean disableXmlValidations,
-                                       LockFactory runtimeLockFactory)
+                                       boolean enableLazyInitialisation, boolean disableXmlValidations)
       throws ConfigurationException {
     this(configurationFiles, artifactProperties, artifactType, enableLazyInitialisation, disableXmlValidations,
-         runtimeLockFactory, DefaultMemoryManagementService.getInstance());
+         DefaultMemoryManagementService.getInstance());
     this.artifactDeclaration = artifactDeclaration;
   }
 
   public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactDeclaration artifactDeclaration,
                                        Map<String, String> artifactProperties, ArtifactType artifactType,
                                        boolean enableLazyInitialisation, boolean disableXmlValidations,
-                                       LockFactory runtimeLockFactory,
                                        MemoryManagementService memoryManagementService)
       throws ConfigurationException {
     this(configurationFiles, artifactDeclaration, artifactProperties, artifactType, enableLazyInitialisation,
-         disableXmlValidations,
-         runtimeLockFactory);
+         disableXmlValidations);
     this.memoryManagementService = memoryManagementService;
   }
 
@@ -204,7 +197,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                                                         artifactType,
                                                                                         enableLazyInit);
     if (baseMuleArtifactContext instanceof ConfigurableApplicationContext) {
-      ((ConfigurableApplicationContext) baseMuleArtifactContext).setParent(parentContext);
+      baseMuleArtifactContext.setParent(parentContext);
     }
     return baseMuleArtifactContext;
   }
@@ -264,9 +257,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                         parentConfigurationProperties,
                                                         baseConfigurationComponentLocator,
                                                         errorTypeRepository, errorTypeLocator,
-                                                        getArtifactProperties(), true, artifactType,
+                                                        getArtifactProperties(), artifactType,
                                                         resolveComponentModelInitializer(),
-                                                        runtimeLockFactory,
                                                         componentBuildingDefinitionRegistry,
                                                         new ArtifactMemoryManagementService(memoryManagementService),
                                                         featureFlaggingService, expressionLanguageMetadataService);
@@ -275,7 +267,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                     parentConfigurationProperties,
                                                     baseConfigurationComponentLocator,
                                                     errorTypeRepository, errorTypeLocator,
-                                                    getArtifactProperties(), true, artifactType,
+                                                    getArtifactProperties(), artifactType,
                                                     componentBuildingDefinitionRegistry,
                                                     new ArtifactMemoryManagementService(memoryManagementService),
                                                     featureFlaggingService, expressionLanguageMetadataService);

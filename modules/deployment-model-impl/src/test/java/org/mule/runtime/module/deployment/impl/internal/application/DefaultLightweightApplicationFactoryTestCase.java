@@ -7,18 +7,18 @@
 package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.APP_CREATION;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
 
 import static java.util.Optional.empty;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,12 +54,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(APP_CREATION)
 @Story(LIGHTWEIGHT)
@@ -91,7 +92,6 @@ public class DefaultLightweightApplicationFactoryTestCase extends AbstractMuleTe
                                     mock(PolicyTemplateClassLoaderBuilderFactory.class),
                                     mock(PluginDependenciesResolver.class),
                                     mock(LicenseValidator.class),
-                                    getRuntimeLockFactory(),
                                     mock(MemoryManagementService.class),
                                     mock(ArtifactConfigurationProcessor.class));
 

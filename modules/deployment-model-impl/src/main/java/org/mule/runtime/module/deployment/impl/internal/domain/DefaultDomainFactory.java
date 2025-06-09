@@ -18,7 +18,6 @@ import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Maps.fromProperties;
 
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -78,11 +77,10 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
                               DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory,
                               ExtensionModelLoaderRepository extensionModelLoaderRepository,
                               LicenseValidator licenseValidator,
-                              LockFactory runtimeLockFactory,
                               MemoryManagementService memoryManagementService,
                               ArtifactConfigurationProcessor artifactConfigurationProcessor) {
 
-    super(licenseValidator, runtimeLockFactory, memoryManagementService, artifactConfigurationProcessor);
+    super(licenseValidator, memoryManagementService, artifactConfigurationProcessor);
 
     checkArgument(domainDescriptorFactory != null, "domainDescriptorFactory cannot be null");
     checkArgument(deployableArtifactDescriptorFactory != null, "Deployable artifact descriptor factory cannot be null");
@@ -186,7 +184,7 @@ public class DefaultDomainFactory extends AbstractDeployableArtifactFactory<Doma
 
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(domainDescriptor, domainClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-                              extensionModelLoaderRepository, getRuntimeLockFactory(),
+                              extensionModelLoaderRepository,
                               new ArtifactMemoryManagementService(getMemoryManagementService()),
                               getArtifactConfigurationProcessor());
 
