@@ -41,7 +41,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.util.Pair;
@@ -117,7 +116,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private final ThreadLocal<Set<String>> beanNamesBeingInitialized = withInitial(HashSet::new);
 
   private final Map<String, String> artifactProperties;
-  private final LockFactory runtimeLockFactory;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -135,7 +133,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
    *                                                   {@code artifactConfigResources} as external configuration values
    * @param artifactType                               the type of artifact to determine the base objects of the created context.
    * @param parentComponentModelInitializer
-   * @param runtimeLockFactory
    * @param componentBuildingDefinitionRegistryFactory
    * @param featureFlaggingService
    * @since 4.0
@@ -148,7 +145,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
                                  Map<String, String> artifactProperties,
                                  ArtifactType artifactType,
                                  Optional<ComponentModelInitializer> parentComponentModelInitializer,
-                                 LockFactory runtimeLockFactory,
                                  ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
                                  MemoryManagementService memoryManagementService,
                                  FeatureFlaggingService featureFlaggingService,
@@ -170,7 +166,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         .getOrDefault(MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY, Boolean.FALSE.toString()));
 
     this.artifactProperties = artifactProperties;
-    this.runtimeLockFactory = runtimeLockFactory;
 
     this.baseGraph = generateFor(getApplicationModel());
 
@@ -184,7 +179,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   protected SpringMuleContextServiceConfigurator createServiceConfigurator(DefaultListableBeanFactory beanFactory) {
     return new LazySpringMuleContextServiceConfigurator(this,
                                                         artifactProperties,
-                                                        runtimeLockFactory,
                                                         getMuleContext(),
                                                         getCoreFunctionsProvider(),
                                                         getConfigurationProperties(),

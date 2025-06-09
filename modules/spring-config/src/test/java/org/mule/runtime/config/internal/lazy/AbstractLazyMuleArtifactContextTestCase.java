@@ -32,7 +32,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -102,9 +101,6 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
 
   @Mock
   private InternalCustomizationService customizationService;
-
-  @Mock
-  private LockFactory lockFactory;
 
   protected TestObjectProviderAwareBeanFactory beanFactory;
 
@@ -196,7 +192,7 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
                                     empty(),
                                     new BaseConfigurationComponentLocator(),
                                     new ContributedErrorTypeRepository(), new ContributedErrorTypeLocator(),
-                                    emptyMap(), APP, empty(), lockFactory,
+                                    emptyMap(), APP, empty(),
                                     componentBuildingDefinitionRegistry,
                                     mock(MemoryManagementService.class),
                                     mock(FeatureFlaggingService.class),

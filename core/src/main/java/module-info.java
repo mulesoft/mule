@@ -330,9 +330,10 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.lock to
-      org.mule.runtime.spring.config,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.launcher,
+      org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
@@ -420,6 +421,7 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.store to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
@@ -534,6 +536,7 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.util.store to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;

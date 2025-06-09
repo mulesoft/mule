@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.tooling.internal.config;
 
-import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_FORCE_TOOLING_APP_LOGS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_ENABLE_DSL_DECLARATION_VALIDATIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.tooling.internal.config.ToolingServicesConfigurator.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;

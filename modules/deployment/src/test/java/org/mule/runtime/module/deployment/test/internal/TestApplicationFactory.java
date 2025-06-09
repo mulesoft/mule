@@ -18,7 +18,6 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.api.builder.ApplicationClassLoaderBuilderFactory;
@@ -69,7 +68,6 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
           domainRepository,
           serviceRepository, extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
           pluginDependenciesResolver, discoverLicenseValidator(TestApplicationFactory.class.getClassLoader()),
-          RuntimeLockFactoryUtil.getRuntimeLockFactory(),
           mock(MemoryManagementService.class),
           serializedAstWithFallbackArtifactConfigurationProcessor());
   }

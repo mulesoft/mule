@@ -11,7 +11,6 @@ import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.internal.registry.AbstractSpringRegistry.SPRING_APPLICATION_CONTEXT;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -20,7 +19,6 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -73,20 +71,18 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   private ApplicationContext parentContext;
   private MuleArtifactContext muleArtifactContext;
   private final ArtifactType artifactType;
-  private final LockFactory runtimeLockFactory;
   private final MemoryManagementService memoryManagementService;
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
 
   private ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
                                           ArtifactType artifactType, boolean enableLazyInit,
-                                          LockFactory runtimeLockFactory, MemoryManagementService memoryManagementService,
+                                          MemoryManagementService memoryManagementService,
                                           ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
       throws ConfigurationException {
     this.artifactAst = artifactAst;
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
     this.enableLazyInit = enableLazyInit;
-    this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
   }
@@ -96,7 +92,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                          ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry)
       throws ConfigurationException {
     this(artifactAst, artifactProperties, artifactType, enableLazyInit,
-         getRuntimeLockFactory(),
          DefaultMemoryManagementService.getInstance(),
          componentBuildingDefinitionRegistry);
   }
@@ -189,7 +184,6 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                          errorTypeRepository, errorTypeLocator,
                                          getArtifactProperties(), artifactType,
                                          resolveComponentModelInitializer(),
-                                         runtimeLockFactory,
                                          componentBuildingDefinitionRegistry,
                                          new ArtifactMemoryManagementService(memoryManagementService),
                                          featureFlaggingService, expressionLanguageMetadataService);

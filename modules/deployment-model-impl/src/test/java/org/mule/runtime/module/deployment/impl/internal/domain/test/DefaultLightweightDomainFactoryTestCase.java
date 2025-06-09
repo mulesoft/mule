@@ -7,17 +7,17 @@
 package org.mule.runtime.module.deployment.impl.internal.domain.test;
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.DOMAIN_CREATION;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
 
 import static java.util.Optional.empty;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -77,7 +77,6 @@ public class DefaultLightweightDomainFactoryTestCase extends AbstractMuleTestCas
                                new DomainClassLoaderBuilderFactory(ArtifactClassLoaderResolver.defaultClassLoaderResolver()),
                                mock(ExtensionModelLoaderRepository.class),
                                mock(LicenseValidator.class),
-                               getRuntimeLockFactory(),
                                mock(MemoryManagementService.class),
                                mock(ArtifactConfigurationProcessor.class));
 

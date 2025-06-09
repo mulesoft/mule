@@ -36,7 +36,6 @@ import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -129,7 +128,6 @@ public class ArtifactContextBuilder {
   private DeployableArtifact<?> parentArtifact;
   private Optional<Properties> properties = empty();
   private String dataFolderName;
-  private LockFactory runtimeLockFactory;
   private MemoryManagementService memoryManagementService;
   private ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private ArtifactCoordinates artifactCoordinates;
@@ -404,16 +402,6 @@ public class ArtifactContextBuilder {
     return this;
   }
 
-  /**
-   * @param runtimeLockFactory {@link LockFactory} for the runtime that can be shared along deployable artifacts to synchronize
-   *                           access on different deployable artifacts to the same resources.
-   * @return the builder
-   */
-  public ArtifactContextBuilder setRuntimeLockFactory(LockFactory runtimeLockFactory) {
-    this.runtimeLockFactory = runtimeLockFactory;
-    return this;
-  }
-
   public ArtifactContextBuilder setArtifactCoordinates(ArtifactCoordinates artifactCoordinates) {
     this.artifactCoordinates = artifactCoordinates;
     return this;
@@ -502,7 +490,6 @@ public class ArtifactContextBuilder {
                     .setDisableXmlValidations(disableXmlValidations)
                     .setAddToolingObjectsToRegistry(addToolingObjectsToRegistry)
                     .setServiceConfigurators(serviceConfigurators)
-                    .setRuntimeLockFactory(runtimeLockFactory)
                     .setMemoryManagementService(memoryManagementService)
                     .setExpressionLanguageMetadataService(expressionLanguageMetadataService);
 

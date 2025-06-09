@@ -11,7 +11,6 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 
 import static java.util.Optional.empty;
 
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
@@ -37,7 +36,6 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
     implements ArtifactFactory<D, T> {
 
   private final LicenseValidator licenseValidator;
-  private final LockFactory runtimeLockFactory;
   private final MemoryManagementService memoryManagementService;
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
 
@@ -45,17 +43,13 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
    * Creates a new {@link AbstractDeployableArtifactFactory}
    *
    * @param licenseValidator               the license validator to use for plugins.
-   * @param runtimeLockFactory             {@link LockFactory} for Runtime, a unique and shared lock factory to be used between
-   *                                       different artifacts.
    * @param memoryManagementService        the memory management service.
    * @param artifactConfigurationProcessor the processor to use for building the application model.
    */
   public AbstractDeployableArtifactFactory(LicenseValidator licenseValidator,
-                                           LockFactory runtimeLockFactory,
                                            MemoryManagementService memoryManagementService,
                                            ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     this.licenseValidator = licenseValidator;
-    this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
   }
@@ -86,13 +80,6 @@ public abstract class AbstractDeployableArtifactFactory<D extends DeployableArti
    */
   public abstract DeployableArtifactDescriptor createArtifactDescriptor(File artifactLocation,
                                                                         Optional<Properties> deploymentProperties);
-
-  /**
-   * @return {@link LockFactory} associated to the Runtime.
-   */
-  public LockFactory getRuntimeLockFactory() {
-    return runtimeLockFactory;
-  }
 
   /**
    * @return the memory management service.

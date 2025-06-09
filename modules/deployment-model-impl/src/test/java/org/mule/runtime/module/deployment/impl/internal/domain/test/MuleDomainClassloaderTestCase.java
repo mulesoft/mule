@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain.test;
 
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
@@ -18,12 +17,12 @@ import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
@@ -80,8 +79,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   public void setUp() throws Exception {
 
     domain = new TestMuleDomain(domainDescriptor, artifactClassLoader, domainClassLoaderRepository, serviceRepository,
-                                artifactPlugins, extensionModelLoaderRepository,
-                                getRuntimeLockFactory());
+                                artifactPlugins, extensionModelLoaderRepository);
     currentThread().setContextClassLoader(originalThreadClassloader);
     when(domainDescriptor.getDeploymentProperties()).thenReturn(empty());
     when(domainDescriptor.getDataFolderName()).thenReturn("dataFolderName");
@@ -129,10 +127,9 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
 
     public TestMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader,
                           ClassLoaderRepository classLoaderRepository, ServiceRepository serviceRepository,
-                          List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                          LockFactory runtimeLockFactory) {
+                          List<ArtifactPlugin> artifactPlugins, ExtensionModelLoaderRepository extensionModelLoaderRepository) {
       super(descriptor, deploymentClassLoader, classLoaderRepository, serviceRepository, artifactPlugins,
-            extensionModelLoaderRepository, runtimeLockFactory, mock(MemoryManagementService.class),
+            extensionModelLoaderRepository, mock(MemoryManagementService.class),
             mock(ArtifactConfigurationProcessor.class));
     }
 

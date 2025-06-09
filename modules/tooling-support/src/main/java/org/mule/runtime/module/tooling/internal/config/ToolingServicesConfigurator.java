@@ -9,31 +9,33 @@ package org.mule.runtime.module.tooling.internal.config;
 import static org.mule.runtime.api.connectivity.ConnectivityTestingService.CONNECTIVITY_TESTING_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY;
 import static org.mule.runtime.api.metadata.MetadataService.NON_LAZY_METADATA_SERVICE_KEY;
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
-import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.LAZY_MULE_OBJECT_STORE_MANAGER;
-import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.LAZY_MULE_RUNTIME_LOCK_FACTORY;
-import static org.mule.runtime.config.internal.context.lazy.LazyBeanProperties.SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_TOOLING_OBJECTS_TO_REGISTRY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_INIT_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
 import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
+import static org.mule.runtime.module.tooling.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.module.tooling.internal.connectivity.LazyConnectivityTestingService.NON_LAZY_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.module.tooling.internal.data.sample.LazySampleDataService.NON_LAZY_SAMPLE_DATA_SERVICE;
+import static org.mule.runtime.module.tooling.internal.store.SharedPartitionedPersistentObjectStore.SHARED_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.module.tooling.internal.value.LazyValueProviderService.NON_LAZY_VALUE_PROVIDER_SERVICE;
 
 import static java.lang.Boolean.parseBoolean;
 
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.metadata.MetadataService;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.value.ValueProviderService;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
+import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager;
+import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
 import org.mule.runtime.module.tooling.internal.connectivity.DefaultConnectivityTestingService;
 import org.mule.runtime.module.tooling.internal.connectivity.LazyConnectivityTestingService;
 import org.mule.runtime.module.tooling.internal.data.sample.LazySampleDataService;
@@ -42,14 +44,20 @@ import org.mule.runtime.module.tooling.internal.metadata.LazyMetadataService;
 import org.mule.runtime.module.tooling.internal.metadata.cache.lazy.DelegateMetadataCacheIdGeneratorFactory;
 import org.mule.runtime.module.tooling.internal.metadata.cache.lazy.DelegateMetadataCacheManager;
 import org.mule.runtime.module.tooling.internal.metadata.model.ModelBasedMetadataCacheIdGeneratorFactory;
+import org.mule.runtime.module.tooling.internal.store.SharedPartitionedPersistentObjectStore;
 import org.mule.runtime.module.tooling.internal.value.LazyValueProviderService;
 import org.mule.runtime.module.tooling.internal.value.MuleValueProviderService;
+
+import java.io.File;
 
 
 public class ToolingServicesConfigurator implements ServiceConfigurator {
 
+  public static final String SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH = "_sharedPartitionatedPersistentObjectStorePath";
+
   private static final String DEFAULT_METADATA_CACHE_MANAGER_KEY = "_defaultPersistentMetadataCacheManager";
   private static final String DEFAULT_METADATA_CACHE_ID_GENERATOR_KEY = "_defaultMetadataCacheIdGenerator";
+  private static final String LAZY_MULE_OBJECT_STORE_MANAGER = "_muleLazyObjectStoreManager";
 
   @Override
   public void configure(CustomizationService customizationService) {
@@ -119,27 +127,39 @@ public class ToolingServicesConfigurator implements ServiceConfigurator {
                                                        .get()),
                                                    false);
 
-    if (customizationService.getArtifactProperties().get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH) != null) {
+    final var sharedPartitionedPersistentObjectStorePath =
+        customizationService.getArtifactProperties().get(SHARED_PARTITIONED_PERSISTENT_OBJECT_STORE_PATH);
+    if (sharedPartitionedPersistentObjectStorePath != null) {
+      // We need to first define this service so it would be later initialized
+      customizationService.registerCustomServiceClass(SHARED_PERSISTENT_OBJECT_STORE_KEY,
+                                                      SharedPartitionedPersistentObjectStore.class);
+      customizationService.registerCustomServiceImpl(SHARED_PERSISTENT_OBJECT_STORE_KEY,
+                                                     new SharedPartitionedPersistentObjectStore<>(new File(sharedPartitionedPersistentObjectStorePath),
+                                                                                                  getRuntimeLockFactory()));
+      MuleObjectStoreManager osm = new MuleObjectStoreManager();
+      osm.setBasePersistentStoreKey(SHARED_PERSISTENT_OBJECT_STORE_KEY);
+      osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
+      customizationService.registerCustomServiceImpl(LAZY_MULE_OBJECT_STORE_MANAGER, osm);
+
       customizationService.registerCustomServiceClass(DEFAULT_METADATA_CACHE_MANAGER_KEY,
                                                       DefaultPersistentMetadataCacheManager.class,
                                                       false);
       customizationService.registerCustomServiceImpl(METADATA_CACHE_MANAGER_KEY,
-                                                     new DelegateMetadataCacheManager(registry -> {
-                                                       DefaultPersistentMetadataCacheManager defaultPersistentMetadataCacheManager =
-                                                           registry
-                                                               .<DefaultPersistentMetadataCacheManager>lookupByName(DEFAULT_METADATA_CACHE_MANAGER_KEY)
-                                                               .get();
-                                                       defaultPersistentMetadataCacheManager.setLockFactory(registry
-                                                           .<LockFactory>lookupByName(LAZY_MULE_RUNTIME_LOCK_FACTORY)
-                                                           .get());
-                                                       defaultPersistentMetadataCacheManager.setObjectStoreManager(registry
-                                                           .<ObjectStoreManager>lookupByName(LAZY_MULE_OBJECT_STORE_MANAGER)
-                                                           .get());
-
-                                                       return defaultPersistentMetadataCacheManager;
-                                                     }),
+                                                     new DelegateMetadataCacheManager(this::lookupMetadataCacheManager),
                                                      false);
     }
+  }
+
+  private MetadataCacheManager lookupMetadataCacheManager(Registry registry) {
+    DefaultPersistentMetadataCacheManager defaultPersistentMetadataCacheManager = registry
+        .<DefaultPersistentMetadataCacheManager>lookupByName(DEFAULT_METADATA_CACHE_MANAGER_KEY)
+        .get();
+    defaultPersistentMetadataCacheManager.setLockFactory(getRuntimeLockFactory());
+    defaultPersistentMetadataCacheManager.setObjectStoreManager(registry
+        .<ObjectStoreManager>lookupByName(LAZY_MULE_OBJECT_STORE_MANAGER)
+        .get());
+
+    return defaultPersistentMetadataCacheManager;
   }
 
 }

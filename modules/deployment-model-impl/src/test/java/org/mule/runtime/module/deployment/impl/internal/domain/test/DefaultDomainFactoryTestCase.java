@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.domain.test;
 
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
-import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.isHeavyPackage;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.DOMAIN_CREATION;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.HEAVYWEIGHT;
 
@@ -17,7 +16,9 @@ import static java.util.Optional.empty;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+
 import static org.junit.Assert.assertThat;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
@@ -50,12 +51,13 @@ import org.mule.runtime.module.license.api.LicenseValidator;
 import java.io.File;
 import java.io.IOException;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockedStatic;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(DOMAIN_CREATION)
 @Story(HEAVYWEIGHT)
@@ -75,7 +77,6 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
                                                                               domainClassLoaderBuilderFactory,
                                                                               extensionModelLoaderRepository,
                                                                               licenseValidator,
-                                                                              getRuntimeLockFactory(),
                                                                               mock(MemoryManagementService.class),
                                                                               mock(ArtifactConfigurationProcessor.class));
   private MockedStatic<AbstractDeployableProjectModelBuilder> utilities;

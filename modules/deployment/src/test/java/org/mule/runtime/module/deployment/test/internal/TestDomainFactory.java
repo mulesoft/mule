@@ -17,7 +17,6 @@ import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -101,7 +100,6 @@ public class TestDomainFactory extends DefaultDomainFactory {
     super(domainDescriptorFactory, deployableArtifactDescriptorFactory, new DefaultDomainManager(),
           classLoaderRepository, serviceRepository, domainClassLoaderBuilderFactory,
           extensionModelLoaderRepository, mock(LicenseValidator.class),
-          RuntimeLockFactoryUtil.getRuntimeLockFactory(),
           mock(MemoryManagementService.class),
           serializedAstWithFallbackArtifactConfigurationProcessor());
   }

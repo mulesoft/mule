@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.store;
+package org.mule.runtime.module.tooling.internal.store;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
 import org.mule.runtime.core.internal.util.store.PersistentObjectStorePartition;
 import org.mule.runtime.core.internal.util.store.PersistentObjectStorePartitionData;
 

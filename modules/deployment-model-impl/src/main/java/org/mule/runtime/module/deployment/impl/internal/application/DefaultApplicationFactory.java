@@ -18,9 +18,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Maps.fromProperties;
-import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -90,12 +88,11 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                    PluginDependenciesResolver pluginDependenciesResolver,
                                    LicenseValidator licenseValidator,
-                                   LockFactory runtimeLockFactory,
                                    MemoryManagementService memoryManagementService,
                                    ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     this(applicationClassLoaderBuilderFactory, deployableArtifactDescriptorFactory, domainRepository, serviceRepository,
          extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
-         pluginDependenciesResolver, licenseValidator, runtimeLockFactory, memoryManagementService,
+         pluginDependenciesResolver, licenseValidator, memoryManagementService,
          artifactConfigurationProcessor, cl -> {
          });
 
@@ -110,11 +107,10 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
                                    PluginDependenciesResolver pluginDependenciesResolver,
                                    LicenseValidator licenseValidator,
-                                   LockFactory runtimeLockFactory,
                                    MemoryManagementService memoryManagementService,
                                    ArtifactConfigurationProcessor artifactConfigurationProcessor,
                                    Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
-    super(licenseValidator, runtimeLockFactory, memoryManagementService, artifactConfigurationProcessor);
+    super(licenseValidator, memoryManagementService, artifactConfigurationProcessor);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(deployableArtifactDescriptorFactory != null, "Deployable artifact descriptor factory cannot be null");
     checkArgument(domainRepository != null, "Domain repository cannot be null");
@@ -214,7 +210,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     DefaultMuleApplication delegate =
         new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository,
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
-                                   classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory(),
+                                   classLoaderRepository, applicationPolicyProvider,
                                    new ArtifactMemoryManagementService(getMemoryManagementService()),
                                    getArtifactConfigurationProcessor(),
                                    actionOnMuleArtifactDeployment);

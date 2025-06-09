@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
-import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.defaultDeployableProjectModelBuilder;
-import static org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder.isHeavyPackage;
+import static org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder.isHeavyPackage;
+import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.MULE_DOMAIN_CLASSIFIER;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import static org.mule.test.allure.AllureConstants.DeployableCreationFeature.APP_CREATION;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.HEAVYWEIGHT;
@@ -18,6 +17,7 @@ import static java.util.Optional.empty;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -69,17 +69,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(APP_CREATION)
 @Story(HEAVYWEIGHT)
@@ -109,7 +108,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
                                     extensionModelLoaderRepository,
                                     classLoaderRepository, policyTemplateClassLoaderBuilderFactory, pluginDependenciesResolver,
                                     discoverLicenseValidator(getClass().getClassLoader()),
-                                    getRuntimeLockFactory(),
                                     mock(MemoryManagementService.class),
                                     mock(ArtifactConfigurationProcessor.class));
   private MockedStatic<AbstractDeployableProjectModelBuilder> utilities;

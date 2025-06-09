@@ -34,7 +34,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.metadata.MetadataService;
@@ -110,8 +109,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   private NotificationListenerRegistry notificationRegistrer;
 
-  private final LockFactory runtimeLockFactory;
-
   public DefaultMuleApplication(ApplicationDescriptor descriptor,
                                 MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
@@ -119,11 +116,10 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider,
-                                LockFactory runtimeLockFactory,
                                 MemoryManagementService memoryManagementService,
                                 ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     this(descriptor, deploymentClassLoader, artifactPlugins, domainRepository, serviceRepository, extensionModelLoaderRepository,
-         location, classLoaderRepository, applicationPolicyProvider, runtimeLockFactory, memoryManagementService,
+         location, classLoaderRepository, applicationPolicyProvider, memoryManagementService,
          artifactConfigurationProcessor, cl -> {
          });
 
@@ -136,7 +132,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
                                 ClassLoaderRepository classLoaderRepository,
                                 ApplicationPolicyProvider applicationPolicyProvider,
-                                LockFactory runtimeLockFactory,
                                 MemoryManagementService memoryManagementService,
                                 ArtifactConfigurationProcessor artifactConfigurationProcessor,
                                 Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
@@ -149,7 +144,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.artifactPlugins = artifactPlugins;
     this.location = location;
     this.policyManager = applicationPolicyProvider;
-    this.runtimeLockFactory = runtimeLockFactory;
     this.memoryManagementService = memoryManagementService;
     this.expressionLanguageMetadataService = getExpressionLanguageMetadataService(serviceRepository);
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
@@ -285,7 +279,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setProperties(ofNullable(resolveDeploymentProperties(descriptor.getDataFolderName(),
                                                                     descriptor.getDeploymentProperties())))
               .setPolicyProvider(policyManager)
-              .setRuntimeLockFactory(runtimeLockFactory)
               .setMemoryManagementService(memoryManagementService)
               .setExpressionLanguageMetadataService(expressionLanguageMetadataService)
               .setArtifactCoordinates(descriptor.getBundleDescriptor());
