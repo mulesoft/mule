@@ -178,7 +178,7 @@
         <licenseYear>2023</licenseYear>
 
         <muleAnnotationsApiVersion>1.8.6-WITH-W-18622349</muleAnnotationsApiVersion>
-        <mule.module.maven.plugin.version>1.9.6</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.9.6-WITH-W-18622349</mule.module.maven.plugin.version>
         <mule.extensions.maven.plugin.version>1.9.6</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.9.6</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
