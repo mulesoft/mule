@@ -29,8 +29,8 @@ module org.mule.runtime.artifact.activation {
   requires org.mule.runtime.maven.client.api;
   requires org.mule.runtime.metadata.model.api;
   requires org.mule.runtime.service;
+  requires org.mule.tools.api.classloader;
 
-  requires mule.classloader.model;
   requires net.bytebuddy;
 
   requires org.apache.commons.io;
