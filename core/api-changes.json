@@ -5,20 +5,6 @@
         "differences": [
           {
             "ignore": true,
-            "code": "java.method.numberOfParametersChanged",
-            "old": "method void org.mule.runtime.core.api.streaming.bytes.FileStoreCursorStreamConfig::<init>(org.mule.runtime.api.util.DataSize)",
-            "new": "method void org.mule.runtime.core.api.streaming.bytes.FileStoreCursorStreamConfig::<init>(org.mule.runtime.api.util.DataSize, boolean)",
-            "justification": "W-18716253: Repeatable streams wait to fill the whole buffer instead of returning immediately available data"
-          },
-          {
-            "ignore": true,
-            "code": "java.method.numberOfParametersChanged",
-            "old": "method void org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig::<init>(org.mule.runtime.api.util.DataSize, org.mule.runtime.api.util.DataSize, org.mule.runtime.api.util.DataSize)",
-            "new": "method void org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig::<init>(org.mule.runtime.api.util.DataSize, org.mule.runtime.api.util.DataSize, org.mule.runtime.api.util.DataSize, boolean)",
-            "justification": "W-18716253: Repeatable streams wait to fill the whole buffer instead of returning immediately available data"
-          },
-          {
-            "ignore": true,
             "code": "java.annotation.added",
             "old": "class org.mule.runtime.core.api.context.notification.MuleContextNotification",
             "new": "class org.mule.runtime.core.api.context.notification.MuleContextNotification",

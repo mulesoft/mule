@@ -49,6 +49,15 @@ public final class FileStoreCursorStreamConfig {
    * Creates a new instance
    *
    * @param maxInMemorySize the maximum amount of data to be held in memory
+   */
+  public FileStoreCursorStreamConfig(DataSize maxInMemorySize) {
+    this(maxInMemorySize, false);
+  }
+
+  /**
+   * Creates a new instance
+   *
+   * @param maxInMemorySize the maximum amount of data to be held in memory
    * @param eagerRead       if provided cursors read method will return immediately after reading some data
    */
   public FileStoreCursorStreamConfig(DataSize maxInMemorySize,
