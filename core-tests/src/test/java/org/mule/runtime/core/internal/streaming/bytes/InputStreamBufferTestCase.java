@@ -149,10 +149,29 @@ class InputStreamBufferTestCase extends AbstractMuleTestCase {
     };
 
     final var streamBuffer = new InMemoryStreamBuffer(is, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
-    // request one more than the avaialble buffer
+    // request one more than the available buffer
     final var byteBuffer = streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE + 1);
 
     assertThat(byteBuffer.limit(), is(ACTUAL_STREAM_BUFFER_SIZE));
     assertThat(byteBuffer.capacity(), is(ACTUAL_STREAM_BUFFER_SIZE));
   }
+
+  @Test
+  void streamIoException() {
+    final var is = new InputStream() {
+
+      @Override
+      public int read() throws IOException {
+        throw new IOException("Expected");
+      }
+
+    };
+
+    final var streamBuffer = new InMemoryStreamBuffer(is, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
+    final var byteBuffer = streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE);
+
+    assertThat(byteBuffer.limit(), is(ACTUAL_STREAM_BUFFER_SIZE));
+    assertThat(byteBuffer.capacity(), is(ACTUAL_STREAM_BUFFER_SIZE));
+  }
+
 }
