@@ -8,6 +8,8 @@ package org.mule.runtime.http.support.api;
 
 import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_FORWARD_COMPATIBILITY;
 
+import static java.util.Optional.of;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
@@ -55,7 +57,7 @@ class HttpServiceApiDelegateTestCase {
   @BeforeEach
   void setUp() {
     delegate = new HttpServiceApiDelegate();
-    delegate.setHttpService(httpService);
+    delegate.setHttpService(of(httpService));
   }
 
   @Test

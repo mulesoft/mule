@@ -27,6 +27,7 @@ import org.mule.sdk.api.http.domain.message.response.HttpResponseBuilder;
 import org.mule.sdk.api.http.server.HttpServer;
 import org.mule.sdk.api.http.server.HttpServerConfig;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import jakarta.inject.Inject;
@@ -38,12 +39,15 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   private HttpService httpService;
 
   @Inject
-  public void setHttpService(HttpService httpService) {
-    this.httpService = httpService;
+  public void setHttpService(Optional<HttpService> httpService) {
+    this.httpService = httpService.orElse(null);
   }
 
   @Override
   public HttpClient client(Consumer<HttpClientConfig> configCallback) throws ClientCreationException {
+    if (httpService == null) {
+      throw new ClientCreationException("There is no implementation of HttpService available");
+    }
     var builder = new HttpClientConfiguration.Builder();
     var configurer = new HttpClientConfigToBuilder(builder);
     configCallback.accept(configurer);
@@ -58,6 +62,9 @@ public class HttpServiceApiDelegate implements org.mule.sdk.api.http.HttpService
   @Override
   public HttpServer server(Consumer<HttpServerConfig> configCallback)
       throws org.mule.sdk.api.http.server.ServerCreationException {
+    if (httpService == null) {
+      throw new org.mule.sdk.api.http.server.ServerCreationException("There is no implementation of HttpService available");
+    }
     var builder = new HttpServerConfiguration.Builder();
     var configurer = new HttpServerConfigToBuilder(builder);
     configCallback.accept(configurer);
