@@ -160,7 +160,7 @@
         <dev.list>mule-esb@mulesoft.com</dev.list>
 
         <muleBomVersion>4.10.0-SNAPSHOT</muleBomVersion>
-        <muleMavenClientBomVersion>2.5.0-SNAPSHOT</muleMavenClientBomVersion>
+        <muleMavenClientBomVersion>2.5.0-20250610</muleMavenClientBomVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.6.0-20250610</mulePropertiesApiVersion>
