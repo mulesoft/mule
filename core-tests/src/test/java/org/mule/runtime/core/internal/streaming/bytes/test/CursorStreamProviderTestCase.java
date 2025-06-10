@@ -8,10 +8,13 @@ package org.mule.runtime.core.internal.streaming.bytes.test;
 
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
 import static java.lang.Math.toIntExact;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -21,6 +24,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
@@ -36,7 +42,6 @@ import org.mule.tck.size.SmallTest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -50,6 +55,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -58,7 +64,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {
+    return asList(new Object[][] {
         {"Doesn't require expansion, eagerRead", KB_256, MB_1, MB_2, true},
         {"Doesn't require expansion, !eagerRead", KB_256, MB_1, MB_2, false},
         {"Requires expansion, eagerRead", MB_1, KB_256, MB_2, true},
@@ -119,7 +125,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
   @Test
   public void readFullyWithInSingleCursor() throws Exception {
-    withCursor(cursor -> assertEquals(IOUtils.toString(cursor), data));
+    withCursor(cursor -> assertEquals(IOUtils.toString(cursor, UTF_8), data));
   }
 
   @Test
@@ -173,7 +179,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   public void randomSeekWithOneOpenCursor() throws Exception {
     withCursor(cursor -> {
       // read fully
-      assertEquals(IOUtils.toString(cursor), data);
+      assertEquals(IOUtils.toString(cursor, UTF_8), data);
 
       // go back and read first 10 bytes
       seekAndAssert(cursor, 0, 10);
@@ -316,8 +322,8 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
                                        new DataSize(maxBufferSize, BYTE),
                                        eagerRead);
 
-    streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager);
-    withCursor(cursor -> assertEquals(IOUtils.toString(cursor), data));
+    streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager, null, false);
+    withCursor(cursor -> assertEquals(IOUtils.toString(cursor, UTF_8), data));
   }
 
   @Test
@@ -335,22 +341,36 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     });
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void ioExceptionIfClosed() throws Exception {
     CursorStream cursor = streamProvider.openCursor();
     cursor.close();
-    cursor.read();
+    assertThrows(IOException.class, () -> cursor.read());
+  }
+
+  @Test
+  @Issue("W-18716253")
+  public void eagerReadLimit() throws IOException {
+    CursorStream cursor = streamProvider.openCursor();
+
+    final var read = cursor.read(new byte[MB_2], 0, MB_2);
+
+    if (eagerRead) {
+      assertThat(read, is(DEFAULT_BUFFER_BUCKET_SIZE));
+    } else {
+      assertThat(read, greaterThanOrEqualTo(KB_256));
+    }
   }
 
   private void doAsync(CheckedRunnable task1, CheckedRunnable task2) throws Exception {
     resetLatches();
-    Future future1 = doAsync(() -> {
+    Future<?> future1 = doAsync(() -> {
       controlLatch.await();
       task1.run();
       mainThreadLatch.countDown();
     });
 
-    Future future2 = doAsync(() -> {
+    Future<?> future2 = doAsync(() -> {
       controlLatch.countDown();
       task2.run();
       mainThreadLatch.countDown();
@@ -361,7 +381,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     assertThat(future2.get(), is(nullValue()));
   }
 
-  private Future doAsync(CheckedRunnable task) {
+  private Future<?> doAsync(CheckedRunnable task) {
     return executorService.submit(() -> {
       try {
         task.run();

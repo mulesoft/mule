@@ -20,6 +20,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_XML_SDK_IMP
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_RESET;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
@@ -205,8 +206,6 @@ import org.apache.commons.lang3.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
 
-import jakarta.transaction.TransactionManager;
-
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
 
   /**
@@ -381,6 +380,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureNtlmAvoidSendPayloadOnType1();
       configureForkJoinCompleteChildrenOnTimeout();
       configureSeparateClassLoaderForPolicyIsolation();
+      configureEnableRepeatableStreamingBytesEagerRead();
     }
   }
 
@@ -1627,6 +1627,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry
         .registerFeatureFlag(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT, minMuleVersion(v4_10_0));
+  }
+
+  private static void configureEnableRepeatableStreamingBytesEagerRead() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry
+        .registerFeatureFlag(ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ, minMuleVersion(v4_10_0));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(MuleVersion version) {

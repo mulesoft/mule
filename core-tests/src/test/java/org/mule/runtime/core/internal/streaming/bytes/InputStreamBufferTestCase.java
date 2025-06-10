@@ -15,6 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -35,7 +37,7 @@ class InputStreamBufferTestCase extends AbstractMuleTestCase {
   private static final int ACTUAL_STREAM_BUFFER_SIZE = 8;
 
   @Test
-  void streamDataAvailableEventually() {
+  void streamDataAvailableEventually() throws IOException {
     final var is = new InputStream() {
 
       private boolean firstRead = false;
@@ -69,7 +71,7 @@ class InputStreamBufferTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  void streamFinished() {
+  void streamFinished() throws IOException {
     final var is = new InputStream() {
 
       @Override
@@ -90,7 +92,7 @@ class InputStreamBufferTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  void streamFinishedAfterSomeData() {
+  void streamFinishedAfterSomeData() throws IOException {
     final var is = new InputStream() {
 
       private long bytesRead;
@@ -120,7 +122,7 @@ class InputStreamBufferTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-18716253")
-  void streamAvailableDataSmallerThanAvaiableBuffer() {
+  void streamAvailableDataSmallerThanAvaiableBuffer() throws IOException {
     final var latch = new CountDownLatch(1);
 
     final var is = new InputStream() {
@@ -168,10 +170,26 @@ class InputStreamBufferTestCase extends AbstractMuleTestCase {
     };
 
     final var streamBuffer = new InMemoryStreamBuffer(is, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
-    final var byteBuffer = streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE);
+    var thrown = assertThrows(IOException.class, () -> streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE));
+    assertThat(thrown.getMessage(), is("Expected"));
+    assertThat(currentThread().isInterrupted(), is(false));
+  }
 
-    assertThat(byteBuffer.limit(), is(ACTUAL_STREAM_BUFFER_SIZE));
-    assertThat(byteBuffer.capacity(), is(ACTUAL_STREAM_BUFFER_SIZE));
+  @Test
+  void streamReadInterrupted() throws IOException {
+    final var is = new InputStream() {
+
+      @Override
+      public int read() throws IOException {
+        currentThread().interrupt();
+        throw new IOException("Expected");
+      }
+
+    };
+
+    final var streamBuffer = new InMemoryStreamBuffer(is, InMemoryCursorStreamConfig.getDefault(), new SimpleByteBufferManager());
+    final var byteBuffer = streamBuffer.get(0, ACTUAL_STREAM_BUFFER_SIZE);
+    assertThat(byteBuffer, is(nullValue()));
   }
 
 }

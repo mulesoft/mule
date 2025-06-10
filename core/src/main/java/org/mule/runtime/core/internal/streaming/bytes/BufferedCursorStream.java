@@ -124,7 +124,7 @@ public final class BufferedCursorStream extends AbstractCursorStream {
     }
   }
 
-  private int assureDataInLocalBuffer(int len) {
+  private int assureDataInLocalBuffer(int len) throws IOException {
     if (len <= localBuffer.remaining()) {
       return toIntExact(len);
     }

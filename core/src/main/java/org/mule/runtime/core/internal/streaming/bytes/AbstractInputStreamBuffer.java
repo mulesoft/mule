@@ -91,12 +91,12 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
    * @throws IllegalStateException if the buffer is closed
    */
   @Override
-  public final ByteBuffer get(long position, int length) {
+  public final ByteBuffer get(long position, int length) throws IOException {
     checkState(!closed.get(), "Buffer is closed");
     return doGet(position, length);
   }
 
-  protected abstract ByteBuffer doGet(long position, int length);
+  protected abstract ByteBuffer doGet(long position, int length) throws IOException;
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
     final byte[] dest = buffer.array();
