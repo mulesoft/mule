@@ -29,4 +29,5 @@ public abstract class AbstractCursorProviderObjectFactory<T> extends AbstractCom
     initialiseIfNeeded(streamingManager);
     return doGetObject();
   }
+
 }

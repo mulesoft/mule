@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.factories.streaming;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ;
+
 import org.mule.runtime.api.util.DataSize;
 import org.mule.runtime.api.util.DataUnit;
 import org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory;
@@ -19,15 +21,20 @@ public class InMemoryCursorStreamProviderObjectFactory
   private final int bufferSizeIncrement;
   private final int maxInMemorySize;
   private final DataUnit dataUnit;
-  private final boolean eagerInit;
+  private final Boolean eagerRead;
 
   public InMemoryCursorStreamProviderObjectFactory(int initialBufferSize, int bufferSizeIncrement, int maxInMemorySize,
-                                                   DataUnit dataUnit, boolean eagerInit) {
+                                                   DataUnit dataUnit) {
+    this(initialBufferSize, bufferSizeIncrement, maxInMemorySize, dataUnit, null);
+  }
+
+  public InMemoryCursorStreamProviderObjectFactory(int initialBufferSize, int bufferSizeIncrement, int maxInMemorySize,
+                                                   DataUnit dataUnit, Boolean eagerRead) {
     this.initialBufferSize = initialBufferSize;
     this.bufferSizeIncrement = bufferSizeIncrement;
     this.maxInMemorySize = maxInMemorySize;
     this.dataUnit = dataUnit;
-    this.eagerInit = eagerInit;
+    this.eagerRead = eagerRead;
   }
 
   @Override
@@ -35,8 +42,10 @@ public class InMemoryCursorStreamProviderObjectFactory
     InMemoryCursorStreamConfig config = new InMemoryCursorStreamConfig(new DataSize(initialBufferSize, dataUnit),
                                                                        new DataSize(bufferSizeIncrement, dataUnit),
                                                                        new DataSize(maxInMemorySize, dataUnit),
-                                                                       eagerInit);
-
+                                                                       eagerRead == null
+                                                                           ? ffService
+                                                                               .isEnabled(ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ)
+                                                                           : eagerRead);
 
     return streamingManager.forBytes().getInMemoryCursorProviderFactory(config);
   }

@@ -31,13 +31,20 @@ public final class InMemoryCursorStreamConfig {
    * @return A new instance configured with default settings
    */
   public static InMemoryCursorStreamConfig getDefault() {
+    return getDefault(false);
+  }
+
+  /**
+   * @return A new instance configured with default settings
+   */
+  public static InMemoryCursorStreamConfig getDefault(final boolean eagerRead) {
     return new InMemoryCursorStreamConfig(new DataSize(DEFAULT_BYTE_STREAMING_BUFFER_SIZE,
                                                        DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT),
                                           new DataSize(DEFAULT_BYTE_STREAMING_BUFFER_INCREMENT_SIZE,
                                                        DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT),
                                           new DataSize(DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE,
                                                        DEFAULT_BYTE_STREAMING_BUFFER_DATA_UNIT),
-                                          false);
+                                          eagerRead);
   }
 
   /**
@@ -90,7 +97,7 @@ public final class InMemoryCursorStreamConfig {
    *
    * @return if provided cursors {@code read} methods will return immediately after readily available data has been read.
    *
-   * @since 4.10
+   * @since 4.10.0, 4.9.7, 4.6.20, 4.4.1
    */
   public boolean isEagerRead() {
     return eagerRead;

@@ -22,6 +22,7 @@ import static java.lang.System.getProperty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -53,9 +54,9 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import java.io.Closeable;
 import java.io.InputStream;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 @NoExtend
 public class DefaultStreamingManager implements StreamingManager, Initialisable, Disposable {
@@ -74,6 +75,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private FeatureFlaggingService ffService;
 
   @Inject
   private StreamingGhostBuster ghostBuster;
@@ -119,7 +123,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   }
 
   protected ByteStreamingManager createByteStreamingManager() {
-    return new DefaultByteStreamingManager(bufferManager, this);
+    return new DefaultByteStreamingManager(bufferManager, this, getFeatureFlaggingService());
   }
 
   protected ObjectStreamingManager createObjectStreamingManager() {
@@ -237,5 +241,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
 
   protected ByteBufferManager getBufferManager() {
     return bufferManager;
+  }
+
+  protected FeatureFlaggingService getFeatureFlaggingService() {
+    return ffService;
   }
 }

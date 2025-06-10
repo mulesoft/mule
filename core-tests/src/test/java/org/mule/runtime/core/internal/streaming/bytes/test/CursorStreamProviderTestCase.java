@@ -12,6 +12,7 @@ import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConsta
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
+import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -356,7 +357,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     final var read = cursor.read(new byte[MB_2], 0, MB_2);
 
     if (eagerRead) {
-      assertThat(read, is(DEFAULT_BUFFER_BUCKET_SIZE));
+      assertThat(read, is(min(DEFAULT_BUFFER_BUCKET_SIZE, maxBufferSize)));
     } else {
       assertThat(read, greaterThanOrEqualTo(KB_256));
     }
