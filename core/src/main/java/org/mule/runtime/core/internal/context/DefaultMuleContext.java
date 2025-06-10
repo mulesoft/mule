@@ -21,6 +21,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
@@ -368,6 +369,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate();
       configureNtlmAvoidSendPayloadOnType1();
       configureForkJoinCompleteChildrenOnTimeout();
+      configureEnableRepeatableStreamingBytesEagerRead();
     }
   }
 
@@ -1613,6 +1615,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry
         .registerFeatureFlag(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT, minMuleVersion("4.10.0"));
+  }
+
+  private static void configureEnableRepeatableStreamingBytesEagerRead() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry
+        .registerFeatureFlag(ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ, featureContext -> false);
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
