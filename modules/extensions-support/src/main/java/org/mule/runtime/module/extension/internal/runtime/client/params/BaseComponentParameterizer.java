@@ -68,14 +68,16 @@ public abstract class BaseComponentParameterizer<T extends ComponentParameterize
     cursorProviderFunction = sm -> sm.forBytes().getInMemoryCursorProviderFactory(
                                                                                   new InMemoryCursorStreamConfig(initialBufferSize,
                                                                                                                  bufferSizeIncrement,
-                                                                                                                 maxBufferSize));
+                                                                                                                 maxBufferSize,
+                                                                                                                 false));
     return (T) this;
   }
 
   @Override
   public T withFileStoreRepeatableStreaming(DataSize maxInMemorySize) {
     cursorProviderFunction = sm -> sm.forBytes().getFileStoreCursorStreamProviderFactory(
-                                                                                         new FileStoreCursorStreamConfig(maxInMemorySize));
+                                                                                         new FileStoreCursorStreamConfig(maxInMemorySize,
+                                                                                                                         false));
     return (T) this;
   }
 

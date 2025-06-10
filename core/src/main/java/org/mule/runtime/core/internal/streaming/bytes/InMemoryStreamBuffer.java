@@ -10,9 +10,7 @@ import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
 import static java.lang.System.arraycopy;
 import static java.nio.ByteBuffer.wrap;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
@@ -59,11 +57,11 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
   }
 
   @Override
-  protected ByteBuffer doGet(long position, int length) {
+  protected ByteBuffer doGet(long position, int length) throws IOException {
     return doGet(position, length, true);
   }
 
-  private ByteBuffer doGet(long position, int length, boolean consumeStreamIfNecessary) {
+  private ByteBuffer doGet(long position, int length, boolean consumeStreamIfNecessary) throws IOException {
     readLock.lock();
     try {
       ByteBuffer presentRead = getFromCurrentData(position, length);
@@ -94,8 +92,6 @@ public class InMemoryStreamBuffer extends AbstractInputStreamBuffer {
             }
           }
           return doGet(position, length, false);
-        } catch (IOException e) {
-          throw new MuleRuntimeException(createStaticMessage("Could not read stream"), e);
         } finally {
           // classic lock downgrade
           readLock.lock();
