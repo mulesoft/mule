@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
-import static org.mule.runtime.core.internal.routing.split.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.internal.routing.ForeachUtils.manageTypedValueForStreaming;
+import static org.mule.runtime.core.internal.routing.split.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
@@ -30,9 +30,9 @@ import org.mule.runtime.core.api.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.internal.routing.split.ExpressionSplittingStrategy;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerIterator;
 import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerList;
+import org.mule.runtime.core.internal.routing.split.ExpressionSplittingStrategy;
 import org.mule.runtime.core.internal.routing.split.SplittingStrategy;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -44,12 +44,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import jakarta.inject.Inject;
-
-import com.google.common.collect.Iterators;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an expression,
@@ -166,10 +164,11 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   Iterator<TypedValue<?>> splitRequest(CoreEvent request, String expression) {
     Object payloadValue = request.getMessage().getPayload().getValue();
     Iterator<TypedValue<?>> result;
-    if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList) {
+    if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerList ebcl) {
       // Support EventBuilderConfigurerList currently used by Batch Module
-      result = Iterators.transform(((EventBuilderConfigurerList<Object>) payloadValue).eventBuilderConfigurerIterator(),
-                                   TypedValue::of);
+      result = ebcl.eventBuilderConfigurerStream()
+          .map(TypedValue::of)
+          .iterator();
     } else if (DEFAULT_SPLIT_EXPRESSION.equals(expression) && payloadValue instanceof EventBuilderConfigurerIterator) {
       // Support EventBuilderConfigurerIterator currently used by Batch Module
       result = new EventBuilderConfigurerIteratorWrapper((EventBuilderConfigurerIterator) payloadValue);
