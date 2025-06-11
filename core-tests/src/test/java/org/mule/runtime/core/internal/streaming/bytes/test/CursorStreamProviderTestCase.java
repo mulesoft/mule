@@ -8,17 +8,24 @@ package org.mule.runtime.core.internal.streaming.bytes.test;
 
 import static org.mule.runtime.api.util.DataUnit.BYTE;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 
+import static java.lang.Math.min;
 import static java.lang.Math.toIntExact;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
@@ -34,21 +41,22 @@ import org.mule.tck.size.SmallTest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.commons.io.IOUtils;
-
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -57,11 +65,16 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {
-        {"Doesn't require expansion", KB_256, MB_1, MB_2},
-        {"Requires expansion", MB_1, KB_256, MB_2},
+    return asList(new Object[][] {
+        {"Doesn't require expansion, eagerRead", KB_256, MB_1, MB_2, true},
+        {"Doesn't require expansion, !eagerRead", KB_256, MB_1, MB_2, false},
+        {"Requires expansion, eagerRead", MB_1, KB_256, MB_2, true},
+        {"Requires expansion, !eagerRead", MB_1, KB_256, MB_2, false},
     });
   }
+
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
 
   private int halfDataLength;
   private final int bufferSize;
@@ -72,13 +85,15 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   private CountDownLatch controlLatch;
   private CountDownLatch mainThreadLatch;
   protected PoolingByteBufferManager bufferManager;
+  private boolean eagerRead;
 
-  public CursorStreamProviderTestCase(String name, int dataSize, int bufferSize, int maxBufferSize) {
+  public CursorStreamProviderTestCase(String name, int dataSize, int bufferSize, int maxBufferSize, boolean eagerRead) {
     super(dataSize);
     executorService = newScheduledThreadPool(2);
     this.bufferSize = bufferSize;
     this.maxBufferSize = maxBufferSize;
     halfDataLength = data.length() / 2;
+    this.eagerRead = eagerRead;
 
     resetLatches();
   }
@@ -87,18 +102,20 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   public void before() {
     bufferManager = new PoolingByteBufferManager();
     final InputStream dataStream = createDataStream();
-    streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream);
+    streamProvider = createStreamProvider(bufferSize, maxBufferSize, dataStream, eagerRead);
   }
 
   protected InputStream createDataStream() {
     return new ByteArrayInputStream(data.getBytes());
   }
 
-  protected CursorStreamProvider createStreamProvider(int bufferSize, int maxBufferSize, InputStream dataStream) {
+  protected CursorStreamProvider createStreamProvider(int bufferSize, int maxBufferSize, InputStream dataStream,
+                                                      boolean eagerRead) {
     InMemoryCursorStreamConfig config =
         new InMemoryCursorStreamConfig(new DataSize(bufferSize, BYTE),
                                        new DataSize(bufferSize / 2, BYTE),
-                                       new DataSize(maxBufferSize, BYTE));
+                                       new DataSize(maxBufferSize, BYTE),
+                                       eagerRead);
 
     return new InMemoryCursorStreamProvider(dataStream, config, bufferManager, from("log"), false);
   }
@@ -112,7 +129,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
   @Test
   public void readFullyWithInSingleCursor() throws Exception {
-    withCursor(cursor -> assertEquals(IOUtils.toString(cursor), data));
+    withCursor(cursor -> assertEquals(IOUtils.toString(cursor, UTF_8), data));
   }
 
   @Test
@@ -129,7 +146,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     byte[] dest = new byte[halfDataLength];
 
     withCursor(cursor -> {
-      cursor.read(dest, 0, halfDataLength);
+      readCursor(cursor, dest, 0, halfDataLength);
       assertEquals(toString(dest), data.substring(0, halfDataLength));
     });
   }
@@ -138,11 +155,12 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   public void rewindWhileStreamNotFullyConsumed() throws Exception {
     withCursor(cursor -> {
       byte[] dest = new byte[halfDataLength];
-      cursor.read(dest, 0, halfDataLength);
+      readCursor(cursor, dest, 0, halfDataLength);
       assertEquals(toString(dest), data.substring(0, halfDataLength));
       cursor.seek(0);
       dest = new byte[data.length()];
-      cursor.read(dest, 0, dest.length);
+
+      readCursor(cursor, dest, 0, dest.length);
       assertEquals(toString(dest), data);
     });
 
@@ -156,7 +174,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     dest[1] = dest[0];
 
     withCursor(cursor -> {
-      cursor.read(dest, 2, halfDataLength);
+      readCursor(cursor, dest, 2, halfDataLength);
       assertEquals(toString(dest), "!!" + data.substring(0, halfDataLength));
     });
   }
@@ -165,7 +183,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   public void randomSeekWithOneOpenCursor() throws Exception {
     withCursor(cursor -> {
       // read fully
-      assertEquals(IOUtils.toString(cursor), data);
+      assertEquals(IOUtils.toString(cursor, UTF_8), data);
 
       // go back and read first 10 bytes
       seekAndAssert(cursor, 0, 10);
@@ -226,13 +244,14 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   @Test
   public void readsMostOfTheStreamInFirstAccessAndRemainderInSecond() throws Exception {
     byte[] dest = new byte[data.length()];
-    halfDataLength = new Double(Math.floor(halfDataLength * .8)).intValue();
+    halfDataLength = Double.valueOf(Math.floor(halfDataLength * .8)).intValue();
     withCursor(cursor -> {
-      int read = cursor.read(dest, 0, halfDataLength);
+      int read = readCursor(cursor, dest, 0, halfDataLength);
       assertThat(read, is(halfDataLength));
       assertEquals(toString(dest, 0, halfDataLength), data.substring(0, halfDataLength));
 
-      int secondRead = cursor.read(dest, read, data.length() - read);
+      int secondRead = readCursor(cursor, dest, read, data.length() - read);
+
       assertThat(secondRead, is(data.length() - read));
       assertEquals(toString(dest, halfDataLength, data.length() - read), data.substring(halfDataLength));
     });
@@ -267,12 +286,12 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     byte[] dest = new byte[len];
 
     withCursor(cursor -> {
-      assertThat(cursor.read(dest, 0, len), is(len));
+      assertThat(readCursor(cursor, dest, 0, len), is(len));
       assertEquals(toString(dest), data.substring(0, len));
 
       final int position = bufferSize - 30;
       cursor.seek(position);
-      assertThat(cursor.read(dest, 0, len), is(len));
+      assertThat(readCursor(cursor, dest, 0, len), is(len));
 
       assertEquals(toString(dest), data.substring(position, position + len));
     });
@@ -291,7 +310,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
 
     withCursor(cursor -> {
       cursor.seek(position);
-      assertThat(cursor.read(dest, 0, len), is(len));
+      assertThat(readCursor(cursor, dest, 0, len), is(len));
       assertEquals(toString(dest), data.substring(position, position + len));
     });
   }
@@ -304,10 +323,11 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     InMemoryCursorStreamConfig config =
         new InMemoryCursorStreamConfig(new DataSize(maxBufferSize, BYTE),
                                        new DataSize(0, BYTE),
-                                       new DataSize(maxBufferSize, BYTE));
+                                       new DataSize(maxBufferSize, BYTE),
+                                       eagerRead);
 
-    streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager);
-    withCursor(cursor -> assertEquals(IOUtils.toString(cursor), data));
+    streamProvider = new InMemoryCursorStreamProvider(dataStream, config, bufferManager, null, false);
+    withCursor(cursor -> assertEquals(IOUtils.toString(cursor, UTF_8), data));
   }
 
   @Test
@@ -325,22 +345,37 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     });
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void ioExceptionIfClosed() throws Exception {
     CursorStream cursor = streamProvider.openCursor();
     cursor.close();
+    expected.expect(IOException.class);
     cursor.read();
+  }
+
+  @Test
+  @Issue("W-18716253")
+  public void eagerReadLimit() throws IOException {
+    CursorStream cursor = streamProvider.openCursor();
+
+    final int read = cursor.read(new byte[MB_2], 0, MB_2);
+
+    if (eagerRead) {
+      assertThat(read, is(min(DEFAULT_BUFFER_BUCKET_SIZE, maxBufferSize)));
+    } else {
+      assertThat(read, greaterThanOrEqualTo(KB_256));
+    }
   }
 
   private void doAsync(CheckedRunnable task1, CheckedRunnable task2) throws Exception {
     resetLatches();
-    Future future1 = doAsync(() -> {
+    Future<?> future1 = doAsync(() -> {
       controlLatch.await();
       task1.run();
       mainThreadLatch.countDown();
     });
 
-    Future future2 = doAsync(() -> {
+    Future<?> future2 = doAsync(() -> {
       controlLatch.countDown();
       task2.run();
       mainThreadLatch.countDown();
@@ -351,7 +386,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     assertThat(future2.get(), is(nullValue()));
   }
 
-  private Future doAsync(CheckedRunnable task) {
+  private Future<?> doAsync(CheckedRunnable task) {
     return executorService.submit(() -> {
       try {
         task.run();
@@ -369,7 +404,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   private void seekAndAssert(CursorStream cursor, long position, int length) throws Exception {
     byte[] randomBytes = new byte[length];
     cursor.seek(position);
-    cursor.read(randomBytes, 0, length);
+    readCursor(cursor, randomBytes, 0, length);
     assertEquals(toString(randomBytes), data.substring(toIntExact(position), toIntExact(position + length)));
   }
 
@@ -403,4 +438,17 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
       accumulator.append((char) buffer[i]);
     }
   }
+
+  private int readCursor(CursorStream cursor, byte[] dest, int off, int len) throws IOException {
+    if (eagerRead) {
+      int r = 0;
+      while (r < len) {
+        r += cursor.read(dest, off + r, len - r);
+      }
+      return r;
+    } else {
+      return cursor.read(dest, off, len);
+    }
+  }
+
 }

@@ -11,12 +11,13 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import io.qameta.allure.Description;
 
 public abstract class InMemoryStreamingConfigContractTestCase extends AbstractMuleTestCase {
 
   @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  public ExpectedException expected = ExpectedException.none();
 
   @Test
   @Description("Test that a valid config is indeed valid")
@@ -65,7 +66,7 @@ public abstract class InMemoryStreamingConfigContractTestCase extends AbstractMu
   }
 
   private void assertInvalid(int initialSize, int increment, int maxSize) {
-    expectedException.expect(IllegalArgumentException.class);
+    expected.expect(IllegalArgumentException.class);
     createConfig(initialSize, increment, maxSize);
   }
 

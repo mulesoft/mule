@@ -9,9 +9,13 @@ package org.mule.runtime.core.internal.streaming.bytes.test;
 import static java.lang.Math.min;
 import static java.lang.String.format;
 import static java.lang.System.arraycopy;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.junit.Assert.fail;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -25,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 
 public abstract class AbstractByteStreamingTestCase extends AbstractMuleTestCase {
 
+  protected static final int KB_1 = 1024;
   protected static final int KB_256 = 256 * 1024;
   protected static final int MB_1 = 1024 * 1024;
   protected static final int MB_2 = MB_1 * 2;
@@ -48,7 +53,7 @@ public abstract class AbstractByteStreamingTestCase extends AbstractMuleTestCase
   }
 
   protected String toString(InputStream inputStream) throws IOException {
-    return IOUtils.toString(inputStream);
+    return IOUtils.toString(inputStream, UTF_8);
   }
 
   protected String toString(ByteBuffer buffer) throws IOException {

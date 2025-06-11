@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import static org.mule.runtime.api.util.Preconditions.checkState;
+
+import static java.lang.Math.min;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.interrupted;
-import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
@@ -88,12 +91,12 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
    * @throws IllegalStateException if the buffer is closed
    */
   @Override
-  public final ByteBuffer get(long position, int length) {
+  public final ByteBuffer get(long position, int length) throws IOException {
     checkState(!closed.get(), "Buffer is closed");
     return doGet(position, length);
   }
 
-  protected abstract ByteBuffer doGet(long position, int length);
+  protected abstract ByteBuffer doGet(long position, int length) throws IOException;
 
   protected int consumeStream(ByteBuffer buffer) throws IOException {
     final byte[] dest = buffer.array();
@@ -104,11 +107,12 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
 
     while (remaining > 0) {
       try {
-        if (totalRead > 0 && stream.available() < 1) {
+        final int available = stream.available();
+        if (totalRead > 0 && available < 1) {
           break;
         }
 
-        int read = stream.read(dest, offset, remaining);
+        int read = stream.read(dest, offset, readLength(remaining, available));
 
         if (read == -1) {
           streamFullyConsumed = true;
@@ -124,30 +128,46 @@ public abstract class AbstractInputStreamBuffer extends AbstractStreamingBuffer 
         totalRead += read;
         remaining -= read;
         offset += read;
+
+        if (available > 0) {
+          // available informed, honor it
+          return advanceBufferPosition(buffer, totalRead, offset);
+        }
+        // else: no data available or not informed. Fill the buffer, block if necessary.
       } catch (IOException e) {
-        if (!interrupted()) {
-          throw e;
-        }
-
-        currentThread().interrupt();
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn("Thread {} interrupted while reading from stream.", currentThread().getName());
-        }
-
-        if (totalRead == 0 || closed.get()) {
-          streamFullyConsumed = true;
-          return -1;
-        }
-
-        throw e;
+        return handleIoException(e, totalRead);
       }
     }
 
+    return advanceBufferPosition(buffer, totalRead, offset);
+  }
+
+  private int readLength(int remaining, final int available) {
+    return available > 0 ? min(remaining, available) : remaining;
+  }
+
+  private int advanceBufferPosition(ByteBuffer buffer, int totalRead, int offset) {
     if (totalRead > 0) {
       buffer.position(offset);
     }
-
     return totalRead;
+  }
+
+  private int handleIoException(IOException ioe, int totalRead) throws IOException {
+    if (!interrupted()) {
+      throw ioe;
+    }
+
+    final Thread thread = currentThread();
+    thread.interrupt();
+    LOGGER.warn("Thread {} interrupted while reading from stream.", thread.getName());
+
+    if (totalRead == 0 || closed.get()) {
+      streamFullyConsumed = true;
+      return -1;
+    }
+
+    throw ioe;
   }
 
   protected abstract ByteBuffer copy(long position, int length);

@@ -21,6 +21,7 @@ import java.io.InputStream;
 public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProvider {
 
   private final InMemoryStreamBuffer buffer;
+  private final boolean eagerRead;
 
   /**
    * Creates a new instance
@@ -40,6 +41,7 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
                                       boolean trackCursorProviderClose) {
     super(wrappedStream, originatingLocation, trackCursorProviderClose);
     buffer = new InMemoryStreamBuffer(wrappedStream, config, bufferManager);
+    this.eagerRead = config.isEagerRead();
   }
 
   /**
@@ -65,7 +67,7 @@ public final class InMemoryCursorStreamProvider extends AbstractCursorStreamProv
    */
   @Override
   protected CursorStream doOpenCursor() {
-    return new BufferedCursorStream(buffer, this);
+    return new BufferedCursorStream(buffer, this, eagerRead);
   }
 
 
