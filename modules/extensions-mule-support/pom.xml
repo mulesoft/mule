@@ -64,6 +64,11 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-dsl-api</artifactId>
         </dependency>
+        <dependency>
+            <!-- logging dependency required by commons-beanutils -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
