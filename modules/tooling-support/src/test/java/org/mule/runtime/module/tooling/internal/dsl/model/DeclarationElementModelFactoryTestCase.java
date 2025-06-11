@@ -6,28 +6,36 @@
  */
 package org.mule.runtime.module.tooling.internal.dsl.model;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
+import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
+import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newListValue;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newObjectValue;
-import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mockito.Mockito.spy;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.app.declaration.api.ConfigurationElementDeclaration;
 import org.mule.runtime.app.declaration.api.ConnectionElementDeclaration;
@@ -38,10 +46,16 @@ import org.mule.runtime.app.declaration.api.TopLevelParameterDeclaration;
 import org.mule.runtime.app.declaration.api.fluent.ElementDeclarer;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntaxBuilder;
+import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
+import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -261,6 +275,58 @@ public class DeclarationElementModelFactoryTestCase extends AbstractDslModelTest
     DslElementModel<ConfigurationModel> element = create(declaration);
     assertThat(element.getModel(), is(configuration));
     assertThat(element.getContainedElements().isEmpty(), is(true));
+  }
+
+  @Test
+  public void testMapParameterWithoutWrapper() {
+    ObjectType mapType = TYPE_BUILDER.objectType().openWith(TYPE_LOADER.load(String.class)).build();
+    ParameterModel mapParameter = createParameterModel("mapParam", false, mapType, null, NOT_SUPPORTED, BEHAVIOUR, null,
+                                                       emptyList(), singleton(new NoWrapperModelProperty()));
+    DslElementSyntax mapParamDsl = DslElementSyntaxBuilder.create().withElementName("map-param")
+        .withNamespace(NAMESPACE, NAMESPACE_URI)
+        .supportsChildDeclaration(true)
+        .supportsAttributeDeclaration(false)
+        .containing(KEY_ATTRIBUTE_NAME, DslElementSyntaxBuilder.create().withAttributeName(KEY_ATTRIBUTE_NAME).build())
+        .containing(VALUE_ATTRIBUTE_NAME, DslElementSyntaxBuilder.create().withAttributeName(VALUE_ATTRIBUTE_NAME).build())
+        .build();
+    DslElementSyntax operationDsl = spy(DslElementSyntaxBuilder.create()
+        .withElementName(OPERATION_NAME)
+        .withNamespace(NAMESPACE, NAMESPACE_URI)
+        .supportsChildDeclaration(true)
+        .supportsAttributeDeclaration(false)
+        .containing("mapParam", mapParamDsl)
+        .build());
+    DslSyntaxResolver mockDslResolver = mock(DslSyntaxResolver.class);
+    when(mockDslResolver.resolve(operation)).thenReturn(operationDsl);
+    when(mockDslResolver.resolve(mapParameter)).thenReturn(mapParamDsl);
+    when(dslContext.getExtension(EXTENSION_NAME)).thenReturn(of(mockExtension));
+    when(operation.getAllParameterModels()).thenReturn(asList(configRefParameter, mapParameter));
+    when(parameterGroupModel.getParameterModels()).thenReturn(asList(configRefParameter, mapParameter));
+    when(parameterGroupModel.getParameter("mapParam")).thenReturn(of(mapParameter));
+
+    ElementDeclarer ext = ElementDeclarer.forExtension(EXTENSION_NAME);
+    OperationElementDeclaration declaration = ext.newOperation(OPERATION_NAME)
+        .withConfig(CONFIGURATION_NAME)
+        .withParameterGroup(newParameterGroup()
+            .withParameter("mapParam", newObjectValue()
+                .withParameter("lakey1", "elvalue1")
+                .withParameter("lakey2", "elvalue2")
+                .build())
+            .getDeclaration())
+        .getDeclaration();
+
+    Map<ExtensionModel, DslSyntaxResolver> resolvers = new HashMap<>();
+    resolvers.put(mockExtension, mockDslResolver);
+    DeclarationBasedElementModelFactory factory = new DeclarationBasedElementModelFactory(dslContext, resolvers);
+
+    Optional<DslElementModel<OperationModel>> elementModel = factory.create(declaration);
+    assertThat(elementModel.isPresent(), is(true));
+    DslElementModel<OperationModel> element = elementModel.get();
+    assertThat(element.getModel(), is(operation));
+    assertThat(element.getContainedElements().size(), is(1));
+    DslElementModel<?> mapElement = element.getContainedElements().get(0);
+    assertThat(mapElement.getDsl().getElementName(), is("map-param"));
+    assertThat(mapElement.getModel(), is(mapParameter));
   }
 
   protected <T> DslElementModel<T> create(ElementDeclaration declaration) {
