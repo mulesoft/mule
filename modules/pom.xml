@@ -51,7 +51,6 @@
         <module>tracing</module>
         <module>metrics</module>
         <module>troubleshooting</module>
-        <module>tooling-support</module>
         <module>observability</module>
     </modules>
 
