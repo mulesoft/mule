@@ -1,4 +1,18 @@
 {
+  "4.9.7": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.field.added",
+            "new": "field org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>.ffService",
+            "justification": "W-18716253: Repeatable streams wait to fill the whole buffer instead of returning immediately available data"
+          }
+        ]
+      }
+    }
+  },
   "4.9.2": {
     "revapi": {
       "ignore": [
