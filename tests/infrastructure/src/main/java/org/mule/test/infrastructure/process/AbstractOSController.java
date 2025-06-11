@@ -21,6 +21,7 @@ import org.mule.tck.probe.Probe;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -281,6 +282,11 @@ public abstract class AbstractOSController {
 
     @Override
     protected Process launch(CommandLine command, Map<String, String> env, File dir) throws IOException {
+      return launch(command, env, dir.toPath());
+    }
+
+    @Override
+    protected Process launch(CommandLine command, Map<String, String> env, Path dir) throws IOException {
       Process process = super.launch(command, env, dir);
       processFuture.complete(process);
       return process;
