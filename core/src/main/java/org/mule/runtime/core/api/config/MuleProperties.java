@@ -128,6 +128,7 @@ public class MuleProperties {
   public static final String OBJECT_LOCAL_STORE_IN_MEMORY = "_localInMemoryObjectStore";
   public static final String OBJECT_LOCAL_STORE_PERSISTENT = "_localPersistentObjectStore";
   public static final String OBJECT_STORE_MANAGER = "_muleObjectStoreManager";
+  public static final String CLUSTER_STATUS_SERVICE = "_clusterStatusService";
   public static final String SDK_OBJECT_STORE_MANAGER = "_sdkObjectStoreManager";
   public static final String LOCAL_OBJECT_STORE_MANAGER = "_muleLocalObjectStoreManager";
   public static final String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";

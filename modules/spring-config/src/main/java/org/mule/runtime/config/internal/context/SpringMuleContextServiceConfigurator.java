@@ -11,59 +11,7 @@ import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJE
 import static org.mule.runtime.config.api.LazyComponentInitializer.LAZY_COMPONENT_INITIALIZER_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.DEPLOYMENT_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_ADD_ARTIFACT_AST_TO_REGISTRY_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.FORWARD_COMPATIBILITY_HELPER_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_LOCK_FACTORY;
-import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ARTIFACT_METER_PROVIDER_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONENT_TRACER_FACTORY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_SPAN_FACTORY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_ERROR_METRICS_FACTORY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_CONFIGURATION_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_EXPORTER_FACTORY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_TRACING_LEVEL_CONFIGURATION_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_ARTIFACT_AST;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATION_PROPERTIES;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXCEPTION_LOCATION_PROVIDER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_FLOW_CLASSIFIER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_QUEUE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_IN_MEMORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCAL_STORE_PERSISTENT;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_DISPATCHER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_PROCESSING_TIME_WATCHER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_RESOURCE_LOCATOR;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STATISTICS;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_GHOST_BUSTER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_FACTORY_LOCATOR;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMATION_SERVICE;
-import static org.mule.runtime.core.api.config.MuleProperties.SDK_OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.*;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
@@ -195,6 +143,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
                .getBeanDefinition())
       .put(OBJECT_LOCAL_STORE_PERSISTENT,
            getBeanDefinition(DefaultObjectStoreFactoryBean.class, "createDefaultPersistentObjectStore"))
+      .put(CLUSTER_STATUS_SERVICE, getPrimaryBeanDefinition(NoHAClusterStatusService.class))
       .put(OBJECT_STORE_MANAGER, getPrimaryBeanDefinition(MuleObjectStoreManager.class))
       .put(SDK_OBJECT_STORE_MANAGER, getPrimaryBeanDefinition(SdkObjectStoreManagerAdapter.class))
       .put(OBJECT_QUEUE_MANAGER, getBeanDefinition(TransactionalQueueManager.class))
