@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static java.lang.Boolean.getBoolean;
 import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
 import org.mule.oauth.client.api.listener.ClientCredentialsListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
@@ -27,6 +28,7 @@ public class UpdatingClientCredentialsState
     implements ClientCredentialsState, org.mule.sdk.api.connectivity.oauth.ClientCredentialsState {
 
   private static final Logger LOGGER = getLogger(UpdatingClientCredentialsState.class);
+  private static final boolean INVALIDATE_POTENTIAL_NULL = getBoolean("mule.oauth.token.nullcheck");
 
   private final ClientCredentialsOAuthDancer dancer;
   private ClientCredentialsState delegate;
@@ -59,7 +61,7 @@ public class UpdatingClientCredentialsState
   private void updateDelegate(ResourceOwnerOAuthContext initialContext) {
     String accessToken = initialContext.getAccessToken();
     String expiresIn = initialContext.getExpiresIn();
-    if (accessToken == null) {
+    if (accessToken == null && INVALIDATE_POTENTIAL_NULL) {
       LOGGER
           .warn("Null token was set in the ResourceOwnerOAuthContext. Using previous token, and ensuring this state stays invalidated for next attempt");
       invalidated = true;
