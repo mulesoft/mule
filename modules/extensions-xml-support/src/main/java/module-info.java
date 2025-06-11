@@ -35,9 +35,9 @@ module org.mule.runtime.extensions.xml.support {
 
   requires java.xml;
 
-  requires commons.beanutils;
   requires com.google.common;
   requires com.google.gson;
+  requires org.apache.commons.beanutils;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires org.jgrapht.core;
