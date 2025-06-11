@@ -76,7 +76,7 @@
 
         <dependency>
             <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit4</artifactId>
+            <artifactId>allure-junit5</artifactId>
         </dependency>
 
         <dependency>
