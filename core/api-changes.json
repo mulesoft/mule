@@ -5,6 +5,20 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.class.added",
+            "new": "class org.mule.runtime.core.privileged.routing.CompositeRoutingException",
+            "justification": "W-16562974: Move CompositeRoutingException to privileged package"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.nowImplementsInterface",
+            "old": "class org.mule.runtime.core.privileged.routing.RoutingResult",
+            "new": "class org.mule.runtime.core.privileged.routing.RoutingResult",
+            "interface": "java.io.Serializable",
+            "justification": "W-16562974: Move CompositeRoutingException to privileged package"
+          },
+          {
+            "ignore": true,
             "code": "java.method.added",
             "new": "method org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics org.mule.runtime.core.api.management.stats.AllStatistics::getFlowSummaryStatisticsV2()",
             "justification": "W-18456190: Improving computation of flows summary statistics"
