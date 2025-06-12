@@ -10,6 +10,7 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 
 import static java.util.Collections.synchronizedList;
 import static java.util.Collections.synchronizedSet;
+import static java.util.stream.Collectors.toCollection;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -71,19 +72,19 @@ public class PluginsDependenciesProcessor {
     LOGGER.debug("Dependencies graph: {}", depsGraph);
 
     while (!depsGraph.vertexSet().isEmpty()) {
-      Set<BundleDescriptor> seenDependencies = synchronizedSet(new HashSet<>());
-
-      artifactPluginsStream(artifactPlugins, parallelize)
+      // need this auxiliary structure because the graph does not support concurrent modifications
+      Set<BundleDescriptor> seenDependencies = artifactPluginsStream(artifactPlugins, parallelize)
           .filter(artifactPlugin -> depsGraph.vertexSet().contains(artifactPlugin.getBundleDescriptor())
               && depsGraph.outDegreeOf(artifactPlugin.getBundleDescriptor()) == 0)
-          .forEach(artifactPlugin -> {
+          .map(artifactPlugin -> {
             LOGGER.debug("process({}): {}", parallelize ? "parallel" : "", artifactPlugin);
 
-            // need this auxiliary structure because the graph does not support concurrent modifications
-            seenDependencies.add(artifactPlugin.getBundleDescriptor());
-
             processor.accept(processedDependencies, artifactPlugin);
-          });
+
+            LOGGER.debug("processed({}): {}", parallelize ? "parallel" : "", artifactPlugin);
+
+            return artifactPlugin.getBundleDescriptor();
+          }).collect(toCollection(() -> synchronizedSet(new HashSet<>())));
 
       seenDependencies.forEach(depsGraph::removeVertex);
       LOGGER.debug("process({}): next iteration on the depsGraph...", parallelize ? "parallel" : "");
