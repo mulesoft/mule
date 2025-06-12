@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.lock;
 
 import static org.mockito.Mockito.spy;
 
+import org.mule.runtime.api.lock.LockProvider;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.config;
 
+import static java.lang.Boolean.getBoolean;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import static java.util.Collections.unmodifiableMap;
@@ -13,8 +15,11 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 
 import org.mule.runtime.api.artifact.ArtifactType;
+import org.mule.runtime.api.lock.LockProvider;
+import org.mule.runtime.core.internal.lock.TwoImplementationsLockProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +31,7 @@ import java.util.function.Consumer;
  */
 public class DefaultCustomizationService implements InternalCustomizationService {
 
+  private static final boolean HA_MIGRATION_ENABLED = getBoolean(SYSTEM_PROPERTY_PREFIX + "enable.ha.migration");
   private final Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
   private final Map<String, CustomService> customServices = new HashMap<>();
 
@@ -47,7 +53,27 @@ public class DefaultCustomizationService implements InternalCustomizationService
    */
   @Override
   public <T> void interceptDefaultServiceImpl(String serviceId, Consumer<ServiceInterceptor<T>> serviceInterceptor) {
-    muleContextDefaultServices.put(serviceId, new CustomService<>(serviceId, serviceInterceptor, false));
+    if (isMigrationSecondService(serviceId)) {
+      CustomService first = muleContextDefaultServices.get(serviceId);
+      CustomService second = new CustomService<>(serviceId, serviceInterceptor, false);
+      muleContextDefaultServices.put(serviceId, combineServicesForMigration(serviceId, first, second));
+    } else {
+      muleContextDefaultServices.put(serviceId, new CustomService<>(serviceId, serviceInterceptor, false));
+    }
+  }
+
+  private boolean isMigrationSecondService(String serviceId) {
+    return HA_MIGRATION_ENABLED && muleContextDefaultServices.containsKey(serviceId) && serviceId.equals(OBJECT_LOCK_PROVIDER);
+  }
+
+  private CustomService combineServicesForMigration(String serviceId, CustomService first, CustomService second) {
+    if (serviceId.equals(OBJECT_LOCK_PROVIDER)) {
+      return new CombinedService(serviceId, first, second, false,
+                                 (impl1, impl2) -> new TwoImplementationsLockProvider((LockProvider) impl1,
+                                                                                      (LockProvider) impl2));
+    } else {
+      return second;
+    }
   }
 
   /**
