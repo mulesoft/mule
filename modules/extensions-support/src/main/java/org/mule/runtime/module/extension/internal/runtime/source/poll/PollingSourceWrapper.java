@@ -512,10 +512,11 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       }
 
       if (status == REJECT) {
-        if (LOGGER.isDebugEnabled()) {
-          itemId = getItemId(pollItem);
-          LOGGER.debug("Source in flow '{}' is skipping item '{}' because it was rejected by the watermark", flowName, itemId);
-        }
+        LOGGER.atDebug()
+            .setMessage("Source in flow '{}' is skipping item '{}' because it was rejected by the watermark")
+            .addArgument(flowName)
+            .addArgument(() -> getItemId(pollItem))
+            .log();
       }
 
       return status;
@@ -723,19 +724,15 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     String id = pollItem.getItemId().get();
     Lock lock = lockFactory.createLock(flowName + "/" + id);
     if (!lock.tryLock()) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Source at flow '{}' is skipping processing of item '{}' because another thread or node already has a mule "
-            + "lock on it", flowName, id);
-      }
+      LOGGER.debug("Source at flow '{}' is skipping processing of item '{}' because another thread or node already has a mule "
+          + "lock on it", flowName, id);
       return false;
     }
 
     try {
       if (inflightIdsObjectStore.contains(id)) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Source at flow '{}' polled item '{}', but skipping it since it is already being processed in another "
-              + "thread or node", flowName, id);
-        }
+        LOGGER.debug("Source at flow '{}' polled item '{}', but skipping it since it is already being processed in another "
+            + "thread or node", flowName, id);
         return false;
       } else {
         try {
@@ -743,16 +740,18 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           callbackContext.addVariable(ITEM_RELEASER_CTX_VAR, new ItemReleaser(id));
           return true;
         } catch (ObjectStoreException e) {
-          LOGGER.error(format("Flow at source '%s' could not track item '%s' as being processed. %s",
-                              flowName, id, e.getMessage()),
-                       e);
+          LOGGER.atError()
+              .setCause(e)
+              .log("Flow at source '{}' could not track item '{}' as being processed. {}",
+                   flowName, id, e.getMessage());
           return false;
         }
       }
     } catch (Exception e) {
-      LOGGER.error(format("Could not guarantee idempotency for item '%s' for source at flow '%s'. '%s",
-                          id, flowName, e.getMessage()),
-                   e);
+      LOGGER.atError()
+          .setCause(e)
+          .log("Could not guarantee idempotency for item '{}' for source at flow '{}'. '{}'",
+               id, flowName, e.getMessage());
       return false;
     } finally {
       safeUnlock(lock);
@@ -798,7 +797,10 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           inflightIdsObjectStore.remove(id);
         }
       } catch (ObjectStoreException e) {
-        LOGGER.error(format("Could not untrack item '%s' in source at flow '%s'. %s", id, flowName, e.getMessage()), e);
+        LOGGER.atError()
+            .setCause(e)
+            .log("Could not untrack item '{}' in source at flow '{}'. {}",
+                 id, flowName, e.getMessage());
       }
     }
   }

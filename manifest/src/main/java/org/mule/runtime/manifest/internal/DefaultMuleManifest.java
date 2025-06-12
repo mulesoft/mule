@@ -169,7 +169,7 @@ public class DefaultMuleManifest implements MuleManifest {
           }
         }
       } catch (IOException e) {
-        logger.warn("Failed to read manifest Info, Manifest information will not display correctly: " + e.getMessage());
+        logger.warn("Failed to read manifest Info, Manifest information will not display correctly: {}", e.getMessage());
       }
     }
     return manifest;

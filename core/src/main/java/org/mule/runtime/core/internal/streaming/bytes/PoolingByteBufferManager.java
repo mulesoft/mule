@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Math.min;
-import static java.lang.Runtime.getRuntime;
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_BUCKET_SIZE;
 import static org.mule.runtime.core.internal.streaming.bytes.ByteStreamingConstants.DEFAULT_BUFFER_POOL_SIZE;
+
+import static java.lang.Math.min;
+import static java.lang.Runtime.getRuntime;
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -25,6 +27,7 @@ import java.nio.ByteBuffer;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalListener;
+
 import org.apache.commons.pool2.KeyedObjectPool;
 import org.slf4j.Logger;
 import org.vibur.objectpool.ConcurrentPool;
@@ -63,9 +66,9 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
         try {
           value.close();
         } catch (Exception e) {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Found exception trying to dispose buffer pool for capacity " + key, e);
-          }
+          LOGGER.atDebug()
+              .setCause(e)
+              .log("Found exception trying to dispose buffer pool for capacity {}", key);
         }
       }).build(this::newBufferPool);
 
@@ -113,16 +116,12 @@ public class PoolingByteBufferManager extends MemoryBoundByteBufferManager imple
     try {
       defaultSizePool.close();
     } catch (Exception e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Error disposing default capacity byte buffers pool", e);
-      }
+      LOGGER.warn("Error disposing default capacity byte buffers pool", e);
     }
     try {
       customSizePools.invalidateAll();
     } catch (Exception e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Error disposing mixed capacity byte buffers pool", e);
-      }
+      LOGGER.warn("Error disposing mixed capacity byte buffers pool", e);
     }
   }
 

@@ -414,11 +414,9 @@ public class MuleDeploymentService implements DeploymentService {
   private void executeSynchronized(SynchronizedDeploymentAction deploymentAction) {
     try {
       if (!deploymentLock.tryLock(0, SECONDS)) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Another deployment operation in progress, will skip this cycle. Owner thread: " +
-              (deploymentLock instanceof DebuggableReentrantLock ? ((DebuggableReentrantLock) deploymentLock).getOwner()
-                  : "Unknown"));
-        }
+        LOGGER.debug("Another deployment operation in progress, will skip this cycle. Owner thread: {}",
+                     (deploymentLock instanceof DebuggableReentrantLock ? ((DebuggableReentrantLock) deploymentLock).getOwner()
+                         : "Unknown"));
         return;
       }
       deploymentAction.execute();
@@ -450,9 +448,9 @@ public class MuleDeploymentService implements DeploymentService {
       try {
         applicationDeployer.redeploy(artifactName, deploymentProperties);
       } catch (DeploymentException e) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Failure while redeploying application: " + artifactName, e);
-        }
+        LOGGER.atDebug()
+            .setCause(e)
+            .log("Failure while redeploying application: {}", artifactName);
       }
     });
   }

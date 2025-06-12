@@ -9,30 +9,26 @@ package org.mule.runtime.module.deployment.impl.internal.util;
 import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
 
 import static java.nio.file.Files.createTempFile;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-
-import static org.apache.commons.io.IOUtils.toByteArray;
+import static java.nio.file.Paths.get;
 
 import org.mule.runtime.core.api.util.FileUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -48,6 +44,9 @@ public final class JarUtils {
   private static final String MULE_LIB_FILENAME = "lib" + File.separator + "mule";
   private static final String MULE_HOME = getMuleHome().map(File::getAbsolutePath).orElse(null);
 
+  private static final int MAX_ENTRY_SIZE = 1024 * 1024 * 1024; // 1GB limit
+  private static final int MAX_ENTRIES = 10000; // Maximum number of entries in a JAR
+
   public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
 
   private static final Logger logger = LoggerFactory.getLogger(JarUtils.class);
@@ -62,9 +61,11 @@ public final class JarUtils {
    * @param jarFile  the jar file
    * @param filePath the path within the jar file
    * @return an URL to the {@code filePath} within the {@code jarFile}
-   * @throws MalformedURLException if the provided {@code filePath} is malformed
+   * @throws MalformedURLException    if the provided {@code filePath} is malformed
+   * @throws IllegalArgumentException if the filePath contains path traversal attempts
    */
   public static URL getUrlWithinJar(File jarFile, String filePath) throws MalformedURLException {
+    validatePath(filePath);
     return new URL("jar:" + jarFile.toURI().toString() + "!/" + filePath);
   }
 
@@ -75,9 +76,11 @@ public final class JarUtils {
    * @param directory the directory within the jar file
    * @return a collection of URLs to files within the directory {@code directory}. Empty collection if the directory does not
    *         exists or is empty.
-   * @throws IOException
+   * @throws IOException              if there was a problem reading from the jar file
+   * @throws IllegalArgumentException if the directory path contains path traversal attempts
    */
   public static List<URL> getUrlsWithinJar(File file, String directory) throws IOException {
+    validatePath(directory);
     List<URL> urls = new ArrayList<>();
     try (JarFile jarFile = new JarFile(file)) {
       Enumeration<JarEntry> entries = jarFile.entries();
@@ -91,117 +94,126 @@ public final class JarUtils {
     return urls;
   }
 
-  public static LinkedHashMap readJarFileEntries(File jarFile) throws Exception {
-    LinkedHashMap entries = new LinkedHashMap();
-    JarFile jarFileWrapper = null;
-    if (jarFile != null) {
-      logger.debug("Reading jar entries from " + jarFile.getAbsolutePath());
-      try {
-        jarFileWrapper = new JarFile(jarFile);
-        Enumeration iter = jarFileWrapper.entries();
-        while (iter.hasMoreElements()) {
-          ZipEntry zipEntry = (ZipEntry) iter.nextElement();
-          InputStream entryStream = jarFileWrapper.getInputStream(zipEntry);
-          try (ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream()) {
-            IOUtils.copy(entryStream, byteArrayStream);
-            entries.put(zipEntry.getName(), byteArrayStream.toByteArray());
-            logger.debug("Read jar entry " + zipEntry.getName() + " from " + jarFile.getAbsolutePath());
-          }
+  public static Map<String, Object> readJarFileEntries(File jarFile) throws IOException {
+    Map<String, Object> entries = new LinkedHashMap<>();
+    logger.debug("Reading jar entries from {}", jarFile.getAbsolutePath());
+    try (JarFile jarFileWrapper = new JarFile(jarFile)) {
+      Enumeration<JarEntry> iter = jarFileWrapper.entries();
+      int entryCount = 0;
+
+      while (iter.hasMoreElements()) {
+        if (++entryCount > MAX_ENTRIES) {
+          throw new IOException("JAR file contains too many entries: " + entryCount);
         }
-      } finally {
-        if (jarFileWrapper != null) {
-          try {
-            jarFileWrapper.close();
-          } catch (Exception ignore) {
-            logger.debug("Error closing jar file", ignore);
-          }
+
+        ZipEntry zipEntry = iter.nextElement();
+        validatePath(zipEntry.getName());
+
+        if (zipEntry.getSize() > MAX_ENTRY_SIZE) {
+          throw new IOException("JAR entry too large: " + zipEntry.getName() + " (" + zipEntry.getSize() + " bytes)");
+        }
+
+        try (InputStream entryStream = jarFileWrapper.getInputStream(zipEntry);
+            ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream()) {
+          IOUtils.copy(entryStream, byteArrayStream);
+          entries.put(zipEntry.getName(), byteArrayStream.toByteArray());
+          logger.debug("Read jar entry {} from {}", zipEntry.getName(), jarFile.getAbsolutePath());
         }
       }
     }
     return entries;
   }
 
-  public static void appendJarFileEntries(File jarFile, LinkedHashMap entries) throws Exception {
-    if (entries != null) {
-      LinkedHashMap combinedEntries = readJarFileEntries(jarFile);
-      combinedEntries.putAll(entries);
-      File tmpJarFile = createTempFile(jarFile.getName(), null).toFile();
-      createJarFileEntries(tmpJarFile, combinedEntries);
-      jarFile.delete();
-      FileUtils.renameFile(tmpJarFile, jarFile);
+  public static void appendJarFileEntries(File jarFile, Map<String, Object> entries) throws IOException {
+    // Validate all entry paths before proceeding
+    for (String entryPath : entries.keySet()) {
+      validatePath(entryPath);
+    }
+
+    Map<String, Object> combinedEntries = readJarFileEntries(jarFile);
+    combinedEntries.putAll(entries);
+    File tmpJarFile = createTempFile(jarFile.getName(), null).toFile();
+    createJarFileEntries(tmpJarFile, combinedEntries);
+    jarFile.delete();
+    FileUtils.renameFile(tmpJarFile, jarFile);
+  }
+
+  public static void createJarFileEntries(File jarFile, Map<String, Object> entries) throws IOException {
+    logger.debug("Creating jar file {}", jarFile.getAbsolutePath());
+
+    if (entries == null || entries.isEmpty()) {
+      return;
+    }
+
+    try (FileOutputStream fileStream = new FileOutputStream(jarFile);
+        JarOutputStream jarStream = new JarOutputStream(fileStream)) {
+
+      int entryCount = 0;
+      Iterator<String> iter = entries.keySet().iterator();
+      while (iter.hasNext()) {
+        if (++entryCount > MAX_ENTRIES) {
+          throw new IOException("Too many entries to write to JAR: " + entryCount);
+        }
+
+        String jarFilePath = iter.next();
+        validatePath(jarFilePath);
+        createForJarEntry(jarFile, entries, jarStream, jarFilePath);
+      }
+
+      jarStream.flush();
+      fileStream.getFD().sync();
     }
   }
 
-  public static void createJarFileEntries(File jarFile, LinkedHashMap entries) throws Exception {
-    JarOutputStream jarStream = null;
-    FileOutputStream fileStream = null;
+  private static void createForJarEntry(File jarFile, Map<String, Object> entries, JarOutputStream jarStream,
+                                        String jarFilePath)
+      throws IOException {
+    Object content = entries.get(jarFilePath);
 
-    if (jarFile != null) {
-      logger.debug("Creating jar file " + jarFile.getAbsolutePath());
+    JarEntry entry = new JarEntry(jarFilePath);
+    jarStream.putNextEntry(entry);
 
-      try {
-        fileStream = new FileOutputStream(jarFile);
-        jarStream = new JarOutputStream(fileStream);
+    logger.debug("Adding jar entry {} to {}", jarFilePath, jarFile.getAbsolutePath());
 
-        if (entries != null && !entries.isEmpty()) {
-          Iterator iter = entries.keySet().iterator();
-          while (iter.hasNext()) {
-            String jarFilePath = (String) iter.next();
-            Object content = entries.get(jarFilePath);
-
-            JarEntry entry = new JarEntry(jarFilePath);
-            jarStream.putNextEntry(entry);
-
-            logger.debug("Adding jar entry " + jarFilePath + " to " + jarFile.getAbsolutePath());
-
-            if (content instanceof String) {
-              writeJarEntry(jarStream, ((String) content).getBytes());
-            } else if (content instanceof byte[]) {
-              writeJarEntry(jarStream, (byte[]) content);
-            } else if (content instanceof File) {
-              writeJarEntry(jarStream, (File) content);
-            }
-          }
-        }
-
-        jarStream.flush();
-        fileStream.getFD().sync();
-      } finally {
-        if (jarStream != null) {
-          try {
-            jarStream.close();
-          } catch (Exception jarNotClosed) {
-            logger.debug("Error closing jar file", jarNotClosed);
-          }
-        }
-        if (fileStream != null) {
-          try {
-            fileStream.close();
-          } catch (Exception fileNotClosed) {
-            logger.debug("Error closing file", fileNotClosed);
-          }
-        }
-      }
+    if (content instanceof String stringContent) {
+      writeJarEntry(jarStream, stringContent.getBytes());
+    } else if (content instanceof byte[] byteArrayContent) {
+      writeJarEntry(jarStream, byteArrayContent);
+    } else if (content instanceof File fileContent) {
+      writeJarEntry(jarStream, fileContent);
     }
   }
 
   private static void writeJarEntry(OutputStream stream, byte[] entry) throws IOException {
+    if (entry.length > MAX_ENTRY_SIZE) {
+      throw new IOException("Entry too large: " + entry.length + " bytes");
+    }
     stream.write(entry, 0, entry.length);
   }
 
   private static void writeJarEntry(OutputStream stream, File entry) throws IOException {
-    FileInputStream fileContentStream = null;
-    try {
-      fileContentStream = new FileInputStream(entry);
+    if (entry.length() > MAX_ENTRY_SIZE) {
+      throw new IOException("File too large: " + entry.length() + " bytes");
+    }
+    try (FileInputStream fileContentStream = new FileInputStream(entry)) {
       IOUtils.copy(fileContentStream, stream);
-    } finally {
-      if (fileContentStream != null) {
-        try {
-          fileContentStream.close();
-        } catch (Exception fileContentNotClosed) {
-          logger.debug("Error closing file", fileContentNotClosed);
-        }
-      }
+    }
+  }
+
+  /**
+   * Validates a path to prevent path traversal attacks.
+   *
+   * @param path the path to validate
+   * @throws IllegalArgumentException if the path contains path traversal attempts
+   */
+  private static void validatePath(String path) {
+    if (path == null) {
+      throw new IllegalArgumentException("Path cannot be null");
+    }
+
+    Path normalizedPath = get(path).normalize();
+    if (normalizedPath.startsWith("..") || normalizedPath.toString().contains("..")) {
+      throw new IllegalArgumentException("Path traversal not allowed: " + path);
     }
   }
 
@@ -220,5 +232,4 @@ public final class JarUtils {
   public static File getMuleLocalJarFile() {
     return new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME);
   }
-
 }

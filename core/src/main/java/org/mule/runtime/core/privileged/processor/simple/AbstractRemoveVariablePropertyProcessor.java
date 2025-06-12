@@ -44,9 +44,7 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
     if (wildcardAttributeEvaluator.hasWildcards()) {
       AtomicReference<CoreEvent> resultEvent = new AtomicReference<>(event);
       wildcardAttributeEvaluator.processValues(getPropertyNames((PrivilegedEvent) event), matchedValue -> {
-        if (logger.isDebugEnabled()) {
-          logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScopeName()));
-        }
+        logger.debug("Removing property: '{}' from scope: '{}'", matchedValue, getScopeName());
         resultEvent.set(removeProperty((PrivilegedEvent) event, matchedValue));
       });
       return resultEvent.get();

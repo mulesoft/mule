@@ -338,9 +338,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   private void logModelNotGenerated(String reason) {
-    if (LOGGER.isWarnEnabled()) {
-      LOGGER.warn("{}. ExtensionModel for app {} not generated", reason, muleContext.getConfiguration().getId());
-    }
+    LOGGER.warn("{}. ExtensionModel for app {} not generated", reason, muleContext.getConfiguration().getId());
   }
 
   protected void registerErrors(final ArtifactAst artifactAst) {

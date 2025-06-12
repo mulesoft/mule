@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.execution.interceptor
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -159,15 +160,17 @@ class LinkedInterceptorChain implements InterceptorChain {
   }
 
   private void logError(Throwable t, String phase, boolean executionContinues) {
-    if (LOGGER.isDebugEnabled()) {
-      StringBuilder builder = new StringBuilder();
-      builder.append(format("Interceptor %s threw exception executing '%s' phase.", interceptor, phase));
-      if (executionContinues) {
-        builder.append(
-                       " Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned");
-      }
+    LOGGER.atDebug()
+        .setCause(t)
+        .log(() -> {
+          StringBuilder builder = new StringBuilder();
+          builder.append(format("Interceptor %s threw exception executing '%s' phase.", interceptor, phase));
+          if (executionContinues) {
+            builder
+                .append(" Exception will be ignored. Next interceptors (if any) will be executed and the operation's exception will be returned");
+          }
 
-      LOGGER.debug(builder.toString(), t);
-    }
+          return builder.toString();
+        });
   }
 }

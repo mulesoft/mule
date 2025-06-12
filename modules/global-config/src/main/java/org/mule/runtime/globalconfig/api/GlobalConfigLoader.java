@@ -91,10 +91,7 @@ public class GlobalConfigLoader {
           InputStream schemaStream = GlobalConfigLoader.class.getClassLoader().getResourceAsStream(MULE_SCHEMA_JSON_LOCATION)) {
         JSONObject rawSchema = new JSONObject(new JSONTokener(schemaStream));
         Schema schema = SchemaLoader.load(rawSchema);
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Using effective mule-config.json configuration: \n"
-              + prettyPrintConfig.get());
-        }
+        LOGGER.debug("Using effective mule-config.json configuration: \n{}", prettyPrintConfig.get());
         schema.validate(new JSONObject(effectiveConfigAsJson));
         parseMavenConfig(muleRuntimeConfig);
         parseClusterConfig(muleRuntimeConfig);

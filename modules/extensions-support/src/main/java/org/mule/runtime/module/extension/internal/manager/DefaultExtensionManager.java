@@ -153,17 +153,14 @@ public final class DefaultExtensionManager implements ExtensionManager, Initiali
     final String extensionVersion = extensionModel.getVersion();
     final String extensionVendor = extensionModel.getVendor();
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Registering extension {} (version: {} vendor: {} )", extensionName, extensionVersion, extensionVendor);
-    }
+    LOGGER.debug("Registering extension {} (version: {} vendor: {} )",
+                 extensionName, extensionVersion, extensionVendor);
 
     extensionJdkValidator.validateJdkSupport(extensionModel);
 
     if (extensionRegistry.containsExtension(extensionName)) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("An extension of name '{}' (version: {} vendor {}) is already registered. Skipping...", extensionName,
-                     extensionVersion, extensionVendor);
-      }
+      LOGGER.debug("An extension of name '{}' (version: {} vendor {}) is already registered. Skipping...",
+                   extensionName, extensionVersion, extensionVendor);
     } else {
       withContextClassLoader(getClassLoader(extensionModel), () -> {
         extensionRegistry.registerExtension(extensionName, extensionModel);

@@ -15,11 +15,11 @@ import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPr
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
@@ -216,16 +216,10 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     this.deploymentListener = deploymentListener;
   }
 
-  private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties) throws DeploymentException {
-    return deployExplodedApp(addedApp, deploymentProperties, empty());
-  }
-
   private T deployExplodedApp(String addedApp, Optional<Properties> deploymentProperties,
                               Optional<Properties> artifactStatusProperties)
       throws DeploymentException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("================== New Exploded Artifact: " + addedApp);
-    }
+    logger.debug("================== New Exploded Artifact: {}", addedApp);
 
     T artifact;
     try {
@@ -375,9 +369,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   }
 
   private void logRequestToUndeployArtifact(T artifact) {
-    if (logger.isInfoEnabled()) {
-      logger.info("================== Request to Undeploy Artifact: " + artifact.getArtifactName());
-    }
+    logger.info("================== Request to Undeploy Artifact: {}", artifact.getArtifactName());
   }
 
   private void logArtifactUndeployed(T artifact) {

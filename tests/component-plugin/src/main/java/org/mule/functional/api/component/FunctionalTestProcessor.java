@@ -14,7 +14,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
 
-import static java.lang.System.lineSeparator;
 import static java.lang.Thread.currentThread;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -47,11 +46,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import jakarta.inject.Inject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * <code>FunctionalTestProcessor</code> is a service that can be used by functional tests. This service accepts an EventCallback
@@ -228,21 +227,16 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
     }
 
     final Message message = event.getMessage();
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Message Received in flow: {}. Content is: {}",
-                  getLocation().getRootContainerName(),
-                  message.getPayload().getValue() != null
-                      ? truncate(message.getPayload().getValue().toString(), 100, true)
-                      : (null));
-    }
+    LOGGER.atInfo()
+        .setMessage("Message Received in flow: {}. Content is: {}")
+        .addArgument(getLocation().getRootContainerName())
+        .addArgument(() -> message.getPayload().getValue() != null
+            ? truncate(message.getPayload().getValue().toString(), 100, true)
+            : (null))
+        .log();
 
-    if (isLogMessageDetails() && LOGGER.isInfoEnabled()) {
-      StringBuilder sb = new StringBuilder();
-
-      sb.append("Full Message: ").append(lineSeparator());
-      sb.append(message.getPayload().getValue().toString()).append(lineSeparator());
-      sb.append(message.toString());
-      LOGGER.info(sb.toString());
+    if (isLogMessageDetails()) {
+      LOGGER.info("Full Message: \n{}\n{}", message.getPayload().getValue(), message);
     }
 
     if (eventCallback != null) {

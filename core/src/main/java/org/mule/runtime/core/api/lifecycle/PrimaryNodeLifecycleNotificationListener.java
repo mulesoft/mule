@@ -62,9 +62,7 @@ public final class PrimaryNodeLifecycleNotificationListener implements ClusterNo
   }
 
   private void logStartableNotStartedMessage() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Not starting Startable since it's not in started state");
-    }
+    logger.debug("Not starting Startable since it's not in started state");
   }
 
   public void unregister() {

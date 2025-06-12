@@ -62,10 +62,9 @@ public class DefaultLifecycleInterceptor implements LifecycleInterceptor {
   public boolean beforePhaseExecution(LifecyclePhase phase, Object object) {
     if (isFinalPhase(phase) && (initialPhaseLifecycleClass.isAssignableFrom(object.getClass()))) {
       if (trackingPhaseFailureObjects.containsKey(object)) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(String.format("Skipping %s lifecycle phase on object because %s phase failed before it could be applied "
-              + "on it. Object is: %s", finalPhase, initialPhase, object));
-        }
+        LOGGER.debug("Skipping {} lifecycle phase on object because {} phase failed before it could be applied on it."
+            + " Object is: {}",
+                     finalPhase, initialPhase, object);
         return false;
       }
       return processedObjects.containsKey(object);

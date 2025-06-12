@@ -46,9 +46,7 @@ public class DynamicDataTypeConversionResolver implements DataTypeConversionReso
           break;
         }
       } catch (TransformerException e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Unable to find an implicit conversion from " + sourceType + " to " + targetDataType);
-        }
+        logger.debug("Unable to find an implicit conversion from {} to {}", sourceType, targetDataType);
       }
     }
 

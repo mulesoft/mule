@@ -189,9 +189,7 @@ public class FileUtils {
    */
   public static String normalizeFilePath(URL url, String encoding) throws UnsupportedEncodingException {
     String resource = URLDecoder.decode(url.toExternalForm(), encoding);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Decoded URL: '{}'", resource);
-    }
+    logger.debug("Decoded URL: '{}'", resource);
     return normalizeDecodedPath(resource, IS_OS_WINDOWS);
   }
 
@@ -654,21 +652,22 @@ public class FileUtils {
                 }
               }
             }
-            logger.debug("File renamed: " + isRenamed);
+            logger.debug("File renamed: {}", isRenamed);
             if (isRenamed) {
               srcFile.delete();
             } else {
               destFile.delete();
             }
           } else {
-            logger.debug(srcFile.getAbsolutePath() + " is not a valid file.");
+            logger.debug("{} is not a valid file.", srcFile.getAbsolutePath());
           }
         } catch (Exception e) {
-          logger.debug("Error renaming file from " + srcFile.getAbsolutePath() + " to " + destFile.getAbsolutePath());
+          logger.debug("Error renaming file from {} to {}",
+                       srcFile.getAbsolutePath(), destFile.getAbsolutePath());
         }
       } else {
-        logger.debug("Error renaming file " + srcFile.getAbsolutePath() + ". Destination file " + destFile.getAbsolutePath()
-            + " already exists.");
+        logger.debug("Error renaming file {}. Destination file {} already exists.",
+                     srcFile.getAbsolutePath(), destFile.getAbsolutePath());
       }
     }
     return isRenamed;

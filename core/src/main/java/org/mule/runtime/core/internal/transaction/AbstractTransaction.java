@@ -82,9 +82,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
 
   @Override
   public void begin() throws TransactionException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Beginning transaction {}@{}", this.getClass().getName(), identityHashCode(this));
-    }
+    LOGGER.debug("Beginning transaction {}@{}", this.getClass().getName(), identityHashCode(this));
     doBegin();
     TransactionCoordination.getInstance().bindTransaction(this);
     fireNotification(new TransactionNotification(getId(), TRANSACTION_BEGAN, getApplicationName()));
@@ -101,9 +99,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
       if (rollbackAfterTimeout && timeoutReached) {
         rollback();
       }
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Committing transaction {}@{}", this.getClass().getName(), identityHashCode(this));
-      }
+      LOGGER.debug("Committing transaction {}@{}", this.getClass().getName(), identityHashCode(this));
       doCommit();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_COMMITTED, getApplicationName()));
     } finally {
@@ -119,9 +115,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   public void rollback() throws TransactionException {
     boolean timeoutReached = timeoutReached();
     try {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Rolling back transaction {}@{}", this.getClass().getName(), identityHashCode(this));
-      }
+      LOGGER.debug("Rolling back transaction {}@{}", this.getClass().getName(), identityHashCode(this));
       setRollbackOnly();
       doRollback();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_ROLLEDBACK, getApplicationName()));

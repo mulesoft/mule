@@ -78,7 +78,9 @@ public class GroovyResourceReleaser implements ResourceReleaser {
         }
       } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
         String className = clazz != null ? clazz.getName() : "Unknown";
-        LOGGER.warn("Could not remove the {} class from the Groovy's InvokerHelper", className, e);
+        LOGGER.atWarn()
+            .setCause(e)
+            .log("Could not remove the {} class from the Groovy's InvokerHelper", className);
       }
     }
   }

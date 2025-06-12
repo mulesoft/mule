@@ -33,7 +33,6 @@ import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
 
-import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -110,9 +109,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Routes a message through a Flow and coordinates error handling and response emitting.
@@ -692,9 +691,9 @@ public class FlowProcessMediator implements Initialisable {
       }
       notificationHelper.fireNotification(source, event, flow.getLocation(), action);
     } catch (Exception e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn(format("Could not fire notification. Action: %s", action), e);
-      }
+      LOGGER.atWarn()
+          .setCause(e)
+          .log("Could not fire notification. Action: {}", action);
     }
   }
 

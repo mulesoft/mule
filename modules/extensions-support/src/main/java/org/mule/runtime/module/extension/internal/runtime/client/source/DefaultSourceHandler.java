@@ -62,7 +62,7 @@ public class DefaultSourceHandler implements SourceHandler {
       try {
         afterDisposeAction.run();
       } catch (Exception e) {
-        LOGGER.error("Exception executing afterDisposeAction: " + e.getMessage(), e);
+        LOGGER.atError().setCause(e).log("Exception executing afterDisposeAction: " + e.getMessage());
       }
     }
   }

@@ -73,9 +73,7 @@ public class TlsPropertiesMapper {
     if (null == value) {
       value = deflt;
     }
-    if (logger.isDebugEnabled()) {
-      logger.debug(namespace + suffix + " -> " + value);
-    }
+    logger.debug("{}{} -> {}", namespace, suffix, value);
     return value;
   }
 

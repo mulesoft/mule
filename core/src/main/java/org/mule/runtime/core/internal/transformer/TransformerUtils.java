@@ -10,8 +10,6 @@ import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformUnexpectedType;
 
-import static java.lang.String.format;
-
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -120,9 +118,10 @@ public class TransformerUtils {
       }
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("The transformed value is of expected type. Type is: " + ClassUtils.getSimpleName(value.getClass()));
-    }
+    LOGGER.atDebug()
+        .setMessage("The transformed value is of expected type. Type is: {}")
+        .addArgument(() -> value != null ? ClassUtils.getSimpleName(value.getClass()) : "null")
+        .log();
   }
 
   /**
@@ -167,12 +166,10 @@ public class TransformerUtils {
     try {
       return (R) transformer.transform(source);
     } catch (TransformerException e) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(
-                     format("Transformer %s threw exception while trying to transform an object of type %s into a %s",
-                            transformer.getName(), sourceDataType.getType().getName(), resultDataType.getType().getName()),
-                     e);
-      }
+      LOGGER.atDebug()
+          .setCause(e)
+          .log("Transformer {} threw exception while trying to transform an object of type {} into a {}",
+               transformer.getName(), sourceDataType.getType().getName(), resultDataType.getType().getName());
 
       return null;
     }

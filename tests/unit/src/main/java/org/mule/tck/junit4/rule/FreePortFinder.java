@@ -46,8 +46,8 @@ public class FreePortFinder {
     this.minPortNumber = minPortNumber;
     this.portRange = maxPortNumber - minPortNumber;
 
-    logger.debug("Building FreePortFinder {basePath='" + basePath + "', minPortNumber=" + minPortNumber + ", maxPortNumber="
-        + maxPortNumber + "}");
+    logger.debug("Building FreePortFinder {{basePath='{}', minPortNumber={}, maxPortNumber={}}}", basePath, minPortNumber,
+                 maxPortNumber);
   }
 
   public synchronized Integer find() {
@@ -59,7 +59,7 @@ public class FreePortFinder {
 
     for (int i = 0; i < portRange; i++) {
       int port = minPortNumber + random.nextInt(portRange);
-      logger.debug("Trying port " + port + "...");
+      logger.debug("Trying port {}...", port);
       String portFile = port + LOCK_FILE_EXTENSION;
       try (FileChannel channel = open(get(basePath + separator + portFile), CREATE, WRITE, DELETE_ON_CLOSE)) {
         FileLock lock = channel.tryLock();
@@ -69,9 +69,7 @@ public class FreePortFinder {
         }
 
         if (isPortFree(port)) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Found free port: " + port);
-          }
+          logger.debug("Found free port: {}", port);
 
           locks.put(port, lock);
           files.put(port, channel);
@@ -82,13 +80,9 @@ public class FreePortFinder {
         }
       } catch (OverlappingFileLockException e) {
         // The file is locked,
-        if (logger.isDebugEnabled()) {
-          logger.debug("Port selected already locked");
-        }
+        logger.debug("Port selected already locked");
       } catch (IOException e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Error when trying to open port lock file, trying another port");
-        }
+        logger.debug("Error when trying to open port lock file, trying another port");
       }
 
     }
@@ -116,9 +110,7 @@ public class FreePortFinder {
         // Ignore
       }
     } else {
-      if (logger.isInfoEnabled()) {
-        logger.info(format("Port %d was not correctly released", port));
-      }
+      logger.info("Port {} was not correctly released", port);
     }
   }
 

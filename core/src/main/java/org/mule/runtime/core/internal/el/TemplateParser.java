@@ -353,9 +353,7 @@ public final class TemplateParser {
       }
 
       if (value == null) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Value " + propname + " not found in context");
-        }
+        logger.debug("Value {} not found in context", propname);
       } else {
         String matchRegex = Pattern.quote(match);
         String valueString = value.toString();

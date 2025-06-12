@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.exception;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -53,9 +54,7 @@ public abstract class BaseExceptionHandler implements FlowExceptionHandler {
 
       @Override
       public void accept(Exception error) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Routing error in '" + this.toString() + "'...");
-        }
+        LOGGER.debug("Routing error in '{}'...", this);
 
         onError(error);
         router.accept(error);

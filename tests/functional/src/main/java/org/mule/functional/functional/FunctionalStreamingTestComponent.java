@@ -57,11 +57,11 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
   private MuleContext muleContext;
 
   public FunctionalStreamingTestComponent() {
-    logger.debug("creating " + toString());
+    logger.debug("creating {}", this);
   }
 
   public void setEventCallback(EventCallback eventCallback, long targetSize) {
-    logger.debug("setting callback: " + eventCallback + " in " + toString());
+    logger.debug("setting callback: {} in {}", eventCallback, this);
     this.eventCallback = eventCallback;
     this.targetSize = targetSize;
   }
@@ -79,7 +79,7 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
     return CoreEvent.builder(event)
         .message(Message.builder(event.getMessage()).value(ifInputStream(event.getMessage().getPayload().getValue(), in -> {
           try {
-            logger.debug("arrived at " + toString());
+            logger.debug("arrived at {}", this);
             byte[] startData = new byte[STREAM_SAMPLE_SIZE];
             long startDataSize = 0;
             byte[] endData = new byte[STREAM_SAMPLE_SIZE]; // ring buffer
@@ -94,9 +94,7 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
             while (bytesRead >= 0) {
               bytesRead = read(in, buffer);
               if (bytesRead > 0) {
-                if (logger.isDebugEnabled()) {
-                  logger.debug("read " + bytesRead + " bytes");
-                }
+                logger.debug("read {} bytes", bytesRead);
 
                 streamLength += bytesRead;
                 long startOfEndBytes = 0;
@@ -120,9 +118,7 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
             in.close();
 
             e.printStackTrace();
-            if (logger.isDebugEnabled()) {
-              logger.debug("Error on test component", e);
-            }
+            logger.debug("Error on test component", e);
             throw e;
           }
 

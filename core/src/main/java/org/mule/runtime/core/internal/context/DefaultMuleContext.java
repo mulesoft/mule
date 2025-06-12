@@ -673,8 +673,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     ServerNotificationManager notificationManager = getNotificationManager();
     if (notificationManager != null) {
       notificationManager.fireNotification(notification);
-    } else if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("MuleEvent Manager is not enabled, ignoring notification: " + notification);
+    } else {
+      LOGGER.debug("MuleEvent Manager is not enabled, ignoring notification: {}", notification);
     }
   }
 

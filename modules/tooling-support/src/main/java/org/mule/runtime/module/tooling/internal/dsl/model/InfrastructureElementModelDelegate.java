@@ -226,9 +226,7 @@ class InfrastructureElementModelDelegate {
                     || TLS_TRUST_STORE_ELEMENT_IDENTIFIER.equals(name)
                     || TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER.equals(name))) {
 
-                  if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug(format("Skipping unknown parameter with name [%s] for TLSContext", name));
-                  }
+                  LOGGER.debug("Skipping unknown parameter with name [{}] for TLSContext", name);
                   return;
                 }
 

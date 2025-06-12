@@ -61,15 +61,11 @@ public final class GZipCompression implements CompressionStrategy {
     // TODO add strict behaviour as option
     if (bytes == null || isCompressed(bytes)) {
       // nothing to compress
-      if (logger.isDebugEnabled()) {
-        logger.debug("Data already compressed; doing nothing");
-      }
+      logger.debug("Data already compressed; doing nothing");
       return bytes;
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Compressing message of size: " + bytes.length);
-    }
+    logger.debug("Compressing message of size: {}", bytes.length);
 
     ByteArrayOutputStream baos = null;
     GZIPOutputStream gzos = null;
@@ -85,9 +81,7 @@ public final class GZipCompression implements CompressionStrategy {
       byte[] compressedByteArray = baos.toByteArray();
       baos.close();
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Compressed message to size: " + compressedByteArray.length);
-      }
+      logger.debug("Compressed message to size: {}", compressedByteArray.length);
 
       return compressedByteArray;
     } catch (IOException ioex) {
@@ -113,15 +107,11 @@ public final class GZipCompression implements CompressionStrategy {
   public byte[] uncompressByteArray(byte[] bytes) throws IOException {
     if (!isCompressed(bytes)) {
       // nothing to uncompress
-      if (logger.isDebugEnabled()) {
-        logger.debug("Data already uncompressed; doing nothing");
-      }
+      logger.debug("Data already uncompressed; doing nothing");
       return bytes;
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Uncompressing message of size: " + bytes.length);
-    }
+    logger.debug("Uncompressing message of size: {}", bytes.length);
 
     ByteArrayInputStream bais = null;
     GZIPInputStream gzis = null;
@@ -139,9 +129,7 @@ public final class GZipCompression implements CompressionStrategy {
       byte[] uncompressedByteArray = baos.toByteArray();
       baos.close();
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Uncompressed message to size: " + uncompressedByteArray.length);
-      }
+      logger.debug("Uncompressed message to size: {}", uncompressedByteArray.length);
 
       return uncompressedByteArray;
     } catch (IOException ioex) {

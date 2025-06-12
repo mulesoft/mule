@@ -75,9 +75,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
 
   @Override
   public void start(Xid xid, int flags) throws XAException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Thread {} {} work on behalf of transaction branch {}", currentThread(), flagsToString(flags), xid);
-    }
+    LOGGER.debug("Thread {} {} work on behalf of transaction branch {}", currentThread(), flagsToString(flags), xid);
     // A local transaction is already begun
     if (this.localContext != null) {
       throw new XAException(XAException.XAER_PROTO);
@@ -112,9 +110,7 @@ public abstract class DefaultXASession<T extends AbstractXaTransactionContext> i
 
   @Override
   public void end(Xid xid, int flags) throws XAException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Thread {} {} work on behalf of transaction branch {}", currentThread(), flagsToString(flags), xid);
-    }
+    LOGGER.debug("Thread {} {} work on behalf of transaction branch {}", currentThread(), flagsToString(flags), xid);
     // No transaction is already begun
     if (localContext == null) {
       throw new XAException(XAException.XAER_NOTA);

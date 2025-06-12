@@ -24,11 +24,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import jakarta.inject.Inject;
-
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
 
 /**
  * Handler that only accepts CRITICAL errors, logging them before propagating them. This handler is added before any others in all
@@ -82,9 +82,9 @@ public class OnCriticalErrorHandler implements MessagingExceptionHandlerAcceptor
     if (exception instanceof MessagingException && ((MessagingException) exception).getEvent().getError().isPresent()) {
       ErrorType errorType = ((MessagingException) exception).getEvent().getError().get().getErrorType();
       if (overloadMatcher.match(errorType)) {
-        if (logger.isInfoEnabled()) {
-          logger.info(exceptionListener.resolveExceptionAndMessageToLog(exception).toString());
-        }
+        logger.atInfo()
+            .setMessage(() -> exceptionListener.resolveExceptionAndMessageToLog(exception).toString())
+            .log();
         return;
       }
     }

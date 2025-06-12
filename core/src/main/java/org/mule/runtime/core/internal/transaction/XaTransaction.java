@@ -343,9 +343,7 @@ public class XaTransaction extends AbstractTransaction {
   }
 
   protected synchronized void closeResources() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), this);
-    }
+    LOGGER.debug("About to close {} resources for XA tx {}...", resources.size(), this);
 
     Iterator<Map.Entry<ResourceKey, Object>> i = resources.entrySet().iterator();
     while (i.hasNext()) {

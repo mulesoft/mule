@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.joining;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
@@ -22,6 +18,11 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getNullSafeDefaultImplementedType;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isConfigOverride;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.ArrayType;
@@ -111,10 +112,8 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
             .collect(joining(", "));
 
         if (!isBlank(requiredFields)) {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(format("Class '%s' cannot be used with NullSafe Wrapper since it contains non optional fields: [%s]",
-                                clazz.getName(), requiredFields));
-          }
+          LOGGER.debug("Class '{}' cannot be used with NullSafe Wrapper since it contains non optional fields: [{}]",
+                       clazz.getName(), requiredFields);
           wrappedResolver.set(delegate);
           return;
         }
@@ -186,10 +185,10 @@ public class NullSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(format("Class '%s' cannot be used with NullSafe Wrapper since it is of a simple type",
-                              getType(metadataType).getName()));
-        }
+        LOGGER.atDebug()
+            .setMessage("Class '{}' cannot be used with NullSafe Wrapper since it is of a simple type")
+            .addArgument(() -> getType(metadataType).getName())
+            .log();
         wrappedResolver.set(delegate);
       }
     });

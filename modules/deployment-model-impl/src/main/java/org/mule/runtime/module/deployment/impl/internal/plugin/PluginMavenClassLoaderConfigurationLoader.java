@@ -177,11 +177,9 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
       if (!SYSTEM.equals(pluginDependencyInDeployableArtifact.getScope())) {
         return collectTransitiveDependencies(pluginDependencyInDeployableArtifact);
       } else {
-        if (logger.isWarnEnabled()) {
-          logger.warn(format(
-                             "Resolving a mule-plugin '%s' with system scope in order to resolve its class loader configuration. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
-                             pluginDependencyInDeployableArtifact.getDescriptor()));
-        }
+        logger
+            .warn("Resolving a mule-plugin '{}' with system scope in order to resolve its class loader configuration. Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered. Prevent this by using compile scope instead",
+                  pluginDependencyInDeployableArtifact.getDescriptor());
       }
     }
     // Backward compatible resolution for resolving dependencies for a mule-plugin with Mule Maven Client
@@ -189,13 +187,10 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
   }
 
   private List<BundleDependency> resolveArtifactDependenciesUsingMavenClient(File artifactFile, MavenClient mavenClient) {
-    if (logger.isWarnEnabled()) {
-      logger.warn(format(
-                         "Resolving a mule-plugin from '%s' without the deployable resolution context in order to resolve its class loader configuration. "
-                             +
-                             "Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered",
-                         artifactFile));
-    }
+    logger
+        .warn("Resolving a mule-plugin from '{}' without the deployable resolution context in order to resolve its class loader configuration. "
+            + "Dependency resolution may fail due to remote repositories from the deployable artifact will not be considered",
+              artifactFile);
 
     try (MuleSystemPluginMavenReactorResolver reactor =
         new MuleSystemPluginMavenReactorResolver(artifactFile, mavenClient)) {

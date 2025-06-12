@@ -38,8 +38,8 @@ public class DefaultNotificationDispatcher implements NotificationDispatcher {
     ServerNotificationManager notificationManager = context.getNotificationManager();
     if (notificationManager != null) {
       notificationManager.fireNotification(notification);
-    } else if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("MuleEvent Manager is not enabled, ignoring notification: " + notification);
+    } else {
+      LOGGER.debug("MuleEvent Manager is not enabled, ignoring notification: {}", notification);
     }
   }
 

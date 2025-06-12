@@ -113,7 +113,9 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
       try {
         disable(key, dancer);
       } catch (Exception e) {
-        LOGGER.warn("Found exception while trying to stop OAuth dancer for config " + key, e);
+        LOGGER.atWarn()
+            .setCause(e)
+            .log("Found exception while trying to stop OAuth dancer for config {}", key);
       }
     });
     dancers.clear();
@@ -138,7 +140,9 @@ public abstract class OAuthHandler<Dancer> implements Lifecycle {
     try {
       stopIfNeeded(dancer);
     } catch (Exception e) {
-      LOGGER.warn("Found exception trying to Stop OAuth dancer for config " + ownerConfigName, e);
+      LOGGER.atWarn()
+          .setCause(e)
+          .log("Found exception trying to Stop OAuth dancer for config {}", ownerConfigName);
     } finally {
       disposeIfNeeded(dancer, LOGGER);
     }

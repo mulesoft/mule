@@ -115,10 +115,8 @@ public class TypeBasedTransformerResolver implements TransformerResolver, Dispos
 
   protected Transformer getNearestTransformerMatch(List<Transformer> trans, Class input, Class output) throws ResolverException {
     if (trans.size() > 1) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Comparing transformers for best match: source = " + input + " target = " + output
-            + " Possible transformers = " + trans);
-      }
+      logger.debug("Comparing transformers for best match: source = {} target = {} Possible transformers = {}",
+                   input, output, trans);
 
       List<TransformerWeighting> weightings = calculateTransformerWeightings(trans, input, output);
 

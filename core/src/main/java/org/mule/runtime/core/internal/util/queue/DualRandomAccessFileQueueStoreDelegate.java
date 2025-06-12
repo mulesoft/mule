@@ -73,9 +73,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
             : randomAccessFileQueueStore2;
     filesLock = new ReentrantReadWriteLock();
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(String.format("Queue %s has %s messages", queueName, getSize()));
-    }
+    logger.debug("Queue {} has {} messages", queueName, getSize());
   }
 
   // only for testing.
@@ -197,9 +195,7 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
         values.add(deserialize(valueAsByte));
       } catch (Exception e) {
         logger.warn("Failure trying to deserialize value " + e.getMessage());
-        if (logger.isDebugEnabled()) {
-          logger.debug("Failure trying to deserialize value", e);
-        }
+        logger.debug("Failure trying to deserialize value", e);
       }
     }
     return values;
@@ -248,10 +244,8 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
   }
 
   private void switchReadFile() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("switching read file. Random 1 size: " + randomAccessFileQueueStore1.getSize() + " , Random 2 size: "
-          + randomAccessFileQueueStore2.getSize());
-    }
+    logger.debug("switching read file. Random 1 size: {} , Random 2 size: {}",
+                 randomAccessFileQueueStore1.getSize(), randomAccessFileQueueStore2.getSize());
     readFile = nextReadFile();
     queueControlDataFile.writeControlData(writeFile.getFile(), readFile.getFile());
   }
@@ -266,10 +260,8 @@ public class DualRandomAccessFileQueueStoreDelegate extends AbstractQueueStoreDe
               && randomAccessFileQueueStore2.getLength() >= MAXIMUM_QUEUE_FILE_SIZE_IN_BYTES) {
             return;
           }
-          if (logger.isDebugEnabled()) {
-            logger.debug("switching write file. Random 1 size: " + randomAccessFileQueueStore1.getLength() + " , Random 2 size: "
-                + randomAccessFileQueueStore2.getLength());
-          }
+          logger.debug("switching write file. Random 1 size: {} , Random 2 size: {}",
+                       randomAccessFileQueueStore1.getLength(), randomAccessFileQueueStore2.getLength());
           writeFile = (writeFile == randomAccessFileQueueStore1 ? randomAccessFileQueueStore2 : randomAccessFileQueueStore1);
           queueControlDataFile.writeControlData(writeFile.getFile(), readFile.getFile());
         }

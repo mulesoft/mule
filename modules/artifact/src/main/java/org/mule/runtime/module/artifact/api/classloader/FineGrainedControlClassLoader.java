@@ -83,7 +83,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     }
 
     if (isVerboseLogging()) {
-      logLoadingClass(name, lookupStrategy, "Loading class '%s' with '%s' on '%s'", this);
+      logLoadingClass(name, lookupStrategy, "Loading class '{}' with '{}' on '{}'", this);
     }
 
     // Gather information about the exceptions in each of the searched class loaders to provide
@@ -126,23 +126,17 @@ public class FineGrainedControlClassLoader extends URLClassLoader
 
   private void logLoadingClass(String name, LookupStrategy lookupStrategy, String format,
                                FineGrainedControlClassLoader fineGrainedControlClassLoader) {
-    final String message = format(format, name, lookupStrategy, fineGrainedControlClassLoader);
-    doVerboseLogging(message);
+    doVerboseLogging(format, name, lookupStrategy, fineGrainedControlClassLoader);
   }
 
   private void logLoadedClass(String name, Class<?> result) {
     final boolean loadedFromChild = result.getClassLoader() == this;
-    final String message = format("Loaded class '%s' from %s: %s", name, (loadedFromChild ? "child" : "parent"),
-                                  (loadedFromChild ? this : getParent()));
-    doVerboseLogging(message);
+    doVerboseLogging("Loaded class '{}' from {}: {}",
+                     name, (loadedFromChild ? "child" : "parent"), (loadedFromChild ? this : getParent()));
   }
 
-  private void doVerboseLogging(String message) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(message);
-    } else {
-      LOGGER.info(message);
-    }
+  private void doVerboseLogging(String message, Object... args) {
+    LOGGER.info(message, args);
   }
 
   protected Class<?> findParentClass(String name, ClassLoader classLoader) throws ClassNotFoundException {

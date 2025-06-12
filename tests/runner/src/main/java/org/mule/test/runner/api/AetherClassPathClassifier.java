@@ -205,17 +205,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
 
     List<PluginUrlClassification> pluginUrlClassifications =
         buildPluginUrlClassifications(context, directDependencies, rootArtifactType, remoteRepositories);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Resolved plugins: {}", pluginUrlClassifications.stream()
-          .map(pluginUrlClassification -> pluginUrlClassification.getArtifactId()).collect(toList()));
-    }
+    logger.debug("Resolved plugins: {}", pluginUrlClassifications.stream()
+        .map(pluginUrlClassification -> pluginUrlClassification.getArtifactId()).collect(toList()));
 
     List<ServiceUrlClassification> serviceUrlClassifications =
         buildServicesUrlClassification(context, directDependencies, rootArtifactType, remoteRepositories);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Resolved services: {}", serviceUrlClassifications.stream()
-          .map(serviceUrlClassification -> serviceUrlClassification.getName()).collect(toList()));
-    }
+    logger.debug("Resolved services: {}", serviceUrlClassifications.stream()
+        .map(serviceUrlClassification -> serviceUrlClassification.getName()).collect(toList()));
 
     ContainerDependencies containerUrls =
         buildContainerUrlClassification(context, directDependencies, applicationSharedLibArtifactUrlClassifications,

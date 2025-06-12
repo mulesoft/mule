@@ -10,9 +10,9 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
@@ -183,9 +183,9 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
         } catch (Exception e1) {
           e.addSuppressed(e1);
           logger.warn("Can not dispose context. {}", getMessage(e1));
-          if (logger.isDebugEnabled()) {
-            logger.debug("Can not dispose context. {}", getStackTrace(e1));
-          }
+          logger.atDebug()
+              .setMessage("Can not dispose context. {}").addArgument(() -> getStackTrace(e1))
+              .log();
         }
       }
       throw e;

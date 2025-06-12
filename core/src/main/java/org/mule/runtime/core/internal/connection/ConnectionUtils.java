@@ -94,13 +94,17 @@ public final class ConnectionUtils {
   }
 
   public static <C> void logPoolStatus(Logger logger, GenericObjectPool<C> pool, String poolId) {
-    if (logger.isDebugEnabled()) {
-      String maxActive =
-          pool.getMaxTotal() < 0 || pool.getMaxTotal() == MAX_VALUE ? "unlimited" : String.valueOf(pool.getMaxTotal());
-      String maxIdle = pool.getMaxIdle() < 0 ? "unlimited" : String.valueOf(pool.getMaxIdle());
-      logger
-          .debug("Status for pool {}: {} connections are active out of {} max active limit, {} connections are idle out of {} max idle limit",
-                 poolId, pool.getNumActive(), maxActive, pool.getNumIdle(), maxIdle);
-    }
+    logger.atDebug()
+        .setMessage("Status for pool {}: {} connections are active out of {} max active limit, {} connections are idle out of {} max idle limit")
+        .addArgument(poolId)
+        .addArgument(pool.getNumActive())
+        .addArgument(() -> pool.getMaxTotal() < 0 || pool.getMaxTotal() == MAX_VALUE
+            ? "unlimited"
+            : String.valueOf(pool.getMaxTotal()))
+        .addArgument(pool.getNumIdle())
+        .addArgument(() -> pool.getMaxIdle() < 0
+            ? "unlimited"
+            : String.valueOf(pool.getMaxIdle()))
+        .log();
   }
 }

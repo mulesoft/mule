@@ -342,14 +342,12 @@ public class DefaultToolingService implements ToolingService {
                                               + toolingServiceAppsFolder),
                                           this);
       }
-      if (logger.isDebugEnabled()) {
-        logger.debug("Created tooling service resources folder at: " + toolingServiceAppsFolder);
-      }
+      logger.debug("Created tooling service resources folder at: {}", toolingServiceAppsFolder);
     } else {
       try {
         cleanDirectory(toolingServiceAppsFolder);
       } catch (IOException e) {
-        logger.warn("Could not clean up tooling service resources folder at: " + toolingServiceAppsFolder);
+        logger.warn("Could not clean up tooling service resources folder at: {}", toolingServiceAppsFolder);
       }
     }
     return toolingServiceAppsFolder;
@@ -368,7 +366,7 @@ public class DefaultToolingService implements ToolingService {
       try {
         cleanDirectory(toolingServiceAppsFolder);
       } catch (Exception e) {
-        logger.warn("Couldn't clean up tooling service resources folder located at: " + toolingServiceAppsFolder);
+        logger.warn("Couldn't clean up tooling service resources folder located at: {}", toolingServiceAppsFolder);
       }
     }
   }

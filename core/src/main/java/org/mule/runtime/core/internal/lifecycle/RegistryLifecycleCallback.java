@@ -10,7 +10,6 @@ import static org.mule.runtime.api.exception.ExceptionHelper.unwrap;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 
-import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -78,9 +77,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
     LifecyclePhase phase = registryLifecycleManager.getPhase(phaseName);
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Applying lifecycle phase: {} for registry: {}", phase, object.getClass().getSimpleName());
-    }
+    LOGGER.debug("Applying lifecycle phase: {} for registry: {}", phase, object.getClass().getSimpleName());
 
     doApplyLifecycle(phase, new HashSet<>(), registryLifecycleManager.getObjectsForPhase(phase));
 
@@ -93,9 +90,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
       if (target == null || duplicates.contains(target)) {
         continue;
       }
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("lifecycle phase: {} for object: {}", phase.getName(), target.getClass().getSimpleName());
-      }
+      LOGGER.debug("lifecycle phase: {} for object: {}", phase.getName(), target.getClass().getSimpleName());
       applyLifecycle(phase, duplicates, target);
     }
   }
@@ -107,26 +102,22 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
         duplicates.add(target);
         interceptor.afterPhaseExecution(phase, target, empty());
       } else {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(format("Skipping the application of the '%s' lifecycle phase over a certain object "
-              + "because a %s interceptor of type [%s] indicated so. Object is: %s",
-                              phase.getName(), LifecycleInterceptor.class.getSimpleName(),
-                              interceptor.getClass().getName(), target.getClass().getSimpleName()));
-        }
+        LOGGER.debug("Skipping the application of the '{}' lifecycle phase over a certain object "
+            + "because a {} interceptor of type [{}] indicated so. Object is: {}",
+                     phase.getName(), LifecycleInterceptor.class.getSimpleName(),
+                     interceptor.getClass().getName(), target.getClass().getSimpleName());
       }
     } catch (Exception e) {
       interceptor.afterPhaseExecution(phase, target, of(e));
       if (getProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR) == null
           && (phase.getName().equals(Disposable.PHASE_NAME) || phase.getName().equals(Stoppable.PHASE_NAME))) {
-        LOGGER.info(format("Failure executing phase %s over object %s%s, error is: %s(%s)", phase.getName(),
-                           target.getClass().getSimpleName(),
-                           target instanceof Component ? (": " + ((Component) target).getRepresentation()) : "",
-                           e.getClass().getName(),
-                           e.getMessage()),
+        LOGGER.info("Failure executing phase {} over object {}{}, error is: {}({})",
+                    phase.getName(),
+                    target.getClass().getSimpleName(),
+                    target instanceof Component ? (": " + ((Component) target).getRepresentation()) : "",
+                    e.getClass().getName(),
                     e.getMessage());
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(e.getMessage(), e);
-        }
+        LOGGER.atDebug().setCause(e).log(e.getMessage());
       } else {
         throw e;
       }

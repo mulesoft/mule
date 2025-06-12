@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notificationListenerSubscriptionAlreadyRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyIsNotSupportedType;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.toClass;
 
-import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
+
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
+import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,10 +54,7 @@ public class Configuration {
     }
     Set<Class<? extends Notification>> events = interfaceToTypes.get(iface);
     events.add(type);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Registered event type: " + type);
-      logger.debug("Binding listener type '" + iface + "' to event type '" + type + "'");
-    }
+    logger.debug("Registered event type: {}, bound to listener type {}", type, iface);
   }
 
   /**

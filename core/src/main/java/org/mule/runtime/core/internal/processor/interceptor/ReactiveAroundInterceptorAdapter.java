@@ -84,10 +84,11 @@ public class ReactiveAroundInterceptorAdapter extends ReactiveInterceptorAdapter
     final ReactiveInterceptionAction reactiveInterceptionAction =
         new ReactiveInterceptionAction(interceptionEvent, next, ctx, component, errorTypeLocator);
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Calling around() for '{}' in processor '{}'...", interceptor,
-                   ((Component) component).getLocation().getLocation());
-    }
+    LOGGER.atDebug()
+        .setMessage("Calling around() for '{}' in processor '{}'...")
+        .addArgument(interceptor)
+        .addArgument(() -> ((Component) component).getLocation().getLocation())
+        .log();
 
     try {
       return withContextClassLoader(interceptor.getClassLoader(), () -> interceptor

@@ -171,10 +171,8 @@ public class TransactionJournal<T, K extends JournalEntry<T>> {
   }
 
   private void debugLogFilesSwap() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Changing files, current file size: " + currentLogFile.fileLength() + " other file size: "
-          + notCurrentLogFile.fileLength());
-    }
+    logger.debug("Changing files, current file size: {} other file size: {}",
+                 currentLogFile.fileLength(), notCurrentLogFile.fileLength());
   }
 
   private void changeCurrentLogFile() {

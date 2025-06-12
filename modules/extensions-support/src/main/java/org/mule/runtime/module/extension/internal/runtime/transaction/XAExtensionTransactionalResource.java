@@ -95,10 +95,10 @@ public class XAExtensionTransactionalResource<T extends XATransactionalConnectio
     try {
       getConnectionHandler().release();
     } catch (Exception e) {
-      if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Exception while explicitly closing the xaConnection (some providers require this). "
-            + "The exception will be ignored and only logged: " + e.getMessage(), e);
-      }
+      LOGGER.atInfo()
+          .setCause(e)
+          .log("Exception while explicitly closing the xaConnection (some providers require this). "
+              + "The exception will be ignored and only logged: {}", e.getMessage());
     }
   }
 

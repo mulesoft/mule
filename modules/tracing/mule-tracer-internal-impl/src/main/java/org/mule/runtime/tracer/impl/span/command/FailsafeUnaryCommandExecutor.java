@@ -40,9 +40,7 @@ public class FailsafeUnaryCommandExecutor<A, R> {
       if (propagateExceptions) {
         throw e;
       }
-      if (customLogger.isWarnEnabled()) {
-        customLogger.warn(errorMessage, e);
-      }
+      customLogger.warn(errorMessage, e);
     }
 
     return onFailureReturn;

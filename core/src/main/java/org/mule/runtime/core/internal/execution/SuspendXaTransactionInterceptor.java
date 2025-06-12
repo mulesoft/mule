@@ -36,9 +36,7 @@ public class SuspendXaTransactionInterceptor<T> implements ExecutionInterceptor<
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     byte action = transactionConfig.getAction();
     if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN) && tx != null && tx.isXA()) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("suspending XA tx " + action + ", " + "current TX: " + tx);
-      }
+      logger.debug("suspending XA tx {}, current TX: {}", action, tx);
       suspendedXATx = tx;
       suspendXATransaction(suspendedXATx);
     }

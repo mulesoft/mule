@@ -37,9 +37,7 @@ public class ResolvePreviousTransactionInterceptor<T> implements ExecutionInterc
     Transaction transactionBeforeTemplate = TransactionCoordination.getInstance().getTransaction();
     if ((action == TransactionConfig.ACTION_NONE || action == TransactionConfig.ACTION_ALWAYS_BEGIN)
         && transactionBeforeTemplate != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(action + ", " + "current TX: " + transactionBeforeTemplate);
-      }
+      logger.debug("{}, current TX: {}", action, transactionBeforeTemplate);
 
       resolveTransaction();
     }

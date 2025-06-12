@@ -64,11 +64,11 @@ public class DefaultExtensionModelLoaderRepository implements ExtensionModelLoad
     Collection<ExtensionModelLoader> loaders = lookupExtensionModelLoaders()
         .collect(toList());
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("The following {} were discovered: [{}]",
-                   ExtensionModelLoader.class.getSimpleName(),
-                   loaders.stream().map(l -> l.getId()).collect(joining(", ")));
-    }
+    LOGGER.atDebug()
+        .setMessage("The following {} were discovered: [{}]")
+        .addArgument(ExtensionModelLoader.class.getSimpleName())
+        .addArgument(() -> loaders.stream().map(l -> l.getId()).collect(joining(", ")))
+        .log();
 
     return loaders;
   }
@@ -98,9 +98,10 @@ public class DefaultExtensionModelLoaderRepository implements ExtensionModelLoad
 
     extensionModelLoaders.forEach(loader -> this.extensionModelLoaders.put(loader.getId(), loader));
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("ExtensionModelLoader registered identifiers: {}", printExtensionModelLoaderIDs());
-    }
+    LOGGER.atDebug()
+        .setMessage("ExtensionModelLoader registered identifiers: {}")
+        .addArgument(this::printExtensionModelLoaderIDs)
+        .log();
   }
 
   private void assertLoaderLookupUniqueness(Collection<ExtensionModelLoader> extensionModelLoaders) {

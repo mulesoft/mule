@@ -10,12 +10,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -42,7 +44,7 @@ public class JarUtilsTestCase extends AbstractMuleTestCase {
       jarEntryFile = File.createTempFile("test", "file");
       byte[] jarEntryBytes = jarEntryString.getBytes();
 
-      LinkedHashMap jarEntries = new LinkedHashMap();
+      LinkedHashMap<String, Object> jarEntries = new LinkedHashMap<>();
       jarEntries.put("META-INF/string", jarEntryString);
       jarEntries.put("META-INF/file", jarEntryFile);
       jarEntries.put("META-INF/byte", jarEntryBytes);
@@ -53,23 +55,23 @@ public class JarUtilsTestCase extends AbstractMuleTestCase {
       JarUtils.createJarFileEntries(jarFile, jarEntries);
 
       // Append entry to jar file
-      LinkedHashMap additionalJarEntries = new LinkedHashMap();
+      LinkedHashMap<String, Object> additionalJarEntries = new LinkedHashMap<>();
       additionalJarEntries.put("META-INF/append/string", jarEntryString);
       jarEntries.put("META-INF/append/string", jarEntryString);
       JarUtils.appendJarFileEntries(jarFile, additionalJarEntries);
 
       // Read jar file and verify previously written values
-      LinkedHashMap readJarEntries = JarUtils.readJarFileEntries(jarFile);
+      Map<String, Object> readJarEntries = JarUtils.readJarFileEntries(jarFile);
 
       assertEquals(jarEntries.size(), readJarEntries.size());
 
-      Iterator jarEntryIter = jarEntries.keySet().iterator();
-      Iterator readJarEntryIter = readJarEntries.keySet().iterator();
+      Iterator<String> jarEntryIter = jarEntries.keySet().iterator();
+      Iterator<String> readJarEntryIter = readJarEntries.keySet().iterator();
 
       // Iterate through original and read jar entries, which must be equal.
       while (jarEntryIter.hasNext()) {
-        String jarEntryPath = (String) jarEntryIter.next();
-        String readJarEntryPath = (String) readJarEntryIter.next();
+        String jarEntryPath = jarEntryIter.next();
+        String readJarEntryPath = readJarEntryIter.next();
 
         assertNotNull(jarEntryPath);
         assertNotNull(readJarEntryPath);

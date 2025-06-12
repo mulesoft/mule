@@ -46,14 +46,10 @@ public abstract class AbstractArtifactAgnosticService {
     if (application == null) {
       long startTime = currentTimeMillis();
       try {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Creating application");
-        }
+        LOGGER.debug("Creating application");
         application = applicationSupplier.get();
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Application: '{}' has been created in [{}ms]", application.getArtifactId(),
-                       currentTimeMillis() - startTime);
-        }
+        LOGGER.debug("Application: '{}' has been created in [{}ms]", application.getArtifactId(),
+                     currentTimeMillis() - startTime);
       } catch (Exception e) {
         Optional<RuntimeException> bundleNotFoundException = getCausalChain(e).stream()
             .filter(exception -> exception.getClass().equals(ArtifactNotFoundException.class)
@@ -67,9 +63,7 @@ public abstract class AbstractArtifactAgnosticService {
       }
       try {
         startTime = currentTimeMillis();
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Starting application: '{}'", application.getArtifactId());
-        }
+        LOGGER.debug("Starting application: '{}'", application.getArtifactId());
         application.install();
 
         if (isLazyInit()) {
@@ -91,10 +85,8 @@ public abstract class AbstractArtifactAgnosticService {
         }
 
         application.start();
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Application: '{}' has been started in [{}ms]", application.getArtifactId(),
-                       currentTimeMillis() - startTime);
-        }
+        LOGGER.debug("Application: '{}' has been started in [{}ms]", application.getArtifactId(),
+                     currentTimeMillis() - startTime);
       } catch (Exception e) {
         // Clean everything if there is an error
         dispose();
@@ -151,9 +143,7 @@ public abstract class AbstractArtifactAgnosticService {
       runnable.run();
     } catch (Exception e) {
       LOGGER.warn(e.getMessage());
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(e.getMessage(), e);
-      }
+      LOGGER.atDebug().setCause(e).log(e.getMessage());
     }
   }
 

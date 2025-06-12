@@ -225,7 +225,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
     if (cursorProviderFactory == null) {
       if (isPagedOperation(componentModel)) {
-        cursorProviderFactory = (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory();
+        cursorProviderFactory = streamingManager.forObjects().getDefaultCursorProviderFactory();
       } else {
         cursorProviderFactory = streamingManager.forBytes().getDefaultCursorProviderFactory();
       }
@@ -237,9 +237,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       classLoader = from(classLoader, ((RegionClassLoader) classLoader.getParent()).getOwnerClassLoader().getClassLoader());
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Starting extensions with %s", classLoader));
-    }
+    LOGGER.debug("Starting extensions with {}", classLoader);
 
     withContextClassLoader(classLoader, () -> {
       Optional<ValueResolver<ConfigurationProvider>> configProviderResolver = findConfigurationProviderResolver();
@@ -879,9 +877,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   private MetadataCacheId getMetadataCacheId() {
     return cacheIdGenerator.getIdForGlobalMetadata((ComponentAst) this.getAnnotation(ANNOTATION_COMPONENT_CONFIG))
         .map(id -> {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(id.getParts().toString());
-          }
+          LOGGER.debug("{}", id.getParts());
           return id;
         })
         .orElseThrow(() -> new IllegalStateException(

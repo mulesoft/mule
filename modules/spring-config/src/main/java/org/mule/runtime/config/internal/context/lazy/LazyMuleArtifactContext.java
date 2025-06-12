@@ -458,9 +458,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
               .anyMatch(missingDep -> missingDep.isSatisfiedBy(componentModel)));
     } else {
       postProcessedGraph.getMissingDependencies().stream().forEach(missingDep -> {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Ignoring dependency {} because it does not exist.", missingDep);
-        }
+        LOGGER.debug("Ignoring dependency {} because it does not exist.", missingDep);
       });
     }
   }

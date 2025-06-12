@@ -80,9 +80,7 @@ public abstract class AbstractDeclaredExceptionListener extends AbstractMessageP
   }
 
   protected void doInitialise() throws InitialisationException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Initialising exception listener: " + toString());
-    }
+    logger.debug("Initialising exception listener: {}", this);
   }
 
   @Override

@@ -73,13 +73,13 @@ public class LifecycleListener implements ArtifactLifecycleListener {
 
   private void fail(String message) {
     AssertionError error = new AssertionError(message);
-    LOGGER.error(message, error);
+    LOGGER.atError().setCause(error).log(message);
     throw error;
   }
 
   private void fail(String message, Throwable cause) {
     AssertionError error = new AssertionError(message, cause);
-    LOGGER.error(message, error);
+    LOGGER.atError().setCause(error).log(message);
     throw error;
   }
 }

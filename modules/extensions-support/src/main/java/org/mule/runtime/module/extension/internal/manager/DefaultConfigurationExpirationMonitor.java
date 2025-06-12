@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.manager;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
-import com.google.common.collect.Multimap;
-
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
+
+import com.google.common.collect.Multimap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,10 +137,10 @@ public final class DefaultConfigurationExpirationMonitor implements Configuratio
     LOGGER.debug("Running configuration expiration cycle");
     try {
       Multimap<String, ConfigurationInstance> expired = extensionRegistry.getExpiredConfigs();
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(expired.isEmpty() ? "No expired configuration instances were found" : "Found {} expired configurations",
-                     expired.size());
-      }
+      LOGGER.debug(expired.isEmpty()
+          ? "No expired configuration instances were found"
+          : "Found {} expired configurations",
+                   expired.size());
 
       expired.entries().stream().forEach(entry -> handleExpiration(entry.getKey(), entry.getValue()));
     } catch (Exception e) {

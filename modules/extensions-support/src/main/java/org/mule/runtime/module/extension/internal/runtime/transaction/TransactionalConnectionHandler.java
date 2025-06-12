@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.transaction;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -63,9 +62,10 @@ public final class TransactionalConnectionHandler<T extends TransactionalConnect
     try {
       forceRollback();
     } catch (Exception e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn(format("Failed to rollback transaction while invalidating connection %s. %s", e, e.getMessage()), e);
-      }
+      LOGGER.atWarn()
+          .setCause(e)
+          .log("Failed to rollback transaction while invalidating connection {}. {}",
+               e, e.getMessage());
     } finally {
       connectionHandler.invalidate();
     }

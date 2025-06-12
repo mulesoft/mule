@@ -178,9 +178,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
   }
 
   private String getDescriptorContent(File jsonFile) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Loading artifact descriptor from '{}'..." + jsonFile.getAbsolutePath());
-    }
+    LOGGER.debug("Loading artifact descriptor from '{}'...", jsonFile.getAbsolutePath());
 
     try (InputStream stream = new BufferedInputStream(new FileInputStream(jsonFile))) {
       return IOUtils.toString(stream);

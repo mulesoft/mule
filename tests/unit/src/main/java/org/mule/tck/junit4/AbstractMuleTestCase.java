@@ -18,7 +18,6 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import static java.lang.Boolean.valueOf;
-import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.getAllStackTraces;
 import static java.util.Collections.singletonMap;
@@ -42,7 +41,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.api.util.SystemUtils;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.rule.LogCleanup;
@@ -404,10 +402,10 @@ public abstract class AbstractMuleTestCase {
       }
     }
     if (filteredThreads > 0) {
-      logThreadsResult(format("Hung threads count: %d. Test case: %s. Thread names:%s", filteredThreads, testCaseName,
-                              builder.toString()));
+      LOGGER.warn("Hung threads count: {}. Test case: {}. Thread names:{}",
+                  filteredThreads, testCaseName, builder);
     } else {
-      logThreadsResult(format("No hung threads. Test case: %s", testCaseName));
+      LOGGER.warn("No hung threads. Test case: {}", testCaseName);
     }
   }
 
@@ -434,12 +432,6 @@ public abstract class AbstractMuleTestCase {
     when(componentLocation.getLine()).thenReturn(OptionalInt.empty());
     when(componentLocation.getFileName()).thenReturn(empty());
     component.setAnnotations(singletonMap(LOCATION_KEY, componentLocation));
-  }
-
-  private static final transient String THREAD_RESULT_LINE = StringUtils.repeat('-', 80);
-
-  private static void logThreadsResult(String result) {
-    LOGGER.warn(format("\n%s\n%s\n%s\n", THREAD_RESULT_LINE, result, THREAD_RESULT_LINE));
   }
 
   /**

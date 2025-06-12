@@ -312,9 +312,7 @@ public final class PropertiesUtils {
 
     while (allPropertiesResources.hasMoreElements()) {
       URL propertiesResource = allPropertiesResources.nextElement();
-      if (logger.isDebugEnabled()) {
-        logger.debug("Reading properties from: {}", propertiesResource.toString());
-      }
+      logger.debug("Reading properties from: {}", propertiesResource);
       Properties properties = new OrderedProperties();
       try (InputStream resourceStream = new BufferedInputStream(getInputStreamWithCacheControl(propertiesResource))) {
         properties.load(resourceStream);

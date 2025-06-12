@@ -46,17 +46,17 @@ class FallbackArtifactConfigurationProcessor implements ArtifactConfigurationPro
 
     try {
       ArtifactContext createdArtifactContext = primary.createArtifactContext(artifactContextConfiguration);
-      LOGGER.debug("Successfully created context with " + primary.toString() + " for deployment "
-          + createdArtifactContext.getMuleContext().getConfiguration().getId());
+      LOGGER.debug("Successfully created context with {} for deployment {}",
+                   primary,
+                   createdArtifactContext.getMuleContext().getConfiguration().getId());
       return createdArtifactContext;
     } catch (ConfigurationException e) {
-      String message = "Falling back to " + fallback.toString() + " for deployment "
-          + artifactContextConfiguration.getMuleContext().getConfiguration().getId();
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.warn(message, e);
-      } else {
-        LOGGER.warn(message + ": " + e.toString());
-      }
+      LOGGER.atWarn()
+          .setCause(e)
+          .log("Falling back to {} for deployment {}: {}",
+               fallback,
+               artifactContextConfiguration.getMuleContext().getConfiguration().getId(),
+               e);
 
       try {
         return fallback.createArtifactContext(artifactContextConfiguration);

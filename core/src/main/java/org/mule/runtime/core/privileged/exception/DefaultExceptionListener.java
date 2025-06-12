@@ -61,9 +61,7 @@ public final class DefaultExceptionListener implements Initialisable {
    */
   @Override
   public final synchronized void initialise() throws InitialisationException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Initialising exception listener: " + toString());
-    }
+    logger.debug("Initialising exception listener: {}", this);
     if (representation == null) {
       representation = this.getClass().getSimpleName();
     }
@@ -169,7 +167,7 @@ public final class DefaultExceptionListener implements Initialisable {
     if (notificationFirer != null) {
       notificationFirer.dispatch(notification);
     } else if (logger.isWarnEnabled()) {
-      logger.debug("notificationFirer is not yet available for firing notifications, ignoring event: " + notification);
+      logger.debug("notificationFirer is not yet available for firing notifications, ignoring event: {}", notification);
     }
   }
 

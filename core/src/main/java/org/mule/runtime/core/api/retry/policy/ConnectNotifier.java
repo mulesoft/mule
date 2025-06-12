@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.notification.ConnectionNotification.CONNECTION_CONNECTED;
 import static org.mule.runtime.api.notification.ConnectionNotification.CONNECTION_FAILED;
+import static org.mule.runtime.core.internal.config.ExceptionHelper.writeException;
 
 import org.mule.runtime.api.notification.ConnectionNotification;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryNotifier;
-import org.mule.runtime.core.internal.config.ExceptionHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,7 @@ public final class ConnectNotifier implements RetryNotifier {
 
   @Override
   public void onSuccess(RetryContext context) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Successfully connected to " + context.getDescription());
-    }
+    logger.debug("Successfully connected to {}", context.getDescription());
 
     fireConnectNotification(CONNECTION_CONNECTED, context.getDescription(), context);
   }
@@ -37,15 +36,13 @@ public final class ConnectNotifier implements RetryNotifier {
   public void onFailure(RetryContext context, Throwable e) {
     fireConnectNotification(CONNECTION_FAILED, context.getDescription(), context);
 
-    if (logger.isErrorEnabled()) {
-      StringBuilder msg = new StringBuilder(512);
-      msg.append("Failed to connect/reconnect: ").append(context.getDescription());
-      Throwable t = ExceptionHelper.getRootException(e);
-      msg.append(". Root Exception was: ").append(ExceptionHelper.writeException(t));
-      if (logger.isTraceEnabled()) {
-        t.printStackTrace();
-      }
-      logger.error(msg.toString());
+    Throwable t = getRootException(e);
+    logger.atError().setMessage("Failed to connect/reconnect: {}. Root Exception was: {}")
+        .addArgument(context.getDescription())
+        .addArgument(() -> writeException(getRootException(e)))
+        .log();
+    if (logger.isTraceEnabled()) {
+      t.printStackTrace();
     }
   }
 

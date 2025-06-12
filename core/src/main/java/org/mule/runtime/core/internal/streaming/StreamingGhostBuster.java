@@ -126,9 +126,7 @@ public class StreamingGhostBuster implements Lifecycle {
         }
       } catch (InterruptedException e) {
         currentThread().interrupt();
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Streaming GC thread was interrupted. Finalizing.");
-        }
+        LOGGER.debug("Streaming GC thread was interrupted. Finalizing.");
       }
     }
   }
@@ -143,9 +141,7 @@ public class StreamingGhostBuster implements Lifecycle {
       }
       ghost.dispose();
     } catch (Exception e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Found exception trying to dispose phantom CursorProvider", e);
-      }
+      LOGGER.warn("Found exception trying to dispose phantom CursorProvider", e);
     } finally {
       ghost.clear();
     }

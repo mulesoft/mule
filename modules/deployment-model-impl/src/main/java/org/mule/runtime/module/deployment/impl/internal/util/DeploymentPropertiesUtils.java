@@ -66,7 +66,9 @@ public class DeploymentPropertiesUtils {
       String deploymentPropertiesPath = getDeploymentPropertiesPath(artifactName);
       return of(getDeploymentProperties(deploymentPropertiesPath, fileName));
     } catch (IOException e) {
-      LOGGER.error("Failed to load persisted deployment property for artifact " + artifactName, e);
+      LOGGER.atError()
+          .setCause(e)
+          .log("Failed to load persisted deployment property for artifact {}", artifactName);
       return empty();
     }
   }

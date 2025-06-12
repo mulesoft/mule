@@ -152,7 +152,9 @@ public abstract class LifecycleAwareConfigurationProvider extends AbstractCompon
         return null;
       });
     } catch (Exception e) {
-      LOGGER.error("Could not dispose configuration provider of name " + getName(), e);
+      LOGGER.atError()
+          .setCause(e)
+          .log("Could not dispose configuration provider of name {}", getName());
     }
   }
 

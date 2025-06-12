@@ -38,9 +38,7 @@ public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycl
   @Override
   public synchronized void fireInitialisePhase(LifecycleCallback<T> callback) throws InitialisationException {
     checkPhase(Initialisable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info("Initialising Bean: " + lifecycleManagerId);
-    }
+    logger.info("Initialising Bean: {}", lifecycleManagerId);
     try {
       invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
     } catch (InitialisationException e) {
@@ -53,27 +51,21 @@ public class DefaultLifecycleManager<T extends Lifecycle> extends SimpleLifecycl
   @Override
   public synchronized void fireStartPhase(LifecycleCallback<T> callback) throws MuleException {
     checkPhase(Startable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info("Starting Bean: " + lifecycleManagerId);
-    }
+    logger.info("Starting Bean: {}", lifecycleManagerId);
     invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
   }
 
   @Override
   public synchronized void fireStopPhase(LifecycleCallback<T> callback) throws MuleException {
     checkPhase(Stoppable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info("Stopping Bean: " + lifecycleManagerId);
-    }
+    logger.info("Stopping Bean: {}", lifecycleManagerId);
     invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
   }
 
   @Override
   public synchronized void fireDisposePhase(LifecycleCallback<T> callback) {
     checkPhase(Disposable.PHASE_NAME);
-    if (logger.isInfoEnabled()) {
-      logger.info("Disposing Bean: " + lifecycleManagerId);
-    }
+    logger.info("Disposing Bean: {}", lifecycleManagerId);
     try {
       invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
     } catch (LifecycleException e) {

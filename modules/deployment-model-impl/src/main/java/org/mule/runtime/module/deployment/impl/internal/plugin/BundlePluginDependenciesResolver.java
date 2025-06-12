@@ -237,12 +237,9 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                                                                                                                          .build()))
                                                                                         .build());
                   } else {
-                    if (logger.isDebugEnabled()) {
-                      logger.debug(format(
-                                          "Resolving mule-plugin '%s' as transitive dependency ['%s' -> '%s]'",
-                                          dependency.getDescriptor(), pluginDescriptor.getBundleDescriptor(),
-                                          dependency.getDescriptor()));
-                    }
+                    logger.debug("Resolving mule-plugin '{}' as transitive dependency ['{}' -> '{}]'",
+                                 dependency.getDescriptor(), pluginDescriptor.getBundleDescriptor(),
+                                 dependency.getDescriptor());
                     // This mechanism is needed for tooling as stated in MULE-10874
                     ArtifactPluginDescriptor artifactPluginDescriptor =
                         artifactDescriptorFactory
@@ -259,12 +256,10 @@ public class BundlePluginDependenciesResolver implements PluginDependenciesResol
                         resolvedPluginApplicationLevelOptional.get().getBundleDescriptor();
                     if (org.apache.commons.lang3.ObjectUtils.notEqual(availablePluginBundleDescriptor.getVersion(),
                                                                       dependency.getDescriptor().getVersion())) {
-                      if (logger.isDebugEnabled()) {
-                        logger.debug(format(
-                                            "Transitive plugin dependency '[%s -> %s]' is minor than the one resolved for the application '%s', it will be ignored.",
-                                            pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
-                                            availablePluginBundleDescriptor));
-                      }
+                      logger
+                          .debug("Transitive plugin dependency '[{} -> {}]' is minor than the one resolved for the application '{}', it will be ignored.",
+                                 pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
+                                 availablePluginBundleDescriptor);
                     }
                   }
                 }

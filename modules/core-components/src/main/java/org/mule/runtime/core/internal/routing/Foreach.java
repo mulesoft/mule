@@ -176,9 +176,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     } else {
       result = getSplittingStrategy().split(request);
     }
-    if (LOGGER.isDebugEnabled() && !result.hasNext()) {
-      LOGGER.debug(
-                   "<foreach> expression \"{}\" returned no results. If this is not expected please check your expression",
+    if (!result.hasNext()) {
+      LOGGER.debug("<foreach> expression \"{}\" returned no results. If this is not expected please check your expression",
                    expression);
     }
     return result;

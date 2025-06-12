@@ -186,9 +186,7 @@ public class InMemoryExpirableObjectStore<T extends Serializable> extends Abstra
   public void expire() {
     int expiredEntries = doTrimAndExpire();
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Expired " + expiredEntries + " old entries");
-    }
+    logger.debug("Expired {} old entries", expiredEntries);
   }
 
   private int trimToMaxSize(int currentSize) {
@@ -203,9 +201,7 @@ public class InMemoryExpirableObjectStore<T extends Serializable> extends Abstra
         currentSize--;
       }
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Expired " + excess + " excess entries");
-      }
+      logger.debug("Expired {} excess entries", excess);
     }
     return excess;
   }

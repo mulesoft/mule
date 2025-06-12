@@ -71,11 +71,12 @@ public abstract class AbstractQueueManager
         throw new MuleRuntimeException(createStaticMessage(format("A queue with name %s is in use so we cannot change it's configuration",
                                                                   queueName)));
       }
+
       if (LOGGER.isDebugEnabled()) {
         if (queueConfigurations.containsKey(queueName)) {
           QueueConfiguration oldConfiguration = queueConfigurations.get(queueName);
-          LOGGER.debug(format("Replacing queue %s configuration: %s with new newConfig: %s", queueName, oldConfiguration,
-                              newConfig));
+          LOGGER.debug("Replacing queue {} configuration: {} with new newConfig: {}",
+                       queueName, oldConfiguration, newConfig);
         }
       }
       queueConfigurations.put(queueName, newConfig);

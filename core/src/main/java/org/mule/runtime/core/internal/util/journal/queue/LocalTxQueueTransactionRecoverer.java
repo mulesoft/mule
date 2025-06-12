@@ -45,13 +45,9 @@ public class LocalTxQueueTransactionRecoverer {
    * Clears the transaction log after processing all the log entries since does entries are not longer required.
    */
   public void recover() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Executing transaction recovery");
-    }
+    LOGGER.debug("Executing transaction recovery");
     Multimap<Integer, LocalQueueTxJournalEntry> allEntries = localTxQueueTransactionJournal.getAllLogEntries();
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Found " + allEntries.size() + " txs to recover");
-    }
+    LOGGER.debug("Found {} txs to recover", allEntries.size());
     int txRecovered = 0;
     for (Integer txId : allEntries.keySet()) {
       Collection<LocalQueueTxJournalEntry> entries = allEntries.get(txId);
@@ -66,9 +62,7 @@ public class LocalTxQueueTransactionRecoverer {
           RecoverableQueueStore queue = queueProvider.getRecoveryQueue(queueName);
           Serializable polledValue = logEntry.getValue();
           if (!queue.contains(polledValue)) {
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("re-adding polled element that was not commited to queue " + queue.getName());
-            }
+            LOGGER.debug("re-adding polled element that was not commited to queue {}", queue.getName());
             try {
               queue.putNow(polledValue);
             } catch (InterruptedException e) {
@@ -80,17 +74,13 @@ public class LocalTxQueueTransactionRecoverer {
           String queueName = logEntry.getQueueName();
           RecoverableQueueStore queue = queueProvider.getRecoveryQueue(queueName);
           if (queue.contains(offeredValue)) {
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("removing offer element that was not commited to queue " + queue.getName());
-            }
+            LOGGER.debug("removing offer element that was not commited to queue {}", queue.getName());
             queue.remove(offeredValue);
           }
         }
       }
     }
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Recovered " + txRecovered + " txs to recover");
-    }
+    LOGGER.debug("Recovered {} txs to recover", txRecovered);
     this.localTxQueueTransactionJournal.clear();
   }
 
