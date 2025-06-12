@@ -563,7 +563,7 @@ class DeclarationBasedElementModelFactory {
       ComponentConfiguration result = mapConfig.build();
       parentConfig.withNestedComponent(result);
       parentElement.containing(mapElement.withConfig(result).build());
-    } else if (generic.isEmpty()) {
+    } else if (!generic.isPresent()) {
       objectValue.getParameters().forEach((key, value) -> addKeyValueEntry(paramDsl, valueType, key, value, false, null, null,
                                                                            parentConfig, parentElement));
     }
