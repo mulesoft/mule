@@ -26,7 +26,6 @@ import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
 import org.mule.runtime.module.troubleshooting.internal.operations.AlertFuseboardOperation;
 import org.mule.runtime.module.troubleshooting.internal.operations.BasicInfoOperation;
 import org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation;
-import org.mule.runtime.module.troubleshooting.internal.operations.ThreadDumpOperation;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -46,7 +45,6 @@ public class DefaultTroubleshootingService implements TroubleshootingService {
     registerOperation(new BasicInfoOperation());
     registerOperation(new EventDumpOperation(deploymentService));
     registerOperation(new AlertFuseboardOperation(deploymentService));
-    registerOperation(new ThreadDumpOperation());
   }
 
   @Override

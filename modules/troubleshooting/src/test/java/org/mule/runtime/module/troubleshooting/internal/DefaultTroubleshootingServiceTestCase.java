@@ -14,7 +14,6 @@ import static org.mule.runtime.module.troubleshooting.internal.TroubleshootingTe
 import static org.mule.runtime.module.troubleshooting.internal.operations.AlertFuseboardOperation.ALERT_FUSEBOARD_OPERATION_NAME;
 import static org.mule.runtime.module.troubleshooting.internal.operations.BasicInfoOperation.BASIC_INFO_OPERATION_NAME;
 import static org.mule.runtime.module.troubleshooting.internal.operations.EventDumpOperation.EVENT_DUMP_OPERATION_NAME;
-import static org.mule.runtime.module.troubleshooting.internal.operations.ThreadDumpOperation.THREAD_DUMP_OPERATION_NAME;
 
 import static java.util.Collections.emptyMap;
 
@@ -63,13 +62,12 @@ public class DefaultTroubleshootingServiceTestCase {
     List<TroubleshootingOperationDefinition> availableOperations = troubleshootingService.getAvailableOperations();
 
     assertThat(availableOperations.stream().map(TroubleshootingOperationDefinition::getName).toList().toString(),
-               availableOperations, iterableWithSize(5));
+               availableOperations, iterableWithSize(4));
 
     List<String> operationNames = availableOperations.stream().map(TroubleshootingOperationDefinition::getName).toList();
     assertThat(operationNames, containsInAnyOrder(BASIC_INFO_OPERATION_NAME,
                                                   EVENT_DUMP_OPERATION_NAME,
                                                   ALERT_FUSEBOARD_OPERATION_NAME,
-                                                  THREAD_DUMP_OPERATION_NAME,
                                                   TEST_OPERATION_NAME));
   }
 
@@ -85,9 +83,6 @@ public class DefaultTroubleshootingServiceTestCase {
         ======"""));
     assertThat(result, containsString("""
         Alert Fuseboard
-        ======"""));
-    assertThat(result, containsString("""
-        Thread Dump
         ======"""));
     assertThat(result, containsString("""
         Test
