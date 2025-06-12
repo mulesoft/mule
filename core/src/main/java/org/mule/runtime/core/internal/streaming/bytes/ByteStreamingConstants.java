@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
-import static java.lang.Integer.getInteger;
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.DataUnit.KB;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUCKET_SIZE;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_BUFFER_POOL_SIZE;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_MAX_HEAP_PERCENTAGE;
+
+import static java.lang.Integer.getInteger;
+import static java.lang.System.getProperty;
 
 /**
  * Constants around byte streaming

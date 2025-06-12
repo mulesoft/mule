@@ -1,4 +1,259 @@
 {
+  "4.4.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.field.added",
+          "new": "field org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>.ffService",
+          "package": "org.mule.runtime.config.api.factories.streaming",
+          "classSimpleName": "AbstractCursorProviderObjectFactory",
+          "fieldName": "ffService",
+          "elementKind": "field",
+          "justification": "W-18716253: Repeatable streams wait to fill the whole buffer instead of returning immediately available data"
+        }
+      ]
+    }
+  },
+  "4.6.20": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.field.added",
+            "new": "field org.mule.runtime.config.api.factories.streaming.AbstractCursorProviderObjectFactory<T>.ffService",
+            "justification": "W-18716253: Repeatable streams wait to fill the whole buffer instead of returning immediately available data"
+          }
+        ]
+      }
+    }
+  },
+  "4.6.14": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Optional<org.mule.runtime.dsl.api.component.ComponentBuildingDefinition<?>> org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry::getBuildingDefinition(org.mule.runtime.api.component.ComponentIdentifier, java.util.function.Predicate<org.mule.runtime.dsl.api.component.ComponentBuildingDefinition<?>>)",
+          "justification": "Reverting W-17484538"
+        }
+      ]
+    }
+  },
+  "4.6.13": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Optional<org.mule.runtime.dsl.api.component.ComponentBuildingDefinition<?>> org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry::getBuildingDefinition(org.mule.runtime.api.component.ComponentIdentifier, java.util.function.Predicate<org.mule.runtime.dsl.api.component.ComponentBuildingDefinition<?>>)",
+          "justification": "Reverting W-17484538"
+        }
+      ]
+    }
+  },
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.model.DslElementModel<T>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classQualifiedName": "org.mule.runtime.config.api.dsl.model.DslElementModel",
+          "classSimpleName": "DslElementModel",
+          "elementKind": "class",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classQualifiedName": "org.mule.runtime.config.api.dsl.model.DslElementModelFactory",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.ast.api.ComponentAst)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.ast.api.ComponentAst)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classQualifiedName": "org.mule.runtime.config.api.dsl.model.DslElementModelFactory",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classQualifiedName": "org.mule.runtime.config.api.dsl.model.DslElementModelFactory",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.properties.ConfigurationPropertiesResolverProvider",
+          "package": "org.mule.runtime.config.api.properties",
+          "classQualifiedName": "org.mule.runtime.config.api.properties.ConfigurationPropertiesResolverProvider",
+          "classSimpleName": "ConfigurationPropertiesResolverProvider",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.ResourceProvider",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "ResourceProvider",
+          "elementKind": "interface",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationPropertiesProvider",
+          "elementKind": "interface",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, ===org.mule.runtime.config.api.dsl.model.ResourceProvider===)",
+          "new": "parameter org.mule.runtime.properties.api.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, ===org.mule.runtime.properties.api.ResourceProvider===)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.ResourceProvider",
+          "newType": "org.mule.runtime.properties.api.ResourceProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationPropertiesProviderFactory",
+          "methodName": "createProvider",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+          "new": "method org.mule.runtime.properties.api.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, org.mule.runtime.properties.api.ResourceProvider)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "newType": "org.mule.runtime.properties.api.ConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationPropertiesProviderFactory",
+          "methodName": "createProvider",
+          "elementKind": "method",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationProperty",
+          "elementKind": "interface",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "elementKind": "class",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, ===org.mule.runtime.config.api.dsl.model.ResourceProvider===)",
+          "new": "parameter org.mule.runtime.properties.api.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, ===org.mule.runtime.properties.api.ResourceProvider===)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.ResourceProvider",
+          "newType": "org.mule.runtime.properties.api.ResourceProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProviderFactory",
+          "methodName": "createProvider",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+          "new": "method org.mule.runtime.properties.api.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, org.mule.runtime.properties.api.ResourceProvider)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "newType": "org.mule.runtime.properties.api.ConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProviderFactory",
+          "methodName": "createProvider",
+          "elementKind": "method",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModel",
+          "elementKind": "class",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T extends java.lang.Object>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.ast.api.ComponentAst)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.ast.api.ComponentAst)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T extends java.lang.Object>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T extends java.lang.Object>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.w3c.dom.Element org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter::asXml(===org.mule.runtime.config.api.dsl.model.DslElementModel===)",
+          "new": "parameter org.w3c.dom.Element org.mule.runtime.config.api.dsl.model.XmlDslElementModelConverter::asXml(===org.mule.runtime.metadata.api.dsl.DslElementModel===)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.DslElementModel",
+          "newType": "org.mule.runtime.metadata.api.dsl.DslElementModel",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "XmlDslElementModelConverter",
+          "methodName": "asXml",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-11858321: Refactor - Move Cache Id Generation to new module"
+        }
+      ]
+    }
+  },
   "4.4.0": {
     "revapi": {
       "ignore": [

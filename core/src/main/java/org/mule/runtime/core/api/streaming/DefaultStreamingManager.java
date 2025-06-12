@@ -20,6 +20,7 @@ import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -78,6 +79,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   private SchedulerService schedulerService;
 
   @Inject
+  private FeatureFlaggingService ffService;
+
+  @Inject
   private StreamingGhostBuster ghostBuster;
 
   /**
@@ -121,7 +125,7 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
   }
 
   protected ByteStreamingManager createByteStreamingManager() {
-    return new DefaultByteStreamingManager(bufferManager, this);
+    return new DefaultByteStreamingManager(bufferManager, this, getFeatureFlaggingService());
   }
 
   protected ObjectStreamingManager createObjectStreamingManager() {
@@ -236,5 +240,9 @@ public class DefaultStreamingManager implements StreamingManager, Initialisable,
 
   protected ByteBufferManager getBufferManager() {
     return bufferManager;
+  }
+
+  protected FeatureFlaggingService getFeatureFlaggingService() {
+    return ffService;
   }
 }

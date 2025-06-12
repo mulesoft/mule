@@ -10,10 +10,11 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGA
 import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_RESET;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_RESET;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT;
@@ -180,6 +181,7 @@ import javax.inject.Inject;
 import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
@@ -339,6 +341,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureEnableXmlSdkReset();
       configureHonourPersistedFlowState();
       configureForkJoinCompleteChildrenOnTimeout();
+      configureEnableRepeatableStreamingBytesEagerRead();
     }
   }
 
@@ -1466,6 +1469,12 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry
         .registerFeatureFlag(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT, minMuleVersion("4.10.0"));
+  }
+
+  private static void configureEnableRepeatableStreamingBytesEagerRead() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry
+        .registerFeatureFlag(ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ, featureContext -> false);
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -29,8 +30,9 @@ public interface InputStreamBuffer {
    * @param length   how many bytes to read
    * @return A {@link ByteBuffer} with up to {@code length} bytes of information or {@code null} if no information available at
    *         all
+   * @throws if an I/O error occurs.
    */
-  ByteBuffer get(long position, int length);
+  ByteBuffer get(long position, int length) throws IOException;
 
   /**
    * Releases all the resources held by this buffer
