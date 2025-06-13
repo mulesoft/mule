@@ -72,6 +72,7 @@ module org.mule.runtime.spring.config {
   // PropertyDescriptor and PropertyEditor from java.beans
   requires java.desktop;
   requires jakarta.transaction;
+  requires org.mule.runtime.http.support;
 
   exports org.mule.runtime.config.api;
   exports org.mule.runtime.config.api.bean;

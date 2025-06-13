@@ -39,7 +39,7 @@ public class SseSourceConfigBuilder {
   private boolean preserveHeaderCase = PRESERVE_HEADER_CASE;
 
   public SseSourceConfigBuilder(String url) {
-    this.url = requireNonNull(url);
+    this.url = requireNonNull(url, "URL must not be null");
   }
 
   /**
