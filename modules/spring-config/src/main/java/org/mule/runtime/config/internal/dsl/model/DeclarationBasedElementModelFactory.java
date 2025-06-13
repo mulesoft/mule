@@ -39,6 +39,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComposableModel;
@@ -544,75 +545,87 @@ class DeclarationBasedElementModelFactory {
     ComponentConfiguration.Builder mapConfig = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(paramDsl));
 
-    DslElementModel.Builder mapElement = DslElementModel.builder()
+    DslElementModel.Builder<Object> mapElement = DslElementModel.builder()
         .withModel(model)
         .withDsl(paramDsl);
 
+    if (!mapType.getOpenRestriction().isPresent()) {
+      throw new MuleRuntimeException(new IllegalArgumentException("Map Type without value type defined"));
+    }
     MetadataType valueType = mapType.getOpenRestriction().get();
+    Optional<DslElementSyntax> generic = paramDsl.getGeneric(valueType);
 
-    paramDsl.getGeneric(valueType)
-        .ifPresent(entryDsl -> objectValue.getParameters().forEach((key, value) -> {
-          ComponentConfiguration.Builder entryConfigBuilder = ComponentConfiguration.builder()
-              .withIdentifier(asIdentifier(entryDsl));
-
-          DslElementModel.Builder<MetadataType> entryElement = DslElementModel.<MetadataType>builder()
-              .withModel(valueType)
-              .withDsl(entryDsl);
-
-
-          entryDsl.getAttribute(KEY_ATTRIBUTE_NAME)
-              .ifPresent(keyDsl -> {
-                entryConfigBuilder.withParameter(KEY_ATTRIBUTE_NAME, key);
-                entryElement.containing(DslElementModel.builder()
-                    .withModel(typeLoader.load(String.class))
-                    .withDsl(keyDsl)
-                    .withValue(key)
-                    .build());
-              });
-
-          entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME)
-              .ifPresent(valueDsl -> value.accept(new ParameterValueVisitor() {
-
-                @Override
-                public void visitSimpleValue(ParameterSimpleValue text) {
-                  entryConfigBuilder.withParameter(VALUE_ATTRIBUTE_NAME, text.getValue());
-                  entryElement.containing(DslElementModel.builder()
-                      .withModel(valueType)
-                      .withDsl(valueDsl)
-                      .withValue(text.getValue())
-                      .build());
-                }
-
-                @Override
-                public void visitListValue(ParameterListValue list) {
-                  createList(list, valueDsl, valueType, (ArrayType) valueType, entryConfigBuilder, entryElement);
-                }
-
-                @Override
-                public void visitObjectValue(ParameterObjectValue objectValue) {
-                  if (isMap(valueType)) {
-                    createMapParameter(objectValue, valueDsl, valueType, (ObjectType) valueType, entryConfigBuilder,
-                                       entryElement);
-                  } else {
-                    createObject(objectValue, valueDsl, valueType, (ObjectType) valueType, entryConfigBuilder, entryElement);
-                  }
-                }
-              }));
-
-          ComponentConfiguration entryConfig = entryConfigBuilder.build();
-          if (isParameterWrappedByContainer) {
-            mapConfig.withNestedComponent(entryConfig);
-            mapElement.containing(entryElement.withConfig(entryConfig).build());
-          } else {
-            parentConfig.withNestedComponent(entryConfig);
-            parentElement.containing(entryElement.withConfig(entryConfig).build());
-          }
-        }));
+    generic.ifPresent(entryDsl -> objectValue.getParameters()
+        .forEach((key, value) -> addKeyValueEntry(entryDsl, valueType, key, value, isParameterWrappedByContainer, mapConfig,
+                                                  mapElement, parentConfig, parentElement)));
 
     if (isParameterWrappedByContainer) {
       ComponentConfiguration result = mapConfig.build();
       parentConfig.withNestedComponent(result);
       parentElement.containing(mapElement.withConfig(result).build());
+    } else if (!generic.isPresent()) {
+      objectValue.getParameters().forEach((key, value) -> addKeyValueEntry(paramDsl, valueType, key, value, false, null, null,
+                                                                           parentConfig, parentElement));
+    }
+  }
+
+  private void addKeyValueEntry(DslElementSyntax entryDsl, MetadataType valueType, String key, ParameterValue value,
+                                boolean isParameterWrappedByContainer, ComponentConfiguration.Builder mapConfig,
+                                DslElementModel.Builder<Object> mapElement, ComponentConfiguration.Builder parentConfig,
+                                DslElementModel.Builder<Object> parentElement) {
+    ComponentConfiguration.Builder entryConfigBuilder = ComponentConfiguration.builder()
+        .withIdentifier(asIdentifier(entryDsl));
+
+    DslElementModel.Builder<MetadataType> entryElement = DslElementModel.<MetadataType>builder()
+        .withModel(valueType)
+        .withDsl(entryDsl);
+
+
+    entryDsl.getAttribute(KEY_ATTRIBUTE_NAME)
+        .ifPresent(keyDsl -> {
+          entryConfigBuilder.withParameter(KEY_ATTRIBUTE_NAME, key);
+          entryElement.containing(DslElementModel.builder()
+              .withModel(typeLoader.load(String.class))
+              .withDsl(keyDsl)
+              .withValue(key)
+              .build());
+        });
+
+    entryDsl.getAttribute(VALUE_ATTRIBUTE_NAME)
+        .ifPresent(valueDsl -> value.accept(new ParameterValueVisitor() {
+
+          @Override
+          public void visitSimpleValue(ParameterSimpleValue text) {
+            entryConfigBuilder.withParameter(VALUE_ATTRIBUTE_NAME, text.getValue());
+            entryElement.containing(DslElementModel.builder()
+                .withModel(valueType)
+                .withDsl(valueDsl)
+                .withValue(text.getValue())
+                .build());
+          }
+
+          @Override
+          public void visitListValue(ParameterListValue list) {
+            createList(list, valueDsl, valueType, (ArrayType) valueType, entryConfigBuilder, entryElement);
+          }
+
+          @Override
+          public void visitObjectValue(ParameterObjectValue objectValue) {
+            if (isMap(valueType)) {
+              createMapParameter(objectValue, valueDsl, valueType, (ObjectType) valueType, entryConfigBuilder,
+                                 entryElement);
+            } else {
+              createObject(objectValue, valueDsl, valueType, (ObjectType) valueType, entryConfigBuilder, entryElement);
+            }
+          }
+        }));
+    ComponentConfiguration entryConfig = entryConfigBuilder.build();
+    if (isParameterWrappedByContainer) {
+      mapConfig.withNestedComponent(entryConfig);
+      mapElement.containing(entryElement.withConfig(entryConfig).build());
+    } else {
+      parentConfig.withNestedComponent(entryConfig);
+      parentElement.containing(entryElement.withConfig(entryConfig).build());
     }
   }
 

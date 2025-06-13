@@ -361,11 +361,11 @@ public abstract class AbstractDslModelTestCase extends AbstractMuleTestCase {
     when(connectionProvider.getAllParameterModels()).thenReturn(componentParameterModels);
   }
 
-  private ImmutableParameterModel createParameterModel(String paramName, boolean isComponentId, MetadataType type,
-                                                       Object defaultValue, ExpressionSupport expressionSupport,
-                                                       ParameterRole parameterRole, ValueProviderModel valueProviderModel,
-                                                       List<StereotypeModel> allowedStereotypes,
-                                                       Set<ModelProperty> modelProperties) {
+  protected ImmutableParameterModel createParameterModel(String paramName, boolean isComponentId, MetadataType type,
+                                                         Object defaultValue, ExpressionSupport expressionSupport,
+                                                         ParameterRole parameterRole, ValueProviderModel valueProviderModel,
+                                                         List<StereotypeModel> allowedStereotypes,
+                                                         Set<ModelProperty> modelProperties) {
     return new ImmutableParameterModel(paramName, "", type, false, false,
                                        false, isComponentId, expressionSupport, defaultValue,
                                        parameterRole, ParameterDslConfiguration.getDefaultInstance(), null, null,
