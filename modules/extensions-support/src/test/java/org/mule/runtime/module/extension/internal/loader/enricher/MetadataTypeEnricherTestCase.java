@@ -44,7 +44,7 @@ import org.mule.metadata.api.model.impl.DefaultTimeZoneType;
 import org.mule.metadata.api.model.impl.DefaultTupleType;
 import org.mule.metadata.api.model.impl.DefaultTypeParameterType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
+import org.mule.metadata.api.utils.MetadataTypeEnricher;
 
 import java.util.Set;
 

@@ -29,13 +29,13 @@ import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.extension.api.loader.AbstractParserBasedExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.artifact.activation.api.ast.AstXmlParserSupplier;
 import org.mule.runtime.module.artifact.activation.internal.ast.ArtifactAstUtils;
 import org.mule.runtime.module.artifact.activation.internal.ast.MuleSdkExtensionModelLoadingMediator;
-import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkPluginExtensionModelParserFactory;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.ast.MuleSdkPluginExtensionModelLoadingMediator;
 
@@ -49,9 +49,9 @@ import org.slf4j.Logger;
  *
  * @since 4.5.0
  */
-public class MuleSdkPluginExtensionModelLoader extends AbstractExtensionModelLoader {
+public class MuleSdkPluginExtensionModelLoader extends AbstractParserBasedExtensionModelLoader {
 
-  private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelParserFactory.class);
+  private static final Logger LOGGER = getLogger(MuleSdkPluginExtensionModelLoader.class);
   private static final String MULE_SDK_EXTENSION_MODEL_PROPERTY_NAME = "_muleSdkArtifactExtensionModel";
 
   @Override

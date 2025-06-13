@@ -20,8 +20,9 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -108,7 +109,9 @@ public final class ParameterModelsLoaderDelegate {
         parameterParser.getOAuthParameterModelProperty().ifPresent(parameter::withModelProperty);
         parameterParser.getAdditionalModelProperties().forEach(parameter::withModelProperty);
         if (context.isResolveMinMuleVersion()) {
-          parameterParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(parameter, resolvedMMV));
+          parameterParser.getResolvedMinMuleVersion()
+              .ifPresent(mmv -> declarerWithMmv(parameter, new ResolvedMinMuleVersion(parameterParser.getName(),
+                                                                                      mmv.getMinMuleVersion(), mmv.getReason())));
         }
 
         addSemanticTerms(parameter.getDeclaration(), parameterParser);

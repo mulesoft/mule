@@ -40,6 +40,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.parser.MediaTypeParser;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
@@ -58,15 +59,14 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.api.loader.java.type.WithOperationContainers;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
-import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+import org.mule.runtime.extension.api.loader.delegate.ModelLoaderDelegate;
+import org.mule.runtime.extension.api.loader.parser.ConnectionProviderModelParser;
+import org.mule.runtime.extension.api.loader.parser.FunctionModelParser;
+import org.mule.runtime.extension.api.loader.parser.OperationModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
-import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
+import org.mule.runtime.extension.api.loader.parser.SourceModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
 import org.mule.sdk.api.annotation.semantics.file.FilePath;
@@ -146,13 +146,12 @@ public final class JavaExtensionModelParserUtils {
   }
 
   public static List<ConnectionProviderModelParser> getConnectionProviderModelParsers(
-                                                                                      JavaExtensionModelParser extensionModelParser,
                                                                                       ExtensionElement extensionElement,
                                                                                       List<ConnectionProviderElement> connectionProviderElements,
                                                                                       ExtensionLoadingContext loadingContext) {
 
     return connectionProviderElements.stream()
-        .map(cpElement -> new JavaConnectionProviderModelParser(extensionModelParser, extensionElement, cpElement,
+        .map(cpElement -> new JavaConnectionProviderModelParser(extensionElement, cpElement,
                                                                 loadingContext))
         .collect(toList());
   }
@@ -445,9 +444,9 @@ public final class JavaExtensionModelParserUtils {
     return new ImmutableDeprecationModel(message, since, toRemoveIn);
   }
 
-  public static Optional<MediaTypeModelProperty> getMediaTypeModelProperty(WithAnnotations element,
-                                                                           String elementType,
-                                                                           String elementName) {
+  public static Optional<MediaTypeParser> getMediaType(WithAnnotations element,
+                                                       String elementType,
+                                                       String elementName) {
     Optional<String> stringValue = mapReduceSingleAnnotation(
                                                              element,
                                                              elementType,
@@ -469,6 +468,25 @@ public final class JavaExtensionModelParserUtils {
                                                                    .getBooleanValue(org.mule.sdk.api.annotation.param.MediaType::strict));
 
 
-    return stringValue.flatMap(str -> booleanValue.map(bool -> new MediaTypeModelProperty(str, bool)));
+    return stringValue.flatMap(str -> booleanValue.map(bool -> new DefaultMediaTypeParser(str, bool)));
+  }
+
+  private static class DefaultMediaTypeParser implements MediaTypeParser {
+
+    private final String mimeType;
+    private final boolean strict;
+
+    public DefaultMediaTypeParser(String mimeType, boolean strict) {
+      this.mimeType = mimeType;
+      this.strict = strict;
+    }
+
+    public String getMimeType() {
+      return mimeType;
+    }
+
+    public boolean isStrict() {
+      return strict;
+    }
   }
 }

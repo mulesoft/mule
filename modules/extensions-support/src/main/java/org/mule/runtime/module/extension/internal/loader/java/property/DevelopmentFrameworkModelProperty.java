@@ -10,7 +10,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
 
 /**
- * {@link ModelProperty} to indicate the {@link ExtensionDevelopmentFramework} used for developing the associated extension.
+ * {@link ModelProperty} to indicate the development framework used for developing the associated extension.
  * <p>
  * Note that some extensions may not have this property, meaning they were not developed by any of the main development
  * frameworks. An example of this could be extensions programmatically declared.
@@ -21,10 +21,10 @@ public class DevelopmentFrameworkModelProperty implements ModelProperty {
 
   private static final long serialVersionUID = 1L;
 
-  private final ExtensionDevelopmentFramework extensionDevelopmentFramework;
+  private final String id;
 
-  public DevelopmentFrameworkModelProperty(ExtensionDevelopmentFramework extensionDevelopmentFramework) {
-    this.extensionDevelopmentFramework = extensionDevelopmentFramework;
+  public DevelopmentFrameworkModelProperty(String id) {
+    this.id = id;
   }
 
   /**
@@ -44,9 +44,9 @@ public class DevelopmentFrameworkModelProperty implements ModelProperty {
   }
 
   /**
-   * @return The {@link ExtensionDevelopmentFramework} used for developing the associated extension.
+   * @return The ID associated with the development framework used for developing the associated extension.
    */
-  public ExtensionDevelopmentFramework getDevelopmentFramework() {
-    return extensionDevelopmentFramework;
+  public String getId() {
+    return id;
   }
 }

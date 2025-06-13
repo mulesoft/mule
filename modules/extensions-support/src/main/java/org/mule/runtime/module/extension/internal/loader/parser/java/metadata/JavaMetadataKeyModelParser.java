@@ -16,7 +16,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.metadata.BooleanKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.EnumKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.MuleTypeKeysResolverAdapter;

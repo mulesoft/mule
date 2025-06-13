@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java.metadata;
 import static org.mule.runtime.module.extension.internal.metadata.chain.NullChainInputTypeResolver.NULL_INSTANCE;
 
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaInputResolverModelParserUtils;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.module.extension.internal.runtime.function.FunctionExecutorFactory;
+import org.mule.runtime.extension.api.loader.parser.FunctionExecutorFactory;
 
 /**
  * A {@link ModelProperty} meant to be used on {@link OperationModel operation models}, which provides access to a

@@ -111,7 +111,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
+import org.mule.metadata.api.utils.MetadataTypeEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;

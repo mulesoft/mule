@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.internal.loader.parser.AdditionalPropertiesModelParser;
+import org.mule.runtime.extension.api.loader.parser.AdditionalPropertiesModelParser;
 
 import java.util.LinkedList;
 import java.util.List;

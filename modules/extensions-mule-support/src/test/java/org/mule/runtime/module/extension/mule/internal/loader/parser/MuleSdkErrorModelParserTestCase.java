@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.util.IdentifierParsingUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

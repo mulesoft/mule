@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.operation.construct;
+package org.mule.runtime.module.extension.mule.internal.construct;
 
 import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.lifecycle.Lifecycle;

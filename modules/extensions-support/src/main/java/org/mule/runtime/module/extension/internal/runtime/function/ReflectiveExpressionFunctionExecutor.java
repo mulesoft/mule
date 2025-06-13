@@ -33,6 +33,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.extension.api.loader.parser.FunctionExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
 

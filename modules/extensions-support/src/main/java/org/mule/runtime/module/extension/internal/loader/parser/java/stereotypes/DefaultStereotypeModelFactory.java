@@ -18,7 +18,7 @@ import static org.mule.sdk.api.stereotype.MuleStereotypes.VALIDATOR;
 
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
 import org.mule.sdk.api.stereotype.StereotypeDefinition;
 
 import java.util.HashMap;

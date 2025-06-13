@@ -20,7 +20,7 @@ import org.mule.runtime.extension.api.model.notification.ImmutableNotificationMo
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
-import org.mule.runtime.module.extension.internal.loader.parser.NotificationEmitterParser;
+import org.mule.runtime.extension.api.loader.parser.NotificationEmitterParser;
 import org.mule.sdk.api.annotation.notification.NotificationActionProvider;
 import org.mule.sdk.api.annotation.notification.NotificationActions;
 import org.mule.sdk.api.notification.NotificationActionDefinition;

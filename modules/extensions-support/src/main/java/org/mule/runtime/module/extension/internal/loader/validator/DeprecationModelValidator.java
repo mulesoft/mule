@@ -29,8 +29,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 
 /**
- * Validates that the parameters which are annotated with {@link org.mule.runtime.extension.api.annotation.deprecated.Deprecated}
- * are not required.
+ * Validates that the parameters which are marked as deprecated are not required.
  *
  * @since 4.2.0
  */

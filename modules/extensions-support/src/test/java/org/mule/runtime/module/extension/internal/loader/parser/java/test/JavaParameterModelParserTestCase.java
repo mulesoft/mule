@@ -22,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -66,14 +67,14 @@ public class JavaParameterModelParserTestCase {
   @Test
   public void minMuleVersionParameter() throws Exception {
     JavaParameterModelParser javaParameterModelParser = getParser("parameter");
-    Optional<ResolvedMinMuleVersion> minMuleVersion = javaParameterModelParser.getResolvedMinMuleVersion();
+    Optional<MinMuleVersionParser> minMuleVersion = javaParameterModelParser.getResolvedMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(false));
   }
 
   @Test
   public void minMuleVersionSdkParameter() throws Exception {
     JavaParameterModelParser javaParameterModelParser = getParser("sdkOAuthParameter");
-    Optional<ResolvedMinMuleVersion> minMuleVersion = javaParameterModelParser.getResolvedMinMuleVersion();
+    Optional<MinMuleVersionParser> minMuleVersion = javaParameterModelParser.getResolvedMinMuleVersion();
     assertThat(minMuleVersion.isPresent(), is(false));
   }
 

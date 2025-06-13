@@ -11,8 +11,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.rout
 import org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.extension.api.loader.parser.NestedChainModelParser;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils;
 import org.mule.sdk.api.annotation.route.ExecutionOccurrence;
 import org.mule.sdk.api.runtime.route.Chain;

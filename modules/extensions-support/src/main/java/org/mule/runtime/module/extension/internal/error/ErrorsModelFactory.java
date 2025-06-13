@@ -21,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.HashMap;

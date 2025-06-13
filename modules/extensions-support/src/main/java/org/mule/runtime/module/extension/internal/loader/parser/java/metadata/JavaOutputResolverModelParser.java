@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.MuleOutputTypeResolverAdapter;
 
 /**

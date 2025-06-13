@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.error;
 
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.Objects;
