@@ -7,13 +7,14 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.utils;
 
 import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 
 /**
  * Holds information about the minimum {@link MuleVersion} that a component can run on and the reason for that value.
  *
  * @since 4.5
  */
-public class ResolvedMinMuleVersion {
+public class ResolvedMinMuleVersion implements MinMuleVersionParser {
 
   public static final MuleVersion FIRST_MULE_VERSION = new MuleVersion("4.1.1");
   private String componentName;

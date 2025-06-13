@@ -15,8 +15,8 @@ import static org.mule.runtime.module.extension.mule.internal.loader.parser.util
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParserFactory;
 
 /**
  * {@link ExtensionModelParserFactory} implementation for Mule SDK in the context of applications.

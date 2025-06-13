@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.THIS_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.THIS_PREFIX;
-import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.MULE_DSL;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
 import static java.lang.String.format;
@@ -18,15 +17,13 @@ import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.Category;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
-import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
-import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
+import org.mule.runtime.extension.api.loader.parser.LicensingParser;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
+import org.mule.runtime.extension.api.loader.parser.XmlDslConfiguration;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -79,20 +76,14 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(new ResolvedMinMuleVersion(extensionName, new MuleVersion(MIN_MULE_VERSION),
-                                         format("Application %s has min mule version %s because the Mule Sdk was introduced in that version.",
-                                                extensionName, MIN_MULE_VERSION)));
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
+    return of(new MuleSdkMinMuleVersionParser(format("Application %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                                     extensionName, MIN_MULE_VERSION)));
   }
 
   @Override
-  public LicenseModelProperty getLicenseModelProperty() {
-    return new LicenseModelProperty(false, true, empty());
-  }
-
-  @Override
-  public ExtensionDevelopmentFramework getDevelopmentFramework() {
-    return MULE_DSL;
+  public LicensingParser getLicensingParser() {
+    return new MuleSdkLicensingParser(false, true, empty());
   }
 
   @Override

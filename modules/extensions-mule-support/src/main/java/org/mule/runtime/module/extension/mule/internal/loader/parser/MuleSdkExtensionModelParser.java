@@ -25,15 +25,15 @@ import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
-import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
+import org.mule.runtime.extension.api.loader.parser.ConfigurationModelParser;
+import org.mule.runtime.extension.api.loader.parser.ConnectionProviderModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
+import org.mule.runtime.extension.api.loader.parser.FunctionModelParser;
+import org.mule.runtime.extension.api.loader.parser.OperationModelParser;
+import org.mule.runtime.extension.api.loader.parser.SourceModelParser;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +105,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   @Override
-  public Optional<ExceptionHandlerModelProperty> getExtensionHandlerModelProperty() {
+  public Optional<SdkExceptionHandlerFactory> getExceptionHandlerFactory() {
     return empty();
   }
 
@@ -150,7 +150,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   @Override
-  public Optional<ArtifactLifecycleListenerModelProperty> getArtifactLifecycleListenerModelProperty() {
+  public Optional<Class<? extends ArtifactLifecycleListener>> getArtifactLifecycleListenerClass() {
     return empty();
   }
 

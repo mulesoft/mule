@@ -27,6 +27,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
@@ -35,9 +36,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.error.AstElementErrorTypeDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter;
 import org.mule.runtime.module.extension.internal.error.SdkErrorTypeProviderAdapter;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionHandlerFactory;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
@@ -115,9 +115,9 @@ public final class JavaErrorModelParserUtils {
         : errorTypeDefinition.getClass();
   }
 
-  public static java.util.Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty(WithAnnotations element,
-                                                                                                   String elementType,
-                                                                                                   String elementName) {
+  public static java.util.Optional<SdkExceptionHandlerFactory> getExceptionHandlerFactory(WithAnnotations element,
+                                                                                          String elementType,
+                                                                                          String elementName) {
     Optional<Type> classValue = mapReduceSingleAnnotation(
                                                           element,
                                                           elementType,
@@ -130,7 +130,7 @@ public final class JavaErrorModelParserUtils {
 
     return classValue
         .flatMap(c -> c.getDeclaringClass())
-        .map(clazz -> new ExceptionHandlerModelProperty(new DefaultExceptionHandlerFactory(clazz)));
+        .map(clazz -> new DefaultExceptionHandlerFactory(clazz));
   }
 
   private static List<ErrorModelParser> parseErrorTypeDefinitions(Type type, String extensionNamespace) {

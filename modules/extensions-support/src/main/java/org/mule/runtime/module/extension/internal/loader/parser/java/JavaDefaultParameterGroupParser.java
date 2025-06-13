@@ -14,8 +14,8 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterModelParser;
 
 import java.util.List;
 import java.util.Optional;

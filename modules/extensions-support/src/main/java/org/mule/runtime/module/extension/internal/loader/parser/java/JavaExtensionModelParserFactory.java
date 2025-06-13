@@ -12,15 +12,14 @@ import static org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoad
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 
-import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParserFactory;
 
 /**
  * {@link ExtensionModelParserFactory} implementation for Java based extensions

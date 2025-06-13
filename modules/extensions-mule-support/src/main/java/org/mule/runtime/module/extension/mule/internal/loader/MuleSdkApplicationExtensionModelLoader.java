@@ -8,10 +8,10 @@ package org.mule.runtime.module.extension.mule.internal.loader;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_APPLICATION_LOADER_ID;
 
+import org.mule.runtime.extension.api.loader.AbstractParserBasedExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkApplicationExtensionModelParserFactory;
 
 /**
@@ -19,7 +19,7 @@ import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkAppl
  *
  * @since 4.5.0
  */
-public class MuleSdkApplicationExtensionModelLoader extends AbstractExtensionModelLoader {
+public class MuleSdkApplicationExtensionModelLoader extends AbstractParserBasedExtensionModelLoader {
 
   @Override
   public String getId() {

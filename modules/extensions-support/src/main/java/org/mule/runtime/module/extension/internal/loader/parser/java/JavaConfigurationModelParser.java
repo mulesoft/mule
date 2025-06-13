@@ -32,21 +32,21 @@ import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.NoImplicit;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ComponentElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.internal.loader.java.TypeAwareConfigurationFactory;
-import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.extension.api.loader.parser.ConfigurationModelParser;
+import org.mule.runtime.extension.api.loader.parser.ConnectionProviderModelParser;
+import org.mule.runtime.extension.api.loader.parser.FunctionModelParser;
+import org.mule.runtime.extension.api.loader.parser.OperationModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.SourceModelParser;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
 import org.mule.sdk.api.annotation.Configurations;
 
 import java.util.ArrayList;
@@ -125,9 +125,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
 
   @Override
   public List<ConnectionProviderModelParser> getConnectionProviderModelParsers() {
-    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(
-                                                                           extensionModelParser,
-                                                                           extensionElement,
+    return JavaExtensionModelParserUtils.getConnectionProviderModelParsers(extensionElement,
                                                                            configElement.getConnectionProviders(),
                                                                            loadingContext);
   }
@@ -140,7 +138,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   }
 
   @Override
-  public ConfigurationFactoryModelProperty getConfigurationFactoryModelProperty() {
+  public ConfigurationFactory getConfigurationFactory() {
     Class<?> extensionClass = extensionElement.getDeclaringClass().orElse(Object.class);
     Class<?> configClass = configElement.getDeclaringClass().orElse(Object.class);
 
@@ -148,10 +146,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
         ? extensionClass.getClassLoader()
         : Thread.currentThread().getContextClassLoader();
 
-    TypeAwareConfigurationFactory typeAwareConfigurationFactory =
-        new TypeAwareConfigurationFactory(configClass, classLoader, isAddAnnotationsToConfigClass(loadingContext));
-
-    return new ConfigurationFactoryModelProperty(typeAwareConfigurationFactory);
+    return new TypeAwareConfigurationFactory(configClass, classLoader, isAddAnnotationsToConfigClass(loadingContext));
   }
 
   @Override
@@ -196,7 +191,7 @@ public class JavaConfigurationModelParser extends AbstractJavaModelParser implem
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
     return of(resolveConfigurationMinMuleVersion(configElement,
                                                  getContainerAnnotationMinMuleVersion(extensionElement,
                                                                                       Configurations.class,

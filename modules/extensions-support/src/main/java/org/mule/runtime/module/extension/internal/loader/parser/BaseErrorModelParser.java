@@ -11,6 +11,8 @@ import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFI
 import static java.util.Locale.ROOT;
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
+
 import java.util.Optional;
 
 /**

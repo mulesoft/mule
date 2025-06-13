@@ -6,16 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
-import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.MULE_DSL;
-
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
-import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.OperationModelParser;
+import org.mule.runtime.extension.api.loader.parser.SourceModelParser;
 
 /**
  * Utility methods for {@link ModelLoaderDelegate} implementations
@@ -35,14 +32,11 @@ public final class ModelLoaderDelegateUtils {
   }
 
   /**
-   * @param extensionDevelopmentFramework the {@link ExtensionDevelopmentFramework} used for developing the extension being
-   *                                      parsed.
-   * @param parser                        a {@link OperationModelParser}
+   * @param parser a {@link OperationModelParser}
    * @return whether the given {@code parser} represents an operation which requires a config to function
    */
-  public static boolean requiresConfig(ExtensionDevelopmentFramework extensionDevelopmentFramework, OperationModelParser parser) {
-    return parser.hasConfig() || (parser.isConnected() && !extensionDevelopmentFramework.equals(MULE_DSL))
-        || parser.isAutoPaging();
+  public static boolean requiresConfig(OperationModelParser parser) {
+    return parser.hasConfig() || (parser.isConnected() && parser.requiresConnectionProvisioning()) || parser.isAutoPaging();
   }
 
   /**

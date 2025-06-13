@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
@@ -575,12 +576,12 @@ public final class MinMuleVersionUtils {
     return parameterMMV;
   }
 
-  public static void declarerWithMmv(HasMinMuleVersionDeclarer declarer, ResolvedMinMuleVersion resolvedMMV) {
+  public static void declarerWithMmv(HasMinMuleVersionDeclarer<?> declarer, MinMuleVersionParser resolvedMMV) {
     declarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
     LOGGER.debug(resolvedMMV.getReason());
   }
 
-  public static void declarationWithMmv(WithMinMuleVersionDeclaration declaration, ResolvedMinMuleVersion resolvedMMV) {
+  public static void declarationWithMmv(WithMinMuleVersionDeclaration declaration, MinMuleVersionParser resolvedMMV) {
     declaration.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
     LOGGER.debug(resolvedMMV.getReason());
   }
