@@ -54,6 +54,11 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-features-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-api</artifactId>
         </dependency>
         <dependency>
