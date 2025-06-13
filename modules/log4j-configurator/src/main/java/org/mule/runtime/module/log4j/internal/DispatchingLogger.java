@@ -22,12 +22,15 @@ import java.util.Map;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogBuilder;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
+import org.apache.logging.log4j.message.EntryMessage;
+import org.apache.logging.log4j.message.FlowMessageFactory;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
@@ -162,6 +165,11 @@ abstract class DispatchingLogger extends Logger {
   }
 
   @Override
+  public FlowMessageFactory getFlowMessageFactory() {
+    return originalLogger.getFlowMessageFactory();
+  }
+
+  @Override
   public Logger getParent() {
     return getLogger().getParent();
   }
@@ -177,8 +185,49 @@ abstract class DispatchingLogger extends Logger {
   }
 
   @Override
+  public LogBuilder atDebug() {
+    return getLogger().atDebug();
+  }
+
+  @Override
+  public LogBuilder atError() {
+    return getLogger().atError();
+  }
+
+  @Override
+  public LogBuilder atFatal() {
+    return getLogger().atFatal();
+  }
+
+  @Override
+  public LogBuilder atInfo() {
+    return getLogger().atInfo();
+  }
+
+  @Override
+  public LogBuilder atLevel(Level level) {
+    return getLogger().atLevel(level);
+  }
+
+  @Override
+  public LogBuilder atTrace() {
+    return getLogger().atTrace();
+  }
+
+  @Override
+  public LogBuilder atWarn() {
+    return getLogger().atWarn();
+  }
+
+  @Override
   public void logMessage(String fqcn, Level level, Marker marker, Message message, Throwable t) {
     getLogger().logMessage(fqcn, level, marker, message, t);
+  }
+
+  @Override
+  public void logMessage(Level level, Marker marker, String fqcn, StackTraceElement location, Message message,
+                         Throwable throwable) {
+    getLogger().logMessage(level, marker, fqcn, location, message, throwable);
   }
 
   @Override
@@ -203,6 +252,68 @@ abstract class DispatchingLogger extends Logger {
 
   @Override
   public boolean isEnabled(Level level, Marker marker, Message message, Throwable t) {
+    return getLogger().isEnabled(level, marker, message, t);
+  }
+
+
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0) {
+    return getLogger().isEnabled(level, marker, message, p0);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1) {
+    return getLogger().isEnabled(level, marker, message, p0, p1);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2) {
+    return getLogger().isEnabled(level, marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    return getLogger().isEnabled(level, marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    return getLogger().isEnabled(level, marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4,
+                           Object p5) {
+    return getLogger().isEnabled(level, marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4,
+                           Object p5, Object p6) {
+    return getLogger().isEnabled(level, marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4,
+                           Object p5, Object p6, Object p7) {
+    return getLogger().isEnabled(level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4,
+                           Object p5, Object p6, Object p7, Object p8) {
+    return getLogger().isEnabled(level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4,
+                           Object p5, Object p6, Object p7, Object p8, Object p9) {
+    return getLogger().isEnabled(level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public boolean isEnabled(Level level, Marker marker, CharSequence message, Throwable t) {
     return getLogger().isEnabled(level, marker, message, t);
   }
 
@@ -258,6 +369,11 @@ abstract class DispatchingLogger extends Logger {
 
   public static void checkMessageFactory(ExtendedLogger logger, MessageFactory messageFactory) {
     AbstractLogger.checkMessageFactory(logger, messageFactory);
+  }
+
+  @Override
+  public LogBuilder always() {
+    return getLogger().always();
   }
 
   @Override
@@ -338,6 +454,181 @@ abstract class DispatchingLogger extends Logger {
   @Override
   public void debug(String message, Throwable t) {
     getLogger().debug(message, t);
+  }
+
+  @Override
+  public void debug(Marker marker, CharSequence message) {
+    getLogger().debug(marker, message);
+  }
+
+  @Override
+  public void debug(Marker marker, CharSequence message, Throwable throwable) {
+    getLogger().debug(marker, message, throwable);
+  }
+
+  @Override
+  public void debug(CharSequence message) {
+    getLogger().debug(message);
+  }
+
+  @Override
+  public void debug(CharSequence message, Throwable throwable) {
+    getLogger().debug(message, throwable);
+  }
+
+  @Override
+  public void debug(Supplier<?> messageSupplier) {
+    getLogger().debug(messageSupplier);
+  }
+
+  @Override
+  public void debug(Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().debug(messageSupplier, throwable);
+  }
+
+  @Override
+  public void debug(Marker marker, Supplier<?> messageSupplier) {
+    getLogger().debug(marker, messageSupplier);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Supplier<?>... paramSuppliers) {
+    getLogger().debug(marker, message, paramSuppliers);
+  }
+
+  @Override
+  public void debug(Marker marker, Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().debug(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void debug(String message, Supplier<?>... paramSuppliers) {
+    getLogger().debug(message, paramSuppliers);
+  }
+
+  @Override
+  public void debug(Marker marker, MessageSupplier messageSupplier) {
+    getLogger().debug(marker, messageSupplier);
+  }
+
+  @Override
+  public void debug(Marker marker, MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().debug(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void debug(MessageSupplier messageSupplier) {
+    getLogger().debug(messageSupplier);
+  }
+
+  @Override
+  public void debug(MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().debug(messageSupplier, throwable);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0) {
+    getLogger().debug(marker, message, p0);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1) {
+    getLogger().debug(marker, message, p0, p1);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1, Object p2) {
+    getLogger().debug(marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().debug(marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().debug(marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().debug(marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().debug(marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7) {
+    getLogger().debug(marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7, Object p8) {
+    getLogger().debug(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void debug(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7, Object p8, Object p9) {
+    getLogger().debug(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public void debug(String message, Object p0) {
+    getLogger().debug(message, p0);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1) {
+    getLogger().debug(message, p0, p1);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1, Object p2) {
+    getLogger().debug(message, p0, p1, p2);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().debug(message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().debug(message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().debug(message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().debug(message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7) {
+    getLogger().debug(message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                    Object p8) {
+    getLogger().debug(message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void debug(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                    Object p8, Object p9) {
+    getLogger().debug(message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
   }
 
   @Override
@@ -426,6 +717,181 @@ abstract class DispatchingLogger extends Logger {
   }
 
   @Override
+  public void error(Marker marker, CharSequence message) {
+    getLogger().error(marker, message);
+  }
+
+  @Override
+  public void error(Marker marker, CharSequence message, Throwable throwable) {
+    getLogger().error(marker, message, throwable);
+  }
+
+  @Override
+  public void error(CharSequence message) {
+    getLogger().error(message);
+  }
+
+  @Override
+  public void error(CharSequence message, Throwable throwable) {
+    getLogger().error(message, throwable);
+  }
+
+  @Override
+  public void error(Supplier<?> messageSupplier) {
+    getLogger().error(messageSupplier);
+  }
+
+  @Override
+  public void error(Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().error(messageSupplier, throwable);
+  }
+
+  @Override
+  public void error(Marker marker, Supplier<?> messageSupplier) {
+    getLogger().error(marker, messageSupplier);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Supplier<?>... paramSuppliers) {
+    getLogger().error(marker, message, paramSuppliers);
+  }
+
+  @Override
+  public void error(Marker marker, Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().error(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void error(String message, Supplier<?>... paramSuppliers) {
+    getLogger().error(message, paramSuppliers);
+  }
+
+  @Override
+  public void error(Marker marker, MessageSupplier messageSupplier) {
+    getLogger().error(marker, messageSupplier);
+  }
+
+  @Override
+  public void error(Marker marker, MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().error(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void error(MessageSupplier messageSupplier) {
+    getLogger().error(messageSupplier);
+  }
+
+  @Override
+  public void error(MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().error(messageSupplier, throwable);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0) {
+    getLogger().error(marker, message, p0);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1) {
+    getLogger().error(marker, message, p0, p1);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1, Object p2) {
+    getLogger().error(marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().error(marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().error(marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().error(marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().error(marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7) {
+    getLogger().error(marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7, Object p8) {
+    getLogger().error(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void error(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7, Object p8, Object p9) {
+    getLogger().error(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public void error(String message, Object p0) {
+    getLogger().error(message, p0);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1) {
+    getLogger().error(message, p0, p1);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1, Object p2) {
+    getLogger().error(message, p0, p1, p2);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().error(message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().error(message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().error(message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().error(message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7) {
+    getLogger().error(message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                    Object p8) {
+    getLogger().error(message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void error(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                    Object p8, Object p9) {
+    getLogger().error(message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
   public void exit() {
     getLogger().exit();
   }
@@ -505,6 +971,183 @@ abstract class DispatchingLogger extends Logger {
     getLogger().fatal(message, t);
   }
 
+
+
+  @Override
+  public void fatal(Marker marker, CharSequence message) {
+    getLogger().fatal(marker, message);
+  }
+
+  @Override
+  public void fatal(Marker marker, CharSequence message, Throwable throwable) {
+    getLogger().fatal(marker, message, throwable);
+  }
+
+  @Override
+  public void fatal(CharSequence message) {
+    getLogger().fatal(message);
+  }
+
+  @Override
+  public void fatal(CharSequence message, Throwable throwable) {
+    getLogger().fatal(message, throwable);
+  }
+
+  @Override
+  public void fatal(Supplier<?> messageSupplier) {
+    getLogger().fatal(messageSupplier);
+  }
+
+  @Override
+  public void fatal(Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().fatal(messageSupplier, throwable);
+  }
+
+  @Override
+  public void fatal(Marker marker, Supplier<?> messageSupplier) {
+    getLogger().fatal(marker, messageSupplier);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Supplier<?>... paramSuppliers) {
+    getLogger().fatal(marker, message, paramSuppliers);
+  }
+
+  @Override
+  public void fatal(Marker marker, Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().fatal(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void fatal(String message, Supplier<?>... paramSuppliers) {
+    getLogger().fatal(message, paramSuppliers);
+  }
+
+  @Override
+  public void fatal(Marker marker, MessageSupplier messageSupplier) {
+    getLogger().fatal(marker, messageSupplier);
+  }
+
+  @Override
+  public void fatal(Marker marker, MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().fatal(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void fatal(MessageSupplier messageSupplier) {
+    getLogger().fatal(messageSupplier);
+  }
+
+  @Override
+  public void fatal(MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().fatal(messageSupplier, throwable);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0) {
+    getLogger().fatal(marker, message, p0);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1) {
+    getLogger().fatal(marker, message, p0, p1);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1, Object p2) {
+    getLogger().fatal(marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().fatal(marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().fatal(marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().fatal(marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().fatal(marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7) {
+    getLogger().fatal(marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7, Object p8) {
+    getLogger().fatal(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void fatal(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7, Object p8, Object p9) {
+    getLogger().fatal(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public void fatal(String message, Object p0) {
+    getLogger().fatal(message, p0);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1) {
+    getLogger().fatal(message, p0, p1);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1, Object p2) {
+    getLogger().fatal(message, p0, p1, p2);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().fatal(message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().fatal(message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().fatal(message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().fatal(message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7) {
+    getLogger().fatal(message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                    Object p8) {
+    getLogger().fatal(message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void fatal(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                    Object p8, Object p9) {
+    getLogger().fatal(message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
   @Override
   public void info(Marker marker, Message msg) {
     getLogger().info(marker, msg);
@@ -573,6 +1216,183 @@ abstract class DispatchingLogger extends Logger {
   @Override
   public void info(String message, Throwable t) {
     getLogger().info(message, t);
+  }
+
+
+
+  @Override
+  public void info(Marker marker, CharSequence message) {
+    getLogger().info(marker, message);
+  }
+
+  @Override
+  public void info(Marker marker, CharSequence message, Throwable throwable) {
+    getLogger().info(marker, message, throwable);
+  }
+
+  @Override
+  public void info(CharSequence message) {
+    getLogger().info(message);
+  }
+
+  @Override
+  public void info(CharSequence message, Throwable throwable) {
+    getLogger().info(message, throwable);
+  }
+
+  @Override
+  public void info(Supplier<?> messageSupplier) {
+    getLogger().info(messageSupplier);
+  }
+
+  @Override
+  public void info(Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().info(messageSupplier, throwable);
+  }
+
+  @Override
+  public void info(Marker marker, Supplier<?> messageSupplier) {
+    getLogger().info(marker, messageSupplier);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Supplier<?>... paramSuppliers) {
+    getLogger().info(marker, message, paramSuppliers);
+  }
+
+  @Override
+  public void info(Marker marker, Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().info(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void info(String message, Supplier<?>... paramSuppliers) {
+    getLogger().info(message, paramSuppliers);
+  }
+
+  @Override
+  public void info(Marker marker, MessageSupplier messageSupplier) {
+    getLogger().info(marker, messageSupplier);
+  }
+
+  @Override
+  public void info(Marker marker, MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().info(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void info(MessageSupplier messageSupplier) {
+    getLogger().info(messageSupplier);
+  }
+
+  @Override
+  public void info(MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().info(messageSupplier, throwable);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0) {
+    getLogger().info(marker, message, p0);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1) {
+    getLogger().info(marker, message, p0, p1);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1, Object p2) {
+    getLogger().info(marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().info(marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().info(marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().info(marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().info(marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                   Object p7) {
+    getLogger().info(marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                   Object p7, Object p8) {
+    getLogger().info(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void info(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                   Object p7, Object p8, Object p9) {
+    getLogger().info(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public void info(String message, Object p0) {
+    getLogger().info(message, p0);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1) {
+    getLogger().info(message, p0, p1);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1, Object p2) {
+    getLogger().info(message, p0, p1, p2);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().info(message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().info(message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().info(message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().info(message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7) {
+    getLogger().info(message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                   Object p8) {
+    getLogger().info(message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void info(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                   Object p8, Object p9) {
+    getLogger().info(message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
   }
 
   @Override
@@ -716,6 +1536,183 @@ abstract class DispatchingLogger extends Logger {
   }
 
   @Override
+  public void log(Level level, Marker marker, CharSequence message) {
+    getLogger().log(level, marker, message);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, CharSequence message, Throwable throwable) {
+    getLogger().log(level, marker, message, throwable);
+  }
+
+  @Override
+  public void log(Level level, CharSequence message) {
+    getLogger().log(level, message);
+  }
+
+  @Override
+  public void log(Level level, CharSequence message, Throwable throwable) {
+    getLogger().log(level, message, throwable);
+  }
+
+  @Override
+  public void log(Level level, Supplier<?> messageSupplier) {
+    getLogger().log(level, messageSupplier);
+  }
+
+  @Override
+  public void log(Level level, Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().log(level, messageSupplier, throwable);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, Supplier<?> messageSupplier) {
+    getLogger().log(level, marker, messageSupplier);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Supplier<?>... paramSuppliers) {
+    getLogger().log(level, marker, message, paramSuppliers);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().log(level, marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void log(Level level, String message, Supplier<?>... paramSuppliers) {
+    getLogger().log(level, message, paramSuppliers);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, MessageSupplier messageSupplier) {
+    getLogger().log(level, marker, messageSupplier);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().log(level, marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void log(Level level, MessageSupplier messageSupplier) {
+    getLogger().log(level, messageSupplier);
+  }
+
+  @Override
+  public void log(Level level, MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().log(level, messageSupplier, throwable);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0) {
+    getLogger().log(level, marker, message, p0);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1) {
+    getLogger().log(level, marker, message, p0, p1);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1, Object p2) {
+    getLogger().log(level, marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().log(level, marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().log(level, marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().log(level, marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5,
+                  Object p6) {
+    getLogger().log(level, marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5,
+                  Object p6, Object p7) {
+    getLogger().log(level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5,
+                  Object p6, Object p7, Object p8) {
+    getLogger().log(level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void log(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5,
+                  Object p6, Object p7, Object p8, Object p9) {
+    getLogger().log(level, marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0) {
+    getLogger().log(level, message, p0);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1) {
+    getLogger().log(level, message, p0, p1);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1, Object p2) {
+    getLogger().log(level, message, p0, p1, p2);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().log(level, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().log(level, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().log(level, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().log(level, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                  Object p7) {
+    getLogger().log(level, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                  Object p7, Object p8) {
+    getLogger().log(level, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void log(Level level, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                  Object p7, Object p8, Object p9) {
+    getLogger().log(level, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
   public void logIfEnabled(String fqcn, Level level, Marker marker, Message msg, Throwable t) {
     getLogger().logIfEnabled(fqcn, level, marker, msg, t);
   }
@@ -772,7 +1769,7 @@ abstract class DispatchingLogger extends Logger {
 
   @Override
   public void logIfEnabled(String fqcn, Level level, Marker marker, String message, Object p0, Object p1, Object p2) {
-    super.logIfEnabled(fqcn, level, marker, message, p0, p1, p2);
+    getLogger().logIfEnabled(fqcn, level, marker, message, p0, p1, p2);
   }
 
   @Override
@@ -907,6 +1904,236 @@ abstract class DispatchingLogger extends Logger {
   }
 
   @Override
+  public void trace(Marker marker, CharSequence message) {
+    getLogger().trace(marker, message);
+  }
+
+  @Override
+  public void trace(Marker marker, CharSequence message, Throwable throwable) {
+    getLogger().trace(marker, message, throwable);
+  }
+
+  @Override
+  public void trace(CharSequence message) {
+    getLogger().trace(message);
+  }
+
+  @Override
+  public void trace(CharSequence message, Throwable throwable) {
+    getLogger().trace(message, throwable);
+  }
+
+  @Override
+  public void trace(Supplier<?> messageSupplier) {
+    getLogger().trace(messageSupplier);
+  }
+
+  @Override
+  public void trace(Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().trace(messageSupplier, throwable);
+  }
+
+  @Override
+  public void trace(Marker marker, Supplier<?> messageSupplier) {
+    getLogger().trace(marker, messageSupplier);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Supplier<?>... paramSuppliers) {
+    getLogger().trace(marker, message, paramSuppliers);
+  }
+
+  @Override
+  public void trace(Marker marker, Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().trace(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void trace(String message, Supplier<?>... paramSuppliers) {
+    getLogger().trace(message, paramSuppliers);
+  }
+
+  @Override
+  public void trace(Marker marker, MessageSupplier messageSupplier) {
+    getLogger().trace(marker, messageSupplier);
+  }
+
+  @Override
+  public void trace(Marker marker, MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().trace(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void trace(MessageSupplier messageSupplier) {
+    getLogger().trace(messageSupplier);
+  }
+
+  @Override
+  public void trace(MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().trace(messageSupplier, throwable);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0) {
+    getLogger().trace(marker, message, p0);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1) {
+    getLogger().trace(marker, message, p0, p1);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1, Object p2) {
+    getLogger().trace(marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().trace(marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().trace(marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().trace(marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().trace(marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7) {
+    getLogger().trace(marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7, Object p8) {
+    getLogger().trace(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void trace(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                    Object p7, Object p8, Object p9) {
+    getLogger().trace(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public void trace(String message, Object p0) {
+    getLogger().trace(message, p0);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1) {
+    getLogger().trace(message, p0, p1);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1, Object p2) {
+    getLogger().trace(message, p0, p1, p2);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().trace(message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().trace(message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().trace(message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().trace(message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7) {
+    getLogger().trace(message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                    Object p8) {
+    getLogger().trace(message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void trace(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                    Object p8, Object p9) {
+    getLogger().trace(message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public EntryMessage traceEntry() {
+    return getLogger().traceEntry();
+  }
+
+  @Override
+  public EntryMessage traceEntry(String format, Object... params) {
+    return getLogger().traceEntry(format, params);
+  }
+
+  @Override
+  public EntryMessage traceEntry(Supplier<?>... paramSuppliers) {
+    return getLogger().traceEntry(paramSuppliers);
+  }
+
+  @Override
+  public EntryMessage traceEntry(String format, Supplier<?>... paramSuppliers) {
+    return getLogger().traceEntry(format, paramSuppliers);
+  }
+
+  @Override
+  public EntryMessage traceEntry(Message message) {
+    return getLogger().traceEntry(message);
+  }
+
+  @Override
+  public void traceExit() {
+    getLogger().traceExit();
+  }
+
+  @Override
+  public <R> R traceExit(R result) {
+    return getLogger().traceExit(result);
+  }
+
+  @Override
+  public <R> R traceExit(String format, R result) {
+    return getLogger().traceExit(format, result);
+  }
+
+  @Override
+  public void traceExit(EntryMessage message) {
+    getLogger().traceExit(message);
+  }
+
+  @Override
+  public <R> R traceExit(EntryMessage message, R result) {
+    return getLogger().traceExit(message, result);
+  }
+
+  @Override
+  public <R> R traceExit(Message message, R result) {
+    return getLogger().traceExit(message, result);
+  }
+
+  @Override
   public void warn(Marker marker, Message msg) {
     getLogger().warn(marker, msg);
   }
@@ -975,4 +2202,180 @@ abstract class DispatchingLogger extends Logger {
   public void warn(String message, Throwable t) {
     getLogger().warn(message, t);
   }
+
+  @Override
+  public void warn(Marker marker, CharSequence message) {
+    getLogger().warn(marker, message);
+  }
+
+  @Override
+  public void warn(Marker marker, CharSequence message, Throwable throwable) {
+    getLogger().warn(marker, message, throwable);
+  }
+
+  @Override
+  public void warn(CharSequence message) {
+    getLogger().warn(message);
+  }
+
+  @Override
+  public void warn(CharSequence message, Throwable throwable) {
+    getLogger().warn(message, throwable);
+  }
+
+  @Override
+  public void warn(Supplier<?> messageSupplier) {
+    getLogger().warn(messageSupplier);
+  }
+
+  @Override
+  public void warn(Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().warn(messageSupplier, throwable);
+  }
+
+  @Override
+  public void warn(Marker marker, Supplier<?> messageSupplier) {
+    getLogger().warn(marker, messageSupplier);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Supplier<?>... paramSuppliers) {
+    getLogger().warn(marker, message, paramSuppliers);
+  }
+
+  @Override
+  public void warn(Marker marker, Supplier<?> messageSupplier, Throwable throwable) {
+    getLogger().warn(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void warn(String message, Supplier<?>... paramSuppliers) {
+    getLogger().warn(message, paramSuppliers);
+  }
+
+  @Override
+  public void warn(Marker marker, MessageSupplier messageSupplier) {
+    getLogger().warn(marker, messageSupplier);
+  }
+
+  @Override
+  public void warn(Marker marker, MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().warn(marker, messageSupplier, throwable);
+  }
+
+  @Override
+  public void warn(MessageSupplier messageSupplier) {
+    getLogger().warn(messageSupplier);
+  }
+
+  @Override
+  public void warn(MessageSupplier messageSupplier, Throwable throwable) {
+    getLogger().warn(messageSupplier, throwable);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0) {
+    getLogger().warn(marker, message, p0);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1) {
+    getLogger().warn(marker, message, p0, p1);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1, Object p2) {
+    getLogger().warn(marker, message, p0, p1, p2);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().warn(marker, message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().warn(marker, message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().warn(marker, message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().warn(marker, message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                   Object p7) {
+    getLogger().warn(marker, message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                   Object p7, Object p8) {
+    getLogger().warn(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void warn(Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6,
+                   Object p7, Object p8, Object p9) {
+    getLogger().warn(marker, message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
+  @Override
+  public void warn(String message, Object p0) {
+    getLogger().warn(message, p0);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1) {
+    getLogger().warn(message, p0, p1);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1, Object p2) {
+    getLogger().warn(message, p0, p1, p2);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1, Object p2, Object p3) {
+    getLogger().warn(message, p0, p1, p2, p3);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
+    getLogger().warn(message, p0, p1, p2, p3, p4);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
+    getLogger().warn(message, p0, p1, p2, p3, p4, p5);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
+    getLogger().warn(message, p0, p1, p2, p3, p4, p5, p6);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7) {
+    getLogger().warn(message, p0, p1, p2, p3, p4, p5, p6, p7);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                   Object p8) {
+    getLogger().warn(message, p0, p1, p2, p3, p4, p5, p6, p7, p8);
+  }
+
+  @Override
+  public void warn(String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7,
+                   Object p8, Object p9) {
+    getLogger().warn(message, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+  }
+
 }
