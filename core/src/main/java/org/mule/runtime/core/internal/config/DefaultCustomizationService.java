@@ -31,7 +31,8 @@ import java.util.function.Consumer;
  */
 public class DefaultCustomizationService implements InternalCustomizationService {
 
-  private static final boolean HA_MIGRATION_ENABLED = getBoolean(SYSTEM_PROPERTY_PREFIX + "enable.ha.migration");
+  // Not retrieving the value once for testing purposes
+  public static final String HA_MIGRATION_ENABLED_PROPERTY = SYSTEM_PROPERTY_PREFIX + "enable.ha.migration";
   private final Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
   private final Map<String, CustomService> customServices = new HashMap<>();
 
@@ -63,7 +64,8 @@ public class DefaultCustomizationService implements InternalCustomizationService
   }
 
   private boolean isMigrationSecondService(String serviceId) {
-    return HA_MIGRATION_ENABLED && muleContextDefaultServices.containsKey(serviceId) && serviceId.equals(OBJECT_LOCK_PROVIDER);
+    return serviceId.equals(OBJECT_LOCK_PROVIDER) && muleContextDefaultServices.containsKey(serviceId)
+        && getBoolean(HA_MIGRATION_ENABLED_PROPERTY);
   }
 
   private CustomService combineServicesForMigration(String serviceId, CustomService first, CustomService second) {
