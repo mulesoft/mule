@@ -142,9 +142,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
   private void initialiseExpression() throws InitialisationException {
     if (useSecureHash && idExpression != null) {
       useSecureHash = false;
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Disabling useSecureHash in idempotent-redelivery-policy since an idExpression has been configured");
-      }
+      LOGGER.warn("Disabling useSecureHash in idempotent-redelivery-policy since an idExpression has been configured");
     }
     if (!useSecureHash && messageDigestAlgorithm != null) {
       throw new InitialisationException(
@@ -213,12 +211,16 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       try {
         store.close();
       } catch (ObjectStoreException e) {
-        LOGGER.warn("error closing object store: " + e.getMessage(), e);
+        LOGGER.atWarn()
+            .setCause(e)
+            .log("error closing object store: {}", e.getMessage());
       }
       try {
         objectStoreManager.disposeStore(getObjectStoreName());
       } catch (ObjectStoreException e) {
-        LOGGER.warn("error disposing object store: " + e.getMessage(), e);
+        LOGGER.atWarn()
+            .setCause(e)
+            .log("error disposing object store: {}", e.getMessage());
       }
       store = null;
     }
@@ -248,10 +250,8 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     try {
       messageId = getIdForEvent(event);
     } catch (ExpressionRuntimeException e) {
-      if (LOGGER.isDebugEnabled()) {
-        // Logs the details of the error.
-        LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG, e);
-      }
+      // Logs the details of the error.
+      LOGGER.warn(EXPRESSION_RUNTIME_EXCEPTION_ERROR_MSG, e);
 
       // The current transaction needs to be committed, so it's not rolled back, what would cause an infinite loop.
       TransactionCoordination.getInstance().commitCurrentTransaction();

@@ -148,10 +148,11 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       final InternalEvent eventWithResolvedParams = addResolvedParameters(event, component, dslParameters);
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling before() for '{}' in processor '{}'...", interceptor,
-                     component.getLocation().getLocation());
-      }
+      LOGGER.atDebug()
+          .setMessage("Calling before() for '{}' in processor '{}'...")
+          .addArgument(interceptor)
+          .addArgument(() -> component.getLocation().getLocation())
+          .log();
       try {
         withContextClassLoader(interceptor.getClassLoader(), () -> interceptor.before(component.getLocation(),
                                                                                       getResolvedParams(eventWithResolvedParams),
@@ -174,10 +175,11 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       final InternalEvent eventWithResolvedParams = removeResolvedParameters(event);
       DefaultInterceptionEvent interceptionEvent = new DefaultInterceptionEvent(eventWithResolvedParams);
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Calling after() for '{}' in processor '{}'...", interceptor,
-                     component.getLocation().getLocation());
-      }
+      LOGGER.atDebug()
+          .setMessage("Calling after() for '{}' in processor '{}'...")
+          .addArgument(interceptor)
+          .addArgument(() -> component.getLocation().getLocation())
+          .log();
       try {
         withContextClassLoader(interceptor.getClassLoader(),
                                () -> interceptor.after(component.getLocation(), interceptionEvent, thrown));
@@ -195,10 +197,10 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
       Processor processor = (Processor) internalParametersFrom(event).get(INTERCEPTION_COMPONENT);
 
       if (processor instanceof ParametersResolverProcessor) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Disposing resolved parameters for processor {}...",
-                       ((Component) processor).getLocation().getLocation());
-        }
+        LOGGER.atDebug()
+            .setMessage("Disposing resolved parameters for processor {}...")
+            .addArgument(() -> ((Component) processor).getLocation().getLocation())
+            .log();
 
         ((ParametersResolverProcessor) processor)
             .disposeResolvedParameters((ExecutionContext) internalParametersFrom(event).get(INTERCEPTION_RESOLVED_CONTEXT));

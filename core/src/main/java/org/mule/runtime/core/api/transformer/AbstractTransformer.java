@@ -10,7 +10,6 @@ import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
 import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
 
-import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.hash;
 
@@ -30,12 +29,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import jakarta.inject.Inject;
-
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
 
 /**
  * <code>AbstractTransformer</code> is a base class for all transformers. Transformations transform one object into another.
@@ -232,16 +231,16 @@ public abstract class AbstractTransformer implements Transformer {
       throw new TransformerException(msg, this);
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(format("Applying transformer %s (%s)", getName(), getClass().getName()));
-      logger.debug(format("Object before transform: %s", StringMessageUtils.toString(payload)));
-    }
-
-    Object result = doTransform(payload, enc);
-
-    if (logger.isDebugEnabled()) {
-      logger.debug(format("Object after transform: %s", StringMessageUtils.toString(result)));
-    }
+    final var actualPayload = payload;
+    logger.atDebug().setMessage("Applying transformer {} ({}); Object before transform: {}")
+        .addArgument(getName())
+        .addArgument(getClass().getName())
+        .addArgument(() -> StringMessageUtils.toString(actualPayload))
+        .log();
+    Object result = doTransform(actualPayload, enc);
+    logger.atDebug().setMessage("Object after transform: {}")
+        .addArgument(() -> StringMessageUtils.toString(result))
+        .log();
 
     checkTransformerReturnClass(this, result);
 

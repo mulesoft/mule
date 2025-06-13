@@ -79,9 +79,7 @@ public final class CachedConnectionHandler<C> implements ConnectionHandlerAdapte
     try {
       connectionProvider.disconnect(connection);
     } catch (Exception e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn(format("Error disconnecting cached connection %s. %s", connection, e.getMessage()), e);
-      }
+      LOGGER.warn("Error disconnecting cached connection {}. {}", connection, e.getMessage(), e);
     } finally {
       connection = null;
     }
@@ -93,9 +91,7 @@ public final class CachedConnectionHandler<C> implements ConnectionHandlerAdapte
       try {
         close();
       } catch (Exception e) {
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn(format("Error invalidating cached connection %s. %s", connection, e.getMessage()), e);
-        }
+        LOGGER.warn("Error invalidating cached connection {}. {}", connection, e.getMessage(), e);
       } finally {
         releaser.accept(this);
       }

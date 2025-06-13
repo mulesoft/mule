@@ -116,13 +116,14 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
       if (exportedService.isPresent()) {
         if (isVerboseLogging()) {
-          logClassloadingTrace(format("Service resource '%s' found in classloader for '%s': '%s", name, getArtifactId(),
-                                      exportedService.get()));
+          logClassloadingTrace("Service resource '{}' found in classloader for '{}': '{}'",
+                               name, getArtifactId(), exportedService.get());
         }
         return exportedService.get().getResource();
       } else {
         if (isVerboseLogging()) {
-          logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
+          logClassloadingTrace("Service resource '{}' not found in classloader for '{}'.",
+                               name, getArtifactId());
         }
         return null;
       }
@@ -131,8 +132,8 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         return getResourceFromDelegate(artifactClassLoader, name);
       } else {
         if (isVerboseLogging()) {
-          logClassloadingTrace(format("Resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
-          logClassloadingTrace(format("Filter applied for resource '%s': %s", name, getArtifactId()));
+          logClassloadingTrace("Resource '{}' not found in classloader for '{}'.", name, getArtifactId());
+          logClassloadingTrace("Filter applied for resource '{}': {}", name, getArtifactId());
         }
 
         return null;
@@ -151,11 +152,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
       if (isVerboseLogging()) {
         if (exportedServiceProviders.isEmpty()) {
-          logClassloadingTrace(format("Service resource '%s' not found in classloader for '%s'.", name, getArtifactId()));
+          logClassloadingTrace("Service resource '{}' not found in classloader for '{}'.",
+                               name, getArtifactId());
         } else {
-
-          logClassloadingTrace(format("Service resources '%s' found in classloader for '%s': '%s", name, getArtifactId(),
-                                      exportedServiceProviders));
+          logClassloadingTrace("Service resources '{}' found in classloader for '{}': '{}'",
+                               name, getArtifactId(), exportedServiceProviders);
         }
       }
       return enumeration(exportedServiceProviders);
@@ -163,8 +164,8 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
       return getResourcesFromDelegate(artifactClassLoader, name);
     } else {
       if (isVerboseLogging()) {
-        logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactId()));
-        logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactId()));
+        logClassloadingTrace("Resources '{}' not found in classloader for '{}'.", name, getArtifactId());
+        logClassloadingTrace("Filter applied for resources '{}': {}", name, getArtifactId());
       }
       return enumeration(emptyList());
     }
@@ -184,11 +185,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
     return name.startsWith(SERVICE_PREFIX);
   }
 
-  private void logClassloadingTrace(String message) {
+  private void logClassloadingTrace(String message, Object... args) {
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace(message);
+      LOGGER.trace(message, args);
     } else {
-      LOGGER.info(message);
+      LOGGER.info(message, args);
     }
   }
 

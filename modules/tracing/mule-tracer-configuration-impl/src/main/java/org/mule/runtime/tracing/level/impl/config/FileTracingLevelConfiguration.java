@@ -15,13 +15,12 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.MONITORING;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.valueOf;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.synchronizedList;
 import static java.util.Optional.empty;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -52,6 +51,7 @@ import javax.inject.Inject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
 import org.slf4j.Logger;
 
 /**
@@ -119,8 +119,8 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
         tracingLevel = valueOf(configuredTracingLevel.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException e) {
         LOGGER
-            .error(format("Wrong tracing level found in configuration file: %s. The tracing level will be set to the default level: %s",
-                          configuredTracingLevel, defaultLevel));
+            .error("Wrong tracing level found in configuration file: {}. The tracing level will be set to the default level: {}",
+                   configuredTracingLevel, defaultLevel);
       }
     }
   }
@@ -129,14 +129,14 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
     readStringListFromConfig(OVERRIDES_PROPERTY_NAME).forEach((override) -> {
       String[] levelOverride = override.split("=");
       if (levelOverride.length != 2) {
-        LOGGER.error(format("Wrong tracing level override found in configuration file: %s. This override will be ignored.",
-                            override));
+        LOGGER.error("Wrong tracing level override found in configuration file: {}. This override will be ignored.",
+                     override);
       } else {
         try {
           tracingLevelOverrides.put(levelOverride[0], valueOf(levelOverride[1].toUpperCase(Locale.ROOT)));
         } catch (IllegalArgumentException e) {
-          LOGGER.error(format("Wrong tracing level override found in configuration file: %s. This override will be ignored.",
-                              override));
+          LOGGER.error("Wrong tracing level override found in configuration file: {}. This override will be ignored.",
+                       override);
         }
       }
     });
@@ -201,16 +201,10 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
       return loadConfiguration(is);
     } catch (MuleRuntimeException | IOException e) {
       if (parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"))) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER
-              .debug(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s",
-                            defaultLevel),
-                     e);
-        } else {
-          LOGGER
-              .info(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s. Enable DEBUG log level to see the exception",
-                           defaultLevel));
-        }
+        LOGGER.info("Non existent or non parseable tracing level config file found. "
+            + "The tracing level will be set to the default: {}. Enable DEBUG log level to see the exception",
+                    defaultLevel);
+        LOGGER.debug("Exception:", e);
       }
     }
     return null;

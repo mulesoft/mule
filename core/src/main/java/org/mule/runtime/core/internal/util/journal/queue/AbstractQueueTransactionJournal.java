@@ -44,35 +44,27 @@ public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<
   }
 
   public void logAdd(T txId, QueueStore queue, Serializable value) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Logging queue add operation for tx " + txId);
-    }
+    logger.debug("Logging queue add operation for tx {}", txId);
     logFile.logUpdateOperation(createUpdateJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.ADD.getByteRepresentation(),
                                                         queue.getName(), value));
   }
 
   public void logAddFirst(T txId, QueueStore queue, Serializable item) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Logging queue add first operation for tx " + txId);
-    }
+    logger.debug("Logging queue add first operation for tx {}", txId);
     logFile.logUpdateOperation(createUpdateJournalEntry(txId,
                                                         AbstractQueueTxJournalEntry.Operation.ADD_FIRST.getByteRepresentation(),
                                                         queue.getName(), item));
   }
 
   public void logRemove(T txId, QueueStore queue, Serializable value) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Logging queue remove operation for tx " + txId);
-    }
+    logger.debug("Logging queue remove operation for tx {}", txId);
     logFile
         .logUpdateOperation(createUpdateJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.REMOVE.getByteRepresentation(),
                                                      queue.getName(), value));
   }
 
   public void logCommit(T txId) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Logging queue commit operation for tx " + txId);
-    }
+    logger.debug("Logging queue commit operation for tx {}", txId);
     logFile.logCheckpointOperation(createCheckpointJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.COMMIT
         .getByteRepresentation()));
   }
@@ -98,9 +90,7 @@ public abstract class AbstractQueueTransactionJournal<T, K extends JournalEntry<
   protected abstract K createCheckpointJournalEntry(T txId, byte operation);
 
   public void logRollback(T txId) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Logging queue rollback operation for tx " + txId);
-    }
+    logger.debug("Logging queue rollback operation for tx {}", txId);
     logFile.logCheckpointOperation(createCheckpointJournalEntry(txId, AbstractQueueTxJournalEntry.Operation.ROLLBACK
         .getByteRepresentation()));
   }

@@ -8,8 +8,6 @@ package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import static java.util.stream.Collectors.toList;
-
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.discoverer.ModuleDiscoverer;
 import org.mule.runtime.jpms.api.MuleContainerModule;
@@ -45,11 +43,13 @@ public class DefaultModuleRepository implements ModuleRepository {
     if (modules == null) {
       synchronized (this) {
         if (modules == null) {
-          modules = discoverModules();
-
-          if (logger.isDebugEnabled()) {
-            logger.debug("Found {} modules: {}", modules.size(), modules.stream().map(m -> m.getName()).collect(toList()));
-          }
+          var discoveredModules = discoverModules();
+          logger.atDebug()
+              .setMessage("Found {} modules: {}")
+              .addArgument(discoveredModules.size())
+              .addArgument(() -> discoveredModules.stream().map(MuleContainerModule::getName).toList())
+              .log();
+          modules = discoveredModules;
         }
       }
     }

@@ -96,9 +96,7 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   @Override
   public synchronized void initialise() throws InitialisationException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Initializing LifecycleAwareConfigurationInstance '%s'", getName()));
-    }
+    LOGGER.debug("Initializing LifecycleAwareConfigurationInstance '{}'", getName());
 
     if (!initialized) {
       initialized = true;
@@ -119,9 +117,7 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
 
   @Override
   public synchronized void start() throws MuleException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Starting LifecycleAwareConfigurationInstance '%s'", getName()));
-    }
+    LOGGER.debug("Starting LifecycleAwareConfigurationInstance '{}'", getName());
 
     if (!started) {
       started = true;
@@ -146,9 +142,7 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
    */
   @Override
   public synchronized void stop() throws MuleException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Stopping LifecycleAwareConfigurationInstance '%s'", getName()));
-    }
+    LOGGER.debug("Stopping LifecycleAwareConfigurationInstance '{}'", getName());
 
     if (started) {
       started = false;
@@ -178,9 +172,7 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
    */
   @Override
   public synchronized void dispose() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(format("Disposing LifecycleAwareConfigurationInstance '%s'", getName()));
-    }
+    LOGGER.debug("Disposing LifecycleAwareConfigurationInstance '{}'", getName());
 
     if (initialized) {
       initialized = false;

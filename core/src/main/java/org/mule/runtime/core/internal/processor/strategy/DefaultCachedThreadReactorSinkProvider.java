@@ -69,7 +69,9 @@ public class DefaultCachedThreadReactorSinkProvider extends AbstractCachedThread
         .doOnNext(eventConsumer)
         .transform(processor)
         .subscribe(null, e -> {
-          LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
+          LOGGER.atError()
+              .setCause(e)
+              .log("Exception reached PS subscriber for flow '{}'", flowConstruct.getName());
           disposableSinks.decrementAndGet();
         }, disposableSinks::decrementAndGet);
 

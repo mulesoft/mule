@@ -8,8 +8,6 @@ package org.mule.runtime.module.extension.internal.lifecycle;
 
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
 
-import static java.lang.String.format;
-
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -106,12 +104,12 @@ public class ExtensionOnMuleContextDisposedNotificationListener
     try {
       artifactLifecycleListener.onArtifactDisposal(artifactDisposalContext);
     } catch (Throwable t) {
-      String message =
-          format("Error executing (%s)'s #onArtifactDisposal from extension '%s' on artifact '%s'. This can cause a resource leak",
-                 artifactLifecycleListener,
-                 extensionId,
-                 artifactId);
-      LOGGER.error(message, t);
+      LOGGER.atError()
+          .setCause(t)
+          .log("Error executing ({})'s #onArtifactDisposal from extension '{}' on artifact '{}'. This can cause a resource leak",
+               artifactLifecycleListener,
+               extensionId,
+               artifactId);
     }
   }
 }

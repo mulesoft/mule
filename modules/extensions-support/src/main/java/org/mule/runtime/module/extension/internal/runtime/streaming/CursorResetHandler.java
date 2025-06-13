@@ -48,10 +48,10 @@ public class CursorResetHandler {
       try {
         pair.getFirst().seek(pair.getSecond());
       } catch (IOException e) {
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn("Could not reset cursor back to position " + pair.getSecond() + ". Inconsistencies might occur if "
-              + "a retry is attempted", e);
-        }
+        LOGGER.atWarn()
+            .setCause(e)
+            .log("Could not reset cursor back to position {}. Inconsistencies might occur if a retry is attempted",
+                 pair.getSecond());
       }
     });
   }

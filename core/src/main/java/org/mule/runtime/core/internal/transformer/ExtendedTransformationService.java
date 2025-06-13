@@ -123,14 +123,10 @@ public class ExtendedTransformationService extends DefaultTransformationService 
         DataType originalSourceType = DataType.fromType(srcCls);
 
         if (transformer.isSourceDataTypeSupported(originalSourceType)) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Using " + transformer + " to transform payload.");
-          }
+          logger.debug("Using {} to transform payload.", transformer);
           result = transformMessage(result, event, transformer);
         } else {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Transformer " + transformer + " doesn't support the source payload: " + srcCls);
-          }
+          logger.debug("Transformer {} doesn't support the source payload: {}", transformer, srcCls);
 
           if (canSkipTransformer(result, transformers, index)) {
             continue;
@@ -141,9 +137,7 @@ public class ExtendedTransformationService extends DefaultTransformationService 
               dataTypeConversionResolver.resolve(originalSourceType, transformer.getSourceDataTypes());
 
           if (implicitTransformer != null) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Performing implicit transformation with: " + transformer);
-            }
+            logger.debug("Performing implicit transformation with: {}", transformer);
             result = transformMessage(result, event, implicitTransformer);
             result = transformMessage(result, event, transformer);
           } else {
@@ -178,7 +172,7 @@ public class ExtendedTransformationService extends DefaultTransformationService 
     }
 
     if (skipConverter) {
-      logger.debug("Skipping converter: " + transformer);
+      logger.debug("Skipping converter: {}", transformer);
     }
 
     return skipConverter;

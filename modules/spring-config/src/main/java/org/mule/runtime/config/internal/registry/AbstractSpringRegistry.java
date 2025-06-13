@@ -491,11 +491,8 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     private void doRegisterObject(String key, Object value) throws RegistrationException {
       if (springContextInitialised.get()) {
         if (applicationContext.containsBean(key)) {
-          if (logger.isWarnEnabled()) {
-            logger.warn(
-                        format("Spring registry already contains an object named '%s'. The previous object will be overwritten.",
-                               key));
-          }
+          logger.warn("Spring registry already contains an object named '{}'. The previous object will be overwritten.",
+                      key);
           AbstractSpringRegistry.this.unregisterObject(key);
         }
 

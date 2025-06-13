@@ -27,15 +27,11 @@ public abstract class AbstractXAResourceManager<T extends AbstractXaTransactionC
   public int prepareTransaction(T context) throws ResourceManagerException {
     assureReady();
     synchronized (context) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Preparing transaction {}", context);
-      }
+      logger.debug("Preparing transaction {}", context);
       context.status = Status.STATUS_PREPARING;
       int status = doPrepare(context);
       context.status = Status.STATUS_PREPARED;
-      if (logger.isDebugEnabled()) {
-        logger.debug("Prepared transaction {}", context);
-      }
+      logger.debug("Prepared transaction {}", context);
       return status;
     }
   }

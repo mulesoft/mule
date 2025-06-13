@@ -233,9 +233,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                                              e);
       }
     } else {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format("No expression marker found in expression '%s'. Parsing as plain String.", expression));
-      }
+      LOGGER.debug("No expression marker found in expression '{}'. Parsing as plain String.", expression);
       return expression;
     }
   }
@@ -289,9 +287,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public ValidationResult validate(String expression) {
     if (!muleContext.getConfiguration().isValidateExpressions()) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Validate expressions is turned off, no checking done for: " + expression);
-      }
+      LOGGER.debug("Validate expressions is turned off, no checking done for: {}", expression);
       return new DefaultValidationResult(true, null);
     }
     final StringBuilder message = new StringBuilder();
@@ -326,9 +322,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   public List<ConstraintViolation> validate(String script, String nameIdentifier, ValidationPhase validationScopePhase,
                                             TypeBindings typeBindings, Optional<MetadataType> outputType) {
     if (!muleContext.getConfiguration().isValidateExpressions()) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Validate expressions is turned off, no checking done for: " + script);
-      }
+      LOGGER.debug("Validate expressions is turned off, no checking done for: {}", script);
       return emptyList();
     }
 

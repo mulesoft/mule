@@ -71,7 +71,7 @@ public class PropertiesResolverUtils {
     try {
       providerFactoryIfaceOld = forName(oldInterfaceName);
     } catch (ClassNotFoundException e) {
-      LOGGER.debug("Interface '" + oldInterfaceName + "' not available in classpath, skipping its processing.");
+      LOGGER.debug("Interface '{}' not available in classpath, skipping its processing.", oldInterfaceName);
     }
     PROVIDER_FACTORY_IFACE_OLD = providerFactoryIfaceOld;
   }

@@ -79,9 +79,7 @@ public final class TransactionCoordination {
       }
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Unbinding transaction (" + txCounter + ") " + transaction);
-    }
+    logger.debug("Unbinding transaction ({}) {}", txCounter, transaction);
   }
 
   public void bindTransaction(final Transaction transaction) throws TransactionException {
@@ -112,9 +110,7 @@ public final class TransactionCoordination {
       txCounter = ++this.txCounter;
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Binding new transaction (" + txCounter + ") " + transaction);
-    }
+    logger.debug("Binding new transaction ({}) {}", txCounter, transaction);
   }
 
   public void resumeXaTransactionIfAvailable() {
@@ -152,30 +148,20 @@ public final class TransactionCoordination {
   public void resolveTransaction() throws TransactionException {
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     if (tx.isRollbackOnly()) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Transaction has been marked rollbackOnly, rolling it back: " + tx);
-      }
+      logger.debug("Transaction has been marked rollbackOnly, rolling it back: {}", tx);
       tx.rollback();
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Committing transaction " + tx);
-      }
+      logger.debug("Committing transaction {}", tx);
       tx.commit();
     }
   }
 
   public void suspendCurrentTransaction() throws TransactionException {
     SuspendableTransaction tx = (SuspendableTransaction) TransactionCoordination.getInstance().getTransaction();
-    if (logger.isDebugEnabled()) {
-      logger.debug("Suspending " + tx);
-    }
+    logger.debug("Suspending {}", tx);
 
     tx.suspend();
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("Successfully suspended " + tx);
-      logger.debug("Unbinding the following TX from the current context: " + tx);
-    }
+    logger.debug("Successfully suspended, unbinding the following TX from the current context: {}", tx);
 
     TransactionCoordination.getInstance().unbindTransaction(tx);
     if (suspendedTransaction.get() == null) {
@@ -187,9 +173,7 @@ public final class TransactionCoordination {
   public void resumeSuspendedTransaction() throws TransactionException {
     SuspendableTransaction tx =
         (suspendedTransaction.get() == null) ? null : (SuspendableTransaction) suspendedTransaction.get().pop();
-    if (logger.isDebugEnabled()) {
-      logger.debug("Re-binding and Resuming " + tx);
-    }
+    logger.debug("Re-binding and Resuming {}", tx);
     TransactionCoordination.getInstance().bindTransaction(tx);
     tx.resume();
   }

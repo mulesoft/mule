@@ -82,9 +82,7 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase {
     try {
       super.applyLifecycle(o);
     } catch (Exception e) {
-      if (logger.isWarnEnabled()) {
-        logger.warn("Failed to dispose object " + o, e);
-      }
+      logger.warn("Failed to dispose object {}", o, e);
     }
   }
 }

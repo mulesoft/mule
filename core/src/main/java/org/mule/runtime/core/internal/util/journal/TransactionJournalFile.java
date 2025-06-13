@@ -102,9 +102,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
 
   protected void doClearEntriesForTransaction(T txId) {
     Collection<K> entries = this.entries.removeAll(txId);
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Evicted from tx log file " + entries.size() + " entries from txid " + txId);
-    }
+    LOGGER.debug("Evicted from tx log file {} entries from txid {}", entries.size(), txId);
   }
 
   protected void clearFileIfNeeded() {
@@ -131,9 +129,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
       logFileOutputStream.close();
     } catch (IOException e) {
       LOGGER.warn(e.getMessage());
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Error closing transaction journal file", e);
-      }
+      LOGGER.debug("Error closing transaction journal file", e);
     }
   }
 
@@ -221,9 +217,7 @@ class TransactionJournalFile<T, K extends JournalEntry<T>> {
         } catch (Exception e) {
           LOGGER.warn("Exception reading transaction content. This is normal if the mule server was shutdown due to a failure"
               + e.getMessage());
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Error reading transaction journal file", e);
-          }
+          LOGGER.debug("Error reading transaction journal file", e);
           logEntryCreationFailed = true;
         }
       }

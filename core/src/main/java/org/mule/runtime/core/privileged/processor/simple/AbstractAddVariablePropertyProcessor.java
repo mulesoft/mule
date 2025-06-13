@@ -9,7 +9,6 @@ package org.mule.runtime.core.privileged.processor.simple;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 
-import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -32,10 +31,10 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
 
 public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
@@ -73,11 +72,9 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
     TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
 
     if (!featureFlaggingService.isEnabled(SET_VARIABLE_WITH_NULL_VALUE) && typedValue.getValue() == null) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(format(
-                            "Variable with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this variable",
-                            key, valueEvaluator.getRawValue()));
-      }
+      LOGGER.debug("Variable with key '{}', not found on message using '{}'."
+          + " Since the value was marked optional, nothing was set on the message for this variable",
+                   key, valueEvaluator.getRawValue());
       return removeProperty((PrivilegedEvent) event, key);
     }
 

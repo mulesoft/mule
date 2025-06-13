@@ -34,9 +34,7 @@ public class TransformationGraph extends DirectedMultigraph<DataType, Transforma
 
   public void addConverter(Converter converter) {
     if (registeredConverters.contains(converter)) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Attempting to register an already registered converter: " + converter);
-      }
+      logger.debug("Attempting to register an already registered converter: {}", converter);
 
       return;
     }
@@ -60,9 +58,7 @@ public class TransformationGraph extends DirectedMultigraph<DataType, Transforma
 
   public void removeConverter(Converter converter) {
     if (!registeredConverters.contains(converter)) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Attempt to remove an unregistered converter: " + converter);
-      }
+      logger.debug("Attempt to remove an unregistered converter: {}", converter);
 
       return;
     }

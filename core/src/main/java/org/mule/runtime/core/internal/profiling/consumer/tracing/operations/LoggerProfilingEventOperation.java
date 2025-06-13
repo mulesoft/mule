@@ -12,6 +12,7 @@ import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.ComponentProcessingStrategyProfilingEventContext;
 
 import com.google.gson.Gson;
+
 import org.slf4j.Logger;
 
 /**
@@ -35,8 +36,8 @@ public class LoggerProfilingEventOperation implements
 
   @Override
   public void execute(ComponentProcessingStrategyProfilingEventContext profilingEventContext) {
-    if (logger.isDebugEnabled()) {
-      logger.debug(gson.toJson(getProcessingStrategyComponentInfoMap(profilingEventType, profilingEventContext)));
-    }
+    logger.atDebug()
+        .setMessage(() -> gson.toJson(getProcessingStrategyComponentInfoMap(profilingEventType, profilingEventContext)))
+        .log();
   }
 }

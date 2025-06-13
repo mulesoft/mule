@@ -199,9 +199,7 @@ public final class TlsConfiguration extends AbstractComponent
    * @throws CreateException ON initialisation problems
    */
   public void initialise(boolean anon, String namespace) throws CreateException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("initialising: anon " + anon);
-    }
+    logger.debug("initialising: anon {}", anon);
     validate(anon);
 
 
@@ -235,9 +233,7 @@ public final class TlsConfiguration extends AbstractComponent
   }
 
   private void initKeyManagerFactory() throws CreateException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("initialising key manager factory from keystore data");
-    }
+    logger.debug("initialising key manager factory from keystore data");
 
     KeyStore tempKeyStore;
     try {
@@ -445,9 +441,7 @@ public final class TlsConfiguration extends AbstractComponent
     keyStoreName = name;
     if (null != keyStoreName) {
       keyStoreName = FileUtils.getResourcePath(keyStoreName, getClass());
-      if (logger.isDebugEnabled()) {
-        logger.debug("Normalised keyStore path to: " + keyStoreName);
-      }
+      logger.debug("Normalised keyStore path to: {}", keyStoreName);
     }
   }
 
@@ -508,9 +502,7 @@ public final class TlsConfiguration extends AbstractComponent
     clientKeyStoreName = name;
     if (null != clientKeyStoreName) {
       clientKeyStoreName = FileUtils.getResourcePath(clientKeyStoreName, getClass());
-      if (logger.isDebugEnabled()) {
-        logger.debug("Normalised clientKeyStore path to: " + clientKeyStoreName);
-      }
+      logger.debug("Normalised clientKeyStore path to: {}", clientKeyStoreName);
     }
   }
 
@@ -546,9 +538,7 @@ public final class TlsConfiguration extends AbstractComponent
     trustStoreName = name;
     if (null != trustStoreName) {
       trustStoreName = FileUtils.getResourcePath(trustStoreName, getClass());
-      if (logger.isDebugEnabled()) {
-        logger.debug("Normalised trustStore path to: " + trustStoreName);
-      }
+      logger.debug("Normalised trustStore path to: {}", trustStoreName);
     }
   }
 

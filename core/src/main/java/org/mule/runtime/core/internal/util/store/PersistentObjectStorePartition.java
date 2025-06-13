@@ -330,11 +330,9 @@ public class PersistentObjectStorePartition<T extends Serializable> extends Temp
             StoreValue<T> storeValue = deserialize(file);
             realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
           } catch (ObjectStoreException e) {
-            if (LOGGER.isWarnEnabled()) {
-              LOGGER
-                  .warn(format("Could not deserialize the ObjectStore file: %s. The file will be skipped and moved to the Garbage folder",
-                               file.getName()));
-            }
+            LOGGER.warn("Could not deserialize the ObjectStore file: {}. "
+                + "The file will be skipped and moved to the Garbage folder",
+                        file.getName());
             moveToCorruptedFilesFolder(file);
           }
         }

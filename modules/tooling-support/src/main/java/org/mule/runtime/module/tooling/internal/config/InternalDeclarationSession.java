@@ -158,14 +158,10 @@ public class InternalDeclarationSession implements DeclarationSession {
         .getConfigurationInstance(configName)
         .map(cp -> {
           try {
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("Doing test connection for configName: {}", configName);
-            }
+            LOGGER.debug("Doing test connection for configName: {}", configName);
             return connectionManager.testConnectivity(cp);
           } finally {
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("Test connection for configName: {} completed", configName);
-            }
+            LOGGER.debug("Test connection for configName: {} completed", configName);
           }
         })
         .orElseGet(() -> failure(format("Could not perform test connection for configuration: '%s'. Connection provider is not defined",

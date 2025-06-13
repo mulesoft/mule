@@ -72,9 +72,9 @@ final class DefaultSourceResultHandler<T, A> implements SourceResultHandler<T, A
       final CompletableFuture<Void> future = new CompletableFuture<>();
       future.whenComplete((v, t) -> {
         if (t != null) {
-          if (LOGGER.isWarnEnabled()) {
-            LOGGER.warn("Failed to send success response to client: " + t.getMessage(), t);
-          }
+          LOGGER.atWarn()
+              .setCause(t)
+              .log("Failed to send success response to client: {}", t.getMessage());
           afterPhaseExecution(left(sourceClient.asMessagingException(t, event)), extensionClassLoader);
         } else {
           afterPhaseExecution(right(event), extensionClassLoader);
@@ -105,9 +105,9 @@ final class DefaultSourceResultHandler<T, A> implements SourceResultHandler<T, A
 
       future.whenComplete((v, t) -> {
         if (t != null) {
-          if (LOGGER.isWarnEnabled()) {
-            LOGGER.warn("Failed to send error response to client: " + t.getMessage(), t);
-          }
+          LOGGER.atWarn()
+              .setCause(t)
+              .log("Failed to send error response to client: {}", t.getMessage());
           afterPhaseExecution(left(sourceClient.asMessagingException(t, event)), extensionClassLoader);
         } else {
           afterPhaseExecution(left(messagingException), extensionClassLoader);
@@ -134,9 +134,9 @@ final class DefaultSourceResultHandler<T, A> implements SourceResultHandler<T, A
     DefaultSourceCallbackParameterizer parameterizer = new DefaultSourceCallbackParameterizer();
     parameterizerConsumer.accept(parameterizer);
 
-    return (Map<String, Object>) callbackModel.map(model -> evaluate(sourceClient.toResolverSet(parameterizer, model),
-                                                                     sourceClient.resolveConfigurationInstance(event),
-                                                                     event))
+    return callbackModel.map(model -> evaluate(sourceClient.toResolverSet(parameterizer, model),
+                                               sourceClient.resolveConfigurationInstance(event),
+                                               event))
         .orElse(emptyMap());
   }
 

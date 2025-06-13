@@ -103,9 +103,7 @@ public class RepositoryServiceFactory {
     } else {
       repositoryFolder = new File(getMuleLibDir(), REPOSITORY_FOLDER);
     }
-    if (logger.isDebugEnabled()) {
-      logger.debug("Using dependencies folder " + repositoryFolder.getAbsolutePath());
-    }
+    logger.debug("Using dependencies folder {}", repositoryFolder.getAbsolutePath());
     return repositoryFolder;
   }
 

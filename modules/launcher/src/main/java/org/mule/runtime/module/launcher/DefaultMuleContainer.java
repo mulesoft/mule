@@ -279,7 +279,9 @@ public class DefaultMuleContainer implements MuleContainer {
     if (muleException != null) {
       logger.error(muleException.getDetailedMessage());
     } else {
-      logger.error(msg.toString() + " " + e.getMessage(), e);
+      logger.atError()
+          .setCause(e)
+          .log("{} {}", msg.toString(), e.getMessage());
     }
     List<String> msgs = new ArrayList<>();
     msgs.add(msg.getMessage());

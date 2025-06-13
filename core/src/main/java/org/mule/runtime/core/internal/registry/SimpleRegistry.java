@@ -158,9 +158,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
         ((Disposable) obj).dispose();
       } catch (Exception e) {
         logger.warn("Can not dispose object. " + getMessage(e));
-        if (logger.isDebugEnabled()) {
-          logger.debug("Can not dispose object. " + getStackTrace(e));
-        }
+        logger.debug("Can not dispose object. {}", getStackTrace(e));
       }
     }
   }
@@ -261,9 +259,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       throw new RegistrationException(createStaticMessage("Attempt to register object with no key"));
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(format("registering key/object %s/%s", key, object));
-    }
+    logger.debug("registering key/object {}/{}", key, object);
 
     logger.debug("applying processors");
     doRegisterObject(key, applyProcessors(object, metadata));
@@ -291,9 +287,7 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   private void doRegisterObject(String key, Object object) throws RegistrationException {
     Object previous = doGet(key);
     if (previous != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(format("An entry already exists for key %s. It will be replaced", key));
-      }
+      logger.debug("An entry already exists for key {}. It will be replaced", key);
 
       unregisterObject(key);
     }

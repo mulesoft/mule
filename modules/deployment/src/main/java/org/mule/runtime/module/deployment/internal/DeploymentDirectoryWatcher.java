@@ -24,6 +24,7 @@ import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -82,10 +83,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   public static final String ARTIFACT_ANCHOR_SUFFIX = "-anchor.txt";
   public static final String CHANGE_CHECK_INTERVAL_PROPERTY = "mule.launcher.changeCheckInterval";
-  public static final IOFileFilter JAR_ARTIFACT_FILTER =
-      new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
-  public static final IOFileFilter ZIP_ARTIFACT_FILTER =
-      new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.FILE);
+  private static final IOFileFilter JAR_ARTIFACT_FILTER =
+      new AndFileFilter(new SuffixFileFilter(JAR_FILE_SUFFIX, INSENSITIVE), FileFileFilter.INSTANCE);
+  private static final IOFileFilter ZIP_ARTIFACT_FILTER =
+      new AndFileFilter(new SuffixFileFilter(ZIP_FILE_SUFFIX, INSENSITIVE), FileFileFilter.INSTANCE);
 
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
@@ -136,17 +137,13 @@ public class DeploymentDirectoryWatcher implements Runnable {
     this.domains = domains;
     applications.addPropertyChangeListener(e -> {
       if (e instanceof ElementAddedEvent || e instanceof ElementRemovedEvent) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Deployed applications set has been modified, flushing state.");
-        }
+        logger.debug("Deployed applications set has been modified, flushing state.");
         dirty = true;
       }
     });
     domains.addPropertyChangeListener(e -> {
       if (e instanceof ElementAddedEvent || e instanceof ElementRemovedEvent) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Deployed applications set has been modified, flushing state.");
-        }
+        logger.debug("Deployed applications set has been modified, flushing state.");
         dirty = true;
       }
     });
@@ -244,7 +241,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         artifact.stop();
         artifact.dispose();
       } catch (Throwable t) {
-        logger.error("Error stopping artifact {}", artifact.getArtifactName(), t);
+        logger.atError().setCause(t).log("Error stopping artifact {}", artifact.getArtifactName());
       }
     }
   }
@@ -308,16 +305,12 @@ public class DeploymentDirectoryWatcher implements Runnable {
   @Override
   public void run() {
     try {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Checking for changes...");
-      }
+      logger.debug("Checking for changes...");
       // use non-barging lock to preserve fairness, according to javadocs
       // if there's a lock present - wait for next poll to do anything
       if (!deploymentLock.tryLock(0, SECONDS)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Another deployment operation in progress, will skip this cycle. Owner thread: "
-              + ((DebuggableReentrantLock) deploymentLock).getOwner());
-        }
+        logger.debug("Another deployment operation in progress, will skip this cycle. Owner thread: {}",
+                     ((DebuggableReentrantLock) deploymentLock).getOwner());
         return;
       }
 
@@ -407,39 +400,31 @@ public class DeploymentDirectoryWatcher implements Runnable {
                                                                                  ArchiveDeployer<D, ? extends Artifact<D>> archiveDeployer) {
     // we care only about removed anchors
     String[] currentAnchors = listFiles(artifactDir, new SuffixFileFilter(ARTIFACT_ANCHOR_SUFFIX));
-    if (logger.isDebugEnabled()) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(format("Current anchors:%n"));
-      for (String currentAnchor : currentAnchors) {
-        sb.append(format("  %s%n", currentAnchor));
-      }
-      logger.debug(sb.toString());
-    }
+    logger.atDebug()
+        .setMessage("Current anchors:\n{}")
+        .addArgument(() -> stream(currentAnchors).collect(joining("\n  ", "  ", "")))
+        .log();
 
     final Set<String> currentAnchorsSet = stream(currentAnchors).collect(toSet());
     Collection<String> deletedAnchors = stream(findExpectedAnchorFiles(artifacts))
         .filter(a -> !currentAnchorsSet.contains(a))
         .collect(toList());
 
-    if (logger.isDebugEnabled()) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(format("Deleted anchors:%n"));
-      for (String deletedAnchor : deletedAnchors) {
-        sb.append(format("  %s%n", deletedAnchor));
-      }
-      logger.debug(sb.toString());
-    }
+    logger.atDebug()
+        .setMessage("Deleted anchors:\n{}")
+        .addArgument(() -> stream(currentAnchors).collect(joining("\n  ", "  ", "")))
+        .log();
 
     for (String deletedAnchor : deletedAnchors) {
       String artifactName = removeEnd(deletedAnchor, ARTIFACT_ANCHOR_SUFFIX);
       try {
         if (findArtifact(artifactName, artifacts) != null) {
           archiveDeployer.undeployArtifact(artifactName);
-        } else if (logger.isDebugEnabled()) {
-          logger.debug(format("Artifact [%s] has already been undeployed via API", artifactName));
+        } else {
+          logger.debug("Artifact [{}] has already been undeployed via API", artifactName);
         }
       } catch (Throwable t) {
-        logger.error("Failed to undeployArtifact artifact: " + artifactName, t);
+        logger.atError().setCause(t).log("Failed to undeployArtifact artifact: {}", artifactName);
       }
     }
   }
@@ -519,9 +504,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
       try {
         artifactArchiveDeployer.redeploy(artifactName, empty());
       } catch (DeploymentException e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Error redeploying artifact {}", artifactName, e);
-        }
+        logger.atDebug().setCause(e).log("Error redeploying artifact {}", artifactName);
       }
     }
   }

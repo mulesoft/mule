@@ -39,9 +39,7 @@ public class SafeExecutionUtils {
       if (propagateExceptions) {
         throw e;
       }
-      if (logger.isWarnEnabled()) {
-        logger.warn(loggingMessage, e);
-      }
+      logger.warn(loggingMessage, e);
 
       return onFailReturnValue;
     }
@@ -63,9 +61,7 @@ public class SafeExecutionUtils {
         throw e;
       }
 
-      if (logger.isWarnEnabled()) {
-        logger.warn(loggingMessage, e);
-      }
+      logger.warn(loggingMessage, e);
     }
   }
 

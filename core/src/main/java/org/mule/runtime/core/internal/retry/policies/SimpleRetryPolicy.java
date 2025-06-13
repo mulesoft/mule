@@ -139,9 +139,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
             .onErrorMap(RetryExhaustedException.class, e2 -> errorFunction.apply(unwrap(e2.getCause())));
         return delay(frequency, reactorRetryScheduler).then(isTransactionActive() ? just(retryMono.block()) : retryMono);
       } else {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Not retrying execution of event. Failing...");
-        }
+        LOGGER.debug("Not retrying execution of event. Failing...");
         e = unwrap(e);
         onExhausted.accept(e);
         return error(errorFunction.apply(e));
@@ -154,10 +152,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
     if (isExhausted() || !isApplicableTo(cause)) {
       return policyExhausted(cause);
     } else {
-      if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Waiting for {} ms before reconnecting. Failed attempt {} of {}", frequency.toMillis(),
-                    retryCounter.current().get() + 1, count != RETRY_COUNT_FOREVER ? valueOf(count) : "unlimited");
-      }
+      LOGGER.info("Waiting for {} ms before reconnecting. Failed attempt {} of {}", frequency.toMillis(),
+                  retryCounter.current().get() + 1, count != RETRY_COUNT_FOREVER ? count : "unlimited");
 
       try {
         retryCounter.current().getAndIncrement();
@@ -218,10 +214,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
   }
 
   private void logRetrying(long attempts) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Retrying execution of event, attempt {} of {}.", attempts,
-                   count != RETRY_COUNT_FOREVER ? valueOf(count) : "unlimited");
-    }
+    LOGGER.debug("Retrying execution of event, attempt {} of {}.", attempts,
+                 count != RETRY_COUNT_FOREVER ? valueOf(count) : "unlimited");
   }
 
   private void logRetriesExhausted() {

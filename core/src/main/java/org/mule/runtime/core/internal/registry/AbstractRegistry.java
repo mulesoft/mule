@@ -9,8 +9,6 @@ package org.mule.runtime.core.internal.registry;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 
-import static java.lang.String.format;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -58,7 +56,9 @@ public abstract class AbstractRegistry implements Registry {
       try {
         getLifecycleManager().fireLifecycle(Stoppable.PHASE_NAME);
       } catch (LifecycleException e) {
-        logger.error("Failed to shut down registry cleanly: " + getRegistryId(), e);
+        logger.atError()
+            .setCause(e)
+            .log("Failed to shut down registry cleanly: {}", getRegistryId());
       }
     }
     // Fire dispose lifecycle before calling doDispose() that that registries can clear any object caches once all objects
@@ -66,13 +66,17 @@ public abstract class AbstractRegistry implements Registry {
     try {
       getLifecycleManager().fireLifecycle(Disposable.PHASE_NAME);
     } catch (LifecycleException e) {
-      logger.error("Failed to shut down registry cleanly: " + getRegistryId(), e);
+      logger.atError()
+          .setCause(e)
+          .log("Failed to shut down registry cleanly: {}", getRegistryId());
     }
 
     try {
       doDispose();
     } catch (Exception e) {
-      logger.error("Failed to cleanly dispose: " + e.getMessage(), e);
+      logger.atError()
+          .setCause(e)
+          .log("Failed to cleanly dispose: {}", e.getMessage());
     }
   }
 
@@ -153,9 +157,9 @@ public abstract class AbstractRegistry implements Registry {
     try {
       getLifecycleManager().applyPhase(object, getLifecycleManager().getCurrentPhase(), Disposable.PHASE_NAME);
     } catch (Exception e) {
-      if (logger.isWarnEnabled()) {
-        logger.warn(format("Could not apply shutdown lifecycle to object '%s' after being unregistered.", key), e);
-      }
+      logger.atWarn()
+          .setCause(e)
+          .log("Could not apply shutdown lifecycle to object '{}' after being unregistered.", key);
     }
 
     return object;

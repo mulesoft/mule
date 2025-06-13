@@ -71,9 +71,7 @@ public class ArtifactArchiveInstaller {
     try {
       final String fullPath = artifactFile.getAbsolutePath();
 
-      if (logger.isInfoEnabled()) {
-        logger.info("Exploding a Mule artifact archive: '" + fullPath + "'");
-      }
+      logger.info("Exploding a Mule artifact archive: '{}'", fullPath);
 
       artifactName = getBaseName(fullPath);
       artifactDir = new File(artifactParentDir, artifactName);

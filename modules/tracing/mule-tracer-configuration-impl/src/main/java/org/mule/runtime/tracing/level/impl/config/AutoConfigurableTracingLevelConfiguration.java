@@ -13,7 +13,6 @@ import static org.mule.runtime.tracing.level.api.config.TracingLevel.MONITORING;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.valueOf;
 
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Objects.requireNonNull;
 
@@ -30,9 +29,9 @@ import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Autoconfiguration of tracing level. Will use the default level.
@@ -82,16 +81,10 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
       return level != null ? level : defaultLevel;
     } catch (MuleRuntimeException e) {
       if (parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"))) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER
-              .debug(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s",
-                            defaultLevel),
-                     e);
-        } else {
-          LOGGER
-              .info(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s. Enable DEBUG log level to see the exception",
-                           defaultLevel));
-        }
+        LOGGER.info("Non existent or non parseable tracing level config file found. "
+            + "The tracing level will be set to the default: {}. Enable DEBUG log level to see the exception",
+                    defaultLevel);
+        LOGGER.debug("Exception:", e);
       }
     }
     return defaultLevel;

@@ -27,8 +27,7 @@ public class LooseExtensionJdkValidator extends BaseExtensionJdkValidator {
 
   @Override
   protected void onUnsupportedJdkVersion(ExtensionModel extensionModel) {
-    if (logger.isWarnEnabled()) {
-      logger.warn(getErrorMessageFor(extensionModel));
-    }
+    logger.atWarn()
+        .log(() -> getErrorMessageFor(extensionModel));
   }
 }

@@ -67,10 +67,7 @@ public class ObjectUtils {
         Number n = (Number) answer;
         return (n.intValue() > 0) ? Boolean.TRUE : Boolean.FALSE;
       } else {
-        if (logger.isWarnEnabled()) {
-          logger
-              .warn("Value exists but cannot be converted to boolean: " + answer + ", returning default value: " + defaultValue);
-        }
+        logger.warn("Value exists but cannot be converted to boolean: {}, returning default value: {}", answer, defaultValue);
         return defaultValue;
       }
     }
@@ -97,9 +94,7 @@ public class ObjectUtils {
         // handled below
       }
     }
-    if (logger.isWarnEnabled()) {
-      logger.warn("Value exists but cannot be converted to byte: " + answer + ", returning default value: " + defaultValue);
-    }
+    logger.warn("Value exists but cannot be converted to byte: {}, returning default value: {}", answer, defaultValue);
     return defaultValue;
   }
 
@@ -123,9 +118,7 @@ public class ObjectUtils {
         // handled below
       }
     }
-    if (logger.isWarnEnabled()) {
-      logger.warn("Value exists but cannot be converted to short: " + answer + ", returning default value: " + defaultValue);
-    }
+    logger.warn("Value exists but cannot be converted to short: {}, returning default value: {}", answer, defaultValue);
     return defaultValue;
   }
 
@@ -149,9 +142,7 @@ public class ObjectUtils {
         // handled below
       }
     }
-    if (logger.isWarnEnabled()) {
-      logger.warn("Value exists but cannot be converted to int: " + answer + ", returning default value: " + defaultValue);
-    }
+    logger.warn("Value exists but cannot be converted to int: {}, returning default value: {}", answer, defaultValue);
     return defaultValue;
   }
 
@@ -176,9 +167,7 @@ public class ObjectUtils {
 
       }
     }
-    if (logger.isWarnEnabled()) {
-      logger.warn("Value exists but cannot be converted to long: " + answer + ", returning default value: " + defaultValue);
-    }
+    logger.warn("Value exists but cannot be converted to long: {}, returning default value: {}", answer, defaultValue);
     return defaultValue;
   }
 
@@ -203,9 +192,7 @@ public class ObjectUtils {
 
       }
     }
-    if (logger.isWarnEnabled()) {
-      logger.warn("Value exists but cannot be converted to float: " + answer + ", returning default value: " + defaultValue);
-    }
+    logger.warn("Value exists but cannot be converted to float: {}, returning default value: {}", answer, defaultValue);
     return defaultValue;
   }
 
@@ -229,9 +216,7 @@ public class ObjectUtils {
         // handled below
       }
     }
-    if (logger.isWarnEnabled()) {
-      logger.warn("Value exists but cannot be converted to double: " + answer + ", returning default value: " + defaultValue);
-    }
+    logger.warn("Value exists but cannot be converted to double: {}, returning default value: {}", answer, defaultValue);
     return defaultValue;
   }
 

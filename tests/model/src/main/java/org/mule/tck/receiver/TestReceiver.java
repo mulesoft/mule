@@ -49,10 +49,8 @@ public class TestReceiver extends AbstractComponent implements Processor, MuleCo
   }
 
   public String receive(String message) throws Exception {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Received: " + message + " Number: " + inc() + " in thread: " + currentThread().getName());
-      logger.debug("Message ID is: " + getCurrentEvent().getCorrelationId());
-    }
+    logger.debug("Received: {} Number: {} in thread: {}", message, inc(), currentThread().getName());
+    logger.debug("Message ID is: {}", getCurrentEvent().getCorrelationId());
 
     return "Received: " + message;
   }
