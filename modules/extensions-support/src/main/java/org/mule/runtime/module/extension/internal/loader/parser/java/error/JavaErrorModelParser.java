@@ -11,7 +11,7 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.erro
 import static java.util.Objects.hash;
 
 import org.mule.runtime.module.extension.internal.loader.parser.BaseErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.Objects;

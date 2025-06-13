@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static java.lang.String.format;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
@@ -19,7 +18,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
-import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
@@ -32,8 +30,8 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithAlias;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterModelParser;
 
 import java.util.LinkedList;
 import java.util.List;

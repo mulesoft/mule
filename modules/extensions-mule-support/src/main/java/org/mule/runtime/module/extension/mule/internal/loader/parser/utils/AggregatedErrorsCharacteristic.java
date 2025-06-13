@@ -33,7 +33,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.error.ErrorMapping;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkErrorModelParser;
 
 import java.util.ArrayList;

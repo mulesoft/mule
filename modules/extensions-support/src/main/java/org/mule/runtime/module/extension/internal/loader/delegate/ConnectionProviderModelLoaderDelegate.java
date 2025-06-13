@@ -16,7 +16,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDecl
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConnectionProviderDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.ExcludeFromConnectivitySchemaModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
+import org.mule.runtime.extension.api.loader.parser.ConnectionProviderModelParser;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,9 @@ final class ConnectionProviderModelLoaderDelegate extends AbstractComponentModel
             .ifPresent(resolvedMMV -> declarationWithMmv(connectionProviderDeclaration, resolvedMMV));
       }
 
-      parser.getConnectionProviderFactoryModelProperty().ifPresent(providerDeclarer::withModelProperty);
+      parser.getConnectionProviderFactory()
+          .map(ConnectionProviderFactoryModelProperty::new)
+          .ifPresent(providerDeclarer::withModelProperty);
 
       if (parser.isExcludedFromConnectivitySchema()) {
         providerDeclarer.withModelProperty(new ExcludeFromConnectivitySchemaModelProperty());

@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.getClassName;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.MuleInputTypeResolverAdapter;
 
 

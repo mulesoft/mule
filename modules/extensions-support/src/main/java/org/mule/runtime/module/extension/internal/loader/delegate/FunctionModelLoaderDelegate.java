@@ -12,7 +12,8 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
+import org.mule.runtime.extension.api.loader.parser.FunctionModelParser;
+import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,9 @@ final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDele
 
       parser.getDeprecationModel().ifPresent(function::withDeprecation);
 
-      parser.getFunctionExecutorModelProperty().ifPresent(function::withModelProperty);
+      parser.getFunctionExecutorFactory()
+          .map(FunctionExecutorModelProperty::new)
+          .ifPresent(function::withModelProperty);
 
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers(), context);

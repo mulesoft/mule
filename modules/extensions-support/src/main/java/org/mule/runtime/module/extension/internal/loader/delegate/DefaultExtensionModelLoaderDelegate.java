@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getJdkVersion;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
@@ -15,6 +16,8 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionN
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -29,20 +32,31 @@ import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
+import org.mule.runtime.extension.api.loader.parser.LicensingParser;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.extension.api.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DevelopmentFrameworkModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.TypeLoaderModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
+import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -52,7 +66,10 @@ import java.util.function.Supplier;
  */
 public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate {
 
+  private final List<ExtensionModelValidator> VALIDATORS = singletonList(new DeprecationModelValidator());
+
   protected final String version;
+  private final String loaderId;
 
   private final ConfigModelLoaderDelegate configLoaderDelegate = new ConfigModelLoaderDelegate(this);
   private final OperationModelLoaderDelegate operationLoaderDelegate = new OperationModelLoaderDelegate(this);
@@ -69,17 +86,9 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
   private ExtensionDeclarer declarer;
   private String namespace;
 
-  public DefaultExtensionModelLoaderDelegate(String version) {
+  public DefaultExtensionModelLoaderDelegate(String version, String loaderId) {
     this.version = version;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @Deprecated
-  public ExtensionDeclarer declare(ExtensionLoadingContext context) {
-    return declare(new JavaExtensionModelParserFactory(), context);
+    this.loaderId = loaderId;
   }
 
   /**
@@ -87,6 +96,37 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
    */
   @Override
   public ExtensionDeclarer declare(ExtensionModelParserFactory parserFactory, ExtensionLoadingContext context) {
+    try {
+      return doDeclare(parserFactory, context);
+    } catch (Exception e) {
+      if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof NoClassDefFoundError) {
+        // Handle errors caused by the java version before the actual validation takes place, since the validation needs the
+        // extension model
+        NoClassDefFoundError ncdfe = (NoClassDefFoundError) e.getCause().getCause();
+
+        if (ncdfe.getMessage().startsWith("javax/")) {
+          JdkVersionUtils.JdkVersion runningJdkVersion = getJdkVersion();
+          Set<String> supportedJavaVersions = context.getExtensionDeclarer().getDeclaration().getSupportedJavaVersions();
+          if (supportedJavaVersions.isEmpty()) {
+            supportedJavaVersions = new HashSet<>(asList("11", "1.8"));
+          }
+
+          throw new IllegalSourceException(format("Extension '%s' version %s does not support Mule 4.6+ on Java %s. Supported Java versions are: %s. (%s)",
+                                                  context.getExtensionDeclarer().getDeclaration().getName(),
+                                                  context.getExtensionDeclarer().getDeclaration().getVersion(),
+                                                  runningJdkVersion.getMajor(),
+                                                  supportedJavaVersions,
+                                                  ncdfe));
+        }
+      }
+
+      throw e;
+    }
+  }
+
+  private ExtensionDeclarer doDeclare(ExtensionModelParserFactory parserFactory, ExtensionLoadingContext context) {
+    context.addCustomValidators(VALIDATORS);
+
     ExtensionModelParser parser = parserFactory.createParser(context);
     ExtensionDeclarer declarer =
         context.getExtensionDeclarer()
@@ -95,16 +135,18 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
             .supportingJavaVersions(parser.getSupportedJavaVersions())
             .fromVendor(parser.getVendor())
             .withCategory(parser.getCategory())
-            .withModelProperty(parser.getLicenseModelProperty())
+            .withModelProperty(createLicenseModelProperty(parser.getLicensingParser()))
             .withXmlDsl(getXmlDslModel(parser.getName(), version, parser.getXmlDslConfiguration()));
 
     // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
     context.getParameter("COMPILATION_MODE")
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
-    declarer.withModelProperty(new DevelopmentFrameworkModelProperty(parser.getDevelopmentFramework()));
+    declarer.withModelProperty(new DevelopmentFrameworkModelProperty(loaderId));
     declarer.withModelProperty(new TypeLoaderModelProperty(context.getTypeLoader()));
-    parser.getArtifactLifecycleListenerModelProperty().ifPresent(declarer::withModelProperty);
+    parser.getArtifactLifecycleListenerClass()
+        .map(ArtifactLifecycleListenerModelProperty::new)
+        .ifPresent(declarer::withModelProperty);
 
     this.declarer = declarer;
     namespace = getExtensionsNamespace(declarer.getDeclaration());
@@ -113,7 +155,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
 
     parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
-    parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
+    parser.getExceptionHandlerFactory().map(ExceptionHandlerModelProperty::new).ifPresent(declarer::withModelProperty);
     parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
     if (context.isResolveMinMuleVersion()) {
       parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> declarerWithMmv(declarer, resolvedMMV));
@@ -129,8 +171,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers(),
                                                                      context);
 
-    operationLoaderDelegate.declareOperations(declarer, parser.getDevelopmentFramework(), declarer,
-                                              parser.getOperationModelParsers(), context);
+    operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers(), context);
     functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers(), context);
     sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers(), context);
 
@@ -288,5 +329,10 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
 
   public ParameterModelsLoaderDelegate getParameterModelsLoaderDelegate() {
     return parameterModelsLoaderDelegate;
+  }
+
+  private LicenseModelProperty createLicenseModelProperty(LicensingParser parser) {
+    return new LicenseModelProperty(parser.requiresEeLicense(), parser.isAllowsEvaluationLicense(),
+                                    parser.getRequiredEntitlement());
   }
 }

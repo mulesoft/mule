@@ -22,7 +22,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationEleme
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser.ExclusiveOptionalDescriptor;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaDeclaredParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext;

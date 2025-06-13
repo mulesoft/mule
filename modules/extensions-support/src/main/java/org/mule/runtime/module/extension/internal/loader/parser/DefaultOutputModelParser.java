@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.extension.api.loader.parser.OutputModelParser;
 
 /**
  * Default implementation for {@link OutputModelParser}.

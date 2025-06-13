@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.internal.metadata.chain.NullChai
 import static java.util.stream.Collectors.toMap;
 
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
 import java.util.List;

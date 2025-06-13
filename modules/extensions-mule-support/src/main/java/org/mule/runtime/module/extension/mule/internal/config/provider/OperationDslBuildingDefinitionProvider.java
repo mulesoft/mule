@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
-import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
+import org.mule.runtime.module.extension.mule.internal.construct.Operation;
 import org.mule.runtime.module.extension.mule.api.processor.MuleSdkRaiseErrorProcessor;
 import org.mule.runtime.module.extension.mule.internal.config.factory.DefaultOperationObjectFactory;
 

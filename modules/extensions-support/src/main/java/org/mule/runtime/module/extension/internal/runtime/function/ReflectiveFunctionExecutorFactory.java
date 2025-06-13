@@ -20,6 +20,9 @@ import org.mule.runtime.api.meta.model.function.FunctionModel;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.extension.api.loader.parser.FunctionExecutor;
+import org.mule.runtime.extension.api.loader.parser.FunctionExecutorFactory;
+import org.mule.runtime.extension.api.loader.parser.FunctionParameterDefaultValueResolverFactory;
 
 import com.google.common.base.Defaults;
 

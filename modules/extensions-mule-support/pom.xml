@@ -52,14 +52,11 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-artifact-ast-xml-parser</artifactId>
         </dependency>
+        <!-- TODO: remove this once and for all, we still require it for the DefaultArtifactTypeLoader and some internals of the
+        execution (see MuleOperationExecutor) -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -79,6 +76,15 @@
             <!-- Needed for tests to be able to parse test config files -->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${project.version}</version>
+            <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
+            <!-- the app classpath, this needs to go into the container classloader -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <!-- Needed for tests to be able to parse test config files -->
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
             <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
             <!-- the app classpath, this needs to go into the container classloader -->

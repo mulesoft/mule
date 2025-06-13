@@ -28,7 +28,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.module.extension.internal.runtime.operation.construct.Operation;
+import org.mule.runtime.module.extension.mule.internal.construct.Operation;
 
 import java.util.HashMap;
 import java.util.List;

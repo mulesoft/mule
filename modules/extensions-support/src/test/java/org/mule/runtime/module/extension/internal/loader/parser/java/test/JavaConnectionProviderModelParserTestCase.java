@@ -334,7 +334,7 @@ public class JavaConnectionProviderModelParserTestCase {
         new ConnectionProviderTypeWrapper(connectionProviderClass, new DefaultExtensionsTypeLoaderFactory()
             .createTypeLoader(Thread.currentThread().getContextClassLoader()));
     final JavaExtensionModelParser extensionModelParser = mock(JavaExtensionModelParser.class);
-    parser = new JavaConnectionProviderModelParser(extensionModelParser, mock(ExtensionElement.class),
+    parser = new JavaConnectionProviderModelParser(mock(ExtensionElement.class),
                                                    connectionProviderElement, ctxResolvingMinMuleVersion());
   }
 
