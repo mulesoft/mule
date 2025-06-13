@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.hash;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.extension.privileged.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
@@ -29,14 +37,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelL
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseAttributesResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseOutputResolverModelParser;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
-
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Objects.hash;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
@@ -228,18 +228,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   private void parseRouter() {
-    if (hasConfig()) {
-      throw new IllegalOperationModelDefinitionException(format(
-                                                                "Router '%s' requires a config, but that is not allowed, remove such parameter",
-                                                                getName()));
-    }
-
-    if (isConnected()) {
-      throw new IllegalOperationModelDefinitionException(format(
-                                                                "Router '%s' requires a connection, but that is not allowed, remove such parameter",
-                                                                getName()));
-    }
-
     List<ExtensionParameter> callbackParameters = operationElement.getParameters().stream()
         .filter(this::isRouterCallback)
         .collect(toList());
