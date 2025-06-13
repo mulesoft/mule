@@ -18,7 +18,13 @@
     <javaModuleName>org.mule.runtime.features.api</javaModuleName>
     <generatorSources>org/mule/runtime/features/internal/generator</generatorSources>
   </properties>
-
+  <dependencies>
+    <dependency>
+      <groupId>org.mule.runtime</groupId>
+      <artifactId>mule-api</artifactId>
+      <version>${muleApiVersion}</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

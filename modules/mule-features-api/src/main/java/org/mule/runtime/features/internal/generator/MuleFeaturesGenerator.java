@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,13 +34,16 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
   private static final Method GET_ISSUE_ID_METHOD;
   private static final Method GET_ENABLED_BY_DEFAULT_SINCE_METHOD;
   private static final Method GET_OVERRIDING_SYSTEM_PROPERTY_NAME_METHOD;
+  private static final Method GET_DESCRIPTION_METHOD;
 
   static {
     try {
       MULE_API_FEATURE_CLASS = Class.forName("org.mule.runtime.api.config.MuleRuntimeFeature");
       GET_ISSUE_ID_METHOD = MULE_API_FEATURE_CLASS.getMethod("getIssueId");
       GET_ENABLED_BY_DEFAULT_SINCE_METHOD = MULE_API_FEATURE_CLASS.getMethod("getEnabledByDefaultSince");
-      GET_OVERRIDING_SYSTEM_PROPERTY_NAME_METHOD = MULE_API_FEATURE_CLASS.getMethod("getOverridingSystemPropertyName");
+      GET_OVERRIDING_SYSTEM_PROPERTY_NAME_METHOD = MULE_API_FEATURE_CLASS
+          .getMethod("getOverridingSystemPropertyName");
+      GET_DESCRIPTION_METHOD = MULE_API_FEATURE_CLASS.getMethod("getDescription");
     } catch (ClassNotFoundException | NoSuchMethodException e) {
       throw new RuntimeException(e);
     }
@@ -59,7 +63,11 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
 
   @Override
   protected Set<String> getImports() {
-    return collectImports(originalPropertiesFromMuleApi);
+    HashSet<String> imports = new HashSet<String>();
+    imports.add("org.mule.runtime.api.config.Feature");
+    imports.add("java.util.Optional");
+    imports.addAll(collectImports(originalPropertiesFromMuleApi));
+    return imports;
   }
 
   @Override
@@ -69,63 +77,83 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
 
   @Override
   protected void writeClassContent(OutputStream outputStream) throws IOException {
-    appendLine(outputStream, "public enum " + getClassName() + " {");
+    appendLine(outputStream, "public enum " + getClassName() + " implements Feature {");
 
     for (MuleFeatureDeclaration property : originalPropertiesFromMuleApi) {
       for (Class<? extends Annotation> annotation : property.getAnnotations()) {
         appendLine(outputStream, "\t@" + annotation.getSimpleName());
       }
-      appendLine(outputStream,
-                 format("\t%s(\"%s\", \"%s\", \"%s\"),", property.getName(), property.getIssueId(),
-                        property.getEnabledByDefaultSince(), property.getOverridingSystemPropertyName().orElse(null)));
+      appendLine(outputStream, format("\t%s(\"%s\", \"%s\", \"%s\", \"%s\"),",
+                                      property.getName(),
+                                      property.getDescription(),
+                                      property.getIssueId(),
+                                      property.getEnabledByDefaultSince(),
+                                      property.getOverridingSystemPropertyName().orElse(null)));
       appendLine(outputStream);
     }
     appendLine(outputStream, "\t;");
 
+    appendLine(outputStream, "\tprivate final String description;");
     appendLine(outputStream, "\tprivate final String issueId;");
     appendLine(outputStream, "\tprivate final String enabledByDefaultSince;");
     appendLine(outputStream, "\tprivate final String overridingSystemPropertyName;");
     appendLine(outputStream);
-    appendLine(outputStream,
-               "\t" + getClassName() + "(String issueId, String enabledByDefaultSince, String overridingSystemPropertyName) {");
+    appendLine(outputStream, "\t" + getClassName()
+        + "(String description, String issueId, String enabledByDefaultSince, String overridingSystemPropertyName) {");
+    appendLine(outputStream, "\t\tthis.description = description;");
     appendLine(outputStream, "\t\tthis.issueId = issueId;");
     appendLine(outputStream, "\t\tthis.enabledByDefaultSince = enabledByDefaultSince;");
     appendLine(outputStream, "\t\tthis.overridingSystemPropertyName = overridingSystemPropertyName;");
     appendLine(outputStream, "\t}");
     appendLine(outputStream);
 
+    appendLine(outputStream,
+               "\tpublic String getDescription() {" +
+                   "\treturn description;" +
+                   "\t} ");
+    appendLine(outputStream,
+               "\tpublic String getIssueId() {" +
+                   "\treturn issueId;" +
+                   "\t} ");
+    appendLine(outputStream,
+               "\tpublic String getSince() {" +
+                   "\treturn getEnabledByDefaultSince();" +
+                   "\t} ");
+    appendLine(outputStream,
+               "\tpublic String getEnabledByDefaultSince() {" +
+                   "\treturn enabledByDefaultSince;" +
+                   "\t} ");
+    appendLine(outputStream,
+               "\tpublic Optional<String> getOverridingSystemPropertyName() {" +
+                   "\treturn Optional.ofNullable(overridingSystemPropertyName);" +
+                   "\t}");
     appendLine(outputStream, "}");
   }
 
   private static Set<String> collectImports(List<MuleFeatureDeclaration> properties) {
-    return properties.stream()
-        .flatMap(prop -> prop.getAnnotations().stream())
-        .filter(MuleFeaturesGenerator::isImportNeeded)
-        .map(Class::getName)
-        .collect(toSet());
+    return properties.stream().flatMap(prop -> prop.getAnnotations().stream())
+        .filter(MuleFeaturesGenerator::isImportNeeded).map(Class::getName).collect(toSet());
   }
+
 
   private static List<MuleFeatureDeclaration> getOriginalFeatureFromMuleApi() {
     Field[] fields = MULE_API_FEATURE_CLASS.getFields();
-    return stream(fields)
-        .filter(MuleFeaturesGenerator::isPublicStaticFinalFeature)
-        .map(f -> {
-          try {
-            List<Class<? extends Annotation>> annotations = stream(f.getAnnotations())
-                .map(Annotation::annotationType)
-                .filter(MuleFeaturesGenerator::isAvailableAnnotation)
-                .collect(toList());
-            return new MuleFeatureDeclaration(f.getName(), f.get(null), annotations);
-          } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-          }
-        })
-        .collect(toList());
+    return stream(fields).filter(MuleFeaturesGenerator::isPublicStaticFinalFeature).map(f -> {
+      try {
+        List<Class<? extends Annotation>> annotations = stream(f.getAnnotations())
+            .map(Annotation::annotationType).filter(MuleFeaturesGenerator::isAvailableAnnotation)
+            .collect(toList());
+        return new MuleFeatureDeclaration(f.getName(), f.get(null), annotations);
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    }).collect(toList());
   }
 
   private static boolean isPublicStaticFinalFeature(Field field) {
     int modifiers = field.getModifiers();
-    return isPublic(modifiers) && isStatic(modifiers) && isFinal(modifiers) && field.getType().equals(MULE_API_FEATURE_CLASS);
+    return isPublic(modifiers) && isStatic(modifiers) && isFinal(modifiers)
+        && field.getType().equals(MULE_API_FEATURE_CLASS);
   }
 
   private static boolean isAvailableAnnotation(Class<? extends Annotation> annotation) {
@@ -139,6 +167,7 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
   private static class MuleFeatureDeclaration {
 
     private final String name;
+    private final String description;
     private final String issueId;
     private final String enabledByDefaultSince;
     private final Optional<String> overridingSystemPropertyName;
@@ -148,9 +177,12 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
       this.name = name;
       this.annotations = annotations;
       try {
+        String rawDescription = (String) GET_DESCRIPTION_METHOD.invoke(value);
+        this.description = rawDescription != null ? rawDescription.replaceAll("\\R", " ").trim() : name;
         issueId = (String) GET_ISSUE_ID_METHOD.invoke(value);
         enabledByDefaultSince = (String) GET_ENABLED_BY_DEFAULT_SINCE_METHOD.invoke(value);
-        overridingSystemPropertyName = (Optional<String>) GET_OVERRIDING_SYSTEM_PROPERTY_NAME_METHOD.invoke(value);
+        overridingSystemPropertyName = (Optional<String>) GET_OVERRIDING_SYSTEM_PROPERTY_NAME_METHOD
+            .invoke(value);
       } catch (IllegalAccessException e) {
         throw new RuntimeException(e);
       } catch (InvocationTargetException e) {
@@ -160,6 +192,10 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
 
     public String getName() {
       return name;
+    }
+
+    public String getDescription() {
+      return description;
     }
 
     public String getIssueId() {

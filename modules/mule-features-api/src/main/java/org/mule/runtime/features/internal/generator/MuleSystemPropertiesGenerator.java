@@ -56,7 +56,8 @@ class MuleSystemPropertiesGenerator extends AbstractClassGenerator {
       for (Class<? extends Annotation> annotation : property.getAnnotations()) {
         appendLine(outputStream, "\t@" + annotation.getSimpleName());
       }
-      appendLine(outputStream, "\tpublic static final String " + property.getName() + " = \"" + property.getValue() + "\";");
+      appendLine(outputStream,
+                 "\tpublic static final String " + property.getName() + " = \"" + property.getValue() + "\";");
       appendLine(outputStream);
     }
 
@@ -69,30 +70,24 @@ class MuleSystemPropertiesGenerator extends AbstractClassGenerator {
   }
 
   private static Set<String> collectImports(List<MuleSystemPropertyDeclaration> properties) {
-    return properties.stream()
-        .flatMap(prop -> prop.getAnnotations().stream())
-        .filter(MuleSystemPropertiesGenerator::isImportNeeded)
-        .map(Class::getName)
-        .collect(toSet());
+    return properties.stream().flatMap(prop -> prop.getAnnotations().stream())
+        .filter(MuleSystemPropertiesGenerator::isImportNeeded).map(Class::getName).collect(toSet());
   }
 
-  private static List<MuleSystemPropertyDeclaration> getOriginalPropertiesFromMuleApi() throws ClassNotFoundException {
+  private static List<MuleSystemPropertyDeclaration> getOriginalPropertiesFromMuleApi()
+      throws ClassNotFoundException {
     Class<?> muleApiProperties = Class.forName("org.mule.runtime.api.util.MuleSystemProperties");
     Field[] fields = muleApiProperties.getFields();
-    return stream(fields)
-        .filter(MuleSystemPropertiesGenerator::isPublicStaticFinalString)
-        .map(f -> {
-          try {
-            List<Class<? extends Annotation>> annotations = stream(f.getAnnotations())
-                .map(Annotation::annotationType)
-                .filter(MuleSystemPropertiesGenerator::isAvailableAnnotation)
-                .collect(toList());
-            return new MuleSystemPropertyDeclaration(f.getName(), (String) f.get(null), annotations);
-          } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-          }
-        })
-        .collect(toList());
+    return stream(fields).filter(MuleSystemPropertiesGenerator::isPublicStaticFinalString).map(f -> {
+      try {
+        List<Class<? extends Annotation>> annotations = stream(f.getAnnotations())
+            .map(Annotation::annotationType).filter(MuleSystemPropertiesGenerator::isAvailableAnnotation)
+            .collect(toList());
+        return new MuleSystemPropertyDeclaration(f.getName(), (String) f.get(null), annotations);
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    }).collect(toList());
   }
 
   private static boolean isPublicStaticFinalString(Field field) {

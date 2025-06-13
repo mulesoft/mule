@@ -6,47 +6,6 @@
  */
 package org.mule.runtime.core.internal.context;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_RESET;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_IMPORT_TARGET_SAME_TYPE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_PERSISTED_FLOW_STATE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.NTLM_AVOID_SEND_PAYLOAD_ON_TYPE_1;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.MuleVersion.v4_10_0;
 import static org.mule.runtime.api.meta.MuleVersion.v4_3_0;
@@ -109,7 +68,8 @@ import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.INFO;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
-import org.mule.runtime.api.config.MuleRuntimeFeature;
+import org.mule.runtime.api.config.Feature;
+import org.mule.runtime.features.api.MuleRuntimeFeature;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -192,6 +152,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.runtime.metrics.api.MeterProvider;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -205,6 +166,8 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
+
+import jakarta.transaction.TransactionManager;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
 
@@ -335,52 +298,40 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
 
   static {
-    // Feature flags (see FeatureFlaggingService)
     if (!areFeatureFlagsConfigured.getAndSet(true)) {
-      configurePropertiesResolverFeatureFlag();
-      configureSplitterExceptionHandlingFeature();
-      configureBatchFixedAggregatorTransactionRecordBuffer();
-      configureComputeConnectionErrorsInStats();
-      configureToStringTransformerTransformIteratorElements();
-      configureEnablePolicyIsolation();
-      configureEntityResolverFailOnFirstErrorFeature();
-      configureEnableProfilingService();
-      configureSetVariableWithNullVale();
-      configureStartExtensionComponentsWithArtifactClassloader();
-      configureRemoveShadowedImplicitInputs();
-      configureHonourMixedContentStructure();
-      configureEnforceErrorTypesValidation();
-      configureDisableAttributeParameterWhitespaceTrimming();
-      configureDisablePojoTextCdataWhitespaceTrimming();
-      configureDefaultErrorHandlerNotRollbackingEveryTx();
-      configureEnforceRequiredExpressionValidation();
-      configureEnforceExpressionValidation();
-      configureParallelForeachFlattenMessage();
-      configureDisableApplyObjectProcessor();
-      configureValidateAppModelWithRegionClassloader();
-      configurePrintDetailedCompositeExceptionLog();
-      configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
-      configureSuppressErrors();
-      configureRethrowExceptionsInIdempotentMessageValidator();
-      configureForeachRouterRejectsMapExpressionFeatureFlag();
-      configureHonourInsecureTlsConfiguration();
-      configureUseTransactionSinkIndex();
-      configurePutTraceIdAndSpanIdInMdc();
-      configureAddMuleSpecificTracingInformationInTraceState();
-      configureCreateChildPolicyContextForParallelScopes();
-      configureCommonsPool2DisableJmx();
-      configureDisableSchedulerLogging();
-      configureErrorAndRollbackTxWhenTimeout();
-      configureDisableXmlSdkImplicitConfigurationCreation();
-      configureEnableXmlSdkReset();
-      configureUnsupportedExtensionsClientRunAsync();
-      configureEnforceImportTargetSameType();
-      configureHonourPersistedFlowState();
-      configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate();
-      configureNtlmAvoidSendPayloadOnType1();
-      configureForkJoinCompleteChildrenOnTimeout();
-      configureSeparateClassLoaderForPolicyIsolation();
-      configureEnableRepeatableStreamingBytesEagerRead();
+      FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+
+      for (MuleRuntimeFeature feature : MuleRuntimeFeature.values()) {
+        Predicate<FeatureContext> condition;
+
+        // Handle special cases
+        if (feature == MuleRuntimeFeature.UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC) {
+          condition = minMuleVersion(v4_8_0).and(minJavaVersion(JAVA_21));
+        } else if (Arrays.asList(
+                                 MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER,
+                                 MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE,
+                                 MuleRuntimeFeature.DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE,
+                                 MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC,
+                                 MuleRuntimeFeature.ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ)
+            .contains(feature)) {
+          condition = featureContext -> false;
+        } else if (Arrays.asList(
+                                 MuleRuntimeFeature.SUPPRESS_ERRORS,
+                                 MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX)
+            .contains(feature)) {
+          condition = featureContext -> true;
+        } else {
+          // Default case
+          String version = feature.getEnabledByDefaultSince();
+          if (version != null && !version.isEmpty()) {
+            condition = minMuleVersion(new MuleVersion(version.trim()));
+          } else {
+            condition = featureContext -> false;
+          }
+        }
+
+        featureFlaggingRegistry.registerFeatureFlag(feature, condition);
+      }
     }
   }
 
@@ -1262,377 +1213,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private org.mule.runtime.api.artifact.Registry getApiRegistry() {
     return getRegistry().lookupObject(OBJECT_REGISTRY);
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#HANDLE_SPLITTER_EXCEPTION} feature flag.
-   *
-   * @since 4.4.0
-   */
-  private static void configureSplitterExceptionHandlingFeature() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(HANDLE_SPLITTER_EXCEPTION,
-                                                minMuleVersion(v4_4_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER} feature flag.
-   *
-   * @since 4.4.0 4.3.1
-   */
-  private static void configureBatchFixedAggregatorTransactionRecordBuffer() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER, featureContext -> false);
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#HONOUR_RESERVED_PROPERTIES} feature flag.
-   *
-   * @since 4.4.0 4.3.1
-   */
-  public static void configurePropertiesResolverFeatureFlag() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(HONOUR_RESERVED_PROPERTIES,
-                                                minMuleVersion(v4_3_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ENABLE_POLICY_ISOLATION} feature flag.
-   *
-   * @since 4.4.0 4.3.1
-   */
-  private static void configureEnablePolicyIsolation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_POLICY_ISOLATION,
-                                                minMuleVersion(v4_4_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION} feature flag.
-   *
-   * @since 4.10.0, 4.9.5, 4.6.17
-   */
-  private static void configureSeparateClassLoaderForPolicyIsolation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(SEPARATE_CLASSLOADER_FOR_POLICY_ISOLATION,
-                                                minMuleVersion(v4_10_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR} feature flag.
-   *
-   * @since 4.4.0
-   */
-  private static void configureEntityResolverFailOnFirstErrorFeature() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR,
-                                                minMuleVersion(v4_4_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#SET_VARIABLE_WITH_NULL_VALUE} feature flag.
-   *
-   * @since 4.4.0
-   */
-  private static void configureSetVariableWithNullVale() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(SET_VARIABLE_WITH_NULL_VALUE,
-                                                minMuleVersion(v4_4_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER} feature flag.
-   *
-   * @since 4.4.0
-   */
-  private static void configureStartExtensionComponentsWithArtifactClassloader() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER,
-                                                minMuleVersion(v4_4_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#DW_REMOVE_SHADOWED_IMPLICIT_INPUTS} feature flag.
-   *
-   * @since 4.4.0
-   */
-  private static void configureRemoveShadowedImplicitInputs() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DW_REMOVE_SHADOWED_IMPLICIT_INPUTS,
-                                                minMuleVersion(v4_4_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#DW_HONOUR_MIXED_CONTENT_STRUCTURE} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureHonourMixedContentStructure() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DW_HONOUR_MIXED_CONTENT_STRUCTURE,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ENFORCE_ERROR_TYPES_VALIDATION} feature flag.
-   *
-   * @since 4.4.0
-   */
-  private static void configureEnforceErrorTypesValidation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENFORCE_ERROR_TYPES_VALIDATION,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  private static void configureDisableAttributeParameterWhitespaceTrimming() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  private static void configureDisablePojoTextCdataWhitespaceTrimming() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING} feature flag.
-   *
-   * @since 4.5.0, 4.4.1, 4.3.1
-   */
-  private static void configureDefaultErrorHandlerNotRollbackingEveryTx() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ENFORCE_REQUIRED_EXPRESSION_VALIDATION} feature flag.
-   *
-   * @since 4.4.0-202202
-   */
-  private static void configureEnforceRequiredExpressionValidation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENFORCE_REQUIRED_EXPRESSION_VALIDATION,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ENFORCE_EXPRESSION_VALIDATION} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureEnforceExpressionValidation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENFORCE_EXPRESSION_VALIDATION,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#PARALLEL_FOREACH_FLATTEN_MESSAGE} feature flag.
-   *
-   * @since 4.3.0-202203
-   */
-  private static void configureParallelForeachFlattenMessage() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(PARALLEL_FOREACH_FLATTEN_MESSAGE,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#DISABLE_APPLY_OBJECT_PROCESSOR} feature flag.
-   *
-   * @since 4.5
-   */
-  private static void configureDisableApplyObjectProcessor() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
-                                                minMuleVersion(v4_6_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureValidateAppModelWithRegionClassloader() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configurePrintDetailedCompositeExceptionLog() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION} feature flag.
-   *
-   * @since 4.5.0, 4.4.0-202207, 4.3.0-202207
-   */
-  private static void configureHonourErrorMappingsWhenPolicyAppliedOnOperation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#SUPPRESS_ERRORS} feature flag.
-   *
-   * @since 4.5.0, 4.4.0-202210, 4.3.0-202210
-   */
-  private static void configureSuppressErrors() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(SUPPRESS_ERRORS,
-                                                featureContext -> true);
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureRethrowExceptionsInIdempotentMessageValidator() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#HONOUR_INSECURE_TLS_CONFIGURATION} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureHonourInsecureTlsConfiguration() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(HONOUR_INSECURE_TLS_CONFIGURATION,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureAddMuleSpecificTracingInformationInTraceState() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE,
-                                                featureContext -> false);
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES} feature flag.
-   *
-   * @since 4.5.0, 4.4.0-202406
-   */
-  private static void configureCreateChildPolicyContextForParallelScopes() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES,
-                                                minMuleVersion(v4_5_0));
-  }
-
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureForeachRouterRejectsMapExpressionFeatureFlag() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS,
-                                                minMuleVersion(v4_5_0));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#USE_TRANSACTION_SINK_INDEX} feature flag.
-   *
-   * @since 4.0.0
-   */
-  private static void configureUseTransactionSinkIndex() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(USE_TRANSACTION_SINK_INDEX, featureContext -> true);
-  }
-
-  private static void configurePutTraceIdAndSpanIdInMdc() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC, featureContext -> false);
-  }
-
-  private static void configureCommonsPool2DisableJmx() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DISABLE_JMX_FOR_COMMONS_POOL2, minMuleVersion(v4_6_0));
-  }
-
-  private static void configureDisableSchedulerLogging() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DISABLE_SCHEDULER_LOGGING, minMuleVersion(v4_6_0));
-  }
-
-  private static void configureErrorAndRollbackTxWhenTimeout() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT, minMuleVersion(v4_6_1));
-  }
-
-  private static void configureDisableXmlSdkImplicitConfigurationCreation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION,
-                                                minMuleVersion(v4_7_0));
-  }
-
-  private static void configureEnableXmlSdkReset() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_XML_SDK_MDC_RESET, minMuleVersion(v4_8_0));
-  }
-
-  private static void configureUnsupportedExtensionsClientRunAsync() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC,
-                                                minMuleVersion(v4_8_0).and(minJavaVersion(JAVA_21)));
-  }
-
-  private static void configureEnforceImportTargetSameType() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENFORCE_IMPORT_TARGET_SAME_TYPE,
-                                                minMuleVersion(v4_8_0));
-  }
-
-  private static void configureHonourPersistedFlowState() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(HONOUR_PERSISTED_FLOW_STATE,
-                                                minMuleVersion(v4_8_0));
-  }
-
-  private static void configureDisableOptimisedNotificationHandlerDynamicResolutionUpdateBasedOnDelegate() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry
-        .registerFeatureFlag(DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE,
-                             featureContext -> false);
-  }
-
-  private static void configureNtlmAvoidSendPayloadOnType1() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry
-        .registerFeatureFlag(NTLM_AVOID_SEND_PAYLOAD_ON_TYPE_1, minMuleVersion(v4_9_0));
-  }
-
-  private static void configureForkJoinCompleteChildrenOnTimeout() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry
-        .registerFeatureFlag(FORK_JOIN_COMPLETE_CHILDREN_ON_TIMEOUT, minMuleVersion(v4_10_0));
-  }
-
-  private static void configureEnableRepeatableStreamingBytesEagerRead() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry
-        .registerFeatureFlag(ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ, featureContext -> false);
   }
 
   private static Predicate<FeatureContext> minMuleVersion(MuleVersion version) {
