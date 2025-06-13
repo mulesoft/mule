@@ -74,6 +74,12 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-artifact-activation</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule</groupId>
+                    <artifactId>mule-maven-client-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -182,6 +188,16 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-metadata-support</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+        <dependency>
+            <!-- logging dependency required by commons-beanutils -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
 
         <!-- Unit tests -->

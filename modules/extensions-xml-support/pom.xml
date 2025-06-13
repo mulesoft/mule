@@ -57,6 +57,11 @@
             <artifactId>commons-beanutils</artifactId>
         </dependency>
         <dependency>
+            <!-- logging dependency required by commons-beanutils -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>

@@ -109,7 +109,7 @@ module org.mule.runtime.core {
   requires com.github.benmanes.caffeine;
   requires com.google.common;
   requires com.google.gson;
-  requires commons.beanutils;
+  requires org.apache.commons.beanutils;
   requires org.apache.commons.collections4;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;

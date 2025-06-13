@@ -34,6 +34,7 @@ module org.mule.runtime.deployment.model.impl {
 
   // For deserialization of patching model:
   requires com.google.gson;
+  requires org.apache.commons.beanutils;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
 
