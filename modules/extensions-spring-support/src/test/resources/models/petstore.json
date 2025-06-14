@@ -12131,6 +12131,7 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "SIMPLE_CONNECTION",
@@ -12683,6 +12684,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "INVALID",
@@ -13227,6 +13229,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CUSTOM_CONNECTION",
@@ -14023,6 +14026,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "TRANSACTIONAL",
@@ -14567,6 +14571,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "VALID",
@@ -26083,6 +26088,7 @@
       "connectionManagementType": "CACHED",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "SIMPLE_CONNECTION",
@@ -26635,6 +26641,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "INVALID",
@@ -27179,6 +27186,7 @@
       "connectionManagementType": "POOLING",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "CUSTOM_CONNECTION",
@@ -27975,6 +27983,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "TRANSACTIONAL",
@@ -28519,6 +28528,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "VALID",

@@ -378,9 +378,9 @@ public class PlatformManagedOAuthConnectionProvider<C>
     return oauthConfig.getDelegateConnectionProviderModel().getConnectionManagementType();
   }
 
+  @Override
   public boolean supportsXa() {
-    // TODO W-18557890 get this from the connection provider model
-    return false;
+    return oauthConfig.getDelegateConnectionProviderModel().supportsXa();
   }
 
   @Override

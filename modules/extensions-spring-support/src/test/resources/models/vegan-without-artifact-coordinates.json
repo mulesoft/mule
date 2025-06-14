@@ -4606,6 +4606,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": false,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "APPLE",
@@ -11032,6 +11033,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "BANANA_PLANTAIN",
@@ -12392,6 +12394,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "GRAPE-CONNECTION",
@@ -13277,6 +13280,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": false,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "KIWI",
@@ -13590,6 +13594,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",

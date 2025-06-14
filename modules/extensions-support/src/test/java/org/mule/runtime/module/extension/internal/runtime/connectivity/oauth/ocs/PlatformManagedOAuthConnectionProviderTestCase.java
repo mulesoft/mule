@@ -6,12 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -22,6 +16,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.quality.Strictness.LENIENT;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -59,6 +59,9 @@ class PlatformManagedOAuthConnectionProviderTestCase extends AbstractMuleTestCas
   private PlatformManagedOAuthConfig mockOAuthConfig;
 
   @Mock
+  private ConnectionProviderModel mockProviderModel;
+
+  @Mock
   private PlatformManagedOAuthHandler mockOAuthHandler;
 
   @Mock
@@ -78,7 +81,6 @@ class PlatformManagedOAuthConnectionProviderTestCase extends AbstractMuleTestCas
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    ConnectionProviderModel mockProviderModel = mock(ConnectionProviderModel.class);
     when(mockOAuthConfig.getDelegateConnectionProviderModel()).thenReturn(mockProviderModel);
     provider = new PlatformManagedOAuthConnectionProvider<>(
                                                             mockOAuthConfig, mockOAuthHandler, mockReconnectionConfig,
@@ -287,9 +289,8 @@ class PlatformManagedOAuthConnectionProviderTestCase extends AbstractMuleTestCas
 
   @Test
   void supportsXa() {
-    // TODO W-18557890 update this with the mock extModel
-    boolean supportsXa = provider.supportsXa();
-
-    assertThat(supportsXa, is(false));
+    assertThat(provider.supportsXa(), is(false));
+    when(mockProviderModel.supportsXa()).thenReturn(true);
+    assertThat(provider.supportsXa(), is(true));
   }
 }
