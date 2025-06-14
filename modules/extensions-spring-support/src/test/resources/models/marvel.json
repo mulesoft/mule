@@ -6669,6 +6669,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "MYSTIC",
@@ -7008,6 +7009,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "POOLING-MYSTIC",
@@ -10464,6 +10466,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "MISSILE",
@@ -10764,6 +10767,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "ODD-MISSILE",

@@ -3062,6 +3062,7 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
@@ -4844,6 +4845,7 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "FAILING-CONNECTION",
@@ -5666,6 +5668,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "LONG-DISCONNECTION",

@@ -897,6 +897,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
@@ -1524,6 +1525,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
@@ -2155,6 +2157,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
@@ -3540,6 +3543,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CHAT",
@@ -5025,6 +5029,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "WITH_VALUE_WITH_REQUIRED_PARAM",
@@ -5398,6 +5403,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "WITH_VALUES_WITH_REQUIRED_PARAMS_FROM_PARAM_GROUP",
@@ -5799,6 +5805,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "WITH_VALUES_WITH_REQUIRED_PARAMS_FROM_SHOW_IN_DSL_GROUP",
@@ -6196,6 +6203,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
@@ -6488,6 +6496,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "FAILURE-CONNECTION",
@@ -6830,6 +6839,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "WITH-PARAMETER-WITH-FIELD-VALUES",
@@ -7134,6 +7144,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "WITH-VALUE-PARAMETER",
@@ -7440,6 +7451,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "WITH_VALUE_FOUR_BOUND_ACTING_PARAMETERS",
@@ -9020,6 +9032,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
@@ -9552,6 +9565,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",

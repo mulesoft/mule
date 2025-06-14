@@ -67,6 +67,12 @@ public interface ConnectionProviderModelParser extends SemanticTermsParser, Ster
   boolean supportsConnectivityTesting();
 
   /**
+   * @return whether this provider connections may participate in an XA transaction.
+   * @since 4.10
+   */
+  boolean supportsXa();
+
+  /**
    * @return whether this provider should be skipped when generating the extension's connectivity schemas
    */
   boolean isExcludedFromConnectivitySchema();

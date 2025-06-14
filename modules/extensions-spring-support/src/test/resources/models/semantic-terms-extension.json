@@ -785,6 +785,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.ApiKeyAuthenticationConnection"
           ],
@@ -1320,6 +1321,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.BasicAuthenticationConnection"
           ],
@@ -1887,6 +1889,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.ApiKeyAuthenticationConnection"
           ],
@@ -2454,6 +2457,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CUSTOM",
@@ -3257,6 +3261,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.DigestAuthenticationConnection"
           ],
@@ -3760,6 +3765,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.KerberosAuthenticationConnection"
           ],
@@ -4295,6 +4301,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.UnsecureConnection"
           ],
@@ -5833,6 +5840,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [
         "connectivity.ApiKeyAuthenticationConnection"
       ],
@@ -6368,6 +6376,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [
         "connectivity.BasicAuthenticationConnection"
       ],
@@ -6935,6 +6944,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [
         "connectivity.ApiKeyAuthenticationConnection"
       ],
@@ -7502,6 +7512,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "CUSTOM",
@@ -8305,6 +8316,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [
         "connectivity.DigestAuthenticationConnection"
       ],
@@ -8808,6 +8820,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [
         "connectivity.KerberosAuthenticationConnection"
       ],
@@ -9343,6 +9356,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [
         "connectivity.UnsecureConnection"
       ],
