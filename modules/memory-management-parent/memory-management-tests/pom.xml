@@ -5,14 +5,14 @@
     <parent>
         <artifactId>mule-modules</artifactId>
         <groupId>org.mule.runtime</groupId>
-        <version>4.6.20-SNAPSHOT</version>
+        <version>4.6.20-rc1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-memory-management-tests</artifactId>
-    <version>4.6.20-SNAPSHOT</version>
+    <version>4.6.20-rc1</version>
     <name>Mule Memory Management Module Tests</name>
     <description>This module tests the Memory Management Module implementation</description>
 
