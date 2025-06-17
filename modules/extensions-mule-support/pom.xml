@@ -52,11 +52,17 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-artifact-ast-xml-parser</artifactId>
         </dependency>
-        <!-- TODO: remove this once and for all, we still require it for the DefaultArtifactTypeLoader and some internals of the
-        execution (see MuleOperationExecutor) -->
         <dependency>
+            <!-- TODO: remove this once and for all, we still require it for the DefaultArtifactTypeLoader and some internals of
+            the execution (see MuleOperationExecutor) -->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <!-- Required for CoreDslConstants, used to do special handling for some core components -->
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -66,29 +72,11 @@
 
         <!-- Test dependencies -->
         <dependency>
-            <!-- Not really a test dependency per se, but if missing test runner fails to bootstrap -->
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <!-- Needed for tests to be able to parse test config files -->
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${project.version}</version>
-            <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
-            <!-- the app classpath, this needs to go into the container classloader -->
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <!-- Needed for tests to be able to parse test config files -->
+            <!-- Needed for DefaultExtensionBuildingDefinitionProvider, DefaultExtensionSchemaGenerator and MulePluginDescriptorGenerator-->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
-            <!-- provided instead of test so that the test framework doesn't wrongfully assume that this goes in -->
-            <!-- the app classpath, this needs to go into the container classloader -->
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
@@ -136,67 +124,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tx-extension</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!-- Excluding as it will be resolved with SNAPSHOT version because test-components
-                    is SNAPSHOT to avoid a circular dep within mule and mule-test-artifacts repos -->
-                    <groupId>org.mule.sdk</groupId>
-                    <artifactId>mule-sdk-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-marvel-extension</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!-- Excluding as it will be resolved with SNAPSHOT version because test-components
-                    is SNAPSHOT to avoid a circular dep within mule and mule-test-artifacts repos -->
-                    <groupId>org.mule.sdk</groupId>
-                    <artifactId>mule-sdk-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
             <artifactId>mule-heisenberg-extension</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!-- Excluding as it will be resolved with SNAPSHOT version because test-components
-                    is SNAPSHOT to avoid a circular dep within mule and mule-test-artifacts repos -->
-                    <groupId>org.mule.sdk</groupId>
-                    <artifactId>mule-sdk-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-subtypes-extension</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!-- Excluding as it will be resolved with SNAPSHOT version because test-components
-                    is SNAPSHOT to avoid a circular dep within mule and mule-test-artifacts repos -->
-                    <groupId>org.mule.sdk</groupId>
-                    <artifactId>mule-sdk-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-vegan-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
@@ -220,24 +148,6 @@
             <version>${muleApiVersion}</version>
             <type>test-jar</type>
             <scope>test</scope>
-        </dependency>
-        <!--TODO: MULE-11030 remove dependency-->
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-weave</artifactId>
-            <classifier>mule-service</classifier>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-dwb-api</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
