@@ -12,6 +12,10 @@ import static org.mule.test.allure.AllureConstants.CustomizationServiceFeature.C
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static java.lang.System.setProperty;
+import static org.mule.test.allure.AllureConstants.HaMigrationFeature.HA_MIGRATION_FEATURE;
+import static org.mule.test.allure.AllureConstants.HaMigrationFeature.LocksStory.LOCKS_MIGRATION;
+import io.qameta.allure.Features;
+import io.qameta.allure.Story;
 import org.mule.runtime.api.lock.LockProvider;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -20,7 +24,8 @@ import io.qameta.allure.Feature;
 
 import java.util.concurrent.locks.Lock;
 
-@Feature(CUSTOMIZATION_SERVICE)
+@Features({@Feature(CUSTOMIZATION_SERVICE), @Feature(HA_MIGRATION_FEATURE)})
+@Story(LOCKS_MIGRATION)
 public class HaMigrationServicesOverrideTestCase extends AbstractMuleTestCase {
 
   private DefaultCustomizationService customizationService = new DefaultCustomizationService();
