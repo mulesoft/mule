@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.artifact.internal.descriptor;
 
-import static java.util.Objects.requireNonNull;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.manifest.api.MuleManifest.getMuleManifest;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 
 import java.util.function.Supplier;
@@ -72,8 +73,7 @@ public class MinMuleVersionArtifactDescriptorValidator implements ArtifactDescri
 
   private void doValidation(ArtifactDescriptor descriptor, MuleVersion minMuleVersion, MuleVersion runtimeVersion) {
     if (runtimeVersion.priorTo(minMuleVersion)) {
-      throw new MuleRuntimeException(
-                                     createStaticMessage("Artifact %s requires a newest runtime version. Artifact required version is %s and Mule Runtime version is %s",
+      throw new ArtifactDescriptorCreateException(format("Artifact %s requires a newest runtime version. Artifact required version is %s and Mule Runtime version is %s",
                                                          descriptor.getName(),
                                                          descriptor.getMinMuleVersion().toCompleteNumericVersion(),
                                                          runtimeVersion.toCompleteNumericVersion()));
