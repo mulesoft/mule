@@ -18,7 +18,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionN
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
+import static java.util.List.of;
 import static java.util.Optional.ofNullable;
 
 import org.mule.metadata.api.model.ArrayType;
@@ -50,6 +50,7 @@ import org.mule.runtime.module.extension.internal.loader.java.property.TypeLoade
 import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
 import org.mule.runtime.extension.api.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 
 import java.util.LinkedHashMap;
@@ -66,7 +67,8 @@ import java.util.function.Supplier;
  */
 public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate {
 
-  private final List<ExtensionModelValidator> VALIDATORS = singletonList(new DeprecationModelValidator());
+  private final List<ExtensionModelValidator> VALIDATORS = of(new DeprecationModelValidator(),
+                                                              new ParameterPluralNameModelValidator());
 
   protected final String version;
   private final String loaderId;

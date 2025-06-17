@@ -15,18 +15,13 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENA
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
 
 import org.mule.runtime.extension.api.loader.AbstractParserBasedExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 import org.mule.runtime.extension.api.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
+import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,8 +33,6 @@ public abstract class AbstractExtensionModelLoader extends AbstractParserBasedEx
 
   private static boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
   private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
-
-  private final List<ExtensionModelValidator> validators = unmodifiableList(asList(new DeprecationModelValidator()));
 
   /**
    * As part of our effort to remove the powermock dependency for the Java 17 upgrade("W-13116494"), we have temporarily
@@ -60,8 +53,6 @@ public abstract class AbstractExtensionModelLoader extends AbstractParserBasedEx
    */
   @Override
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
-    context.addCustomValidators(validators);
-
     Optional<Object> disableComponentIgnore = checkBoolean(context, DISABLE_COMPONENT_IGNORE);
     if (IGNORE_DISABLED && !disableComponentIgnore.isPresent()) {
       context.addParameter(DISABLE_COMPONENT_IGNORE, true);

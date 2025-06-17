@@ -27,7 +27,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProp
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
-import org.mule.runtime.extension.internal.loader.validator.ParameterPluralNameModelValidator;
+import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
