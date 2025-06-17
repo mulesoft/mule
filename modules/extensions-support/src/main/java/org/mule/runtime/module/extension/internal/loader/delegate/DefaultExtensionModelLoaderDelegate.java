@@ -8,7 +8,9 @@ package org.mule.runtime.module.extension.internal.loader.delegate;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getJdkVersion;
+import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentDeclarationTypeName;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.declarerWithMmv;
@@ -16,7 +18,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionN
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 
@@ -51,7 +52,6 @@ import org.mule.runtime.extension.api.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,26 +99,24 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     try {
       return doDeclare(parserFactory, context);
     } catch (Exception e) {
-      if (e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof NoClassDefFoundError) {
-        // Handle errors caused by the java version before the actual validation takes place, since the validation needs the
-        // extension model
-        NoClassDefFoundError ncdfe = (NoClassDefFoundError) e.getCause().getCause();
+      // Handle errors caused by the java version before the actual validation takes place, since the validation needs the
+      // extension model
+      extractOfType(e, NoClassDefFoundError.class)
+          .filter(ncdfe -> ncdfe.getMessage().startsWith("javax/"))
+          .ifPresent(ncdfe -> {
+            JdkVersionUtils.JdkVersion runningJdkVersion = getJdkVersion();
+            Set<String> supportedJavaVersions = context.getExtensionDeclarer().getDeclaration().getSupportedJavaVersions();
+            if (supportedJavaVersions.isEmpty()) {
+              supportedJavaVersions = DEFAULT_SUPPORTED_JAVA_VERSIONS;
+            }
 
-        if (ncdfe.getMessage().startsWith("javax/")) {
-          JdkVersionUtils.JdkVersion runningJdkVersion = getJdkVersion();
-          Set<String> supportedJavaVersions = context.getExtensionDeclarer().getDeclaration().getSupportedJavaVersions();
-          if (supportedJavaVersions.isEmpty()) {
-            supportedJavaVersions = new HashSet<>(asList("11", "1.8"));
-          }
-
-          throw new IllegalSourceException(format("Extension '%s' version %s does not support Mule 4.6+ on Java %s. Supported Java versions are: %s. (%s)",
-                                                  context.getExtensionDeclarer().getDeclaration().getName(),
-                                                  context.getExtensionDeclarer().getDeclaration().getVersion(),
-                                                  runningJdkVersion.getMajor(),
-                                                  supportedJavaVersions,
-                                                  ncdfe));
-        }
-      }
+            throw new IllegalSourceException(format("Extension '%s' version %s does not support Mule 4.6+ on Java %s. Supported Java versions are: %s. (%s)",
+                                                    context.getExtensionDeclarer().getDeclaration().getName(),
+                                                    context.getExtensionDeclarer().getDeclaration().getVersion(),
+                                                    runningJdkVersion.getMajor(),
+                                                    supportedJavaVersions,
+                                                    ncdfe));
+          });
 
       throw e;
     }
