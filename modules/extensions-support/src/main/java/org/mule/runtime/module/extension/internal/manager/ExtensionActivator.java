@@ -34,8 +34,8 @@ import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.DefaultExpressionModuleBuilder;
 import org.mule.runtime.core.internal.transformer.simple.StringToEnum;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
-import org.mule.runtime.extension.api.loader.parser.FunctionExecutor;
-import org.mule.runtime.extension.api.loader.parser.FunctionParameterDefaultValueResolverFactory;
+import org.mule.runtime.extension.api.runtime.function.FunctionExecutor;
+import org.mule.runtime.extension.api.runtime.function.FunctionParameterDefaultValueResolverFactory;
 import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
 
 import java.util.HashSet;

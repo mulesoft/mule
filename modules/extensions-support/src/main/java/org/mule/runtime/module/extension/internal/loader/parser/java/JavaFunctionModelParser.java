@@ -22,7 +22,7 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.loader.parser.FunctionExecutorFactory;
+import org.mule.runtime.extension.api.runtime.function.FunctionExecutorFactory;
 import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
