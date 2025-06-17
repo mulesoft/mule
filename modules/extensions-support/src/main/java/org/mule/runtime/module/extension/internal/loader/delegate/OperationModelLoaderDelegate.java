@@ -27,9 +27,9 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
@@ -58,6 +58,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
   }
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
+                         ExtensionDevelopmentFramework extensionDevelopmentFramework,
                          HasOperationDeclarer ownerDeclarer,
                          List<OperationModelParser> operations,
                          ExtensionLoadingContext context) {
@@ -68,7 +69,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
         continue;
       }
 
-      final boolean requiresConfig = requiresConfig(parser);
+      final boolean requiresConfig = requiresConfig(extensionDevelopmentFramework, parser);
       HasOperationDeclarer actualDeclarer = requiresConfig
           ? ownerDeclarer
           : extensionDeclarer;

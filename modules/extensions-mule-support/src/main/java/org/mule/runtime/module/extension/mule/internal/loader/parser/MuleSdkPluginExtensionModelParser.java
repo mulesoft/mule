@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework.MULE_SDK;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
@@ -29,6 +30,7 @@ import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
+import org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
 import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
@@ -96,6 +98,11 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
     return of(new MuleSdkMinMuleVersionParser(format("Plugin %s has min mule version %s because the Mule Sdk was introduced in that version.",
                                                      name, MIN_MULE_VERSION)));
+  }
+
+  @Override
+  public ExtensionDevelopmentFramework getDevelopmentFramework() {
+    return MULE_SDK;
   }
 
   @Override

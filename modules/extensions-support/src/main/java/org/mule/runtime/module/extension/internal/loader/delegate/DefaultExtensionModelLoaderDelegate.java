@@ -71,7 +71,6 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
                                                               new ParameterPluralNameModelValidator());
 
   protected final String version;
-  private final String loaderId;
 
   private final ConfigModelLoaderDelegate configLoaderDelegate = new ConfigModelLoaderDelegate(this);
   private final OperationModelLoaderDelegate operationLoaderDelegate = new OperationModelLoaderDelegate(this);
@@ -88,9 +87,8 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
   private ExtensionDeclarer declarer;
   private String namespace;
 
-  public DefaultExtensionModelLoaderDelegate(String version, String loaderId) {
+  public DefaultExtensionModelLoaderDelegate(String version) {
     this.version = version;
-    this.loaderId = loaderId;
   }
 
   /**
@@ -142,7 +140,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     context.getParameter("COMPILATION_MODE")
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
-    declarer.withModelProperty(new DevelopmentFrameworkModelProperty(loaderId));
+    declarer.withModelProperty(new DevelopmentFrameworkModelProperty(parser.getDevelopmentFramework()));
     declarer.withModelProperty(new TypeLoaderModelProperty(context.getTypeLoader()));
     parser.getArtifactLifecycleListenerClass()
         .map(ArtifactLifecycleListenerModelProperty::new)
@@ -171,7 +169,8 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     connectionProviderModelLoaderDelegate.declareConnectionProviders(declarer, parser.getConnectionProviderModelParsers(),
                                                                      context);
 
-    operationLoaderDelegate.declareOperations(declarer, declarer, parser.getOperationModelParsers(), context);
+    operationLoaderDelegate.declareOperations(declarer, parser.getDevelopmentFramework(), declarer,
+                                              parser.getOperationModelParsers(), context);
     functionModelLoaderDelegate.declareFunctions(declarer, parser.getFunctionModelParsers(), context);
     sourceModelLoaderDelegate.declareMessageSources(declarer, declarer, parser.getSourceModelParsers(), context);
 

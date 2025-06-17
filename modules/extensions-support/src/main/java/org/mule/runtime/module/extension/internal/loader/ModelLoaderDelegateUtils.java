@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
+import static org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework.MULE_DSL;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
 import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 import org.mule.runtime.extension.api.loader.parser.OperationModelParser;
@@ -32,11 +35,17 @@ public final class ModelLoaderDelegateUtils {
   }
 
   /**
-   * @param parser a {@link OperationModelParser}
+   * @param extensionDevelopmentFramework the {@link ExtensionDevelopmentFramework} used for developing the extension being
+   *                                      parsed.
+   * @param parser                        a {@link OperationModelParser}
    * @return whether the given {@code parser} represents an operation which requires a config to function
    */
-  public static boolean requiresConfig(OperationModelParser parser) {
-    return parser.hasConfig() || (parser.isConnected() && parser.requiresConnectionProvisioning()) || parser.isAutoPaging();
+  public static boolean requiresConfig(ExtensionDevelopmentFramework extensionDevelopmentFramework, OperationModelParser parser) {
+    // For the time being Mule SDK operations are not associated with their own connection provider, they can delegate to
+    // connected
+    // operations from other extensions by receiving the necessary configs as parameters
+    return parser.hasConfig() || (parser.isConnected() && !extensionDevelopmentFramework.equals(MULE_DSL))
+        || parser.isAutoPaging();
   }
 
   /**

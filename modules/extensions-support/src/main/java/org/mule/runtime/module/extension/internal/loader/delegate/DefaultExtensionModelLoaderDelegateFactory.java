@@ -18,6 +18,6 @@ public class DefaultExtensionModelLoaderDelegateFactory implements ModelLoaderDe
 
   @Override
   public ModelLoaderDelegate getLoader(String version, String loaderId) {
-    return new DefaultExtensionModelLoaderDelegate(version, loaderId);
+    return new DefaultExtensionModelLoaderDelegate(version);
   }
 }

@@ -241,14 +241,6 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   @Override
-  public boolean requiresConnectionProvisioning() {
-    // For the time being Mule SDK operations are not associated with their own connection provider, they can delegate to
-    // connected
-    // operations from other extensions by receiving the necessary configs as parameters
-    return false;
-  }
-
-  @Override
   public boolean hasConfig() {
     return false;
   }

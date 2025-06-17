@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
+import static org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework.JAVA_SDK;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
@@ -50,6 +51,7 @@ import org.mule.runtime.extension.api.annotation.SubTypesMapping;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
 import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
@@ -349,7 +351,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                extensionElement,
                                extensionElement,
                                loadingContext)
-                                   .filter(operation -> !requiresConfig(operation))
+                                   .filter(operation -> !requiresConfig(getDevelopmentFramework(), operation))
                                    .collect(toList());
   }
 
@@ -461,6 +463,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
     return of(resolveExtensionMinMuleVersion(extensionElement));
+  }
+
+  @Override
+  public ExtensionDevelopmentFramework getDevelopmentFramework() {
+    return JAVA_SDK;
   }
 
   @Override

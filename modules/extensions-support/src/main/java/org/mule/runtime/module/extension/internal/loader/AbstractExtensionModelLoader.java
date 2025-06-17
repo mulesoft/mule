@@ -78,6 +78,6 @@ public abstract class AbstractExtensionModelLoader extends AbstractParserBasedEx
 
   protected ModelLoaderDelegate getModelLoaderDelegate(ExtensionLoadingContext context, String version) {
     // We can skip the SPI lookup of the parent class because we have direct access to the impl we need.
-    return new DefaultExtensionModelLoaderDelegate(version, getId());
+    return new DefaultExtensionModelLoaderDelegate(version);
   }
 }

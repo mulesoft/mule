@@ -140,10 +140,6 @@ abstract class AbstractJavaExecutableComponentModelParser extends AbstractJavaMo
     return connected;
   }
 
-  public boolean requiresConnectionProvisioning() {
-    return connected;
-  }
-
   public boolean isTransactional() {
     return transactional;
   }

@@ -8,7 +8,6 @@ package org.mule.test.module.extension.internal.util;
 
 import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.extension.api.ExtensionConstants.JAVA_SDK_LOADER_ID;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
@@ -42,7 +41,6 @@ public final class ExtensionDeclarationTestUtils {
   }
 
   public static ExtensionDeclarer javaDeclarerFor(String version, ExtensionLoadingContext context) {
-    return new DefaultExtensionModelLoaderDelegate(version, JAVA_SDK_LOADER_ID).declare(new JavaExtensionModelParserFactory(),
-                                                                                        context);
+    return new DefaultExtensionModelLoaderDelegate(version).declare(new JavaExtensionModelParserFactory(), context);
   }
 }

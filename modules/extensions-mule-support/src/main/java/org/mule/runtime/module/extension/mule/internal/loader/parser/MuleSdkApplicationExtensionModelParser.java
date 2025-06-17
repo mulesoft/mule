@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.THIS_NAMESPACE;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.THIS_PREFIX;
+import static org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework.MULE_DSL;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
 import static java.lang.String.format;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
+import org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
 import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
 import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
@@ -79,6 +81,11 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
   public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
     return of(new MuleSdkMinMuleVersionParser(format("Application %s has min mule version %s because the Mule Sdk was introduced in that version.",
                                                      extensionName, MIN_MULE_VERSION)));
+  }
+
+  @Override
+  public ExtensionDevelopmentFramework getDevelopmentFramework() {
+    return MULE_DSL;
   }
 
   @Override
