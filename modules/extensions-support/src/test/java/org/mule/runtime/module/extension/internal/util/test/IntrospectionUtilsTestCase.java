@@ -111,7 +111,7 @@ import com.google.testing.compile.CompilationRule;
 import org.springframework.core.ResolvableType;
 
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -132,8 +132,8 @@ public class IntrospectionUtilsTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
-  @Rule
-  public CompilationRule compilationRule = new CompilationRule();
+  @ClassRule
+  public static CompilationRule compilationRule = new CompilationRule();
 
   private final ReflectionCache reflectionCache = new ReflectionCache();
 
