@@ -51,7 +51,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.notification.NotificationActions;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.loader.parser.LicensingParser;
+import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
 import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
@@ -386,7 +386,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   @Override
-  public LicensingParser getLicensingParser() {
+  public LicenseModelParser getLicensingParser() {
     Optional<RequiresEntitlementInfo> requiresEntitlementOptional = getRequiresEntitlementInfo(extensionElement);
     Optional<RequiresEnterpriseLicenseInfo> requiresEnterpriseLicenseOptional =
         getRequiresEnterpriseLicenseInfo(extensionElement);
@@ -395,7 +395,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
         requiresEnterpriseLicenseOptional.map(RequiresEnterpriseLicenseInfo::isAllowEvaluationLicense).orElse(true);
     Optional<String> requiredEntitlement = requiresEntitlementOptional.map(RequiresEntitlementInfo::getName);
 
-    return new JavaLicensingParser(requiresEnterpriseLicense, allowsEvaluationLicense, requiredEntitlement);
+    return new JavaLicenseModelParser(requiresEnterpriseLicense, allowsEvaluationLicense, requiredEntitlement);
   }
 
   @Override
@@ -501,14 +501,14 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
         .map(cls -> (Class<? extends ArtifactLifecycleListener>) cls);
   }
 
-  private class JavaLicensingParser implements LicensingParser {
+  private class JavaLicenseModelParser implements LicenseModelParser {
 
     private final boolean requiresEnterpriseLicense;
     private final boolean allowsEvaluationLicense;
     private final Optional<String> requiredEntitlement;
 
-    public JavaLicensingParser(boolean requiresEnterpriseLicense, boolean allowsEvaluationLicense,
-                               Optional<String> requiredEntitlement) {
+    public JavaLicenseModelParser(boolean requiresEnterpriseLicense, boolean allowsEvaluationLicense,
+                                  Optional<String> requiredEntitlement) {
       this.requiresEnterpriseLicense = requiresEnterpriseLicense;
       this.allowsEvaluationLicense = allowsEvaluationLicense;
       this.requiredEntitlement = requiredEntitlement;

@@ -37,7 +37,7 @@ import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
-import org.mule.runtime.extension.api.loader.parser.LicensingParser;
+import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.api.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
@@ -329,7 +329,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     return parameterModelsLoaderDelegate;
   }
 
-  private LicenseModelProperty createLicenseModelProperty(LicensingParser parser) {
+  private LicenseModelProperty createLicenseModelProperty(LicenseModelParser parser) {
     return new LicenseModelProperty(parser.requiresEeLicense(), parser.isAllowsEvaluationLicense(),
                                     parser.getRequiredEntitlement());
   }

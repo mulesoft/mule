@@ -31,7 +31,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
-import org.mule.runtime.extension.api.loader.parser.LicensingParser;
+import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
 import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.extension.api.loader.parser.XmlDslConfiguration;
 
@@ -53,7 +53,7 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   private String vendor;
   private String namespace;
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
-  private LicensingParser licensingParser;
+  private LicenseModelParser licenseModelParser;
   private List<ErrorModelParser> errorModelParsers;
 
   public MuleSdkPluginExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
@@ -99,8 +99,8 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   }
 
   @Override
-  public LicensingParser getLicensingParser() {
-    return licensingParser;
+  public LicenseModelParser getLicensingParser() {
+    return licenseModelParser;
   }
 
   @Override
@@ -157,7 +157,7 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   }
 
   private void parseLicenseModelProperty(ComponentAst descriptionComponentAst) {
-    licensingParser = getSingleChild(descriptionComponentAst, MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME)
+    licenseModelParser = getSingleChild(descriptionComponentAst, MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME)
         .map(licensingComponentAst -> {
           boolean requiresEeLicense =
               getParameter(licensingComponentAst, MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME);
@@ -165,8 +165,8 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
                                                          MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME);
           Optional<String> requiredEntitlement = getOptionalParameter(licensingComponentAst,
                                                                       MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME);
-          return new MuleSdkLicensingParser(requiresEeLicense, allowsEvaluationLicense, requiredEntitlement);
+          return new MuleSdkLicenseModelParser(requiresEeLicense, allowsEvaluationLicense, requiredEntitlement);
         })
-        .orElse(new MuleSdkLicensingParser(false, true, empty()));
+        .orElse(new MuleSdkLicenseModelParser(false, true, empty()));
   }
 }

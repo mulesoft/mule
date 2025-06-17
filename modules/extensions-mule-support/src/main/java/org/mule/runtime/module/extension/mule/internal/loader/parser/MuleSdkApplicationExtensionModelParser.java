@@ -21,7 +21,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
-import org.mule.runtime.extension.api.loader.parser.LicensingParser;
+import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
 import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.extension.api.loader.parser.XmlDslConfiguration;
 
@@ -82,8 +82,8 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
   }
 
   @Override
-  public LicensingParser getLicensingParser() {
-    return new MuleSdkLicensingParser(false, true, empty());
+  public LicenseModelParser getLicensingParser() {
+    return new MuleSdkLicenseModelParser(false, true, empty());
   }
 
   @Override

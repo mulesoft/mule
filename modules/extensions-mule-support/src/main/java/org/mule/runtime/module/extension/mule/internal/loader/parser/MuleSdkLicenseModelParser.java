@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import org.mule.runtime.extension.api.loader.parser.LicensingParser;
+import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
 
 import java.util.Optional;
 
-class MuleSdkLicensingParser implements LicensingParser {
+class MuleSdkLicenseModelParser implements LicenseModelParser {
 
   private final boolean requiresEnterpriseLicense;
   private final boolean allowsEvaluationLicense;
   private final Optional<String> requiredEntitlement;
 
-  public MuleSdkLicensingParser(boolean requiresEnterpriseLicense, boolean allowsEvaluationLicense,
-                                Optional<String> requiredEntitlement) {
+  public MuleSdkLicenseModelParser(boolean requiresEnterpriseLicense, boolean allowsEvaluationLicense,
+                                   Optional<String> requiredEntitlement) {
     this.requiresEnterpriseLicense = requiresEnterpriseLicense;
     this.allowsEvaluationLicense = allowsEvaluationLicense;
     this.requiredEntitlement = requiredEntitlement;
