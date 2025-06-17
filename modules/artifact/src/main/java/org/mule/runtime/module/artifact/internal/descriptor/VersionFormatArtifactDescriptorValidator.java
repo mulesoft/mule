@@ -43,12 +43,12 @@ public class VersionFormatArtifactDescriptorValidator implements ArtifactDescrip
 
   private void doValidate(ArtifactDescriptor descriptor) {
     String bundleDescriptorVersion = descriptor.getBundleDescriptor().getVersion();
-    if (!(bundleDescriptorVersion != null)) {
+    if (bundleDescriptorVersion == null) {
       throw new ArtifactDescriptorCreateException(format("No version specified in the bundle descriptor of the artifact %s",
                                                          descriptor.getName()));
     }
     MuleVersion artifactVersion = new MuleVersion(bundleDescriptorVersion);
-    if (!(artifactVersion.getRevision() != NO_REVISION)) {
+    if (artifactVersion.getRevision() == NO_REVISION) {
       throw new ArtifactDescriptorCreateException(format("Artifact %s version %s must contain a revision number. The version format must be x.y.z and the z part is missing",
                                                          descriptor.getName(), artifactVersion));
     }
