@@ -6,16 +6,15 @@
  */
 package org.mule.runtime.core.internal.config;
 
-import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
+import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.lock.LockProvider;
