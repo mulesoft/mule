@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.streaming.object.iterator;
 
-import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
 
@@ -58,12 +58,9 @@ public class ObjectStoreProducer<T extends Serializable> implements Producer<T> 
     try {
       return this.objectStore.retrieve(key);
     } catch (ObjectDoesNotExistException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format(
-                                   "key %s no longer available in objectstore. This is likely due to a concurrency issue. Will continue with next key if available",
-                                   key));
-      }
-
+      logger.debug("key {} no longer available in objectstore. This is likely due to a concurrency issue."
+          + " Will continue with next key if available",
+                   key);
       return this.produce();
     } catch (ObjectStoreException e) {
       throw new RuntimeException(e);

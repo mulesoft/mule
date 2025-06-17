@@ -128,13 +128,13 @@ public class ValueProviderExecutor {
     } catch (MuleRuntimeException e) {
       Throwable cause = e.getCause();
       if (cause instanceof ValueResolvingException valueResolvingException) {
-        if (LOGGER.isWarnEnabled()) {
-          LOGGER.warn(format("Resolve value provider has FAILED with code: %s for component: %s %s",
-                             valueResolvingException.getFailureCode(),
-                             actingParameter.getModel().getName(),
-                             loggingSuffix),
-                      cause);
-        }
+        LOGGER.atWarn()
+            .setCause(cause)
+            .setMessage("Resolve value provider has FAILED with code: {} for component: {} {}")
+            .addArgument(valueResolvingException.getFailureCode())
+            .addArgument(actingParameter.getModel().getName())
+            .addArgument(loggingSuffix)
+            .log();
         ResolvingFailure.Builder failureBuilder = newFailure(cause);
         failureBuilder.withFailureCode(valueResolvingException.getFailureCode());
         return resultFrom(failureBuilder.build());
@@ -145,12 +145,9 @@ public class ValueProviderExecutor {
       propagateIfPossible(e, MuleRuntimeException.class);
       throw new MuleRuntimeException(e);
     } finally {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Resolve value provider: {} FINISHED for component: {} {}", providerName,
-                     actingParameter.getModel()
-                         .getName(),
-                     loggingSuffix);
-      }
+      LOGGER.debug("Resolve value provider: {} FINISHED for component: {} {}", providerName,
+                   actingParameter.getModel().getName(),
+                   loggingSuffix);
     }
   }
 

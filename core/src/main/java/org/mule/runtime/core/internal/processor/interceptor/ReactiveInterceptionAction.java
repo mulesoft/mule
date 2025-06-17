@@ -60,9 +60,10 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   @Override
   public CompletableFuture<InterceptionEvent> proceed() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called proceed() for processor {}", ((Component) processor).getLocation().getLocation());
-    }
+    LOGGER.atDebug()
+        .setMessage("Called proceed() for processor {}")
+        .addArgument(() -> ((Component) processor).getLocation().getLocation())
+        .log();
 
     return just(interceptionEvent.resolve())
         .cast(CoreEvent.class)
@@ -78,9 +79,10 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   @Override
   public CompletableFuture<InterceptionEvent> skip() {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called skip() for processor {}", ((Component) processor).getLocation().getLocation());
-    }
+    LOGGER.atDebug()
+        .setMessage("Called skip() for processor {}")
+        .addArgument(() -> ((Component) processor).getLocation().getLocation())
+        .log();
 
     interceptionEvent.resolve();
     return completedFuture(interceptionEvent);
@@ -88,10 +90,12 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   @Override
   public CompletableFuture<InterceptionEvent> fail(Throwable cause) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called fail() for processor {} with cause {} ({})", ((Component) processor).getLocation().getLocation(),
-                   cause.getClass(), cause.getMessage());
-    }
+    LOGGER.atDebug()
+        .setMessage("Called fail() for processor {} with cause {} ({})")
+        .addArgument(() -> ((Component) processor).getLocation().getLocation())
+        .addArgument(cause.getClass())
+        .addArgument(cause.getMessage())
+        .log();
 
     Error newError = getErrorFromFailingProcessor(null, (Component) processor, cause, errorTypeLocator);
 
@@ -112,19 +116,22 @@ class ReactiveInterceptionAction implements InterceptionAction {
 
   @Override
   public CompletableFuture<InterceptionEvent> fail(ErrorType errorType) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called fail() for processor {} with errorType {}", ((Component) processor).getLocation().getLocation(),
-                   errorType.getIdentifier());
-    }
+    LOGGER.atDebug()
+        .setMessage("Called fail() for processor {} with errorType {}")
+        .addArgument(() -> ((Component) processor).getLocation().getLocation())
+        .addArgument(errorType.getIdentifier())
+        .log();
     return failWithMessage(errorType, "");
   }
 
   @Override
   public CompletableFuture<InterceptionEvent> fail(ErrorType errorType, String msg) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Called fail() for processor {} with errorType {} and message {}",
-                   ((Component) processor).getLocation().getLocation(), errorType.getIdentifier(), msg);
-    }
+    LOGGER.atDebug()
+        .setMessage("Called fail() for processor {} with errorType {} and message {}")
+        .addArgument(() -> ((Component) processor).getLocation().getLocation())
+        .addArgument(errorType.getIdentifier())
+        .addArgument(msg)
+        .log();
     return failWithMessage(errorType, msg);
   }
 }

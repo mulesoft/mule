@@ -106,7 +106,7 @@ public class DependencyResolver implements AutoCloseable {
 
     if (logger.isDebugEnabled()) {
       resolutionContext.getAuthenticatorSelector()
-          .ifPresent(selector -> logger.debug("Using authenticator selector: " + ReflectionToStringBuilder.toString(selector)));
+          .ifPresent(selector -> logger.debug("Using authenticator selector: {}", ReflectionToStringBuilder.toString(selector)));
     }
   }
 

@@ -52,9 +52,7 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
   private final AtomicInteger inFlightEvents = new AtomicInteger();
   private final BiConsumer<CoreEvent, Throwable> inFlightDecrementCallback = (e, t) -> {
     int decremented = inFlightEvents.decrementAndGet();
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("decremented inFlightEvents={}", decremented);
-    }
+    LOGGER.debug("decremented inFlightEvents={}", decremented);
   };
 
   private Scheduler cpuLightScheduler;
@@ -112,14 +110,10 @@ public abstract class AbstractReactorStreamProcessingStrategy extends AbstractSt
   protected BackPressureReason checkCapacity(CoreEvent event) {
     if (maxConcurrencyEagerCheck) {
       int incremented = inFlightEvents.incrementAndGet();
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("incremented inFlightEvents={}", incremented);
-      }
+      LOGGER.debug("incremented inFlightEvents={}", incremented);
       if (incremented > maxConcurrency) {
         int decremented = inFlightEvents.decrementAndGet();
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("decremented due to too large maxConcurrency={} inFlightEvents={}", maxConcurrency, decremented);
-        }
+        LOGGER.debug("decremented due to too large maxConcurrency={} inFlightEvents={}", maxConcurrency, decremented);
         return MAX_CONCURRENCY_EXCEEDED;
       }
 

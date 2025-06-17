@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
@@ -18,6 +16,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.valuesWithClassLoader;
+
+import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -210,7 +212,9 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
               stopIfNeeded(configuration);
             } catch (Exception ex) {
               // Ignore and continue with the disposal
-              LOGGER.warn("Exception while stopping " + configuration.toString(), e);
+              LOGGER.atWarn()
+                  .setCause(ex)
+                  .log("Exception while stopping {}", configuration.toString());
             }
             disposeIfNeeded(configuration, LOGGER);
             throw e;

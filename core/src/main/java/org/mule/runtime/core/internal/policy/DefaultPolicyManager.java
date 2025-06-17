@@ -197,9 +197,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     cacheInvalidateLock.readLock().lock();
 
     try {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Source policy - populating outer cache for {}", policyKey);
-      }
+      LOGGER.debug("Source policy - populating outer cache for {}", policyKey);
 
       SourcePolicy sourcePolicy = sourcePolicyOuterCache.get(policyKey, outerKey -> sourcePolicyInnerCache
           .get(new Pair<>(source.getLocation().getRootContainerName(),
@@ -256,9 +254,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     cacheInvalidateLock.readLock().lock();
 
     try {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Operation policy - populating outer cache for {}", policyKey);
-      }
+      LOGGER.debug("Operation policy - populating outer cache for {}", policyKey);
 
       OperationPolicy operationPolicy =
           operationPolicyOuterCache.get(policyKey, outerKey -> operationPolicyInnerCache
@@ -463,9 +459,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
         }
       } catch (InterruptedException e) {
         currentThread().interrupt();
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Stale policies cleaner thread was interrupted. Finalizing.");
-        }
+        LOGGER.debug("Stale policies cleaner thread was interrupted. Finalizing.");
       }
     }
   }

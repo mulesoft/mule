@@ -38,9 +38,9 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.concurrent.locks.Lock;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
+
+import jakarta.inject.Inject;
 
 /**
  * Implementation of {@link ConnectivityTesterFactory} that takes into account the reconnection strategy.
@@ -100,7 +100,7 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
         }
 
         Scheduler retryScheduler = schedulerService.ioScheduler();
-        RetryPolicyTemplate retryTemplate = (RetryPolicyTemplate) connectionManager.getRetryTemplateFor(provider);
+        RetryPolicyTemplate retryTemplate = connectionManager.getRetryTemplateFor(provider);
         ReconnectionConfig reconnectionConfig = connectionManager.getReconnectionConfigFor(provider);
         final Latch latch = new Latch();
         RetryCallback retryCallback = new RetryCallback() {
@@ -186,11 +186,10 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
       context.setFailed(result.getException());
       throw new ConnectionException(format("Connectivity test failed for config '%s'", name), result.getException());
     } else {
-      if (LOGGER.isInfoEnabled()) {
-        LOGGER.info(format("Connectivity test failed for config '%s'. Application deployment will continue. Error was: %s",
-                           name, result.getMessage()),
-                    result.getException());
-      }
+      LOGGER.atInfo()
+          .setCause(result.getException())
+          .log("Connectivity test failed for config '{}'. Application deployment will continue. Error was: {}",
+               name, result.getMessage());
     }
   }
 

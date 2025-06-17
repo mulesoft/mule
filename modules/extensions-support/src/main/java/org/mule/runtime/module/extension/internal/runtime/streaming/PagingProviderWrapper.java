@@ -57,9 +57,7 @@ final class PagingProviderWrapper<C, T> implements PagingProvider<C, T> {
   }
 
   private void handleCloseException(Throwable t) {
-    if (LOGGER.isWarnEnabled()) {
-      LOGGER.warn("Exception was found trying to close paging delegate. Execution will continue", t);
-    }
+    LOGGER.warn("Exception was found trying to close paging delegate. Execution will continue", t);
   }
 
   /**

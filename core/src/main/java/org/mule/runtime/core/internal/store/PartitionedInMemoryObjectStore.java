@@ -170,9 +170,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
       }
     }
 
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Expired " + expiredEntries + " old entries");
-    }
+    LOGGER.debug("Expired {} old entries", expiredEntries);
   }
 
   private void trimToMaxSize(ConcurrentLinkedQueue<ExpiryEntry> store, int maxEntries, ConcurrentMap<String, T> partition) {
@@ -189,9 +187,7 @@ public class PartitionedInMemoryObjectStore<T extends Serializable> extends Abst
         currentSize--;
       }
 
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Expired " + excess + " excess entries");
-      }
+      LOGGER.debug("Expired {} excess entries", excess);
     }
   }
 

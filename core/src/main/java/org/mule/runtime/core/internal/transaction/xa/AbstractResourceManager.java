@@ -136,14 +136,10 @@ public abstract class AbstractResourceManager {
     assureStarted();
 
     synchronized (context) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Beginning transaction {}", context);
-      }
+      logger.debug("Beginning transaction {}", context);
       doBegin(context);
       context.status = Status.STATUS_ACTIVE;
-      if (logger.isDebugEnabled()) {
-        logger.debug("Began transaction {}", context);
-      }
+      logger.debug("Began transaction {}", context);
     }
     globalTransactions.add(context);
   }
@@ -151,9 +147,7 @@ public abstract class AbstractResourceManager {
   public void rollbackTransaction(AbstractTransactionContext context) throws ResourceManagerException {
     assureReady();
     synchronized (context) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Rolling back transaction {}", context);
-      }
+      logger.debug("Rolling back transaction {}", context);
       try {
         context.status = Status.STATUS_ROLLING_BACK;
         doRollback(context);
@@ -167,9 +161,7 @@ public abstract class AbstractResourceManager {
         // tell shutdown thread this tx is finished
         context.notifyFinish();
       }
-      if (logger.isDebugEnabled()) {
-        logger.debug("Rolled back transaction {}", context);
-      }
+      logger.debug("Rolled back transaction {}", context);
     }
   }
 
@@ -183,9 +175,7 @@ public abstract class AbstractResourceManager {
       throw new ResourceManagerException(transactionMarkedForRollback());
     }
     synchronized (context) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Committing transaction {}", context);
-      }
+      logger.debug("Committing transaction {}", context);
       try {
         context.status = Status.STATUS_COMMITTING;
         doCommit(context);
@@ -202,9 +192,7 @@ public abstract class AbstractResourceManager {
         // tell shutdown thread this tx is finished
         context.notifyFinish();
       }
-      if (logger.isDebugEnabled()) {
-        logger.debug("Committed transaction {}", context);
-      }
+      logger.debug("Committed transaction {}", context);
     }
   }
 

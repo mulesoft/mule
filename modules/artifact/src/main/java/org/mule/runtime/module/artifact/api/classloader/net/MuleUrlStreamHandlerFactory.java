@@ -6,16 +6,15 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.net;
 
+import static java.util.Collections.synchronizedMap;
+
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ public final class MuleUrlStreamHandlerFactory extends Object implements URLStre
 
   private static final Logger log = LoggerFactory.getLogger(MuleUrlStreamHandlerFactory.class);
 
-  private static Map registry = Collections.synchronizedMap(new HashMap());
+  private static Map<String, URLStreamHandler> registry = synchronizedMap(new HashMap<>());
 
   /**
    * Install an instance of this class as UrlStreamHandlerFactory. This may be done exactly once as {@link URL} will throw an
@@ -65,8 +64,9 @@ public final class MuleUrlStreamHandlerFactory extends Object implements URLStre
     registry.put(protocol, handler);
   }
 
+  @Override
   public URLStreamHandler createURLStreamHandler(String protocol) {
     // In case no custom protocol is registered, we return null and let the JDK handle the default behaviour
-    return (URLStreamHandler) registry.get(protocol);
+    return registry.get(protocol);
   }
 }

@@ -12,16 +12,16 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.StreamCloserService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 /**
  * Closes streams of different types by looking up available {@link StreamCloser}'s from the Mule registry. {@link StreamCloser}
@@ -49,17 +49,14 @@ public class DefaultStreamCloserService implements StreamCloserService {
           }
         }
 
-        if (log.isDebugEnabled()) {
-          log.debug(String.format("Unable to find a StreamCloser for the stream type: %s " + ", the stream will not be closed.",
-                                  stream.getClass()));
-        }
+        log.debug("Unable to find a StreamCloser for the stream type: {} , the stream will not be closed.",
+                  stream.getClass());
       }
     } catch (Exception e) {
-      if (log.isDebugEnabled()) {
-        log.debug(String.format("Exception closing stream of class %s", stream.getClass()), e);
-      }
+      log.atDebug()
+          .setCause(e)
+          .log("Exception closing stream of class {}", stream.getClass());
     }
-
   }
 
   /**
@@ -135,9 +132,9 @@ public class DefaultStreamCloserService implements StreamCloserService {
     }
 
     private void logCloseException(Object stream, Throwable e) {
-      if (log.isWarnEnabled()) {
-        log.warn("Exception was found trying to close resource of class " + stream.getClass().getCanonicalName(), e);
-      }
+      log.atWarn()
+          .setCause(e)
+          .log("Exception was found trying to close resource of class {}", stream.getClass().getCanonicalName());
     }
 
   }

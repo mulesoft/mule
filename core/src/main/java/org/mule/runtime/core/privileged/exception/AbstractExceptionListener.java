@@ -43,10 +43,10 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import jakarta.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
 
 /**
  * This is the base class for exception strategies which contains several helper methods. However, you should probably inherit
@@ -109,9 +109,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   protected void doInitialise() throws InitialisationException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Initialising exception listener: " + toString());
-    }
+    logger.debug("Initialising exception listener: {}", this);
     doInitialise(muleContext);
   }
 
@@ -222,7 +220,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     if (notificationFirer != null) {
       notificationFirer.dispatch(notification);
     } else if (logger.isWarnEnabled()) {
-      logger.debug("notificationFirer is not yet available for firing notifications, ignoring event: " + notification);
+      logger.debug("notificationFirer is not yet available for firing notifications, ignoring event: {}", notification);
     }
   }
 

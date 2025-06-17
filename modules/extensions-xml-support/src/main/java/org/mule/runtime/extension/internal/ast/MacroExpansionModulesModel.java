@@ -96,12 +96,10 @@ public class MacroExpansionModulesModel {
       if (extensionModel.getModelProperty(XmlExtensionModelProperty.class).isPresent()) {
         hasMacroExpansionExtension = true;
 
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(format("macro expanding '%s' connector, xmlns:%s=\"%s\"",
-                              extensionModel.getName(),
-                              extensionModel.getXmlDslModel().getPrefix(),
-                              extensionModel.getXmlDslModel().getNamespace()));
-        }
+        LOGGER.debug("macro expanding '{}' connector, xmlns:{}=\"{}\"",
+                     extensionModel.getName(),
+                     extensionModel.getXmlDslModel().getPrefix(),
+                     extensionModel.getXmlDslModel().getNamespace());
         applicationModel = new MacroExpansionModuleModel(applicationModel, extensionModel, featureFlaggingService).expand();
       }
     }
@@ -131,32 +129,36 @@ public class MacroExpansionModulesModel {
       }, () -> componentsToAdd, c -> false);
 
       if (LOGGER.isDebugEnabled()) {
-        // only log the macro expanded app if there are smart connectors in it
-        final StringBuilder buf = new StringBuilder(1024);
-        buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
+        LOGGER.atDebug()
+            .log(() -> {
+              // only log the macro expanded app if there are smart connectors in it
+              final StringBuilder buf = new StringBuilder(1024);
+              buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
 
-        AtomicReference<String> lastFile = new AtomicReference<>();
+              AtomicReference<String> lastFile = new AtomicReference<>();
 
-        applicationModel.topLevelComponentsStream().forEach(comp -> {
-          final String fileName = comp.getMetadata().getFileName().orElse("<unnamed>");
+              applicationModel.topLevelComponentsStream().forEach(comp -> {
+                final String fileName = comp.getMetadata().getFileName().orElse("<unnamed>");
 
-          if (!fileName.equals(lastFile.get())) {
-            if (lastFile.get() != null) {
-              buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
-            }
-            buf.append("Filename: ").append(fileName);
-            buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
+                if (!fileName.equals(lastFile.get())) {
+                  if (lastFile.get() != null) {
+                    buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
+                  }
+                  buf.append("Filename: ").append(fileName);
+                  buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_SECTION_DELIMITER);
 
-            lastFile.set(fileName);
-          }
+                  lastFile.set(fileName);
+                }
 
-          buf
-              .append(comp.getMetadata().getSourceCode().orElse(""))
-              .append(lineSeparator());
-        });
+                buf
+                    .append(comp.getMetadata().getSourceCode().orElse(""))
+                    .append(lineSeparator());
+              });
 
-        buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
-        LOGGER.debug(buf.toString());
+              buf.append(lineSeparator()).append(FILE_MACRO_EXPANSION_DELIMITER);
+
+              return buf.toString();
+            });
       }
     }
 

@@ -71,16 +71,12 @@ public class ArtifactCopyNativeLibraryFinder implements NativeLibraryFinder {
     }
 
     if (libraryPath != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("Found native library for '%s' on '%s", name, libraryPath));
-      }
+      logger.debug("Found native library for '{}' on '{}'", name, libraryPath);
 
       final File tempLibrary = copyNativeLibrary(name, libraryPath);
       libraryPath = tempLibrary.getAbsolutePath();
 
-      if (logger.isDebugEnabled()) {
-        logger.debug(String.format("Created native library copy for '%s' on '%s", name, libraryPath));
-      }
+      logger.debug("Created native library copy for '{}' on '{}'", name, libraryPath);
     }
     return libraryPath;
   }

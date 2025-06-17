@@ -61,9 +61,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
     while (e.hasMoreElements()) {
       try {
         URL url = (URL) e.nextElement();
-        if (logger.isDebugEnabled()) {
-          logger.debug("Reading extension file: {}", url);
-        }
+        logger.debug("Reading extension file: {}", url);
         extensions.add(loadProperties(getInputStreamWithCacheControl(url)));
       } catch (Exception ex) {
         throw new DefaultMuleException("Error loading Mule core extensions", ex);

@@ -261,7 +261,9 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     @Override
     public void registerInternalSink(Publisher<CoreEvent> flux, String sinkRepresentation) {
       from(flux).subscribe(null, e -> {
-        LOGGER.error("Exception reached PS subscriber for " + sinkRepresentation, e);
+        LOGGER.atError()
+            .setCause(e)
+            .log("Exception reached PS subscriber for {}", sinkRepresentation);
         stopSchedulersIfNeeded();
       },
                            () -> stopSchedulersIfNeeded());
@@ -317,7 +319,9 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     protected Consumer<Throwable> getThrowableConsumer(FlowConstruct flowConstruct, Latch completionLatch,
                                                        AtomicReference<Throwable> failedSubscriptionCause) {
       return e -> {
-        LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
+        LOGGER.atError()
+            .setCause(e)
+            .log("Exception reached PS subscriber for flow '{}'", flowConstruct.getName());
 
         failedSubscriptionCause.set(e);
         completionLatch.release();

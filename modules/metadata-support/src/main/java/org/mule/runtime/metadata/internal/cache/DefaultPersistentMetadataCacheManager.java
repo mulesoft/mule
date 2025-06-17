@@ -98,15 +98,11 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
     return withKeyLock(id, key -> {
       try {
         if (metadataStore.get().contains(key)) {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(format("Retrieving cache from OS with ID '%s'", id));
-          }
+          LOGGER.debug("Retrieving cache from OS with ID '{}'", id);
           return metadataStore.get().retrieve(key);
         }
 
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(format("Creating new cache in OS with ID '%s'", id));
-        }
+        LOGGER.debug("Creating new cache in OS with ID '{}'", id);
         DefaultMetadataCache metadataCache = new DefaultMetadataCache();
         metadataStore.get().store(key, metadataCache);
         return metadataCache;
@@ -124,9 +120,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
   public void updateCache(String id, MetadataCache cache) {
     withKeyLock(id, key -> {
       try {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug(format("Updating cache in OS with ID '%s'", id));
-        }
+        LOGGER.debug("Updating cache in OS with ID '{}'", id);
         if (metadataStore.get().contains(key)) {
           metadataStore.get().remove(key);
         }
@@ -148,17 +142,12 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
         if (isBlank(keyHash)) {
           clearMetadataCaches();
         } else {
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(format("Removing cache in OS with ID '%s'", key));
-          }
+          LOGGER.debug("Removing cache in OS with ID '{}'", key);
           metadataStore.get().remove(key);
         }
       } catch (ObjectDoesNotExistException e) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER
-              .debug(format("No exact match found for key '%s'. Disposing all the elements with a prefix matching the given value.",
-                            key));
-        }
+        LOGGER.debug("No exact match found for key '{}'. Disposing all the elements with a prefix matching the given value.",
+                     key);
         disposeAllMatches(keyHash);
       } catch (Exception e) {
         String msg = format("An error occurred while disposing the MetadataCache with ID '%s': %s",
@@ -178,9 +167,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
             try {
               this.dispose(id);
             } catch (Exception inner) {
-              if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(format("Failed to dispose ID '%s' with partial prefix match: %s", id, inner.getMessage()));
-              }
+              LOGGER.debug("Failed to dispose ID '{}' with partial prefix match: {}", id, inner.getMessage());
             }
           });
     } catch (ObjectStoreException e) {
@@ -193,9 +180,7 @@ public class DefaultPersistentMetadataCacheManager implements MetadataCacheManag
 
   private void clearMetadataCaches() {
     try {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Clearing cache from OS");
-      }
+      LOGGER.debug("Clearing cache from OS");
       metadataStore.get().clear();
     } catch (ObjectStoreException e) {
       String msg = format("An error occurred while clearing MetadataCaches: %s", e.getMessage());

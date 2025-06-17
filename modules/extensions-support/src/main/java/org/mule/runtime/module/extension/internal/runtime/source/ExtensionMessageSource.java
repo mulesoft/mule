@@ -374,11 +374,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     muleContext.getExceptionListener().handleException(exception, getLocation());
 
-    if (LOGGER.isWarnEnabled()) {
-      LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
-                         sourceAdapter.getName(), getLocation().getRootContainerName()),
-                  exception);
-    }
+    LOGGER.warn("Message source '{}' on flow '{}' threw exception. Attempting to reconnect...",
+                sourceAdapter.getName(), getLocation().getRootContainerName(), exception);
 
     try {
       refreshTokenIfNecessary(getConfigurationInstance()
@@ -388,11 +385,10 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         refreshException = new DefaultMuleException(refreshException);
       }
 
-      if (LOGGER.isErrorEnabled()) {
-        LOGGER.error(format("Message source '%s' on flow '%s' threw exception while trying to refresh OAuth access token: %s",
-                            sourceAdapter.getName(), getLocation().getRootContainerName(), exception.getMessage()),
-                     exception);
-      }
+      LOGGER.atError()
+          .setCause(exception)
+          .log("Message source '{}' on flow '{}' threw exception while trying to refresh OAuth access token: {}",
+               sourceAdapter.getName(), getLocation().getRootContainerName(), exception.getMessage());
       muleContext.getExceptionListener().handleException(refreshException, getLocation());
     }
 
@@ -422,18 +418,14 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void onReconnectionSuccessful() {
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Message source '{}' on flow '{}' successfully reconnected",
-                  sourceModel.getName(), getLocation().getRootContainerName());
-    }
+    LOGGER.info("Message source '{}' on flow '{}' successfully reconnected",
+                sourceModel.getName(), getLocation().getRootContainerName());
     reconnecting.set(false);
   }
 
   private void onStartSuccessful() {
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Message source '{}' on flow '{}' successfully started",
-                  sourceModel.getName(), getLocation().getRootContainerName());
-    }
+    LOGGER.info("Message source '{}' on flow '{}' successfully started",
+                sourceModel.getName(), getLocation().getRootContainerName());
     reconnecting.set(false);
   }
 
@@ -537,9 +529,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
 
     if (e instanceof IllegalStateException) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Skipping lifecycle phase: " + e.getMessage(), e);
-      }
+      LOGGER.atDebug()
+          .setCause(e)
+          .log("Skipping lifecycle phase: {}", e.getMessage());
     } else if (e instanceof MuleException muleException) {
       throw muleException;
     } else {
@@ -712,17 +704,15 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     flowConstruct = new LazyValue<>(() -> (FlowConstruct) componentLocator.find(getRootContainerLocation()).orElse(null));
     messageProcessContext = createProcessingContext();
     if (shouldRunOnThisNode()) {
-      if (LOGGER.isDebugEnabled()) {
-        boolean isPrimaryPollingInstance = clusterService.isPrimaryPollingInstance();
-        if (primaryNodeOnly) {
-          LOGGER
-              .debug("Message source '{}' on flow '{}' running on the primary node is initializing. Note that this Message source must run on the primary node only.",
-                     sourceModel.getName(), getLocation().getRootContainerName());
-        } else {
-          LOGGER
-              .debug("Message source '{}' on flow '{}' is initializing. This {} the primary node of the cluster.",
-                     sourceModel.getName(), getLocation().getRootContainerName(), isPrimaryPollingInstance ? "is" : "is not");
-        }
+      boolean isPrimaryPollingInstance = clusterService.isPrimaryPollingInstance();
+      if (primaryNodeOnly) {
+        LOGGER
+            .debug("Message source '{}' on flow '{}' running on the primary node is initializing. Note that this Message source must run on the primary node only.",
+                   sourceModel.getName(), getLocation().getRootContainerName());
+      } else {
+        LOGGER
+            .debug("Message source '{}' on flow '{}' is initializing. This {} the primary node of the cluster.",
+                   sourceModel.getName(), getLocation().getRootContainerName(), isPrimaryPollingInstance ? "is" : "is not");
       }
 
       withContextClassLoader(classLoader, () -> {

@@ -237,12 +237,11 @@ public class BundlePluginDependenciesResolver {
                         resolvedPluginApplicationLevelOptional.get().getBundleDescriptor();
                     if (org.apache.commons.lang3.ObjectUtils.notEqual(availablePluginBundleDescriptor.getVersion(),
                                                                       dependency.getDescriptor().getVersion())) {
-                      if (logger.isDebugEnabled()) {
-                        logger.debug(format(
-                                            "Transitive plugin dependency '[%s -> %s]' is minor than the one resolved for the application '%s', it will be ignored.",
-                                            pluginDescriptor.getBundleDescriptor(), dependency.getDescriptor(),
-                                            availablePluginBundleDescriptor));
-                      }
+                      logger.debug("Transitive plugin dependency '[{} -> {}]' is minor than the one resolved "
+                          + "for the application '{}', it will be ignored.",
+                                   pluginDescriptor.getBundleDescriptor(),
+                                   dependency.getDescriptor(),
+                                   availablePluginBundleDescriptor);
                     }
                   }
                 }

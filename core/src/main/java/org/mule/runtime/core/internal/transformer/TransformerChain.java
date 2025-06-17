@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObje
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
@@ -90,11 +89,12 @@ public final class TransformerChain extends AbstractTransformer {
         throw new TransformerException(transformOnObjectUnsupportedTypeOfEndpoint(getName(), src.getClass()), this);
       }
     }
-    if (logger.isDebugEnabled()) {
-      logger.debug("Applying transformer {} ({})", getName(), getClass().getName());
-      logger.debug("Object before transform: {}", StringMessageUtils.toString(src));
-    }
 
+    logger.atDebug().setMessage("Applying transformer {} ({}); Object before transform: {}")
+        .addArgument(getName())
+        .addArgument(getClass().getName())
+        .addArgument(() -> StringMessageUtils.toString(src))
+        .log();
     Message message;
     if (src instanceof Message) {
       message = (Message) src;
@@ -106,11 +106,10 @@ public final class TransformerChain extends AbstractTransformer {
 
     Object result = transformMessage(message, enc);
 
-    if (logger.isDebugEnabled()) {
-      logger.debug(format("Object after transform: %s", StringMessageUtils.toString(result)));
-    }
-    result = checkReturnClass(result);
-    return result;
+    logger.atDebug().setMessage("Object after transform: {}")
+        .addArgument(() -> StringMessageUtils.toString(result))
+        .log();
+    return checkReturnClass(result);
   }
 
   private Object transformMessage(Message message, Charset outputEncoding) throws TransformerException {

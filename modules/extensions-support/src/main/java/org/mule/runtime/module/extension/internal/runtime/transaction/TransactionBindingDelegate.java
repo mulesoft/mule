@@ -133,6 +133,8 @@ public class TransactionBindingDelegate {
                                                                   connection.getClass().getName())));
       }
     } catch (Exception e) {
+      String msg = format("Could not bind %s to current transaction. Transaction will be marked for rollback", connection);
+      LOGGER.atWarn().setCause(e).log(msg);
       if (extractConnectionException(e).isPresent()) {
         connectionHandler.invalidate();
       }
@@ -142,12 +144,8 @@ public class TransactionBindingDelegate {
         try {
           connectionHandler.release();
         } catch (Exception e) {
-          final String msg = "Ignored '" + e.getClass().getName() + ": " + e.getMessage() + "' during connection release";
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.warn(msg, e);
-          } else {
-            LOGGER.warn(msg);
-          }
+          LOGGER.warn("Ignored '{}: {}' during connection release", e.getClass().getName(), e.getMessage());
+          LOGGER.debug("Exception:", e);
         }
       }
     }

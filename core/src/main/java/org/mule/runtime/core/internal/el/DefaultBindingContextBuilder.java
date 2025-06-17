@@ -425,16 +425,13 @@ public class DefaultBindingContextBuilder implements BindingContext.Builder {
     }
 
     private static void reportRepeatedNamespace(ModuleNamespace namespace) {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Two modules with namespace '{}' were found in a binding context. We're merging them into a single one " +
-            "in order to make the expression language able to use the content of both, but the maintainer of such module " +
-            "should review this situation.\nIt may happen when an extension with types or functions also declares a " +
-            "GlobalBindingContextProvider that adds a ExpressionModule to the resulting BindingContext. If that's the case," +
-            "the provider should be removed and the types/functions should be added to the extension model.", namespace);
-      } else {
-        LOGGER.warn("Two modules with namespace '{}' were found in a binding context. Set log level to DEBUG for details",
-                    namespace);
-      }
+      LOGGER.debug("Two modules with namespace '{}' were found in a binding context. We're merging them into a single one " +
+          "in order to make the expression language able to use the content of both, but the maintainer of such module " +
+          "should review this situation.\nIt may happen when an extension with types or functions also declares a " +
+          "GlobalBindingContextProvider that adds a ExpressionModule to the resulting BindingContext. If that's the case," +
+          "the provider should be removed and the types/functions should be added to the extension model.", namespace);
+      LOGGER.warn("Two modules with namespace '{}' were found in a binding context. Set log level to DEBUG for details",
+                  namespace);
     }
   }
 }

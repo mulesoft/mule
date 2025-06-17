@@ -210,7 +210,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     try {
       sourceClient.stop();
     } catch (Exception e) {
-      LOGGER.error("Exception found stopping source client: " + e.getMessage(), e);
+      LOGGER.atError().setCause(e).log("Exception found stopping source client: " + e.getMessage());
     } finally {
       sourceClient.dispose();
     }
@@ -256,7 +256,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     try {
       stopIfNeeded(client);
     } catch (Exception e) {
-      LOGGER.error("Exception found trying to stop operation client for operation {}", identifier);
+      LOGGER.atError().setCause(e).log("Exception found trying to stop operation client for operation {}", identifier);
     } finally {
       disposeIfNeeded(client, LOGGER);
     }

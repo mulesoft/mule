@@ -8,6 +8,7 @@ package org.mule.test.runner.api;
 
 import static java.io.File.pathSeparator;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -64,11 +65,7 @@ public class ClassPathUrlProvider {
     addUrlsFromSystemProperty(urls, "sun.boot.class.path");
     addUrlsFromSystemProperty(urls, "surefire.test.class.path");
 
-    if (logger.isDebugEnabled()) {
-      StringBuilder builder = new StringBuilder("ClassPath:");
-      urls.stream().forEach(url -> builder.append(pathSeparator).append(url));
-      logger.debug(builder.toString());
-    }
+    logger.debug("ClassPath: {}", urls.stream().map(URL::toString).collect(joining(pathSeparator)));
 
     return Lists.newArrayList(urls);
   }

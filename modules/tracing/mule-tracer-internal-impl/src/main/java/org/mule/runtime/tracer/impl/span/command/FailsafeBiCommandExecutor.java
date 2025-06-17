@@ -38,9 +38,7 @@ public class FailsafeBiCommandExecutor<A, B> {
       if (propagateExceptions) {
         throw e;
       }
-      if (customLogger.isWarnEnabled()) {
-        customLogger.warn(errorMessage, e);
-      }
+      customLogger.warn(errorMessage, e);
     }
   }
 

@@ -56,9 +56,7 @@ public class GlobalErrorHandler extends ErrorHandler {
 
       @Override
       public void accept(Exception error) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Routing error in '" + this + "'...");
-        }
+        LOGGER.debug("Routing error in '{}'...", this);
 
         router.accept(error);
       }

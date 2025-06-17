@@ -10,9 +10,6 @@ import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +17,9 @@ import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic queueing functionality with file storage.
@@ -157,9 +157,7 @@ class RandomAccessFileQueueStore {
         }
       }
     } catch (IOException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Error reading queue elements", e);
-      }
+      logger.debug("Error reading queue elements", e);
     }
     return elements;
   }
@@ -195,9 +193,7 @@ class RandomAccessFileQueueStore {
         }
       }
     } catch (EOFException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Error removing queue element", e);
-      }
+      logger.debug("Error removing queue element", e);
       return false;
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -213,13 +209,7 @@ class RandomAccessFileQueueStore {
     try {
       this.queueFileProvider.close();
     } catch (IOException e) {
-      logAndIgnore(e);
-    }
-  }
-
-  private void logAndIgnore(IOException e) {
-    logger.warn(e.getMessage());
-    if (logger.isDebugEnabled()) {
+      logger.warn(e.getMessage());
       logger.debug("Error closing queue store", e);
     }
   }
@@ -281,9 +271,7 @@ class RandomAccessFileQueueStore {
       } catch (IOException ioe) {
         throw new MuleRuntimeException(e);
       }
-      if (logger.isDebugEnabled()) {
-        logger.debug("Error initializing queue store", e);
-      }
+      logger.debug("Error initializing queue store", e);
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
@@ -336,9 +324,7 @@ class RandomAccessFileQueueStore {
         }
       }
     } catch (EOFException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Cannot determine if element is contained in the queue store", e);
-      }
+      logger.debug("Cannot determine if element is contained in the queue store", e);
       return false;
     } catch (IOException e) {
       throw new RuntimeException(e);

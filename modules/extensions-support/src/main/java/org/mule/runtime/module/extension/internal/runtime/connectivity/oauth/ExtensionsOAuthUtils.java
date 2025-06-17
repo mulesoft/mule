@@ -374,10 +374,8 @@ public final class ExtensionsOAuthUtils {
         String rsId = cp.getResourceOwnerId();
         resourceOwnerIdReference.set(of(rsId));
 
-        if (LOGGER.isInfoEnabled()) {
-          LOGGER.info("AccessToken for resourceOwner '{}' expired {}. "
-              + "Will attempt to refresh token and retry", rsId, refreshContext.map(LazyValue::get).orElse(""));
-        }
+        LOGGER.info("AccessToken for resourceOwner '{}' expired {}. "
+            + "Will attempt to refresh token and retry", rsId, refreshContext.map(LazyValue::get).orElse(""));
       }
 
       @Override
@@ -391,10 +389,8 @@ public final class ExtensionsOAuthUtils {
       }
 
       private void logTokenExpiration() {
-        if (LOGGER.isInfoEnabled()) {
-          LOGGER.info("AccessToken expired {}. "
-              + "Will attempt to refresh token and retry", refreshContext.map(LazyValue::get).orElse(""));
-        }
+        LOGGER.info("AccessToken expired {}. "
+            + "Will attempt to refresh token and retry", refreshContext.map(LazyValue::get).orElse(""));
       }
     });
 
@@ -409,10 +405,8 @@ public final class ExtensionsOAuthUtils {
       LOGGER.error(errorMessage, refreshException);
       throw new MuleRuntimeException(createStaticMessage(errorMessage), refreshException);
     }
-    if (LOGGER.isInfoEnabled()) {
-      LOGGER.info("Access Token successfully refreshed {} on config '{}'",
-                  forResourceOwner(resourceOwnerId), configName.map(LazyValue::get).orElse(""));
-    }
+    LOGGER.info("Access Token successfully refreshed {} on config '{}'",
+                forResourceOwner(resourceOwnerId), configName.map(LazyValue::get).orElse(""));
 
     return true;
   }

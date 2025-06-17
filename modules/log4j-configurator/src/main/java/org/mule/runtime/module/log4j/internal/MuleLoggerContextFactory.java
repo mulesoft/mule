@@ -105,7 +105,7 @@ public class MuleLoggerContextFactory {
       appLogConfig = getLogConfig(muleCL);
     }
 
-    if (appLogConfig != null && LOGGER.isInfoEnabled()) {
+    if (appLogConfig != null) {
       LOGGER.info("Found logging config for application '{}' at '{}'", muleCL.getArtifactId(), appLogConfig);
     }
 

@@ -78,9 +78,7 @@ public class DefaultMuleSecurityManager extends AbstractComponent implements Sec
       SecurityProvider provider = iter.next();
 
       if (provider.supports(authentication.getClass())) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Authentication attempt using {}", provider.getClass().getName());
-        }
+        LOGGER.debug("Authentication attempt using {}", provider.getClass().getName());
 
         Authentication result = null;
         try {

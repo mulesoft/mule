@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.core.internal.policy.OperationPolicyContext.from;
+
+import static java.util.Collections.emptyMap;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.message.Message;
@@ -219,9 +221,7 @@ public class PolicyEventMapper {
           .message(message)
           .build();
     } catch (Exception e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Error after Flow finished execution", e);
-      }
+      LOGGER.warn("Error after Flow finished execution", e);
       throw new MessagingException(flowResult, e);
     }
   }
@@ -261,9 +261,7 @@ public class PolicyEventMapper {
           .variablesTyped(variables != null ? variables : emptyMap())
           .build();
     } catch (Exception e) {
-      if (LOGGER.isWarnEnabled()) {
-        LOGGER.warn("Error after Flow finished execution", e);
-      }
+      LOGGER.warn("Error after Flow finished execution", e);
       Map<String, TypedValue<?>> variables = loadVars(event, policyId);
 
       return InternalEvent.builder(event)

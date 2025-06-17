@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.container.internal.JreExplorer.exploreJdk;
+
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.container.internal.JreExplorer.exploreJdk;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.util.LazyValue;
@@ -45,10 +46,13 @@ public class JreModuleDiscoverer implements ModuleDiscoverer {
 
     exploreJdk(packages, resources, services);
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Discovered JRE:\npackages: {}\nresources: {}\nservices: {}", packages, resources,
-                   services.stream().map(p -> p.getServiceInterface() + ":" + p.getResource().toString()).collect(toList()));
-    }
+    logger.atDebug()
+        .setMessage("Discovered JRE:\npackages: {}\nresources: {}\nservices: {}")
+        .addArgument(packages)
+        .addArgument(resources)
+        .addArgument(() -> services.stream().map(p -> p.getServiceInterface() + ":" + p.getResource().toString())
+            .toList())
+        .log();
 
     MuleContainerModule jdkModule = new MuleModule(JRE_MODULE_NAME, packages, resources, emptySet(), emptySet(), services);
 

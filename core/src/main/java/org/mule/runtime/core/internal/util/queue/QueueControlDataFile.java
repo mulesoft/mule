@@ -47,9 +47,10 @@ public class QueueControlDataFile {
         this.currentWriteFilePath = getStoredFile();
         this.currentReadFilePath = getStoredFile();
       } catch (Exception e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("failure reading queue control data from file " + queueFileProvider.getFile().getAbsolutePath(), e);
-        }
+        logger.atDebug()
+            .setCause(e)
+            .log("failure reading queue control data from file {}",
+                 queueFileProvider.getFile().getAbsolutePath());
         // perhaps mule crashed while this file was written.
         File lastUpdatedFile = firstFile.lastModified() > secondFile.lastModified() ? firstFile : secondFile;
         this.currentWriteFilePath = lastUpdatedFile;
@@ -122,9 +123,7 @@ public class QueueControlDataFile {
       queueFileProvider.close();
     } catch (IOException e) {
       logger.warn("failure closing queue data control file: " + e.getMessage());
-      if (logger.isDebugEnabled()) {
-        logger.debug("Failure closing queue data control file", e);
-      }
+      logger.debug("Failure closing queue data control file", e);
     }
   }
 

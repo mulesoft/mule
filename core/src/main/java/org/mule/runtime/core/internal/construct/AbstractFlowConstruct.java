@@ -167,8 +167,10 @@ public abstract class AbstractFlowConstruct extends AbstractExecutableComponent 
         disposeIfDisposable(exceptionListener);
         doDispose();
       });
-    } catch (MuleException e) {
-      LOGGER.error("Failed to stop service: " + name, e);
+    } catch (Exception e) {
+      LOGGER.atError()
+          .setCause(e)
+          .log("Failed to stop service: {}", name);
     }
   }
 
