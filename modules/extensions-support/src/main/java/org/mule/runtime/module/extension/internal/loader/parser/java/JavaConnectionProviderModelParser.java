@@ -64,6 +64,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelF
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 import org.mule.sdk.api.connectivity.NoConnectivityTest;
+import org.mule.sdk.api.connectivity.XATransactionalConnectionProvider;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
@@ -150,6 +151,11 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   public boolean supportsConnectivityTesting() {
     return !element.isAssignableTo(NoConnectivityTest.class)
         && !element.isAssignableTo(org.mule.runtime.extension.api.connectivity.NoConnectivityTest.class);
+  }
+
+  @Override
+  public boolean supportsXa() {
+    return element.isAssignableTo(XATransactionalConnectionProvider.class);
   }
 
   @Override

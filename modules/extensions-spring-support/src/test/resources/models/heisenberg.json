@@ -17916,6 +17916,7 @@
             }
           ],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
@@ -18330,6 +18331,7 @@
             }
           ],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "SECURE",
@@ -57511,6 +57513,7 @@
         }
       ],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "CONNECTION",
@@ -57925,6 +57928,7 @@
         }
       ],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "SECURE",

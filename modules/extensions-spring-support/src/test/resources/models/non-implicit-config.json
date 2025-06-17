@@ -1776,6 +1776,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [],
           "stereotype": {
             "type": "CONNECTION",
@@ -2150,6 +2151,7 @@
       "connectionManagementType": "NONE",
       "externalLibraryModels": [],
       "supportsConnectivityTesting": true,
+      "supportsXa": false,
       "semanticTerms": [],
       "stereotype": {
         "type": "CONNECTION",
