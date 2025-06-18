@@ -26,7 +26,7 @@ import java.util.concurrent.locks.Lock;
 
 @Features({@Feature(CUSTOMIZATION_SERVICE), @Feature(HA_MIGRATION_FEATURE)})
 @Story(LOCKS_MIGRATION)
-public class HaMigrationServicesOverrideTestCase extends AbstractMuleTestCase {
+public class HaLockMigrationServicesOverrideTestCase extends AbstractMuleTestCase {
 
   private DefaultCustomizationService customizationService = new DefaultCustomizationService();
 

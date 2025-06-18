@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.config;
 
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
@@ -18,7 +19,9 @@ import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.artifact.ArtifactType;
 import org.mule.runtime.api.lock.LockProvider;
+import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.internal.lock.TwoImplementationsLockProvider;
+import org.mule.runtime.core.internal.store.TwoImplementationsObjectStore;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +66,8 @@ public class DefaultCustomizationService implements InternalCustomizationService
   }
 
   private boolean isMigrationSecondService(String serviceId) {
-    return serviceId.equals(OBJECT_LOCK_PROVIDER) && muleContextDefaultServices.containsKey(serviceId)
+    return muleContextDefaultServices.containsKey(serviceId)
+        && (serviceId.equals(OBJECT_LOCK_PROVIDER) || serviceId.equals(BASE_IN_MEMORY_OBJECT_STORE_KEY))
         && getBoolean(HA_MIGRATION_ENABLED_PROPERTY);
   }
 
@@ -72,6 +76,9 @@ public class DefaultCustomizationService implements InternalCustomizationService
       return new CombinedService(serviceId, first, second, false,
                                  (impl1, impl2) -> new TwoImplementationsLockProvider((LockProvider) impl1,
                                                                                       (LockProvider) impl2));
+    } else if (serviceId.equals(BASE_IN_MEMORY_OBJECT_STORE_KEY)) {
+      return new CombinedService(serviceId, first, second, false,
+                                 (impl1, impl2) -> new TwoImplementationsObjectStore((ObjectStore) impl1, (ObjectStore) impl2));
     } else {
       return second;
     }

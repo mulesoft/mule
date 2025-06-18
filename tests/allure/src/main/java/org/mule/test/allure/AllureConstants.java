@@ -1349,6 +1349,7 @@ public interface AllureConstants {
     interface LocksStory {
 
       String LOCKS_MIGRATION = "Locks Migration";
+      String OS_MIGRATION = "Object Store Migration";
     }
   }
 }
