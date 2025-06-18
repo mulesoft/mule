@@ -29,6 +29,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
+import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -192,6 +194,9 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
             .withMinOccurs(route.getMinOccurs())
             .withMaxOccurs(route.getMaxOccurs().orElse(null));
 
+        if (route.isListOfRoutes()) {
+          routeDeclarer.withModelProperty(ListOfRoutersModelProperty.INSTANCE);
+        }
         if (route.isSdkApiDefined()) {
           routeDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);
         }
