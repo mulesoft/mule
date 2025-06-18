@@ -130,7 +130,6 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
         .filter(AbstractClassGenerator::isImportNeeded).map(Class::getName).collect(toSet());
   }
 
-
   private static List<MuleFeatureDeclaration> getOriginalFeatureFromMuleApi() {
     Field[] fields = MULE_API_FEATURE_CLASS.getFields();
     return stream(fields).filter(field -> AbstractClassGenerator.isPublicStaticFinalFeature(field, MULE_API_FEATURE_CLASS))
@@ -146,8 +145,6 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
         }).collect(toList());
   }
 
-
-
   private static class MuleFeatureDeclaration {
 
     private final String name;
@@ -161,7 +158,7 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
     public MuleFeatureDeclaration(String name, Object value, List<Class<? extends Annotation>> annotations) {
       this.name = name;
       this.annotations = annotations;
-      
+
       Feature feature = (Feature) value;
 
       String rawDescription = feature.getDescription();
