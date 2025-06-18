@@ -44,7 +44,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
-import org.mule.metadata.api.utils.MetadataTypeEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 
 import java.io.IOException;
 import java.io.InputStream;

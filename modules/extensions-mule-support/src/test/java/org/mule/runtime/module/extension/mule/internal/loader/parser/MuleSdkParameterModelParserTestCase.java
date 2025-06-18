@@ -23,7 +23,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.metadata.api.utils.MetadataTypeEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;

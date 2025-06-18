@@ -44,7 +44,7 @@ import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueType
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.metadata.api.utils.MetadataTypeEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 import org.mule.runtime.extension.api.loader.parser.ParameterModelParser;
 import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;

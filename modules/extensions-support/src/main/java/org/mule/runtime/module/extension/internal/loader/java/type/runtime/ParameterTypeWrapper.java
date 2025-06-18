@@ -11,7 +11,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.metadata.api.utils.MetadataTypeEnricher;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 
 import java.io.InputStream;
 import java.io.Serializable;
