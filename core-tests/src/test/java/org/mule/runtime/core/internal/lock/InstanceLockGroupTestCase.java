@@ -17,6 +17,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.verify;
 
+import org.mule.runtime.api.lock.LockProvider;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.api.util.concurrent.Latch;

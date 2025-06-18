@@ -1341,4 +1341,14 @@ public interface AllureConstants {
 
     }
   }
+
+  interface HaMigrationFeature {
+
+    String HA_MIGRATION_FEATURE = "HA Migration";
+
+    interface LocksStory {
+
+      String LOCKS_MIGRATION = "Locks Migration";
+    }
+  }
 }

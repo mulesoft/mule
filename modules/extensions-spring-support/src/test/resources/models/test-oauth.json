@@ -10207,6 +10207,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -11958,6 +11959,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -13707,6 +13709,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -15456,6 +15459,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -17207,6 +17211,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthClientCredentialsConnection"
           ],
@@ -18667,6 +18672,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -20418,6 +20424,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -22167,6 +22174,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -33917,6 +33925,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthClientCredentialsConnection"
           ],
@@ -44306,6 +44315,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthClientCredentialsConnection"
           ],
@@ -45877,6 +45887,7 @@
           "connectionManagementType": "NONE",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -56446,6 +56457,7 @@
           "connectionManagementType": "POOLING",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],
@@ -67227,6 +67239,7 @@
           "connectionManagementType": "CACHED",
           "externalLibraryModels": [],
           "supportsConnectivityTesting": true,
+          "supportsXa": false,
           "semanticTerms": [
             "connectivity.OAuthAuthorizationCodeConnection"
           ],

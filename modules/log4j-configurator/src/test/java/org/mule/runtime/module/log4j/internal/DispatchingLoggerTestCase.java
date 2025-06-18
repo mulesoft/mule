@@ -12,15 +12,20 @@ import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
 import static java.lang.Thread.sleep;
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -35,27 +40,37 @@ import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.size.SmallTest;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @SmallTest
+@ExtendWith(MockitoExtension.class)
 @Feature(LOGGING)
 @Story(CONTEXT_FACTORY)
 public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
@@ -66,9 +81,6 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private static final long PROBER_POLLING_TIMEOUT = 5000;
   private static final long PROBER_POLLING_INTERVAL = 100;
-
-  @Rule
-  public MockitoRule rule = MockitoJUnit.rule();
 
   private ClassLoader currentClassLoader;
 
@@ -100,7 +112,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   private LoggerContextCache loggerContextCache;
 
-  @Before
+  @BeforeEach
   public void before() {
     currentClassLoader = Thread.currentThread().getContextClassLoader();
     when(containerLoggerContext.getConfiguration().getLoggerConfig(anyString()).getLevel()).thenReturn(Level.INFO);
@@ -116,14 +128,14 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
     loggerContextCache = spy(new LoggerContextCache(artifactAwareContextSelector, mock(ClassLoader.class, RETURNS_DEEP_STUBS)));
   }
 
-  @After
+  @AfterEach
   public void after() {
     loggerContextCache.dispose();
   }
 
   @Test
   @Issue("W-18388443")
-  public void noParallelizationWhenGettingLoggerFirstForClassNeedingBlockingAndThenForRegularClass() throws Exception {
+  void noParallelizationWhenGettingLoggerFirstForClassNeedingBlockingAndThenForRegularClass() throws Exception {
     Logger regionClassLoaderLogger = getRegionClassLoader();
 
     final Latch latch = new Latch();
@@ -216,7 +228,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-18388443")
-  public void noParallelizationWhenGettingLoggerFirstForRegularClassAndThenForClassNeedingBlocking() throws Exception {
+  void noParallelizationWhenGettingLoggerFirstForRegularClassAndThenForClassNeedingBlocking() throws Exception {
     Logger regionClassLoaderLogger = getRegionClassLoader();
 
     final Latch latch = new Latch();
@@ -345,20 +357,20 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
     when(artifactAwareContextSelector.getContextWithResolvedContextClassLoader(any()))
         .thenAnswer(invocation -> loggerContextCache.getLoggerContext(invocation.getArgument(0)));
     when(artifactAwareContextSelector.getLoggerContextCache()).thenReturn(loggerContextCache);
-    doAnswer(invocationOnMock -> containerLoggerContext)
+    lenient().doAnswer(invocationOnMock -> containerLoggerContext)
         .when(loggerContextCache).doGetLoggerContext(eq(currentClassLoader), any());
 
     return regionClassLoaderLogger;
   }
 
   @Test
-  public void currentClassLoader() {
+  void currentClassLoader() {
     logger.info(MESSAGE);
     verify(originalLogger).info(MESSAGE);
   }
 
   @Test
-  public void anotherClassLoader() {
+  void anotherClassLoader() {
     withContextClassLoader(additionalClassLoader, () -> {
       logger.info(MESSAGE);
       verify(originalLogger).info(MESSAGE);
@@ -366,7 +378,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void regionClassLoader() {
+  void regionClassLoader() {
     RegionClassLoader regionClassLoader = mock(RegionClassLoader.class);
     withContextClassLoader(regionClassLoader, () -> {
       logger.info(MESSAGE);
@@ -375,7 +387,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void whenRecursiveLoggerContextInstantiationExceptionExpectFallbackUsingContainerClassLoader() {
+  void whenRecursiveLoggerContextInstantiationExceptionExpectFallbackUsingContainerClassLoader() {
     // Expected Loggers
     Logger containerLogger = mock(Logger.class);
     Logger regionClassLoaderLogger = mock(Logger.class);
@@ -407,7 +419,7 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void whenFallbackToContainerClassLoaderFailsReturnOriginalLogger() {
+  void whenFallbackToContainerClassLoaderFailsReturnOriginalLogger() {
     // Expected Loggers
     Logger containerLogger = mock(Logger.class);
     Logger regionClassLoaderLogger = mock(Logger.class);
@@ -437,6 +449,92 @@ public class DispatchingLoggerTestCase extends AbstractMuleTestCase {
     });
     verify(originalLogger, times(1)).info("Fallback Test Message");
     verify(regionClassLoaderLogger, times(1)).info("Test Message");
+  }
+
+  static Stream<Method> log4jOverridableMethods() {
+    final Class<?> log4jLoggerClass = org.apache.logging.log4j.core.Logger.class;
+
+    // Collect the signature of every method that originates from a non-Log4j type so that we can
+    // filter out Log4j methods overriding them (e.g. java.util.function.Supplier#get()).
+    final Set<String> nonLog4jSignatures = new HashSet<>();
+    // Add java.lang.Object methods explicitly so classic overrides like equals/hashCode/toString are ignored.
+    Stream.of(Object.class.getDeclaredMethods())
+        .map(DispatchingLoggerTestCase::signature)
+        .forEach(nonLog4jSignatures::add);
+
+    collectNonLog4jMethodSignatures(log4jLoggerClass, nonLog4jSignatures);
+
+    return Stream.of(log4jLoggerClass.getMethods())
+        // Keep only methods declared within the Log4j code-base.
+        .filter(m -> m.getDeclaringClass().getPackageName().startsWith("org.apache.logging.log4j"))
+        .filter(m -> isPublic(m.getModifiers()) && !isFinal(m.getModifiers()) && !isStatic(m.getModifiers()))
+        .filter(m -> !nonLog4jSignatures.contains(signature(m)))
+        // getName of the logger does not need delegation
+        .filter(m -> !m.getName().equals("getName"))
+        .distinct();
+  }
+
+  /**
+   * Recursively walks the hierarchy of the provided class (super-classes and interfaces) collecting the signatures for every
+   * method that does not belong to log4j.
+   */
+  private static void collectNonLog4jMethodSignatures(Class<?> type, Set<String> signatures) {
+    if (type == null || type == Object.class) {
+      return;
+    }
+
+    // Add signatures not coming from log4j classes / interfaces.
+    if (!type.getPackageName().startsWith("org.apache.logging.log4j")) {
+      Stream.of(type.getDeclaredMethods())
+          .map(DispatchingLoggerTestCase::signature)
+          .forEach(signatures::add);
+    }
+
+    // Traverse interfaces first.
+    for (Class<?> iface : type.getInterfaces()) {
+      collectNonLog4jMethodSignatures(iface, signatures);
+    }
+
+    // Then superclass.
+    collectNonLog4jMethodSignatures(type.getSuperclass(), signatures);
+  }
+
+  private static String signature(Method m) {
+    return m.getName() + Arrays.toString(m.getParameterTypes());
+  }
+
+  public static boolean isOverridden(Method method, Method superMethod) {
+    if (superMethod.getName().equals(method.getName()) &&
+        Arrays.equals(superMethod.getParameterTypes(), method.getParameterTypes()) &&
+        superMethod.getReturnType().isAssignableFrom(method.getReturnType())) {
+      return true;
+    }
+    return false;
+  }
+
+  @Issue("W-10622326")
+  @ParameterizedTest
+  @MethodSource("log4jOverridableMethods")
+  void properLog4jDelegation(Method overridableMethod) throws IllegalAccessException, InvocationTargetException {
+    final Object[] params = Stream.of(overridableMethod.getParameterTypes())
+        .map(p -> {
+          if (p.isPrimitive()) {
+            if (p.equals(boolean.class)) {
+              return true;
+            }
+          } else if (p.isArray()) {
+            return Array.newInstance(p.getComponentType(), 0);
+          } else if (p.equals(Object.class)) {
+            return new Object();
+          } else if (p.equals(String.class)) {
+            return "string";
+          }
+          return mock(p);
+        })
+        .toArray();
+
+    overridableMethod.invoke(logger, params);
+    overridableMethod.invoke(verify(originalLogger), params);
   }
 
 }

@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
+import org.mule.runtime.api.lock.LockProvider;
 import org.slf4j.Logger;
 
 /**
