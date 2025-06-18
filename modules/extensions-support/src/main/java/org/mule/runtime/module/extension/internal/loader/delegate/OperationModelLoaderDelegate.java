@@ -28,6 +28,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.ListOfRoutesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
@@ -187,6 +188,9 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
             .withMinOccurs(route.getMinOccurs())
             .withMaxOccurs(route.getMaxOccurs().orElse(null));
 
+        if (route.isListOfRoutes()) {
+          routeDeclarer.withModelProperty(ListOfRoutesModelProperty.INSTANCE);
+        }
         if (route.isSdkApiDefined()) {
           routeDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);
         }

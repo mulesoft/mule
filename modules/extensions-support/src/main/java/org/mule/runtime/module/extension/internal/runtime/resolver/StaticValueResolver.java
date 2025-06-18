@@ -58,4 +58,9 @@ public class StaticValueResolver<T> implements ValueResolver<T> {
   public boolean isDynamic() {
     return false;
   }
+
+  @Override
+  public String toString() {
+    return "StaticValueResolver: " + value;
+  }
 }

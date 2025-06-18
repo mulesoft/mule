@@ -111,6 +111,26 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
     }
   }
 
+  public void manyRoutesRouter(String processorName,
+                               @ExecutionOccurrence(ONCE_OR_NONE) List<WhenRoute> whens,
+                               @org.mule.sdk.api.annotation.param.Optional OtherwiseRoute other,
+                               RouterCompletionCallback callback) {
+    final var whenToExecute = whens.stream()
+        .filter(WhenRoute::shouldExecute)
+        .findFirst();
+    if (whenToExecute.isPresent()) {
+      final var when = whenToExecute.get();
+      when.getChain().process(Result.builder()
+          .output(processorName)
+          .attributes(when.getMessage()).build(),
+                              callback::success, (e, r) -> callback.error(e));
+    } else if (other != null && other.shouldExecute()) {
+      other.getChain().process(processorName, null, callback::success, (e, r) -> callback.error(e));
+    } else {
+      callback.error(new IllegalArgumentException("No route executed"));
+    }
+  }
+
   public void stereotypedRoutes(KillingRoute killingRoute,
                                 @Optional DrugKillingRoute drugKillingRoute,
                                 org.mule.sdk.api.runtime.process.RouterCompletionCallback callback) {

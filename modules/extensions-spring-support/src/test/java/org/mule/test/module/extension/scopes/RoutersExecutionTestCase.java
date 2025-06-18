@@ -6,20 +6,26 @@
  */
 package org.mule.test.module.extension.scopes;
 
+import static org.mule.test.allure.AllureConstants.Sdk.Components.SDK_ROUTERS_LIST_OF_ROUTES;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.DISPOSE_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.INITIALIZE_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.START_CALL_COUNT;
+import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.STOP_CALL_COUNT;
+
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
+
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
-import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.DISPOSE_CALL_COUNT;
-import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.INITIALIZE_CALL_COUNT;
-import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.START_CALL_COUNT;
-import static org.mule.test.heisenberg.extension.HeisenbergOperationLifecycleValidator.STOP_CALL_COUNT;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.event.Event;
@@ -43,7 +49,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
 
 public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCase {
 
@@ -51,9 +58,6 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Rule
   public SystemProperty maxRedelivery = new SystemProperty("killingReason", KILL_REASON);
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private ExecutorService executor = null;
 
@@ -195,10 +199,44 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
   }
 
   @Test
-  public void twoRoutesRouterNone() throws Exception {
-    expectedException.expectCause(instanceOf(ConnectionException.class));
-    expectedException.expectMessage("No route executed");
-    runFlow("twoRoutesRouterNone");
+  public void twoRoutesRouterNone() {
+    var thrown = assertThrows(Exception.class, () -> runFlow("twoRoutesRouterNone"));
+    assertThat(thrown.getCause(), instanceOf(ConnectionException.class));
+    assertThat(thrown.getMessage(), containsString("No route executed"));
+  }
+
+  @Test
+  @Feature(SDK_ROUTERS_LIST_OF_ROUTES)
+  public void listOfRoutesRouterWhen() throws Exception {
+    CoreEvent internalEvent = flowRunner("listOfRoutesRouter")
+        .withVariable("executeWhen1", true)
+        .withVariable("executeWhen2", false)
+        .withVariable("executeWhen3", true)
+        .withVariable("executeOther", false)
+        .run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("mule:set-payload"));
+    assertThat(internalEvent.getVariables().get("newPayload1").getValue(), is("mule:set-payload"));
+    assertThat(internalEvent.getVariables().get("newPayload2"), is(nullValue()));
+    assertThat(internalEvent.getVariables().get("newPayload3"), is(nullValue()));
+  }
+
+  @Test
+  @Feature(SDK_ROUTERS_LIST_OF_ROUTES)
+  public void listOfRoutesRouterOther() throws Exception {
+    CoreEvent internalEvent = flowRunner("listOfRoutesRouter")
+        .withVariable("executeWhen1", false)
+        .withVariable("executeWhen2", false)
+        .withVariable("executeWhen3", false)
+        .withVariable("executeOther", true).run();
+
+    assertThat(internalEvent.getMessage().getPayload().getValue(), is("mule:set-payload"));
+    assertThat(internalEvent.getVariables().get("newPayload1"), is(nullValue()));
+    assertThat(internalEvent.getVariables().get("newPayload2"), is(nullValue()));
+    assertThat(internalEvent.getVariables().get("newPayload3"), is(nullValue()));
+    assertThat(internalEvent.getVariables().get("newAttributes1"), is(nullValue()));
+    assertThat(internalEvent.getVariables().get("newAttributes2"), is(nullValue()));
+    assertThat(internalEvent.getVariables().get("newAttributes3"), is(nullValue()));
   }
 
   @Test
