@@ -53,8 +53,8 @@
             <artifactId>mule-artifact-ast-xml-parser</artifactId>
         </dependency>
         <dependency>
-            <!-- TODO: remove this once and for all, we still require it for the DefaultArtifactTypeLoader and some internals of
-            the execution (see MuleOperationExecutor) -->
+            <!-- TODO W-18813696: remove this once and for all, we still require it for the DefaultArtifactTypeLoader and some
+            internals of the execution (see MuleOperationExecutor) -->
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
             <version>${project.version}</version>

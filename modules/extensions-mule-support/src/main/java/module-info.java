@@ -24,8 +24,8 @@ module org.mule.runtime.extensions.mule.support {
   requires org.mule.runtime.artifact.ast.xmlParser;
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.core;
-  // TODO: remove this once and for all, we still require it for the DefaultArtifactTypeLoader and some internals of the
-  // execution (see MuleOperationExecutor)
+  // TODO W-18813696: remove this once and for all, we still require it for the DefaultArtifactTypeLoader and some internals of
+  // the execution (see MuleOperationExecutor)
   requires org.mule.runtime.extensions.support;
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.spring.config;
