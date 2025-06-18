@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
+import static org.slf4j.LoggerFactory.getLogger;
+import static java.lang.Boolean.getBoolean;
 import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
 import org.mule.oauth.client.api.listener.ClientCredentialsListener;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -23,6 +26,9 @@ import java.util.function.Consumer;
  */
 public class UpdatingClientCredentialsState
     implements ClientCredentialsState, org.mule.sdk.api.connectivity.oauth.ClientCredentialsState {
+
+  private static final Logger LOGGER = getLogger(UpdatingClientCredentialsState.class);
+  private static final boolean INVALIDATE_POTENTIAL_NULL = getBoolean("mule.oauth.token.nullcheck");
 
   private final ClientCredentialsOAuthDancer dancer;
   private ClientCredentialsState delegate;
@@ -38,12 +44,14 @@ public class UpdatingClientCredentialsState
 
       @Override
       public void onTokenRefreshed(ResourceOwnerOAuthContext context) {
+        LOGGER.debug("Token has been refreshed");
         updateDelegate(context);
         onUpdate.accept(context);
       }
 
       @Override
       public void onTokenInvalidated() {
+        LOGGER.debug("Stored token is invalidated");
         invalidated = true;
       }
     };
@@ -51,7 +59,15 @@ public class UpdatingClientCredentialsState
   }
 
   private void updateDelegate(ResourceOwnerOAuthContext initialContext) {
-    delegate = new ImmutableClientCredentialsState(initialContext.getAccessToken(), initialContext.getExpiresIn());
+    String accessToken = initialContext.getAccessToken();
+    String expiresIn = initialContext.getExpiresIn();
+    if (accessToken == null && INVALIDATE_POTENTIAL_NULL) {
+      LOGGER
+          .warn("Null token was set in the ResourceOwnerOAuthContext. Using previous token, and ensuring this state stays invalidated for next attempt");
+      invalidated = true;
+      return;
+    }
+    delegate = new ImmutableClientCredentialsState(accessToken, expiresIn);
     invalidated = false;
   }
 
@@ -59,6 +75,8 @@ public class UpdatingClientCredentialsState
   public String getAccessToken() {
     if (invalidated) {
       try {
+        LOGGER
+            .debug("Stored AccessToken in UpdatingClientCredentialsState was invalidated, retrieving another from the OAuth Dancer");
         dancer.accessToken().get();
         updateDelegate(dancer.getContext());
       } catch (Exception e) {
