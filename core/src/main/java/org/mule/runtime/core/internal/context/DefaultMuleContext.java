@@ -152,7 +152,6 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
 import org.mule.runtime.metrics.api.MeterProvider;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -166,8 +165,6 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.JavaVersion;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
-
-import jakarta.transaction.TransactionManager;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
 
@@ -298,41 +295,47 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
 
   static {
+    registerAllFeatureFlagsIfNeeded();
+  }
+
+  /**
+   * Registers all Feature flags with their conditions if not already configured.
+   *
+   * @since 4.10.0
+   */
+  public static void registerAllFeatureFlagsIfNeeded() {
     if (!areFeatureFlagsConfigured.getAndSet(true)) {
       FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
 
       for (MuleRuntimeFeature feature : MuleRuntimeFeature.values()) {
-        Predicate<FeatureContext> condition;
-
-        // Handle special cases
-        if (feature == MuleRuntimeFeature.UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC) {
-          condition = minMuleVersion(v4_8_0).and(minJavaVersion(JAVA_21));
-        } else if (Arrays.asList(
-                                 MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER,
-                                 MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE,
-                                 MuleRuntimeFeature.DISABLE_OPTIMISED_NOTIFICATION_HANDLER_DYNAMIC_RESOLUTION_UPDATE_BASED_ON_DELEGATE,
-                                 MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC,
-                                 MuleRuntimeFeature.ENABLE_REPEATABLE_STREAMING_BYTES_EAGER_READ)
-            .contains(feature)) {
-          condition = featureContext -> false;
-        } else if (Arrays.asList(
-                                 MuleRuntimeFeature.SUPPRESS_ERRORS,
-                                 MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX)
-            .contains(feature)) {
-          condition = featureContext -> true;
-        } else {
-          // Default case
-          String version = feature.getEnabledByDefaultSince();
-          if (version != null && !version.isEmpty()) {
-            condition = minMuleVersion(new MuleVersion(version.trim()));
-          } else {
-            condition = featureContext -> false;
-          }
-        }
-
+        Predicate<FeatureContext> condition = createFeatureCondition(feature);
         featureFlaggingRegistry.registerFeatureFlag(feature, condition);
       }
     }
+  }
+
+  private static Predicate<FeatureContext> createFeatureCondition(MuleRuntimeFeature feature) {
+    String muleVersion = feature.getEnabledByDefaultSince();
+    String minJavaVersion = feature.getMinJavaVersion();
+
+    if ("Always".equals(muleVersion)) {
+      return featureContext -> true;
+    } else if ("Never".equals(muleVersion)) {
+      return featureContext -> false;
+    }
+
+    Predicate<FeatureContext> condition = null;
+
+    if (muleVersion != null && !muleVersion.trim().isEmpty()) {
+      condition = minMuleVersion(new MuleVersion(muleVersion.trim()));
+    }
+
+    if (minJavaVersion != null && !minJavaVersion.trim().isEmpty() && !"null".equals(minJavaVersion)) {
+      Predicate<FeatureContext> javaCondition = minJavaVersion(JAVA_21);
+      condition = (condition == null) ? javaCondition : condition.and(javaCondition);
+    }
+
+    return (condition != null) ? condition : featureContext -> false;
   }
 
   @Override

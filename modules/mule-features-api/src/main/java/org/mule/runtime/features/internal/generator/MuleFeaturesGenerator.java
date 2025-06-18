@@ -7,20 +7,17 @@
 package org.mule.runtime.features.internal.generator;
 
 import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isFinal;
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+
+import org.mule.runtime.api.config.Feature;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,20 +28,11 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
   private static final String PACKAGE_NAME = "org.mule.runtime.features.api";
   private static final String MULE_FEATURE_CLASS_NAME = "MuleRuntimeFeature";
   private static final Class<?> MULE_API_FEATURE_CLASS;
-  private static final Method GET_ISSUE_ID_METHOD;
-  private static final Method GET_ENABLED_BY_DEFAULT_SINCE_METHOD;
-  private static final Method GET_OVERRIDING_SYSTEM_PROPERTY_NAME_METHOD;
-  private static final Method GET_DESCRIPTION_METHOD;
 
   static {
     try {
       MULE_API_FEATURE_CLASS = Class.forName("org.mule.runtime.api.config.MuleRuntimeFeature");
-      GET_ISSUE_ID_METHOD = MULE_API_FEATURE_CLASS.getMethod("getIssueId");
-      GET_ENABLED_BY_DEFAULT_SINCE_METHOD = MULE_API_FEATURE_CLASS.getMethod("getEnabledByDefaultSince");
-      GET_OVERRIDING_SYSTEM_PROPERTY_NAME_METHOD = MULE_API_FEATURE_CLASS
-          .getMethod("getOverridingSystemPropertyName");
-      GET_DESCRIPTION_METHOD = MULE_API_FEATURE_CLASS.getMethod("getDescription");
-    } catch (ClassNotFoundException | NoSuchMethodException e) {
+    } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
   }
@@ -63,7 +51,7 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
 
   @Override
   protected Set<String> getImports() {
-    HashSet<String> imports = new HashSet<String>();
+    HashSet<String> imports = new HashSet<>();
     imports.add("org.mule.runtime.api.config.Feature");
     imports.add("java.util.Optional");
     imports.addAll(collectImports(originalPropertiesFromMuleApi));
@@ -83,12 +71,13 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
       for (Class<? extends Annotation> annotation : property.getAnnotations()) {
         appendLine(outputStream, "\t@" + annotation.getSimpleName());
       }
-      appendLine(outputStream, format("\t%s(\"%s\", \"%s\", \"%s\", \"%s\"),",
+      appendLine(outputStream, format("\t%s(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\"),",
                                       property.getName(),
                                       property.getDescription(),
                                       property.getIssueId(),
                                       property.getEnabledByDefaultSince(),
-                                      property.getOverridingSystemPropertyName().orElse(null)));
+                                      property.getOverridingSystemPropertyName().orElse(null),
+                                      property.getMinJavaVersion()));
       appendLine(outputStream);
     }
     appendLine(outputStream, "\t;");
@@ -97,13 +86,15 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
     appendLine(outputStream, "\tprivate final String issueId;");
     appendLine(outputStream, "\tprivate final String enabledByDefaultSince;");
     appendLine(outputStream, "\tprivate final String overridingSystemPropertyName;");
+    appendLine(outputStream, "\tprivate final String minJavaVersion;");
     appendLine(outputStream);
     appendLine(outputStream, "\t" + getClassName()
-        + "(String description, String issueId, String enabledByDefaultSince, String overridingSystemPropertyName) {");
+        + "(String description, String issueId, String enabledByDefaultSince, String overridingSystemPropertyName, String minJavaVersion) {");
     appendLine(outputStream, "\t\tthis.description = description;");
     appendLine(outputStream, "\t\tthis.issueId = issueId;");
     appendLine(outputStream, "\t\tthis.enabledByDefaultSince = enabledByDefaultSince;");
     appendLine(outputStream, "\t\tthis.overridingSystemPropertyName = overridingSystemPropertyName;");
+    appendLine(outputStream, "\t\tthis.minJavaVersion = minJavaVersion;");
     appendLine(outputStream, "\t}");
     appendLine(outputStream);
 
@@ -127,42 +118,35 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
                "\tpublic Optional<String> getOverridingSystemPropertyName() {" +
                    "\treturn Optional.ofNullable(overridingSystemPropertyName);" +
                    "\t}");
+    appendLine(outputStream,
+               "\tpublic String getMinJavaVersion() {" +
+                   "\treturn minJavaVersion;" +
+                   "\t}");
     appendLine(outputStream, "}");
   }
 
   private static Set<String> collectImports(List<MuleFeatureDeclaration> properties) {
     return properties.stream().flatMap(prop -> prop.getAnnotations().stream())
-        .filter(MuleFeaturesGenerator::isImportNeeded).map(Class::getName).collect(toSet());
+        .filter(AbstractClassGenerator::isImportNeeded).map(Class::getName).collect(toSet());
   }
 
 
   private static List<MuleFeatureDeclaration> getOriginalFeatureFromMuleApi() {
     Field[] fields = MULE_API_FEATURE_CLASS.getFields();
-    return stream(fields).filter(MuleFeaturesGenerator::isPublicStaticFinalFeature).map(f -> {
-      try {
-        List<Class<? extends Annotation>> annotations = stream(f.getAnnotations())
-            .map(Annotation::annotationType).filter(MuleFeaturesGenerator::isAvailableAnnotation)
-            .collect(toList());
-        return new MuleFeatureDeclaration(f.getName(), f.get(null), annotations);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-    }).collect(toList());
+    return stream(fields).filter(field -> AbstractClassGenerator.isPublicStaticFinalFeature(field, MULE_API_FEATURE_CLASS))
+        .map(f -> {
+          try {
+            List<Class<? extends Annotation>> annotations = stream(f.getAnnotations())
+                .map(Annotation::annotationType).filter(AbstractClassGenerator::isAvailableAnnotation)
+                .collect(toList());
+            return new MuleFeatureDeclaration(f.getName(), f.get(null), annotations);
+          } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+          }
+        }).collect(toList());
   }
 
-  private static boolean isPublicStaticFinalFeature(Field field) {
-    int modifiers = field.getModifiers();
-    return isPublic(modifiers) && isStatic(modifiers) && isFinal(modifiers)
-        && field.getType().equals(MULE_API_FEATURE_CLASS);
-  }
 
-  private static boolean isAvailableAnnotation(Class<? extends Annotation> annotation) {
-    return !annotation.getPackageName().startsWith("org.mule.api.annotation");
-  }
-
-  private static boolean isImportNeeded(Class<?> cls) {
-    return !cls.getPackageName().startsWith("java.lang");
-  }
 
   private static class MuleFeatureDeclaration {
 
@@ -171,45 +155,85 @@ class MuleFeaturesGenerator extends AbstractClassGenerator {
     private final String issueId;
     private final String enabledByDefaultSince;
     private final Optional<String> overridingSystemPropertyName;
+    private final String minJavaVersion;
     private final List<Class<? extends Annotation>> annotations;
 
     public MuleFeatureDeclaration(String name, Object value, List<Class<? extends Annotation>> annotations) {
       this.name = name;
       this.annotations = annotations;
-      try {
-        String rawDescription = (String) GET_DESCRIPTION_METHOD.invoke(value);
-        this.description = rawDescription != null ? rawDescription.replaceAll("\\R", " ").trim() : name;
-        issueId = (String) GET_ISSUE_ID_METHOD.invoke(value);
-        enabledByDefaultSince = (String) GET_ENABLED_BY_DEFAULT_SINCE_METHOD.invoke(value);
-        overridingSystemPropertyName = (Optional<String>) GET_OVERRIDING_SYSTEM_PROPERTY_NAME_METHOD
-            .invoke(value);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      } catch (InvocationTargetException e) {
-        throw new RuntimeException(e.getCause());
-      }
+      
+      Feature feature = (Feature) value;
+
+      String rawDescription = feature.getDescription();
+      this.description = rawDescription != null ? rawDescription.replaceAll("\\R", " ").trim() : name;
+      this.issueId = feature.getIssueId();
+      this.enabledByDefaultSince = feature.getEnabledByDefaultSince();
+      this.overridingSystemPropertyName = feature.getOverridingSystemPropertyName();
+      this.minJavaVersion = feature.getMinJavaVersion();
     }
 
+    /**
+     * Returns the name of the feature flag.
+     *
+     * @return the feature flag name.
+     */
     public String getName() {
       return name;
     }
 
+    /**
+     * Description of the feature.
+     *
+     * @return The feature description.
+     */
     public String getDescription() {
       return description;
     }
 
+    /**
+     * The issue that caused this feature addition.
+     *
+     * @return Issue that motivated the feature.
+     */
     public String getIssueId() {
       return issueId;
     }
 
+    /**
+     * A comma-separated list of versions (must include all the different minors) since this feature will be enabled by default.
+     * Any relevant artifact (application, policy... etc) with a minMuleVersion matching this list will have this {@link Feature}
+     * enabled by default.
+     *
+     * @return A comma-separated list of versions.
+     */
     public String getEnabledByDefaultSince() {
       return enabledByDefaultSince;
     }
 
+    /**
+     * Returns the minimum Java version required for this feature to be enabled.
+     *
+     * @return The minimum Java version required for this feature, or null if there is no minimum version requirement.
+     */
+    public String getMinJavaVersion() {
+      return minJavaVersion;
+    }
+
+    /**
+     * Returns the system property name that can override the feature flag configuration.
+     *
+     * @return Optional containing the system property name, or {@code Optional.empty()} if no override is available
+     * @see Feature#getOverridingSystemPropertyName()
+     */
     public Optional<String> getOverridingSystemPropertyName() {
       return overridingSystemPropertyName;
     }
 
+    /**
+     * Returns the list of annotations applied to this feature declaration.
+     *
+     * @return an immutable list of annotation classes applied to this feature.
+     */
     public List<Class<? extends Annotation>> getAnnotations() {
       return annotations;
     }

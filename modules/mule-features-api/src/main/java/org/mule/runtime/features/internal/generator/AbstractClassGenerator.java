@@ -16,6 +16,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
+
 abstract class AbstractClassGenerator {
 
   private final File outputDir;
@@ -59,5 +66,24 @@ abstract class AbstractClassGenerator {
 
   private static String getLocationFromPackageName(String packageName) {
     return packageName.replace(".", "/");
+  }
+
+  protected static boolean isPublicStaticFinalString(Field field) {
+    int modifiers = field.getModifiers();
+    return isPublic(modifiers) && isStatic(modifiers) && isFinal(modifiers) && field.getType().equals(String.class);
+  }
+
+  protected static boolean isPublicStaticFinalFeature(Field field, Class<?> featureClass) {
+    int modifiers = field.getModifiers();
+    return isPublic(modifiers) && isStatic(modifiers) && isFinal(modifiers)
+        && field.getType().equals(featureClass);
+  }
+
+  protected static boolean isAvailableAnnotation(Class<? extends Annotation> annotation) {
+    return !annotation.getPackageName().startsWith("org.mule.api.annotation");
+  }
+
+  protected static boolean isImportNeeded(Class<?> cls) {
+    return !cls.getPackageName().startsWith("java.lang");
   }
 }

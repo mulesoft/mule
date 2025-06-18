@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.features.internal.generator;
 
-import static java.lang.reflect.Modifier.isFinal;
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -71,36 +68,23 @@ class MuleSystemPropertiesGenerator extends AbstractClassGenerator {
 
   private static Set<String> collectImports(List<MuleSystemPropertyDeclaration> properties) {
     return properties.stream().flatMap(prop -> prop.getAnnotations().stream())
-        .filter(MuleSystemPropertiesGenerator::isImportNeeded).map(Class::getName).collect(toSet());
+        .filter(AbstractClassGenerator::isImportNeeded).map(Class::getName).collect(toSet());
   }
 
   private static List<MuleSystemPropertyDeclaration> getOriginalPropertiesFromMuleApi()
       throws ClassNotFoundException {
     Class<?> muleApiProperties = Class.forName("org.mule.runtime.api.util.MuleSystemProperties");
     Field[] fields = muleApiProperties.getFields();
-    return stream(fields).filter(MuleSystemPropertiesGenerator::isPublicStaticFinalString).map(f -> {
+    return stream(fields).filter(AbstractClassGenerator::isPublicStaticFinalString).map(f -> {
       try {
         List<Class<? extends Annotation>> annotations = stream(f.getAnnotations())
-            .map(Annotation::annotationType).filter(MuleSystemPropertiesGenerator::isAvailableAnnotation)
+            .map(Annotation::annotationType).filter(AbstractClassGenerator::isAvailableAnnotation)
             .collect(toList());
         return new MuleSystemPropertyDeclaration(f.getName(), (String) f.get(null), annotations);
       } catch (IllegalAccessException e) {
         throw new RuntimeException(e);
       }
     }).collect(toList());
-  }
-
-  private static boolean isPublicStaticFinalString(Field field) {
-    int modifiers = field.getModifiers();
-    return isPublic(modifiers) && isStatic(modifiers) && isFinal(modifiers) && field.getType().equals(String.class);
-  }
-
-  private static boolean isAvailableAnnotation(Class<? extends Annotation> annotation) {
-    return !annotation.getPackageName().startsWith("org.mule.api.annotation");
-  }
-
-  private static boolean isImportNeeded(Class<?> cls) {
-    return !cls.getPackageName().startsWith("java.lang");
   }
 
   private static class MuleSystemPropertyDeclaration {
@@ -115,14 +99,29 @@ class MuleSystemPropertiesGenerator extends AbstractClassGenerator {
       this.annotations = annotations;
     }
 
+    /**
+     * Returns the name of the system property constant.
+     *
+     * @return the system property constant name.
+     */
     public String getName() {
       return name;
     }
 
+    /**
+     * Returns the string value of the system property.
+     *
+     * @return the system property value.
+     */
     public String getValue() {
       return value;
     }
 
+    /**
+     * Returns the list of annotations applied to this system property declaration.
+     *
+     * @return an immutable list of annotation classes applied to this system property.
+     */
     public List<Class<? extends Annotation>> getAnnotations() {
       return annotations;
     }
