@@ -21,10 +21,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.jupiter.api.Test;
 
-public class VersionFormatArtifactDescriptorValidatorTestCase extends AbstractMuleTestCase {
+class VersionFormatArtifactDescriptorValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void nullBundleDescriptorVersion() {
+  void nullBundleDescriptorVersion() {
     final var bundleDescriptor = mock(BundleDescriptor.class);
     when(bundleDescriptor.getVersion()).thenReturn(null);
 
@@ -37,7 +37,7 @@ public class VersionFormatArtifactDescriptorValidatorTestCase extends AbstractMu
   }
 
   @Test
-  public void noRevisionBundleDescriptorVersion() {
+  void noRevisionBundleDescriptorVersion() {
     final var bundleDescriptor = mock(BundleDescriptor.class);
     when(bundleDescriptor.getVersion()).thenReturn("4.6");
 
@@ -51,7 +51,7 @@ public class VersionFormatArtifactDescriptorValidatorTestCase extends AbstractMu
   }
 
   @Test
-  public void validationSkipped() {
+  void validationSkipped() {
     final var descriptor = mock(ArtifactDescriptor.class);
     when(descriptor.getBundleDescriptor()).thenReturn(null);
 
@@ -60,7 +60,7 @@ public class VersionFormatArtifactDescriptorValidatorTestCase extends AbstractMu
   }
 
   @Test
-  public void validationNullBundleDescriptor() {
+  void validationNullBundleDescriptor() {
     final var descriptor = mock(ArtifactDescriptor.class);
     when(descriptor.getBundleDescriptor()).thenReturn(null);
 

@@ -21,10 +21,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.jupiter.api.Test;
 
-public class MinMuleVersionArtifactDescriptorValidatorTestCase extends AbstractMuleTestCase {
+class MinMuleVersionArtifactDescriptorValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void validationOk() {
+  void validationOk() {
     final var descriptor = mock(ArtifactDescriptor.class);
     when(descriptor.getMinMuleVersion()).thenReturn(new MuleVersion("4.6"));
     when(descriptor.getName()).thenReturn("test");
@@ -34,7 +34,7 @@ public class MinMuleVersionArtifactDescriptorValidatorTestCase extends AbstractM
   }
 
   @Test
-  public void validationFailure() {
+  void validationFailure() {
     final var descriptor = mock(ArtifactDescriptor.class);
     when(descriptor.getMinMuleVersion()).thenReturn(new MuleVersion("4.99999"));
     when(descriptor.getName()).thenReturn("test");
@@ -42,11 +42,11 @@ public class MinMuleVersionArtifactDescriptorValidatorTestCase extends AbstractM
     final var validator = new MinMuleVersionArtifactDescriptorValidator(false, () -> "4.9");
     var thrown = assertThrows(ArtifactDescriptorCreateException.class, () -> validator.validate(descriptor));
     assertThat(thrown.getMessage(),
-               is("Artifact test requires a newest runtime version. Artifact required version is 4.99999.0 and Mule Runtime version is 4.9.0"));
+               is("Artifact test requires a newer runtime version. Artifact required version is 4.99999.0 and Mule Runtime version is 4.9.0"));
   }
 
   @Test
-  public void validateMinMuleVersionWithSemanticVersion() {
+  void validateMinMuleVersionWithSemanticVersion() {
     final var descriptor = mock(ArtifactDescriptor.class);
     when(descriptor.getMinMuleVersion()).thenReturn(new MuleVersion("4.9.1"));
     when(descriptor.getName()).thenReturn("test");

@@ -23,11 +23,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.jupiter.api.Test;
 
-
-public class MuleProductArtifactDescriptorValidatorTestCase extends AbstractMuleTestCase {
+class MuleProductArtifactDescriptorValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
-  public void supportedProduct() {
+  void supportedProduct() {
     final var descriptor = mock(ArtifactDescriptor.class);
     when(descriptor.getRequiredProduct()).thenReturn(MULE);
 
@@ -36,7 +35,7 @@ public class MuleProductArtifactDescriptorValidatorTestCase extends AbstractMule
   }
 
   @Test
-  public void unsupportedProduct() {
+  void unsupportedProduct() {
     final var descriptor = mock(ArtifactDescriptor.class);
     when(descriptor.getRequiredProduct()).thenReturn(MULE_EE);
 

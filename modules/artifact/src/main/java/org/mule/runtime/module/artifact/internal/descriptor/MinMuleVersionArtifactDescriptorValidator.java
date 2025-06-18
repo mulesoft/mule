@@ -73,7 +73,7 @@ public class MinMuleVersionArtifactDescriptorValidator implements ArtifactDescri
 
   private void doValidation(ArtifactDescriptor descriptor, MuleVersion minMuleVersion, MuleVersion runtimeVersion) {
     if (runtimeVersion.priorTo(minMuleVersion)) {
-      throw new ArtifactDescriptorCreateException(format("Artifact %s requires a newest runtime version. Artifact required version is %s and Mule Runtime version is %s",
+      throw new ArtifactDescriptorCreateException(format("Artifact %s requires a newer runtime version. Artifact required version is %s and Mule Runtime version is %s",
                                                          descriptor.getName(),
                                                          descriptor.getMinMuleVersion().toCompleteNumericVersion(),
                                                          runtimeVersion.toCompleteNumericVersion()));
