@@ -5,6 +5,22 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.annotation.removed",
+            "old": "class org.apache.logging.log4j.Level",
+            "new": "class org.apache.logging.log4j.Level",
+            "annotation": "@aQute.bnd.annotation.baseline.BaselineIgnore(\"2.22.0\")",
+            "justification": "W-18834079: Update log4j2 monorepo to v2.25.0"
+          },
+          {
+            "ignore": true,
+            "code": "java.annotation.added",
+            "old": "class org.apache.logging.log4j.spi.LoggerRegistry<T extends org.apache.logging.log4j.spi.ExtendedLogger>",
+            "new": "class org.apache.logging.log4j.spi.LoggerRegistry<T extends org.apache.logging.log4j.spi.ExtendedLogger>",
+            "annotation": "@org.jspecify.annotations.NullMarked",
+            "justification": "W-18834079: Update log4j2 monorepo to v2.25.0"
+          },
+          {
+            "ignore": true,
             "code": "java.method.varargOverloadsOnlyDifferInVarargParameter",
             "old": "method void org.apache.logging.log4j.LogBuilder::log(java.lang.String, java.lang.Object[])",
             "new": "method void org.apache.logging.log4j.LogBuilder::log(java.lang.String, java.lang.Object[])",
