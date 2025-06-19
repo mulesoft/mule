@@ -18,8 +18,9 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.property.NoImplicitModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
+import org.mule.runtime.extension.api.loader.parser.ConfigurationModelParser;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 
 /**
  * Helper class for declaring configurations through a {@link DefaultExtensionModelLoaderDelegate}
@@ -39,7 +40,7 @@ final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       String configName = resolveConfigName(configParser);
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(configName)
           .describedAs(resolveConfigDescription(configParser, configName))
-          .withModelProperty(configParser.getConfigurationFactoryModelProperty());
+          .withModelProperty(new ConfigurationFactoryModelProperty(configParser.getConfigurationFactory()));
 
       if (configParser.isForceNoImplicit()) {
         configurationDeclarer.withModelProperty(new NoImplicitModelProperty());

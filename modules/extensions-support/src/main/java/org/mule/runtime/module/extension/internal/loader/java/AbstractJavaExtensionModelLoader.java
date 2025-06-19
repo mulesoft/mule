@@ -20,9 +20,6 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.AbstractExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateFactory;
-import org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.DefaultEncodingDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.DsqlDynamicMetadataDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.ExtensionDescriptionsEnricher;
@@ -57,16 +54,14 @@ import org.mule.runtime.module.extension.internal.loader.java.validation.Paramet
 import org.mule.runtime.module.extension.internal.loader.java.validation.PojosModelValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.PrivilegedApiValidator;
 import org.mule.runtime.module.extension.internal.loader.java.validation.SourceCallbacksModelValidator;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserFactory;
 import org.mule.runtime.module.extension.internal.loader.validator.JavaConfigurationModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.JavaConnectionProviderModelValidator;
 import org.mule.runtime.module.extension.internal.loader.validator.DeprecationModelValidator;
-import org.mule.runtime.module.extension.internal.loader.validator.ParameterPluralNameModelValidator;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.BiFunction;
 
 public abstract class AbstractJavaExtensionModelLoader extends AbstractExtensionModelLoader {
 
@@ -91,7 +86,6 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                          new PagedOperationModelValidator(),
                                                                                          new ParameterGroupModelValidator(),
                                                                                          new JavaParameterTypeModelValidator(),
-                                                                                         new ParameterPluralNameModelValidator(),
                                                                                          new JavaOAuthConnectionProviderModelValidator(),
                                                                                          new JavaValueProviderModelValidator(),
                                                                                          new JavaSampleDataModelValidator(),
@@ -120,22 +114,9 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                                new PollingSourceDeclarationEnricher()));
 
   private final String id;
-  private final ModelLoaderDelegateFactory modelLoaderDelegateFactory;
-
-  @Deprecated
-  public AbstractJavaExtensionModelLoader(String id, BiFunction<Class<?>, String, ModelLoaderDelegate> delegate) {
-    this(id, (ModelLoaderDelegateFactory) (extensionElement, version) -> delegate
-        .apply(extensionElement.getDeclaringClass().get(), version));
-  }
-
-  @Deprecated
-  public AbstractJavaExtensionModelLoader(String id, ModelLoaderDelegateFactory modelLoaderDelegateFactory) {
-    this.id = id;
-    this.modelLoaderDelegateFactory = modelLoaderDelegateFactory;
-  }
 
   public AbstractJavaExtensionModelLoader(String id) {
-    this(id, (ModelLoaderDelegateFactory) (e, v) -> new DefaultExtensionModelLoaderDelegate(v));
+    this.id = id;
   }
 
   /**
@@ -164,11 +145,6 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
   @Override
   protected ExtensionModelParserFactory getExtensionModelParserFactory(ExtensionLoadingContext context) {
     return new JavaExtensionModelParserFactory();
-  }
-
-  @Override
-  protected ModelLoaderDelegate getModelLoaderDelegate(ExtensionLoadingContext context, String version) {
-    return modelLoaderDelegateFactory.getLoader(getExtensionElement(context), version);
   }
 
   private Collection<DeclarationEnricher> getPrivilegedDeclarationEnrichers(ExtensionLoadingContext context) {

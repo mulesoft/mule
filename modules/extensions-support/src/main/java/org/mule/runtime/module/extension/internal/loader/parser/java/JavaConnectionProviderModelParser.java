@@ -48,20 +48,20 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
+import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProviderElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultConnectionProviderFactory;
-import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.extension.api.loader.parser.ConnectionProviderModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
 import org.mule.sdk.api.annotation.semantics.connectivity.ExcludeFromConnectivitySchema;
 import org.mule.sdk.api.connectivity.NoConnectivityTest;
 import org.mule.sdk.api.connectivity.XATransactionalConnectionProvider;
@@ -83,17 +83,14 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
 
   private static final String CONNECTION_PROVIDER_NAME = "connection provider";
 
-  private final JavaExtensionModelParser extensionModelParser;
   private final ConnectionProviderElement element;
   private final ExtensionLoadingContext loadingContext;
   private final List<ModelProperty> additionalModelProperties = new LinkedList<>();
   private final ClassLoader extensionClassLoader;
 
-  public JavaConnectionProviderModelParser(JavaExtensionModelParser extensionModelParser,
-                                           ExtensionElement extensionElement,
+  public JavaConnectionProviderModelParser(ExtensionElement extensionElement,
                                            ConnectionProviderElement element,
                                            ExtensionLoadingContext loadingContext) {
-    this.extensionModelParser = extensionModelParser;
     this.element = element;
     this.loadingContext = loadingContext;
     extensionClassLoader = extensionElement.getDeclaringClass()
@@ -140,11 +137,9 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   }
 
   @Override
-  public Optional<ConnectionProviderFactoryModelProperty> getConnectionProviderFactoryModelProperty() {
+  public Optional<ConnectionProviderFactory<?>> getConnectionProviderFactory() {
     return element.getDeclaringClass()
-        .map(declaringClass -> new ConnectionProviderFactoryModelProperty(new DefaultConnectionProviderFactory(
-                                                                                                               declaringClass,
-                                                                                                               extensionClassLoader)));
+        .map(declaringClass -> new DefaultConnectionProviderFactory<>(declaringClass, extensionClassLoader));
   }
 
   @Override
@@ -238,7 +233,7 @@ public class JavaConnectionProviderModelParser implements ConnectionProviderMode
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
     return of(resolveConnectionProviderMinMuleVersion(element));
   }
 

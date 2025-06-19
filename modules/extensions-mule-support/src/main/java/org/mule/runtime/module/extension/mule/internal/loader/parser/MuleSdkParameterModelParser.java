@@ -10,7 +10,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
-import static org.mule.runtime.module.extension.internal.type.catalog.SpecialTypesTypeLoader.VOID;
+import static org.mule.runtime.module.extension.mule.internal.loader.parser.MuleSdkMinMuleVersionParser.MIN_MULE_VERSION_STRING;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -42,12 +42,12 @@ import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
+import org.mule.runtime.extension.api.loader.parser.ParameterModelParser;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,9 +60,10 @@ import java.util.Set;
  */
 public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser implements ParameterModelParser {
 
+  private static final String VOID = "void";
   private static final MetadataTypeEnricher METADATA_TYPE_ENRICHER = new MetadataTypeEnricher();
   private static final Set<TypeAnnotation> METADATA_TYPE_ANNOTATIONS = singleton(new TypedValueTypeAnnotation());
-  private static final String MIN_MULE_VERSION = "4.5";
+  private static final MuleVersion MIN_MULE_VERSION = new MuleVersion(MIN_MULE_VERSION_STRING);
 
   /**
    * {@link MetadataType} representing a {@link ConfigurationProvider}, suitable for config-ref parameters.
@@ -261,10 +262,9 @@ public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(new ResolvedMinMuleVersion(name, new MuleVersion(MIN_MULE_VERSION),
-                                         format("Parameter %s has min mule version %s because the Mule Sdk was introduced in that version.",
-                                                name, MIN_MULE_VERSION)));
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
+    return of(new MuleSdkMinMuleVersionParser(format("Parameter %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                                     name, MIN_MULE_VERSION)));
   }
 
   @Override
@@ -281,4 +281,5 @@ public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser
   public Optional<Pair<Integer, Boolean>> getMetadataKeyPart() {
     return empty();
   }
+
 }

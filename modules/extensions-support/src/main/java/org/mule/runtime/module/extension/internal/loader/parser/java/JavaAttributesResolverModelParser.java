@@ -12,10 +12,9 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetada
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.metadata.MuleAttributesTypeResolverAdapter;
 
 /**

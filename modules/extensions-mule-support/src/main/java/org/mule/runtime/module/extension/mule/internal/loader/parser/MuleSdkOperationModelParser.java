@@ -23,7 +23,7 @@ import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.TypeLoader;
-import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -36,25 +36,23 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ComposedOperationModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.AttributesResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.MediaTypeParser;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
+import org.mule.runtime.extension.api.loader.parser.NestedChainModelParser;
+import org.mule.runtime.extension.api.loader.parser.NestedRouteModelParser;
+import org.mule.runtime.extension.api.loader.parser.OperationModelParser;
+import org.mule.runtime.extension.api.loader.parser.OutputModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.AggregatedErrorsCharacteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
@@ -146,7 +144,7 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return singletonList(new ComposedOperationModelProperty());
+    return emptyList();
   }
 
   @Override
@@ -208,8 +206,8 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   @Override
-  public Optional<CompletableComponentExecutorModelProperty> getExecutorModelProperty() {
-    return of(new CompletableComponentExecutorModelProperty((model, p) -> new MuleOperationExecutor(model)));
+  public Optional<CompletableComponentExecutorFactory<?>> getExecutor() {
+    return of((model, p) -> new MuleOperationExecutor(model));
   }
 
   @Override
@@ -270,12 +268,12 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   @Override
-  public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
+  public Optional<MediaTypeParser> getMediaType() {
     return empty();
   }
 
   @Override
-  public Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty() {
+  public Optional<SdkExceptionHandlerFactory> getExceptionHandlerFactory() {
     return empty();
   }
 
@@ -305,10 +303,9 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(new ResolvedMinMuleVersion(name, new MuleVersion(MIN_MULE_VERSION),
-                                         format("Operation %s has min mule version %s because the Mule Sdk was introduced in that version.",
-                                                name, MIN_MULE_VERSION)));
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
+    return of(new MuleSdkMinMuleVersionParser(format("Operation %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                                     name, MIN_MULE_VERSION)));
   }
 
   @Override
@@ -486,5 +483,8 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   private boolean areAllCharacteristicsWithDefinitiveValue(List<Characteristic<?>> characteristics) {
     return characteristics.stream().allMatch(Characteristic::hasDefinitiveValue);
+  }
+
+  private record DefaultOutputModelParser(MetadataType getType, boolean isDynamic) implements OutputModelParser {
   }
 }

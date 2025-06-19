@@ -31,9 +31,9 @@ import org.mule.runtime.extension.api.declaration.type.annotation.Infrastructure
 import org.mule.runtime.extension.api.declaration.type.annotation.StereotypeTypeAnnotation;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.AllowedStereotypesModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelParser;
+import org.mule.runtime.extension.api.loader.parser.AllowedStereotypesModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterModelParser;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.CustomStereotypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.DefaultStereotypeModelFactory;
 import org.mule.sdk.api.stereotype.ImplicitStereotypeDefinition;

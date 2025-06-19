@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.java.enricher;
+package org.mule.runtime.module.extension.internal.loader.enricher;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -221,7 +221,7 @@ public class MetadataTypeEnricher {
                                          getAllTypeAnnotationsMap());
     }
 
-    private <T extends TypeBuilder & WithAnnotation> MetadataType withNewAnnotations(T builder) {
+    private <T extends TypeBuilder<?> & WithAnnotation<?>> MetadataType withNewAnnotations(T builder) {
       Set<TypeAnnotation> all = getAllTypeAnnotations();
       for (TypeAnnotation typeAnnotation : all) {
         builder.with(typeAnnotation);

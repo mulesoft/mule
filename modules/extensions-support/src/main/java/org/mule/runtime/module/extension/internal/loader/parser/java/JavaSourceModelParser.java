@@ -48,32 +48,32 @@ import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.parser.MediaTypeParser;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.SourceCallbackModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionTypeDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterModelParser;
+import org.mule.runtime.extension.api.loader.parser.SourceModelParser;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.source.JavaSourceModelParserUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.utils.JavaModelLoaderUtils;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSdkSourceFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
@@ -128,11 +128,11 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public Optional<SdkSourceFactoryModelProperty> getSourceFactoryModelProperty() {
+  public Optional<SdkSourceFactory> getSourceFactory() {
     if (sourceClass == null) {
       return empty();
     } else {
-      return of(new SdkSourceFactoryModelProperty(new DefaultSdkSourceFactory(sourceClass)));
+      return of(new DefaultSdkSourceFactory(sourceClass));
     }
   }
 
@@ -168,13 +168,13 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
-    return JavaExtensionModelParserUtils.getMediaTypeModelProperty(sourceElement, "Source", getName());
+  public Optional<MediaTypeParser> getMediaType() {
+    return JavaExtensionModelParserUtils.getMediaType(sourceElement, "Source", getName());
   }
 
   @Override
-  public Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty() {
-    return JavaErrorModelParserUtils.getExceptionHandlerModelProperty(sourceElement, "Source", getName());
+  public Optional<SdkExceptionHandlerFactory> getExceptionHandlerFactory() {
+    return JavaErrorModelParserUtils.getExceptionHandlerFactory(sourceElement, "Source", getName());
   }
 
   @Override
@@ -325,7 +325,7 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
     return of(resolveSourceMinMuleVersion(sourceElement));
   }
 
@@ -366,10 +366,8 @@ public class JavaSourceModelParser extends AbstractJavaExecutableComponentModelP
   private static class JavaSourceCallbackModelParser implements SourceCallbackModelParser {
 
     private final List<ParameterGroupModelParser> groupModelParsers;
-    private final MethodElement<?> methodElement;
 
     public JavaSourceCallbackModelParser(MethodElement<?> methodElement, List<ParameterGroupModelParser> groupModelParsers) {
-      this.methodElement = methodElement;
       this.groupModelParsers = groupModelParsers;
     }
 
