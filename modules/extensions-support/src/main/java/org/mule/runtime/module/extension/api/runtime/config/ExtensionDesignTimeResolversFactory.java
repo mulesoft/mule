@@ -149,4 +149,19 @@ public interface ExtensionDesignTimeResolversFactory {
    */
   <CM extends ComponentModel> MetadataMediator createMetadataMediator(CM componentModel);
 
+  /**
+   * Provides a way to create top level elements to be used in design time.
+   *
+   * @param componentParameterization
+   * @param componentName
+   * @param componentClass
+   * @return
+   * @throws Exception
+   *
+   * @since 4.10, 4.9.7, 4.8.7
+   */
+  Object createTopLevelComponent(ComponentParameterization componentParameterization, String componentName,
+                                 Class<?> componentClass)
+      throws Exception;
+
 }

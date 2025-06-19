@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
@@ -14,6 +16,8 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.ObjectType;
+import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -51,6 +55,7 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProvider
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.api.tooling.sampledata.SampleDataProviderMediator;
@@ -62,12 +67,15 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.Connectio
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
+import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeValueResolverWrapper;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.DefaultValueProviderMediator;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -76,6 +84,9 @@ import jakarta.inject.Inject;
 
 
 public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesignTimeResolversFactory {
+
+  private static final String CHILD_ELEMENT_KEY_PREFIX = "<<";
+  private static final String CHILD_ELEMENT_KEY_SUFFIX = ">>";
 
   @Inject
   private MuleContext muleContext;
@@ -289,6 +300,93 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
   public <CM extends ComponentModel> MetadataMediator createMetadataMediator(CM componentModel) {
     return new DefaultMetadataMediator<>(componentModel,
                                          reflectionCache);
+  }
+
+  @Override
+  public Object createTopLevelComponent(ComponentParameterization componentParameterization, String componentName,
+                                        Class<?> componentClass)
+      throws Exception {
+    ClassLoader classLoader = componentClass.getClassLoader();
+
+    return withContextClassLoader(classLoader, () -> {
+      String parametersOwner = "";
+      ResolverSet resolverSetFromComponentParameterization = getResolverSetFromComponentParameterization(
+                                                                                                         componentParameterization,
+                                                                                                         muleContext,
+                                                                                                         false,
+                                                                                                         reflectionCache,
+                                                                                                         expressionManager,
+                                                                                                         parametersOwner,
+                                                                                                         artifactEncoding);
+      JavaTypeLoader javaTypeLoader = new JavaTypeLoader(classLoader);
+      ObjectType objectType = (ObjectType) javaTypeLoader.load(componentClass);
+      ParametersResolver parametersResolver =
+          parametersResolverFromValues(normalize(resolverSetFromComponentParameterization.getResolvers()), parametersOwner);
+
+      DefaultObjectBuilder builder = new DefaultObjectBuilder<>(componentClass, reflectionCache);
+      resolveParameters(objectType, builder, parametersResolver);
+      resolveParameterGroups(objectType, builder, parametersResolver);
+      builder.setEncoding(artifactEncoding.getDefaultEncoding().name());
+      builder.setName(componentName);
+
+      ValueResolver<Object> resolver = new ObjectBuilderValueResolver<>(builder, muleContext);
+      if (resolver.isDynamic()) {
+        return resolver;
+      }
+
+      CoreEvent initialiserEvent = getNullEvent();
+      try (ValueResolvingContext ctx = ValueResolvingContext.builder(initialiserEvent, expressionManager).build()) {
+        Object staticProduct = resolver.resolve(ctx);
+        muleContext.getInjector().inject(staticProduct);
+        return staticProduct;
+      } finally {
+        if (initialiserEvent != null) {
+          ((BaseEventContext) initialiserEvent.getContext()).success();
+        }
+      }
+    }, Exception.class, exception -> {
+      throw exception;
+    });
+  }
+
+  private void resolveParameterGroups(ObjectType objectType, DefaultObjectBuilder builder,
+                                      ParametersResolver parametersResolver) {
+    parametersResolver.resolveParameterGroups(objectType, builder);
+  }
+
+  private void resolveParameters(ObjectType objectType, DefaultObjectBuilder builder, ParametersResolver parametersResolver) {
+    parametersResolver.resolveParameters(objectType, builder);
+  }
+
+  private ParametersResolver parametersResolverFromValues(Map<String, ValueResolver<?>> resolvers, String parametersOwner) {
+    return ParametersResolver.fromValues(resolvers, muleContext, reflectionCache, expressionManager,
+                                         parametersOwner);
+  }
+
+  private Map<String, ValueResolver<?>> normalize(Map<String, ValueResolver<?>> parameters) {
+    Map<String, ValueResolver<?>> normalized = new HashMap<>();
+    parameters.forEach((key, value) -> {
+      String normalizedKey = key;
+
+      if (isChildKey(key)) {
+        normalizedKey = unwrapChildKey(key);
+        normalized.put(normalizedKey, value);
+      } else {
+        if (!normalized.containsKey(normalizedKey)) {
+          normalized.put(normalizedKey, value);
+        }
+      }
+    });
+
+    return normalized;
+  }
+
+  private static boolean isChildKey(String key) {
+    return key.startsWith(CHILD_ELEMENT_KEY_PREFIX) && key.endsWith(CHILD_ELEMENT_KEY_SUFFIX);
+  }
+
+  private static String unwrapChildKey(String key) {
+    return key.replaceAll(CHILD_ELEMENT_KEY_PREFIX, "").replaceAll(CHILD_ELEMENT_KEY_SUFFIX, "");
   }
 
 }

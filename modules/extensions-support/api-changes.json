@@ -5,6 +5,12 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.addedToInterface",
+            "new": "method java.lang.Object org.mule.runtime.module.extension.api.runtime.config.ExtensionDesignTimeResolversFactory::createTopLevelComponent(org.mule.runtime.api.parameterization.ComponentParameterization, java.lang.String, java.lang.Class<?>) throws java.lang.Exception",
+            "justification": "W-18672633: fix top level elements creation"
+          },
+          {
+            "ignore": true,
             "code": "java.method.exception.runtimeAdded",
             "old": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.io.InputStream)",
             "new": "method org.mule.runtime.module.extension.api.resources.documentation.XmlExtensionDocumentation org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionsSerializer::deserialize(java.io.InputStream) throws org.mule.runtime.module.extension.api.resources.documentation.ExtensionDescriptionSerializerException",
