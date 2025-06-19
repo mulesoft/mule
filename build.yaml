@@ -1,6 +1,6 @@
 upstreamProjects:
   Mule-runtime/metadata-model-api/master-TESTCYCLE-2020-DRY-RUN,
-  Mule-runtime/mule-profiling-api/master,
+  Mule-runtime/mule-profiling-api/master-TESTCYCLE-2020-DRY-RUN,
   Mule-runtime/mule-api/master-TESTCYCLE-2020-DRY-RUN,
   Mule-runtime/mule-extensions-api/master-TESTCYCLE-2020-DRY-RUN,
   Mule-runtime/mule-artifact-ast/master-TESTCYCLE-2020-DRY-RUN,
