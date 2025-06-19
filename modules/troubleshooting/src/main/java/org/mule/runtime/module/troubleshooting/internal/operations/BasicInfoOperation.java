@@ -96,6 +96,15 @@ public class BasicInfoOperation implements TroubleshootingOperation {
           .orElse("n/a");
       writer.write("Running time: %s".formatted(runningTime));
       writer.write(lineSeparator());
+
+      writer.write(lineSeparator());
+      writer.write("Process Information:" + lineSeparator());
+      writer.write("  PID: %d".formatted(ProcessHandle.current().pid()) + lineSeparator());
+
+      writer.write(lineSeparator());
+      writer.write("Report Generation:" + lineSeparator());
+      writer.write("  Report Millis Time: %d".formatted(System.currentTimeMillis()) + lineSeparator());
+      writer.write("  Report Nano Time: %d".formatted(System.nanoTime()) + lineSeparator());
     };
   }
 
