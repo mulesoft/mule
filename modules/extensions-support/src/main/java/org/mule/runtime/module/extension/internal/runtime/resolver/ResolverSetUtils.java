@@ -586,7 +586,7 @@ public class ResolverSetUtils {
   }
 
   private static boolean acceptsReferences(ParameterModel parameterModel) {
-    return parameterModel.getDslConfiguration().allowsReferences();
+    return parameterModel.getDslConfiguration() != null ? parameterModel.getDslConfiguration().allowsReferences() : false;
   }
 
   /**
