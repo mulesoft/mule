@@ -48,43 +48,43 @@ import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.parser.MediaTypeParser;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
+import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
-import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationContainerElement;
 import org.mule.runtime.module.extension.api.loader.java.type.OperationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldOperationParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.NestedChainModelParser;
+import org.mule.runtime.extension.api.loader.parser.NestedRouteModelParser;
+import org.mule.runtime.extension.api.loader.parser.OperationModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaRoutesChainInputTypesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaScopeChainInputTypeResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.Operations;
@@ -376,11 +376,9 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public Optional<CompletableComponentExecutorModelProperty> getExecutorModelProperty() {
-    return operationElement.getMethod().map(method -> new CompletableComponentExecutorModelProperty(
-                                                                                                    new CompletableOperationExecutorFactory(enclosingType
-                                                                                                        .getDeclaringClass()
-                                                                                                        .get(), method)));
+  public Optional<CompletableComponentExecutorFactory<?>> getExecutor() {
+    return operationElement.getMethod()
+        .map(method -> new CompletableOperationExecutorFactory<>(enclosingType.getDeclaringClass().get(), method));
   }
 
   @Override
@@ -429,17 +427,17 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public Optional<MediaTypeModelProperty> getMediaTypeModelProperty() {
-    return JavaExtensionModelParserUtils.getMediaTypeModelProperty(operationElement, "Operation", getName());
+  public Optional<MediaTypeParser> getMediaType() {
+    return JavaExtensionModelParserUtils.getMediaType(operationElement, "Operation", getName());
   }
 
   @Override
-  public Optional<ExceptionHandlerModelProperty> getExceptionHandlerModelProperty() {
-    return JavaErrorModelParserUtils.getExceptionHandlerModelProperty(operationElement, "Operation", getName());
+  public Optional<SdkExceptionHandlerFactory> getExceptionHandlerFactory() {
+    return JavaErrorModelParserUtils.getExceptionHandlerFactory(operationElement, "Operation", getName());
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
     return of(resolveOperationMinMuleVersion(operationElement, this.operationContainer,
                                              getContainerAnnotationMinMuleVersion(extensionElement,
                                                                                   Operations.class,

@@ -25,8 +25,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 
 /**
- * Validates that the classes through which parameter groups are implemented are valid
- * </ul>
+ * Validates that parameters that represent collections have a plural name.
  *
  * @since 4.0
  */

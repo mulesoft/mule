@@ -25,12 +25,15 @@ import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclarer
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser.SourceCallbackModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.AttributesResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.SourceModelParser;
+import org.mule.runtime.extension.api.loader.parser.SourceModelParser.SourceCallbackModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.extension.api.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkSourceFactoryModelProperty;
 
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +95,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
 
       parser.getDeprecationModel().ifPresent(sourceDeclarer::withDeprecation);
       parser.getDisplayModel().ifPresent(d -> sourceDeclarer.getDeclaration().setDisplayModel(d));
-      parser.getSourceFactoryModelProperty().ifPresent(sourceDeclarer::withModelProperty);
+      parser.getSourceFactory().map(SdkSourceFactoryModelProperty::new).ifPresent(sourceDeclarer::withModelProperty);
 
       parser.getOutputType().applyOn(sourceDeclarer.withOutput());
       parser.getAttributesOutputType().applyOn(sourceDeclarer.withOutputAttributes());
@@ -106,8 +109,12 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
 
       loader.getParameterModelsLoaderDelegate().declare(sourceDeclarer, parser.getParameterGroupModelParsers(), context);
 
-      parser.getMediaTypeModelProperty().ifPresent(sourceDeclarer::withModelProperty);
-      parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
+      parser.getMediaType()
+          .map(mediaTypeParser -> new MediaTypeModelProperty(mediaTypeParser.getMimeType(), mediaTypeParser.isStrict()))
+          .ifPresent(sourceDeclarer::withModelProperty);
+      parser.getExceptionHandlerFactory()
+          .map(ExceptionHandlerModelProperty::new)
+          .ifPresent(sourceDeclarer::withModelProperty);
       loader.registerOutputTypes(sourceDeclarer.getDeclaration());
 
       declareMetadataModelProperties(sourceDeclarer.getDeclaration(), outputResolverModelParser,

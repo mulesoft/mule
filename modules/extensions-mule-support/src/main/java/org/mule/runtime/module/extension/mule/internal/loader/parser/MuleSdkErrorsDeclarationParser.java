@@ -21,7 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
 
 import java.util.HashMap;
 import java.util.Map;

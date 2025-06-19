@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static org.mule.runtime.module.extension.internal.loader.utils.ExtensionNamespaceUtils.getExtensionsNamespace;
-import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.MULE_SDK;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
+import static org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework.MULE_SDK;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_CATEGORY_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DESCRIPTION_IDENTIFIER;
@@ -28,16 +27,15 @@ import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.Category;
-import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
-import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
-import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
-import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework;
+import org.mule.runtime.extension.api.loader.parser.ErrorModelParser;
+import org.mule.runtime.extension.api.loader.parser.ExtensionModelParser;
+import org.mule.runtime.extension.api.loader.parser.LicenseModelParser;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
+import org.mule.runtime.extension.api.loader.parser.XmlDslConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +55,7 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   private String vendor;
   private String namespace;
   private Optional<XmlDslConfiguration> xmlDslConfiguration;
-  private LicenseModelProperty licenseModelProperty;
+  private LicenseModelParser licenseModelParser;
   private List<ErrorModelParser> errorModelParsers;
 
   public MuleSdkPluginExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
@@ -97,20 +95,19 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
-    return of(new ResolvedMinMuleVersion(name, new MuleVersion(MIN_MULE_VERSION),
-                                         format("Plugin %s has min mule version %s because the Mule Sdk was introduced in that version.",
-                                                name, MIN_MULE_VERSION)));
-  }
-
-  @Override
-  public LicenseModelProperty getLicenseModelProperty() {
-    return licenseModelProperty;
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
+    return of(new MuleSdkMinMuleVersionParser(format("Plugin %s has min mule version %s because the Mule Sdk was introduced in that version.",
+                                                     name, MIN_MULE_VERSION)));
   }
 
   @Override
   public ExtensionDevelopmentFramework getDevelopmentFramework() {
     return MULE_SDK;
+  }
+
+  @Override
+  public LicenseModelParser getLicensingParser() {
+    return licenseModelParser;
   }
 
   @Override
@@ -129,8 +126,13 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
     parseXmlDslConfiguration(descriptionComponentAst);
     parseLicenseModelProperty(descriptionComponentAst);
 
-    // use dummy version since this is just for obtaining the namespace
-    this.namespace = getExtensionsNamespace(getXmlDslModel(name, "1.0.0", xmlDslConfiguration));
+    // use dummy version since this is just for obtaining the prefix
+    this.namespace = createXmlLanguageModel(xmlDslConfiguration.map(XmlDslConfiguration::getPrefix),
+                                            xmlDslConfiguration.map(XmlDslConfiguration::getNamespace),
+                                            name,
+                                            "1.0.0")
+                                                .getPrefix()
+                                                .toUpperCase();
 
     parseErrorsDeclaration(ast);
   }
@@ -162,7 +164,7 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   }
 
   private void parseLicenseModelProperty(ComponentAst descriptionComponentAst) {
-    licenseModelProperty = getSingleChild(descriptionComponentAst, MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME)
+    licenseModelParser = getSingleChild(descriptionComponentAst, MULE_SDK_EXTENSION_LICENSING_COMPONENT_NAME)
         .map(licensingComponentAst -> {
           boolean requiresEeLicense =
               getParameter(licensingComponentAst, MULE_SDK_EXTENSION_REQUIRES_ENTERPRISE_LICENSE_PARAMETER_NAME);
@@ -170,8 +172,8 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
                                                          MULE_SDK_EXTENSION_ALLOWS_EVALUATION_LICENSE_PARAMETER_NAME);
           Optional<String> requiredEntitlement = getOptionalParameter(licensingComponentAst,
                                                                       MULE_SDK_EXTENSION_REQUIRED_ENTITLEMENT_PARAMETER_NAME);
-          return new LicenseModelProperty(requiresEeLicense, allowsEvaluationLicense, requiredEntitlement);
+          return new MuleSdkLicenseModelParser(requiresEeLicense, allowsEvaluationLicense, requiredEntitlement);
         })
-        .orElse(new LicenseModelProperty(false, true, empty()));
+        .orElse(new MuleSdkLicenseModelParser(false, true, empty()));
   }
 }

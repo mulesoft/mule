@@ -22,16 +22,16 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.runtime.function.FunctionExecutorFactory;
+import org.mule.runtime.extension.api.loader.parser.MinMuleVersionParser;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionContainerElement;
 import org.mule.runtime.module.extension.api.loader.java.type.FunctionElement;
-import org.mule.runtime.module.extension.internal.loader.java.property.FunctionExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.extension.api.loader.parser.FunctionModelParser;
+import org.mule.runtime.extension.api.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.runtime.function.ReflectiveFunctionExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.ExpressionFunctions;
@@ -84,12 +84,10 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
   }
 
   @Override
-  public Optional<FunctionExecutorModelProperty> getFunctionExecutorModelProperty() {
+  public Optional<FunctionExecutorFactory> getFunctionExecutorFactory() {
     if (functionElement.getMethod().isPresent()) {
-      return of(new FunctionExecutorModelProperty(new ReflectiveFunctionExecutorFactory<>(
-                                                                                          functionElement.getDeclaringClass()
-                                                                                              .get(),
-                                                                                          functionElement.getMethod().get())));
+      return of(new ReflectiveFunctionExecutorFactory<>(functionElement.getDeclaringClass().get(),
+                                                        functionElement.getMethod().get()));
     } else {
       return empty();
     }
@@ -140,7 +138,7 @@ public class JavaFunctionModelParser extends AbstractJavaExecutableComponentMode
   }
 
   @Override
-  public Optional<ResolvedMinMuleVersion> getResolvedMinMuleVersion() {
+  public Optional<MinMuleVersionParser> getResolvedMinMuleVersion() {
     return of(resolveFunctionMinMuleVersion(functionElement,
                                             getContainerAnnotationMinMuleVersion(extensionElement,
                                                                                  ExpressionFunctions.class,

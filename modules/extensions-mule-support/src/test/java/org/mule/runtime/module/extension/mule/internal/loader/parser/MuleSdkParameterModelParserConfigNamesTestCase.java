@@ -30,9 +30,9 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
+import org.mule.runtime.extension.api.loader.parser.StereotypeModelFactory;
+import org.mule.runtime.module.extension.internal.loader.enricher.MetadataTypeEnricher;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;

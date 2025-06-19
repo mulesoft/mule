@@ -192,14 +192,9 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.type.catalog to
       org.mule.runtime.extensions.mule.support,
       org.mule.runtime.spring.config;
-  exports org.mule.runtime.module.extension.internal.loader.parser to
-      org.mule.runtime.extensions.mule.support;
   exports org.mule.runtime.module.extension.internal.loader.parser.java.utils to
       org.mule.runtime.extensions.mule.support;
   exports org.mule.runtime.module.extension.internal.loader.parser.java.metadata to
-      org.mule.runtime.extensions.mule.support,
-      org.mule.runtime.extensions.spring.support;
-  exports org.mule.runtime.module.extension.internal.loader.parser.metadata to
       org.mule.runtime.extensions.mule.support,
       org.mule.runtime.extensions.spring.support;
 
@@ -216,5 +211,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
   provides org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactoryDelegate with
       org.mule.runtime.module.extension.internal.metadata.DefaultComponentMetadataConfigurerFactoryDelegate;
+  provides org.mule.runtime.extension.api.loader.delegate.ModelLoaderDelegateFactory with
+      org.mule.runtime.module.extension.internal.loader.delegate.DefaultExtensionModelLoaderDelegateFactory;
 
 }

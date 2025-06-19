@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
+import org.mule.runtime.extension.api.loader.parser.OutputModelParser;
 
 /**
  * Represents a void output type
