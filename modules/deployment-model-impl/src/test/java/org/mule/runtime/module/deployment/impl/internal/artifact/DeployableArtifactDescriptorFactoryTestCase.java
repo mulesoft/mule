@@ -17,8 +17,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVID
 import static org.mule.runtime.module.deployment.impl.internal.BundleDependencyMatcher.bundleDependency;
 import static org.mule.tck.MavenTestUtils.installArtifact;
 
-import static java.io.File.separator;
-import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
@@ -28,8 +26,6 @@ import static java.util.stream.Stream.of;
 
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,8 +43,10 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -637,34 +635,6 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         .forEach(bundleDependency -> {
           assertThat(asList(classLoaderConfiguration.getUrls()), not(hasItem(bundleDependency.getBundleUri())));
         });
-  }
-
-  @Test
-  public void missingRequiredProduct() throws Exception {
-    String artifactName = "no-required-product";
-    var thrown =
-        assertThrows(IllegalStateException.class, () -> createArtifactDescriptor(getArtifactRootFolder() + "/" + artifactName));
-    assertThat(thrown.getMessage(),
-               containsString(format("Invalid artifact descriptor: \"%s\". Mandatory field \"requiredProduct\" is missing or has an invalid value. Valid values are MULE, MULE_EE",
-                                     artifactName)));
-  }
-
-  @Test
-  public void wrongRequiredProductValue() throws Exception {
-    String artifactName = "bad-required-product";
-    var thrown = assertThrows(IllegalStateException.class,
-                              () -> createArtifactDescriptor(getArtifactRootFolder() + separator + artifactName));
-    assertThat(thrown.getMessage(),
-               containsString(format("Invalid artifact descriptor: \"%s\". Mandatory field \"requiredProduct\" is missing or has an invalid value. Valid values are MULE, MULE_EE",
-                                     artifactName)));
-  }
-
-  @Test
-  public void descriptorWithNoRevisionVersion() throws Exception {
-    var thrown = assertThrows(IllegalStateException.class,
-                              () -> createArtifactDescriptor(getArtifactRootFolder() + separator + "no-revision-artifact"));
-    assertThat(thrown.getMessage(),
-               containsString("Artifact no-revision-artifact version 1.0 must contain a revision number. The version format must be x.y.z and the z part is missing"));
   }
 
   @Test

@@ -21,7 +21,7 @@ public interface ArtifactDescriptorValidator {
    * would be thrown.
    *
    * @param descriptor an {@link ArtifactDescriptor} to be validated.
-   * @throws org.mule.runtime.api.exception.MuleRuntimeException
+   * @throws ArtifactDescriptorCreateException
    */
   void validate(ArtifactDescriptor descriptor);
 

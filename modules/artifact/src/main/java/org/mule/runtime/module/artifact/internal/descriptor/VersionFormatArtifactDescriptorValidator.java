@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.artifact.internal.descriptor;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.meta.MuleVersion.NO_REVISION;
-import static org.mule.runtime.api.util.Preconditions.checkState;
+
+import static java.lang.String.format;
+
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 
 /**
@@ -41,12 +43,15 @@ public class VersionFormatArtifactDescriptorValidator implements ArtifactDescrip
 
   private void doValidate(ArtifactDescriptor descriptor) {
     String bundleDescriptorVersion = descriptor.getBundleDescriptor().getVersion();
-    checkState(bundleDescriptorVersion != null,
-               format("No version specified in the bundle descriptor of the artifact %s", descriptor.getName()));
+    if (bundleDescriptorVersion == null) {
+      throw new ArtifactDescriptorCreateException(format("No version specified in the bundle descriptor of the artifact %s",
+                                                         descriptor.getName()));
+    }
     MuleVersion artifactVersion = new MuleVersion(bundleDescriptorVersion);
-    checkState(artifactVersion.getRevision() != NO_REVISION,
-               format("Artifact %s version %s must contain a revision number. The version format must be x.y.z and the z part is missing",
-                      descriptor.getName(), artifactVersion));
+    if (artifactVersion.getRevision() == NO_REVISION) {
+      throw new ArtifactDescriptorCreateException(format("Artifact %s version %s must contain a revision number. The version format must be x.y.z and the z part is missing",
+                                                         descriptor.getName(), artifactVersion));
+    }
   }
 
 }
