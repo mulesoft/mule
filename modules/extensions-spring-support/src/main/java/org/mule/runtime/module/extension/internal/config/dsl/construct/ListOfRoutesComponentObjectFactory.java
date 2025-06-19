@@ -14,7 +14,6 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
-import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -26,7 +25,8 @@ import java.util.List;
 import jakarta.inject.Inject;
 
 /**
- * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements with {@link ListOfRoutersModelProperty}.
+ * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements with
+ * {@link org.mule.runtime.extension.api.property.ListOfRoutesModelProperty}.
  * <p>
  * The objects are parsed as a {@link ValueResolver}.
  *

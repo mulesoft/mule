@@ -36,7 +36,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
+import org.mule.runtime.extension.api.property.ListOfRoutesModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -173,7 +173,7 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   private void generateNestedRouteElement(ExtensionType type, DslElementSyntax routeDsl, NestedRouteModel routeModel) {
-    if (routeModel.getModelProperty(ListOfRoutersModelProperty.class).isPresent()) {
+    if (routeModel.getModelProperty(ListOfRoutesModelProperty.class).isPresent()) {
       TopLevelElement routesWrapperElement = builder.createTopLevelElement(routeDsl.getElementName(),
                                                                            BigInteger.valueOf(routeModel.getMinOccurs()),
                                                                            MAX_ONE);

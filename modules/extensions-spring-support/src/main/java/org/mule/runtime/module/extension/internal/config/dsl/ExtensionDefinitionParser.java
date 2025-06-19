@@ -85,7 +85,7 @@ import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.loader.util.InfrastructureTypeUtils;
 import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
-import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
+import org.mule.runtime.extension.api.property.ListOfRoutesModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.construct.ListOfRoutesComponentParser;
@@ -881,7 +881,7 @@ public abstract class ExtensionDefinitionParser {
     final var tccl = getContextClassLoader();
     final var parserTypeLoader = of(typeLoader);
     try {
-      if (routeModel.getModelProperty(ListOfRoutersModelProperty.class).isPresent()) {
+      if (routeModel.getModelProperty(ListOfRoutesModelProperty.class).isPresent()) {
         new ListOfRoutesComponentParser(definitionBuilder, routeModel, metadataType, tccl, routeDsl,
                                         dslResolver, parsingContext, parserTypeLoader)
                                             .parse()

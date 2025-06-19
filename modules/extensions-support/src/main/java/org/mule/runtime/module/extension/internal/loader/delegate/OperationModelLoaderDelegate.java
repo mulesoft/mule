@@ -29,17 +29,16 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
-import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
 import org.mule.runtime.extension.api.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.extension.api.loader.parser.OperationModelParser;
 import org.mule.runtime.extension.api.loader.parser.metadata.InputResolverModelParser;
 import org.mule.runtime.extension.api.loader.parser.metadata.MetadataKeyModelParser;
 import org.mule.runtime.extension.api.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.extension.api.property.ListOfRoutesModelProperty;
+import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.SdkApiDefinedModelProperty;
 
 import java.util.HashMap;
 import java.util.List;
@@ -195,7 +194,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
             .withMaxOccurs(route.getMaxOccurs().orElse(null));
 
         if (route.isListOfRoutes()) {
-          routeDeclarer.withModelProperty(ListOfRoutersModelProperty.INSTANCE);
+          routeDeclarer.withModelProperty(ListOfRoutesModelProperty.INSTANCE);
         }
         if (route.isSdkApiDefined()) {
           routeDeclarer.withModelProperty(SdkApiDefinedModelProperty.INSTANCE);

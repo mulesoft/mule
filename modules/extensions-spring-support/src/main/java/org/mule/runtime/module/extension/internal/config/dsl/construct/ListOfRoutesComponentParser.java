@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
@@ -33,7 +32,8 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingCon
 import java.util.Optional;
 
 /**
- * A parser which returns the definition parsers for a given {@link NestedRouteModel} with {@link ListOfRoutersModelProperty}
+ * A parser which returns the definition parsers for a given {@link NestedRouteModel} with
+ * {@link org.mule.runtime.extension.api.property.ListOfRoutesModelProperty}
  *
  * @since 4.10
  */

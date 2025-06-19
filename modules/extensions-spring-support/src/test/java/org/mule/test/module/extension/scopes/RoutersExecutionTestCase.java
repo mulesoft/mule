@@ -207,8 +207,8 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Test
   @Feature(SDK_ROUTERS_LIST_OF_ROUTES)
-  public void manyRoutesRouterWhen() throws Exception {
-    CoreEvent internalEvent = flowRunner("manyRoutesRouter")
+  public void listOfRoutesRouterWhen() throws Exception {
+    CoreEvent internalEvent = flowRunner("listOfRoutesRouter")
         .withVariable("executeWhen1", true)
         .withVariable("executeWhen2", false)
         .withVariable("executeWhen3", true)
@@ -223,8 +223,8 @@ public class RoutersExecutionTestCase extends AbstractExtensionFunctionalTestCas
 
   @Test
   @Feature(SDK_ROUTERS_LIST_OF_ROUTES)
-  public void manyRoutesRouterOther() throws Exception {
-    CoreEvent internalEvent = flowRunner("manyRoutesRouter")
+  public void listOfRoutesRouterOther() throws Exception {
+    CoreEvent internalEvent = flowRunner("listOfRoutesRouter")
         .withVariable("executeWhen1", false)
         .withVariable("executeWhen2", false)
         .withVariable("executeWhen3", false)
