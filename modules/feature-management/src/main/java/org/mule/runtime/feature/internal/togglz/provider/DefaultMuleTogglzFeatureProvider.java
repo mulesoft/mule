@@ -41,7 +41,7 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
   public static final String CONSUMER_NAME_MUST_NOT_BE_NULL = "Consumer name must not be null.";
   public static final String FEATURE_NAME_MUST_NOT_BE_NULL = "Feature name must not be null.";
 
-  private final Cache<org.mule.runtime.api.config.Feature, MuleTogglzRuntimeFeature> runtimeFeaturesCache =
+  private final Cache<String, MuleTogglzRuntimeFeature> runtimeFeaturesCache =
       Caffeine.newBuilder().build();
 
   private final Cache<ProfilingEventType<?>, Map<String, MuleTogglzProfilingFeature>> profilingEventTypesFeatures =
@@ -91,14 +91,14 @@ public class DefaultMuleTogglzFeatureProvider implements MuleTogglzFeatureProvid
 
   @Override
   public Feature getRuntimeTogglzFeature(org.mule.runtime.api.config.Feature feature) {
-    return runtimeFeaturesCache.get(feature, ft -> {
+    return runtimeFeaturesCache.get(feature.toString(), ft -> {
       throw new IllegalArgumentException(format(RUNTIME_FEATURE_NOT_REGISTERED, feature));
     });
   }
 
   @Override
   public MuleTogglzRuntimeFeature getOrRegisterRuntimeTogglzFeatureFrom(org.mule.runtime.api.config.Feature feature) {
-    return runtimeFeaturesCache.get(feature, this::newRuntimeTogglzFeature);
+    return runtimeFeaturesCache.get(feature.toString(), key -> newRuntimeTogglzFeature(feature));
   }
 
   private MuleTogglzRuntimeFeature newRuntimeTogglzFeature(org.mule.runtime.api.config.Feature ft) {

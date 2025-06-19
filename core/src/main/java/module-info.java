@@ -74,6 +74,7 @@ module org.mule.runtime.core {
 
   requires org.mule.runtime.featureManagement;
   requires org.mule.runtime.errors;
+  requires org.mule.runtime.features.api;
 
   // reactor and friends
   requires org.reactivestreams;
