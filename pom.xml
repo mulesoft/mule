@@ -177,7 +177,7 @@
 
         <muleAnnotationsApiVersion>1.9.0-20250619</muleAnnotationsApiVersion>
         <mule.module.maven.plugin.version>1.10.0-20250619</mule.module.maven.plugin.version>
-        <mule.extensions.maven.plugin.version>1.10.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.extensions.maven.plugin.version>1.10.0-20250619</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.10.0-20250619</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
 
