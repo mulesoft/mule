@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
@@ -32,13 +33,12 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingCon
 import java.util.Optional;
 
 /**
- * A parser which returns the definition parsers for a given {@link NestedRouteModel}
+ * A parser which returns the definition parsers for a given {@link NestedRouteModel} with {@link ListOfRoutersModelProperty}
  *
- * @since 4.0
+ * @since 4.10
  */
 public class ListOfRoutesComponentParser extends ExtensionDefinitionParser {
 
-  private final Class routeType;
   private final ObjectType metadataType;
   private final ClassLoader classLoader;
   private final DslElementSyntax routeDsl;
@@ -48,7 +48,6 @@ public class ListOfRoutesComponentParser extends ExtensionDefinitionParser {
 
   public ListOfRoutesComponentParser(Builder definition,
                                      NestedRouteModel route,
-                                     Class routeType,
                                      MetadataType metadataType,
                                      ClassLoader classLoader,
                                      DslElementSyntax routeDsl,
@@ -61,7 +60,6 @@ public class ListOfRoutesComponentParser extends ExtensionDefinitionParser {
                   format("Only an ObjectType can be parsed as a TypedParameterGroup, found [%s] instead",
                          metadataType.getClass().getName()));
     this.route = route;
-    this.routeType = routeType;
     this.metadataType = (ObjectType) metadataType;
     this.classLoader = classLoader;
     this.routeDsl = routeDsl;

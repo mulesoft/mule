@@ -882,7 +882,7 @@ public abstract class ExtensionDefinitionParser {
     final var parserTypeLoader = of(typeLoader);
     try {
       if (routeModel.getModelProperty(ListOfRoutersModelProperty.class).isPresent()) {
-        new ListOfRoutesComponentParser(definitionBuilder, routeModel, type, metadataType, tccl, routeDsl,
+        new ListOfRoutesComponentParser(definitionBuilder, routeModel, metadataType, tccl, routeDsl,
                                         dslResolver, parsingContext, parserTypeLoader)
                                             .parse()
                                             .forEach(this::addDefinition);

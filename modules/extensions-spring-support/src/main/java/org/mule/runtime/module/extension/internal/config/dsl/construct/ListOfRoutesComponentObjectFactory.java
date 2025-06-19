@@ -13,8 +13,8 @@ import static org.mule.runtime.core.api.util.func.Once.of;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
+import org.mule.runtime.extension.api.property.ListOfRoutersModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
@@ -22,17 +22,15 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionVal
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
-import java.util.Map;
 
 import jakarta.inject.Inject;
 
 /**
- * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements.
+ * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements with {@link ListOfRoutersModelProperty}.
  * <p>
- * The objects are parsed as a {@link ValueResolver}. If that resolver is not static, then a value is obtained using a default
- * {@link CoreEvent} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
+ * The objects are parsed as a {@link ValueResolver}.
  *
- * @since 4.0
+ * @since 4.10
  */
 public class ListOfRoutesComponentObjectFactory<T> extends AbstractExtensionObjectFactory<Object> {
 
@@ -43,6 +41,7 @@ public class ListOfRoutesComponentObjectFactory<T> extends AbstractExtensionObje
   private final RunOnce initialiser;
   private DefaultObjectBuilder builder;
   private Class<Object> objectClass;
+
   @Inject
   private ReflectionCache reflectionCache;
 
@@ -61,7 +60,6 @@ public class ListOfRoutesComponentObjectFactory<T> extends AbstractExtensionObje
 
   @Override
   public Object doGetObject() throws Exception {
-
     return withContextClassLoader(classLoader, () -> {
       initialiser.runOnce();
 
@@ -74,8 +72,4 @@ public class ListOfRoutesComponentObjectFactory<T> extends AbstractExtensionObje
     });
   }
 
-  @Override
-  public void setParameters(Map<String, Object> parameters) {
-    super.setParameters(parameters);
-  }
 }
