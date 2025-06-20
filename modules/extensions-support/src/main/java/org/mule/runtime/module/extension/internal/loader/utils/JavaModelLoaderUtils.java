@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
@@ -17,6 +18,8 @@ import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
+import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
 
 import java.io.InputStream;
 import java.util.List;
@@ -97,8 +100,26 @@ public class JavaModelLoaderUtils {
    * @return whether the given parameter represents a route
    */
   public static boolean isRoute(ExtensionParameter parameter) {
-    return parameter.getType().isAssignableTo(Route.class)
-        || parameter.getType().isAssignableTo(org.mule.sdk.api.runtime.route.Route.class);
+    return isRoute(parameter.getType())
+        || isRouterListParam(parameter);
+  }
+
+  private static boolean isRoute(Type paramType) {
+    return paramType.isAssignableTo(Route.class)
+        || paramType.isAssignableTo(org.mule.sdk.api.runtime.route.Route.class);
+  }
+
+  private static boolean isRouterListParam(ExtensionParameter parameter) {
+    if (!parameter.getType().isAssignableTo(List.class)) {
+      return false;
+    }
+
+    List<TypeGeneric> generics = parameter.getType().getGenerics();
+    if (generics.isEmpty()) {
+      return false;
+    }
+
+    return isRoute(generics.get(0).getConcreteType());
   }
 
   /**

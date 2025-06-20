@@ -87,4 +87,8 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
     this.extendedExpressionManager = extendedExpressionManager;
   }
 
+  @Override
+  public String toString() {
+    return "TypeSafeExpressionValueResolver: " + expression;
+  }
 }

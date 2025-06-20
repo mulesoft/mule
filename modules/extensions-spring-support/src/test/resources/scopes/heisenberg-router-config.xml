@@ -74,6 +74,29 @@
         </heisenberg:two-routes-router>
     </flow>
 
+    <flow name="listOfRoutesRouter">
+        <heisenberg:many-routes-router processorName="mule:set-payload">
+            <heisenberg:whens>
+                <heisenberg:when message="myString1" execute="#[vars.executeWhen1]">
+                    <set-variable variableName="newPayload1" value="#[payload]" />
+                    <set-variable variableName="newAttributes1" value="#[attributes]" />
+                </heisenberg:when>
+                <heisenberg:when message="myString2" execute="#[vars.executeWhen2]">
+                    <set-variable variableName="newPayload2" value="#[payload]" />
+                    <set-variable variableName="newAttributes2" value="#[attributes]" />
+                </heisenberg:when>
+                <heisenberg:when message="myString3" execute="#[vars.executeWhen3]">
+                    <set-variable variableName="newPayload3" value="#[payload]" />
+                    <set-variable variableName="newAttributes3" value="#[attributes]" />
+                </heisenberg:when>
+            </heisenberg:whens>
+            <heisenberg:other execute="#[vars.executeOther]">
+                <logger />
+            </heisenberg:other>
+        </heisenberg:many-routes-router>
+        <logger />
+    </flow>
+
     <flow name="stereotypedRoutes">
         <set-payload value="someName"/>
         <heisenberg:stereotyped-routes>
