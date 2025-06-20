@@ -115,7 +115,7 @@ public class JavaModelLoaderUtils {
     }
 
     List<TypeGeneric> generics = parameter.getType().getGenerics();
-    if (generics.size() < 1) {
+    if (generics.isEmpty()) {
       return false;
     }
 

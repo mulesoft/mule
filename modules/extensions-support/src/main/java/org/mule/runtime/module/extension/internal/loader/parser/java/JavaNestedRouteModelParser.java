@@ -52,12 +52,12 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
     this.route = route;
     this.loadingContext = loadingContext;
 
-    Class clazz = route.getType().getDeclaringClass().orElse(null);
+    Class<?> clazz = route.getType().getDeclaringClass().orElse(null);
 
     if (clazz != null) {
       if (clazz.isAssignableFrom(List.class)) {
         listOfRoutes = true;
-        Class routeClazz = route.getType().getGenerics().get(0).getConcreteType()
+        Class<?> routeClazz = route.getType().getGenerics().get(0).getConcreteType()
             .getDeclaringClass().orElse(null);
 
         additionalModelProperties.add(new ImplementingTypeModelProperty(routeClazz));

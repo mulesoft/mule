@@ -37,7 +37,7 @@ import java.util.Optional;
  *
  * @since 4.10
  */
-public class ListOfRoutesComponentParser extends ExtensionDefinitionParser {
+public class ListOfRoutesComponentParser<T> extends ExtensionDefinitionParser {
 
   private final ObjectType metadataType;
   private final ClassLoader classLoader;
@@ -70,7 +70,7 @@ public class ListOfRoutesComponentParser extends ExtensionDefinitionParser {
 
   @Override
   protected Builder doParse(Builder definitionBuilder) throws ConfigurationException {
-    Builder finalBuilder = definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed()
+    return definitionBuilder.withIdentifier(name).withNamespace(namespace).asNamed()
         .withTypeDefinition(fromType(ValueResolver.class))
         .withObjectFactoryType(ListOfRoutesComponentObjectFactory.class)
         .withConstructorParameterDefinition(fromFixedValue(route).build())
@@ -78,7 +78,5 @@ public class ListOfRoutesComponentParser extends ExtensionDefinitionParser {
         .withConstructorParameterDefinition(fromFixedValue(classLoader).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withConstructorParameterDefinition(fromChildCollectionConfiguration(ValueResolver.class).build());
-
-    return finalBuilder;
   }
 }

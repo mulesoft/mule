@@ -18,11 +18,8 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
-
-import jakarta.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements with
@@ -32,18 +29,15 @@ import jakarta.inject.Inject;
  *
  * @since 4.10
  */
-public class ListOfRoutesComponentObjectFactory<T> extends AbstractExtensionObjectFactory<Object> {
+public class ListOfRoutesComponentObjectFactory<T> extends AbstractExtensionObjectFactory<CollectionValueResolver<T>> {
 
   private final NestedRouteModel model;
   private final ObjectType objectType;
   private final ClassLoader classLoader;
   private final List<ValueResolver<T>> nestedRoutes;
   private final RunOnce initialiser;
-  private DefaultObjectBuilder builder;
+  private DefaultObjectBuilder<T> builder;
   private Class<Object> objectClass;
-
-  @Inject
-  private ReflectionCache reflectionCache;
 
   public ListOfRoutesComponentObjectFactory(NestedRouteModel model, ObjectType objectType, ClassLoader classLoader,
                                             MuleContext muleContext, List<ValueResolver<T>> nestedRoutes) {
@@ -59,7 +53,7 @@ public class ListOfRoutesComponentObjectFactory<T> extends AbstractExtensionObje
   }
 
   @Override
-  public Object doGetObject() throws Exception {
+  public CollectionValueResolver<T> doGetObject() throws Exception {
     return withContextClassLoader(classLoader, () -> {
       initialiser.runOnce();
 
