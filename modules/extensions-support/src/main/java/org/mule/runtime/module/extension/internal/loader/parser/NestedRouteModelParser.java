@@ -74,13 +74,4 @@ public interface NestedRouteModelParser extends SemanticTermsParser, AllowedSter
    */
   ChainExecutionOccurrence getExecutionOccurrence();
 
-  /**
-   * @return whether the parsed model may be present more than once in its component.
-   *
-   * @since 4.9.7
-   */
-  default boolean isListOfRoutes() {
-    return false;
-  }
-
 }

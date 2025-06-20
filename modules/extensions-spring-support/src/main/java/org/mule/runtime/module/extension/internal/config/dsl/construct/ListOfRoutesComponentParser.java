@@ -6,15 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.construct;
 
+import static java.lang.String.format;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isObjectType;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildCollectionConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromFixedValue;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
-
-import static java.lang.String.format;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -33,7 +32,7 @@ import java.util.Optional;
 
 /**
  * A parser which returns the definition parsers for a given {@link NestedRouteModel} with
- * {@link org.mule.runtime.extension.api.property.ListOfRoutesModelProperty}
+ * {@link NestedRouteModel#getMaxOccurs()} is empty or greater than 1
  *
  * @since 4.10
  */

@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forRoute;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.route.JavaChainParsingUtils.parseChainExecutionOccurrence;
-
-import static java.util.Optional.empty;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -94,7 +95,7 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
 
   @Override
   public Optional<Integer> getMaxOccurs() {
-    return empty();
+    return listOfRoutes ? empty() : of(1);
   }
 
   @Override
@@ -135,11 +136,6 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
   @Override
   public Set<String> getSemanticTerms() {
     return new LinkedHashSet<>();
-  }
-
-  @Override
-  public boolean isListOfRoutes() {
-    return listOfRoutes;
   }
 
   @Override

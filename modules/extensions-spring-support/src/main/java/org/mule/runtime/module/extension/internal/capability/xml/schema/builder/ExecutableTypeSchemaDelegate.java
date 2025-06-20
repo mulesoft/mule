@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.VALIDATOR;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.supportsMultiple;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
@@ -17,9 +21,6 @@ import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConsta
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_VALIDATOR;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.UNBOUNDED;
-
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -36,7 +37,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.api.property.ListOfRoutesModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -173,7 +173,7 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   private void generateNestedRouteElement(ExtensionType type, DslElementSyntax routeDsl, NestedRouteModel routeModel) {
-    if (routeModel.getModelProperty(ListOfRoutesModelProperty.class).isPresent()) {
+    if (supportsMultiple(routeModel)) {
       TopLevelElement routesWrapperElement = builder.createTopLevelElement(routeDsl.getElementName(),
                                                                            BigInteger.valueOf(routeModel.getMinOccurs()),
                                                                            MAX_ONE);

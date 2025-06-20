@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve {@link NestedRouteModel} elements with
- * {@link org.mule.runtime.extension.api.property.ListOfRoutesModelProperty}.
+ * {@link NestedRouteModel#getMaxOccurs()} is empty or greater than 1
  * <p>
  * The objects are parsed as a {@link ValueResolver}.
  *
