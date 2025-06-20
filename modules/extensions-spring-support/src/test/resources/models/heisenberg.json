@@ -46669,7 +46669,7 @@
           "name": "whens",
           "description": "",
           "modelProperties": {
-            "org.mule.runtime.extension.api.property.ListOfRoutersModelProperty": {}
+            "org.mule.runtime.extension.api.property.ListOfRoutesModelProperty": {}
           },
           "childComponents": [
             {
